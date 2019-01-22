@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'apps.oscauth',
     'welcome',
 ]
 
@@ -84,8 +85,22 @@ WSGI_APPLICATION = 'wsgi.application'
 
 from . import database
 
+ORACLE_DATABASE = os.environ['ORACLE_DATABASE']
+ORACLE_USER = os.environ['ORACLE_USER']
+ORACLE_PASSWORD = os.environ['ORACLE_PASSWORD']
+
 DATABASES = {
-    'default': database.config()
+    #'default':{
+    #  'ENGINE': 'django.db.backends.sqlite3',
+    #  'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #  },
+    'default': {
+        'NAME': ORACLE_DATABASE,
+        'ENGINE': 'django.db.backends.oracle',
+        'USER': ORACLE_USER,
+        'PASSWORD': ORACLE_PASSWORD,
+        'TEST': {'NAME':ORACLE_DATABASE}
+    },
 }
 
 
