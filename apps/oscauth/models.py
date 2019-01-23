@@ -8,7 +8,7 @@ class ExternalModel(models.Model):
 class Role(models.Model):
     role = models.CharField(primary_key=True, max_length=30, db_column='role')
     role_description = models.CharField(max_length=2000)
-    is_dept_manager = models.CharField(max_length=1)
+    is_dept_manager = models.NullBooleanField()
     can_add_proxy = models.CharField(max_length=1)
     can_add_nonproxy_users = models.CharField(max_length=1)
     can_submit_orders = models.CharField(max_length=1)
