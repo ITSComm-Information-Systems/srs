@@ -90,11 +90,15 @@ ORACLE_USER = os.environ['ORACLE_USER']
 ORACLE_PASSWORD = os.environ['ORACLE_PASSWORD']
 
 DATABASES = {
-    #'default':{
-    #  'ENGINE': 'django.db.backends.sqlite3',
-    #  'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    #  },
     'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'default',
+        'USER': 'postgres',
+        'PASSWORD': 'magpie',
+        'HOST': 'pgoscdev',
+        #'PORT': '5432',
+    },
+    'pinnacle': {
         'NAME': ORACLE_DATABASE,
         'ENGINE': 'django.db.backends.oracle',
         'USER': ORACLE_USER,
