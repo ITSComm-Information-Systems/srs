@@ -1,19 +1,10 @@
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
-
-from welcome.views import index, health
-from apps.oscauth.views import auth
+from django.urls import path
 
 urlpatterns = [
-    # Examples:
-    # url(r'^$', 'project.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-
-    url(r'^$', index),
-    url(r'^auth/', auth),
-    url(r'^health$', health),
-    url(r'^admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
 ]
 
 if settings.DEBUG:
