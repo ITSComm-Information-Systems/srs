@@ -80,33 +80,46 @@ TEMPLATES = [
 WSGI_APPLICATION = 'wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
 from . import database
 
-ORACLE_DATABASE = os.environ['ORACLE_DATABASE']
-ORACLE_USER = os.environ['ORACLE_USER']
-ORACLE_PASSWORD = os.environ['ORACLE_PASSWORD']
-
 DATABASES = {
-    #'default':{
-    #  'ENGINE': 'django.db.backends.sqlite3',
-    #  'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    #  },
     'default': {
-        'NAME': ORACLE_DATABASE,
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv('DATABASE_NAME','postgres'),
+        'USER': os.getenv('DATABASE_USER','postgres'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD','magpie'),
+        'HOST': os.getenv('DATABASE_SERVICE_NAME','localhost'),
+        #'PORT': '15432',
+    },
+    'pinnacle': {
+        'NAME': os.getenv('ORACLE_DATABASE','pinntst.dsc.umich.edu:1521/pinndev.world'),
         'ENGINE': 'django.db.backends.oracle',
-        'USER': ORACLE_USER,
-        'PASSWORD': ORACLE_PASSWORD,
-        'TEST': {'NAME':ORACLE_DATABASE}
+        'USER': os.getenv('ORACLE_USER','RMTITCOMOSC_DJ_PINNDEV1'),
+        'PASSWORD': os.getenv('ORACLE_PASSWORD','wPJ5edcH'),
+        #'TEST': {'NAME':ORACLE_DATABASE}
     },
 }
 
+DATABASE_ROUTERS = ['project.settings.DBRouter']
+
+class DBRouter(object):
+  def db_for_read(self, model, **hints):
+
+    if model._meta.db_table.startswith('PINN_CUSTOM'):
+      return 'pinnacle'
+    return 'default'
+
+  def db_for_write(self, model, **hints):
+    return 'default'
+
+  def allow_migrate(self, db, app_label, **hints):
+    if db == "pinnacle":
+      return False
+    else:
+      return True
+
 
 # Password validation
-# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -124,8 +137,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.11/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -138,8 +149,6 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
