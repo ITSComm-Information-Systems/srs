@@ -1,34 +1,18 @@
 from django.db import models
 
-class Service(models.Model):
-    name = models.CharField(max_length=20)
+class Cart(models.Model):
+    number = models.IntegerField()
     description = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return self.description
 
-    class Meta:
-        db_table = 'service'
 
-class Action(models.Model):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    name = models.CharField(max_length=20)
-    description = models.CharField(max_length=100)
+class Item(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    service = models.CharField(max_length=10) 
+    service_action = models.CharField(max_length=10) 
+    service_detail = models.CharField(max_length=10) 
+    status = models.CharField(max_length=10) 
 
-    def __str__(self):
-        return self.name
 
-    class Meta:
-        db_table = 'service_action'
-
-class Attribute(models.Model):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    name = models.CharField(max_length=20)
-    description = models.CharField(max_length=100)
-    required = models.BooleanField()
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'service_attribute'
