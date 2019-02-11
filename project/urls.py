@@ -12,8 +12,8 @@ urlpatterns = [
     path('oscauth/', include('oscauth.urls')),
     path('wismo/', include('wismo.urls')),
     path('admin/', admin.site.urls),
+    path('', include('pages.urls')),
 ]
-
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [
