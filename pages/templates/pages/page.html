@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block topnav %}
+<li>
+    {% for page in page_list %}
+       <a href="{{ page.permalink }}">{{ page.title }}</a> |
+    {% endfor %}
+  </li>
+{% endblock topnav %}
+
+
+{% block content %}
+{% autoescape off %}
+{{ content }}
+{% endautoescape %}
+
+<p>
+    Page last updated: {{ last_updated|date:'D d F Y'}}
+</p>
+{% endblock content %}
