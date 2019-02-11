@@ -1,0 +1,35 @@
+{% load staticfiles %}
+<style>
+    .header {
+        height: 85px;
+        background: #00274c;
+    }
+
+    #page-wrapper {
+    margin-top: 0;
+    /* background: #cc0000; */
+    width: 960px;
+    padding: 0 20px 0 20px;
+    /* background: transparent url(/sites/all/themes/zen_services/images/pagebody-bg.png) repeat-y; */
+}
+
+</style>
+<html>
+    <head>
+        <title>OSC Development</title>
+        <link rel="shortcut icon" href="{%  static 'favicon.ico' %}">
+    </head>
+    <body>
+        <div class="header">
+            <a href="/" title="Home" rel="home" id="logo"><img src={%  static 'logo.png' %} alt="Home"></a>
+        </div>
+
+        <div class="content container">
+            <div class="row">
+                <div class="col-md-8">
+                    {% block content %}{% endblock content %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

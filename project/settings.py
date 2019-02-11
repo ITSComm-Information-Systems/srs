@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'project',
     'order',
     'oscauth',
     'pages',
@@ -96,7 +97,13 @@ DATABASES = {
         'ENGINE': 'django.db.backends.oracle',
         'USER': os.getenv('ORACLE_USER','RMTITCOMOSC_DJ_PINNDEV1'),
         'PASSWORD': os.getenv('ORACLE_PASSWORD','wPJ5edcH'),
-        'TEST': {'NAME': 'pinntst.dsc.umich.edu:1521/pinndev.world'}
+        'TEST': {
+          'NAME': 'pinntst.dsc.umich.edu:1521/pinndev.world',
+          'CREATE_DB': False,
+          'CREATE_USER': False,
+          'USER': os.getenv('ORACLE_USER','PINN_CUSTOM'),
+          'PASSWORD': os.getenv('ORACLE_PASSWORD','wpfx8rea'),
+        }
     },
 }
 

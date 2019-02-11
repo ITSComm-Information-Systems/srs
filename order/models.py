@@ -1,6 +1,7 @@
 from django.db import models
 
 class Cart(models.Model):
+    #user = models.CharField(max_length=8)
     number = models.IntegerField()
     description = models.CharField(max_length=100)
 
