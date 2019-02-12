@@ -9,6 +9,9 @@ class Page(models.Model):
     update_date = models.DateTimeField()
     bodytext = models.TextField()
     display_seq_no = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        ordering = ('display_seq_no',)
        
     def __str__(self):
         return self.title

@@ -15,4 +15,4 @@ def index(request, pagename):
         'page_list':  Page.objects.all(),
     }
     # assert False
-    return render(request, 'pages/page.html', context)
+    return render(request, 'base.html', context)
