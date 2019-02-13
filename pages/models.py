@@ -11,7 +11,7 @@ class Page(models.Model):
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
 
     class Meta:
-        ordering = ('display_seq_no',)
+        ordering = ('display_seq_no', 'title')
        
     def __str__(self):
         return self.title
