@@ -8,7 +8,7 @@ class Page(models.Model):
     permalink = models.CharField(unique=True, max_length=12)
     update_date = models.DateTimeField()
     bodytext = models.TextField()
-    display_seq_no = models.IntegerField(blank=True, null=True)
+    display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
 
     class Meta:
         ordering = ('display_seq_no',)
