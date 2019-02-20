@@ -23,11 +23,32 @@
         <div class="header">
             <a href="/" title="Home" rel="home" id="logo"><img src={%  static 'logo.png' %} alt="Home"></a>
         </div>
-
+        <div id="pagemenu">
+            <nav id="nav"> 
+                <ul> 
+                    {% block topnav %}
+                    <li>
+                        {% for page in page_list %}
+                           <a href="{{ page.permalink }}">{{ page.title }}</a> |
+                        {% endfor %}
+                      </li>
+                    {% endblock topnav %}
+                </ul> 
+                </nav> 
+        </div>
+        <!--/pagemenu-->  </div>
         <div class="content container">
             <div class="row">
                 <div class="col-md-8">
-                    {% block content %}{% endblock content %}
+                    {% block content %}
+                    {% autoescape off %}
+                    {{ content }}
+                    {% endautoescape %}
+
+                <p>
+                  Page last updated: {{ last_updated|date:'D d F Y'}}
+                 </p>
+                   {% endblock content %}
                 </div>
             </div>
         </div>
