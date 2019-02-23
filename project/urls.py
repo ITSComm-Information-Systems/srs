@@ -1,21 +1,19 @@
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.urls import path
 
-from welcome.views import index, health
-from apps.oscauth.views import auth
+admin.AdminSite.site_header = 'OSC Administration'
+admin.AdminSite.site_title = 'OSC Site Admin'
 
 urlpatterns = [
-    # Examples:
-    # url(r'^$', 'project.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-
-    url(r'^$', index),
-    url(r'^auth/', auth),
-    url(r'^health$', health),
-    url(r'^admin/', admin.site.urls),
+    path('order/', include('order.urls')),
+    path('pages/', include('pages.urls')),
+    path('oscauth/', include('oscauth.urls')),
+    path('wismo/', include('wismo.urls')),
+    path('admin/', admin.site.urls),
+    path('', include('pages.urls')),
 ]
-
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [

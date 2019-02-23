@@ -1,0 +1,16 @@
+.navbar {
+    background-color: #00274c; 
+}
+
+.dropdown:hover>.dropdown-menu {
+    display: block;
+}
+
+.dropdown>.dropdown-toggle:active {
+    /*Without this, clicking will make it sticky*/
+    pointer-events: none;
+}
+
+h1 {
+    margin-top: 0.5em;
+}
