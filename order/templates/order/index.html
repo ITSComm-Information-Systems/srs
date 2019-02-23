@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if item_list %}
+        <table>
+        {% for item in item_list %}
+            <tr>
+                <td>Number</td>
+                <td>Service</td>
+                <td>Action</td>
+            </tr>
+
+            <tr>
+                <td>{{ item.service }}</td>
+                <td>{{ item.service_action }}</td>
+                <td>{{ item.service_detail }}</td>
+            </tr>
+            
+        {% endfor %}
+        </table>
+    {% else %}
+        <p>No orders are available.</p>
+    {% endif %}
+{% endblock content %}
