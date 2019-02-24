@@ -15,15 +15,15 @@
     integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
   <!-- Custom CSS -->
-  <link rel="stylesheet" type="text/css" href="static/styles.css">
+  <link rel="stylesheet" type="text/css" href="/static/styles.css">
 
   <title>OSC | Home</title>
 </head>
 
 <body>
   <nav class="navbar navbar-expand-xl navbar-dark">
-    <a class="navbar-brand" href="index.html">
-      <img src="static/itcom-homebanner.jpg" alt="ITCOM Logo">
+    <a class="navbar-brand" href="/">
+      <img src="/static/itcom-homebanner.jpg" alt="ITCOM Logo">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarLinks"
       aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,7 +33,7 @@
     <div class="collapse navbar-collapse" id="navbarLinks">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="#navbarServicesTypes" data-toggle="dropdown"
@@ -84,11 +84,11 @@
           <a class="nav-link dropdown-toggle" href="#" id="#navbarSupportOptions" role="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">Support</a>
           <div class="dropdown-menu" aria-labelledby="#navbarSupportOptions">
-            <a class="dropdown-item" href="http://osc-dev.openshift.dsc.umich.edu/intro">Introduction</a>
-            <a class="dropdown-item" href="http://osc-dev.openshift.dsc.umich.edu/howtouse">How to Use</a>
-            <a class="dropdown-item" href="http://osc-dev.openshift.dsc.umich.edu/palo">Placing a large Order</a>
-            <a class="dropdown-item" href="http://osc-dev.openshift.dsc.umich.edu/andb">Authorization and Billing</a>
-            <a class="dropdown-item" href="http://osc-dev.openshift.dsc.umich.edu/contactus">Contact Us</a>
+            <a class="dropdown-item" href="/intro">Introduction</a>
+            <a class="dropdown-item" href="/howtouse">How to Use</a>
+            <a class="dropdown-item" href="/palo">Placing a large Order</a>
+            <a class="dropdown-item" href="/andb">Authorization and Billing</a>
+            <a class="dropdown-item" href="/contactus">Contact Us</a>
           </div>
         </li>
 
@@ -101,6 +101,7 @@
             <a class="dropdown-item" href="#">Manage Access</a> <!-- Link to Manage Access similar to Manage Access in current OSC-->
             <a class="dropdown-item" href="#">My Privileges</a> <!-- Link to view personal profile similar to view my system priveleges in current OSC-->
             <a class="dropdown-item" href="#">ChartField Change Request</a> <!-- Link to view ChartField Change Request app-->
+            <a class="dropdown-item" href="/admin/">Admin</a> <!-- Link to view ChartField Change Request app-->
           </div>
         </li>
 
@@ -108,20 +109,20 @@
     </div>
   </nav>
   <div class="container" role="main">
-    <h1>Title of the Page Goes Here</h1>
+    <h1>{{ title }}</h1>
     <div class="row">
       <div class="col-lg-9">
-        <div class="alert alert-primary" role="alert">
-          <h4 class="alert-heading">This is a bulletin message</h4>
-          <p>Coming Soon - A New version of the Online Service Center stay tuned. </p>
-          <hr>
-          <p>We can hide this message. Just an idea of how we can show bulletins on OSC</p>
-        </div>
-
+        {% block content %}{% endblock content %}
+        {% autoescape off %}
+        {{ content }}
+        {% endautoescape %}
       </div>
 
     </div>
+
+
   </div>
+  
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
