@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
     {% if item_list %}
-        <table>
-        {% for item in item_list %}
+        <table class="table">
             <tr>
-                <td>Number</td>
-                <td>Service</td>
-                <td>Action</td>
+
+                <th>Service</th>
+                <th>Action</th>
+                <th>Number</th>
             </tr>
+            {% for item in item_list %}
+
 
             <tr>
                 <td>{{ item.service }}</td>
@@ -18,6 +20,6 @@
         {% endfor %}
         </table>
     {% else %}
-        <p>No orders are available.</p>
+        <p>Your cart is empty.</p>
     {% endif %}
 {% endblock %}
