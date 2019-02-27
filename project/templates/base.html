@@ -1,56 +1,140 @@
-{% load staticfiles %}
-<style>
-    .header {
-        height: 85px;
-        background: #00274c;
-    }
+<!doctype html>
+<html lang="en">
 
-    #page-wrapper {
-    margin-top: 0;
-    /* background: #cc0000; */
-    width: 960px;
-    padding: 0 20px 0 20px;
-    /* background: transparent url(/sites/all/themes/zen_services/images/pagebody-bg.png) repeat-y; */
-}
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-</style>
-<html>
-    <head>
-        <title>OSC Development</title>
-        <link rel="shortcut icon" href="{%  static 'favicon.ico' %}">
-    </head>
-    <body>
-        <div class="header">
-            <a href="/" title="Home" rel="home" id="logo"><img src={%  static 'logo.png' %} alt="Home"></a>
-        </div>
-        <div id="pagemenu">
-            <nav id="nav"> 
-                <ul> 
-                    {% block topnav %}
-                    <li>
-                        {% for page in page_list %}
-                           <a href="{{ page.permalink }}">{{ page.title }}</a> |
-                        {% endfor %}
-                      </li>
-                    {% endblock topnav %}
-                </ul> 
-                </nav> 
-        </div>
-        <!--/pagemenu-->  </div>
-        <div class="content container">
-            <div class="row">
-                <div class="col-md-8">
-                    {% block content %}
-                    {% autoescape off %}
-                    {{ content }}
-                    {% endautoescape %}
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-                <p>
-                  Page last updated: {{ last_updated|date:'D d F Y'}}
-                 </p>
-                   {% endblock content %}
-                </div>
-            </div>
-        </div>
-    </body>
+  <!-- FontAwesome CSS -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" type="text/css" href="/static/styles.css">
+
+  <title>OSC | Home</title>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-xl navbar-dark">
+    <a class="navbar-brand" href="/">
+      <img src="/static/itcom-homebanner.jpg" alt="ITCOM Logo">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarLinks"
+      aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarLinks">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="#navbarServicesTypes" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">Request Service</a>
+          <div class="dropdown-menu" aria-labelledby="#navbarServicesTypes">
+            <a class="dropdown-item" href="#">Phones</a>
+            <a class="dropdown-item" href="#">Audio/Visual</a>
+            <a class="dropdown-item" href="#">Other</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="#navbarReports" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">Reports</a>
+          <div class="dropdown-menu" aria-labelledby="#navbarReports">
+            <a class="dropdown-item"
+              href="https://osc-nonprod.miserver.it.umich.edu/UofM/WebObjects/OSC-dev-reggie.woa/1/wo/4wNViEKBIwCqv7LX7kW2EM/0.16.3.0.1.5.1">Summary
+              of Charges</a>
+            <a class="dropdown-item"
+              href="https://osc-nonprod.miserver.it.umich.edu/UofM/WebObjects/OSC-dev-reggie.woa/1/wo/LO9UXWSld0uJOKbyeo5yjM/0.16.3.0.1.9">Detail
+              of Charges</a>
+            <a class="dropdown-item" href="https://www.itcom.itd.umich.edu/osc/tollstmts/">Toll Statements</a>
+            <a class="dropdown-item" href="https://www.itcom.itd.umich.edu/osc/invloc/">Inventory and Location
+              Report</a>
+            <a class="dropdown-item"
+              href="https://tableau.dsc.umich.edu/t/UM/views/telecom_dashboard_db_conn_month_actives/DepartmentalTelephoneServiceMetrics?:embed=y&:showShareOptions=true&:display_count=no&:showVizHome=no">Departmental
+              Telephone Service Metrics
+            </a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/orders/cart">Cart</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="#navbarOrderOptions" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Orders
+          </a>
+          <!-- <a class="nav-link" href="orders.html">Orders</a> -->
+          <div class="dropdown-menu" aria-labelledby="#navbarOrderOptions">
+            <a class="dropdown-item" href="#">My Past Orders</a>
+            <a class="dropdown-item" href="#">Department's Past Orders</a>
+          </div>
+        </li>
+
+      </ul>
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="#navbarSupportOptions" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">Support</a>
+          <div class="dropdown-menu" aria-labelledby="#navbarSupportOptions">
+            <a class="dropdown-item" href="/intro">Introduction</a>
+            <a class="dropdown-item" href="/howtouse">How to Use</a>
+            <a class="dropdown-item" href="/palo">Placing a large Order</a>
+            <a class="dropdown-item" href="/andb">Authorization and Billing</a>
+            <a class="dropdown-item" href="/contactus">Contact Us</a>
+          </div>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="#navbarAccountSettings" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Account Settings
+          </a>
+          <div class="dropdown-menu" aria-labelledby="#navbarAccountSettings">
+            <a class="dropdown-item" href="#">Manage Access</a> <!-- Link to Manage Access similar to Manage Access in current OSC-->
+            <a class="dropdown-item" href="#">My Privileges</a> <!-- Link to view personal profile similar to view my system priveleges in current OSC-->
+            <a class="dropdown-item" href="#">ChartField Change Request</a> <!-- Link to view ChartField Change Request app-->
+            <a class="dropdown-item" href="/admin">Admin</a> <!-- Link to view ChartField Change Request app-->
+          </div>
+        </li>
+
+      </ul>
+    </div>
+  </nav>
+  <div class="container" role="main">
+    <h1>{{ title }}</h1>
+    <div class="row">
+      <div class="col-lg-9">
+        {% block content %}{% endblock content %}
+        {% autoescape off %}
+        {{ content }}
+        {% endautoescape %}
+      </div>
+
+    </div>
+
+
+  </div>
+  
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+</body>
+
 </html>
