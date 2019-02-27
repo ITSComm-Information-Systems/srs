@@ -1,0 +1,90 @@
+<p>What type of change are you requesting?</p>
+<div class="btn-group" role="group" id="action-type">
+    <button type="button" class="btn btn-primary" id="add">Add</button>
+    <button type="button" class="btn btn-primary" id="move">Move</button>
+    <button type="button" class="btn btn-primary" id="disconnect">Disconnect</button>
+</div>
+</br>
+<div>
+    <div id="service-type" style="display:none">
+        <hr>
+        <p>What type of service?</p>
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-primary" id="phone">Phone</button>
+            <button type="button" class="btn btn-primary" id="data">Data</button>
+            <button type="button" class="btn btn-primary" id="both">Both</button>
+        </div>
+    </div>
+</div>
+
+<div id="phone" style="display:none">
+    <hr>
+    <div class="input-group mb-3" style="display:none"></div>
+    <div class="input-group-prepend">
+        <span class="input-group-text">Phone Number</span>
+    </div>
+    <select class="form-control">Phone Number<option value="0">1100 N. UNIVERSITY BLDG (1000188)</option>
+        <option>734-222-9302</option>
+        <option>734-333-9302</option>
+        <option>734-444-9302</option>
+        <option>734-555-9302</option>
+        <option>734-666-9302</option>
+        <option>734-777-9302</option>
+        <option>734-867-5309</option>
+    </select>
+</div>
+
+
+<div id="location" style="display:none">
+    <hr>
+    <p id='location-description'></p>
+
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">Campus</span>
+            </div>
+            <select class="form-control">Campus
+                <option disabled selected value> -- select campus -- </option>
+                <option>Ann Arbor</option>
+                <option>Dearborn</option>
+                <option>Flint</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="input-group mb-3" id="building">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Building</span>
+        </div>
+        <select class="form-control">Building<option disabled selected value> -- select building -- </option>
+            <option value="0">1100 N. UNIVERSITY BLDG (1000188)</option>
+            <option value="1">ADMINISTRATIVE SERVICES (1000815)</option>
+            <option value="2">ARBOR LAKES 1 (1008079)</option>
+            <option value="3">ARBOR LAKES 2 (1008080)</option>
+            <option value="4">ARBOR LAKES 3 (1008081)</option>
+            <option value="5">BURSLEY HALL (1000555)</option>
+            <option value="6">FLEMING ADMINISTRATION BU (1000149)</option>
+            <option value="7">OH GEDDES RESIDENCE (1000043)</option>
+            <option value="8">OH VANDENBERG HALL (1000041)</option>
+            <option value="9">PERRY BUILDING (1000890)</option>
+            <option value="10">WOLVERINE TOWER (1008090)</option>
+        </select>
+    </div>
+
+    <div class="input-group mb-3" id="floor">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">Floor</span>
+        </div>
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">Room</span>
+        </div>
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+
+    </div>
+</div>
+
+<hr>
+<button type="button" class="btn btn-outline-primary" id="wf1-next" style="display:none">Next</button>
