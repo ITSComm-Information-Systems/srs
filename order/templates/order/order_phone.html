@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+
+<ul class="nav nav-pills mb-3" id="workflow" role="tablist" style="visibility:hidden">
+    <li class="nav-item" id="wf1">
+        <a class="nav-link active" id="wf-service" data-toggle="pill" href="#pills-home" role="tab"
+            aria-controls="pills-home" aria-selected="true">Service</a>
+    </li>
+    <li class="nav-item" id="wf2">
+        <a class="nav-link" id="wf-equip" data-toggle="pill" href="#pills-profile" role="tab"
+            aria-controls="pills-profile" aria-selected="false">Equipment</a>
+    </li>
+    <li class="nav-item" id="wf3">
+        <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab"
+            aria-controls="pills-contact" aria-selected="false">Extras</a>
+    </li>
+</ul>
+<div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+        {% include 'order/order_phone1.html'%}
+    </div>
+    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+        <p>Select equipment from the following list</p>
+    </div>
+    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+            <p>Select add-ons from the following list</p>
+    </div>
+</div>
+
+
+
+{% endblock %}
+{% block js %}
+<script>
+    $("#action-type").click(function () {
+        $("#service-type").show()
+    });
+    $("#service-type").click(function () {
+        $("#location").show()
+        $("#location-description").text("Location of new service");
+    });
+
+    $("#add").click(function () {
+        $("#service-type").show()
+    });
+    $("#move").click(function () {
+        $("#location-description").text("New Location");
+    });
+    $("#disconnect").click(function () {
+        $("#location-description").text("Location of phone to disconnect");
+    });
+
+    $("#floor").click(function () {
+        $("#wf1-next").show()
+        //$("#location-description").text("Location of phone to disconnect");
+    });
+
+    $("#wf1-next").click(function () {
+        //$("#workflow").show();
+        $("#workflow").css({"visibility":"visible"});
+        $("#workflow").tabs("option", "active", 2);
+        //$("#location-description").text("Location of phone to disconnect");
+    });
+
+</script>
+{% endblock js%}                   
