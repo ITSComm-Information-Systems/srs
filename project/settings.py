@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
         'NAME': os.getenv('DATABASE_NAME','postgres'),
         'USER': os.getenv('DATABASE_USER','postgres'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD','magpie'),
