@@ -86,10 +86,10 @@ WSGI_APPLICATION = 'wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
-        'NAME': os.getenv('DATABASE_NAME','postgres'),
+        'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
         'USER': os.getenv('DATABASE_USER','postgres'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD','magpie'),
-        'HOST': os.getenv('DATABASE_SERVICE_NAME','localhost'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD','w94zLR2dkkfo'),
+        'HOST': os.getenv('DATABASE_SERVICE_NAME','pgoscdev.cvwq7quwqs3k.us-east-2.rds.amazonaws.com'),
         #'PORT': '15432',
     },
     'pinnacle': {
