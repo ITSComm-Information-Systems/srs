@@ -11,6 +11,7 @@ urlpatterns = [
     path('pages/', include('pages.urls')),
     path('oscauth/', include('oscauth.urls')),
     path('wismo/', include('wismo.urls')),
+    path('su/', include('django_su.urls')),
     path('admin/', admin.site.urls),
     path('', include('pages.urls')),
 ]
