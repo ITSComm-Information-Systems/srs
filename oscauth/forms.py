@@ -24,12 +24,12 @@ class UserSuForm(forms.Form):
                 settings, 'AJAX_LOOKUP_CHANNELS', None):
             from ajax_select.fields import AutoCompleteSelectField
 
-            lookup = settings.AJAX_LOOKUP_CHANNELS.get('django_su', None)
+            lookup = settings.AJAX_LOOKUP_CHANNELS.get('oscauth', None)
             if lookup is not None:
                 old_field = self.fields['user']
 
                 self.fields['user'] = AutoCompleteSelectField(
-                    'django_su',
+                    'oscauth',
                     required=old_field.required,
                     label=old_field.label,
                 )
