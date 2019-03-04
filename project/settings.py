@@ -33,7 +33,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'django_su',
     'oscauth',
     'project',
     'django.contrib.admin',
