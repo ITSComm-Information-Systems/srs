@@ -61,7 +61,7 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'django_su.backends.SuBackend',
+    'oscauth.backends.SuBackend',
 ]
 
 ROOT_URLCONF = 'project.urls'
