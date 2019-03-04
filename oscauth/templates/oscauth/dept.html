@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% if dept_list %}
+        <table class="table">
+            <tr>
+
+                <th>User</th>
+                <th>Role</th>
+                <th>Department</th>
+            </tr>
+            {% for dept in dept_list %}
+
+
+            <tr>
+
+                <td>{{ dept.user }}</td>
+                <td>{{ dept.group }}</td>
+                <td>{{ dept.dept }}</td>
+            </tr>
+            
+        {% endfor %}
+        </table>
+    {% else %}
+        <p>End of List.</p>
+    {% endif %}
+{% endblock %}

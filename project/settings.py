@@ -34,6 +34,8 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django_su',
+    'oscauth',
+    'project',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,14 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
-    'project',
     'order',
-    'oscauth',
     'pages',
-    'wismo',
-    'reports.soc',
-    'reports.doc',
-    'reports.toll',
+    'reports',
 ]
 
 MIDDLEWARE = [
