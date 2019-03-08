@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, Group
 
 
 class Role(models.Model):  
+    group = models.OneToOneField(Group, on_delete=models.CASCADE)
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     role = models.CharField(max_length=30,unique=True)
     role_description = models.CharField(max_length=1000)

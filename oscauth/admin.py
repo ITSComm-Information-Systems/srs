@@ -7,7 +7,7 @@ from .models import AuthUserDept
 class RoleAdmin(admin.ModelAdmin):
     list_display = ('role', 'display_seq_no', 'active', 'create_date', 'created_by',  'last_update_date', 'last_updated_by')
     ordering = ('display_seq_no', )
-    fields = ('role', 'display_seq_no', 'active')
+
 
 class AuthUserDeptAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'group', 'dept')
