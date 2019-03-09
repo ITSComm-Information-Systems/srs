@@ -109,6 +109,7 @@
             <a class="dropdown-item" href="/auth/user/{{ user.get_username }}">My Privileges</a> 
             {% if perms.auth %}
               <a class="dropdown-item" href="/auth/dept/1">Manage Access</a> 
+              <a class="dropdown-item" href="/auth/adduser/">Add User</a> 
             {% endif %}
             {% if user.is_superuser %}
               <a class="dropdown-item" href="/admin/">Admin</a>

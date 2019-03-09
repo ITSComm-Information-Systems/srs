@@ -17,10 +17,30 @@ from django.shortcuts import get_object_or_404, render
 
 #from . import get_user_model
 from django.contrib.auth import get_user_model
-from .forms import UserSuForm
-from .utils import su_login_callback, custom_login_action
+from .forms import UserSuForm, AddUserForm
+from .utils import su_login_callback, custom_login_action, get_ldap_user, McUser
 
 
+def get_name(request, parm=1):
+    if request.method == 'POST':
+        form = AddUserForm(request.POST)
+        if form.is_valid():
+            uniqname = form.cleaned_data['uniqname']
+            McUser(uniqname).add_user()
+            return HttpResponseRedirect('/auth/adduser?' + uniqname)
+
+    else:
+        if parm:
+            result = 'User added'
+
+        form = AddUserForm()
+        context = {
+            'result': result,
+            'form': form,
+            'title': 'Add User from MCommunity',
+        }
+
+    return render(request, 'oscauth/add_user.html', context)
  
 def index(request):
     dept_list = AuthUserDept.objects.order_by('-id')
@@ -76,12 +96,6 @@ def login_as_user(request, user_id):
             userobj.last_login = last_login
             userobj.save(update_fields=['last_login'])
 
-    if hasattr(settings, 'SU_REDIRECT_LOGIN'):
-        warnings.warn(
-            "SU_REDIRECT_LOGIN is deprecated, use SU_LOGIN_REDIRECT_URL",
-            DeprecationWarning,
-        )
-
     return HttpResponseRedirect(
         getattr(settings, "SU_LOGIN_REDIRECT_URL", "/"))
 
@@ -131,3 +145,17 @@ def su_logout(request):
 
     return HttpResponseRedirect(
         getattr(settings, "SU_LOGOUT_REDIRECT_URL", "/"))   
+
+def ldap_user(request):
+    user = get_ldap_user('frga')
+    add_user('frga')
+    template = loader.get_template('oscauth/ldap.html')
+    context = {
+        'title': 'User from LDAP',
+        'first': user,
+        'last': 'from ldap',
+        'uniqname': 'from ldap',
+    }
+    return HttpResponse(template.render(context, request))
+
+
