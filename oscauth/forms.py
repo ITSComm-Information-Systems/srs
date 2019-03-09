@@ -6,6 +6,9 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth import get_user_model
 
+class AddUserForm(forms.Form):
+    uniqname = forms.CharField(label='Uniqname', max_length=8)
+
 
 class UserSuForm(forms.Form):
 
@@ -46,3 +49,5 @@ class UserSuForm(forms.Form):
             except ImportError:
                 pass
         return super(UserSuForm, self).__str__()
+
+

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+
+        {{ result }}
+
+        <hr>
+
+        <form action="/auth/adduser/" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input class="btn btn-primary" type="submit" value="Submit">
+        </form>
+
+
+{% endblock %}
