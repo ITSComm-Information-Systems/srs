@@ -12,7 +12,6 @@ class RoleAdmin(admin.ModelAdmin):
 class AuthUserDeptAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'group', 'dept')
     description = 'Users Authorized Departments'
-    actions = None
 
 
 admin.site.register(Role, RoleAdmin)
