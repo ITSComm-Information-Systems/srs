@@ -2,8 +2,6 @@ import warnings
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.template import loader
-from .models import AuthUserDept
-from .models import Role
 
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -12,13 +10,13 @@ from django.contrib.auth import login, authenticate, user_logged_in
 from django.contrib.auth.decorators import user_passes_test
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
-#from django.http import 
 from django.shortcuts import get_object_or_404, render
-
-#from . import get_user_model
 from django.contrib.auth import get_user_model
+
+from .models import AuthUserDept
+from .models import Role
 from .forms import UserSuForm, AddUserForm
-from .utils import su_login_callback, custom_login_action, get_ldap_user, McUser
+from .utils import su_login_callback, custom_login_action, upsert_user
 
 
 def get_name(request, parm=1):
@@ -26,7 +24,7 @@ def get_name(request, parm=1):
         form = AddUserForm(request.POST)
         if form.is_valid():
             uniqname = form.cleaned_data['uniqname']
-            McUser(uniqname).add_user()
+            upsert_user(uniqname)
             return HttpResponseRedirect('/auth/adduser?' + uniqname)
 
     else:
@@ -96,8 +94,7 @@ def login_as_user(request, user_id):
             userobj.last_login = last_login
             userobj.save(update_fields=['last_login'])
 
-    return HttpResponseRedirect(
-        getattr(settings, "SU_LOGIN_REDIRECT_URL", "/"))
+    return HttpResponseRedirect('/')
 
 
 @csrf_protect
@@ -105,20 +102,14 @@ def login_as_user(request, user_id):
 @user_passes_test(su_login_callback)
 def su_login(request, form_class=UserSuForm, template_name='oscauth/su_login.html'):
     form = form_class(request.POST or None)
+    user_list = User.objects.order_by('username')
     if form.is_valid():
         return login_as_user(request, form.get_user().pk)
-    
-    #users = login_as_user(request, form.get_user().pk)
-    #user_list = User.objects.order_by('-id')
-    #context = {
-    #    'title': 'Impersonate User',
-    #    'user_list': user_list,
-    #}
 
-    #template = loader.get_template('oscauth/su_login.html')
-    #return HttpResponse(template.render(context, request))
     return render(request, template_name, {
+        'title': 'Impersonate User',
         'form': form,
+        'user_list': user_list,
     })
 
 
@@ -137,25 +128,8 @@ def su_logout(request):
         login(request, userobj)
     request.session["exit_users_pk"] = exit_users_pk
 
-    if hasattr(settings, 'SU_REDIRECT_EXIT'):
-        warnings.warn(
-            "SU_REDIRECT_EXIT is deprecated, use SU_LOGOUT_REDIRECT_URL",
-            DeprecationWarning,
-        )
-
     return HttpResponseRedirect(
         getattr(settings, "SU_LOGOUT_REDIRECT_URL", "/"))   
 
-def ldap_user(request):
-    user = get_ldap_user('frga')
-    add_user('frga')
-    template = loader.get_template('oscauth/ldap.html')
-    context = {
-        'title': 'User from LDAP',
-        'first': user,
-        'last': 'from ldap',
-        'uniqname': 'from ldap',
-    }
-    return HttpResponse(template.render(context, request))
 
 
