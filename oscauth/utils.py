@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
-
 import warnings
 import collections
+
+from ldap3 import Server, Connection, ALL
+from django.contrib.auth.models import User
 
 from django.conf import settings
 
@@ -33,3 +34,26 @@ def custom_login_action(request, user):
     func(request, user)
 
     return True
+
+def upsert_user(uniqname):
+    # Get User from MCommunity.  Create them in OSC if they are not there otherwise update them.
+    conn = Connection('ldap.umich.edu', auto_bind=True)
+    conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","sn"])
+    
+    if conn.entries:
+        mc_user = conn.entries[0]
+    else:
+        return None
+        
+    try:
+        osc_user = User.objects.get(username=uniqname)
+    except:
+        osc_user = User()
+
+    osc_user.username = mc_user.uid
+    osc_user.last_name = mc_user.sn
+    osc_user.first_name = mc_user.givenName
+    osc_user.email = mc_user.mail
+    osc_user.save()
+
+    return osc_user

@@ -2,8 +2,6 @@ import warnings
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.template import loader
-from .models import AuthUserDept
-from .models import Role
 
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -12,15 +10,35 @@ from django.contrib.auth import login, authenticate, user_logged_in
 from django.contrib.auth.decorators import user_passes_test
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
-#from django.http import 
 from django.shortcuts import get_object_or_404, render
-
-#from . import get_user_model
 from django.contrib.auth import get_user_model
-from .forms import UserSuForm
-from .utils import su_login_callback, custom_login_action
+
+from .models import AuthUserDept
+from .models import Role
+from .forms import UserSuForm, AddUserForm
+from .utils import su_login_callback, custom_login_action, upsert_user
 
 
+def get_name(request, parm=1):
+    if request.method == 'POST':
+        form = AddUserForm(request.POST)
+        if form.is_valid():
+            uniqname = form.cleaned_data['uniqname']
+            upsert_user(uniqname)
+            return HttpResponseRedirect('/auth/adduser?' + uniqname)
+
+    else:
+        if parm:
+            result = 'User added'
+
+        form = AddUserForm()
+        context = {
+            'result': result,
+            'form': form,
+            'title': 'Add User from MCommunity',
+        }
+
+    return render(request, 'oscauth/add_user.html', context)
  
 def index(request):
     dept_list = AuthUserDept.objects.order_by('-id')
@@ -76,14 +94,7 @@ def login_as_user(request, user_id):
             userobj.last_login = last_login
             userobj.save(update_fields=['last_login'])
 
-    if hasattr(settings, 'SU_REDIRECT_LOGIN'):
-        warnings.warn(
-            "SU_REDIRECT_LOGIN is deprecated, use SU_LOGIN_REDIRECT_URL",
-            DeprecationWarning,
-        )
-
-    return HttpResponseRedirect(
-        getattr(settings, "SU_LOGIN_REDIRECT_URL", "/"))
+    return HttpResponseRedirect('/')
 
 
 @csrf_protect
@@ -91,20 +102,14 @@ def login_as_user(request, user_id):
 @user_passes_test(su_login_callback)
 def su_login(request, form_class=UserSuForm, template_name='oscauth/su_login.html'):
     form = form_class(request.POST or None)
+    user_list = User.objects.order_by('username')
     if form.is_valid():
         return login_as_user(request, form.get_user().pk)
-    
-    #users = login_as_user(request, form.get_user().pk)
-    #user_list = User.objects.order_by('-id')
-    #context = {
-    #    'title': 'Impersonate User',
-    #    'user_list': user_list,
-    #}
 
-    #template = loader.get_template('oscauth/su_login.html')
-    #return HttpResponse(template.render(context, request))
     return render(request, template_name, {
+        'title': 'Impersonate User',
         'form': form,
+        'user_list': user_list,
     })
 
 
@@ -123,11 +128,8 @@ def su_logout(request):
         login(request, userobj)
     request.session["exit_users_pk"] = exit_users_pk
 
-    if hasattr(settings, 'SU_REDIRECT_EXIT'):
-        warnings.warn(
-            "SU_REDIRECT_EXIT is deprecated, use SU_LOGOUT_REDIRECT_URL",
-            DeprecationWarning,
-        )
-
     return HttpResponseRedirect(
         getattr(settings, "SU_LOGOUT_REDIRECT_URL", "/"))   
+
+
+
