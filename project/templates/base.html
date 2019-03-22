@@ -42,6 +42,9 @@
             <a class="dropdown-item" href="/orders/phone">Phones</a>
             <a class="dropdown-item" href="#">Audio/Visual</a>
             <a class="dropdown-item" href="#">Other</a>
+            {% for item in menu_list %}
+              <a class="dropdown-item" href="#">{{ item }}</a>
+            {% endfor %}
           </div>
         </li>
         <li class="nav-item dropdown">
