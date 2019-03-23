@@ -41,3 +41,4 @@ class AuthUserDept(models.Model):
 
     class Meta:
         db_table = 'auth_user_dept'
+        unique_together = (("user", "group", "dept"),)
