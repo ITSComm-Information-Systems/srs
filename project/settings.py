@@ -96,10 +96,10 @@ DATABASES = {
         #'PORT': '15432',
     },
     'pinnacle': {
-        'NAME': os.getenv('ORACLE_DATABASE','pinntst.dsc.umich.edu:1521/pinndev.world'),
+        'NAME': os.getenv('ORACLE_DATABASE','pinndev_blade.world'),
         'ENGINE': 'django.db.backends.oracle',
-        'USER': os.getenv('ORACLE_USER','RMTITCOMOSC_DJ_PINNDEV1'),
-        'PASSWORD': os.getenv('ORACLE_PASSWORD','wPJ5edcH'),
+        'USER': os.getenv('ORACLE_USER','PINN_CUSTOM'),
+        'PASSWORD': os.getenv('ORACLE_PASSWORD','wpfx8rea'),
         'TEST': {
           'NAME': 'pinntst.dsc.umich.edu:1521/pinndev.world',
           'CREATE_DB': False,
