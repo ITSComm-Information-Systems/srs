@@ -1,19 +1,13 @@
 from django.db import models
+from oscauth.models import Role
 
 class Step(models.Model):
     name = models.CharField(max_length=20)
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
-    description = models.CharField(max_length=100)
+    label = models.CharField(max_length=80)
 
     def __str__(self):
-        return self.name
-
-class Workflow(models.Model):
-    name = models.CharField(max_length=20)
-    active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name 
+        return self.label
 
 class Product(models.Model):
     name = models.CharField(max_length=20)
@@ -25,7 +19,7 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-class Action(models.Model):
+class Service(models.Model):
     name = models.CharField(max_length=20)
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     active = models.BooleanField(default=True)
@@ -33,19 +27,37 @@ class Action(models.Model):
     def __str__(self):
         return self.name
 
-class Service(models.Model):
+class Feature(models.Model):
     name = models.CharField(max_length=20)
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
+    description = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
-    workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
-    actions = models.ManyToManyField(Action)
-    products = models.ManyToManyField(Product)
+
+    def __str__(self):
+        return self.name
+
+class Action(models.Model):
+    ROUTE_CHOICES = (
+        ('P', 'Preorder'),
+        ('I', 'Incident'),
+        ('E', 'Email'),
+    )
+
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    display_seq_no = models.PositiveIntegerField(blank=True, null=True)
+    active = models.BooleanField(default=True)    
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product, blank=True)
+    features = models.ManyToManyField(Feature, blank=True)
+    steps = models.ManyToManyField(Step)
+    route = models.CharField(max_length=1, choices=ROUTE_CHOICES, default='P')
+    destination = models.CharField(max_length=40, blank=True)
 
     def __str__(self):
         return self.name 
 
 class Cart(models.Model):
-    #user = models.CharField(max_length=8)
     number = models.IntegerField()
     description = models.CharField(max_length=100)
 
@@ -60,3 +72,14 @@ class Item(models.Model):
     status = models.CharField(max_length=10) 
 
 
+class PinnServiceProfile(models.Model):
+    deptid = models.CharField(max_length=20, primary_key=True) 
+    service_number = models.CharField(max_length=20) 
+    service_type = models.CharField(max_length=20) 
+    
+    def __str__(self):
+        return self.service_number
+    
+    class Meta:
+        managed = False
+        db_table = 'PINN_CUSTOM\".\"um_osc_service_profile_v'

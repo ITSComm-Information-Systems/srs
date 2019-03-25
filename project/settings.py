@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'oidc_provider',
     'debug_toolbar',
     'order',
     'pages',
@@ -145,6 +146,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# oidc_provider
+LOGIN_URL = '/accounts/login/'
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
