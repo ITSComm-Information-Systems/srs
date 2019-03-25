@@ -14,7 +14,7 @@ class Product(models.Model):
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     description = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
-    picture = models.ImageField()
+    picture = models.FileField()
 
     def __str__(self):
         return self.name
