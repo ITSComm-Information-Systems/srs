@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'oidc_provider',
+    'mozilla_django_oidc',  # Load after auth
     'debug_toolbar',
     'order',
     'pages',
@@ -61,6 +61,7 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
+    'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
     'oscauth.backends.SuBackend',
 ]
@@ -113,6 +114,15 @@ DATABASES = {
 
 DATABASE_ROUTERS = ['project.settings.DBRouter']
 
+
+# mozilla-django-oidc
+OIDC_RP_CLIENT_ID = os.getenv('OIDC_RP_CLIENT_ID')
+OIDC_RP_CLIENT_SECRET = os.getenv('OIDC_RP_CLIENT_SECRET')
+OIDC_OP_AUTHORIZATION_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/authorize'
+OIDC_OP_TOKEN_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/token'
+OIDC_OP_USER_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/userinfo'
+
+
 class DBRouter(object):
   def db_for_read(self, model, **hints):
 
@@ -145,9 +155,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-# oidc_provider
-LOGIN_URL = '/accounts/login/'
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'

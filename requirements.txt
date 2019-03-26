@@ -5,4 +5,4 @@ psycopg2-binary==2.7.7
 whitenoise==4.1.2
 cx_Oracle==7.0
 ldap3==2.5.2
-django-oidc-provider==0.7.0
+mozilla-django-oidc==1.2.1
