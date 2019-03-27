@@ -116,12 +116,18 @@ DATABASE_ROUTERS = ['project.settings.DBRouter']
 
 
 # mozilla-django-oidc
-OIDC_RP_CLIENT_ID = os.getenv('OIDC_RP_CLIENT_ID')
-OIDC_RP_CLIENT_SECRET = os.getenv('OIDC_RP_CLIENT_SECRET')
-OIDC_OP_AUTHORIZATION_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/authorize'
-OIDC_OP_TOKEN_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/token'
-OIDC_OP_USER_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/userinfo'
+#shib-idp-test.www.umich.edu
+OIDC_RP_CLIENT_ID = 'b976c852-20f0-444c-95f9-5924757143a6'  #os.getenv('OIDC_RP_CLIENT_ID')
+OIDC_RP_CLIENT_SECRET = '4d451a20-1f9f-46a9-b676-5736f5b3c05d' #os.getenv('OIDC_RP_CLIENT_SECRET')
+OIDC_OP_AUTHORIZATION_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/authorize'
+OIDC_OP_TOKEN_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/token'
+OIDC_OP_USER_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/userinfo'
+OIDC_OP_JWKS_ENDPOINT = 'https://shib-idp-test.www.umich.edu/oidc/keyset.jwk'
 
+OIDC_RP_SIGN_ALGO = 'RS256'
+
+LOGIN_REDIRECT_URL = 'http://127.0.0.1:8000'
+LOGOUT_REDIRECT_URL = 'https://osc-dev.its.umich.edu'
 
 class DBRouter(object):
   def db_for_read(self, model, **hints):
