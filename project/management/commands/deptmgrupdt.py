@@ -31,13 +31,6 @@ class Command(BaseCommand):
         auth_removed_count = 0
         auth_not_removed_count = 0
 
-    def get_pinn_match(id,dept):
-        try:
-            pinn_match = PinnDeptMgr.objects.get(dept_mgr_uniqname==username) and PinnDeptMgr.objects.deptid==dept
-            print('Pinnacle match found:   %s' % pinn_match)
-        except:
-            print('get_pinn_match threw an exception:  %s' % pinn_match)
-
         print('Add New Department Managers')
         print('-------------------------------------------')
     
@@ -54,8 +47,13 @@ class Command(BaseCommand):
                     print('User failed MCommunity check: %s' % row.dept_mgr_uniqname)
        
         for row in curr_mgr_list:
-            print('%s  %s' % (row.dept_mgr_uniqname, row.deptid))
-            if (AuthUserDept.user==User.objects.get(username=row.dept_mgr_uniqname).username) and (AuthUserDept.dept==row.deptid) and (AuthUserDept.group == Group.objects.get(name='Department Manager')):
+#            print('%s  %s' % (row.dept_mgr_uniqname, row.deptid))
+            try:
+                pu_id = User.objects.get(username=row.dept_mgr_uniqname).id
+            except User.DoesNotExist:
+                pu_id = None
+
+            if (AuthUserDept.user==pu_id) and (AuthUserDept.dept==row.deptid) and (AuthUserDept.group == Group.objects.get(name='Department Manager')):
 #            if (AuthUserDept.user==User.objects.get(username=row.dept_mgr_uniqname)) & (AuthUserDept.dept == row.deptid) & (AuthUserDept.group == Group.objects.get(name='Department Manager')):
 	            continue
             else:
@@ -87,24 +85,31 @@ class Command(BaseCommand):
         print('-------------------------------------------')
 
         for row in remove_mgr_list:
-#            print('%s' % row.user)
             #if (PinnDeptMgr.dept_mgr_uniqname==User.objects.get(username==row.user).username and PinnDeptMgr.deptid==row.dept):
 #            if (row.user == PinnDeptMgr.dept_mgr_uniqname) & (row.dept == PinnDeptMgr.deptid):
             #    print('Bypass Security for: %s   Dept: %s' % (row.user, row.dept))
             #    continue
             #else:
+#            pinn_match = PinnDeptMgr.objects.get(dept_mgr_uniqname==User.objects.get(id=row.user).username and deptid==row.dept).first()
+
             try:
-#                pinn_match = PinnDeptMgr.objects.filter(dept_mgr_uniqname==User.objects.get(id=row.user).username and deptid==row.dept).first()
-                pinn_match = get_pinn_match(row.user, row.dept)
+                au_uniqname = User.objects.get(username=row.user).username
+            except User.DoesNotExist:
+                au_uniqname = None
+
+            try:
+                au_deptid = PinnDeptMgr.objects.get(deptid=row.dept).deptid
+            except PinnDeptMgr.DoesNotExist:
+                au_deptid = None
+
+            print('%s  %s' % (au_uniqname, au_deptid))
+
+            if PinnDeptMgr.objects.get(dept_mgr_uniqname=au_uniqname) and PinnDeptMgr.objects.get(deptid=au_deptid):
                 auth_not_removed_count = auth_not_removed_count + 1
-                print("Unable to remove Dept Manager role from AuthUserDept for User: %s  Dept: %s" % (row.user, row.dept))
-                    #print('Remove Security for: %s   Dept: %s' % (row.user, row.dept))
-                    #auth_removed_count = auth_removed_count + 1
-            except DoesNotExist:
+                print('Unable to remove Dept Manager role from AuthUserDept for User: %s  Dept: %s' % (row.user, row.dept))          
+            else:
                 print('Remove Security for: %s   Dept: %s' % (row.user, row.dept))
                 auth_removed_count = auth_removed_count + 1
-                    #auth_not_removed_count = auth_not_removed_count + 1
-                    #print("Unable to remove Dept Manager role from AuthUserDept for User: %s  Dept: %s" % (row.user, row.dept))
  
         print('-------------------------------------------')
         print('Records to be removed: %s' % remove_mgr_count) 
