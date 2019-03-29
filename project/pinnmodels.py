@@ -11,7 +11,7 @@ from django.db import models
 
 class UmOscDeptProfileV(models.Model):
    deptid = models.CharField(max_length=15,null=True, primary_key=True)
-   dept_eff_status = models.CharField(max_length=1,null=True)  # I or A
+   dept_eff_status = models.CharField(max_length=1,null=True) 
    dept_name = models.CharField(max_length=50,null=True)
    dept_grp = models.CharField(max_length=20,null=True)
    dept_summary_subscriber_id = models.CharField(max_length=7,null=True)
@@ -27,7 +27,7 @@ class UmOscDeptProfileV(models.Model):
    
    class Meta:
         managed = False
-        ordering = ('dept_name')
+        ordering = ('dept_name', )
         db_table = 'PINN_CUSTOM\".\"um_osc_dept_profile_v'
 
    def __str__(self):
