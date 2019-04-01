@@ -126,7 +126,7 @@ OIDC_RP_CLIENT_SECRET = os.getenv('OIDC_RP_CLIENT_SECRET')
 #OIDC_OP_JWKS_ENDPOINT = 'https://shibboleth.umich.edu/oidc/keyset.jwk'
 
 AUTH_BASE_URL = os.getenv('AUTH_BASE_URL','https://shib-idp-test.www.umich.edu')
-SECURE_SSL_REDIRECT = True
+
 
 OIDC_OP_AUTHORIZATION_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/authorize'
 OIDC_OP_TOKEN_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/token'
