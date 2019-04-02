@@ -3,35 +3,59 @@ from django.forms import ModelForm
 from .models import Product, Service, Action, PinnServiceProfile, Feature
 
 
-class WorkflowForm(forms.Form):
-    service = forms.ModelChoiceField(Service.objects.all(), to_field_name="name")
-    action = forms.ModelChoiceField(Action.objects.all(), to_field_name="name")
-    
-    class Meta:
-        model = Service
-        fields = ('name')
+#class WorkflowForm(forms.Form):
+#    service = forms.ModelChoiceField(Service.objects.all(), to_field_name="name")
+#    action = forms.ModelChoiceField(Action.objects.all(), to_field_name="name")
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['action'].queryset = Action.objects.none()
+ #   class Meta:
+ #       model = Service
+ #       fields = ('name')
+
+  #  def __init__(self, *args, **kwargs):
+  #      super().__init__(*args, **kwargs)
+   #     self.fields['action'].queryset = Action.objects.none()
 
 class FeaturesForm(forms.Form):
     features = forms.ModelMultipleChoiceField(
         queryset=Feature.objects.all(), 
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.CheckboxSelectMultiple(),
     )
-    
+    list = Feature.objects.all()
+    template = 'order/features.html'
+
+    class Meta:
+        model = Feature
+        fields = ('name', 'description',) 
 
 class PhoneForm(forms.Form):
-    phones = PinnServiceProfile.objects.filter(deptid='481054')
-    phone_number = forms.ModelChoiceField(phones)
-    phone_number = forms.ModelChoiceField(phones)
-    #content = forms.Textarea('or search by uniqname')   
-    uniqname = forms.CharField(label='Uniqname', max_length=8)
+    phone_number = forms.CharField(label='Current Phone Number')
+
+
+class ChartfieldForm(forms.Form):
+    occ = forms.CharField(label='OCC', max_length=6)
+    mrc = forms.CharField(label='MRS', max_length=6)
+    local = forms.CharField(label='Local', max_length=6)
+    longdistance = forms.CharField(label='Long Distance', max_length=6)
 
 class ReviewForm(forms.Form):
-    review = forms.CharField(label='Review', max_length=100)
+    comments = forms.CharField(label='Additional Comments', max_length=100)
     review = forms.BooleanField(label='Accept Terms')
+
+class NewLocationForm(forms.Form):
+    label = 'Location Form'
+    campuses= [
+    ('A', 'Ann Arbor'),
+    ('F', 'Flint'),
+    ('D', 'Dearborn'),
+    ]
+    
+    Campus = forms.ChoiceField(choices=campuses)
+    building = forms.CharField(label='Building', max_length=100)
+    floor = forms.CharField(label='Floor', max_length=100)
+    room = forms.CharField(label='Room', max_length=100)
+    jack = forms.BooleanField(label='Is there a Jack at the new location?')
+    conduit = forms.BooleanField(label='Is there a Conduit at the new location?')
+
 
 class EquipmentForm(forms.Form):
     equipment = forms.ModelMultipleChoiceField(
@@ -46,11 +70,13 @@ class LocationForm(forms.Form):
     ('F', 'Flint'),
     ('D', 'Dearborn'),
     ]
-    
+
+    phone_number = forms.CharField(label='Current Phone Number')
     Campus = forms.ChoiceField(choices=campuses)
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
+
 
 
 class ProductForm(ModelForm):
