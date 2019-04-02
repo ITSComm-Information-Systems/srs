@@ -10,4 +10,7 @@ urlpatterns = [
  
     path('ajax/load-actions/', views.load_actions, name='ajax_load_actions'),  # <-- this one here
 
+    path('wf/<int:action_id>', views.get_workflow),
+
+
 ]
