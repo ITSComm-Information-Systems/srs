@@ -1,62 +1,16 @@
 {% extends 'base.html' %}
-
 {% load i18n admin_static %}
 
-
-
-
 {% block content %}
-  <form action="." method="POST">{% csrf_token %}
+
+<form action="." method="POST">{% csrf_token %}
+ 
     {{ form }}
     <div class="submit-row">
       <input type="submit" name="submit" class="btn btn-primary" value="{% trans "Change Login" %}"/>
     </div>
+
   </form>
 
-  <div id="the-basics">
-      <input class="typeahead" type="text" placeholder="Select User">
-
 {% endblock %}
-{% block js %}
 
-      <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
-
-      <script>
-          var substringMatcher = function(strs) {
-            return function findMatches(q, cb) {
-              var matches, substringRegex;
-        
-              // an array that will be populated with substring matches
-              matches = [];
-        
-              // regex used to determine if a string contains the substring `q`
-              substrRegex = new RegExp(q, 'i');
-        
-              // iterate through the pool of strings and for any string that
-              // contains the substring `q`, add it to the `matches` array
-              $.each(strs, function(i, str) {
-                if (substrRegex.test(str)) {
-                  matches.push(str);
-                }
-              });
-        
-              cb(matches);
-            };
-          };
-        
-          var users = ['djamison', 'jwalfish', 'mafaith', 'gregn'];
-        
-          $('#the-basics .typeahead').typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1
-          },
-          {
-            name: 'users',
-            source: substringMatcher(users)
-          });
-        </script>
-
-
-
-{% endblock %}

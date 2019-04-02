@@ -127,7 +127,7 @@ OIDC_RP_CLIENT_SECRET = os.getenv('OIDC_RP_CLIENT_SECRET')
 # Test
 AUTH_BASE_URL = os.getenv('AUTH_BASE_URL','https://shib-idp-test.www.umich.edu')
 
-
+OIDC_CALLBACK = SITE_URL + '/oidc/callback/'
 OIDC_OP_AUTHORIZATION_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/authorize'
 OIDC_OP_TOKEN_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/token'
 OIDC_OP_USER_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/userinfo'
