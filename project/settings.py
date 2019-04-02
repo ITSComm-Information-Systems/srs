@@ -148,6 +148,9 @@ class DBRouter(object):
     return 'default'
 
   def db_for_write(self, model, **hints):
+   
+    if model._meta.db_table.startswith('PINN_CUSTOM'):
+      return 'pinnacle'
     return 'default'
 
   def allow_migrate(self, db, app_label, **hints):
