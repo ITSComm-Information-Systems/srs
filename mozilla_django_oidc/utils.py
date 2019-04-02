@@ -35,9 +35,9 @@ def import_from_settings(attr, *args):
 
 def absolutify(request, path):
     """Return the absolute URL of a path."""
-    print(request.build_absolute_uri(path))
+    #print(request.build_absolute_uri(path))
     #return request.build_absolute_uri(path)
-    return 'https://osc-dev.its.umich.edu/oidc/callback/'
+    return import_from_settings('OIDC_CALLBACK')
 
 # Computed once, reused in every request
 _less_than_django_1_10 = VERSION < (1, 10)
