@@ -37,11 +37,12 @@ INSTALLED_APPS = [
     'project',
     'django.contrib.admin',
     'django.contrib.auth',
+    'mozilla_django_oidc',  # Load after auth
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'mozilla_django_oidc',  # Load after auth
+
     'debug_toolbar',
     'order',
     'pages',
@@ -116,12 +117,28 @@ DATABASE_ROUTERS = ['project.settings.DBRouter']
 
 
 # mozilla-django-oidc
+SITE_URL = os.getenv('SITE_URL')
 OIDC_RP_CLIENT_ID = os.getenv('OIDC_RP_CLIENT_ID')
 OIDC_RP_CLIENT_SECRET = os.getenv('OIDC_RP_CLIENT_SECRET')
-OIDC_OP_AUTHORIZATION_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/authorize'
-OIDC_OP_TOKEN_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/token'
-OIDC_OP_USER_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/userinfo'
+#OIDC_OP_AUTHORIZATION_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/authorize'
+#OIDC_OP_TOKEN_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/token'
+#OIDC_OP_USER_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/userinfo'
+#OIDC_OP_JWKS_ENDPOINT = 'https://shibboleth.umich.edu/oidc/keyset.jwk'
+# Test
+AUTH_BASE_URL = os.getenv('AUTH_BASE_URL','https://shib-idp-test.www.umich.edu')
 
+OIDC_CALLBACK = SITE_URL + '/oidc/callback/'
+OIDC_OP_AUTHORIZATION_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/authorize'
+OIDC_OP_TOKEN_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/token'
+OIDC_OP_USER_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/userinfo'
+OIDC_OP_JWKS_ENDPOINT = 'https://shib-idp-test.www.umich.edu/oidc/keyset.jwk'
+
+#OIDC_AUTHENTICATION_CALLBACK_URL = 'https://osc-dev.its.umich.edu/oidc/callback/'
+
+OIDC_RP_SIGN_ALGO = 'RS256'
+LOGIN_REDIRECT_URL = SITE_URL
+LOGOUT_REDIRECT_URL = SITE_URL
+LOGIN_URL = '/oidc/authenticate'
 
 class DBRouter(object):
   def db_for_read(self, model, **hints):

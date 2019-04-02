@@ -1,31 +1,52 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render
-from order.forms import forms
+from order.forms import *
 
 from .models import Cart, Item, Product, Action, Service, Step
 
-from .forms import WorkflowForm, LocationForm, EquipmentForm, ReviewForm, ProductForm, FeaturesForm, PhoneForm
+#from .forms import WorkflowForm, LocationForm, EquipmentForm, ReviewForm, ProductForm, FeaturesForm, PhoneForm
 
 def add_to_cart(request):
-    print('added to cart')
+    if request.method == "POST":
+        print(request.POST)
+        form = ChartfieldForm(request.POST)
+
+        if form.is_valid():
+            print(form.cleaned_data['occ'])
+
+            c = Cart()
+            c.number = 1
+            c.description = 'New office'
+            c.save()
+
+            i = Item()
+            i.cart = c
+            i.service = 'Phone'
+            i.service_action = 'Add'
+            i.service_detail ='Add Phone'
+            i.status = 'Start'
+            i.save()
+        else:
+            print('bad form')
+    else:
+        form = PostForm()
+
+    #return render(request, 'blog/post_edit.html', {'form': form})
 
     return HttpResponseRedirect('/orders/cart/') 
 
 def get_workflow(request, action_id):
-    form_list = []
-    tab_list = []
 
     tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
+    action = Action.objects.get(id=action_id)
 
     for tab in tabs:
-        tab_list.append(tab.label)
-        form_list.append(globals()[tab.name]) # Get form class name dynamicaly
+        tab.form = globals()[tab.name]
 
     return render(request, 'order/workflow.html', 
-        {'title': 'Place Order',
-        'tab_list': tab_list,
-        'form_list': form_list})
+        {'title': action,
+        'tab_list': tabs})
 
 
 def load_actions(request):
@@ -40,6 +61,7 @@ def load_actions(request):
 
 def cart(request):
     item_list = Item.objects.order_by('-id')
+    print(request.build_absolute_uri())
     template = loader.get_template('order/cart.html')
     context = {
         'title': 'Shopping Cart',
