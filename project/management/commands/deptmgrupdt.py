@@ -6,8 +6,8 @@ from oscauth.models import AuthUserDept
 from django.contrib.auth.models import User, Group
 
 class PinnDeptMgr(models.Model):
-    deptid = models.CharField(max_length=10, primary_key=True) 
-    dept_mgr_uniqname = models.CharField(max_length=20) 
+    deptid = models.CharField(max_length=10) 
+    dept_mgr_uniqname = models.CharField(max_length=20, primary_key=True) 
     
     class Meta:
         managed = False
@@ -17,7 +17,7 @@ class Command(BaseCommand):
     help = 'Update of Department Managers'
 
     def handle(self, *args, **options):
-        curr_mgr_list = PinnDeptMgr.objects.order_by('dept_mgr_uniqname').exclude(dept_mgr_uniqname__isnull=True).filter(dept_mgr_uniqname__startswith='a')
+        curr_mgr_list = PinnDeptMgr.objects.order_by('dept_mgr_uniqname').exclude(dept_mgr_uniqname__isnull=True)  #.filter(dept_mgr_uniqname__startswith='a')
         curr_mgr_count = PinnDeptMgr.objects.exclude(dept_mgr_uniqname__isnull=True).count()
         distinct_users = set(curr_mgr_list)
         distinct_user_count = len(distinct_users)
@@ -33,44 +33,69 @@ class Command(BaseCommand):
 
         print('Add New Department Managers')
         print('-------------------------------------------')
+        print('  ')
+        print('Adding/updating Users...')
+        print('  ')
     
         for row in distinct_users:
             if (User.username == row.dept_mgr_uniqname):
 	            continue
             else:
                 try:
-#                    print("User added or updated: %s" % row.dept_mgr_uniqname)
-#                    osc_user = upsert_user(row.dept_mgr_uniqname)
+                    osc_user = upsert_user(row.dept_mgr_uniqname)
                     user_add_count = user_add_count + 1
                 except:
                     user_not_added_count = user_not_added_count + 1
                     print('User failed MCommunity check: %s' % row.dept_mgr_uniqname)
-       
+
+        print('Adding Department Managers to AuthUserDept...')
+        print('  ')
+
         for row in curr_mgr_list:
-#            print('%s  %s' % (row.dept_mgr_uniqname, row.deptid))
             try:
                 pu_id = User.objects.get(username=row.dept_mgr_uniqname).id
             except User.DoesNotExist:
                 pu_id = None
 
-            if (AuthUserDept.user==pu_id) and (AuthUserDept.dept==row.deptid) and (AuthUserDept.group == Group.objects.get(name='Department Manager')):
-#            if (AuthUserDept.user==User.objects.get(username=row.dept_mgr_uniqname)) & (AuthUserDept.dept == row.deptid) & (AuthUserDept.group == Group.objects.get(name='Department Manager')):
-	            continue
+            try:
+                pu_group = Group.objects.get(name='Department Manager').id
+            except Group.DoesNotExist:
+                pu_group = None
+
+            try:
+                pu_user_group = AuthUserDept.group
+            except AuthUserDept.DoesNotExist:
+                pu_user_group = None
+
+            try:
+#                pu_deptid = AuthUserDept.objects.get(dept=row.deptid).dept
+                pu_deptid = AuthUserDept.objects.filter(dept=row.deptid).values('dept').distinct()
+            except AuthUserDept.DoesNotExist:
+                pu_deptid = None
+
+            if pu_id is None:
+                print('No User record for: %s' % row.dept_mgr_uniqname)
+                auth_not_added_count = auth_not_added_count + 1
+                continue
             else:
-                try:
-#                    print(User.objects.get(username=row.dept_mgr_uniqname).username)
-#                    print('Add Security for: %s   Dept: %s' % (row.dept_mgr_uniqname, row.deptid))
-#-                  osc_user = User.objects.get(username=row.dept_mgr_uniqname)
-#-                  new_record = AuthUserDept()
-#-                  new_record.user = osc_user  
-#-                  new_record.group = Group.objects.get(name='Department Manager')
-#-                  new_record.dept = row.deptid
-#-                  new_record.save()
-                    auth_added_count = auth_added_count + 1
-                except:
+                if pu_user_group is not None and pu_deptid is not None:
+#                    print('AuthUserDept record already exists for: %s  %s' % (row.dept_mgr_uniqname, row.deptid))
                     auth_not_added_count = auth_not_added_count + 1
-                    print("Unable to add Dept Manager role to AuthUserDept for User: %s  Dept: %s" % (row.dept_mgr_uniqname, row.deptid))
- 
+                    continue
+                else:
+                    try:
+                        osc_user = User.objects.get(username=row.dept_mgr_uniqname)
+                        new_record = AuthUserDept()
+                        new_record.user = osc_user  
+                        new_record.group = Group.objects.get(name='Department Manager')
+                        new_record.dept = row.deptid
+                        new_record.save()
+                        auth_added_count = auth_added_count + 1
+#                        print("Added Dept Manager role to AuthUserDept for User: %s  Dept: %s" % (row.dept_mgr_uniqname, row.deptid))
+                    except:
+                        auth_not_added_count = auth_not_added_count + 1
+                        print("Unable to add Dept Manager role to AuthUserDept for User: %s  Dept: %s" % (row.dept_mgr_uniqname, row.deptid))
+
         print('-------------------------------------------')
         print('PinnDeptMgr records read: %s' % curr_mgr_count) 
         print('Distinct users read: %s' % distinct_user_count)
@@ -85,16 +110,12 @@ class Command(BaseCommand):
         print('-------------------------------------------')
 
         for row in remove_mgr_list:
-            #if (PinnDeptMgr.dept_mgr_uniqname==User.objects.get(username==row.user).username and PinnDeptMgr.deptid==row.dept):
-#            if (row.user == PinnDeptMgr.dept_mgr_uniqname) & (row.dept == PinnDeptMgr.deptid):
-            #    print('Bypass Security for: %s   Dept: %s' % (row.user, row.dept))
-            #    continue
-            #else:
-#            pinn_match = PinnDeptMgr.objects.get(dept_mgr_uniqname==User.objects.get(id=row.user).username and deptid==row.dept).first()
+
+            au_username = User.objects.get(username=row.user).username
 
             try:
-                au_uniqname = User.objects.get(username=row.user).username
-            except User.DoesNotExist:
+                au_uniqname = PinnDeptMgr.objects.filter(dept_mgr_uniqname=au_username).values('dept_mgr_uniqname').distinct()
+            except PinnDeptMgr.DoesNotExist:
                 au_uniqname = None
 
             try:
@@ -102,14 +123,18 @@ class Command(BaseCommand):
             except PinnDeptMgr.DoesNotExist:
                 au_deptid = None
 
-            print('%s  %s' % (au_uniqname, au_deptid))
-
-            if PinnDeptMgr.objects.get(dept_mgr_uniqname=au_uniqname) and PinnDeptMgr.objects.get(deptid=au_deptid):
-                auth_not_removed_count = auth_not_removed_count + 1
-                print('Unable to remove Dept Manager role from AuthUserDept for User: %s  Dept: %s' % (row.user, row.dept))          
-            else:
+            if au_uniqname is None:
                 print('Remove Security for: %s   Dept: %s' % (row.user, row.dept))
+                AuthUserDept.objects.filter(user=row.user, dept=row.dept, group=row.group).delete()
                 auth_removed_count = auth_removed_count + 1
+            else:
+                if au_deptid is None:
+                    print('Remove Security for: %s   Dept: %s' % (row.user, row.dept))
+                    AuthUserDept.objects.filter(user=row.user, dept=row.dept, group=row.group).delete()
+                    auth_removed_count = auth_removed_count + 1
+                else:
+                    auth_not_removed_count = auth_not_removed_count + 1
+                
  
         print('-------------------------------------------')
         print('Records to be removed: %s' % remove_mgr_count) 
