@@ -147,7 +147,7 @@ class UmOscPreorderApiV(models.Model):
    suspend_restore_code =  models.CharField(max_length=4, blank=True, null=True)
    suspend_restore_name =  models.CharField(max_length=80, blank=True, null=True)
    comment_text =  models.CharField(max_length=4000, blank=True, null=True)
-   department_number =  models.CharField(max_length=60, blank=True, null=True)
+   department_number =  models.CharField(max_length=15, blank=True, null=True)
    department_id =  models.IntegerField(9, null=True)
    department_name =  models.CharField(max_length=200, blank=True, null=True)
    division_code =  models.CharField(max_length=60, blank=True, null=True)
