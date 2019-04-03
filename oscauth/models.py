@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User, Group, get_username
+from django.contrib.auth.models import User, Group
+from django.contrib.auth import get_username
 
 
 class Role(models.Model):  
