@@ -41,8 +41,9 @@ def get_workflow(request, action_id):
     tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
     action = Action.objects.get(id=action_id)
 
-    for tab in tabs:
+    for index, tab in enumerate(tabs, start=1):
         tab.form = globals()[tab.name]
+        tab.step = 'step' + str(index)
 
     return render(request, 'order/workflow.html', 
         {'title': action,

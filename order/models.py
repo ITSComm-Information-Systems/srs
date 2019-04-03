@@ -1,5 +1,6 @@
 from django.db import models
 from oscauth.models import Role
+#from project.pinnmodels import UmOscPreorderApiV
 
 class Step(models.Model):
     name = models.CharField(max_length=20)
@@ -83,6 +84,9 @@ class Item(models.Model):
     service_action = models.CharField(max_length=10) 
     service_detail = models.CharField(max_length=10) 
     status = models.CharField(max_length=10) 
+
+#class Item(UmOscPreorderApiV):
+#    action = models.CharField(max_length=100)
 
 
 class PinnServiceProfile(models.Model):
