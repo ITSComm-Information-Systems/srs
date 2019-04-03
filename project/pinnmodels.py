@@ -402,3 +402,11 @@ class UmOscPreorderApiV(models.Model):
 
    def __str__(self):
         return self.pre_order_number_display
+
+class UmCurrentDeptManagersV(models.Model):
+    deptid = models.CharField(max_length=10) 
+    dept_mgr_uniqname = models.CharField(max_length=20, primary_key=True) 
+    
+     class Meta:
+          managed = False
+          db_table = 'PINN_CUSTOM\".\"um_current_dept_managers_v'

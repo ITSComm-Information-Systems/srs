@@ -25,10 +25,13 @@ class Role(models.Model):
         elif self.active and self.inactivation_date is not None:
             self.inactivation_date = None
         if self.pk is None:
-            self.created_by = 'First user'
-            self.last_updated_by = 'First user'
+#            self.created_by = 'First user'
+            self.creted_by = request.user
+#            self.last_updated_by = 'First user'
+            self.last_updated_by = request.user
         elif self.pk is not None:
-            self.last_updated_by = 'New user'
+#            self.last_updated_by = 'New user'
+            self.last_updated_by = request.user
         super(Role, self).save(*args, **kwargs)
 
     class Meta:
