@@ -67,6 +67,22 @@ AUTHENTICATION_BACKENDS = [
     'oscauth.backends.SuBackend',
 ]
 
+# mozilla-django-oidc
+SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')
+OIDC_RP_CLIENT_ID = os.getenv('OIDC_RP_CLIENT_ID', 'N/A')
+OIDC_RP_CLIENT_SECRET = os.getenv('OIDC_RP_CLIENT_SECRET','N/A')
+AUTH_BASE_URL = os.getenv('AUTH_BASE_URL','https://shib-idp-test.www.umich.edu')
+OIDC_CALLBACK = SITE_URL + '/oidc/callback/'
+OIDC_OP_AUTHORIZATION_ENDPOINT = AUTH_BASE_URL + '/idp/profile/oidc/authorize'
+OIDC_OP_TOKEN_ENDPOINT = AUTH_BASE_URL + '/idp/profile/oidc/token'
+OIDC_OP_USER_ENDPOINT = AUTH_BASE_URL + '/idp/profile/oidc/userinfo'
+OIDC_OP_JWKS_ENDPOINT = AUTH_BASE_URL + '/oidc/keyset.jwk'
+OIDC_RP_SIGN_ALGO = 'RS256'
+LOGIN_REDIRECT_URL = SITE_URL
+LOGOUT_REDIRECT_URL = SITE_URL
+LOGIN_URL = '/oidc/authenticate'
+
+
 ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = [
@@ -113,32 +129,8 @@ DATABASES = {
     },
 }
 
+
 DATABASE_ROUTERS = ['project.settings.DBRouter']
-
-
-# mozilla-django-oidc
-SITE_URL = os.getenv('SITE_URL')
-OIDC_RP_CLIENT_ID = os.getenv('OIDC_RP_CLIENT_ID')
-OIDC_RP_CLIENT_SECRET = os.getenv('OIDC_RP_CLIENT_SECRET')
-#OIDC_OP_AUTHORIZATION_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/authorize'
-#OIDC_OP_TOKEN_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/token'
-#OIDC_OP_USER_ENDPOINT = 'https://shibboleth.umich.edu/idp/profile/oidc/userinfo'
-#OIDC_OP_JWKS_ENDPOINT = 'https://shibboleth.umich.edu/oidc/keyset.jwk'
-# Test
-AUTH_BASE_URL = os.getenv('AUTH_BASE_URL','https://shib-idp-test.www.umich.edu')
-
-OIDC_CALLBACK = SITE_URL + '/oidc/callback/'
-OIDC_OP_AUTHORIZATION_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/authorize'
-OIDC_OP_TOKEN_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/token'
-OIDC_OP_USER_ENDPOINT = 'https://shib-idp-test.www.umich.edu/idp/profile/oidc/userinfo'
-OIDC_OP_JWKS_ENDPOINT = 'https://shib-idp-test.www.umich.edu/oidc/keyset.jwk'
-
-#OIDC_AUTHENTICATION_CALLBACK_URL = 'https://osc-dev.its.umich.edu/oidc/callback/'
-
-OIDC_RP_SIGN_ALGO = 'RS256'
-LOGIN_REDIRECT_URL = SITE_URL
-LOGOUT_REDIRECT_URL = SITE_URL
-LOGIN_URL = '/oidc/authenticate'
 
 class DBRouter(object):
   def db_for_read(self, model, **hints):
