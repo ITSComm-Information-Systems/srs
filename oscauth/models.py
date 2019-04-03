@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, user_logged_in
 
 
 class Role(models.Model):  
@@ -26,12 +26,12 @@ class Role(models.Model):
             self.inactivation_date = None
         if self.pk is None:
 #            self.created_by = 'First user'
-            self.creted_by = request.user
+            self.creted_by = user.get_username
 #            self.last_updated_by = 'First user'
-            self.last_updated_by = request.user
+            self.last_updated_by = user.get_username
         elif self.pk is not None:
 #            self.last_updated_by = 'New user'
-            self.last_updated_by = request.user
+            self.last_updated_by = user.get_username
         super(Role, self).save(*args, **kwargs)
 
     class Meta:
