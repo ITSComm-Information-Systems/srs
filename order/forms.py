@@ -3,18 +3,6 @@ from django.forms import ModelForm
 from .models import Product, Service, Action, PinnServiceProfile, Feature
 
 
-#class WorkflowForm(forms.Form):
-#    service = forms.ModelChoiceField(Service.objects.all(), to_field_name="name")
-#    action = forms.ModelChoiceField(Action.objects.all(), to_field_name="name")
-
- #   class Meta:
- #       model = Service
- #       fields = ('name')
-
-  #  def __init__(self, *args, **kwargs):
-  #      super().__init__(*args, **kwargs)
-   #     self.fields['action'].queryset = Action.objects.none()
-
 class FeaturesForm(forms.Form):
     features = forms.ModelMultipleChoiceField(
         queryset=Feature.objects.all(), 
@@ -28,7 +16,7 @@ class FeaturesForm(forms.Form):
         fields = ('name', 'description',) 
 
 class PhoneForm(forms.Form):
-    phone_number = forms.CharField(label='Current Phone Number')
+    phone_number = forms.CharField(label='Phone')
 
 
 class ChartfieldForm(forms.Form):
@@ -63,6 +51,7 @@ class EquipmentForm(forms.Form):
         widget=forms.RadioSelect,
     )
 
+
 class LocationForm(forms.Form):
     label = 'Location Form'
     campuses= [
@@ -76,7 +65,6 @@ class LocationForm(forms.Form):
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
-
 
 
 class ProductForm(ModelForm):
