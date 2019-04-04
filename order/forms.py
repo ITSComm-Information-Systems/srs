@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, PinnServiceProfile, Feature
+from .models import Product, Service, Action, Feature
 
 
 class FeaturesForm(forms.Form):
