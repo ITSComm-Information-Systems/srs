@@ -18,14 +18,18 @@
         {% if tab.form.template %}
           {% include tab.form.template %}
         {% else %}
-          {{tab.form.as_p}}
+          <table>{{tab.form.as_table}}</table>
         {% endif %}
       </div>
     {% endfor %}
-    <ul class="pagination">
-      <li class="page-item"><a class="page-link" href="#" id="previous">Previous</a></li>
-      <li class="page-item"><a class="page-link" href="#" id="next">Next</a></li>
-    </ul>
+
+    <div style="overflow:auto;">
+      <div style="float:right;">
+        <button type="button" class="btn btn-primary" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+        <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextPrev(1)">Next</button>
+      </div>
+    </div>
+
   </div>
 
 
@@ -35,35 +39,27 @@
 
 {% block js %}
 <script>
-  $(document).ready(function(){
+currStep = 1;
+lastStep = document.getElementsByClassName("tab-pane").length
+$('#pills-tab li:first-child a').tab('show') // Select first tab
 
-    $('#pills-tab li:first-child a').tab('show')
-    $curtab = 1;
-
-  });
-
-  $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-    e.target // newly activated tab
-    e.relatedTarget // previous active tab
-    console.log(e.target.index)
-  })
-
-  document.getElementById("next").addEventListener("click", next);
-  document.getElementById("previous").addEventListener("click", previous);
-
-  function next() {
-
-    $curtab++;
-    $step = '#pills-step' + $curtab;
-    $($step).tab('show')
+$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+  currStep = $(this)[0].id.substring(10,12) *1;
+  console.log(lastStep)
+  if (currStep == lastStep) {
+    document.getElementById("nextBtn").innerHTML = "Add to Cart";
   }
+})
 
-  function previous() {
-    console.log('next event' + $curtab);
-    $curtab--;
-    $step = '#pills-step' + $curtab;
-    $($step).tab('show')
+function nextPrev(n) {
+  currStep = currStep + n;
+  $('#pills-tab li:nth-child(' + currStep + ') a').tab('show') ;
+
+  if (currStep > lastStep) {
+    document.getElementById("workflowForm").submit();
+    return false;
   }
+}
 
 </script>
 {% endblock %}
