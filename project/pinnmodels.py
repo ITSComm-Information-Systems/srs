@@ -10,7 +10,7 @@ from django.db import models
 
 
 class UmOscDeptProfileV(models.Model):
-   deptid = models.CharField(max_length=15,null=True, primary_key=True)
+   deptid = models.CharField(max_length=15, primary_key=True)
    dept_eff_status = models.CharField(max_length=1,null=True) 
    dept_name = models.CharField(max_length=50,null=True)
    dept_grp = models.CharField(max_length=20,null=True)
@@ -34,7 +34,7 @@ class UmOscDeptProfileV(models.Model):
         return self.dept_name
 
 class UmOscAllServLocV(models.Model):
-   location_id = models.IntegerField(null=True, primary_key=True)
+   location_id = models.IntegerField(primary_key=True)
    building_code =  models.CharField(max_length=10, blank=True, null=True)
    building_name =  models.CharField(max_length=25, blank=True, null=True)
    floor_name =  models.CharField(max_length=18, blank=True, null=True)
@@ -56,7 +56,7 @@ class UmOscAllServLocV(models.Model):
 
 class UmOscChartfieldV(models.Model):
    short_code = models.CharField(max_length=10, blank=True, null=True)
-   chartfield =  models.CharField(max_length=100, blank=True, null=True, primary_key=True)
+   chartfield =  models.CharField(max_length=100,primary_key=True)
    fund =  models.CharField(max_length=30, blank=True, null=True)
    fund_desc =  models.CharField(max_length=30, blank=True, null=True)
    fund_eff_status =  models.CharField(max_length=1, blank=True, null=True)
@@ -91,7 +91,7 @@ class UmOscChartfieldV(models.Model):
 
 class UmOscServiceProfileV(models.Model):
    deptid =  models.CharField(max_length=15, blank=True, null=True)
-   service_number = models.CharField(max_length=60,blank=True, null=True, primary_key=True)
+   service_number = models.CharField(max_length=60,primary_key=True)
    service_status_code = models.CharField(max_length=15, blank=True, null=True)
    service_type = models.CharField(max_length=20, blank=True, null=True)
    subscriber_id = models.CharField(max_length=7,null=True)
@@ -124,7 +124,7 @@ class UmOscServiceProfileV(models.Model):
         return self.service_number
 
 class UmOscPreorderApiV(models.Model):
-   pre_order_id =  models.BigIntegerField( null=True, primary_key=True)
+   pre_order_id =  models.BigIntegerField( null=True)
    category_code =  models.CharField(max_length=4, blank=True, null=True)
    wo_type_category_id =  models.NullBooleanField()
    wo_type_category_name =  models.CharField(max_length=240, blank=True, null=True)
@@ -301,35 +301,35 @@ class UmOscPreorderApiV(models.Model):
    wo_step_name =  models.CharField(max_length=400, blank=True, null=True)
    quick_incident =  models.NullBooleanField()
    script =  models.CharField(max_length=4000, blank=True, null=True)
-   add_info_text_1 =  models.CharField(max_length=512, blank=True, null=True)
-   add_info_text_2 =  models.CharField(max_length=512, blank=True, null=True)
-   add_info_text_3 =  models.CharField(max_length=512, blank=True, null=True)
-   add_info_text_4 =  models.CharField(max_length=512, blank=True, null=True)
-   add_info_text_5 =  models.CharField(max_length=512, blank=True, null=True)
-   add_info_text_6 =  models.CharField(max_length=512, blank=True, null=True)
-   add_info_text_7 =  models.CharField(max_length=512, blank=True, null=True)
-   add_info_text_8 =  models.CharField(max_length=512, blank=True, null=True)
-   add_info_text_9 =  models.CharField(max_length=512, blank=True, null=True)
-   add_info_text_10 =  models.CharField(max_length=512, blank=True, null=True)
+   add_info_text_1 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="Estimated Hours")
+   add_info_text_2 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="Area Of Campus")
+   add_info_text_3 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="OSC Order Number")
+   add_info_text_4 =  models.CharField(max_length=512, primary_key=True, verbose_name="OSC Order Item Number")
+   add_info_text_5 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="V.O.I.P WO")
+   add_info_text_6 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="# of Data Act")
+   add_info_text_7 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="Child's First Name and Last Name")
+   add_info_text_8 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="Set Type")
+   add_info_text_9 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="MAC Address")
+   add_info_text_10 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="Serial Number")
    add_info_text_11 =  models.CharField(max_length=512, blank=True, null=True)
-   add_info_text_12 =  models.CharField(max_length=512, blank=True, null=True)
+   add_info_text_12 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="Transition Ord #")
    add_info_text_13 =  models.CharField(max_length=512, blank=True, null=True)
    add_info_text_14 =  models.CharField(max_length=512, blank=True, null=True)
    add_info_text_15 =  models.CharField(max_length=512, blank=True, null=True)
    add_info_text_16 =  models.CharField(max_length=512, blank=True, null=True)
-   add_info_checkbox_1 =  models.NullBooleanField()
-   add_info_checkbox_2 =  models.NullBooleanField()
-   add_info_checkbox_3 =  models.NullBooleanField()
-   add_info_checkbox_4 =  models.NullBooleanField()
-   add_info_checkbox_5 =  models.NullBooleanField()
-   add_info_checkbox_6 =  models.NullBooleanField()
-   add_info_checkbox_7 =  models.NullBooleanField()
-   add_info_checkbox_8 =  models.NullBooleanField()
+   add_info_checkbox_1 =  models.NullBooleanField(verbose_name="Draft Comp-D")
+   add_info_checkbox_2 =  models.NullBooleanField(verbose_name="Asbuilt Recv'd-D")
+   add_info_checkbox_3 =  models.NullBooleanField(verbose_name="Asbuilt Compl-D")
+   add_info_checkbox_4 =  models.NullBooleanField(verbose_name="Child's First Name and Last Name")
+   add_info_checkbox_5 =  models.NullBooleanField(verbose_name="Asbuilt/Prints-F")
+   add_info_checkbox_6 =  models.NullBooleanField(verbose_name="Closeout Compl-F")
+   add_info_checkbox_7 =  models.NullBooleanField(verbose_name="Asbuilt/Prints Received-A")
+   add_info_checkbox_8 =  models.NullBooleanField(verbose_name="Assignments Complete-A")
    add_info_checkbox_9 =  models.NullBooleanField()
    add_info_checkbox_10 =  models.NullBooleanField()
-   add_info_date_1 =  models.DateField(null=True)
-   add_info_date_2 =  models.DateField(null=True)
-   add_info_date_3 =  models.DateField(null=True)
+   add_info_date_1 =  models.DateField(null=True, verbose_name="Closed Date")
+   add_info_date_2 =  models.DateField(null=True, verbose_name="Complete by FSU")
+   add_info_date_3 =  models.DateField(null=True, verbose_name="Customer Requested Due Date")
    add_info_date_4 =  models.DateField(null=True)
    add_info_date_5 =  models.DateField(null=True)
    add_info_date_6 =  models.DateField(null=True)
@@ -337,8 +337,8 @@ class UmOscPreorderApiV(models.Model):
    add_info_date_8 =  models.DateField(null=True)
    add_info_date_9 =  models.DateField(null=True)
    add_info_date_10 =  models.DateField(null=True)
-   add_info_number_1 =  models.BigIntegerField( null=True)
-   add_info_number_2 =  models.BigIntegerField( null=True)
+   add_info_number_1 =  models.BigIntegerField( null=True, verbose_name="Estimate")
+   add_info_number_2 =  models.BigIntegerField( null=True, verbose_name="Final Estimate")
    add_info_number_3 =  models.BigIntegerField( null=True)
    add_info_number_4 =  models.BigIntegerField( null=True)
    add_info_number_5 =  models.BigIntegerField( null=True)
@@ -347,8 +347,8 @@ class UmOscPreorderApiV(models.Model):
    add_info_number_8 =  models.BigIntegerField( null=True)
    add_info_number_9 =  models.BigIntegerField( null=True)
    add_info_number_10 =  models.BigIntegerField( null=True)
-   add_info_list_value_id_1 =  models.IntegerField(9, null=True)
-   add_info_list_value_code_1 =  models.CharField(max_length=200, blank=True, null=True)
+   add_info_list_value_id_1 =  models.IntegerField(null=True, verbose_name="Building")
+   add_info_list_value_code_1 =  models.CharField(max_length=200, blank=True, null=True, verbose_name="Bill Error Codes")
    add_info_list_value_name_1 =  models.CharField(max_length=400, blank=True, null=True)
    add_info_list_value_id_2 =  models.IntegerField(9, null=True)
    add_info_list_value_code_2 =  models.CharField(max_length=200, blank=True, null=True)
@@ -377,15 +377,15 @@ class UmOscPreorderApiV(models.Model):
    add_info_list_value_id_10 =  models.IntegerField(9, null=True)
    add_info_list_value_code_10 =  models.CharField(max_length=200, blank=True, null=True)
    add_info_list_value_name_10 =  models.CharField(max_length=400, blank=True, null=True)
-   originating_source_id =  models.IntegerField(max_length=1, null=True)
+   originating_source_id =  models.IntegerField(1, null=True)
    originating_source_name =  models.CharField(max_length=80, blank=True, null=True)
-   add_info_values_id =  models.BigIntegerField( null=False)
+   add_info_values_id =  models.BigIntegerField(null=False)
    add_info_row_defn_id =  models.IntegerField(9, null=False)
-   switch_id =  models.BigIntegerField( null=True)
+   switch_id =  models.BigIntegerField(null=True)
    svc_bill_description =  models.CharField(max_length=400, blank=True, null=True)
    sub_id_to_swap_with =  models.CharField(max_length=28, blank=True, null=True)
-   svc_id_to_swap_with =  models.BigIntegerField( null=True)
-   loc_id_to_swap_with =  models.BigIntegerField( null=True)
+   svc_id_to_swap_with =  models.BigIntegerField(null=True)
+   loc_id_to_swap_with =  models.BigIntegerField(null=True)
    move_svc_chars =  models.NullBooleanField()
    move_feat_items =  models.NullBooleanField()
    move_inventory =  models.NullBooleanField()
@@ -404,9 +404,9 @@ class UmOscPreorderApiV(models.Model):
         return self.pre_order_number_display
 
 class UmCurrentDeptManagersV(models.Model):
-    deptid = models.CharField(max_length=10) 
-    dept_mgr_uniqname = models.CharField(max_length=20, primary_key=True) 
+   deptid = models.CharField(max_length=10) 
+   dept_mgr_uniqname = models.CharField(max_length=20, primary_key=True) 
     
-     class Meta:
-          managed = False
-          db_table = 'PINN_CUSTOM\".\"um_current_dept_managers_v'
+   class Meta:
+        managed = False
+        db_table = 'PINN_CUSTOM\".\"um_current_dept_managers_v'
