@@ -1,5 +1,26 @@
+
+<style>
+ul {
+  columns: 3;
+  -webkit-columns: 3;
+  -moz-columns: 3;
+  list-style-type: none;
+}
+
+pre {
+    font-family: "Helvetica Neue"
+}
+</style>
+
+<ul class="columns" data-columns="2">
+
 {% for field in tab.form.list %}
 
-<input type="checkbox" name="vehicle1" value="Bike"> {{ field }}
+<li>
+<input type="checkbox" name="feature1" value="featureID"> {{ field }}
  <pre>{{ field.description }}</pre>
+</li>
 {% endfor %}
+
+
+</ul>
