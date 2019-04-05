@@ -21,13 +21,13 @@ class PhoneForm(forms.Form):
 
 class ChartfieldForm(forms.Form):
     occ = forms.CharField(label='OCC', max_length=6)
-    mrc = forms.CharField(label='MRS', max_length=6)
+    mrc = forms.CharField(label='MRC', max_length=6)
     local = forms.CharField(label='Local', max_length=6)
     longdistance = forms.CharField(label='Long Distance', max_length=6)
 
 class ReviewForm(forms.Form):
-    comments = forms.CharField(label='Additional Comments', max_length=100)
-    review = forms.BooleanField(label='Accept Terms')
+    comments = forms.CharField( widget=forms.Textarea )
+    file = forms.FileField()
 
 class NewLocationForm(forms.Form):
     label = 'Location Form'
@@ -35,6 +35,7 @@ class NewLocationForm(forms.Form):
     ('A', 'Ann Arbor'),
     ('F', 'Flint'),
     ('D', 'Dearborn'),
+    ('O', 'Off site'),
     ]
     
     Campus = forms.ChoiceField(choices=campuses)
@@ -42,6 +43,7 @@ class NewLocationForm(forms.Form):
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
     jack = forms.BooleanField(label='Is there a Jack at the new location?')
+    jack_number = forms.CharField(label='Jack Number')
     conduit = forms.BooleanField(label='Is there a Conduit at the new location?')
 
 
@@ -50,6 +52,8 @@ class EquipmentForm(forms.Form):
         queryset=Product.objects.all(), 
         widget=forms.RadioSelect,
     )
+    list = Product.objects.all()
+    template = 'order/products.html'
 
 
 class LocationForm(forms.Form):
