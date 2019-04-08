@@ -1,0 +1,26 @@
+
+<style>
+
+
+pre {
+    font-family: "Helvetica Neue"
+}
+</style>
+
+
+<div class="card-group">
+{% for field in tab.form.list %}
+
+
+
+<div class="card" style="width: 18rem;">
+    <img class="card-img-top" src="/static/order/voip.jpg" alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title">{{ field }}</h5>
+      <p class="card-text"><pre>{{ field.description }}</pre></p>
+      <a href="#" class="btn btn-primary">Select</a>
+    </div>
+</div>
+
+{% endfor %}
+</div>
