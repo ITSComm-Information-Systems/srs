@@ -5,8 +5,6 @@ from order.forms import *
 
 from .models import Cart, Item, Product, Action, Service, Step
 
-#from .forms import WorkflowForm, LocationForm, EquipmentForm, ReviewForm, ProductForm, FeaturesForm, PhoneForm
-
 def add_to_cart(request):
     if request.method == "POST":
         print(request.POST)
@@ -15,17 +13,11 @@ def add_to_cart(request):
         if form.is_valid():
             print(form.cleaned_data['occ'])
 
-            c = Cart()
-            c.number = 1
-            c.description = 'New office'
-            c.save()
+            c, created = Cart.objects.get_or_create(number='Not Submitted', description='Order',username=request.user.get_username())
 
             i = Item()
             i.cart = c
-            i.service = 'Phone'
-            i.service_action = 'Add'
-            i.service_detail ='Add Phone'
-            i.status = 'Start'
+            i.action = 'Add a new phone'
             i.save()
         else:
             print('bad form')
@@ -41,8 +33,9 @@ def get_workflow(request, action_id):
     tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
     action = Action.objects.get(id=action_id)
 
-    for tab in tabs:
+    for index, tab in enumerate(tabs, start=1):
         tab.form = globals()[tab.name]
+        tab.step = 'step' + str(index)
 
     return render(request, 'order/workflow.html', 
         {'title': action,

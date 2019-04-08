@@ -1,6 +1,7 @@
 from django.db import models
 from oscauth.models import Role
 
+
 class Step(models.Model):
     name = models.CharField(max_length=20)
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
@@ -71,28 +72,13 @@ class Action(models.Model):
         return self.name 
 
 class Cart(models.Model):
-    number = models.IntegerField()
+    number = models.CharField(max_length=20)
     description = models.CharField(max_length=100)
+    username = models.CharField(max_length=8)
 
     def __str__(self):
         return self.description
 
 class Item(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    service = models.CharField(max_length=10) 
-    service_action = models.CharField(max_length=10) 
-    service_detail = models.CharField(max_length=10) 
-    status = models.CharField(max_length=10) 
-
-
-class PinnServiceProfile(models.Model):
-    deptid = models.CharField(max_length=20, primary_key=True) 
-    service_number = models.CharField(max_length=20) 
-    service_type = models.CharField(max_length=20) 
-    
-    def __str__(self):
-        return self.service_number
-    
-    class Meta:
-        managed = False
-        db_table = 'PINN_CUSTOM\".\"um_osc_service_profile_v'
+    action = models.CharField(max_length=100) 

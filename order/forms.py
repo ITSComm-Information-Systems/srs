@@ -1,19 +1,7 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, PinnServiceProfile, Feature
+from .models import Product, Service, Action, Feature
 
-
-#class WorkflowForm(forms.Form):
-#    service = forms.ModelChoiceField(Service.objects.all(), to_field_name="name")
-#    action = forms.ModelChoiceField(Action.objects.all(), to_field_name="name")
-
- #   class Meta:
- #       model = Service
- #       fields = ('name')
-
-  #  def __init__(self, *args, **kwargs):
-  #      super().__init__(*args, **kwargs)
-   #     self.fields['action'].queryset = Action.objects.none()
 
 class FeaturesForm(forms.Form):
     features = forms.ModelMultipleChoiceField(
@@ -28,18 +16,18 @@ class FeaturesForm(forms.Form):
         fields = ('name', 'description',) 
 
 class PhoneForm(forms.Form):
-    phone_number = forms.CharField(label='Current Phone Number')
+    phone_number = forms.CharField(label='Phone')
 
 
 class ChartfieldForm(forms.Form):
     occ = forms.CharField(label='OCC', max_length=6)
-    mrc = forms.CharField(label='MRS', max_length=6)
+    mrc = forms.CharField(label='MRC', max_length=6)
     local = forms.CharField(label='Local', max_length=6)
     longdistance = forms.CharField(label='Long Distance', max_length=6)
 
 class ReviewForm(forms.Form):
-    comments = forms.CharField(label='Additional Comments', max_length=100)
-    review = forms.BooleanField(label='Accept Terms')
+    comments = forms.CharField( widget=forms.Textarea )
+    file = forms.FileField()
 
 class NewLocationForm(forms.Form):
     label = 'Location Form'
@@ -47,6 +35,7 @@ class NewLocationForm(forms.Form):
     ('A', 'Ann Arbor'),
     ('F', 'Flint'),
     ('D', 'Dearborn'),
+    ('O', 'Off site'),
     ]
     
     Campus = forms.ChoiceField(choices=campuses)
@@ -54,6 +43,7 @@ class NewLocationForm(forms.Form):
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
     jack = forms.BooleanField(label='Is there a Jack at the new location?')
+    jack_number = forms.CharField(label='Jack Number')
     conduit = forms.BooleanField(label='Is there a Conduit at the new location?')
 
 
@@ -62,6 +52,9 @@ class EquipmentForm(forms.Form):
         queryset=Product.objects.all(), 
         widget=forms.RadioSelect,
     )
+    list = Product.objects.all()
+    template = 'order/products.html'
+
 
 class LocationForm(forms.Form):
     label = 'Location Form'
@@ -76,7 +69,6 @@ class LocationForm(forms.Form):
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
-
 
 
 class ProductForm(ModelForm):
