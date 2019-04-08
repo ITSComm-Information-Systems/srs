@@ -12,5 +12,6 @@ urlpatterns = [
     path('?P<user_id>', views.login_as_user, name="login_as_user"),
     path('adduser/', views.get_name),
     #path('ldap/user/', views.get_name),
+    path('mypriv/', views.mypriv),
 
 ]
