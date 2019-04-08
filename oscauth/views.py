@@ -68,7 +68,7 @@ def user(request, user_id):
     return HttpResponse(template.render(context, request))
 
 def mypriv(request):
-    depts = get_object_or_404(AuthUserDept.objects.filter(user=request.user.id).order_by('dept'))
+    depts = AuthUserDept.objects.filter(user=request.user.id).order_by('dept')
     rows = []
     prev_dept = ''
     group_name = ''
