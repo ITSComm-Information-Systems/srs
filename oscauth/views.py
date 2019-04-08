@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404, render
 from django.contrib.auth import get_user_model
 
 from .models import AuthUserDept
-from .models import Role
+from .models import Role, Group
 from .forms import UserSuForm, AddUserForm
 from .utils import su_login_callback, custom_login_action, upsert_user
 
@@ -60,12 +60,41 @@ def dept(request, dept_id):
 
 def user(request, user_id):
     roles = Role.objects.order_by('display_seq_no')
-  
     template = loader.get_template('oscauth/user.html')
     context = {
         'title': 'Access for User: ' + user_id,
         'roles': roles
     }
+    return HttpResponse(template.render(context, request))
+
+def mypriv(request):
+    depts = get_object_or_404(AuthUserDept.objects.filter(user=request.user.id).order_by('dept'))
+    rows = []
+    prev_dept = ''
+    group_name = ''
+    col1 = ''
+    roles = ''
+    i = 0
+    for dept in depts:
+        group_name = Group.objects.get(name=dept.group).name
+        if dept.dept == prev_dept:
+            roles = roles + ', ' + group_name
+        else:
+            if prev_dept != '':
+                data = {'col1' : col1, 'roles': roles}
+                rows.append(data)
+            i = i + 1
+            col1 = dept.dept
+            roles = group_name
+        prev_dept = dept.dept
+    data = {'col1' : col1, 'roles': roles}
+    rows.append(data)
+    template = loader.get_template('oscauth/mypriv.html')
+    context = {
+        'title': 'My Privileges: ' + request.user.username,
+        'rows': rows
+    }
+    print(len(rows))
     return HttpResponse(template.render(context, request))
 
 
