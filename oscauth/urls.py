@@ -13,6 +13,8 @@ urlpatterns = [
     path('adduser/', views.get_name),
     #path('ldap/user/', views.get_name),
     path('mypriv/', views.mypriv),
-    path('deptpriv/', views.deptpriv),
+    path('get_dept/', views.get_dept),
+    path('deptpriv/<str:dept_parm>/', views.deptpriv),
+#    path('setpriv/', views.setpriv),
 
 ]
