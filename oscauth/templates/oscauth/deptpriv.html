@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>{{ subtitle }}</h2>
+
+<form action="/auth/get_dept/" method="POST">{% csrf_token %}
+    <h1>Select a Department</h1>
+    <p>Department ID <input type="search" name='dept_parm'>
+        <select id="dept_list">
+            <option value="%">----------</option>
+            {% for dept in dept_list %}
+            <option value="{{ dept.deptid }}">{{ dept.deptid }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p><input type='submit' value='Submit'></p>
+</form>
+
+<h3>{{ subtitle1 }}</h3>
+<h4>{{ subtitle2 }}</h4>
 <table class="table table-hover table-headings">
     <thead>
         <tr>
