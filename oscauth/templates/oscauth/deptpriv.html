@@ -3,7 +3,7 @@
 
 <form action="/auth/get_dept/" method="POST">{% csrf_token %}
     <h1>Select a Department</h1>
-    <p>Department ID <input type="search" name='dept_parm'>
+    <p>Department ID 
         <select id="dept_list">
             <option value="%">----------</option>
             {% for dept in dept_list %}
