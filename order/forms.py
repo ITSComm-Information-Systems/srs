@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature
+from .models import Product, Service, Action, Feature, Restriction
 
 
 class FeaturesForm(forms.Form):
@@ -19,6 +19,30 @@ class PhoneForm(forms.Form):
     phone_number = forms.CharField(label='Phone')
 
 
+class RestrictionsForm(forms.Form):
+    restrictions = forms.ModelMultipleChoiceField(
+        queryset=Restriction.objects.all(), 
+        widget=forms.CheckboxSelectMultiple(),
+    )
+    list = Restriction.objects.all()
+    #template = 'order/features.html'
+
+
+class PhoneSetTypeForm(forms.Form):
+    label = 'Phone Set Type'
+    phone_types = [
+    ('B', 'Basic'),
+    ('A', 'Advanced'),
+    ('I', 'IP'),
+    ]
+
+    purchase = forms.ChoiceField(label='Do you want to purchase equipment from ITCOM?', choices=[('yes','Yes'),
+         ('no','No')], initial='yes', widget=forms.RadioSelect)
+    byod = forms.CharField(label='Please enter the make and model of phone you will be using.', max_length=100)
+    phone_set_type = forms.ChoiceField(choices=phone_types)
+
+    template = 'order/phone_set_type.html'
+
 class ChartfieldForm(forms.Form):
     occ = forms.CharField(label='OCC', max_length=6)
     mrc = forms.CharField(label='MRC', max_length=6)
@@ -26,6 +50,10 @@ class ChartfieldForm(forms.Form):
     longdistance = forms.CharField(label='Long Distance', max_length=6)
 
 class ReviewForm(forms.Form):
+    contact = forms.BooleanField(label='Are you the on-site contact person?')
+    contact_id = forms.CharField(label='Uniqname', max_length=8)
+    contact_name = forms.CharField(label='Name', max_length=40)
+    contact_number = forms.CharField(label='Best number to contact.', max_length=8)
     comments = forms.CharField( widget=forms.Textarea )
     file = forms.FileField()
 
@@ -45,6 +73,7 @@ class NewLocationForm(forms.Form):
     jack = forms.BooleanField(label='Is there a Jack at the new location?')
     jack_number = forms.CharField(label='Jack Number')
     conduit = forms.BooleanField(label='Is there a Conduit at the new location?')
+    jack_count = forms.IntegerField(label='How many jacks would you like?')
 
 
 class EquipmentForm(forms.Form):
