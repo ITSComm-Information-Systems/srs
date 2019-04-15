@@ -5,9 +5,14 @@ from project.pinnmodels import UmOscPreorderApiAbstract
 class Step(models.Model):
     FORM_CHOICES = (
         ('', ''),
-        ('FeaturesForm', 'Features'),
-        ('EquipmentForm', 'Incident'),
+        ('LocationForm', 'Location'),
+        ('EquipmentForm', 'Equipment'),
+        ('NewLocationForm', 'New Location'),
+        ('ReviewForm', 'Review'),
+        ('ChartfieldForm', 'Chartfield'),
         ('RestrictionsForm', 'Restrictions'),
+        ('FeaturesForm', 'Features'),
+
     )
 
     name = models.CharField(max_length=80)
