@@ -74,6 +74,7 @@ def mypriv(request):
     rows = []
     prev_dept = ''
     dept_name = ''
+    dept_status = ''
     group_name = ''
     col1 = ''
     col2 = ''
@@ -81,13 +82,12 @@ def mypriv(request):
     i = 0
     for dept in depts:
         dept_info = UmOscDeptProfileV.objects.filter(deptid=dept.dept)
-        print('Dept: %s' % dept.dept)
         if dept.dept == 'All':
             dept_name = 'All departments'
+            dept_status = 'A'
         else:
             for name in dept_info:
                 dept_name = name.dept_name
-        print('Name: %s' % name.dept_name)
 
         group_name = Group.objects.get(name=dept.group).name
 
@@ -95,14 +95,15 @@ def mypriv(request):
             roles = roles + ', ' + group_name
         else:
             if prev_dept != '':
-                data = {'col1' : col1, 'col2' : col2,  'roles': roles}
+                data = {'dept_status' : dept_status,'col1' : col1, 'col2' : col2,  'roles': roles}
                 rows.append(data)
             i = i + 1
+            dept_status = name.dept_eff_status
             col1 = dept.dept
             col2 = dept_name
             roles = group_name
         prev_dept = dept.dept
-    data = {'col1' : col1, 'col2' : col2, 'roles': roles}
+    data = {'dept_status' : dept_status,'col1' : col1, 'col2' : col2, 'roles': roles}
     rows.append(data)
     template = loader.get_template('oscauth/mypriv.html')
     context = {
@@ -134,6 +135,7 @@ def deptpriv(request, dept_parm):
     for dept in dept_info:
         deptid = dept.deptid
         dept_name = dept.dept_name
+        dept_status = dept.dept_status
         dept_mgr_name = dept.dept_mgr_name
         dept_mgr_uniqname = dept.dept_mgr_uniqname
 
@@ -157,6 +159,7 @@ def deptpriv(request, dept_parm):
     template = loader.get_template('oscauth/deptpriv.html')
     context = {
         'dept_list': dept_list,
+        'dept_status': dept_status,
         'subtitle1': 'Access For Department: ' + dept_parm + ' - '+ dept_name ,
         'subtitle2': 'Department Manager: ' + dept_mgr_name + ' (' + dept_mgr_uniqname + ')',
         'rows': rows
