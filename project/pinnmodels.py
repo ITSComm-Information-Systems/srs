@@ -123,7 +123,7 @@ class UmOscServiceProfileV(models.Model):
    def __str__(self):
         return self.service_number
 
-class UmOscPreorderApiV(models.Model):
+class UmOscPreorderApiAbstract(models.Model):
    pre_order_id =  models.BigIntegerField( null=True)
    category_code =  models.CharField(max_length=4, blank=True, null=True)
    wo_type_category_id =  models.NullBooleanField()
@@ -396,12 +396,19 @@ class UmOscPreorderApiV(models.Model):
    subscriber_email =  models.CharField(max_length=1280, blank=True, null=True)
 
    class Meta:
+        abstract = True 
+
+class UmOscPreorderApiV(UmOscPreorderApiAbstract):
+   pass
+
+   class Meta:
         managed = False 
         ordering = ('add_info_text_3', 'pre_order_number', 'pre_order_issue')    
         db_table = 'PINN_CUSTOM\".\"um_osc_preorder_api_v'    
 
    def __str__(self):
         return self.pre_order_number_display
+
 
 class UmCurrentDeptManagersV(models.Model):
    deptid = models.CharField(max_length=10) 
