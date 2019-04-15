@@ -15,9 +15,10 @@ class Step(models.Model):
 
     )
 
-    name = models.CharField(max_length=80)
+    name = models.CharField(max_length=20)
+    label = models.CharField(max_length=100)
     display_seq_no = models.PositiveIntegerField()
-    custom_form = models.CharField(max_length=20, choices=FORM_CHOICES)
+    custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
 
     def __str__(self):
         return self.name

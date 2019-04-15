@@ -42,7 +42,14 @@ def get_workflow(request, action_id):
             element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
 
             for element in element_list:
-                f.fields.update({element.target: forms.CharField(label=element.label, max_length=6)})
+                if element.type == 'YN':
+                    field = forms.ChoiceField(label=element.label, widget=forms.RadioSelect, choices=(('Y', 'Yes',), ('N', 'No',)))
+                elif element.type == 'ST':
+                    field = forms.CharField(label=element.label)
+                else:
+                    field = forms.IntegerField(label=element.label)
+
+                f.fields.update({element.target: field})
 
             tab.form = f
         else:
@@ -56,11 +63,7 @@ def get_workflow(request, action_id):
 def load_actions(request):
     service = request.GET.get('service')
     service_id = Service.objects.get(name=service)
-    print(service_id)
     actions = Action.objects.filter(service=service_id)
-    print(actions)
-    #actions = Action.objects.all()
-    print(actions)
     return render(request, 'order/workflow_actions.html', {'actions': actions})
 
 def cart(request):

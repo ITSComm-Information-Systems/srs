@@ -8,7 +8,7 @@
 
         <ul>
             {% for step in step_list %}
-            <li>{{ step.name }}</li>
+            <li>{{ step.label }}</li>
             <ul>
                 {% for element in step.element_list %}
                     <li>{{ element.label }}</li>

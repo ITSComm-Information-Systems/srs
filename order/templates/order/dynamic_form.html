@@ -1,20 +1,14 @@
-
+<table>
 {% for field in tab.form %}
-    <div class="form-group">
+  <tr>
+    <div class="fieldWrapper"><td>
         {{ field.errors }}
-        {{ field.label_tag }} 
-       <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="{{ field.name }}" id="purchaseYes" value="Yes">
-            <label class="form-check-label" for="inlineRadio1">Yes</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="{{ field.name }}" id="purchaseNo" value="Yes">
-            <label class="form-check-label" for="inlineRadio2">No</label>
-          </div>
-        
-
+        {{ field.label_tag }} {{ field }}
         {% if field.help_text %}
         <p class="help">{{ field.help_text|safe }}</p>
         {% endif %}
+      </td>
     </div>
+  </tr>
 {% endfor %}
+</table>
