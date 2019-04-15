@@ -2,7 +2,6 @@
 {% for field in tab.form %}
     <div class="form-group">
         {{ field.errors }}
-        {{ field.name }}
         {{ field.label_tag }} 
        <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="{{ field.name }}" id="purchaseYes" value="Yes">

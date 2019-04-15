@@ -26,6 +26,10 @@ class ActionAdmin(admin.ModelAdmin):
         )
 
 
+class ElementAdmin(admin.ModelAdmin):
+    list_display  = ['name','display_seq_no','label']
+
+
 class ServiceAdmin(admin.ModelAdmin):
     list_display  = ['name','display_seq_no','active']
 
@@ -42,7 +46,7 @@ class RestrictionAdmin(admin.ModelAdmin):
 class FeatureCategoryAdmin(admin.ModelAdmin):
     list_display = ['name','display_seq_no']
 
-
+admin.site.register(Element, ElementAdmin)
 admin.site.register(Service, ServiceAdmin)
 admin.site.register(Action, ActionAdmin)
 admin.site.register(Product, ProductAdmin)
