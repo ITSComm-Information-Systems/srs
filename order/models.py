@@ -25,7 +25,8 @@ class Element(models.Model):
         ('NU', 'Number'),
     )
 
-    label = models.CharField(max_length=80)
+    name = models.CharField(max_length=20)
+    label = models.CharField(max_length=100)
     display_seq_no = models.PositiveIntegerField()
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=2, choices=ELEMENT_CHOICES)
