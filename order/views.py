@@ -3,7 +3,7 @@ from django.template import loader
 from django.shortcuts import render
 from order.forms import *
 
-from .models import Cart, Item, Product, Action, Service, Step
+from .models import Cart, Product, Action, Service, Step, Element
 
 def add_to_cart(request):
     if request.method == "POST":
@@ -34,8 +34,19 @@ def get_workflow(request, action_id):
     action = Action.objects.get(id=action_id)
 
     for index, tab in enumerate(tabs, start=1):
-        tab.form = globals()[tab.name]
         tab.step = 'step' + str(index)
+
+        if tab.custom_form == '':
+            f = forms.Form()
+            f.template = 'order/dynamic_form.html'
+            element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
+
+            for element in element_list:
+                f.fields.update({element.target: forms.CharField(label=element.label, max_length=6)})
+
+            tab.form = f
+        else:
+            tab.form = globals()[tab.custom_form]
 
     return render(request, 'order/workflow.html', 
         {'title': action,
@@ -53,7 +64,8 @@ def load_actions(request):
     return render(request, 'order/workflow_actions.html', {'actions': actions})
 
 def cart(request):
-    item_list = Item.objects.order_by('-id')
+    #item_list = Item.objects.order_by('-id')
+    item_list = ['one','two']
     print(request.build_absolute_uri())
     template = loader.get_template('order/cart.html')
     context = {

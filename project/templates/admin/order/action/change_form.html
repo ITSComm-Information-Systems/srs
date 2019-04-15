@@ -1,0 +1,30 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+{% block after_field_sets %}
+
+
+    <fieldset class="module aligned {{ fieldset.classes }}">
+        <p>Rendering</p>
+
+        <ul>
+            {% for step in step_list %}
+            <li>{{ step.name }}</li>
+            <ul>
+                {% for element in step.element_list %}
+                    <li>{{ element.label }}</li>
+                {% endfor %}
+            </ul>
+            {% endfor %}
+        </ul>
+
+        <p>Constants</p>
+        <ul>
+            {% for con in consts %}
+            <li>{{ con.label }}</li>
+            {% endfor %}
+        </ul>
+
+    </fieldset>
+    
+
+{% endblock %}

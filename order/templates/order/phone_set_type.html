@@ -14,12 +14,13 @@
 
       <div class="form-group", id="byod", style="display:none">
         <label for="phone_type_byod">Enter Phone Type</label>
-        <input type="password" class="form-control" id="phone_type_byod" placeholder="Phone Make and Model">
+        <input type="text" class="form-control" id="phone_type_byod" placeholder="Phone Make and Model">
       </div>
 
       <div class="form-group", id="phone_type", style="display:none">
         <label for="phone_type_purchase">Select Phone Type</label>
         <select class="form-control" id="phone_type_purchase">
+          <option></option>
           <option>Basic</option>
           <option>Advanced</option>
           <option>VOIP</option>
@@ -34,23 +35,3 @@
   
 
   
-
-<script>
-//document.getElementById("nextBtn").style.display = 'disabled'
-//$('nextBtn').prop('disabled', true);
-//$('#nextBtn').disable(true);
-
-
-// Phone Set Type - Buy Equipment
-purchaseYes.onclick = function() {
-    document.getElementById("byod").style.display = "none";
-    document.getElementById("phone_type").style.display = "block";
-    $('#nextBtn').prop('disabled', false);
-}
-
-purchaseNo.onclick = function() {
-    document.getElementById("byod").style.display = "block";
-    document.getElementById("phone_type").style.display = "none";
-}
-
-</script>
