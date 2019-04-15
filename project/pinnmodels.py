@@ -421,3 +421,70 @@ class UmCurrentDeptManagersV(models.Model):
    class Meta:
         managed = False
         db_table = 'PINN_CUSTOM\".\"um_current_dept_managers_v'
+
+class UmOscNoteProfileV(models.Model):
+   note_id =  models.IntegerField(9, null=False)
+   note_type_id =  models.IntegerField(9, null=False)
+   note_type_code =  models.CharField(max_length=120, blank=True, null=True)
+   note_type_subcode =  models.CharField(max_length=120, blank=True, null=True)
+   note_types_id =  models.IntegerField(9, null=False)
+   note_types_code =  models.CharField(max_length=200, blank=True, null=True)
+   note_types_name =  models.CharField(max_length=400, blank=True, null=True)
+   accessibility =  models.BooleanField()
+   accessibility_name =  models.CharField(max_length=240, blank=True, null=True)
+   note_keyid_value =  models.IntegerField(9, null=True)
+   note_keyid_value2 =  models.IntegerField(9, null=True)
+   note_subject =  models.CharField(max_length=1020, blank=True, null=True)
+   note_body = models.TextField(null=True)
+   note_body_stripped =  models.CharField(max_length=4000, blank=True, null=True)
+   primary_note =  models.BooleanField()
+   tenant_code =  models.CharField(max_length=120, blank=True, null=True)
+   note_author =  models.CharField(max_length=400, blank=True, null=True)
+   note_creation_date =  models.DateField(null=True)
+   last_update_user =  models.CharField(max_length=400, blank=True, null=True)
+   last_update_date =  models.DateField(null=True)
+
+   
+   class Meta:
+        managed = False 
+        ordering = ('note_keyid_value', 'note_id')    
+        db_table = 'PINN_CUSTOM\".\"um_osc_note_profile_v'    
+
+   def __str__(self):
+        return self.note_subject
+
+        
+class UmOscAttachmentApiAbstract(models.Model):      
+   attachment_id =  models.IntegerField(9, null=False)
+   note_id =  models.IntegerField(9, null=False)
+   attachment_type_id =  models.IntegerField(9, null=False)
+   attachment_type_code =  models.CharField(max_length=240, blank=True, null=True)
+   attachment_type_subcode =  models.CharField(max_length=240, blank=True, null=True)
+   attachment_keyid_value =  models.IntegerField(9, null=False)
+   attachment_keyid_value2 =  models.IntegerField(9, null=True)
+   description =  models.CharField(max_length=1020, blank=True, null=True)
+   file_name =  models.CharField(max_length=1020, blank=True, null=True)
+   file_size =  models.IntegerField(10, null=False)
+   mime_type =  models.CharField(max_length=1020, blank=True, null=True)
+   blob_content = models.BinaryField(null=True)
+   tenant_code =  models.CharField(max_length=120, blank=True, null=True)
+   primary_attachment =  models.BooleanField()
+   last_update_user =  models.CharField(max_length=400, blank=True, null=True)
+   last_update_date =  models.DateField(null=True)
+   attachment_dir =  models.CharField(max_length=512, blank=True, null=True)
+   attachment_guid =  models.CharField(max_length=4000, blank=True, null=True)
+
+
+   class Meta:
+        abstract = True
+   
+class UmOscAttachmentApiV(UmOscAttachmentApiAbstract):
+   pass
+
+   class Meta:
+        managed = False 
+        ordering = ('attachment_keyid_value', 'description')    
+        db_table = 'PINN_CUSTOM\".\"um_osc_attachment_api_v'    
+
+   def __str__(self):
+        return self.description                   
