@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from oscauth.models import Role
 from project.pinnmodels import UmOscPreorderApiAbstract
@@ -119,17 +120,10 @@ class Cart(models.Model):
     def __str__(self):
         return self.description
 
-#class Item(models.Model):
-#    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-#    action = models.CharField(max_length=100) 
-
-
-class Item(UmOscPreorderApiAbstract):
+class Item(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    description = models.CharField(max_length=100) 
-
-    class Meta:
-        db_table = 'order_item'    
+    description = models.CharField(max_length=100)
+    data = JSONField()
 
     def __str__(self):
         return self.description
