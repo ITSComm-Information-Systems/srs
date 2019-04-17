@@ -27,7 +27,7 @@ class ActionAdmin(admin.ModelAdmin):
 
 
 class ElementAdmin(admin.ModelAdmin):
-    list_display  = ['step','name','display_seq_no','label']
+    list_display  = ['step','name','type','target','display_seq_no','label']
 
 
 class ServiceAdmin(admin.ModelAdmin):

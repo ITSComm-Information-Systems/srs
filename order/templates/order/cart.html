@@ -9,14 +9,14 @@
 
 
             <tr>
-                <td>{{ item.action }}</td>
+                <td>{{ item.description }}</td>
             </tr>
             
         {% endfor %}
         </table>
         <form action="/orders/submit/" method="post" id="submitOrder" >
             {% csrf_token %}
-            <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextPrev(1)">Submit Order</button>
+            <input type="submit" name="submitorder" value="Submit Order" class="btn btn-primary">
         </form>
 
     {% else %}
