@@ -118,7 +118,7 @@ def get_dept(request):
         dept_parm = request.POST['dept_parm']
         return HttpResponseRedirect('/auth/deptpriv/' + dept_parm + '/')
     else:
-        dept_priv = '000000'
+        dept_priv = ''
 
 
 def deptpriv(request, dept_parm=''):
