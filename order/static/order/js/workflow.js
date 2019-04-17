@@ -4,8 +4,7 @@ $(document).ready(function() {
   lastStep = document.getElementsByClassName("tab-pane").length;
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
-  //$('#nextBtn').disable();
-  $('#nextBtn').prop('disabled', true);
+  //$('#nextBtn').prop('disabled', true);
 
   // Phone Type Tab
   $("#purchaseYes").click(function() {
@@ -36,6 +35,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
   if (currStep == lastStep) {
       document.getElementById("nextBtn").innerHTML = "Add to Cart";
   }
+  $('#nextBtn').prop('disabled', false);
 })
 
 function nextPrev(n) {

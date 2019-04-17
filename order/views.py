@@ -3,7 +3,18 @@ from django.template import loader
 from django.shortcuts import render
 from order.forms import *
 
-from .models import Cart, Product, Action, Service, Step, Element
+from .models import Cart, Product, Action, Service, Step, Element, Item
+
+def submit_order(request):
+    if request.method == "POST":
+        print('submit cart')
+        print(request.user.username)
+    else:
+        print('fourOfour')
+
+    #return ('thanks')
+    return HttpResponseRedirect('/orders/cart/')
+
 
 def add_to_cart(request):
     if request.method == "POST":
@@ -13,16 +24,19 @@ def add_to_cart(request):
         if form.is_valid():
             print(form.cleaned_data['occ'])
 
-            c, created = Cart.objects.get_or_create(number='Not Submitted', description='Order',username=request.user.get_username())
-
-            i = Item()
-            i.cart = c
-            i.action = 'Add a new phone'
-            i.save()
         else:
             print('bad form')
     else:
         form = PostForm()
+
+    c, created = Cart.objects.get_or_create(number='Not Submitted', description='Order',username=request.user.get_username())
+
+    i = Item()
+    i.cart = c
+    i.description = request.POST['action']
+    i.data = request.POST
+    i.save()
+
 
     #return render(request, 'blog/post_edit.html', {'form': form})
 
@@ -66,10 +80,14 @@ def load_actions(request):
     actions = Action.objects.filter(service=service_id)
     return render(request, 'order/workflow_actions.html', {'actions': actions})
 
-def cart(request):
-    #item_list = Item.objects.order_by('-id')
-    item_list = ['one','two']
-    print(request.build_absolute_uri())
+def get_cart(request):
+    try:
+        c = Cart.objects.get(username=request.user.username).id
+    except Cart.DoesNotExist:
+        c = 0
+
+    item_list = Item.objects.order_by('-id').filter(cart=c)
+
     template = loader.get_template('order/cart.html')
     context = {
         'title': 'Shopping Cart',
