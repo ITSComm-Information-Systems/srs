@@ -115,14 +115,19 @@ def mypriv(request):
 
 def get_dept(request):
     if request.method == 'POST':
-        print(request.POST)
-        print(request.POST.get('dept_parm'))
-        print(request.POST[0])
-        return HttpResponseRedirect('/auth/deptpriv/' + '481054' + '/')
+        dept_parm = request.POST['dept_parm']
+        return HttpResponseRedirect('/auth/deptpriv/' + dept_parm + '/')
+    else:
+        dept_priv = '000000'
 
 
-def deptpriv(request, dept_parm):
+def deptpriv(request, dept_parm=''):
+    template = loader.get_template('oscauth/deptpriv.html')
     dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
+    if dept_parm == '':
+        return  HttpResponse(template.render({'dept_list': dept_list},request))
+
+#    dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
     dept_info = UmCurrentDeptManagersV.objects.filter(deptid=dept_parm)
     users = AuthUserDept.objects.filter(dept=dept_parm).order_by('group','user__last_name','user__first_name')
     rows = []
@@ -156,7 +161,7 @@ def deptpriv(request, dept_parm):
         prev_user = user.user
     data = {'col1' : col1, 'col2' : col2, 'roles': roles}
     rows.append(data)
-    template = loader.get_template('oscauth/deptpriv.html')
+#    template = loader.get_template('oscauth/deptpriv.html')
     context = {
         'dept_list': dept_list,
         'dept_status': dept_status,
@@ -167,8 +172,11 @@ def deptpriv(request, dept_parm):
     return HttpResponse(template.render(context, request))
 
 
-#def setpriv(request):
-
+def setpriv(request):
+    grantor_depts = AuthUserDept.objects.filter(user=request.user.id).order_by('dept')
+    grantable_roles = Role.objects.filter(grantable_by_dept=True, active=True)
+    template = loader.get_template('oscauth/setpriv.html')
+    return HttpResponse(template.render(context, request))
 
 
 @csrf_protect
