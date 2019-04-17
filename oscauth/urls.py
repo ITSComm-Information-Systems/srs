@@ -15,6 +15,7 @@ urlpatterns = [
     path('mypriv/', views.mypriv),
     path('get_dept/', views.get_dept),
     path('deptpriv/<str:dept_parm>/', views.deptpriv),
-#    path('setpriv/', views.setpriv),
+    path('deptpriv/', views.deptpriv),
+    path('setpriv/', views.setpriv),
 
 ]

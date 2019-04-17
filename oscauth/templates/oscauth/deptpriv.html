@@ -4,18 +4,24 @@
 <form action="/auth/get_dept/" method="POST">{% csrf_token %}
     <h1>Select a Department</h1>
     <p>Department ID 
-        <select id="dept_list">
-            <option value="%">----------</option>
+        <select type="select" name="dept_parm" id="dept" value="{{ dept.deptid }}">
+            <option value="%">--Select--</option>
             {% for dept in dept_list %}
-            <option value="{{ dept.deptid }}">{{ dept.deptid }}</option>
+            <option value={{ dept.deptid }}>{{ dept.deptid }}</option>
             {% endfor %}
         </select>
-    </p>
+     </p>
     <p><input type='submit' value='Submit'></p>
 </form>
 
+{% if dept_status != 'I' %}
 <h3>{{ subtitle1 }}</h3>
 <h4>{{ subtitle2 }}</h4>
+{% else %}
+<br><font size=+2 color="#FF0000">This department is inactive.</font>
+<h3><font color="#FF0000"> {{ subtitle1 }} </font></h3>
+<h4><font color="#FF0000"> {{ subtitle2 }} </font></h4>
+{% endif %}
 <table class="table table-hover table-headings">
     <thead>
         <tr>
