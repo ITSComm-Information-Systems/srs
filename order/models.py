@@ -112,6 +112,9 @@ class Constant(models.Model):
     field = models.CharField(max_length=100)
     value = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.field 
+
 class Cart(models.Model):
     number = models.CharField(max_length=20)
     description = models.CharField(max_length=100)
