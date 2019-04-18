@@ -114,7 +114,7 @@ DATABASES = {
         'HOST': os.getenv('DATABASE_SERVICE_NAME','pgoscdev.cvwq7quwqs3k.us-east-2.rds.amazonaws.com'),
     },
     'pinnacle': {
-        'NAME': os.getenv('ORACLE_DATABASE','pinndev_blade.world'),
+        'NAME': os.getenv('ORACLE_DATABASE','pinntst.dsc.umich.edu:1521/pinndev.world'),
         'ENGINE': 'django.db.backends.oracle',
         'USER': os.getenv('ORACLE_USER','PINN_CUSTOM'),
         'PASSWORD': os.getenv('ORACLE_PASSWORD','wpfx8rea'),

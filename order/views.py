@@ -2,18 +2,43 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render
 from order.forms import *
+from project.pinnmodels import UmOscPreorderApiV
 
-from .models import Cart, Product, Action, Service, Step, Element, Item
+from .models import Cart, Product, Action, Service, Step, Element, Item, Constant
 
 def submit_order(request):
     if request.method == "POST":
-        print('submit cart')
-        print(request.user.username)
+        c = Cart.objects.get(username=request.user.username)
+        create_preorder(c)
+
     else:
         print('fourOfour')
 
     #return ('thanks')
     return HttpResponseRedirect('/orders/cart/')
+
+def create_preorder(cart):
+
+    item_list = Item.objects.filter(cart=cart.id)
+
+    for item in item_list:
+        api = UmOscPreorderApiV()
+        api.add_info_text_3 = cart.id
+        api.add_info_text_4 = item.id
+        print(item.data)
+
+        action_id = item.data['action_id']
+        cons = Constant.objects.filter(action=action_id)
+        for con in cons:             #Populate the model with constants
+            setattr(api, con.field, con.value)
+        
+        #for key, value in item.data.items():
+        #    if value:           #Populate the model with user supplied values
+        #        setattr(api, key, value)
+        #        print(key + '>' + value +'<')
+
+    api.save()
+    print('saved')
 
 
 def add_to_cart(request):

@@ -4,25 +4,30 @@
 
 
     <fieldset class="module aligned {{ fieldset.classes }}">
-        <p>Rendering</p>
+        <h4>Rendering:</h4>
 
-        <ul>
-            {% for step in step_list %}
-            <li>{{ step.label }}</li>
-            <ul>
-                {% for element in step.element_list %}
-                    <li>{{ element.label }}</li>
-                {% endfor %}
-            </ul>
+        <table>
+        {% for step in step_list %}
+        <tr><td>{{ step.label }}</td></tr>
+            {% for element in step.element_list %}
+            <tr>
+                <td></td>
+                <td> {{ element.label }} </td>
+                <td> {{ element.type }} </td>
+                <td> {{ element.target }} </td>
+            </tr>
             {% endfor %}
-        </ul>
-
-        <p>Constants</p>
-        <ul>
+        {% endfor %}
+        </table>
+        <hr>
+        <h4>Constants</h4>
+        <table>
             {% for con in consts %}
-            <li>{{ con.label }}</li>
+            <tr>
+            <td>{{ con.field }}</td><td>{{ con.value }}</td> 
+            </tr>
             {% endfor %}
-        </ul>
+        </table>
 
     </fieldset>
     
