@@ -7,6 +7,8 @@ $(document).ready(function() {
       console.log('add class');
   }
 
+  $('#pills-step1').removeClass('disabled');
+
   console.log('ready');
   currStep = 1;
   lastStep = document.getElementsByClassName("tab-pane").length;
@@ -59,6 +61,7 @@ function nextPrev(n) {
   if (n == 1 && !validateForm()) return false;
 
   currStep = currStep + n;
+  $('#pills-step'+currStep).removeClass('disabled');
   $('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
   if (currStep > lastStep) {
       console.log('test');
