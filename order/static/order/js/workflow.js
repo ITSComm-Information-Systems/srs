@@ -1,13 +1,11 @@
 $(document).ready(function() {
 
-
   var x, i;
   x = document.getElementsByTagName("input");
   for (i = 0; i < x.length; i++) {
       x[i].className += " form-control";
       console.log('add class');
   }
-
 
   console.log('ready');
   currStep = 1;
@@ -35,32 +33,12 @@ $(document).ready(function() {
   });
 
   $("#nextBtn").click(function(event) {
-    console.log('next')
     nextPrev(1);
-    // Fetch form to apply custom Bootstrap validation
-
-  
-    //var inpObj = document.getElementsByClassName("fid_default_one_time_expense_acctorm-control");
-    //var inpObj = $('#id_default_one_time_expense_acct')[0]
-    //console.log(inpObj);
-    //if (form[0].checkValidity() === false) {
-    //if (inpObj.reportValidity() === false) {
-     // event.preventDefault()
-     // event.stopPropagation()
-    //  console.log('falsy')
-    //  form.addClass('was-validated');
-    //} else {
-      
-    //  console.log('truthy');
-     // form.removeClass('was-validated');
-   // }
-
-
-  
-    // Perform ajax submit here...
-    
   });
 
+  $("#prevBtn").click(function(event) {
+    nextPrev(-1);
+  });
 
 });
 
@@ -83,7 +61,9 @@ function nextPrev(n) {
   currStep = currStep + n;
   $('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
   if (currStep > lastStep) {
+      console.log('test');
       document.getElementById("workflowForm").submit();
+      console.log('two');
       return false;
   }
 }
@@ -100,20 +80,23 @@ function validateForm() {
   for (i = 0; i < y.length; i++) {
     // If a field is empty...
 
-    if (y[i].value == "") {
+    //if (y[i].value == "") {
+    if (y[i].checkValidity()) {
+      console.log('valid:' + y[i].name);
+    } else {
+
       // add an "invalid" class to the field:
       y[i].className += " invalid";
       console.log('invalid:' + y[i].name);
       // and set the current valid status to false:
       valid = false;
-    } else {
-      console.log('invalid:' + y[i].name);
+
     }
   }
   // If the valid status is true, mark the step as finished and valid:
   var form = $("#workflowForm");
   if (valid) {
-    document.getElementsByClassName("tab-pane")[currStep].className += " finish";
+    document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
     form.removeClass('was-validated');
   } else {
     form.addClass('was-validated');
