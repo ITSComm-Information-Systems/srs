@@ -4,10 +4,14 @@ $(document).ready(function() {
   x = document.getElementsByTagName("input");
   for (i = 0; i < x.length; i++) {
       x[i].className += " form-control";
-      console.log('add class');
+      console.log('add classform-check-input');
   }
 
-  $('#pills-step1').removeClass('disabled');
+  $('#id_field14').addClass('form-check');
+  $('#id_field14_0').addClass('form-check');
+  $('#id_field14_1').addClass('form-check');
+
+  $('#pills-step1').removeClass('disabled');  // Enable first pill 
 
   console.log('ready');
   currStep = 1;
@@ -15,7 +19,6 @@ $(document).ready(function() {
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
-  //$('#nextBtn').prop('disabled', true);
 
   // Phone Type Tab
   $("#purchaseYes").click(function() {
@@ -49,9 +52,11 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
   currStep = $(this)[0].id.substring(10, 12) * 1;
   console.log('shown tab event: ' + currStep + " of " + lastStep);
   if (currStep == lastStep) {
-      document.getElementById("nextBtn").innerHTML = "Add to Cart";
+      //document.getElementById("nextBtn").innerHTML = "Add to Cart";
+      $('#nextBtn').html('Add to Cart');
   } else {
-    document.getElementById("nextBtn").innerHTML = "Next";
+      //document.getElementById("nextBtn").innerHTML = "Next";
+      $('#nextBtn').html('Next');
   }
   $('#nextBtn').prop('disabled', false);
 })
@@ -64,9 +69,8 @@ function nextPrev(n) {
   $('#pills-step'+currStep).removeClass('disabled');
   $('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
   if (currStep > lastStep) {
-      console.log('test');
-      document.getElementById("workflowForm").submit();
-      console.log('two');
+      $('#workflowForm').submit();
+      //document.getElementById("workflowForm").submit();
       return false;
   }
 }
@@ -97,12 +101,12 @@ function validateForm() {
     }
   }
   // If the valid status is true, mark the step as finished and valid:
-  var form = $("#workflowForm");
+  //var form = $("#workflowForm");
   if (valid) {
     document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
-    form.removeClass('was-validated');
+    $("#workflowForm").removeClass('was-validated');
   } else {
-    form.addClass('was-validated');
+    $("#workflowForm").addClass('was-validated');
   }
   return valid; // return the valid status
 }
