@@ -4,14 +4,10 @@ $(document).ready(function() {
   x = document.getElementsByTagName("input");
   for (i = 0; i < x.length; i++) {
       x[i].className += " form-control";
-      console.log('add classform-check-input');
   }
 
-  $('#id_field14').addClass('form-check');
-  $('#id_field14_0').addClass('form-check');
-  $('#id_field14_1').addClass('form-check');
 
-  $('#pills-step1').removeClass('disabled');  // Enable first pill 
+  $('#pills-step1').removeClass('disabled');  // Enable first pill, that is how it all starts.
 
   console.log('ready');
   currStep = 1;
@@ -19,17 +15,43 @@ $(document).ready(function() {
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
+  $("#Conduit").hide();
+  $("#PurchasePhone").hide();
+  $("#ModelInfo").hide();
+  $("#PhoneSetType").hide();
+  $("#JackNumber").hide();
+
+  
 
   // Phone Type Tab
-  $("#purchaseYes").click(function() {
-      $("#byod").hide();
-      $("#phone_type").show();
+  $("#Jack_Yes").click(function() {
+    $("#JackNumber").show();
+    $("#Conduit").hide();
   });
 
-  $("#purchaseNo").click(function() {
-    $("#byod").show();
-    $("#phone_type").hide();
+  $("#Jack_No").click(function() {
+    $("#JackNumber").hide();
+    $("#Conduit").show();
   });
+
+  $("#Conduit_Yes").click(function() {
+    $("#PurchasePhone").show();
+  });
+
+  $("#Conduit_No").click(function() {
+    $("#PurchasePhone").show();
+  });
+
+  $("#PurchasePhone_Yes").click(function() {
+    $("#PhoneSetType").show();
+    $("#ModelInfo").hide();
+  });
+
+  $("#PurchasePhone_No").click(function() {
+    $("#ModelInfo").show();
+    $("#PhoneSetType").hide();
+  });
+
 
   $("#phone_type").click(function() {
     if ($('#phone_type option:selected') > 1) {
@@ -50,12 +72,9 @@ $(document).ready(function() {
 // Workflow stuff
 $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
   currStep = $(this)[0].id.substring(10, 12) * 1;
-  console.log('shown tab event: ' + currStep + " of " + lastStep);
   if (currStep == lastStep) {
-      //document.getElementById("nextBtn").innerHTML = "Add to Cart";
       $('#nextBtn').html('Add to Cart');
   } else {
-      //document.getElementById("nextBtn").innerHTML = "Next";
       $('#nextBtn').html('Next');
   }
   $('#nextBtn').prop('disabled', false);
@@ -70,7 +89,6 @@ function nextPrev(n) {
   $('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
   if (currStep > lastStep) {
       $('#workflowForm').submit();
-      //document.getElementById("workflowForm").submit();
       return false;
   }
 }
@@ -78,30 +96,15 @@ function nextPrev(n) {
 
 
 function validateForm() {
-  // This function deals with validation of the form fields
-  var x, y, i, valid = true;
-  x = document.getElementsByClassName("tab-pane");
-  console.log('validateForm:' + currStep + ' of ' + x.length);
-  y = x[currStep-1].getElementsByTagName("input");
-  // A loop that checks every input field in the current tab:
-  for (i = 0; i < y.length; i++) {
-    // If a field is empty...
-
-    //if (y[i].value == "") {
-    if (y[i].checkValidity()) {
-      console.log('valid:' + y[i].name);
-    } else {
-
-      // add an "invalid" class to the field:
-      y[i].className += " invalid";
-      console.log('invalid:' + y[i].name);
-      // and set the current valid status to false:
+  inp = $("#step" + currStep + " :input:visible");
+  valid = true;
+  for (i = 0; i < inp.length; i++) {
+    if (!inp[i].checkValidity()) {
+      inp[i].className += " invalid";
       valid = false;
-
     }
   }
-  // If the valid status is true, mark the step as finished and valid:
-  //var form = $("#workflowForm");
+
   if (valid) {
     document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
     $("#workflowForm").removeClass('was-validated');
