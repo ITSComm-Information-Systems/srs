@@ -70,10 +70,6 @@ class NewLocationForm(forms.Form):
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
-    jack = forms.BooleanField(label='Is there a Jack at the new location?')
-    jack_number = forms.CharField(label='Jack Number')
-    conduit = forms.BooleanField(label='Is there a Conduit at the new location?')
-    jack_count = forms.IntegerField(label='How many jacks would you like?')
 
 
 class EquipmentForm(forms.Form):

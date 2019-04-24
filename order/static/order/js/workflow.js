@@ -6,7 +6,6 @@ $(document).ready(function() {
       x[i].className += " form-control";
   }
 
-
   $('#pills-step1').removeClass('disabled');  // Enable first pill, that is how it all starts.
 
   console.log('ready');
@@ -32,6 +31,10 @@ $(document).ready(function() {
   $("#Jack_No").click(function() {
     $("#JackNumber").hide();
     $("#Conduit").show();
+  });
+
+  $("#JackNumber").keypress(function() {
+    $("#PurchasePhone").show();
   });
 
   $("#Conduit_Yes").click(function() {
@@ -80,6 +83,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
   $('#nextBtn').prop('disabled', false);
 })
 
+
 function nextPrev(n) {
 
   if (n == 1 && !validateForm()) return false;
@@ -92,7 +96,6 @@ function nextPrev(n) {
       return false;
   }
 }
-
 
 
 function validateForm() {
