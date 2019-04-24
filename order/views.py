@@ -90,7 +90,7 @@ def get_workflow(request, action_id):
                 else:
                     field = forms.IntegerField(label=element.label)
 
-                f.fields.update({element.target: field})
+                f.fields.update({element.name: field})
 
             tab.form = f
         else:
