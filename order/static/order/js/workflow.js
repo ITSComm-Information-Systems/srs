@@ -8,9 +8,21 @@ $(document).ready(function() {
 
   $('#pills-step1').removeClass('disabled');  // Enable first pill, that is how it all starts.
 
+
+  console.log("X:" + x);
+
   console.log('ready');
   currStep = 1;
   lastStep = document.getElementsByClassName("tab-pane").length;
+
+  //  <input type="hidden" id="wfname" name="action" value="TestWorkflows"">
+  if ( $('#wfname')[0].value === 'TestWorkflows' ) {
+    for (i = 0; i < lastStep; i++) {
+    $('#pills-step'+ i).removeClass('disabled'); 
+    console.log('count:' + lastStep)
+    }
+  }
+
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
@@ -77,12 +89,23 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
   currStep = $(this)[0].id.substring(10, 12) * 1;
   if (currStep == lastStep) {
       $('#nextBtn').html('Add to Cart');
+      reviewTab();
   } else {
       $('#nextBtn').html('Next');
   }
   $('#nextBtn').prop('disabled', false);
 })
 
+function reviewTab() {
+  choices = $(":input");
+  //console.log('run review tab:' + choices);
+
+  for (i = 0; i < choices.length; i++) {
+    console.log(choices[i]);
+    $('#review').html('Your selections...');
+  }
+
+}
 
 function nextPrev(n) {
 
