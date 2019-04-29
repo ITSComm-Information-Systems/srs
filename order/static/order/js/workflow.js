@@ -8,10 +8,6 @@ $(document).ready(function() {
 
   $('#pills-step1').removeClass('disabled');  // Enable first pill, that is how it all starts.
 
-
-  console.log("X:" + x);
-
-  console.log('ready');
   currStep = 1;
   lastStep = document.getElementsByClassName("tab-pane").length;
 
@@ -19,7 +15,6 @@ $(document).ready(function() {
   if ( $('#wfname')[0].value === 'TestWorkflows' ) {
     for (i = 0; i < lastStep; i++) {
     $('#pills-step'+ i).removeClass('disabled'); 
-    console.log('count:' + lastStep)
     }
   }
 
@@ -33,7 +28,6 @@ $(document).ready(function() {
   $("#JackNumber").hide();
 
   
-
   // Phone Type Tab
   $("#Jack_Yes").click(function() {
     $("#JackNumber").show();
@@ -89,23 +83,12 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
   currStep = $(this)[0].id.substring(10, 12) * 1;
   if (currStep == lastStep) {
       $('#nextBtn').html('Add to Cart');
-      reviewTab();
   } else {
       $('#nextBtn').html('Next');
   }
   $('#nextBtn').prop('disabled', false);
 })
 
-function reviewTab() {
-  choices = $(":input");
-  //console.log('run review tab:' + choices);
-
-  for (i = 0; i < choices.length; i++) {
-    console.log(choices[i]);
-    $('#review').html('Your selections...');
-  }
-
-}
 
 function nextPrev(n) {
 
@@ -125,6 +108,9 @@ function validateForm() {
   inp = $("#step" + currStep + " :input:visible");
   valid = true;
   for (i = 0; i < inp.length; i++) {
+    id = "#" + $(inp[i]).attr('id') + "_review";
+    $(id).html($(inp[i]).val());
+    
     if (!inp[i].checkValidity()) {
       inp[i].className += " invalid";
       valid = false;
