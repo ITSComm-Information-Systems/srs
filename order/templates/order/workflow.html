@@ -10,7 +10,7 @@
 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     {% for tab in tab_list %}
       <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" id="pills-{{ tab.step }}" href="#{{ tab.step }}" role="tab" aria-controls="pills-{{ tab.name }}" aria-selected="false">{{ tab.label }}</a>
+        <a class="nav-link disabled" data-toggle="tab" id="pills-{{ tab.step }}" href="#{{ tab.step }}" role="tab" aria-controls="pills-{{ tab.name }}" aria-selected="false">{{ tab.label }}</a>
       </li>
     {% endfor %}
   </ul>
@@ -27,8 +27,8 @@
 
     <div style="overflow:auto;">
       <div style="float:right;">
-        <button type="button" class="btn btn-primary" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
-        <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextPrev(1)">Next</button>
+        <button type="button" class="btn btn-primary" id="prevBtn">Previous</button>
+        <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
       </div>
     </div>
 

@@ -9,6 +9,7 @@ class Step(models.Model):
         ('LocationForm', 'Location'),
         ('EquipmentForm', 'Equipment'),
         ('NewLocationForm', 'New Location'),
+        ('AddlInfoForm', 'Additional Information'),
         ('ReviewForm', 'Review'),
         ('ChartfieldForm', 'Chartfield'),
         ('RestrictionsForm', 'Restrictions'),
@@ -38,6 +39,9 @@ class Element(models.Model):
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=2, choices=ELEMENT_CHOICES)
     target = models.CharField(max_length=80)
+
+    def __str__(self):
+        return self.name
 
 class Product(models.Model):
     name = models.CharField(max_length=80)
@@ -112,6 +116,9 @@ class Constant(models.Model):
     field = models.CharField(max_length=100)
     value = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.field 
+
 class Cart(models.Model):
     number = models.CharField(max_length=20)
     description = models.CharField(max_length=100)
@@ -119,6 +126,10 @@ class Cart(models.Model):
 
     def __str__(self):
         return self.description
+    
+    def leppard(self):
+        pour=['me']
+        pour.append('sugar')
 
 class Item(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
