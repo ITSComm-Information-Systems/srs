@@ -1,49 +1,127 @@
 $(document).ready(function() {
-  console.log('ready');
+
+  var x, i;
+  x = document.getElementsByTagName("input");
+  for (i = 0; i < x.length; i++) {
+      x[i].className += " form-control";
+  }
+
+  $('#pills-step1').removeClass('disabled');  // Enable first pill, that is how it all starts.
+
   currStep = 1;
   lastStep = document.getElementsByClassName("tab-pane").length;
+
+  //  <input type="hidden" id="wfname" name="action" value="TestWorkflows"">
+  if ( $('#wfname')[0].value === 'TestWorkflows' ) {
+    for (i = 0; i < lastStep; i++) {
+    $('#pills-step'+ i).removeClass('disabled'); 
+    }
+  }
+
+
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
-  //$('#nextBtn').prop('disabled', true);
+  $("#Conduit").hide();
+  $("#PurchasePhone").hide();
+  $("#ModelInfo").hide();
+  $("#PhoneSetType").hide();
+  $("#JackNumber").hide();
 
+  
   // Phone Type Tab
-  $("#purchaseYes").click(function() {
-      $("#byod").hide();
-      $("#phone_type").show();
+  $("#Jack_Yes").click(function() {
+    $("#JackNumber").show();
+    $("#Conduit").hide();
   });
 
-  $("#purchaseNo").click(function() {
-    $("#byod").show();
-    $("#phone_type").hide();
+  $("#Jack_No").click(function() {
+    $("#JackNumber").hide();
+    $("#Conduit").show();
   });
+
+  $("#JackNumber").keypress(function() {
+    $("#PurchasePhone").show();
+  });
+
+  $("#Conduit_Yes").click(function() {
+    $("#PurchasePhone").show();
+  });
+
+  $("#Conduit_No").click(function() {
+    $("#PurchasePhone").show();
+  });
+
+  $("#PurchasePhone_Yes").click(function() {
+    $("#PhoneSetType").show();
+    $("#ModelInfo").hide();
+  });
+
+  $("#PurchasePhone_No").click(function() {
+    $("#ModelInfo").show();
+    $("#PhoneSetType").hide();
+  });
+
 
   $("#phone_type").click(function() {
-    console.log('test');
     if ($('#phone_type option:selected') > 1) {
       $('#nextBtn').prop('disabled', false);
     }
   });
-  
 
+  $("#nextBtn").click(function(event) {
+    nextPrev(1);
+  });
+
+  $("#prevBtn").click(function(event) {
+    nextPrev(-1);
+  });
 
 });
 
 // Workflow stuff
 $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
   currStep = $(this)[0].id.substring(10, 12) * 1;
-  console.log(lastStep)
   if (currStep == lastStep) {
-      document.getElementById("nextBtn").innerHTML = "Add to Cart";
+      $('#nextBtn').html('Add to Cart');
+  } else {
+      $('#nextBtn').html('Next');
   }
   $('#nextBtn').prop('disabled', false);
 })
 
-function nextPrev(n) {
-  currStep = currStep + n;
-  $('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
 
+function nextPrev(n) {
+
+  if (n == 1 && !validateForm()) return false;
+
+  currStep = currStep + n;
+  $('#pills-step'+currStep).removeClass('disabled');
+  $('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
   if (currStep > lastStep) {
-      document.getElementById("workflowForm").submit();
+      $('#workflowForm').submit();
       return false;
   }
+}
+
+
+function validateForm() {
+  inp = $("#step" + currStep + " :input:visible");
+  valid = true;
+  for (i = 0; i < inp.length; i++) {
+    id = "#" + $(inp[i]).attr('id') + "_review";
+    $(id).html($(inp[i]).val());
+    
+    if (!inp[i].checkValidity()) {
+      inp[i].className += " invalid";
+      valid = false;
+    }
+  }
+
+  if (valid) {
+    document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
+    $("#workflowForm").removeClass('was-validated');
+  } else {
+    $("#workflowForm").addClass('was-validated');
+  }
+  return valid; // return the valid status
 }

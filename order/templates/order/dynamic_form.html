@@ -1,14 +1,10 @@
-<table>
 {% for field in tab.form %}
-  <tr>
-    <div class="fieldWrapper"><td>
+    <div class="form-group row col-4" id="{{ field.name }}">
+        <div class = "form-check">
         {{ field.errors }}
         {{ field.label_tag }} {{ field }}
-        {% if field.help_text %}
-        <p class="help">{{ field.help_text|safe }}</p>
-        {% endif %}
-      </td>
+        <div class="invalid-feedback">Please enter a value.</div>
+        <div class="valid-feedback">Good.</div>
+        </div>
     </div>
-  </tr>
 {% endfor %}
-</table>

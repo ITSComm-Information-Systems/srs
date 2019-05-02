@@ -18,6 +18,8 @@ class FeaturesForm(forms.Form):
 class PhoneForm(forms.Form):
     phone_number = forms.CharField(label='Phone')
 
+    
+
 
 class RestrictionsForm(forms.Form):
     restrictions = forms.ModelMultipleChoiceField(
@@ -49,13 +51,18 @@ class ChartfieldForm(forms.Form):
     local = forms.CharField(label='Local', max_length=6)
     longdistance = forms.CharField(label='Long Distance', max_length=6)
 
-class ReviewForm(forms.Form):
+class AddlInfoForm(forms.Form):
     contact = forms.BooleanField(label='Are you the on-site contact person?')
     contact_id = forms.CharField(label='Uniqname', max_length=8)
     contact_name = forms.CharField(label='Name', max_length=40)
     contact_number = forms.CharField(label='Best number to contact.', max_length=8)
-    comments = forms.CharField( widget=forms.Textarea )
-    file = forms.FileField()
+    comments = forms.CharField(required=False, widget=forms.Textarea )
+    file = forms.FileField(required=False)
+
+class ReviewForm(forms.Form):
+    summary = forms.CharField(label='summary', max_length=6)
+    template = 'order/review.html'
+
 
 class NewLocationForm(forms.Form):
     label = 'Location Form'
@@ -70,10 +77,6 @@ class NewLocationForm(forms.Form):
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
-    jack = forms.BooleanField(label='Is there a Jack at the new location?')
-    jack_number = forms.CharField(label='Jack Number')
-    conduit = forms.BooleanField(label='Is there a Conduit at the new location?')
-    jack_count = forms.IntegerField(label='How many jacks would you like?')
 
 
 class EquipmentForm(forms.Form):
