@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+{{ result }}
+<p>Inactive departments are shown in <font color="#FF0000">red.</font></p>
+<br>
+<table class="table table-hover table-headings">
+    <thead>
+        <tr>
+                <th>Department ID</th>
+                <th>Department Name</th>
+                <th>Role</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+                {% if row.dept_status != 'I' %}
+                <td> {{ row.col1 }}</td>
+                <td> {{ row.col2 }}</td>
+                <td> {{ row.roles }}</td>
+                {% else %}
+                <td><font color="#FF0000"> {{ row.col1 }} </font></td>
+                <td><font color="#FF0000"> {{ row.col2 }} </font></td>
+                <td> {{ row.roles }}</td>
+                {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
