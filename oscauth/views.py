@@ -13,6 +13,8 @@ from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth import get_user_model
 
+from ldap3 import Server, Connection, ALL
+
 from .models import AuthUserDept
 from .models import Role, Group, User
 from .forms import UserSuForm, AddUserForm
@@ -127,7 +129,6 @@ def deptpriv(request, dept_parm=''):
     if dept_parm == '':
         return  HttpResponse(template.render({'dept_list': dept_list},request))
 
-#    dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
     dept_info = UmCurrentDeptManagersV.objects.filter(deptid=dept_parm)
     users = AuthUserDept.objects.filter(dept=dept_parm).order_by('group','user__last_name','user__first_name')
     rows = []
@@ -161,7 +162,6 @@ def deptpriv(request, dept_parm=''):
         prev_user = user.user
     data = {'col1' : col1, 'col2' : col2, 'roles': roles}
     rows.append(data)
-#    template = loader.get_template('oscauth/deptpriv.html')
     context = {
         'dept_list': dept_list,
         'dept_status': dept_status,
@@ -172,11 +172,274 @@ def deptpriv(request, dept_parm=''):
     return HttpResponse(template.render(context, request))
 
 
-def setpriv(request):
-    grantor_depts = AuthUserDept.objects.filter(user=request.user.id).order_by('dept')
-    grantable_roles = Role.objects.filter(grantable_by_dept=True, active=True)
+def get_uniqname(request, uniqname_parm=''):
     template = loader.get_template('oscauth/setpriv.html')
+    if request.method == 'POST':  #big work here
+        print(request.POST)
+        uniqname_parm = request.POST['uniqname_parm']
+
+    if uniqname_parm == '':
+        set_priv = ''
+        return  HttpResponse(template.render({'uniqname_parm': uniqname_parm}, request))
+    else:
+        # Check for valid uniqname format
+        if len(uniqname_parm) < 3 or len(uniqname_parm) > 8 or uniqname_parm.isalpha is False:
+            result = uniqname_parm + ' is not a valid uniqname'
+            print('uniqname_parm: %s %s' % (uniqname_parm, result))
+            return  HttpResponse(template.render({'result': result}, request))
+        else:
+            # Get User from MCommunity
+            conn = Connection('ldap.umich.edu', auto_bind=True)
+            conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname_parm + ')', attributes=["uid","mail","user","givenName","sn"])
+            
+            if conn.entries:
+                mc_user = conn.entries[0]
+                result = ''
+
+                try:
+                    osc_user = User.objects.filter(username=uniqname_oarm)
+                except:
+                    osc_user = User()
+
+                osc_user.username = mc_user.uid
+                osc_user.last_name = mc_user.sn
+                osc_user.first_name = mc_user.givenName
+                osc_user.email = mc_user.mail
+
+                context = {
+                    'uniqname_parm': uniqname_parm,
+                    'osc_user': osc_user,
+                    'osc_user.last_name': osc_user.last_name,
+                    'osc_user.first_name': osc_user.first_name,
+                    'last_name': osc_user.last_name,
+                    'first_name': osc_user.first_name,
+                    'result': result,
+                }
+
+                return render(request, 'oscauth/setpriv.html', context)
+                #return HttpResponseRedirect('/auth/setpriv/' + uniqname_parm + '/' + last_name + '/' + first_name + '/')
+
+            else:
+                result = uniqname_parm + ' is not in MCommunity'
+                return  HttpResponse(template.render({'result': result}, request))
+
+
+
+def setpriv(request, uniqname_parm, last_name, first_name):
+#    result  = ''
+#    last_name = ''
+#    first_name = ''
+
+    template = loader.get_template('oscauth/setpriv.html')
+#    if request.method == 'POST':
+#        uniqname_parm = request.POST['uniqname_parm']
+#        osc_user = request.POST['osc_user']
+#        last_name = request.POST['last_name']
+#        first_name = request.POST['first_name']
+#        print('osc_user: %s' % osc_user)
+#        last_name = osc_user.last_name
+#        first_name = osc_user.first_name
+
+#    if uniqname_parm == '':
+#        return  HttpResponse(template.render(request))
+
+    if uniqname_parm is not None:
+        print('Uniqname: %s   Last Name: %s   First Name: %s' % (uniqname_parm, last_name, first_name))
+
+    grantor_depts = AuthUserDept.objects.filter(user=request.user.id).exclude(dept='All').order_by('dept')
+    grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
+    rows = []
+    dept_name = ''
+    dept_status = ''
+
+    for role in grantable_roles:
+        role = role.role
+
+    for dept in grantor_depts:
+        dept = dept.dept
+        dept_info = UmCurrentDeptManagersV.objects.get(deptid=dept)
+        dept_name = dept_info.dept_name
+        dept_status = dept_info.dept_status
+        data = {'dept_status' : dept_status,'dept' : dept, 'dept_name' : dept_name}
+        rows.append(data)
+
+    dept_checked = request.POST.getlist('dchcecks[]')
+    role_checked = request.POST.getlist('rchcecks[]')
+
+    print(dept_checked)
+    print(role_checked)
+
+    context = {
+        'uniqname_parm': uniqname_parm,
+        'last_name': last_name,
+        'last_name': last_name,
+        'dept_checked': dept_checked,
+        'role_checked': dept_checked,
+        'grantable_roles': grantable_roles,
+        'grantor_depts': grantor_depts,
+        'rows': rows
+    }
     return HttpResponse(template.render(context, request))
+
+
+def showpriv(request, uniqname_parm, last_name, first_name):
+    user_id = ''
+
+    if request.method == 'POST':
+        uniqname_parm = request.POST['uniqname_parm']
+        last_name = request.POST['last_name']
+        first_name = request.POST['first_name']
+
+    template = loader.get_template('oscauth/showpriv.html')
+    if uniqname_parm == '':
+        result = 'Please enter uniqname'
+        return HttpResponseRedirect('/auth/setpriv/', request)
+
+    else:
+
+        try:
+            user_id = User.objects.get(username=uniqname_parm).id
+    #        depts = AuthUserDept.objects.filter(user=osc_user.id).order_by('dept')
+            depts = AuthUserDept.objects.filter(user=user_id).order_by('dept')
+            rows = []
+            prev_dept = ''
+            dept_name = ''
+            dept_status = ''
+            group_name = ''
+            col1 = ''
+            col2 = ''
+            roles = ''
+            i = 0
+            for dept in depts:
+    #            template = loader.get_template('oscauth/showpriv.html')
+                dept_info = UmOscDeptProfileV.objects.filter(deptid=dept.dept)
+                if dept.dept == 'All':
+                    dept_name = 'All departments'
+                    dept_status = 'A'
+                else:
+                    for name in dept_info:
+                        dept_name = name.dept_name
+
+                group_name = Group.objects.get(name=dept.group).name
+
+                if dept.dept == prev_dept:
+                    roles = roles + ', ' + group_name
+                else:
+                    if prev_dept != '':
+                        data = {'dept_status' : dept_status,'col1' : col1, 'col2' : col2,  'roles': roles}
+                        rows.append(data)
+                    i = i + 1
+                    dept_status = name.dept_eff_status
+                    col1 = dept.dept
+                    col2 = dept_name
+                    roles = group_name
+                prev_dept = dept.dept
+            data = {'dept_status' : dept_status,'col1' : col1, 'col2' : col2, 'roles': roles}
+            rows.append(data)
+        #    template = loader.get_template('oscauth/showpriv.html')
+            context = {
+                'title': 'Current Privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
+                'rows': rows
+            }
+        except:
+            context = {
+                'title': 'There currently are no privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')'
+            }
+            
+    return HttpResponse(template.render(context, request))
+
+
+def addpriv(request, uniqname_parm):
+#def addpriv(request):
+    result = ''
+    template = loader.get_template('oscauth/addpriv.html')
+
+    if request.method == 'POST':
+        uniqname_parm = request.POST['uniqname_parm']
+        osc_user = request.POST['osc_user']
+        last_name = request.POST['last_name']
+        first_name = request.POST['first_name']
+        dept_checked = request.POST['dept_checked']
+        role_checked = request.POST['role_checked']
+        result = request.POST['result']
+        print('Add access for %s' % uniqname_parm)
+
+    try:
+        user_id = User.objects.get(username=uniqname_parm).id
+        result = 'User already exists'
+        print('User already exists')
+    except:
+#    	upsert_user(uniqname_parm)
+        result = 'Added user'
+        print('Added user')
+        user_id = User.objects.get(username=uniqname_parm).id
+
+        new_auth = AuthUserDept()
+
+#    for dept in dept_checked:
+#	    for role in role_checked:
+#            groupid = Role.objects.get(role=role.rchecked).group
+
+#            new_auth.user = user_id
+#            new_auth.role = groupid
+#            new_auth.dept = dept.deptid
+#            new_auth.save()
+
+#            result = 'Added'
+#            print('Added User: %s  Role: %s   Dept: %s' % (uniqname_parm, new_auth.role, new_auth.dept))
+
+#        context = {
+#            'title': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
+#            'uniqname_parm': uniqname_parm,
+#            'last_name': last_name,
+#            'first_name': first_name,
+#            'result': result
+#        }
+
+#    return HttpResponseRedirect('/auth/setpriv/' + uniqname_parm + '/', context)
+        return HttpResponse(template.render(context, request))
+
+
+
+def removepriv(request, uniqname_parm):
+#def removepriv(request):
+    result = ''
+    template = loader.get_template('oscauth/addpriv.html')
+
+    if request.method == 'POST':
+        uniqname_parm = request.POST['uniqname_parm']
+        osc_user = request.POST['osc_user']
+        last_name = request.POST['last_name']
+        first_name = request.POST['first_name']
+        dept_checked = request.POST['dept_checked']
+        role_checked = request.POST['role_checked']
+        result = request.POST['result']
+        print('Remove access for %s' % uniqname_parm)
+
+        user_id = User.objects.get(username=uniqname_parm).id
+
+    for dept in dept_checked:
+	    for role in role_checked:
+		    groupid = Role.objects.get(role=role.rchecked).group
+
+
+		    try:
+			    osc_auth = AuthUserDept.objects.filter(user=user_id, dept=dept.deptid, role=groupid)
+#			    osc_auth.delete()
+
+			    print('Removed User: %s  Role: %d   Dept: %s' % (uniqname_parm, role.role, dept.deptid))
+
+		    except:   
+			    continue
+
+    context = {
+        'uniqname_parm': uniqname_parm,
+        'osc_user': osc_user,
+        'result': result,
+    }
+#    return HttpResponseRedirect('/auth/setpriv/' + uniqname_parm + '/', context)
+    return HttpResponse(template.render(context, request))
+
 
 
 @csrf_protect

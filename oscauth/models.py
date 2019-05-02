@@ -42,3 +42,15 @@ class AuthUserDept(models.Model):
     class Meta:
         db_table = 'auth_user_dept'
         unique_together = (("user", "group", "dept"),)
+
+class Grantor(models.Model):
+    grantor_role = models.ForeignKey(Group, on_delete=models.PROTECT)
+    granted_role = models.ForeignKey(Role, on_delete=models.PROTECT)
+    display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
+
+    def __str__(self):
+        return self.role
+
+    class Meta:
+        db_table = 'auth_grantor'
+        unique_together = (("grantor_role", "granted_role"),)
