@@ -3,7 +3,6 @@ from django.template import loader
 from django.shortcuts import render
 from order.forms import *
 from project.pinnmodels import UmOscPreorderApiV
-from .widgets import YesNoInput
 
 from .models import Cart, Product, Action, Service, Step, Element, Item, Constant
 
@@ -84,12 +83,18 @@ def get_workflow(request, action_id):
             for element in element_list:
                 if element.type == 'YN':
                     #field = forms.ChoiceField(label=element.label, widget=forms.RadioSelect, choices=(('Y', 'Yes',), ('N', 'No',)))
-                    field = forms.ChoiceField(label=element.label, widget=YesNoInput, choices=(('Y', 'Yes',), ('N', 'No',)))
+                    field = forms.ChoiceField(label=element.label, choices=(('Y', 'Yes',), ('N', 'No',)))
+                elif element.type == 'Radio':
+                    field = forms.ChoiceField(label=element.label, choices=eval(element.attributes))
+
                 elif element.type == 'ST':
                     field = forms.CharField(label=element.label)
+                elif element.type == 'PH':
+                    field = forms.ChoiceField(label=element.label, widget=PhoneSetType, choices=(('B', 'Basic',), ('A', 'Advanced',),('V', 'VOIP',)))
                 else:
                     field = forms.IntegerField(label=element.label)
 
+                field.type = element.type                
                 f.fields.update({element.name: field})
 
             tab.form = f

@@ -17,11 +17,7 @@
   <div class="tab-content" id="pills-tabContent">
     {% for tab in tab_list %}
       <div class="tab-pane fade" id="{{ tab.step }}" role="tabpanel" aria-labelledby="pills-contact-tab">
-        {% if tab.form.template %}
           {% include tab.form.template %}
-        {% else %}
-          <table>{{tab.form.as_table}}</table>
-        {% endif %}
       </div>
     {% endfor %}
 
