@@ -29,15 +29,18 @@ class Element(models.Model):
     ELEMENT_CHOICES = (
         ('', ''),
         ('YN', 'Yes/No'),
+        ('Radio', 'Radio'),
         ('ST', 'String'),
         ('NU', 'Number'),
+        ('PH', 'Phone Set Type'),
     )
 
     name = models.CharField(max_length=20)
     label = models.CharField(max_length=100)
     display_seq_no = models.PositiveIntegerField()
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
-    type = models.CharField(max_length=2, choices=ELEMENT_CHOICES)
+    type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
+    attributes = models.CharField(blank=True, max_length=100)
     target = models.CharField(max_length=80)
 
     def __str__(self):

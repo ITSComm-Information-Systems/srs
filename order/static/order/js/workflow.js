@@ -29,12 +29,12 @@ $(document).ready(function() {
 
   
   // Phone Type Tab
-  $("#Jack_Yes").click(function() {
+  $("#Jack_Y").click(function() {
     $("#JackNumber").show();
     $("#Conduit").hide();
   });
 
-  $("#Jack_No").click(function() {
+  $("#Jack_N").click(function() {
     $("#JackNumber").hide();
     $("#Conduit").show();
   });
@@ -43,20 +43,20 @@ $(document).ready(function() {
     $("#PurchasePhone").show();
   });
 
-  $("#Conduit_Yes").click(function() {
+  $("#Conduit_Y").click(function() {
     $("#PurchasePhone").show();
   });
 
-  $("#Conduit_No").click(function() {
+  $("#Conduit_N").click(function() {
     $("#PurchasePhone").show();
   });
 
-  $("#PurchasePhone_Yes").click(function() {
+  $("#PurchasePhone_Y").click(function() {
     $("#PhoneSetType").show();
     $("#ModelInfo").hide();
   });
 
-  $("#PurchasePhone_No").click(function() {
+  $("#PurchasePhone_N").click(function() {
     $("#ModelInfo").show();
     $("#PhoneSetType").hide();
   });
@@ -109,6 +109,7 @@ function validateForm() {
   valid = true;
   for (i = 0; i < inp.length; i++) {
     id = "#" + $(inp[i]).attr('id') + "_review";
+    console.log('id:' + $("#AnalogIP").val());
     $(id).html($(inp[i]).val());
     
     if (!inp[i].checkValidity()) {
