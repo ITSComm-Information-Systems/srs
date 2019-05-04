@@ -28,6 +28,16 @@ $(document).ready(function() {
   $("#JackNumber").hide();
 
   
+
+  $("#AnalogIP_A").click(function() {
+    v = $("#AnalogIP:checked").val();
+    console.log('id:' + v);
+  });
+
+  $("#AnalogIP_IP").click(function() {
+    console.log('id:' + $(":radio:checked").val());
+  });
+
   // Phone Type Tab
   $("#Jack_Y").click(function() {
     $("#JackNumber").show();
@@ -109,7 +119,8 @@ function validateForm() {
   valid = true;
   for (i = 0; i < inp.length; i++) {
     id = "#" + $(inp[i]).attr('id') + "_review";
-    console.log('id:' + $("#AnalogIP").val());
+    //console.log('id:' + $("#AnalogIP:checked").val());
+
     $(id).html($(inp[i]).val());
     
     if (!inp[i].checkValidity()) {
@@ -118,6 +129,18 @@ function validateForm() {
     }
   }
 
+    $("input[type='radio']:checked").each(function() {
+        var idVal = $(this).attr("id");
+        console.log('checked');
+        //console.log($("label[for='"+idVal+"']").text());
+        id = "#id_" + $(this).attr("name") + "_review";
+        console.log('target:' + id);
+        $(id).html($("label[for='"+idVal+"']").text());
+        console.log('end');
+    });
+
+  
+  
   if (valid) {
     document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
     $("#workflowForm").removeClass('was-validated');
