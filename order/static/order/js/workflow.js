@@ -27,48 +27,49 @@ $(document).ready(function() {
   $("#PhoneSetType").hide();
   $("#JackNumber").hide();
 
-  
-
-  $("#AnalogIP_A").click(function() {
-    v = $("#AnalogIP:checked").val();
-    console.log('id:' + v);
-  });
-
-  $("#AnalogIP_IP").click(function() {
-    console.log('id:' + $(":radio:checked").val());
-  });
 
   // Phone Type Tab
   $("#Jack_Y").click(function() {
     $("#JackNumber").show();
+    $("#JackNumber_review").show();
     $("#Conduit").hide();
+    $("#Conduit_review").hide();
   });
 
   $("#Jack_N").click(function() {
     $("#JackNumber").hide();
+    $("#JackNumber_review").hide();
     $("#Conduit").show();
+    $("#Conduit_review").show();
   });
 
   $("#JackNumber").keypress(function() {
     $("#PurchasePhone").show();
+    $("#PurchasePhone_review").show();
   });
 
   $("#Conduit_Y").click(function() {
     $("#PurchasePhone").show();
+    $("#PurchasePhone_review").show();
   });
 
   $("#Conduit_N").click(function() {
     $("#PurchasePhone").show();
+    $("#PurchasePhone_review").show();
   });
 
   $("#PurchasePhone_Y").click(function() {
     $("#PhoneSetType").show();
+    $("#PhoneSetType_review").show();
     $("#ModelInfo").hide();
+    $("#ModelInfo_review").hide();
   });
 
   $("#PurchasePhone_N").click(function() {
     $("#ModelInfo").show();
+    $("#ModelInfo_review").show();
     $("#PhoneSetType").hide();
+    $("#PhoneSetType_review").hide();
   });
 
 
@@ -119,24 +120,17 @@ function validateForm() {
   valid = true;
   for (i = 0; i < inp.length; i++) {
     id = "#" + $(inp[i]).attr('id') + "_review";
-    //console.log('id:' + $("#AnalogIP:checked").val());
-
     $(id).html($(inp[i]).val());
-    
     if (!inp[i].checkValidity()) {
       inp[i].className += " invalid";
       valid = false;
     }
   }
 
-    $("input[type='radio']:checked").each(function() {
+    $("input[type='radio']:checked").each(function() { // Update review form with radio data
         var idVal = $(this).attr("id");
-        console.log('checked');
-        //console.log($("label[for='"+idVal+"']").text());
         id = "#id_" + $(this).attr("name") + "_review";
-        console.log('target:' + id);
         $(id).html($("label[for='"+idVal+"']").text());
-        console.log('end');
     });
 
   
