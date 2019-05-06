@@ -5,7 +5,9 @@
   <div class="card-body">
     <p class="card-text">
       {% for field in tab.form %}
-        <b>{{ field.label_tag }} </b><span id="id_{{field.name}}_review">Value</span></br>
+      <div id="{{field.name}}_review">
+        <b>{{ field.label_tag }} </b><span id="id_{{field.name}}_review">Val</span></br>
+      </div>
       {% endfor %}
     </p>
   </div>
