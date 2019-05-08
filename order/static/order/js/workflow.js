@@ -12,53 +12,86 @@ $(document).ready(function() {
   lastStep = document.getElementsByClassName("tab-pane").length;
 
   //  <input type="hidden" id="wfname" name="action" value="TestWorkflows"">
-  if ( $('#wfname')[0].value === 'TestWorkflows' ) {
-    for (i = 0; i < lastStep; i++) {
+  console.log('x:'+ $("h1").html());
+  if ( $("h1").html() === 'TestWorkflows' ) {
+    console.log('test');
+    for (i = 1; i < lastStep+1; i++) {
     $('#pills-step'+ i).removeClass('disabled'); 
+    console.log('omg'+i);
     }
   }
 
+  $("#buildingSearch").on("keyup", function() {
+    $("#buildingTable").show();
+    var value = $(this).val().toLowerCase();
+    $("#buildingTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+
+  $('#buildingTable tr').click(function() {
+    var building = $(this).find("td").eq(1).html();   
+    var buildingCode = $(this).find("td").eq(0).html();   
+    $('#buildingName').val(building);
+    $('#buildingID').val(buildingCode);
+    $("#buildingTable").hide();
+    $("#buildingFields").show();
+  });
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
+  
+  $("#buildingFields").hide();
+  $("#buildingTable").hide();
   $("#Conduit").hide();
   $("#PurchasePhone").hide();
   $("#ModelInfo").hide();
   $("#PhoneSetType").hide();
   $("#JackNumber").hide();
 
-  
+
   // Phone Type Tab
-  $("#Jack_Yes").click(function() {
+  $("#Jack_Y").click(function() {
     $("#JackNumber").show();
+    $("#JackNumber_review").show();
     $("#Conduit").hide();
+    $("#Conduit_review").hide();
   });
 
-  $("#Jack_No").click(function() {
+  $("#Jack_N").click(function() {
     $("#JackNumber").hide();
+    $("#JackNumber_review").hide();
     $("#Conduit").show();
+    $("#Conduit_review").show();
   });
 
   $("#JackNumber").keypress(function() {
     $("#PurchasePhone").show();
+    $("#PurchasePhone_review").show();
   });
 
-  $("#Conduit_Yes").click(function() {
+  $("#Conduit_Y").click(function() {
     $("#PurchasePhone").show();
+    $("#PurchasePhone_review").show();
   });
 
-  $("#Conduit_No").click(function() {
+  $("#Conduit_N").click(function() {
     $("#PurchasePhone").show();
+    $("#PurchasePhone_review").show();
   });
 
-  $("#PurchasePhone_Yes").click(function() {
+  $("#PurchasePhone_Y").click(function() {
     $("#PhoneSetType").show();
+    $("#PhoneSetType_review").show();
     $("#ModelInfo").hide();
+    $("#ModelInfo_review").hide();
   });
 
-  $("#PurchasePhone_No").click(function() {
+  $("#PurchasePhone_N").click(function() {
     $("#ModelInfo").show();
+    $("#ModelInfo_review").show();
     $("#PhoneSetType").hide();
+    $("#PhoneSetType_review").hide();
   });
 
 
@@ -75,6 +108,9 @@ $(document).ready(function() {
   $("#prevBtn").click(function(event) {
     nextPrev(-1);
   });
+
+
+
 
 });
 
@@ -110,13 +146,20 @@ function validateForm() {
   for (i = 0; i < inp.length; i++) {
     id = "#" + $(inp[i]).attr('id') + "_review";
     $(id).html($(inp[i]).val());
-    
     if (!inp[i].checkValidity()) {
       inp[i].className += " invalid";
       valid = false;
     }
   }
 
+    $("input[type='radio']:checked").each(function() { // Update review form with radio data
+        var idVal = $(this).attr("id");
+        id = "#id_" + $(this).attr("name") + "_review";
+        $(id).html($("label[for='"+idVal+"']").text());
+    });
+
+  
+  
   if (valid) {
     document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
     $("#workflowForm").removeClass('was-validated');

@@ -1,4 +1,20 @@
 {% for field in tab.form %}
+    {% if field.field.type == 'Radio' %}
+        <fieldset id="{{ field.name }}">
+            <legend>{{ field.label_tag }}</legend>
+            {% for choice in field.field.choices %}
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="{{ field.name }}_{{ choice|first }}"
+                    value="{{ choice|first }}" name="{{ field.name }}" required>
+                    <label class="custom-control-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
+                    {% if choice == field.field.choices|last %}
+                    <div class="invalid-feedback">Please choose one.</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <br>
+        </fieldset>
+    {% else %}
     <div class="form-group row col-4" id="{{ field.name }}">
         <div class = "form-check">
         {{ field.errors }}
@@ -7,4 +23,7 @@
         <div class="valid-feedback">Good.</div>
         </div>
     </div>
+    {% endif %}
+
 {% endfor %}
+ 

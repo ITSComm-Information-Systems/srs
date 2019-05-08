@@ -1,0 +1,28 @@
+
+
+<p>
+  Look Up Building Name or ID
+  <input id="buildingSearch" type="text" placeholder="Search..">
+
+  <table id="buildingTable" class="table table-hover">
+  {% for building in tab.form.building_list %}
+    <tr id="{{ building.building_code }}">
+      <td>{{ building.building_code }}</td>
+      <td name="buildingName">{{ building.building_name }}</td>
+    </tr>
+  {% endfor %}
+  </table>
+
+
+</p>
+
+
+<div class="form-group" id="buildingFields">
+    <div class="col-xs-4">
+        <label for="id_OneTimeCharges">Building Code:</label>
+        <input type="text" name="buildingCode" required="" id="buildingID" class=" form-control">
+
+        <label for="id_OneTimeCharges">Building Name:</label>
+        <input type="text" name="buildingName" required="" id="buildingName" class=" form-control">
+    </div>
+</div>

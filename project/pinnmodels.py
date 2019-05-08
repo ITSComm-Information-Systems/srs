@@ -7,7 +7,17 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
+class UmOSCBuildingV(models.Model):
+   building_code = models.CharField(max_length=15, primary_key=True)
+   building_name = models.CharField(max_length=100,null=True) 
 
+   class Meta:
+        managed = False
+        ordering = ('building_code', )
+        db_table = 'PINN_CUSTOM\".\"um_osc_building_v'
+
+   def __str__(self):
+        return self.building_name
 
 class UmOscDeptProfileV(models.Model):
    deptid = models.CharField(max_length=15, primary_key=True)
