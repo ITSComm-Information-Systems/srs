@@ -12,15 +12,37 @@ $(document).ready(function() {
   lastStep = document.getElementsByClassName("tab-pane").length;
 
   //  <input type="hidden" id="wfname" name="action" value="TestWorkflows"">
-  if ( $('#wfname')[0].value === 'TestWorkflows' ) {
-    for (i = 0; i < lastStep; i++) {
+  console.log('x:'+ $("h1").html());
+  if ( $("h1").html() === 'TestWorkflows' ) {
+    console.log('test');
+    for (i = 1; i < lastStep+1; i++) {
     $('#pills-step'+ i).removeClass('disabled'); 
+    console.log('omg'+i);
     }
   }
 
+  $("#buildingSearch").on("keyup", function() {
+    $("#buildingTable").show();
+    var value = $(this).val().toLowerCase();
+    $("#buildingTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+
+  $('#buildingTable tr').click(function() {
+    var building = $(this).find("td").eq(1).html();   
+    var buildingCode = $(this).find("td").eq(0).html();   
+    $('#buildingName').val(building);
+    $('#buildingID').val(buildingCode);
+    $("#buildingTable").hide();
+    $("#buildingFields").show();
+  });
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
+  
+  $("#buildingFields").hide();
+  $("#buildingTable").hide();
   $("#Conduit").hide();
   $("#PurchasePhone").hide();
   $("#ModelInfo").hide();
@@ -86,6 +108,9 @@ $(document).ready(function() {
   $("#prevBtn").click(function(event) {
     nextPrev(-1);
   });
+
+
+
 
 });
 

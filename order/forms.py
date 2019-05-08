@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from .models import Product, Service, Action, Feature, Restriction
+from project.pinnmodels import UmOSCBuildingV
 
 class FeaturesForm(forms.Form):
     features = forms.ModelMultipleChoiceField(
@@ -14,10 +15,9 @@ class FeaturesForm(forms.Form):
         model = Feature
         fields = ('name', 'description',) 
 
-class PhoneForm(forms.Form):
-    phone_number = forms.CharField(label='Phone')
 
-    
+#class PhoneForm(forms.Form):
+#    phone_number = forms.CharField(label='Phone')
 
 
 class RestrictionsForm(forms.Form):
@@ -44,12 +44,12 @@ class RestrictionsForm(forms.Form):
 
 #    template = 'order/phone_set_type.html'
 
-class ChartfieldForm(forms.Form):
-    occ = forms.CharField(label='OCC', max_length=6)
-    mrc = forms.CharField(label='MRC', max_length=6)
-    local = forms.CharField(label='Local', max_length=6)
-    longdistance = forms.CharField(label='Long Distance', max_length=6)
-    template = 'order/dynamic_form.html'
+#class ChartfieldForm(forms.Form):
+#    occ = forms.CharField(label='OCC', max_length=6)
+#    mrc = forms.CharField(label='MRC', max_length=6)
+#    local = forms.CharField(label='Local', max_length=6)
+#    longdistance = forms.CharField(label='Long Distance', max_length=6)
+#    template = 'order/dynamic_form.html'
 
 class AddlInfoForm(forms.Form):
     #contact = forms.BooleanField(label='Are you the on-site contact person?')
@@ -58,9 +58,10 @@ class AddlInfoForm(forms.Form):
     contact_name = forms.CharField(label='Name', max_length=40)
     contact_number = forms.CharField(label='Best number to contact.', max_length=8)
     comments = forms.CharField(required=False, widget=forms.Textarea )
-    file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    file = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
     template = 'order/dynamic_form.html'
+
 
 class ReviewForm(forms.Form):
     summary = forms.CharField(label='summary', max_length=6)
@@ -76,12 +77,22 @@ class NewLocationForm(forms.Form):
     ('O', 'Off site'),
     ]
     
+    building_list = [
+    ('AL1', 'Arbor Lakes 1'),
+    ('AL2', 'Arbor Lakes 2'),
+    ('AL3', 'Arbor Lakes 3'),
+    ('ASB', 'Admin Services Building'),
+    ]
+
+    building_list = UmOSCBuildingV.objects.all()
+
     Campus = forms.ChoiceField(choices=campuses)
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
-    
-    template = 'order/dynamic_form.html'
+
+    template = 'order/location.html'
+
 
 class EquipmentForm(forms.Form):
     equipment = forms.ModelMultipleChoiceField(
@@ -105,12 +116,12 @@ class LocationForm(forms.Form):
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
-    template = 'order/dynamic_form.html'
+    template = 'order/location.html'
 
 
-class ProductForm(ModelForm):
-    template = 'order/dynamic_form.html'
+#class ProductForm(ModelForm):
+#    template = 'order/dynamic_form.html'
 
-    class Meta:
-        model = Product
-        fields = ['name', 'description']
+#    class Meta:
+#        model = Product
+#        fields = ['name', 'description']
