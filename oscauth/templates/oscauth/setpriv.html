@@ -1,62 +1,114 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    /* Create four columns that floats next to each other */
+    .column {
+      float: left;
+      width: 20%;
+      padding: 10px;
+    }
+    
+
+        .left, .right {
+    width: 50%;
+    }
+
+    .middle {
+    width: 20%;
+    }
+
+    .deptid {
+    column-width:500px;
+    width:500px;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+</style>
+    
+
 <form action="/auth/get_uniqname/" method="POST">{% csrf_token %}
-    <h1>Select Person</h1>
+    <h1>Manage Access</h1>
+
+    <h2>Select Person</h2>
     <p>Uniqname <input type='search' name="uniqname_parm"> <input type='submit' value='Search' class="btn btn-primary">
         {% if uniqname_parm is None or result != '' %}
         <font size=+1 color="#FF0000">{{ result }}</font>
         {% else %}
-        <b><font size=+1>  {{ osc_user.last_name }}, {{ osc_user.first_name }}  ({{ uniqname_parm }})</font></b> 
-        <input type='button' Value='Show Current Access' class="btn btn-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/' + '{{osc_user.last_name}}' + '/' + '{{osc_user.first_name}}' + '/'" parameter=uniqname_parm>
+        <b><font size=+1>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</font></b> 
+        <input type='button' Value='Show Current Access' class="btn btn-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/' + '{{last_name}}' + '/' + '{{first_name}}' + '/'" parameter=uniqname_parm>
         {% endif %}
     </p>
-
-<br>
-
-<table class="table table-hover table-headings">
-    <b>
-        <font size=+20>
-        <thead>
-            <tr>
-                    <th>Select Department</th>
-                    <th>Select Role</th>
-                    <th>Select Action</th>
-            </tr>
-        </thead>
-        </font>
-    </b>
-</table>    
-
-
-<div style="text-align:right; width:100%; padding:0;">
-    <p> <input type='button' value='Add Access' class="btn btn-primary" onclick="window.location.href='/auth/addpriv/' + '{{uniqname_parm }}' + '/'" >
-        <input type='button' value='Remove Access' class="btn btn-primary" onclick="window.location.href='/auth/removepriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
-    </p>
-</div>
-
-    <h1>Select Role</h1>
-    <p> 
-            {% for role in grantable_roles %}
-            <input type='radio' name="rolerad[]" value={{ role.role }}>{{ role.role }}
-            <br>
-            {% endfor %}
-        </select>
-    </p>
-
-
-    <h1>Select Department</h1>
-    <h6>Inactive departments are shown in <font color="#FF0000">red.</font></h6>
     <br>
-            {% for row in rows %}
-            {% if row.dept_status != 'I' %}
-            <input type='checkbox' name="deptck[]" value={{ row.dept }}>{{ row.dept }} - {{ row.dept_name }}
-            {% else %}
-            <input type='checkbox' name="deptck[]" value={{ row.dept }}><font color="#FF0000">{{ row.dept }} - {{ row.dept_name }}</font>
-            {% endif %}
+
+{% if last_name %}
+
+<h6><font size=+1 color="#FF0000">{{ submit_msg }}</font></h6>
+
+
+<h6>Please select a Task, a Role, and at least one Department then click Submit.</h6>
+
+<h7>Inactive departments are shown in <font color="#FF0000">red.</font></h7>
+
+<div class="row">
+    <div class="column">
+        <h2>Select Task</h2>
+        {{ form.task }}
+        <input type='radio' name="task" id="task{{ forloop.counter }}" value="{{ task.id }}">
+        <label for="task{{ forloop.counter }}">{{ task }} </label>
+        <br>
+    </div>
+    <div class="column">
+        <h2>Select Role</h2>
+        {% for role in grantable_roles %}
+        <input type='radio' name="rolerad" value={{ role.role }}>{{ role.role }}
+        <br>
+        {% endfor %}
+    </div>
+    <div class="column deptid">
+        <h2>Select Department</h2>
+        <input type="checkbox" onclick="toggle(this);" />Select All Departments<br />
+        {% for row in rows %}
+        {% if row.dept_status != 'I' %}
+        <input type='checkbox' name="deptck" value={{ row.dept }}>{{ row.dept }} - {{ row.dept_name }}
+        {% else %}
+        <input type='checkbox' name="deptck" value={{ row.dept }}><font color="#FF0000">{{ row.dept }} - {{ row.dept_name }}</font>
+        {% endif %}
         <br>
         {% endfor %} 
-        <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+    </div>
+    <div class="column">
+        <h2></h2>
+        <p><input type='submit' name='process_access' value='Submit' class="btn btn-primary"></p>
+    </div>
+</div>
+
+{% endif %}
 </form>
 
 {% endblock %}
+
+{% block js %}
+<script language="JavaScript">
+
+console.log("you are here");
+
+function toggle(source) {
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    for (var i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i] != source)
+            checkboxes[i].checked = source.checked;
+    }
+}
+
+</script>
+{% endblock js %}
