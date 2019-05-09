@@ -12,6 +12,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth import get_user_model
+from django import forms
 
 from ldap3 import Server, Connection, ALL
 
@@ -177,6 +178,8 @@ def get_uniqname(request, uniqname_parm=''):
     if request.method == 'POST':  #big work here
         print(request.POST)
         uniqname_parm = request.POST['uniqname_parm']
+#        process_access = request.POST['process_access']
+
 
     if uniqname_parm == '':
         set_priv = ''
@@ -206,15 +209,68 @@ def get_uniqname(request, uniqname_parm=''):
                 osc_user.first_name = mc_user.givenName
                 osc_user.email = mc_user.mail
 
+                print('Uniqname: %s   Last Name: %s   First Name: %s' % (uniqname_parm, osc_user.last_name, osc_user.first_name))
+
+                TASK_CHOICES = [
+                    ('Add','Add Access'),
+                    ('Remove','Remove Access'),
+                ]
+
+#                task = models.CharField(max_length=15, choices=TASK_CHOICES)
+#                tasks = forms.ChoiceField(choices=TASK_CHOICES, widget=forms.RadioSelect)
+                tasks = forms.ChoiceField(choices=TASK_CHOICES)
+
+
+                grantor_depts = AuthUserDept.objects.filter(user=request.user.id).exclude(dept='All').order_by('dept')
+                grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
+                rows = []
+                dept_name = ''
+                dept_status = ''
+                process_access = ''
+                submit_msg = ''
+
+                for role in grantable_roles:
+                    role = role.role
+
+                for dept in grantor_depts:
+                    dept = dept.dept
+                    dept_info = UmCurrentDeptManagersV.objects.get(deptid=dept)
+                    dept_name = dept_info.dept_name
+                    dept_status = dept_info.dept_status
+                    data = {'dept_status' : dept_status,'dept' : dept, 'dept_name' : dept_name}
+                    rows.append(data)
+
+                print('Dept status: %s  Dept Name: %s' % (dept_status, dept_name))
+
+
                 context = {
                     'uniqname_parm': uniqname_parm,
-                    'osc_user': osc_user,
-                    'osc_user.last_name': osc_user.last_name,
-                    'osc_user.first_name': osc_user.first_name,
+#                    'osc_user': osc_user,
+#                    'osc_user.last_name': osc_user.last_name,
+#                    'osc_user.first_name': osc_user.first_name,
                     'last_name': osc_user.last_name,
                     'first_name': osc_user.first_name,
+                    'grantor_depts': grantor_depts,
+                    'grantable_roles': grantable_roles,
+                    'dept_name': dept_name,
+                    'tasks': tasks,
+                    'rows': rows,
                     'result': result,
+                    'process_access': process_access,
+                    'submit_msg': submit_msg,
                 }
+
+                print(request.POST.get('process_access'))
+
+                if request.method=='POST': # and request.POST.get('process_access'):
+                    print('Submitted')
+                    if 'rolerad' and 'deptck':
+                        submit_msg = 'Ready to Process'
+                        print('Ready to Process')
+                    else:
+                        submit_msg = 'Please select a Task, a Role, and at least one Department then click Submit.'
+                        print('Incomplete input')
+                
 
                 return render(request, 'oscauth/setpriv.html', context)
                 #return HttpResponseRedirect('/auth/setpriv/' + uniqname_parm + '/' + last_name + '/' + first_name + '/')
@@ -247,6 +303,9 @@ def setpriv(request, uniqname_parm, last_name, first_name):
         print('Uniqname: %s   Last Name: %s   First Name: %s' % (uniqname_parm, last_name, first_name))
 
     grantor_depts = AuthUserDept.objects.filter(user=request.user.id).exclude(dept='All').order_by('dept')
+    len()
+    print('User: ' + request.user.id)
+    print('Grantor_depts: ' + grantor_depts)
     grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
     rows = []
     dept_name = ''
@@ -268,6 +327,7 @@ def setpriv(request, uniqname_parm, last_name, first_name):
 
     print(dept_checked)
     print(role_checked)
+
 
     context = {
         'uniqname_parm': uniqname_parm,
