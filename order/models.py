@@ -64,13 +64,6 @@ class Service(models.Model):
     def __str__(self):
         return self.name
 
-class Restriction(models.Model):
-    name = models.CharField(max_length=40)
-    display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
 class FeatureCategory(models.Model):
     name = models.CharField(max_length=40)
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
@@ -79,13 +72,29 @@ class FeatureCategory(models.Model):
         return self.name
 
 class Feature(models.Model):
+    TYPE_CHOICES = (
+        ('STD', 'Standard'),
+        ('OPT', 'Optional'),
+        ('SPD', 'Speed Call'),
+        ('VM', 'Voice Mail'),
+    )
+
     name = models.CharField(max_length=40)
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     category = models.ManyToManyField(FeatureCategory)
+    type = models.CharField(max_length=3, choices=TYPE_CHOICES)
     description = models.TextField(blank=True)
     active = models.BooleanField(default=True)
 
     def __str__(self):        
+        return self.name
+
+class Restriction(models.Model):
+    name = models.CharField(max_length=40)
+    display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
+    category = models.ManyToManyField(FeatureCategory)
+
+    def __str__(self):
         return self.name
 
 class Action(models.Model):
