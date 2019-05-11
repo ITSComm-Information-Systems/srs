@@ -1,26 +1,24 @@
+{% for category in tab.form.list %}
+  <div>
+  <h3> {{category.name}} </h3>
 
-<style>
-ul {
-  columns: 3;
-  -webkit-columns: 3;
-  -moz-columns: 3;
-  list-style-type: none;
-}
+    <div class="form-row">
+      {% for type in category.type %}
+      {{type.name}}
+        <div class="form-check col">
+        <legend>{{type.label}}</legend>
 
-pre {
-    font-family: "Helvetica Neue"
-}
-</style>
+          {% for feature in type %}
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="{{feature.id}}">
+            <label class="form-check-label" for="defaultCheck1">
+                {{feature.name}}
+            </label>
+          </div>
+          {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
 
-<ul class="columns" data-columns="2">
-
-{% for field in tab.form.list %}
-
-<li>
-<input type="checkbox" name="feature1" value="featureID"> {{ field }}
- <pre>{{ field.description }}</pre>
-</li>
+  </div>
 {% endfor %}
-
-
-</ul>
