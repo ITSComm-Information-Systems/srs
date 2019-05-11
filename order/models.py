@@ -70,6 +70,9 @@ class FeatureCategory(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name_plural = "Feature Categories"
 
 class Feature(models.Model):
     TYPE_CHOICES = (
