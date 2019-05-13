@@ -2,8 +2,9 @@ import warnings
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.template import loader
+from django.db import models
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import login, authenticate, user_logged_in
@@ -22,6 +23,8 @@ from .forms import UserSuForm, AddUserForm
 from .utils import su_login_callback, custom_login_action, upsert_user
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from oscauth.forms import *
+from oscauth.utils import upsert_user
+from oscauth.models import AuthUserDept, Grantor, Role
 
 
 def get_name(request, parm=1):
@@ -178,7 +181,6 @@ def get_uniqname(request, uniqname_parm=''):
     if request.method == 'POST':  #big work here
         print(request.POST)
         uniqname_parm = request.POST['uniqname_parm']
-#        process_access = request.POST['process_access']
 
 
     if uniqname_parm == '':
@@ -188,7 +190,7 @@ def get_uniqname(request, uniqname_parm=''):
         # Check for valid uniqname format
         if len(uniqname_parm) < 3 or len(uniqname_parm) > 8 or uniqname_parm.isalpha is False:
             result = uniqname_parm + ' is not a valid uniqname'
-            print('uniqname_parm: %s %s' % (uniqname_parm, result))
+#            print('uniqname_parm: %s %s' % (uniqname_parm, result))
             return  HttpResponse(template.render({'result': result}, request))
         else:
             # Get User from MCommunity
@@ -200,37 +202,43 @@ def get_uniqname(request, uniqname_parm=''):
                 result = ''
 
                 try:
-                    osc_user = User.objects.filter(username=uniqname_oarm)
+                    osc_user = User.objects.filter(username=uniqname_parm)
                 except:
                     osc_user = User()
 
                 osc_user.username = mc_user.uid
-                osc_user.last_name = mc_user.sn
-                osc_user.first_name = mc_user.givenName
-                osc_user.email = mc_user.mail
+#                osc_user.last_name = mc_user.sn
+#                osc_user.first_name = mc_user.givenName
+                last_name = mc_user.sn
+                first_name = mc_user.givenName
 
-                print('Uniqname: %s   Last Name: %s   First Name: %s' % (uniqname_parm, osc_user.last_name, osc_user.first_name))
+                print('Uniqname: %s   Last Name: %s   First Name: %s' % (uniqname_parm, last_name, first_name))
 
-                TASK_CHOICES = [
-                    ('Add','Add Access'),
-                    ('Remove','Remove Access'),
-                ]
-
-#                task = models.CharField(max_length=15, choices=TASK_CHOICES)
-#                tasks = forms.ChoiceField(choices=TASK_CHOICES, widget=forms.RadioSelect)
-                tasks = forms.ChoiceField(choices=TASK_CHOICES)
-
-
-                grantor_depts = AuthUserDept.objects.filter(user=request.user.id).exclude(dept='All').order_by('dept')
                 grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
+                grantor_roles = Grantor.objects.values('grantor_role').distinct()
+#                print(len(grantor_roles))
+                this_grantors_roles = AuthUserDept.objects.filter(user=request.user.id).values("group").distinct()
+#                print(len(this_grantors_roles))
+# The list of roles should only include those that this particular user can grant
+#                grantable_roles = Grantor.objects.filter(grantor_role__in=this_grantors_roles).values("granted_role_id").distinct()
+#                print(len(grantable_roles))
+
+# The list of depts should be dependent on the role selected
+#   e.g. if proxy is selected, only those depts for which thia grantor has the dept manager role should be displayed
+                grantor_depts = AuthUserDept.objects.filter(user=request.user.id,group__in=grantor_roles).exclude(dept='All').order_by('dept')
+
                 rows = []
                 dept_name = ''
                 dept_status = ''
                 process_access = ''
                 submit_msg = ''
 
+                print(grantable_roles)
+
                 for role in grantable_roles:
                     role = role.role
+#                    role = grantable_roles.granted_role_id
+#                    role = Role.objects.get(id=granted_role_id).role
 
                 for dept in grantor_depts:
                     dept = dept.dept
@@ -245,32 +253,39 @@ def get_uniqname(request, uniqname_parm=''):
 
                 context = {
                     'uniqname_parm': uniqname_parm,
-#                    'osc_user': osc_user,
+                    'osc_user': osc_user,
 #                    'osc_user.last_name': osc_user.last_name,
 #                    'osc_user.first_name': osc_user.first_name,
-                    'last_name': osc_user.last_name,
-                    'first_name': osc_user.first_name,
+                    'last_name': last_name,
+                    'first_name': first_name,
                     'grantor_depts': grantor_depts,
                     'grantable_roles': grantable_roles,
                     'dept_name': dept_name,
-                    'tasks': tasks,
                     'rows': rows,
                     'result': result,
-                    'process_access': process_access,
+#                    'process_access': process_access,
                     'submit_msg': submit_msg,
                 }
 
-                print(request.POST.get('process_access'))
-
-                if request.method=='POST': # and request.POST.get('process_access'):
+                if request.method=='POST' and request.POST.get('process_access'):
                     print('Submitted')
-                    if 'rolerad' and 'deptck':
+                    if request.POST.get('rolerad') and request.POST.get('deptck'):
                         submit_msg = 'Ready to Process'
                         print('Ready to Process')
+                        if request.POST.get('taskrad') == 'add':
+                            print('Add access')
+#                            return render(request,'oscauth/addpriv.html', context)
+                            return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context)
+                        if request.POST.get('taskrad') == 'remove':
+                            print('Remove Access')
+                            return render(request, 'oscauth/removepriv.html', context)
+
                     else:
                         submit_msg = 'Please select a Task, a Role, and at least one Department then click Submit.'
                         print('Incomplete input')
-                
+                        return  HttpResponse(template.render({'submit_msg': submit_msg}, request))
+
+#                print(POST)
 
                 return render(request, 'oscauth/setpriv.html', context)
                 #return HttpResponseRedirect('/auth/setpriv/' + uniqname_parm + '/' + last_name + '/' + first_name + '/')
@@ -411,64 +426,82 @@ def showpriv(request, uniqname_parm, last_name, first_name):
 
 def addpriv(request, uniqname_parm):
 #def addpriv(request):
-    result = ''
+#    uniqname_parm = 'dummy'
+    last_name = 'Dummy'
+    first_name = 'Dummy'
+#    last_name = User.objects.get(username=uniqname_parm).last_name
+#    first_name = User.objects.get(username=uniqname_parm).first_name
+    role_checked = ''
+    dept_checked = ''
+    result = 'fake result'
     template = loader.get_template('oscauth/addpriv.html')
+
+#    print(request.POST)
 
     if request.method == 'POST':
         uniqname_parm = request.POST['uniqname_parm']
-        osc_user = request.POST['osc_user']
+#        osc_user = request.POST['osc_user']
         last_name = request.POST['last_name']
         first_name = request.POST['first_name']
-        dept_checked = request.POST['dept_checked']
-        role_checked = request.POST['role_checked']
+        role_checked = request.POST['rolerad']
+        dept_checked = request.POST.getlist['deptck[]']
         result = request.POST['result']
         print('Add access for %s' % uniqname_parm)
+
+    print(request.POST)
 
     try:
         user_id = User.objects.get(username=uniqname_parm).id
         result = 'User already exists'
         print('User already exists')
     except:
-#    	upsert_user(uniqname_parm)
+        osc_user = upsert_user(uniqname_parm)
         result = 'Added user'
         print('Added user')
-        user_id = User.objects.get(username=uniqname_parm).id
 
-        new_auth = AuthUserDept()
+#    user_id = User.objects.get(username=uniqname_parm).id
 
-#    for dept in dept_checked:
-#	    for role in role_checked:
-#            groupid = Role.objects.get(role=role.rchecked).group
+    new_auth = AuthUserDept()
 
-#            new_auth.user = user_id
-#            new_auth.role = groupid
-#            new_auth.dept = dept.deptid
+    for dept in dept_checked:
+        groupid = Role.objects.get(role=role.rchecked).group
+
+        new_auth.user = user_id
+        new_auth.role = groupid
+        new_auth.dept = dept.deptid
 #            new_auth.save()
 
-#            result = 'Added'
-#            print('Added User: %s  Role: %s   Dept: %s' % (uniqname_parm, new_auth.role, new_auth.dept))
+        result = 'Added Privileges'
+        print('Added privs')
+#        print('Added User: %s  Role: %s   Dept: %s' % (uniqname_parm, new_auth.role, new_auth.dept))
 
-#        context = {
-#            'title': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
-#            'uniqname_parm': uniqname_parm,
-#            'last_name': last_name,
-#            'first_name': first_name,
-#            'result': result
-#        }
+    context = {
+        'title': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
+        'uniqname_parm': uniqname_parm,
+        'last_name': last_name,
+        'first_name': first_name,
+        'role_checked': role_checked,
+        'dept_checked': dept_checked,
+        'result': result
+    }
+
+    print(request.POST)
+
 
 #    return HttpResponseRedirect('/auth/setpriv/' + uniqname_parm + '/', context)
-        return HttpResponse(template.render(context, request))
+#    return HttpResponse(template.render(context, request))
+    return render(request,'oscauth/addpriv.html', context)
 
 
 
-def removepriv(request, uniqname_parm):
+def removepriv(request, uniqname_parm, last_name, first_name):
 #def removepriv(request):
     result = ''
-    template = loader.get_template('oscauth/addpriv.html')
+    template = loader.get_template('oscauth/removepriv.html')
 
     if request.method == 'POST':
         uniqname_parm = request.POST['uniqname_parm']
-        osc_user = request.POST['osc_user']
+#        osc_user = request.POST['osc_user']
         last_name = request.POST['last_name']
         first_name = request.POST['first_name']
         dept_checked = request.POST['dept_checked']

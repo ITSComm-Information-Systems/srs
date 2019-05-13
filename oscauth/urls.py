@@ -18,6 +18,7 @@ urlpatterns = [
     path('deptpriv/', views.deptpriv),
     path('get_uniqname/', views.get_uniqname),
     path('setpriv/<str:uniqname_parm>/<str:last_name>/<str:first_name>/', views.setpriv),
+    path('setpriv/<str:uniqname_parm>/', views.setpriv),
     path('setpriv/', views.setpriv),
     path('showpriv/<str:uniqname_parm>/<str:last_name>/<str:first_name>/', views.showpriv),
     path('showpriv/', views.showpriv),
