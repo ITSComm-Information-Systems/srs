@@ -49,11 +49,16 @@
         {% endif %}
     </p>
     <br>
+    <h6><font size=+1 color="#FF0000">{{ submit_msg }}</font></h6>
+
+</form>
+
+<form action="/auth/get_uniqname/" method="POST">{% csrf_token %}
+    <input type="hidden" id="uniqname" name="uniqname_parm" value="{{uniqname_parm}}">
+    <input type="hidden" id="last_name" name="last_name" value="{{last_name}}">
+    <input type="hidden" id="first_name" name="first_name" value="{{first_name}}">
 
 {% if last_name %}
-
-<h6><font size=+1 color="#FF0000">{{ submit_msg }}</font></h6>
-
 
 <h6>Please select a Task, a Role, and at least one Department then click Submit.</h6>
 
@@ -62,9 +67,8 @@
 <div class="row">
     <div class="column">
         <h2>Select Task</h2>
-        {{ form.task }}
-        <input type='radio' name="task" id="task{{ forloop.counter }}" value="{{ task.id }}">
-        <label for="task{{ forloop.counter }}">{{ task }} </label>
+        <input type='radio' name="taskrad" value='add'>Add Access<br>
+        <input type='radio' name="taskrad" value='remove'>Remove Access<br>
         <br>
     </div>
     <div class="column">
