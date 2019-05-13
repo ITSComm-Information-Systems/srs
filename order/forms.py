@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature, Restriction
+from .models import Product, Service, Action, Feature, FeatureCategory, Restriction
 from project.pinnmodels import UmOSCBuildingV
 
 class FeaturesForm(forms.Form):
@@ -8,7 +8,20 @@ class FeaturesForm(forms.Form):
         queryset=Feature.objects.all(), 
         widget=forms.CheckboxSelectMultiple(),
     )
-    list = Feature.objects.all()
+    features = Feature.objects.all()
+    list = FeatureCategory.objects.all()
+
+    for cat in list:
+        cat.type = ['STD','OPT','SC','VM']
+        cat.type[0] = features.filter(category=cat).filter(type='STD')
+        cat.type[0].label = 'Standard'
+        cat.type[1] = features.filter(category=cat).filter(type='OPT')
+        cat.type[1].label = 'Optional'
+        cat.type[2] = features.filter(category=cat).filter(type='SPD')
+        cat.type[2].label = 'Speed Call'
+        cat.type[3] = features.filter(category=cat).filter(type='VM')
+        cat.type[3].label = 'Voicemail'
+
     template = 'order/features.html'
 
     class Meta:
@@ -16,40 +29,22 @@ class FeaturesForm(forms.Form):
         fields = ('name', 'description',) 
 
 
-#class PhoneForm(forms.Form):
-#    phone_number = forms.CharField(label='Phone')
-
 
 class RestrictionsForm(forms.Form):
-    restrictions = forms.ModelMultipleChoiceField(
-        queryset=Restriction.objects.all(), 
-        widget=forms.CheckboxSelectMultiple(),
-    )
-    list = Restriction.objects.all()
-    template = 'order/dynamic_form.html'
+    #restrictions = forms.ModelMultipleChoiceField(
+    #    queryset=Restriction.objects.all(), 
+    #    widget=forms.CheckboxSelectMultiple(),
+    #)
+
+    res = Restriction.objects.all()
+    list = FeatureCategory.objects.all()
+
+    for cat in list:
+        cat.res = res.filter(category=cat)
+
+    template = 'order/restrictions.html'
 
 
-#class PhoneSetTypeForm(forms.Form):
-#    label = 'Phone Set Type'
-#    phone_types = [
-#    ('B', 'Basic'),
-#    ('A', 'Advanced'),
-#    ('I', 'IP'),
-#    ]
-
-#    purchase = forms.ChoiceField(label='Do you want to purchase equipment from ITCOM?', choices=[('yes','Yes'),
-#         ('no','No')], initial='yes', widget=forms.RadioSelect)
-#    byod = forms.CharField(label='Please enter the make and model of phone you will be using.', max_length=100)
-#    phone_set_type = forms.ChoiceField(choices=phone_types)
-
-#    template = 'order/phone_set_type.html'
-
-#class ChartfieldForm(forms.Form):
-#    occ = forms.CharField(label='OCC', max_length=6)
-#    mrc = forms.CharField(label='MRC', max_length=6)
-#    local = forms.CharField(label='Local', max_length=6)
-#    longdistance = forms.CharField(label='Long Distance', max_length=6)
-#    template = 'order/dynamic_form.html'
 
 class AddlInfoForm(forms.Form):
     #contact = forms.BooleanField(label='Are you the on-site contact person?')
@@ -77,12 +72,6 @@ class NewLocationForm(forms.Form):
     ('O', 'Off site'),
     ]
     
-    building_list = [
-    ('AL1', 'Arbor Lakes 1'),
-    ('AL2', 'Arbor Lakes 2'),
-    ('AL3', 'Arbor Lakes 3'),
-    ('ASB', 'Admin Services Building'),
-    ]
 
     building_list = UmOSCBuildingV.objects.all()
 
@@ -117,11 +106,3 @@ class LocationForm(forms.Form):
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
     template = 'order/location.html'
-
-
-#class ProductForm(ModelForm):
-#    template = 'order/dynamic_form.html'
-
-#    class Meta:
-#        model = Product
-#        fields = ['name', 'description']

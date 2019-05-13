@@ -39,7 +39,7 @@ class StepAdmin(admin.ModelAdmin):
 
 class FeatureAdmin(admin.ModelAdmin):
     list_filter = ('category',)
-    list_display = ['display_seq_no','name','description']
+    list_display = ['display_seq_no','name','type']
 
 class RestrictionAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','name']
