@@ -50,6 +50,33 @@ $(document).ready(function() {
   $("#JackNumber").hide();
 
 
+  $("#PhoneSetType_B").click(function() {
+    $("#cat3").show();
+    $("#cat2").hide();
+    $("#cat1").hide();
+    $("#rescat3").show();
+    $("#rescat2").hide();
+    $("#rescat1").hide();
+  });
+
+  $("#PhoneSetType_A").click(function() {
+    $("#cat2").show();
+    $("#cat1").hide();
+    $("#cat3").hide();
+    $("#rescat2").show();
+    $("#rescat1").hide();
+    $("#rescat3").hide();
+  });
+
+  $("#PhoneSetType_V").click(function() {
+    $("#cat1").show();
+    $("#cat2").hide();
+    $("#cat3").hide();
+    $("#rescat1").show();
+    $("#rescat2").hide();
+    $("#rescat3").hide();
+  });
+
   // Phone Type Tab
   $("#Jack_Y").click(function() {
     $("#JackNumber").show();
