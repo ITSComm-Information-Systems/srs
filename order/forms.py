@@ -12,7 +12,6 @@ class FeaturesForm(forms.Form):
     list = FeatureCategory.objects.all()
 
     for cat in list:
-        cat.label = 'custom'
         cat.type = ['STD','OPT','SC','VM']
         cat.type[0] = features.filter(category=cat).filter(type='STD')
         cat.type[0].label = 'Standard'
@@ -23,7 +22,6 @@ class FeaturesForm(forms.Form):
         cat.type[3] = features.filter(category=cat).filter(type='VM')
         cat.type[3].label = 'Voicemail'
 
-
     template = 'order/features.html'
 
     class Meta:
@@ -33,12 +31,18 @@ class FeaturesForm(forms.Form):
 
 
 class RestrictionsForm(forms.Form):
-    restrictions = forms.ModelMultipleChoiceField(
-        queryset=Restriction.objects.all(), 
-        widget=forms.CheckboxSelectMultiple(),
-    )
-    list = Restriction.objects.all()
-    template = 'order/dynamic_form.html'
+    #restrictions = forms.ModelMultipleChoiceField(
+    #    queryset=Restriction.objects.all(), 
+    #    widget=forms.CheckboxSelectMultiple(),
+    #)
+
+    res = Restriction.objects.all()
+    list = FeatureCategory.objects.all()
+
+    for cat in list:
+        cat.res = res.filter(category=cat)
+
+    template = 'order/restrictions.html'
 
 
 

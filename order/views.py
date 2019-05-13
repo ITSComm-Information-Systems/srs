@@ -44,10 +44,11 @@ def create_preorder(cart):
 def add_to_cart(request):
     if request.method == "POST":
         print(request.POST)
-        form = ChartfieldForm(request.POST)
+        form = FeaturesForm(request.POST)
 
         if form.is_valid():
-            print(form.cleaned_data['occ'])
+            #print(form.cleaned_data['occ'])
+            print('valid')
 
         else:
             print('bad form')
