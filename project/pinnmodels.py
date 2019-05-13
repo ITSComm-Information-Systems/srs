@@ -14,7 +14,7 @@ class UmOSCBuildingV(models.Model):
    class Meta:
         managed = False
         ordering = ('building_code', )
-        db_table = 'PINN_CUSTOM\".\"um_osc_building_v'
+        db_table = 'PINN_CUSTOM\".\"um_osc_location_profile_v'
 
    def __str__(self):
         return self.building_name
