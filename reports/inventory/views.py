@@ -23,8 +23,8 @@ from ldap3 import Server, Connection, ALL
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from oscauth.forms import *
 
-def get_doc(request):
-    template = loader.get_template('doc.html')
+def get_inventory(request):
+    template = loader.get_template('inventory.html')
     context = {
         'tolls': 'Here is the summary',
         'summary': "not gonna lie we got nothing at the moment"

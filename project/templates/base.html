@@ -24,8 +24,8 @@
 	
 	<style>
 	#aux-nav {
-		background-color: {{ background_color }}
-	}
+		background-color: /* background_color}*/ {{ background_color }}
+	 } 
 	</style>
 
 	<title>OSC | Dashboard</title>
@@ -96,8 +96,12 @@
 							Reports
 						</a>
 						<div class="dropdown-menu" aria-labelledby="reportsDropdown">
-							<a class="dropdown-item" href="/auth/deptpriv/">Look Up</a>
-							<a class="dropdown-item" href="#">Cost Estimator</a>
+							<a class="dropdown-item" href="/reports/soc">Summary of Charges</a>
+							<a class="dropdown-item" href="/reports/tolls/">Toll Statements</a>
+							<a class="dropdown-item" href="/reports/inventory/">Inventory and Location Report
+							<a class="dropdown-item" href="/reports/metrics/">Departmental Telephone Service Metrics</a>
+							<a class="dropdown-item" href="/reports/doc/">Detail of Charges</a>
+							</a>
 						</div>
 					</li>
 					<li class="nav-item">
