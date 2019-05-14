@@ -12,6 +12,7 @@ urlpatterns = [
     path('pages/', include('pages.urls')),
     path('auth/', include('oscauth.urls')),
     path('admin/', admin.site.urls),
+    path('reports/',include('reports.urls')),
     path('', include('pages.urls')),
 ]
 if settings.DEBUG:
