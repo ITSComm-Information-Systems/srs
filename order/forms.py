@@ -88,7 +88,7 @@ class EquipmentForm(forms.Form):
         queryset=Product.objects.all(), 
         widget=forms.RadioSelect,
     )
-    list = Product.objects.all()
+    list = Product.objects.all().order_by('display_seq_no')
     template = 'order/products.html'
 
 
