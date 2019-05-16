@@ -1,4 +1,5 @@
 import warnings
+from datetime import datetime
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.template import loader
@@ -15,18 +16,24 @@ from django.contrib.auth import get_user_model
 from django import forms
 
 from ldap3 import Server, Connection, ALL
-
-# from .models import AuthUserDept
-# from .models import Role, Group, User
-# from .forms import UserSuForm, AddUserForm
-# from .utils import su_login_callback, custom_login_action, upsert_user
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from oscauth.forms import *
 
 def get_tolls(request):
     template = loader.get_template('tolls.html')
+    date_list = get_periods(request)
     context = {
-        'tolls': 'Here is the summary',
-        'summary': "not gonna lie we got nothing at the moment"
+        'date_list': date_list,
     }
     return HttpResponse(template.render(context,request))
+
+def get_periods(request):
+    date_list = []
+    for x in range(13):
+        now = datetime.now()
+        month = now.month-x if now.month-x>=1 else 12-(x-now.month)
+        year = now.year -1 if now.month-x<1 else now.year
+        months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split()[month-1]      
+        date_list.append([months, year])
+
+    return date_list
