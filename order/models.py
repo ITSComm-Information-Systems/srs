@@ -62,6 +62,7 @@ class Product(models.Model):
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, blank=True, null=True)
     description = models.TextField()
+    price = models.DecimalField(max_digits=6, decimal_places=2)
     active = models.BooleanField(default=True)
     picture = models.FileField(upload_to='pictures',blank=True, null=True)
 

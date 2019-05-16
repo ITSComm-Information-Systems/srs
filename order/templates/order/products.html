@@ -8,7 +8,7 @@ pre {
 </style>
 
 
-<div class="card-group">
+<div class="card-columns">
 {% for field in tab.form.list %}
 
 
@@ -18,7 +18,7 @@ pre {
     <div class="card-body">
       <h5 class="card-title">{{ field }}</h5>
       <p class="card-text"><pre>{{ field.description }}</pre></p>
-      <a href="#" class="btn btn-primary">Select</a>
+      <a href="#" class="btn btn-primary">Select</a><p>${{ field.price }}</p>
     </div>
 </div>
 
