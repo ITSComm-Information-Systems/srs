@@ -1,38 +1,44 @@
 {% extends 'base.html' %}
 {% block content %}
-    
-    <form action="/reports/tolls/get_date" method="POST">{% csrf_token %}
-    <h1>Select a Billing Period</h2>
-    <p>Billing Period
-        <select type="select" name="dept_parm" id="dept" value="{{ date }}">
+
+<form action="/reports/tolls/" method="POST">{% csrf_token %}
+    <h1>Select a billing period:</h1>
+    <p>Billing period 
+        <select type="select" name="bill_period" id="month" value="{{ i }}">
             <option value="%">--Select--</option>
-            {% for date in date_list %}
-            <option value={{ date }}>{{ date  }}</option>
+            {% for i in periods %}
+            <option value="{{ i }}">{{ i }}</option>
             {% endfor %}
         </select>
      </p>
+    {% if depts %}
+    <p>Departments 
+        <select type="select" name="dept_id" id="month" value="{{ i }}">
+            <option value="%">--Select--</option>
+            {% for dept in depts %}
+            <option value="{{ dept }}">{{ dept }}</option>
+            {% endfor %}
+        </select>
+     </p>
+     {% endif %}
     <p><input type='submit' value='Submit' class="btn btn-primary"></p>
 </form>
 
 <table class="table table-hover table-headings">
     <thead>
         <tr>
-                <th>csv</th>
-                <th>pdf</th>
-                <th>condensed pdf</th>
+                <th>CSV</th>
+                <th>PDF</th>
+                <th>Condensed PDF</th>
         </tr>
     </thead>
     <tbody>
-        {% for row in rows %}
         <tr>
-                <td> {{ row.col1 }}</td>
-                <td> {{ row.col2 }}</td>
-                <td> {{ row.roles }}</td>
+                <td> {{ csv }}</td>
+                <td> {{ pdf }}</td>
+                <td> {{ cond_pdf }}</td>
         </tr>
-        {% endfor %}
     </tbody>
 </table>
-
-
 
 {% endblock %}
