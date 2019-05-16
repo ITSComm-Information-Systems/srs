@@ -84,11 +84,11 @@ class NewLocationForm(forms.Form):
 
 
 class EquipmentForm(forms.Form):
-    equipment = forms.ModelMultipleChoiceField(
-        queryset=Product.objects.all(), 
-        widget=forms.RadioSelect,
-    )
-    list = Product.objects.all().order_by('display_seq_no')
+    #equipment = forms.ModelMultipleChoiceField(
+    #    queryset=Product.objects.all(), 
+    #    widget=forms.RadioSelect,
+    #)
+    list = Product.objects.all().filter(category=1).order_by('display_seq_no')  # TODO add more types
     template = 'order/products.html'
 
 
