@@ -26,7 +26,6 @@ from oscauth.forms import *
 def get_metrics(request):
     template = loader.get_template('metrics.html')
     context = {
-        'tolls': 'Here is the summary',
-        'summary': "not gonna lie we got nothing at the moment"
+        'title': 'Metrics',
     }
     return HttpResponse(template.render(context,request))
