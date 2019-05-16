@@ -1,5 +1,44 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h>Toll Summary</h>
-    <p>Number 2</p>
+
+<form action="/reports/tolls/" method="POST">{% csrf_token %}
+    <h1>Select a billing period:</h1>
+    <p>Billing period 
+        <select type="select" name="bill_period" id="month" value="{{ i }}">
+            <option value="%">--Select--</option>
+            {% for i in periods %}
+            <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        </select>
+     </p>
+    {% if depts %}
+    <p>Departments 
+        <select type="select" name="dept_id" id="month" value="{{ i }}">
+            <option value="%">--Select--</option>
+            {% for dept in depts %}
+            <option value="{{ dept }}">{{ dept }}</option>
+            {% endfor %}
+        </select>
+     </p>
+     {% endif %}
+    <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+</form>
+
+<table class="table table-hover table-headings">
+    <thead>
+        <tr>
+                <th>CSV</th>
+                <th>PDF</th>
+                <th>Condensed PDF</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+                <td> {{ csv }}</td>
+                <td> {{ pdf }}</td>
+                <td> {{ cond_pdf }}</td>
+        </tr>
+    </tbody>
+</table>
+
 {% endblock %}
