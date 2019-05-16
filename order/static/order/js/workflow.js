@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
   var x, i;
-  x = document.getElementsByTagName("input");
+  x = $('input:not(:checkbox)');
   for (i = 0; i < x.length; i++) {
       x[i].className += " form-control";
   }
@@ -11,13 +11,10 @@ $(document).ready(function() {
   currStep = 1;
   lastStep = document.getElementsByClassName("tab-pane").length;
 
-  //  <input type="hidden" id="wfname" name="action" value="TestWorkflows"">
-  console.log('x:'+ $("h1").html());
+
   if ( $("h1").html() === 'TestWorkflows' ) {
-    console.log('test');
     for (i = 1; i < lastStep+1; i++) {
-    $('#pills-step'+ i).removeClass('disabled'); 
-    console.log('omg'+i);
+      $('#pills-step'+ i).removeClass('disabled'); 
     }
   }
 
