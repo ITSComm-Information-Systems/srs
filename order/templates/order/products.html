@@ -8,17 +8,17 @@ pre {
 </style>
 
 
-<div class="card-group">
+<div class="card-columns">
 {% for field in tab.form.list %}
 
 
 
 <div class="card" style="width: 18rem;">
-    <img class="card-img-top" src="/static/order/voip.jpg" alt="Card image cap">
+    <img class="card-img-top" src="/media/{{field.picture}}" alt="Product Image">
     <div class="card-body">
       <h5 class="card-title">{{ field }}</h5>
-      <p class="card-text"><pre>{{ field.description }}</pre></p>
-      <a href="#" class="btn btn-primary">Select</a>
+      <p class="card-text">{{ field.description }}</p>
+      <a href="#" class="btn btn-primary">Select</a><p>${{ field.price }}</p>
     </div>
 </div>
 
