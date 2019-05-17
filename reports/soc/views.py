@@ -26,7 +26,6 @@ from oscauth.forms import *
 def get_soc(request):
     template = loader.get_template('soc.html')
     context = {
-        'tolls': 'Here is the summary',
-        'summary': "not gonna lie we got nothing at the moment"
+        'title': 'Summary of Charges',
     }
     return HttpResponse(template.render(context,request))
