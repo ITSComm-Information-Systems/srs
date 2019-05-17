@@ -58,9 +58,9 @@ class Element(Configuration):
         return self.name
 
 
-class ProductCategory(models.Model):
-    label = models.CharField(max_length=40)
-    display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
+class ProductCategory(Configuration):
+    #label = models.CharField(max_length=40)
+    #display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -69,9 +69,9 @@ class ProductCategory(models.Model):
         verbose_name_plural = "Product Categories"
 
 
-class Product(models.Model):
-    label = models.CharField(max_length=80)
-    display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
+class Product(Configuration):
+    #label = models.CharField(max_length=80)
+    #display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, blank=True, null=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
@@ -79,7 +79,7 @@ class Product(models.Model):
     picture = models.FileField(upload_to='pictures',blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return self.label
 
 
 class Service(Configuration):
@@ -89,7 +89,7 @@ class Service(Configuration):
     active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.name
+        return self.label
 
 
 class FeatureCategory(models.Model):
@@ -97,7 +97,7 @@ class FeatureCategory(models.Model):
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return self.label
     
     class Meta:
         verbose_name_plural = "Feature Categories"
@@ -119,8 +119,7 @@ class Feature(models.Model):
     active = models.BooleanField(default=True)
 
     def __str__(self):        
-        return self.name
-
+        return self.label
 
 class Restriction(models.Model):
     label = models.CharField(max_length=40)
@@ -128,10 +127,10 @@ class Restriction(models.Model):
     category = models.ManyToManyField(FeatureCategory)
 
     def __str__(self):
-        return self.name
+        return self.label
 
 
-class Action(models.Model):
+class Action(Configuration):
     ROUTE_CHOICES = (
         ('P', 'Preorder'),
         ('I', 'Incident'),
@@ -146,8 +145,8 @@ class Action(models.Model):
     )
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='A')
-    label = models.CharField(max_length=100)
-    display_seq_no = models.PositiveIntegerField(blank=True, null=True)
+    #label = models.CharField(max_length=100)
+    #display_seq_no = models.PositiveIntegerField(blank=True, null=True)
     active = models.BooleanField(default=True)    
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     steps = models.ManyToManyField(Step)
@@ -155,7 +154,7 @@ class Action(models.Model):
     destination = models.CharField(max_length=40, blank=True)
 
     def __str__(self):
-        return self.name 
+        return self.label 
 
 
 class Constant(models.Model):
