@@ -4,7 +4,7 @@ from django.shortcuts import render
 from .models import Service, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display  = ['display_seq_no','category','price']
+    list_display  = ['display_seq_no','label','name','category','price']
     ordering = ('display_seq_no',)
 
 class ActionAdmin(admin.ModelAdmin):
@@ -30,30 +30,30 @@ class ActionAdmin(admin.ModelAdmin):
 
 
 class ElementAdmin(admin.ModelAdmin):
-    list_display  = ['step','display_seq_no','name','label','type','target']
+    list_display  = ['display_seq_no','label','name','type','target']
     ordering = ('display_seq_no',)
 
 
 class ServiceAdmin(admin.ModelAdmin):
-    list_display  = ['label','display_seq_no','active']
+    list_display  = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
 
 class StepAdmin(admin.ModelAdmin):
-    list_display = ['label','display_seq_no','custom_form']
+    list_display = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
 
 class FeatureAdmin(admin.ModelAdmin):
     list_filter = ('category',)
-    list_display = ['display_seq_no','label','type']
-    ordering = ('display_seq_no',)
-
-class RestrictionAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','label']
     ordering = ('display_seq_no',)
 
+class RestrictionAdmin(admin.ModelAdmin):
+    list_display = ['display_seq_no','label','name']
+    ordering = ('display_seq_no',)
+
 class FeatureCategoryAdmin(admin.ModelAdmin):
-    list_display = ['display_seq_no']
-    #ordering = ('display_seq_no',)
+    #list_display = ['display_seq_no','name']
+    ordering = ('display_seq_no',)
 
 admin.site.register(Constant)
 admin.site.register(ProductCategory)
