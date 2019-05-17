@@ -3,7 +3,17 @@ from django.db import models
 from oscauth.models import Role
 from project.pinnmodels import UmOscPreorderApiAbstract
 
-class Step(models.Model):
+
+class Configuration(models.Model):   #Common fields for configuration models
+    name = models.CharField(max_length=20)
+    label = models.CharField(max_length=100)
+    display_seq_no = models.PositiveIntegerField()
+
+    class Meta:
+        abstract = True 
+
+
+class Step(Configuration):
     FORM_CHOICES = (
         ('', ''),
         ('LocationForm', 'Location'),
@@ -17,15 +27,16 @@ class Step(models.Model):
 
     )
 
-    name = models.CharField(max_length=20)
-    label = models.CharField(max_length=100)
-    display_seq_no = models.PositiveIntegerField()
+    #name = models.CharField(max_length=20)
+    #label = models.CharField(max_length=100)
+    #display_seq_no = models.PositiveIntegerField()
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
 
     def __str__(self):
         return self.name
-    
-class Element(models.Model):
+
+
+class Element(Configuration):
     ELEMENT_CHOICES = (
         ('', ''),
         ('YN', 'Yes/No'),
@@ -35,9 +46,9 @@ class Element(models.Model):
         ('PH', 'Phone Set Type'),
     )
 
-    name = models.CharField(max_length=20)
-    label = models.CharField(max_length=100)
-    display_seq_no = models.PositiveIntegerField()
+    #name = models.CharField(max_length=20)
+    #label = models.CharField(max_length=100)
+    #display_seq_no = models.PositiveIntegerField()
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
     attributes = models.CharField(blank=True, max_length=100)
@@ -46,8 +57,9 @@ class Element(models.Model):
     def __str__(self):
         return self.name
 
+
 class ProductCategory(models.Model):
-    name = models.CharField(max_length=40)
+    label = models.CharField(max_length=40)
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
 
     def __str__(self):
@@ -58,7 +70,7 @@ class ProductCategory(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=80)
+    label = models.CharField(max_length=80)
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, blank=True, null=True)
     description = models.TextField()
@@ -69,13 +81,16 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-class Service(models.Model):
-    name = models.CharField(max_length=20)
-    display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
+
+class Service(Configuration):
+    #name = models.CharField(max_length=20)
+    #label = models.CharField(max_length=100)
+    #display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
+
 
 class FeatureCategory(models.Model):
     name = models.CharField(max_length=40)
@@ -87,6 +102,7 @@ class FeatureCategory(models.Model):
     class Meta:
         verbose_name_plural = "Feature Categories"
 
+
 class Feature(models.Model):
     TYPE_CHOICES = (
         ('STD', 'Standard'),
@@ -95,7 +111,7 @@ class Feature(models.Model):
         ('VM', 'Voice Mail'),
     )
 
-    name = models.CharField(max_length=40)
+    label = models.CharField(max_length=40)
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     category = models.ManyToManyField(FeatureCategory)
     type = models.CharField(max_length=3, choices=TYPE_CHOICES)
@@ -105,13 +121,15 @@ class Feature(models.Model):
     def __str__(self):        
         return self.name
 
+
 class Restriction(models.Model):
-    name = models.CharField(max_length=40)
+    label = models.CharField(max_length=40)
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     category = models.ManyToManyField(FeatureCategory)
 
     def __str__(self):
         return self.name
+
 
 class Action(models.Model):
     ROUTE_CHOICES = (
@@ -128,7 +146,7 @@ class Action(models.Model):
     )
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='A')
-    name = models.CharField(max_length=100)
+    label = models.CharField(max_length=100)
     display_seq_no = models.PositiveIntegerField(blank=True, null=True)
     active = models.BooleanField(default=True)    
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
@@ -139,6 +157,7 @@ class Action(models.Model):
     def __str__(self):
         return self.name 
 
+
 class Constant(models.Model):
     action = models.ForeignKey(Action, on_delete=models.CASCADE)
     field = models.CharField(max_length=100)
@@ -146,6 +165,7 @@ class Constant(models.Model):
 
     def __str__(self):
         return self.field 
+
 
 class Cart(models.Model):
     number = models.CharField(max_length=20)
@@ -158,6 +178,7 @@ class Cart(models.Model):
     def leppard(self):
         pour=['me']
         pour.append('sugar')
+
 
 class Item(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
