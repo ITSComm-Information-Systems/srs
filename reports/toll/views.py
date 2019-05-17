@@ -44,16 +44,17 @@ def generate(request):
 
 	dropdown = select_billing(request)
 	depts = find_depts(request)
-	pdf = 'From' #PDF_report(request)
+	pdf =  'From' #PDF_report(request)
 	cond_pdf = 'Elsewhere!' #condPDF_report(request)
 	csv = 'Pull' #CSV_report(request)
-
+	links = "https://www.itcom.itd.umich.edu/osc/tollstmts/getfile.php?file=" + generate_data(request) + "_Toll_Statement"
 	context = {
 	'periods': dropdown,
 	'depts': depts,
-	'pdf': pdf,
-	'cond_pdf': cond_pdf,
-	'csv': csv,
+	'pdf': links + ".pdf",
+	'cond_pdf': links + "_breif.pdf",
+	'csv': links + ".csv",
+
 	}
 
 	return HttpResponse(template.render(context, request))
@@ -87,6 +88,7 @@ def find_depts(request):
 # Generate report data
 def generate_data(request):
 	if request.POST.get('bill_period') is None:
+		## make default the most recent one 
 		return 'temp'
 	else:
 		# ITS Comm Monthly Charge Summary totals of all charges by userID
@@ -98,10 +100,14 @@ def generate_data(request):
 
 		parsed_month = strptime(date[0], '%B').tm_mon
 		parsed_year = strptime(date[-1], '%Y').tm_year
-		string_date = str(parsed_year) + '-' + str(parsed_month) + '-20'
-		bill_date = parse_date(string_date)
+		if parsed_month > 9:
+			string_date = str(parsed_year) + '_' + str(parsed_month) + '_20_'
+		else:
+			string_date = str(parsed_year) + '_0' + str(parsed_month) + '_20_'
+		#bill_date = parse_date(string_date)
+		
 
-		return bill_date
+		return string_date + str(dept_id)
 
 # # Provide downloadable PDF report
 # def PDF_report(request):

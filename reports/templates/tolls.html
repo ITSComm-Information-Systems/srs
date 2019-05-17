@@ -34,9 +34,13 @@
     </thead>
     <tbody>
         <tr>
-                <td> {{ csv }}</td>
-                <td> {{ pdf }}</td>
-                <td> {{ cond_pdf }}</td>
+            {% comment %} have to put department on page when selection occurs  {% endcomment %}
+                <td> 
+                    <a href= {{csv}}>CSV Download</a></td>
+                <td> 
+                    <a href= {{pdf}}>PDF Download</a></td>
+                <td>
+                    <a href= {{cond_pdf}}>Condensed PDF Download</a></td>
         </tr>
     </tbody>
 </table>
