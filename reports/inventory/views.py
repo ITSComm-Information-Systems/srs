@@ -26,7 +26,6 @@ from oscauth.forms import *
 def get_inventory(request):
     template = loader.get_template('inventory.html')
     context = {
-        'tolls': 'Here is the summary',
-        'summary': "not gonna lie we got nothing at the moment"
+        'title': 'Inventory and Location',
     }
     return HttpResponse(template.render(context,request))
