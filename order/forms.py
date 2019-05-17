@@ -88,6 +88,7 @@ class EquipmentForm(forms.Form):
     #    queryset=Product.objects.all(), 
     #    widget=forms.RadioSelect,
     #)
+    #  "/opt/app-root/src/media/pictures/Z-002968_2500w_tap.jpg"
     list = Product.objects.all().filter(category=1).order_by('display_seq_no')  # TODO add more types
     template = 'order/products.html'
 
