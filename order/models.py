@@ -9,6 +9,9 @@ class Configuration(models.Model):   #Common fields for configuration models
     label = models.CharField(max_length=100)
     display_seq_no = models.PositiveIntegerField()
 
+    def __str__(self):
+        return self.label
+
     class Meta:
         abstract = True 
 
@@ -27,13 +30,7 @@ class Step(Configuration):
 
     )
 
-    #name = models.CharField(max_length=20)
-    #label = models.CharField(max_length=100)
-    #display_seq_no = models.PositiveIntegerField()
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
-
-    def __str__(self):
-        return self.name
 
 
 class Element(Configuration):
@@ -46,50 +43,28 @@ class Element(Configuration):
         ('PH', 'Phone Set Type'),
     )
 
-    #name = models.CharField(max_length=20)
-    #label = models.CharField(max_length=100)
-    #display_seq_no = models.PositiveIntegerField()
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
     attributes = models.CharField(blank=True, max_length=100)
     target = models.CharField(max_length=80)
 
-    def __str__(self):
-        return self.name
-
 
 class ProductCategory(Configuration):
-    #label = models.CharField(max_length=40)
-    #display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
     
     class Meta:
         verbose_name_plural = "Product Categories"
 
 
 class Product(Configuration):
-    #label = models.CharField(max_length=80)
-    #display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, blank=True, null=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
     active = models.BooleanField(default=True)
     picture = models.FileField(upload_to='pictures',blank=True, null=True)
 
-    def __str__(self):
-        return self.label
-
 
 class Service(Configuration):
-    #name = models.CharField(max_length=20)
-    #label = models.CharField(max_length=100)
-    #display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.label
 
 
 class FeatureCategory(models.Model):
@@ -97,13 +72,13 @@ class FeatureCategory(models.Model):
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
 
     def __str__(self):
-        return self.label
+        return self.name
     
     class Meta:
         verbose_name_plural = "Feature Categories"
 
 
-class Feature(models.Model):
+class Feature(Configuration):
     TYPE_CHOICES = (
         ('STD', 'Standard'),
         ('OPT', 'Optional'),
@@ -111,19 +86,16 @@ class Feature(models.Model):
         ('VM', 'Voice Mail'),
     )
 
-    label = models.CharField(max_length=40)
-    display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
+    name = models.CharField(max_length=40)
     category = models.ManyToManyField(FeatureCategory)
     type = models.CharField(max_length=3, choices=TYPE_CHOICES)
     description = models.TextField(blank=True)
     active = models.BooleanField(default=True)
 
-    def __str__(self):        
-        return self.label
 
-class Restriction(models.Model):
-    label = models.CharField(max_length=40)
-    display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
+class Restriction(Configuration):
+    #label = models.CharField(max_length=40)
+    #display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     category = models.ManyToManyField(FeatureCategory)
 
     def __str__(self):
