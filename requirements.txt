@@ -6,3 +6,4 @@ whitenoise==4.1.2
 cx_Oracle==7.0
 ldap3==2.5.2
 mozilla-django-oidc==1.2.1
+dateutil
