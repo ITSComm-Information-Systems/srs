@@ -67,9 +67,10 @@ class Service(Configuration):
     active = models.BooleanField(default=True)
 
 
-class FeatureCategory(models.Model):
-    name = models.CharField(max_length=40)
-    display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
+class FeatureCategory(Configuration):
+    #name = models.CharField(max_length=40)
+    #label = models.CharField(max_length=100)
+    #display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -86,7 +87,7 @@ class Feature(Configuration):
         ('VM', 'Voice Mail'),
     )
 
-    name = models.CharField(max_length=40)
+    #name = models.CharField(max_length=40)
     category = models.ManyToManyField(FeatureCategory)
     type = models.CharField(max_length=3, choices=TYPE_CHOICES)
     description = models.TextField(blank=True)
@@ -94,12 +95,7 @@ class Feature(Configuration):
 
 
 class Restriction(Configuration):
-    #label = models.CharField(max_length=40)
-    #display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
     category = models.ManyToManyField(FeatureCategory)
-
-    def __str__(self):
-        return self.label
 
 
 class Action(Configuration):
