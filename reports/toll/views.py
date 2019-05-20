@@ -48,12 +48,36 @@ def generate(request):
 	cond_pdf = 'Elsewhere!' #condPDF_report(request)
 	csv = 'Pull' #CSV_report(request)
 	links = "https://www.itcom.itd.umich.edu/osc/tollstmts/getfile.php?file=" + generate_data(request) + "_Toll_Statement"
+
+	bill_period = ''
+	dept_id = ''
+	if request.POST.get('bill_period') is None:
+		current_period = datetime.now() - relativedelta(months=1)
+		bill_period = format(current_period, '%B %Y')
+	else:
+		bill_period = request.POST.get('bill_period')
+	if request.POST.get('dept_id') is None:
+		dept_id = depts[0]
+	else:
+		dept_id = request.POST.get('dept_id')
+
+	dept = UmOscDeptProfileV.objects.filter(deptid=dept_id)
+	dept_name = dept[0]
+
+	inactive = False
+	if dept[0].dept_eff_status == 'I':
+		inactive = True
+
 	context = {
-	'periods': dropdown,
-	'depts': depts,
-	'pdf': links + ".pdf",
-	'cond_pdf': links + "_breif.pdf",
-	'csv': links + ".csv",
+		'periods': dropdown,
+		'depts': depts,
+		'dept_id': dept_id,
+		'dept_name': dept_name,
+		'inactive': inactive,
+		'bill_period': bill_period,
+		'pdf': links + ".pdf",
+		'cond_pdf': links + "_breif.pdf",
+		'csv': links + ".csv",
 
 	}
 
