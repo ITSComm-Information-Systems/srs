@@ -103,13 +103,13 @@ def get_workflow(request, action_id):
             tab.form = globals()[tab.custom_form]
 
     return render(request, 'order/workflow.html', 
-        {'title': action,
+        {'title': action.label,
         'tab_list': tabs})
 
 
 def load_actions(request):
     service = request.GET.get('service')
-    service_id = Service.objects.get(name=service)
+    service_id = Service.objects.get(label=service)
     actions = Action.objects.filter(service=service_id)
     return render(request, 'order/workflow_actions.html', {'actions': actions})
 
