@@ -30,13 +30,7 @@ from datetime import datetime
 from django.utils.dateparse import parse_date
 from time import strptime
 
-def get_tolls(request):
-    template = loader.get_template('tolls.html')
- #   date_list = get_periods(request)
-    context = {
-        'date_list': date_list,
-    }
-    return HttpResponse(template.render(context,request))
+
 
 # Generate report
 def generate(request):
