@@ -26,7 +26,7 @@ from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from oscauth.forms import *
 
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
+#from dateutil.relativedelta import relativedelta
 from django.utils.dateparse import parse_date
 from time import strptime
 
