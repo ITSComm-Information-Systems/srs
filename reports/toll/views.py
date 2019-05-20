@@ -26,10 +26,11 @@ from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from oscauth.forms import *
 
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
+#from dateutil.relativedelta import relativedelta
 from django.utils.dateparse import parse_date
 from time import strptime
 
+<<<<<<< HEAD
 # def get_tolls(request):
 #     template = loader.get_template('tolls.html')
 #     date_list = get_periods(request)
@@ -37,6 +38,15 @@ from time import strptime
 #         'date_list': date_list,
 #     }
 #     return HttpResponse(template.render(context,request))
+=======
+def get_tolls(request):
+    template = loader.get_template('tolls.html')
+ #   date_list = get_periods(request)
+    context = {
+        'date_list': date_list,
+    }
+    return HttpResponse(template.render(context,request))
+>>>>>>> fb0b8826059e57183c293fe3e4267d790158deaa
 
 # Generate report
 def generate(request):
