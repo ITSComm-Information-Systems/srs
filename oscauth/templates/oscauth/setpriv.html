@@ -53,7 +53,7 @@
 
 </form>
 
-<form action="/auth/get_uniqname/" method="POST">{% csrf_token %}
+<form action="/auth/addpriv/" method="POST">{% csrf_token %}
     <input type="hidden" id="uniqname" name="uniqname_parm" value="{{uniqname_parm}}">
     <input type="hidden" id="last_name" name="last_name" value="{{last_name}}">
     <input type="hidden" id="first_name" name="first_name" value="{{first_name}}">

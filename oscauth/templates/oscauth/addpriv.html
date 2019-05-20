@@ -15,12 +15,12 @@
         </tr>
     </thead>
     <tbody>
-        {% for row in rows %}
+        {% for dept in dept_checked %}
         <tr>
                 {% if row.dept_status != 'I' %}
-                <td> {{ row.col1 }}</td>
-                <td> {{ row.col2 }}</td>
-                <td> {{ row.role }}</td>
+                <td> {{ dept }}</td>
+                <td> {{ role_checked }}</td>
+                <td> {{ result }}</td>
                 <td> {{ row.result }}</td>
                 {% else %}
                 <td><font color="#FF0000"> {{ row.col1 }} </font></td>
