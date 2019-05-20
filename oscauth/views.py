@@ -275,7 +275,7 @@ def get_uniqname(request, uniqname_parm=''):
                         if request.POST.get('taskrad') == 'add':
                             print('Add access')
 #                            return render(request,'oscauth/addpriv.html', context)
-                            return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context)
+                            return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not')
                         if request.POST.get('taskrad') == 'remove':
                             print('Remove Access')
                             return render(request, 'oscauth/removepriv.html', context)
@@ -424,38 +424,30 @@ def showpriv(request, uniqname_parm, last_name, first_name):
     return HttpResponse(template.render(context, request))
 
 
-def addpriv(request, uniqname_parm):
-#def addpriv(request):
-#    uniqname_parm = 'dummy'
-    last_name = 'Dummy'
-    first_name = 'Dummy'
-#    last_name = User.objects.get(username=uniqname_parm).last_name
-#    first_name = User.objects.get(username=uniqname_parm).first_name
-    role_checked = ''
-    dept_checked = ''
-    result = 'fake result'
-    template = loader.get_template('oscauth/addpriv.html')
+def addpriv(request):
 
-#    print(request.POST)
+    print(request.body)
 
     if request.method == 'POST':
-        uniqname_parm = request.POST['uniqname_parm']
-#        osc_user = request.POST['osc_user']
-        last_name = request.POST['last_name']
-        first_name = request.POST['first_name']
-        role_checked = request.POST['rolerad']
-        dept_checked = request.POST.getlist['deptck[]']
-        result = request.POST['result']
-        print('Add access for %s' % uniqname_parm)
+            uniqname_parm = request.POST['uniqname_parm']
+#           osc_user = request.POST['osc_user']
+            last_name = request.POST['last_name']
+            first_name = request.POST['first_name']
+            role_checked = request.POST['rolerad']
+            dept_checked = request.POST.getlist('deptck')
+            #result = request.POST['result']
+            print('Add access for %s' % uniqname_parm)
 
     print(request.POST)
+   # print('dept>' + dept_checked + '<') 
+
 
     try:
         user_id = User.objects.get(username=uniqname_parm).id
         result = 'User already exists'
         print('User already exists')
     except:
-        osc_user = upsert_user(uniqname_parm)
+        osc_user = upsert_user(uniqname_parm) 
         result = 'Added user'
         print('Added user')
 
@@ -463,16 +455,16 @@ def addpriv(request, uniqname_parm):
 
     new_auth = AuthUserDept()
 
-    for dept in dept_checked:
-        groupid = Role.objects.get(role=role.rchecked).group
+    #for dept in dept_checked:
+        #groupid = Role.objects.get(role=role.rchecked).group
 
-        new_auth.user = user_id
-        new_auth.role = groupid
-        new_auth.dept = dept.deptid
+     #   new_auth.user = user_id
+      #  new_auth.role = groupid
+       # new_auth.dept = dept.deptid
 #            new_auth.save()
 
-        result = 'Added Privileges'
-        print('Added privs')
+        #result = 'Added Privileges'
+        #print('Added privs')
 #        print('Added User: %s  Role: %s   Dept: %s' % (uniqname_parm, new_auth.role, new_auth.dept))
 
     context = {
@@ -482,7 +474,7 @@ def addpriv(request, uniqname_parm):
         'first_name': first_name,
         'role_checked': role_checked,
         'dept_checked': dept_checked,
-        'result': result
+        'result': 'added'
     }
 
     print(request.POST)
