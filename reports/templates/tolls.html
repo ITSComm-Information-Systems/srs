@@ -4,7 +4,7 @@
 <form action="/reports/tolls/" method="POST">{% csrf_token %}
     <h1>Select a billing period:</h1>
     <p>Billing period 
-        <select type="select" name="bill_period" id="month" value="{{ i }}">
+        <select requried type="select" name="bill_period" id="month" value="{{ i }}">
             <option value="%">--Select--</option>
             {% for i in periods %}
             <option value="{{ i }}">{{ i }}</option>
@@ -12,18 +12,25 @@
         </select>
      </p>
     {% if depts %}
-    <p>Departments 
-        <select type="select" name="dept_id" id="month" value="{{ i }}">
-            <option value="%">--Select--</option>
-            {% for dept in depts %}
-            <option value="{{ dept }}">{{ dept }}</option>
-            {% endfor %}
+        <p>Departments 
+            <select requried type="select" name="dept_id" id="month" value="{{ i }}">
+                <option value="%">--Select--</option>
+                {% for dept in depts %}
+                <option mouseover="test" value="{{ dept }}">{{ dept }}</option>
+                {% endfor %}
         </select>
      </p>
      {% endif %}
     <p><input type='submit' value='Submit' class="btn btn-primary"></p>
 </form>
 
+{% if inactive %}
+    <p style="color:red">{{dept_name}} ({{dept_id}})**</p>
+{% else %}
+    <p>{{dept_name}} ({{dept_id}})</p>
+{% endif %}
+
+<p>{{bill_period}}</p>
 <table class="table table-hover table-headings">
     <thead>
         <tr>
