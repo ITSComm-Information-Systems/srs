@@ -19,34 +19,25 @@ from ldap3 import Server, Connection, ALL
 
 from .models import UmTollCallDetail
 from oscauth.models import AuthUserDept, Grantor, Role
-#from .models import Role, Group, User
-# from .forms import UserSuForm, AddUserForm
-# from .utils import su_login_callback, custom_login_action, upsert_user
+
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from oscauth.forms import *
 
 from datetime import datetime
-#from dateutil.relativedelta import relativedelta
 from django.utils.dateparse import parse_date
 from time import strptime
 
-<<<<<<< HEAD
-# def get_tolls(request):
-#     template = loader.get_template('tolls.html')
-#     date_list = get_periods(request)
-#     context = {
-#         'date_list': date_list,
-#     }
-#     return HttpResponse(template.render(context,request))
-=======
+import os
+from os import listdir
+from project import settings
+
 def get_tolls(request):
     template = loader.get_template('tolls.html')
- #   date_list = get_periods(request)
+    date_list = get_periods(request)
     context = {
         'date_list': date_list,
     }
     return HttpResponse(template.render(context,request))
->>>>>>> fb0b8826059e57183c293fe3e4267d790158deaa
 
 # Generate report
 def generate(request):
@@ -54,16 +45,12 @@ def generate(request):
 
 	dropdown = select_billing(request)
 	depts = find_depts(request)
-	pdf =  'From' #PDF_report(request)
-	cond_pdf = 'Elsewhere!' #condPDF_report(request)
-	csv = 'Pull' #CSV_report(request)
-	links = "https://www.itcom.itd.umich.edu/osc/tollstmts/getfile.php?file=" + generate_data(request) + "_Toll_Statement"
 
+	# Set default billing period/dept ID
 	bill_period = ''
 	dept_id = ''
 	if request.POST.get('bill_period') is None:
-		current_period = datetime.now() - relativedelta(months=1)
-		bill_period = format(current_period, '%B %Y')
+		bill_period = dropdown[0]
 	else:
 		bill_period = request.POST.get('bill_period')
 	if request.POST.get('dept_id') is None:
@@ -78,6 +65,9 @@ def generate(request):
 	if dept[0].dept_eff_status == 'I':
 		inactive = True
 
+	month = bill_period.split(' ')[0]
+	year = bill_period.split(' ')[1]
+
 	context = {
 		'periods': dropdown,
 		'depts': depts,
@@ -85,10 +75,8 @@ def generate(request):
 		'dept_name': dept_name,
 		'inactive': inactive,
 		'bill_period': bill_period,
-		'pdf': links + ".pdf",
-		'cond_pdf': links + "_breif.pdf",
-		'csv': links + ".csv",
-
+		'bill_month': month,
+		'bill_year': year
 	}
 
 	return HttpResponse(template.render(context, request))
@@ -98,14 +86,22 @@ def select_billing(request):
  	template = loader.get_template('tolls.html')
 
  	billing_options = []
- 	current_period = datetime.now() - relativedelta(months=1)
- 	for i in range(0, 13):
- 		month = current_period - relativedelta(months=i)
- 		text = format(month, '%B %Y')
- 		billing_options.append(text)
 
+ 	# # We should be able to do this without hardcoding...
+ 	months = ['null', 'January', 'February', 'March', 'April', 'May', 'June', 'July',
+ 	 		  'August', 'September', 'October', 'November', 'December']
+
+ 	og_format = os.listdir(settings.MEDIA_ROOT)
+ 	for date in og_format:
+ 		pieces = date.split('_')
+ 		year = pieces[0]
+ 		month_num = pieces[1]
+ 		month = months[int(month_num)]
+ 		text = month + ' ' + str(year)
+ 		billing_options.append(text)
+ 	billing_options.reverse()
  	return billing_options
- 	#return HttpResponse(template.render(context, request))
+
 
  # List all departments
 def find_depts(request):
@@ -120,38 +116,51 @@ def find_depts(request):
  	return depts
 
 # Generate report data
-def generate_data(request):
-	if request.POST.get('bill_period') is None:
-		## make default the most recent one 
-		return 'temp'
+def generate_path(request, bill_date, deptid):
+	date = bill_date.split('_');
+	parsed_month = strptime(date[0], '%B').tm_mon
+	parsed_year = strptime(date[-1], '%Y').tm_year
+	string_date = ''
+	if parsed_month > 9:
+		string_date = str(parsed_year) + '_' + str(parsed_month) + '_20'
 	else:
-		# ITS Comm Monthly Charge Summary totals of all charges by userID
-		date = ''
-		dept_id = ''
-		if request.method == 'POST':
-			date = request.POST.get('bill_period').split()
-			dept_id = request.POST.get('dept_id')
+		string_date = str(parsed_year) + '_0' + str(parsed_month) + '_20'
 
-		parsed_month = strptime(date[0], '%B').tm_mon
-		parsed_year = strptime(date[-1], '%Y').tm_year
-		if parsed_month > 9:
-			string_date = str(parsed_year) + '_' + str(parsed_month) + '_20_'
-		else:
-			string_date = str(parsed_year) + '_0' + str(parsed_month) + '_20_'
-		#bill_date = parse_date(string_date)
-		
+	return string_date + '/' + string_date + '_' + deptid + '_Toll_Statement'
 
-		return string_date + str(dept_id)
+def download_PDF(request, bill_date, deptid):
+	path = generate_path(request, bill_date, deptid) + '.pdf'
+	file_path = os.path.join(settings.MEDIA_ROOT, path)
+	if os.path.exists(file_path):
+		with open(file_path, 'rb') as fh:
+			response = HttpResponse(fh.read(), content_type="application/pdf")
+			response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
+			return response
+		raise Http404
+	else:
+		return HttpResponse(file_path)
 
-# # Provide downloadable PDF report
-# def PDF_report(request):
+def download_cond_PDF(request, bill_date, deptid):
+	path = generate_path(request, bill_date, deptid) + '_brief.pdf'
+	file_path = os.path.join(settings.MEDIA_ROOT, path)
+	if os.path.exists(file_path):
+		with open(file_path, 'rb') as fh:
+			response = HttpResponse(fh.read(), content_type="application/pdf")
+			response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
+			return response
+		raise Http404
+	else:
+		return HttpResponse(file_path)
 
-# 	return 'Test'
+def download_CSV(request, bill_date, deptid):
+	path = generate_path(request, bill_date, deptid) + '.csv'
 
-# # Provide downloadable condensed PDF report
-# def condPDF_report(request):
-# 	return 'Test'
-
-# # Provide downloadable CSV report
-# def CSV_report(request):
-# 	return 'Test'
+	file_path = os.path.join(settings.MEDIA_ROOT, path)
+	if os.path.exists(file_path):
+		with open(file_path, 'rb') as fh:
+			response = HttpResponse(fh.read(), content_type='text/csv')
+			response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
+			return response
+		raise Http404
+	else:
+		return HttpResponse(file_path)
