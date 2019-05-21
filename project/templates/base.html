@@ -71,7 +71,8 @@
             	{% endif %}
             	{% if request.session.exit_users_pk %}
               	<a class="dropdown-item" href="/auth/su/">Exit Impersonate</a>
-            	{% endif %}
+							{% endif %}
+							<a class="dropdown-item" href="/auth/get_uniqname/">Manage Access</a>
 							<a class="dropdown-item" href="/auth/mypriv/">View System Privileges</a>
 						</div>
 					</li>
