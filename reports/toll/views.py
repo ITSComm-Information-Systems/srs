@@ -31,14 +31,6 @@ import os
 from os import listdir
 from project import settings
 
-def get_tolls(request):
-    template = loader.get_template('tolls.html')
-    date_list = get_periods(request)
-    context = {
-        'date_list': date_list,
-    }
-    return HttpResponse(template.render(context,request))
-
 # Generate report
 def generate(request):
 	template = loader.get_template('tolls.html')
