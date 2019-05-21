@@ -17,15 +17,6 @@ urlpatterns = [
     path('deptpriv/<str:dept_parm>/', views.deptpriv),
     path('deptpriv/', views.deptpriv),
     path('get_uniqname/', views.get_uniqname),
-    path('setpriv/<str:uniqname_parm>/<str:last_name>/<str:first_name>/', views.setpriv),
-    path('setpriv/<str:uniqname_parm>/', views.setpriv),
-    path('setpriv/', views.setpriv),
-    path('showpriv/<str:uniqname_parm>/<str:last_name>/<str:first_name>/', views.showpriv),
-    path('showpriv/', views.showpriv),
-    path('addpriv/<str:uniqname_parm>/<str:last_name>/<str:first_name>/', views.addpriv),
-    path('addpriv/<str:uniqname_parm>/', views.addpriv),
-    path('addpriv/', views.addpriv),
-    path('removepriv/<str:uniqname_parm>/', views.removepriv),
-    path('removepriv/', views.removepriv),
+    path('modpriv/', views.modpriv),
 
 ]

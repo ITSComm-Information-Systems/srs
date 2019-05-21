@@ -296,7 +296,7 @@ def get_uniqname(request, uniqname_parm=''):
 
 
 
-def setpriv(request, uniqname_parm, last_name, first_name):
+def delete_setpriv(request, uniqname_parm, last_name, first_name):
 #    result  = ''
 #    last_name = ''
 #    first_name = ''
@@ -357,7 +357,7 @@ def setpriv(request, uniqname_parm, last_name, first_name):
     return HttpResponse(template.render(context, request))
 
 
-def showpriv(request, uniqname_parm, last_name, first_name):
+def delete_showpriv(request, uniqname_parm, last_name, first_name):
     user_id = ''
 
     if request.method == 'POST':
@@ -424,26 +424,21 @@ def showpriv(request, uniqname_parm, last_name, first_name):
     return HttpResponse(template.render(context, request))
 
 
-def addpriv(request):
-
-    print(request.body)
+def modpriv(request):
 
     if request.method == 'POST':
             uniqname_parm = request.POST['uniqname_parm']
-#           osc_user = request.POST['osc_user']
             last_name = request.POST['last_name']
             first_name = request.POST['first_name']
             role_checked = request.POST['rolerad']
+            action_checked = request.POST['taskrad']
             dept_checked = request.POST.getlist('deptck')
-            #result = request.POST['result']
             print('Add access for %s' % uniqname_parm)
-
-    print(request.POST)
-   # print('dept>' + dept_checked + '<') 
-
+    
+    print(action_checked)
 
     try:
-        user_id = User.objects.get(username=uniqname_parm).id
+        osc_user = User.objects.get(username=uniqname_parm)
         result = 'User already exists'
         print('User already exists')
     except:
@@ -451,21 +446,18 @@ def addpriv(request):
         result = 'Added user'
         print('Added user')
 
-#    user_id = User.objects.get(username=uniqname_parm).id
-
-    new_auth = AuthUserDept()
-
-    #for dept in dept_checked:
-        #groupid = Role.objects.get(role=role.rchecked).group
-
-     #   new_auth.user = user_id
-      #  new_auth.role = groupid
-       # new_auth.dept = dept.deptid
-#            new_auth.save()
-
-        #result = 'Added Privileges'
-        #print('Added privs')
-#        print('Added User: %s  Role: %s   Dept: %s' % (uniqname_parm, new_auth.role, new_auth.dept))
+    if action_checked == 'add':
+        for dept in dept_checked:
+            new_auth = AuthUserDept()
+            new_auth.user = osc_user
+            new_auth.role = Role.objects.get(role=role_checked).group
+            new_auth.dept = dept
+            #new_auth.save()
+            result = 'Added Privileges'
+#           print('Added User: %s  Role: %s   Dept: %s' % (uniqname_parm, new_auth.role, new_auth.dept))
+    else:
+        result = 'Deleted Privileges'
+        #TODO deletes
 
     context = {
         'title': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
@@ -474,19 +466,13 @@ def addpriv(request):
         'first_name': first_name,
         'role_checked': role_checked,
         'dept_checked': dept_checked,
-        'result': 'added'
+        'result': result
     }
 
-    print(request.POST)
+    return render(request,'oscauth/modpriv.html', context)
 
 
-#    return HttpResponseRedirect('/auth/setpriv/' + uniqname_parm + '/', context)
-#    return HttpResponse(template.render(context, request))
-    return render(request,'oscauth/addpriv.html', context)
-
-
-
-def removepriv(request, uniqname_parm, last_name, first_name):
+def delete_removepriv(request, uniqname_parm, last_name, first_name):
 #def removepriv(request):
     result = ''
     template = loader.get_template('oscauth/removepriv.html')

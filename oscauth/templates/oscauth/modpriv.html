@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form action="/auth/addpriv/" method="POST">{% csrf_token %}
+
+<p>Inactive departments are shown in <font color="#FF0000">red.</font></p>
+<br>
+
+<table class="table table-hover table-headings">
+    <thead>
+        <tr>
+                <th>Department</th>
+                <th>Role</th>
+                <th>Result</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dept in dept_checked %}
+        <tr>
+                {% if row.dept_status != 'I' %}
+                <td> {{ dept }}</td>
+                <td> {{ role_checked }}</td>
+                <td> {{ result }}</td>
+                <td> {{ row.result }}</td>
+                {% else %}
+                <td><font color="#FF0000"> {{ row.col1 }} </font></td>
+                <td><font color="#FF0000"> {{ row.col2 }} </font></td>
+                <td> {{ row.role }}</td>
+                <td> {{ row.result }}</td>
+                {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</form>
+
+{% endblock %}

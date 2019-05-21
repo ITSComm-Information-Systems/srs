@@ -189,3 +189,8 @@ MEDIA_ROOT = '/uploads' # Use persistent volume in openshift
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 INTERNAL_IPS = ['127.0.0.1']
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
