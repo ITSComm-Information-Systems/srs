@@ -2,7 +2,8 @@
 {% block content %}
 
 <form action="/reports/tolls/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
-    <h1>Select a billing period:</h1>
+    <h1>Toll Statements</h1>
+    <h2>Select a billing period:</h2>
     <p>Billing period 
         <select requried type="select" name="bill_period" id="month" value="{{ i }}">
             <option value="%">--Select--</option>
@@ -12,15 +13,15 @@
         </select>
      </p>
     {% if depts %}
-        <p>Departments 
-            <select requried type="select" name="dept_id" id="month" value="{{ i }}" onchange="display_dept()">
+        <p>Departments
+            <select requried type="select" name="dept_id" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
                 <option value="%">--Select--</option>
                 {% for dept in depts %}
                 <option value="{{ dept }}">{{ dept }}</option>
                 {% endfor %}
         </select>
      </p>
-     <p id="display"></p>
+          <p id="display"></p>
      {% endif %}
     <p><input type='submit' value='Submit' class="btn btn-primary"></p>
 </form>
@@ -44,11 +45,11 @@
         <tr>
             {% comment %} have to put department on page when selection occurs  {% endcomment %}
                 <td> 
-                    <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/'>CSV Download</a></td>
+                    <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><img src='media/pictures/csv_icon.png'/>CSV Download</a></td>
                 <td> 
-                    <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'>PDF Download</a></td>
+                    <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><img src='settings.MEDIA_ROOT/PDF_icon.png'/>PDF Download</a></td>
                 <td>
-                    <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'>Condensed PDF Download</a></td>
+                    <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><img src='settings.MEDIA_ROOT/PDF_icon.png'/>Condensed PDF Download</a></td>
         </tr>
     </tbody>
 </table>
@@ -71,8 +72,10 @@
         return true;
     }
 
-    function display_dept() {
-        document.getElementById("display").innerHTML = "Test";
+    function display_dept(depts) {
+        var deptid = document.forms["Select"]["dept_id"];
+        var index = deptid.selectedIndex - 1;
+        document.getElementById("display").innerHTML = depts[index];
     }
 </script>
 
