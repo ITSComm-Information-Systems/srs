@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 <form action="/reports/tolls/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
     <h1>Toll Statements</h1>
-    <h2>Select a billing period:</h2>
+    <h2>Select:</h2>
     <p>Billing period 
         <select requried type="select" name="bill_period" id="month" value="{{ i }}">
             <option value="%">--Select--</option>
@@ -45,11 +47,11 @@
         <tr>
             {% comment %} have to put department on page when selection occurs  {% endcomment %}
                 <td> 
-                    <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><img src='media/pictures/csv_icon.png'/>CSV Download</a></td>
+                    <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fas fa-file-csv" style=font-size:20px;color:green></i> CSV Download</a></td>
                 <td> 
-                    <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><img src='settings.MEDIA_ROOT/PDF_icon.png'/>PDF Download</a></td>
+                    <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style=font-size:20px;color:red></i> PDF Download</a></td>
                 <td>
-                    <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><img src='settings.MEDIA_ROOT/PDF_icon.png'/>Condensed PDF Download</a></td>
+                    <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style=font-size:20px;color:red></i> Condensed PDF Download</a></td>
         </tr>
     </tbody>
 </table>
