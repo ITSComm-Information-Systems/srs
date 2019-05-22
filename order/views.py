@@ -107,12 +107,6 @@ def get_workflow(request, action_id):
         'tab_list': tabs})
 
 
-def load_actions(request):
-    service = request.GET.get('service')
-    service_id = Service.objects.get(label=service)
-    actions = Action.objects.filter(service=service_id)
-    return render(request, 'order/workflow_actions.html', {'actions': actions})
-
 def get_cart(request):
     try:
         c = Cart.objects.get(username=request.user.username).id
@@ -130,13 +124,15 @@ def get_cart(request):
 
 
 def get_services(request):
-    #item_list = Item.objects.order_by('-id')
     template = loader.get_template('order/service.html')
-    action_list = Action.objects.all().order_by('display_seq_no')
+    action_list = Action.objects.all().order_by('service','display_seq_no')
     service_list = Service.objects.all().order_by('display_seq_no')
+
+    for service in service_list:
+        service.actions = action_list.filter(service=service)
+
     context = {
         'title': 'Request Service',
-        'action_list': action_list,
         'service_list': service_list,
     }
     return HttpResponse(template.render(context, request))
