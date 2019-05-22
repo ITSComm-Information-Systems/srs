@@ -1,4 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
-    <p>Number 1</p>
+    <form action="/reports/soc/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
+    {% if depts %}
+        <form action="">
+        <input type="radio" style='font-size:20px' name = "generate_by">  Department ID
+            <select multiple style='font-size:16px' requried type="select" name="dept_id" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
+                <option value="%">--Select--</option>
+                {% for dept in depts %}
+                <option value="{{ dept }}">{{ dept }}</option>
+                {% endfor %}
+            </select>
+        </br>
+        <p></p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name = "generate_by">  Department Group
+            <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
+                <option value="%">--Select--</option>
+                {% for group in groups %}
+                <option value="{{ group }}">{{ group }}</option>
+                {% endfor %}
+            </select>
+        </br>
+        <p></p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name = "generate_by">  Department Group VP Area
+            <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
+                <option value="%">--Select--</option>
+                {% for group in groups %}
+                <option value="{{ group }}">{{ group }}</option>
+                {% endfor %}
+            </select>
+        </br>
+        </form>
+     {% endif %}
+     <p></p>
+     <p></p>
+    <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+</form>
 {% endblock %}
