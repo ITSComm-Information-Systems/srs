@@ -2,6 +2,7 @@
 {% block content %}
     <form action="/reports/soc/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
     {% if depts %}
+        <h2>Select Unit Grouping</h2>
         <form action="">
         <input type="radio" style='font-size:20px' name = "generate_by">  Department ID
             <select multiple style='font-size:16px' requried type="select" name="dept_id" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
@@ -12,6 +13,7 @@
             </select>
         </br>
         <p></p>
+        <p>-or-</p>
         <p></p>
         <input type="radio" style='font-size:20px' name = "generate_by">  Department Group
             <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
@@ -22,6 +24,7 @@
             </select>
         </br>
         <p></p>
+        <p>-or-</p>
         <p></p>
         <input type="radio" style='font-size:20px' name = "generate_by">  Department Group VP Area
             <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
@@ -32,7 +35,29 @@
             </select>
         </br>
         </form>
+        <h2>Choose Date Range</h2>
+        <form action= "">
+        <input type="radio" style='font-size:20px' name = "period">  Fiscal Year
+        </br>
+        <p></p>
+        <p>-or-</p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name = "period">  Calender Year
+        </br>
+        <p></p>
+        <p>-or-</p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name = "period">  Single Month
+        </br>
+        <p></p>
+        <p>-or-</p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name = "period">  Month-to-month
+        </br>
+        </form>
+
      {% endif %}
+
      <p></p>
      <p></p>
     <p><input type='submit' value='Submit' class="btn btn-primary"></p>
