@@ -34,27 +34,31 @@
     <p>{{dept_name}} ({{dept_id}})</p>
 {% endif %}
 
-<p>{{bill_period}}</p>
-<table class="table table-hover table-headings">
-    <thead>
-        <tr>
-                <th>CSV</th>
-                <th>PDF</th>
-                <th>Condensed PDF</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            {% comment %} have to put department on page when selection occurs  {% endcomment %}
-                <td> 
-                    <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fas fa-file-csv" style="font-size:20px;color:green"></i></i> CSV Download</a></td>
-                <td> 
-                    <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> PDF Download</a></td>
-                <td>
-                    <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> Condensed PDF Download</a></td>
-        </tr>
-    </tbody>
-</table>
+{% if inactive %}
+    <p>No reports created for inactive departments.</p>
+{% else %}
+    <p>{{bill_period}}</p>
+    <table class="table table-hover table-headings">
+        <thead>
+            <tr>
+                    <th>CSV</th>
+                    <th>PDF</th>
+                    <th>Condensed PDF</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% comment %} have to put department on page when selection occurs  {% endcomment %}
+                    <td> 
+                        <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fas fa-file-csv" style="font-size:20px;color:green"></i></i> CSV Download</a></td>
+                    <td> 
+                        <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> PDF Download</a></td>
+                    <td>
+                        <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> Condensed PDF Download</a></td>
+            </tr>
+        </tbody>
+    </table>
+{% endif %}
 
 {% if inactive %}
     <p style="color:red">**Department is inactive.</p>
