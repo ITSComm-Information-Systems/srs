@@ -1,14 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
   
-  <h2>Select a Service</h2>
-  <ul>
-  {% for action in action_list %}
-  <li>
-    <a href="/orders/wf/{{action.id}}">{{action.label}}</a>
-  </li>
-  {% endfor %}
-</ul>
+<h2>Select a Service</h2>
 
+<div class="container">
+  <div class="row">
+    {% for service in service_list %}
+    <div class="col-sm">
+      {{ service }}
+      <ul>
+          {% for action in service.actions %}
+          <li>
+              <a href="/orders/wf/{{action.id}}">{{action.label}}</a>
+          </li>
+          {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}
 

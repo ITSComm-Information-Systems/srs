@@ -45,7 +45,7 @@
         <font size=+1 color="#FF0000">{{ result }}</font>
         {% else %}
         <b><font size=+1>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</font></b> 
-        <input type='button' Value='Show Current Access' class="btn btn-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/' + '{{last_name}}' + '/' + '{{first_name}}' + '/'" parameter=uniqname_parm>
+        <input type='button' Value='Show Current Access' class="btn btn-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
         {% endif %}
     </p>
     <br>
