@@ -42,10 +42,12 @@ def generate(request):
 	# Set default billing period/dept ID
 	bill_period = ''
 	dept_id = ''
+	submit = False
 	if request.POST.get('bill_period') is None:
 		bill_period = dropdown[0]
 	else:
 		bill_period = request.POST.get('bill_period')
+		submit = True
 	if request.POST.get('dept_id') is None:
 		dept_id = depts[0]
 	else:
@@ -74,7 +76,8 @@ def generate(request):
 		'inactive': inactive,
 		'bill_period': bill_period,
 		'bill_month': month,
-		'bill_year': year
+		'bill_year': year,
+		'submit': submit
 	}
 
 	return HttpResponse(template.render(context, request))
@@ -130,6 +133,7 @@ def generate_path(request, bill_date, deptid):
 def download_PDF(request, bill_date, deptid):
 	path = generate_path(request, bill_date, deptid) + '.pdf'
 	file_path = os.path.join(settings.MEDIA_ROOT + '/toll/', path)
+
 	if os.path.exists(file_path):
 		with open(file_path, 'rb') as fh:
 			response = HttpResponse(fh.read(), content_type="application/pdf")

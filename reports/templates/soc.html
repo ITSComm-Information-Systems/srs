@@ -46,7 +46,7 @@
 
         <h2>Choose Date Range</h2>
         <form action= "">
-        <input type="radio" style='font-size:20px' name = "period">  Fiscal Year
+        <input type="radio" style='font-size:20px' name = "period" checked>  Fiscal Year
             <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
                 <option value="%">--Select--</option>
                 {% for year in fiscal %}
