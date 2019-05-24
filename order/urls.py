@@ -8,9 +8,4 @@ urlpatterns = [
     path('submit/', views.submit_order),
     path('services/', views.get_services),
     path('wf/<int:action_id>', views.get_workflow),
- 
-    #path('ajax/load-actions/', views.load_actions, name='ajax_load_actions'),  # <-- this one here
-
-    #path('wf/<int:action_id>', views.get_workflow),
-
 ]
