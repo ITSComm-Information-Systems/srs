@@ -498,3 +498,28 @@ class UmOscAttachmentApiV(UmOscAttachmentApiAbstract):
 
    def __str__(self):
         return self.description                   
+
+
+class UmOscDeptUnitsRept(models.Model):
+     fiscal_yr = models.CharField(max_length=4)
+     calendar_yr = models.CharField(max_length=4)
+     month = models.CharField(max_length=2)
+     deptid = models.CharField(max_length=6) 
+     dept_descr = models.CharField(max_length=30)
+     dept_grp = models.CharField(primary_key= True,max_length=20) 
+     dept_grp_descr = models.CharField(max_length=30)
+     dept_grp_vp_area = models.CharField(max_length=20) 
+     dept_grp_vp_area_descr = models.CharField(max_length=30)
+     account = models.CharField(max_length=6) 
+     account_desc = models.CharField(max_length=20)
+     charge_group = models.CharField(max_length=50)
+     charge_code = models.CharField(max_length=12)
+     description = models.CharField(max_length=50)
+     unit_rate = models.CharField(max_length=40)
+     quantity = models.PositiveIntegerField(null=True)
+     amount = models.DecimalField(decimal_places=2, max_digits=19,  null=False)
+    
+     class Meta:
+          managed = False
+          db_table = 'PINN_CUSTOM\".\"um_osc_dept_units_rept'
+

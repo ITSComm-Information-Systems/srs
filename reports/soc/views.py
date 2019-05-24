@@ -21,8 +21,9 @@ from oscauth.models import AuthUserDept, Grantor, Role
 # from .models import Role, Group, User
 # from .forms import UserSuForm, AddUserForm
 # from .utils import su_login_callback, custom_login_action, upsert_user
-from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
+from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscDeptUnitsRept
 from oscauth.forms import *
+import datetime
 
 def get_soc(request):
     template = loader.get_template('soc.html')
@@ -32,10 +33,23 @@ def get_soc(request):
     for q in query:
         groups.append(q.dept_grp)
     groups = list(dict.fromkeys(groups))
+    fiscal = select_fiscal_year(request)
+    calender = select_calender_year(request)
+    months = select_month(request)
+
+    vps = []
+    vps = UmOscDeptUnitsRept.objects.filter(dept_grp__in = groups).order_by('dept_grp_vp_area').exclude(dept_grp='All').values_list('dept_grp_vp_area',flat =True).distinct()
+
+    bill_period = request.POST.get('generate_by')
     context = {
         'title': 'Summary of Charges',
         'depts': depts,
-        'groups': groups 
+        'groups': groups,
+        'fiscal':fiscal,
+        'calender':calender,
+        'months':months,
+        'vps': vps,
+
     }
     return HttpResponse(template.render(context,request))
 
@@ -51,6 +65,17 @@ def find_depts(request):
 
  	return depts
 
+def select_fiscal_year(request):
+    query = UmOscDeptUnitsRept.objects.order_by('fiscal_yr').values_list('fiscal_yr',flat =True).distinct()
+    return query.reverse()
+    
+def select_calender_year(request):
+    query = UmOscDeptUnitsRept.objects.order_by('calendar_yr').values_list('calendar_yr',flat =True).distinct()
+    return query.reverse()
+
+def select_month(request):
+    query = UmOscDeptUnitsRept.objects.order_by('month').values_list('month',flat =True).distinct()
+    return query.reverse()
 # def find_groups(request):
 #     groups = []
 
