@@ -9,7 +9,7 @@
 
         <h2>Select Unit Grouping</h2>
         <form action="">
-        <input type="radio" style='font-size:20px' name = "generate_by">  Department ID
+        <input type="radio" style='font-size:20px' name = "generate_by" checked>  Department ID
             <select multiple style='font-size:16px' requried type="select" name="dept_id" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
                 <option value="%">--Select--</option>
                 {% for dept in depts %}
