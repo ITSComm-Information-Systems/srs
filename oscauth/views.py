@@ -17,14 +17,14 @@ from django import forms
 
 from ldap3 import Server, Connection, ALL
 
-from .models import AuthUserDept
-from .models import Role, Group, User
+#from .models import AuthUserDept
+from .models import AuthUserDept, Grantor, Role, Group, User
 from .forms import UserSuForm, AddUserForm
 from .utils import su_login_callback, custom_login_action, upsert_user
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from oscauth.forms import *
 from oscauth.utils import upsert_user
-from oscauth.models import AuthUserDept, Grantor, Role
+#from oscauth.models import AuthUserDept, Grantor, Role
 
 
 def get_name(request, parm=1):
@@ -295,75 +295,7 @@ def get_uniqname(request, uniqname_parm=''):
                 return  HttpResponse(template.render({'result': result}, request))
 
 
-
-def delete_setpriv(request, uniqname_parm, last_name, first_name):
-#    result  = ''
-#    last_name = ''
-#    first_name = ''
-
-    template = loader.get_template('oscauth/setpriv.html')
-#    if request.method == 'POST':
-#        uniqname_parm = request.POST['uniqname_parm']
-#        osc_user = request.POST['osc_user']
-#        last_name = request.POST['last_name']
-#        first_name = request.POST['first_name']
-#        print('osc_user: %s' % osc_user)
-#        last_name = osc_user.last_name
-#        first_name = osc_user.first_name
-
-#    if uniqname_parm == '':
-#        return  HttpResponse(template.render(request))
-
-    if uniqname_parm is not None:
-        print('Uniqname: %s   Last Name: %s   First Name: %s' % (uniqname_parm, last_name, first_name))
-
-    grantor_depts = AuthUserDept.objects.filter(user=request.user.id).exclude(dept='All').order_by('dept')
-    len()
-    print('User: ' + request.user.id)
-    print('Grantor_depts: ' + grantor_depts)
-    grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
-    rows = []
-    dept_name = ''
-    dept_status = ''
-
-    for role in grantable_roles:
-        role = role.role
-
-    for dept in grantor_depts:
-        dept = dept.dept
-        dept_info = UmCurrentDeptManagersV.objects.get(deptid=dept)
-        dept_name = dept_info.dept_name
-        dept_status = dept_info.dept_status
-        data = {'dept_status' : dept_status,'dept' : dept, 'dept_name' : dept_name}
-        rows.append(data)
-
-    dept_checked = request.POST.getlist('dchcecks[]')
-    role_checked = request.POST.getlist('rchcecks[]')
-
-    print(dept_checked)
-    print(role_checked)
-
-
-    context = {
-        'uniqname_parm': uniqname_parm,
-        'last_name': last_name,
-        'last_name': last_name,
-        'dept_checked': dept_checked,
-        'role_checked': dept_checked,
-        'grantable_roles': grantable_roles,
-        'grantor_depts': grantor_depts,
-        'rows': rows
-    }
-    return HttpResponse(template.render(context, request))
-
-
-def delete_showpriv(request, uniqname_parm, last_name, first_name):
-    user_id = ''
-
-    if request.method == 'POST':
-        uniqname_parm = request.POST['uniqname_parm']
-        last_name = request.POST['last_name']
-        first_name = request.POST['first_name']
+def showpriv(request, uniqname_parm):
 
     template = loader.get_template('oscauth/showpriv.html')
     if uniqname_parm == '':
@@ -373,7 +305,9 @@ def delete_showpriv(request, uniqname_parm, last_name, first_name):
     else:
 
         try:
-            user_id = User.objects.get(username=uniqname_parm).id
+            osc_user = User.objects.get(username=uniqname_parm)
+            user_id = osc_user.id
+
     #        depts = AuthUserDept.objects.filter(user=osc_user.id).order_by('dept')
             depts = AuthUserDept.objects.filter(user=user_id).order_by('dept')
             rows = []
@@ -413,12 +347,12 @@ def delete_showpriv(request, uniqname_parm, last_name, first_name):
             rows.append(data)
         #    template = loader.get_template('oscauth/showpriv.html')
             context = {
-                'title': 'Current Privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
+                'title': 'Current Privileges for: ' + osc_user.last_name + ', ' + osc_user.first_name + ' (' + uniqname_parm + ')',
                 'rows': rows
             }
         except:
             context = {
-                'title': 'There currently are no privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')'
+                'title': 'There currently are no privileges for: ' + osc_user.last_name + ', ' + osc_user.first_name + ' (' + uniqname_parm + ')'
             }
             
     return HttpResponse(template.render(context, request))
@@ -470,47 +404,6 @@ def modpriv(request):
     }
 
     return render(request,'oscauth/modpriv.html', context)
-
-
-def delete_removepriv(request, uniqname_parm, last_name, first_name):
-#def removepriv(request):
-    result = ''
-    template = loader.get_template('oscauth/removepriv.html')
-
-    if request.method == 'POST':
-        uniqname_parm = request.POST['uniqname_parm']
-#        osc_user = request.POST['osc_user']
-        last_name = request.POST['last_name']
-        first_name = request.POST['first_name']
-        dept_checked = request.POST['dept_checked']
-        role_checked = request.POST['role_checked']
-        result = request.POST['result']
-        print('Remove access for %s' % uniqname_parm)
-
-        user_id = User.objects.get(username=uniqname_parm).id
-
-    for dept in dept_checked:
-	    for role in role_checked:
-		    groupid = Role.objects.get(role=role.rchecked).group
-
-
-		    try:
-			    osc_auth = AuthUserDept.objects.filter(user=user_id, dept=dept.deptid, role=groupid)
-#			    osc_auth.delete()
-
-			    print('Removed User: %s  Role: %d   Dept: %s' % (uniqname_parm, role.role, dept.deptid))
-
-		    except:   
-			    continue
-
-    context = {
-        'uniqname_parm': uniqname_parm,
-        'osc_user': osc_user,
-        'result': result,
-    }
-#    return HttpResponseRedirect('/auth/setpriv/' + uniqname_parm + '/', context)
-    return HttpResponse(template.render(context, request))
-
 
 
 @csrf_protect
