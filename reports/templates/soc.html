@@ -55,9 +55,9 @@
         <p>-or-</p>
         <p></p>
         <input type="radio" style='font-size:20px' name = "dateRangeGroup" id ="calender" value = '2'>  Calender Year
-        <select style='font-size:16px' name="CALENDERYEAR">
+        <select style='font-size:16px' name="CALENDARYEAR">
                 <option value="%">--Select--</option>
-                {% for year in calender %}
+                {% for year in calendar %}
                 <option value="{{ year }}">{{ year }}</option>
                 {% endfor %}
             </select>
@@ -74,7 +74,7 @@
         </select>
         <select style='font-size:16px' name="SINGLEYEAR">
             <option value="%">--Select--</option>
-            {% for year in calender %}
+            {% for year in calendar %}
             <option value="{{ year }}">{{ year }}</option>
             {% endfor %}
         </select>
@@ -91,7 +91,7 @@
         </select>
         <select style='font-size:16px' name="FIRSTYEAR">
             <option value="%">--Select--</option>
-            {% for year in calender %}
+            {% for year in calendar %}
             <option value="{{ year }}">{{ year }}</option>
             {% endfor %}
         </select>
@@ -104,7 +104,7 @@
         </select>
         <select style='font-size:16px' name="SECONDYEAR">
             <option value="%">--Select--</option>
-            {% for year in calender %}
+            {% for year in calendar %}
             <option value="{{ year }}">{{ year }}</option>
             {% endfor %}
         </select>
@@ -117,8 +117,8 @@
     <p><input type='submit' value='Submit' class="btn btn-primary"></p>
 </form>
 
-<p>{{grouping}}</p>
-<p>{{dateRange}}</p>
+<p>{{grouping}} - {{unit}}</p>
+<p>{{dateRange}} - {{billing_period}}</p>
 
 <table class="table table-hover table-headings">
         <thead>
