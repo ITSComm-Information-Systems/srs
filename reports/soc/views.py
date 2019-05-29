@@ -34,48 +34,58 @@ def get_soc(request):
         groups.append(q.dept_grp)
     groups = list(dict.fromkeys(groups))
     fiscal = select_fiscal_year(request)
-    calender = select_calender_year(request)
+    calendar = select_calendar_year(request)
     months = select_month(request)
 
     vps = []
     vps = UmOscDeptUnitsRept.objects.filter(dept_grp__in = groups).order_by('dept_grp_vp_area').exclude(dept_grp='All').values_list('dept_grp_vp_area',flat =True).distinct()
-    billing_period = request.POST.get('dateRangeGroup')
-    deptid = request.POST.get('department_id')
-    fyear = request.POST.get('FISCALYEAR')
 
+
+    unit = ''
     grouping = ''
     display_type = request.POST.get("unitGroupingGroup",None)
     if display_type in ['1']:
         grouping = 'Department ID'
+        unit = request.POST.get('department_id')
     elif display_type in ['2']:
         grouping = 'Department Group'
+        unit = request.POST.get('department_group')
     else:
         grouping = 'Department Group VP Area'
+        unit = request.POST.get('department_vp')
 
+    billing_period = ''
     dateRange = ''
     display_type = request.POST.get("dateRangeGroup",None)
     if display_type in ['1']:
         dateRange = 'Fiscal Year'
+        billing_period = request.POST.get('FISCALYEAR')
     elif display_type in ['2']:
-        dateRange = 'Calender Year'
+        dateRange = 'Calendar Year'
+        billing_period = request.POST.get('CALENDARYEAR')
     elif display_type in ['3']:
         dateRange = 'Single Month'
+        billing_period = request.POST.get('SINGLEMONTH')
+        billing_period = billing_period + " " + request.POST.get('SINGLEYEAR')
     else:
         dateRange = 'Month-to-Month'
+        billing_period = request.POST.get('FIRSTMONTH')
+        billing_period = billing_period + " " + request.POST.get('FIRSTYEAR') + " to "
+        billing_period = billing_period + " " + request.POST.get('SECONDMONTH')
+        billing_period = billing_period + " " + request.POST.get('SECONDYEAR')
 
     context = {
         'title': 'Summary of Charges',
         'depts': depts,
         'groups': groups,
         'fiscal':fiscal,
-        'calender':calender,
+        'calendar':calendar,
         'months':months,
         'vps': vps,
         'grouping': grouping,
         'dateRange': dateRange,
+        'unit': unit,
         'billing_period': billing_period,
-        'deptid': deptid,
-        'fyear': fyear,
     }
     return HttpResponse(template.render(context,request))
 
@@ -95,7 +105,7 @@ def select_fiscal_year(request):
     query = UmOscDeptUnitsRept.objects.order_by('fiscal_yr').values_list('fiscal_yr',flat =True).distinct()
     return query.reverse()
     
-def select_calender_year(request):
+def select_calendar_year(request):
     query = UmOscDeptUnitsRept.objects.order_by('calendar_yr').values_list('calendar_yr',flat =True).distinct()
     return query.reverse()
 
