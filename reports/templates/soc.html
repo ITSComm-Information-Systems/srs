@@ -8,46 +8,43 @@
 
 
         <h2>Select Unit Grouping</h2>
-        <form action="">
-        <input type="radio" style='font-size:20px' name = "generate_by" checked>  Department ID
-            <select multiple style='font-size:16px' requried type="select" name="dept_id" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
+        <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptid" value = '1' checked>  Department ID
+        <select multiple style='font-size:16px' name="department_id">
                 <option value="%">--Select--</option>
                 {% for dept in depts %}
                 <option value="{{ dept }}">{{ dept }}</option>
                 {% endfor %}
-            </select>
+            </select>    
         </br>
         <p></p>
         <p>-or-</p>
         <p></p>
-        <input type="radio" style='font-size:20px' name = "generate_by">  Department Group
-            <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
+        <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptgroup" value = '2'>  Department Group
+        <select style='font-size:16px' name="department_group">
                 <option value="%">--Select--</option>
                 {% for group in groups %}
                 <option value="{{ group }}">{{ group }}</option>
                 {% endfor %}
-            </select>
+            </select>    
         </br>
         <p></p>
         <p>-or-</p>
         <p></p>
-        <input type="radio" style='font-size:20px' name = "generate_by">  Department Group VP Area
-            <select style='font-size:16px' requried type="select" name="dept_grp_vp_area" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
+        <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptvp" value = '3'>  Department Group VP Area
+        <select style='font-size:16px' name="department_vp">
                 <option value="%">--Select--</option>
                 {% for vp in vps %}
                 <option value="{{ vp }}">{{ vp }}</option>
                 {% endfor %}
             </select>
         </br>
-        </form>
 
 
 
 
         <h2>Choose Date Range</h2>
-        <form action= "">
-        <input type="radio" style='font-size:20px' name = "period" checked>  Fiscal Year
-            <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
+        <input type="radio" style='font-size:20px' name = "dateRangeGroup" id = "fiscal" value = '1' checked>  Fiscal Year
+        <select style='font-size:16px' name="FISCALYEAR">
                 <option value="%">--Select--</option>
                 {% for year in fiscal %}
                 <option value="{{ year }}">{{ year }}</option>
@@ -57,8 +54,8 @@
         <p></p>
         <p>-or-</p>
         <p></p>
-        <input type="radio" style='font-size:20px' name = "period">  Calender Year
-            <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
+        <input type="radio" style='font-size:20px' name = "dateRangeGroup" id ="calender" value = '2'>  Calender Year
+        <select style='font-size:16px' name="CALENDERYEAR">
                 <option value="%">--Select--</option>
                 {% for year in calender %}
                 <option value="{{ year }}">{{ year }}</option>
@@ -68,58 +65,60 @@
         <p></p>
         <p>-or-</p>
         <p></p>
-        <input type="radio" style='font-size:20px' name = "period">  Single Month
-            <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
-                <option value="%">--Select--</option>
-                {% for month in months %}
-                <option value="{{ month }}">{{ month }}</option>
-                {% endfor %}
-            </select>
-            <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
-                <option value="%">--Select--</option>
-                {% for year in calender %}
-                <option value="{{ year }}">{{ year }}</option>
-                {% endfor %}
-            </select>
+        <input type="radio" style='font-size:20px' name = "dateRangeGroup" id = "single" value = '3'>  Single Month
+        <select style='font-size:16px' name="SINGLEMONTH">
+            <option value="%">--Select--</option>
+            {% for month in months %}
+            <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+        </select>
+        <select style='font-size:16px' name="SINGLEYEAR">
+            <option value="%">--Select--</option>
+            {% for year in calender %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
         </br>
         <p></p>
         <p>-or-</p>
         <p></p>
-        <input type="radio" style='font-size:20px' name = "period">  Month-to-month
-            <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
-                <option value="%">--Select--</option>
-                {% for month in months %}
-                <option value="{{ month }}">{{ month }}</option>
-                {% endfor %}
-            </select>
-            <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
-                <option value="%">--Select--</option>
-                {% for year in calender %}
-                <option value="{{ year }}">{{ year }}</option>
-                {% endfor %}
-            </select>
-            <span>to</span>
-            <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
-                <option value="%">--Select--</option>
-                {% for month in months %}
-                <option value="{{ month }}">{{ month }}</option>
-                {% endfor %}
-            </select>
-            <select style='font-size:16px' requried type="select" name="dept_grp" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
-                <option value="%">--Select--</option>
-                {% for year in calender %}
-                <option value="{{ year }}">{{ year }}</option>
-                {% endfor %}
-            </select>
+        <input type="radio" style='font-size:20px' name = "dateRangeGroup" id = "multiple" value = '4'>  Month-to-month
+        <select style='font-size:16px' name="FIRSTMONTH">
+            <option value="%">--Select--</option>
+            {% for month in months %}
+            <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+        </select>
+        <select style='font-size:16px' name="FIRSTYEAR">
+            <option value="%">--Select--</option>
+            {% for year in calender %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+        <span>to</span>
+        <select style='font-size:16px' name="SECONDMONTH">
+            <option value="%">--Select--</option>
+            {% for month in months %}
+            <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+        </select>
+        <select style='font-size:16px' name="SECONDYEAR">
+            <option value="%">--Select--</option>
+            {% for year in calender %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
         </br>
-        </form>
 
-     {% endif %}
+    {% endif %}
 
      <p></p>
      <p></p>
     <p><input type='submit' value='Submit' class="btn btn-primary"></p>
 </form>
+
+<p>{{grouping}}</p>
+<p>{{dateRange}}</p>
 
 <table class="table table-hover table-headings">
         <thead>

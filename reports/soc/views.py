@@ -39,8 +39,30 @@ def get_soc(request):
 
     vps = []
     vps = UmOscDeptUnitsRept.objects.filter(dept_grp__in = groups).order_by('dept_grp_vp_area').exclude(dept_grp='All').values_list('dept_grp_vp_area',flat =True).distinct()
+    billing_period = request.POST.get('dateRangeGroup')
+    deptid = request.POST.get('department_id')
+    fyear = request.POST.get('FISCALYEAR')
 
-    bill_period = request.POST.get('generate_by')
+    grouping = ''
+    display_type = request.POST.get("unitGroupingGroup",None)
+    if display_type in ['1']:
+        grouping = 'Department ID'
+    elif display_type in ['2']:
+        grouping = 'Department Group'
+    else:
+        grouping = 'Department Group VP Area'
+
+    dateRange = ''
+    display_type = request.POST.get("dateRangeGroup",None)
+    if display_type in ['1']:
+        dateRange = 'Fiscal Year'
+    elif display_type in ['2']:
+        dateRange = 'Calender Year'
+    elif display_type in ['3']:
+        dateRange = 'Single Month'
+    else:
+        dateRange = 'Month-to-Month'
+
     context = {
         'title': 'Summary of Charges',
         'depts': depts,
@@ -49,7 +71,11 @@ def get_soc(request):
         'calender':calender,
         'months':months,
         'vps': vps,
-
+        'grouping': grouping,
+        'dateRange': dateRange,
+        'billing_period': billing_period,
+        'deptid': deptid,
+        'fyear': fyear,
     }
     return HttpResponse(template.render(context,request))
 
@@ -75,7 +101,10 @@ def select_calender_year(request):
 
 def select_month(request):
     query = UmOscDeptUnitsRept.objects.order_by('month').values_list('month',flat =True).distinct()
-    return query.reverse()
+    months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+ 	 		  'August', 'September', 'October', 'November', 'December']
+    return months #,query
+
 # def find_groups(request):
 #     groups = []
 
