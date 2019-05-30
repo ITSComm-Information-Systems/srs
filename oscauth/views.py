@@ -166,12 +166,16 @@ def deptpriv(request, dept_parm=''):
         prev_user = user.user
     data = {'col1' : col1, 'col2' : col2, 'roles': roles}
     rows.append(data)
+
+    form = DeptForm()
+    
     context = {
         'dept_list': dept_list,
         'dept_status': dept_status,
         'subtitle1': 'Access For Department: ' + dept_parm + ' - '+ dept_name ,
         'subtitle2': 'Department Manager: ' + dept_mgr_name + ' (' + dept_mgr_uniqname + ')',
-        'rows': rows
+        'rows': rows,
+        'form': form
     }
     return HttpResponse(template.render(context, request))
 
