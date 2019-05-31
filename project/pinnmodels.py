@@ -529,7 +529,7 @@ class UmOscChartcomInitialLoadV(models.Model):
      program = models.CharField(max_length=30)
      class_code = models.CharField(max_length=30)
      project_grant = models.CharField(max_length=30)
-     account_number = models.CharField(max_length=4000)
+     account_number = models.CharField(max_length=4000, primary_key=True)
      name = models.CharField(max_length=100)
 
      class Meta:
