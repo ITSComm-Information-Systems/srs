@@ -1,4 +1,143 @@
 {% extends 'base.html' %}
 {% block content %}
-    <p>Number 1</p>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <form action="/reports/soc/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
+    {% if depts %}
+
+
+
+        <h2>Select Unit Grouping</h2>
+        <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptid" value = '1' checked>  Department ID
+        <select multiple style='font-size:16px' name="department_id">
+                <option value="%">--Select--</option>
+                {% for dept in depts %}
+                <option value="{{ dept }}">{{ dept }}</option>
+                {% endfor %}
+            </select>    
+        </br>
+        <p></p>
+        <p>-or-</p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptgroup" value = '2'>  Department Group
+        <select style='font-size:16px' name="department_group">
+                <option value="%">--Select--</option>
+                {% for group in groups %}
+                <option value="{{ group }}">{{ group }}</option>
+                {% endfor %}
+            </select>    
+        </br>
+        <p></p>
+        <p>-or-</p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptvp" value = '3'>  Department Group VP Area
+        <select style='font-size:16px' name="department_vp">
+                <option value="%">--Select--</option>
+                {% for vp in vps %}
+                <option value="{{ vp }}">{{ vp }}</option>
+                {% endfor %}
+            </select>
+        </br>
+
+
+
+
+        <h2>Choose Date Range</h2>
+        <input type="radio" style='font-size:20px' name = "dateRangeGroup" id = "fiscal" value = '1' checked>  Fiscal Year
+        <select style='font-size:16px' name="FISCALYEAR">
+                <option value="%">--Select--</option>
+                {% for year in fiscal %}
+                <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </br>
+        <p></p>
+        <p>-or-</p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name = "dateRangeGroup" id ="calender" value = '2'>  Calender Year
+        <select style='font-size:16px' name="CALENDARYEAR">
+                <option value="%">--Select--</option>
+                {% for year in calendar %}
+                <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </br>
+        <p></p>
+        <p>-or-</p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name = "dateRangeGroup" id = "single" value = '3'>  Single Month
+        <select style='font-size:16px' name="SINGLEMONTH">
+            <option value="%">--Select--</option>
+            {% for month in months %}
+            <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+        </select>
+        <select style='font-size:16px' name="SINGLEYEAR">
+            <option value="%">--Select--</option>
+            {% for year in calendar %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+        </br>
+        <p></p>
+        <p>-or-</p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name = "dateRangeGroup" id = "multiple" value = '4'>  Month-to-month
+        <select style='font-size:16px' name="FIRSTMONTH">
+            <option value="%">--Select--</option>
+            {% for month in months %}
+            <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+        </select>
+        <select style='font-size:16px' name="FIRSTYEAR">
+            <option value="%">--Select--</option>
+            {% for year in calendar %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+        <span>to</span>
+        <select style='font-size:16px' name="SECONDMONTH">
+            <option value="%">--Select--</option>
+            {% for month in months %}
+            <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+        </select>
+        <select style='font-size:16px' name="SECONDYEAR">
+            <option value="%">--Select--</option>
+            {% for year in calendar %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+        </br>
+
+    {% endif %}
+
+     <p></p>
+     <p></p>
+    <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+</form>
+
+<p>{{grouping}} - {{unit}}</p>
+<p>{{dateRange}} - {{billing_period}}</p>
+
+<table class="table table-hover table-headings">
+        <thead>
+            <tr>
+                    <th>CSV</th>
+                    <th>PDF</th>
+                    <th>Condensed PDF</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% comment %} have to put department on page when selection occurs  {% endcomment %}
+                    <td> 
+                        <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fas fa-file-csv" style="font-size:20px;color:green"></i></i> CSV Download</a></td>
+                    <td> 
+                        <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> PDF Download</a></td>
+                    <td>
+                        <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> Condensed PDF Download</a></td>
+            </tr>
+        </tbody>
+    </table>
 {% endblock %}

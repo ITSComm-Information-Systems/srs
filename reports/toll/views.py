@@ -42,10 +42,12 @@ def generate(request):
 	# Set default billing period/dept ID
 	bill_period = ''
 	dept_id = ''
+	submit = False
 	if request.POST.get('bill_period') is None:
 		bill_period = dropdown[0]
 	else:
 		bill_period = request.POST.get('bill_period')
+		submit = True
 	if request.POST.get('dept_id') is None:
 		dept_id = depts[0]
 	else:
@@ -74,7 +76,8 @@ def generate(request):
 		'inactive': inactive,
 		'bill_period': bill_period,
 		'bill_month': month,
-		'bill_year': year
+		'bill_year': year,
+		'submit': submit
 	}
 
 	return HttpResponse(template.render(context, request))
@@ -89,7 +92,7 @@ def select_billing(request):
  	months = ['null', 'January', 'February', 'March', 'April', 'May', 'June', 'July',
  	 		  'August', 'September', 'October', 'November', 'December']
 
- 	og_format = os.listdir(settings.MEDIA_ROOT)
+ 	og_format = os.listdir(settings.MEDIA_ROOT + '/toll/')
  	og_format.sort()
  	for date in og_format:
  		pieces = date.split('_')
@@ -116,7 +119,7 @@ def find_depts(request):
 
 # Generate report data
 def generate_path(request, bill_date, deptid):
-	date = bill_date.split('_');
+	date = bill_date.split('_')
 	parsed_month = strptime(date[0], '%B').tm_mon
 	parsed_year = strptime(date[-1], '%Y').tm_year
 	string_date = ''
@@ -129,7 +132,8 @@ def generate_path(request, bill_date, deptid):
 
 def download_PDF(request, bill_date, deptid):
 	path = generate_path(request, bill_date, deptid) + '.pdf'
-	file_path = os.path.join(settings.MEDIA_ROOT, path)
+	file_path = os.path.join(settings.MEDIA_ROOT + '/toll/', path)
+
 	if os.path.exists(file_path):
 		with open(file_path, 'rb') as fh:
 			response = HttpResponse(fh.read(), content_type="application/pdf")
@@ -141,7 +145,7 @@ def download_PDF(request, bill_date, deptid):
 
 def download_cond_PDF(request, bill_date, deptid):
 	path = generate_path(request, bill_date, deptid) + '_brief.pdf'
-	file_path = os.path.join(settings.MEDIA_ROOT, path)
+	file_path = os.path.join(settings.MEDIA_ROOT + '/toll/',path)
 	if os.path.exists(file_path):
 		with open(file_path, 'rb') as fh:
 			response = HttpResponse(fh.read(), content_type="application/pdf")
@@ -154,7 +158,7 @@ def download_cond_PDF(request, bill_date, deptid):
 def download_CSV(request, bill_date, deptid):
 	path = generate_path(request, bill_date, deptid) + '.csv'
 
-	file_path = os.path.join(settings.MEDIA_ROOT, path)
+	file_path = os.path.join(settings.MEDIA_ROOT + '/toll/', path)
 	if os.path.exists(file_path):
 		with open(file_path, 'rb') as fh:
 			response = HttpResponse(fh.read(), content_type='text/csv')
