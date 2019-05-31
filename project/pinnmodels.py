@@ -523,3 +523,43 @@ class UmOscDeptUnitsRept(models.Model):
           managed = False
           db_table = 'PINN_CUSTOM\".\"um_osc_dept_units_rept'
 
+class UmOscChartcomInitialLoadV(models.Model):
+     fund = models.CharField(max_length=30)
+     dept = models.CharField(max_length=30)
+     program = models.CharField(max_length=30)
+     class_code = models.CharField(max_length=30)
+     project_grant = models.CharField(max_length=30)
+     account_number = models.CharField(max_length=4000)
+     name = models.CharField(max_length=100)
+
+     class Meta:
+          managed = False
+          ordering = ('dept', 'account_number')
+          db_table = 'PINN_CUSTOM\".\"um_osc_chartcom_initial_load_v'
+
+
+class UmOscAllActiveAcctNbrsV(models.Model):
+   short_code = models.CharField(max_length=10, blank=True, null=True)
+   account_number =  models.CharField(max_length=100,primary_key=True)
+   fund =  models.CharField(max_length=30, blank=True, null=True)
+   fund_desc =  models.CharField(max_length=30, blank=True, null=True)
+   fund_eff_status =  models.CharField(max_length=1, blank=True, null=True)
+   deptid =  models.CharField(max_length=30, blank=True, null=True)
+   dept_desc =  models.CharField(max_length=30, blank=True, null=True)
+   dept_eff_status =  models.CharField(max_length=1, blank=True, null=True)
+   program =  models.CharField(max_length=30, blank=True, null=True)
+   program_desc =  models.CharField(max_length=30, blank=True, null=True)
+   program_eff_status =  models.CharField(max_length=1, blank=True, null=True)
+   class_code =  models.CharField(max_length=30, blank=True, null=True)
+   class_desc =  models.CharField(max_length=30, blank=True, null=True)
+   class_eff_status =  models.CharField(max_length=1, blank=True, null=True)
+   project_grant =  models.CharField(max_length=30, blank=True, null=True)
+   project_grant_desc =  models.CharField(max_length=225, blank=True, null=True)
+   project_grant_eff_status =  models.CharField(max_length=3, blank=True, null=True)
+   active =  models.CharField(max_length=1, blank=True, null=True)
+
+   class Meta:
+        managed = False
+        ordering = ('deptid', 'account_number')
+        db_table = 'PINN_CUSTOM\".\"um_osc_all_active_acct_nbrs_v'
+
