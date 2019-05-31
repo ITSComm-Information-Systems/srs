@@ -133,6 +133,17 @@ class Constant(models.Model):
     def __str__(self):
         return self.field 
 
+class Chartcom(models.Model):
+    fund = models.CharField(max_length=30)
+    dept = models.CharField(max_length=30)
+    program = models.CharField(max_length=30)
+    acct_class = models.CharField(max_length=30)
+    project_grant = models.CharField(max_length=30)
+    name = models.CharField(max_length=100)
+    account_number = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name 
 
 class Cart(models.Model):
     number = models.CharField(max_length=20)
