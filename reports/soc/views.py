@@ -50,7 +50,7 @@ def get_soc(request):
     elif display_type in ['2']:
         grouping = 'Department Group'
         unit = request.POST.get('department_group')
-    else:
+    elif display_type in ['3']:
         grouping = 'Department Group VP Area'
         unit = request.POST.get('department_vp')
 
@@ -67,7 +67,7 @@ def get_soc(request):
         dateRange = 'Single Month'
         billing_period = request.POST.get('SINGLEMONTH')
         billing_period = billing_period + " " + request.POST.get('SINGLEYEAR')
-    else:
+    elif display_type in ['4']:
         dateRange = 'Month-to-Month'
         billing_period = request.POST.get('FIRSTMONTH')
         billing_period = billing_period + " " + request.POST.get('FIRSTYEAR') + " to "
