@@ -6,7 +6,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth import get_user_model
 
-from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
+from project.pinnmodels import UmCurrentDeptManagersV
+
+from dal import autocomplete
+from django_select2.forms import Select2MultipleWidget, Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 
 class AddUserForm(forms.Form):
     uniqname = forms.CharField(label='Uniqname', max_length=8)
@@ -53,6 +56,49 @@ class UserSuForm(forms.Form):
         return super(UserSuForm, self).__str__()
 
 class DeptForm(forms.Form):
-    deptids = forms.ModelChoiceField(queryset=UmCurrentDeptManagersV.objects.all().order_by('deptid'))
+    query = UmCurrentDeptManagersV.objects.all().order_by('deptid')
 
+    DEPT_CHOICES = [tuple([q.deptid, q.deptid]) for q in query]
 
+    deptids = forms.ChoiceField(label='Department ID', choices=DEPT_CHOICES, widget=Select2Widget(attrs={'data-placeholder': '--Select--', 'data-width': '15%'}))
+    # deptids = forms.CharField(label='Department ID', widget=Select2Widget(choices=DEPT_CHOICES), initial='--Select--')
+    # deptids = forms.ModelChoiceField(queryset=UmCurrentDeptManagersV.objects.all().order_by('deptid'))#, widget=Select2MultipleWidget)
+
+    # class Meta:
+    #     widgets = {
+    #         'deptids': Select2Widget
+    #     }
+    #     model = UmCurrentDeptManagersV
+    #     fields = ['deptid']
+    #     widgets = {
+    #         'deptids':autocomplete.TextWidget('DeptAutocomplete')
+    #     }
+
+# class DeptForm(forms.ModelForm):
+#     #deptids = forms.ModelMultipleChoiceField(queryset=UmCurrentDeptManagersV.objects.all().order_by('deptid'), widget=Select2Widget)
+
+#     class Meta:
+#         model = UmCurrentDeptManagersV
+#         fields = ('deptid', )
+#         widgets = {
+#             'deptid': Select2Widget(
+#                 attrs={'data-placeholder': '--Select--', 'data-width': '100%'},)
+#         }
+
+# class DeptForm(forms.ModelForm):
+#     deptids = forms.ModelChoiceField(
+#         queryset=UmCurrentDeptManagersV.objects.values_list('deptid').all().order_by('deptid'),
+#         label='Department ID',
+#         widget=ModelSelect2Widget(
+#             model=UmCurrentDeptManagersV,
+#             search_fields=['deptid__icontains'],
+#             attrs={'data-placeholder': '--Select--', 'data-width': '100%'},),)
+
+#     class Meta():
+#         model = UmCurrentDeptManagersV
+#         fields = ('deptid',)
+
+# class DeptForm(forms.Form):
+#     ids = forms.ModelMultipleChoiceField(queryset=UmCurrentDeptManagersV.objects.values('deptid').all().order_by('deptid'),
+#         widget=ModelSelect2MultipleWidget(queryset=UmCurrentDeptManagersV.objects.values('deptid').all().order_by('deptid'),
+#         search_fields=['ids__icontains']))

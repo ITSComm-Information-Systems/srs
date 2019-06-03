@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'order',
     'pages',
     'reports',
+    'django_select2',
 ]
 
 MIDDLEWARE = [

@@ -130,8 +130,13 @@ def get_dept(request):
 def deptpriv(request, dept_parm=''):
     template = loader.get_template('oscauth/deptpriv.html')
     dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
+    form = DeptForm()
     if dept_parm == '':
-        return  HttpResponse(template.render({'dept_list': dept_list},request))
+        context = {
+            'dept_list': dept_list,
+            'form': form
+        }
+        return  HttpResponse(template.render(context, request))
 
     dept_info = UmCurrentDeptManagersV.objects.filter(deptid=dept_parm)
     users = AuthUserDept.objects.filter(dept=dept_parm).order_by('group','user__last_name','user__first_name')
@@ -166,9 +171,6 @@ def deptpriv(request, dept_parm=''):
         prev_user = user.user
     data = {'col1' : col1, 'col2' : col2, 'roles': roles}
     rows.append(data)
-
-    form = DeptForm()
-    
     context = {
         'dept_list': dept_list,
         'dept_status': dept_status,

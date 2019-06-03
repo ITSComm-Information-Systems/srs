@@ -2,6 +2,8 @@ from django.urls import path
 
 from . import views
 
+from django.conf.urls import include, url
+
 urlpatterns = [
     path('dept/<str:dept_id>', views.dept, name='dept'),
     path('user/<str:user_id>', views.user, name='user'),
@@ -20,5 +22,6 @@ urlpatterns = [
     path('deptpriv/', views.deptpriv),
     path('get_uniqname/', views.get_uniqname),
     path('modpriv/', views.modpriv),
+    url(r'^select2/', include('django_select2.urls')),
 
 ]
