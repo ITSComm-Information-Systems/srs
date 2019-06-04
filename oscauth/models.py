@@ -33,6 +33,12 @@ class Role(models.Model):
 
     class Meta:
         db_table = 'auth_role'
+        permissions = [
+            ('can_order', 'All ordering functions'),
+            ('can_proxy', 'Can Proxy'),
+            ('can_report', 'Can run reports'),
+            ('can_impersonate', 'Can Impersonate'),            
+        ]
 
 class AuthUserDept(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)

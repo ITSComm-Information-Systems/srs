@@ -1,8 +1,10 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render
+from django.views.generic import View
 from order.forms import *
 from project.pinnmodels import UmOscPreorderApiV
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from .models import Cart, Product, Action, Service, Step, Element, Item, Constant
 
@@ -68,43 +70,47 @@ def add_to_cart(request):
 
     return HttpResponseRedirect('/orders/cart/') 
 
-def get_workflow(request, action_id):
+class Workflow(PermissionRequiredMixin, View):
+    permission_required = 'oscauth.can_order'
 
-    tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
-    action = Action.objects.get(id=action_id)
+    def get(self, request, action_id):
+    #def get_workflow(request, action_id):
 
-    for index, tab in enumerate(tabs, start=1):
-        tab.step = 'step' + str(index)
+        tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
+        action = Action.objects.get(id=action_id)
 
-        if tab.custom_form == '':
-            f = forms.Form()
-            f.template = 'order/dynamic_form.html'
-            element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
+        for index, tab in enumerate(tabs, start=1):
+            tab.step = 'step' + str(index)
 
-            for element in element_list:
-                if element.type == 'YN':
-                    #field = forms.ChoiceField(label=element.label, widget=forms.RadioSelect, choices=(('Y', 'Yes',), ('N', 'No',)))
-                    field = forms.ChoiceField(label=element.label, choices=(('Y', 'Yes',), ('N', 'No',)))
-                elif element.type == 'Radio':
-                    field = forms.ChoiceField(label=element.label, choices=eval(element.attributes))
+            if tab.custom_form == '':
+                f = forms.Form()
+                f.template = 'order/dynamic_form.html'
+                element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
 
-                elif element.type == 'ST':
-                    field = forms.CharField(label=element.label)
-                elif element.type == 'PH':
-                    field = forms.ChoiceField(label=element.label, widget=PhoneSetType, choices=(('B', 'Basic',), ('A', 'Advanced',),('V', 'VOIP',)))
-                else:
-                    field = forms.IntegerField(label=element.label)
+                for element in element_list:
+                    if element.type == 'YN':
+                        #field = forms.ChoiceField(label=element.label, widget=forms.RadioSelect, choices=(('Y', 'Yes',), ('N', 'No',)))
+                        field = forms.ChoiceField(label=element.label, choices=(('Y', 'Yes',), ('N', 'No',)))
+                    elif element.type == 'Radio':
+                        field = forms.ChoiceField(label=element.label, choices=eval(element.attributes))
 
-                field.type = element.type                
-                f.fields.update({element.name: field})
+                    elif element.type == 'ST':
+                        field = forms.CharField(label=element.label)
+                    elif element.type == 'PH':
+                        field = forms.ChoiceField(label=element.label, widget=PhoneSetType, choices=(('B', 'Basic',), ('A', 'Advanced',),('V', 'VOIP',)))
+                    else:
+                        field = forms.IntegerField(label=element.label)
 
-            tab.form = f
-        else:
-            tab.form = globals()[tab.custom_form]
+                    field.type = element.type                
+                    f.fields.update({element.name: field})
 
-    return render(request, 'order/workflow.html', 
-        {'title': action.label,
-        'tab_list': tabs})
+                tab.form = f
+            else:
+                tab.form = globals()[tab.custom_form]
+
+        return render(request, 'order/workflow.html', 
+            {'title': action.label,
+            'tab_list': tabs})
 
 
 def get_cart(request):
@@ -123,16 +129,23 @@ def get_cart(request):
     return HttpResponse(template.render(context, request))
 
 
-def get_services(request):
-    template = loader.get_template('order/service.html')
-    action_list = Action.objects.all().order_by('service','display_seq_no')
-    service_list = Service.objects.all().order_by('display_seq_no')
+class Services(View):
 
-    for service in service_list:
-        service.actions = action_list.filter(service=service)
+    def get(self, request):
+        u = request.user
+        p = u.user_permissions.all()
+        for x in p:
+            print(x)
 
-    context = {
-        'title': 'Request Service',
-        'service_list': service_list,
-    }
-    return HttpResponse(template.render(context, request))
+        template = loader.get_template('order/service.html')
+        action_list = Action.objects.all().order_by('service','display_seq_no')
+        service_list = Service.objects.all().order_by('display_seq_no')
+
+        for service in service_list:
+            service.actions = action_list.filter(service=service)
+
+        context = {
+            'title': 'Request Service',
+            'service_list': service_list,
+        }
+        return HttpResponse(template.render(context, request))
