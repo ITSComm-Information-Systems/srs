@@ -14,12 +14,6 @@ class Migration(migrations.Migration):
             name='service',
             options={'permissions': [('can_order', 'Can submit orders, view cart, view order status')]},
         ),
-        migrations.AddField(
-            model_name='featurecategory',
-            name='label',
-            field=models.CharField(default=1, max_length=100),
-            preserve_default=False,
-        ),
         migrations.AlterField(
             model_name='featurecategory',
             name='display_seq_no',
