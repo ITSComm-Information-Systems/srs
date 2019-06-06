@@ -55,50 +55,5 @@ class UserSuForm(forms.Form):
                 pass
         return super(UserSuForm, self).__str__()
 
-class DeptForm(forms.Form):
-    query = UmCurrentDeptManagersV.objects.all().order_by('deptid')
 
-    DEPT_CHOICES = [tuple([q.deptid, q.deptid]) for q in query]
 
-    deptids = forms.ChoiceField(label='Department ID', choices=DEPT_CHOICES, widget=Select2Widget(attrs={'data-placeholder': '--Select--', 'data-width': '15%'}))
-    # deptids = forms.CharField(label='Department ID', widget=Select2Widget(choices=DEPT_CHOICES), initial='--Select--')
-    # deptids = forms.ModelChoiceField(queryset=UmCurrentDeptManagersV.objects.all().order_by('deptid'))#, widget=Select2MultipleWidget)
-
-    # class Meta:
-    #     widgets = {
-    #         'deptids': Select2Widget
-    #     }
-    #     model = UmCurrentDeptManagersV
-    #     fields = ['deptid']
-    #     widgets = {
-    #         'deptids':autocomplete.TextWidget('DeptAutocomplete')
-    #     }
-
-# class DeptForm(forms.ModelForm):
-#     #deptids = forms.ModelMultipleChoiceField(queryset=UmCurrentDeptManagersV.objects.all().order_by('deptid'), widget=Select2Widget)
-
-#     class Meta:
-#         model = UmCurrentDeptManagersV
-#         fields = ('deptid', )
-#         widgets = {
-#             'deptid': Select2Widget(
-#                 attrs={'data-placeholder': '--Select--', 'data-width': '100%'},)
-#         }
-
-# class DeptForm(forms.ModelForm):
-#     deptids = forms.ModelChoiceField(
-#         queryset=UmCurrentDeptManagersV.objects.values_list('deptid').all().order_by('deptid'),
-#         label='Department ID',
-#         widget=ModelSelect2Widget(
-#             model=UmCurrentDeptManagersV,
-#             search_fields=['deptid__icontains'],
-#             attrs={'data-placeholder': '--Select--', 'data-width': '100%'},),)
-
-#     class Meta():
-#         model = UmCurrentDeptManagersV
-#         fields = ('deptid',)
-
-# class DeptForm(forms.Form):
-#     ids = forms.ModelMultipleChoiceField(queryset=UmCurrentDeptManagersV.objects.values('deptid').all().order_by('deptid'),
-#         widget=ModelSelect2MultipleWidget(queryset=UmCurrentDeptManagersV.objects.values('deptid').all().order_by('deptid'),
-#         search_fields=['ids__icontains']))

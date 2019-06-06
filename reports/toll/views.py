@@ -21,7 +21,7 @@ from .models import UmTollCallDetail
 from oscauth.models import AuthUserDept, Grantor, Role
 
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
-from oscauth.forms import *
+from reports.forms import *
 
 from datetime import datetime
 from django.utils.dateparse import parse_date
@@ -52,6 +52,7 @@ def generate(request):
 		dept_id = depts[0]
 	else:
 		dept_id = request.POST.get('dept_id')
+
 
 	dept = UmOscDeptProfileV.objects.filter(deptid=dept_id)
 	dept_name = dept[0]

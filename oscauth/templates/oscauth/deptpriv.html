@@ -3,16 +3,14 @@
 
 <form action="/auth/get_dept/" method="POST">{% csrf_token %}
     <h1>Select a Department</h1>
-    <!-- <p>Department ID 
-        <select type="select" name="dept_parm" id="dept" value="{{ dept.deptid }}">
-            <option value="%">--Select--</option>
+    <p>Department ID 
+        <select type="select" name="dept_parm" id="deptf" value="{{ dept.deptid }}">
+            <option></option>
             {% for dept in dept_list %}
             <option value={{ dept.deptid }}>{{ dept.deptid }}</option>
             {% endfor %}
         </select>
-     </p> -->
-    <!--  {{ form.as_p }} -->
-    {{ form.as_p }}
+     </p>
     <p><input type='submit' value='Submit' class="btn btn-primary"></p>
 </form>
 
@@ -43,4 +41,8 @@
     </tbody>
 </table>
 
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/static/select.js"></script>
 {% endblock %}

@@ -2,7 +2,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-  	{{ form.media.css }}
+  	{% load static %}
 	<link rel="shortcut icon" href="/static/favicon.ico" />
 	<!-- Required meta tags -->
 	<meta charset="utf-8">
@@ -13,6 +13,8 @@
 
 	<!-- FontAwesome CSS -->
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+	<link rel="stylesheet" href="{% static 'select2-bootstrap4.css' %}">
 
 	<!-- Custom CSS -->
 	<link rel="stylesheet" type="text/css" href="/static/global.css">
@@ -52,6 +54,7 @@
 						<div class="dropdown-menu" aria-labelledby="toolsDropdown">
 							<a class="dropdown-item" href="/auth/deptpriv/">Look Up</a>
 							<a class="dropdown-item" href="#">Cost Estimator</a>
+							<a class="dropdown-item" href="/auth/chartchange/">Chartfield Change Request</a>
 						</div>
 					</li>
 					<li class="nav-item">
@@ -172,7 +175,12 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
+	<!-- Select with search -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+	<link rel="stylesheet" href="/static/select2.css">
+	<link rel="stylesheet" href="/static/select2-bootstrap4.css">
+
   {% block js %}{% endblock js %}
-  {{ form.media.js }}
   </body>
 </html>

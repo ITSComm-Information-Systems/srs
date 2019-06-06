@@ -46,8 +46,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'order',
     'pages',
-    'reports',
-    'django_select2',
+    'reports'
 ]
 
 MIDDLEWARE = [
