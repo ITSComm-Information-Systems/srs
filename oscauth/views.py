@@ -413,6 +413,7 @@ def modpriv(request):
 @require_http_methods(['POST'])
 @user_passes_test(su_login_callback)
 def login_as_user(request, user_id):
+    print('oscauth.login_as_user')
     userobj = authenticate(request=request, su=True, user_id=user_id)
     if not userobj:
         raise Http404("User not found")
@@ -434,7 +435,20 @@ def login_as_user(request, user_id):
             userobj.last_login = last_login
             userobj.save(update_fields=['last_login'])
 
+    add_custom_permissions(user_id)
+
     return HttpResponseRedirect('/')
+
+def add_custom_permissions(user_id):
+    # Add permissions for groups the user is in.  
+
+    groups = AuthUserDept.objects.filter(user=user_id).distinct('group_id')
+    u = User.objects.get(id=user_id)
+
+    for group in groups:
+        g = Group.objects.get(id=group.group_id)
+        for perm in g.permissions.all():
+            u.user_permissions.add(perm)
 
 
 @csrf_protect
@@ -454,12 +468,14 @@ def su_login(request, form_class=UserSuForm, template_name='oscauth/su_login.htm
 
 
 def su_logout(request):
+    print('oscauth.login_as_user')
     exit_users_pk = request.session.get("exit_users_pk", default=[])
     if not exit_users_pk:
         return HttpResponseBadRequest(
             ("This session was not su'ed into. Cannot exit."))
 
     user_id, backend = exit_users_pk.pop()
+    print('oscauth.su_logout')
 
     userobj = get_object_or_404(get_user_model(), pk=user_id)
     userobj.backend = backend
