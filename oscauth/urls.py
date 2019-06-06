@@ -22,6 +22,6 @@ urlpatterns = [
     path('deptpriv/', views.deptpriv),
     path('get_uniqname/', views.get_uniqname),
     path('modpriv/', views.modpriv),
-    url(r'^select2/', include('django_select2.urls')),
+    path('chartchange/', views.chart_change),
 
 ]

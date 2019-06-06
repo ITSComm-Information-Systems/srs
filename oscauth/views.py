@@ -130,11 +130,9 @@ def get_dept(request):
 def deptpriv(request, dept_parm=''):
     template = loader.get_template('oscauth/deptpriv.html')
     dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
-    form = DeptForm()
     if dept_parm == '':
         context = {
-            'dept_list': dept_list,
-            'form': form
+            'dept_list': dept_list
         }
         return  HttpResponse(template.render(context, request))
 
@@ -176,8 +174,7 @@ def deptpriv(request, dept_parm=''):
         'dept_status': dept_status,
         'subtitle1': 'Access For Department: ' + dept_parm + ' - '+ dept_name ,
         'subtitle2': 'Department Manager: ' + dept_mgr_name + ' (' + dept_mgr_uniqname + ')',
-        'rows': rows,
-        'form': form
+        'rows': rows
     }
     return HttpResponse(template.render(context, request))
 
@@ -472,7 +469,10 @@ def su_logout(request):
     request.session["exit_users_pk"] = exit_users_pk
 
     return HttpResponseRedirect(
-        getattr(settings, "SU_LOGOUT_REDIRECT_URL", "/"))   
+        getattr(settings, "SU_LOGOUT_REDIRECT_URL", "/")) 
 
+def chart_change(request):
+    template = loader.get_template('oscauth/chartchange.html');
 
+    return HttpResponse(template.render({'title':'Chartfield Change Request'}, request))
 
