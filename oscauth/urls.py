@@ -22,6 +22,5 @@ urlpatterns = [
     path('deptpriv/', views.deptpriv),
     path('get_uniqname/', views.get_uniqname),
     path('modpriv/', views.modpriv),
-    path('chartchange/', views.chart_change),
 
 ]

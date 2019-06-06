@@ -3,6 +3,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls.static import static
+from . import views
 
 admin.AdminSite.site_header = 'OSC Administration'
 admin.AdminSite.site_title = 'OSC Site Admin'
@@ -14,6 +15,7 @@ urlpatterns = [
     path('auth/', include('oscauth.urls')),
     path('admin/', admin.site.urls),
     path('reports/',include('reports.urls')),
+    path('chartchange/', views.chartchange),
     path('', include('pages.urls')),
 ]
 if settings.DEBUG:
