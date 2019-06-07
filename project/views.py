@@ -17,7 +17,21 @@ from django import forms
 
 from ldap3 import Server, Connection, ALL
 
+# from pinnmodels import UmOscAcctsInUseV
+# from oscauth.models import AuthUserDept
+# from reports.tolls.views import find_depts
+
 def chartchange(request):
 	template = loader.get_template('chartchange.html')
 
-	return HttpResponse(template.render({'title':'Chartfield Change Request'}, request))
+	# user_depts = AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept')
+	# chartfield_list = UmOscAcctsInUseV.objects.filter(deptid__in = user_depts)
+
+	
+
+	return HttpResponse(template.render({'title':'ChartField Change Request'}, request))
+
+
+# def get_dept(request):
+# 	if request.method =='POST':
+# 		
