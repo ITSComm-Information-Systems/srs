@@ -19,18 +19,24 @@
         <p></p>
         <p>-or-</p>
         <p></p>
-        <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptgroup" value = '2'>  Department Group
-        <select style='font-size:16px' name="department_group">
-                <option value="%">--Select--</option>
-                {% for group in groups %}
-                <option value="{{ group }}">{{ group }}</option>
-                {% endfor %}
-            </select>    
-        </br>
+        <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptidtext" value = '2'>  Select All Departments (you have access to)
         <p></p>
         <p>-or-</p>
         <p></p>
-        <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptvp" value = '3'>  Department Group VP Area
+        <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptgroup" value = '3'>  Department Group
+        <select style='font-size:16px' name="department_group" onchange="display_active({{active}})">
+                <option value="%">--Select--</option>
+                {% for group in groups_descr %}
+                <option value="{{ group }}">{{ group }}</option>
+                {% endfor %}
+            </select>    
+        {% comment %} <span id = "display">(Fiscal Years Active)</span> {% endcomment %}
+        </br>
+        
+        <p></p>
+        <p>-or-</p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptvp" value = '4'>  Department Group VP Area
         <select style='font-size:16px' name="department_vp">
                 <option value="%">--Select--</option>
                 {% for vp in vps %}
@@ -119,6 +125,7 @@
 
 <p>{{grouping}} - {{unit}}</p>
 <p>{{dateRange}} - {{billing_period}}</p>
+<p> {{rows}}</p>
 
 <table class="table table-hover table-headings">
         <thead>
@@ -140,4 +147,13 @@
             </tr>
         </tbody>
     </table>
+
+<script>
+    function display_active(active) {
+        var group = document.forms["Select"]["department_group"];
+        var index = group.selectedIndex-1;
+        document.getElementById("display").innerHTML = active[index]
+        
+    }
+</script>
 {% endblock %}
