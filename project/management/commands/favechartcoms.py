@@ -17,15 +17,16 @@ class Command(BaseCommand):
             try:
                 new_record = Chartcom()
                 new_record.fund = row.fund  
-                new_record.dept = row.deptid
+                new_record.dept = row.dept
                 new_record.program = row.program
                 new_record.class_code = row.class_code
                 new_record.project_grant = row.project_grant
-                new_record.save()
-                auth_added_count = auth_added_count + 1
+                new_record.save()                
+                fave_added_count = fave_added_count + 1
                 print("Added Chartcom for Fund: %s  Dept: %s  Program: %s  Class: %s  PG: %s" % (row.fund, row.dept, row.program, row.class_code, row.project_grant))
-            except:
+            except Exception as ex:
                 fave_not_added_count = fave_not_added_count + 1
+                print(ex)
                 print("Unable to add Chartcom for Fund: %s  Dept: %s  Program: %s  Class: %s  PG: %s" % (row.fund, row.dept, row.program, row.class_code, row.project_grant))
  
         print('-------------------------------------------')
