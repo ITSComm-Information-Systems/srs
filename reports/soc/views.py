@@ -16,6 +16,10 @@ from django import forms
 
 from ldap3 import Server, Connection, ALL
 from oscauth.models import AuthUserDept, Grantor, Role
+from django.db.models import indexes
+
+from django.db.models import Value
+from django.db.models.functions import Concat
 
 # from .models import AuthUserDept
 # from .models import Role, Group, User
@@ -28,29 +32,41 @@ import datetime
 def get_soc(request):
     template = loader.get_template('soc.html')
     depts = find_depts(request)
-    groups = []
-    query = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('dept_grp').exclude(dept_grp='All')
-    for q in query:
-        groups.append(q.dept_grp)
+    groups = UmOscDeptUnitsRept.objects.filter(deptid__in=depts).order_by('dept_grp').values_list('dept_grp',flat = True).distinct()
+    groups_descr = UmOscDeptUnitsRept.objects.order_by('dept_grp_descr').values_list('dept_grp_descr',flat = True).distinct()
+    active = [None] * 255
+    # for i in range(255):
+    #     valid = UmOscDeptUnitsRept.objects.filter(dept_grp_descr__exact = groups_descr[i]).order_by('fiscal_yr').values_list('fiscal_yr',flat =True).distinct()
+    #     text = valid[0] + '-' + valid[valid.count()-1]
+    #     active[i]= text
+        
+
+    
     groups = list(dict.fromkeys(groups))
     fiscal = select_fiscal_year(request)
     calendar = select_calendar_year(request)
     months = select_month(request)
 
     vps = []
-    vps = UmOscDeptUnitsRept.objects.filter(dept_grp__in = groups).order_by('dept_grp_vp_area').exclude(dept_grp='All').values_list('dept_grp_vp_area',flat =True).distinct()
+    vps = UmOscDeptUnitsRept.objects.order_by('dept_grp_vp_area').values_list('dept_grp_vp_area_descr',flat =True).distinct()
 
 
     unit = ''
     grouping = ''
+    
+    text = ''
+    submit = False
     display_type = request.POST.get("unitGroupingGroup",None)
     if display_type in ['1']:
         grouping = 'Department ID'
         unit = request.POST.get('department_id')
     elif display_type in ['2']:
+        grouping = 'Department IDs'
+        unit = depts
+    elif display_type in ['3']:
         grouping = 'Department Group'
         unit = request.POST.get('department_group')
-    elif display_type in ['3']:
+    elif display_type in ['4']:
         grouping = 'Department Group VP Area'
         unit = request.POST.get('department_vp')
 
@@ -60,6 +76,7 @@ def get_soc(request):
     if display_type in ['1']:
         dateRange = 'Fiscal Year'
         billing_period = request.POST.get('FISCALYEAR')
+
     elif display_type in ['2']:
         dateRange = 'Calendar Year'
         billing_period = request.POST.get('CALENDARYEAR')
@@ -70,14 +87,20 @@ def get_soc(request):
     elif display_type in ['4']:
         dateRange = 'Month-to-Month'
         billing_period = request.POST.get('FIRSTMONTH')
-        billing_period = billing_period + " " + request.POST.get('FIRSTYEAR') + " to "
+        billing_period = billing_period + " " + request.POST.get('FIRSTYEAR') + " to"
         billing_period = billing_period + " " + request.POST.get('SECONDMONTH')
         billing_period = billing_period + " " + request.POST.get('SECONDYEAR')
+
+    if (unit != '' and billing_period != ''):
+        rows = list(get_rows(unit, grouping, billing_period, dateRange, request))
+    else:
+        rows = 'There is no data for the currect selection'
 
     context = {
         'title': 'Summary of Charges',
         'depts': depts,
         'groups': groups,
+        'groups_descr':groups_descr,
         'fiscal':fiscal,
         'calendar':calendar,
         'months':months,
@@ -86,6 +109,10 @@ def get_soc(request):
         'dateRange': dateRange,
         'unit': unit,
         'billing_period': billing_period,
+        'submit': submit,
+        'active': active,
+        'text': text,
+        'rows': rows,
     }
     return HttpResponse(template.render(context,request))
 
@@ -113,13 +140,30 @@ def select_month(request):
     query = UmOscDeptUnitsRept.objects.order_by('month').values_list('month',flat =True).distinct()
     months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
  	 		  'August', 'September', 'October', 'November', 'December']
-    return months #,query
+    return query
 
-# def find_groups(request):
-#     groups = []
+def get_rows(unit, grouping, period, drange, request):
+    if (grouping == 'Department ID'):
+        values = UmOscDeptUnitsRept.objects.filter(deptid__exact = unit).order_by('account').values('calendar_yr','month','fiscal_yr').distinct()
+    elif (grouping == 'Department IDs'):
+        values = UmOscDeptUnitsRept.objects.filter(deptid__in = unit).order_by('account').values('calendar_yr','month','fiscal_yr').distinct()
+    elif (grouping == 'Department Group'):
+        values = UmOscDeptUnitsRept.objects.filter(dept_grp_descr__exact = unit).order_by('account').values('calendar_yr','month','fiscal_yr').distinct()
+    elif (grouping == 'Department Group VP Area'):
+        values = UmOscDeptUnitsRept.objects.filter(dept_grp_vp_descr__exact = unit).order_by('account').values('calendar_yr','month','fiscal_yr').distinct()
 
-#     query = UmOscDeptProfileV.objects.filter(deptid_
-
-#     for group in query:
-#         groups.append(group)
-#     return groups
+    if (drange == 'Fiscal Year'):
+       return values.filter(fiscal_yr__exact = period)
+    elif (drange == 'Calendar Year'):
+        return values.filter(calendar_yr__exact = period)
+    elif (drange == 'Single Month'):
+        month = period.split(' ')[0]
+        year = period.split(' ')[1]
+        return values.filter(calendar_yr__exact = year).filter(month__exact = month)
+    elif (drange == 'Month-to-Month'):
+        month1 = period.split(' ')[0]
+        year1 = period.split(' ')[1]
+        month2 = period.split(' ')[3]
+        year2 = period.split(' ')[4]
+        values = UmOscDeptUnitsRept.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).order_by('account').values('account','date').distinct()
+        return values.filter(date__range = [year1+''+month1,year2+''+month2])
