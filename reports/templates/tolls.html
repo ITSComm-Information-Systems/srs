@@ -5,18 +5,20 @@
 
 <form action="/reports/tolls/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
     <h1>Toll Statements</h1>
-    <p style='font-size:20px'>Billing period 
-        <select style='font-size:16px' requried type="select" name="bill_period" id="month" value="{{ i }}">
+    <p style='font-size:20px'>Billing period</p> 
+        <select style='font-size:16px' type="select" name="bill_period" id="month" value="{{ i }}">
             <option value="%">--Select--</option>
             {% for i in periods %}
             <option value="{{ i }}">{{ i }}</option>
             {% endfor %}
         </select>
-     </p>
+        <p></p>
+        <p></p>
     {% if depts %}
         <span style='font-size:20px'>Departments
-            <select style='font-size:16px' requried type="select" name="dept_id" id="month" value="{{ i }}" onchange="display_dept({{dept_names}})">
-                <option value="%">--Select--</option>
+            <select style='font-size:16px, width:50%' requried type="select" name="dept_id" id="html_test" value="{{ i }}" onchange="display_dept({{dept_names}})">
+                <option></option>
+                <!-- <option value="%">--Select--</option> -->
                 {% for dept in depts %}
                 <option value="{{ dept }}">{{ dept }}</option>
                 {% endfor %}
@@ -91,4 +93,8 @@
     }
 </script>
 
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/static/select.js"></script>
 {% endblock %}

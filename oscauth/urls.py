@@ -2,6 +2,8 @@ from django.urls import path
 
 from . import views
 
+from django.conf.urls import include, url
+
 urlpatterns = [
     path('dept/<str:dept_id>', views.dept, name='dept'),
     path('user/<str:user_id>', views.user, name='user'),

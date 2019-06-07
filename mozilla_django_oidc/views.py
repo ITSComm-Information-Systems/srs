@@ -17,6 +17,7 @@ from django.utils.crypto import get_random_string
 from django.utils.http import is_safe_url
 from django.utils.module_loading import import_string
 from django.views.generic import View
+from oscauth.views import add_custom_permissions
 
 from mozilla_django_oidc.utils import (
     absolutify,
@@ -51,10 +52,12 @@ class OIDCAuthenticationCallbackView(View):
         # using the RenewIDToken middleware.
         expiration_interval = import_from_settings('OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS', 60 * 15)
         self.request.session['oidc_id_token_expiration'] = time.time() + expiration_interval
+        add_custom_permissions(self.user.id)
 
         return HttpResponseRedirect(self.success_url)
 
     def get(self, request):
+
         """Callback handler for OIDC authorization code flow"""
 
         nonce = request.session.get('oidc_nonce')
