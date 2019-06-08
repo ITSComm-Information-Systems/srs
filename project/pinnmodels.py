@@ -563,3 +563,167 @@ class UmOscAllActiveAcctNbrsV(models.Model):
         ordering = ('deptid', 'account_number')
         db_table = 'PINN_CUSTOM\".\"um_osc_all_active_acct_nbrs_v'
 
+class UmOscAvailableLocsV(models.Model):
+     campus_code = models.CharField(max_length=4)
+     campus_desc = models.CharField(max_length=30)
+     service_type = models.CharField(max_length=20)
+     service_number = models.CharField(max_length=60, primary_key=True)
+     status = models.CharField(max_length=15)
+     service_id = models.IntegerField(9, null=False)
+     location_id = models.IntegerField(9, null=False)
+     path_id = models.IntegerField(9, null=False)
+     building_id = models.CharField(max_length=10)
+     building_name = models.CharField(max_length=25)
+     floor = models.CharField(max_length=18)
+     floor_desc = models.CharField(max_length=50)
+     room = models.CharField(max_length=18)
+     room_desc = models.CharField(max_length=50)
+     jack = models.CharField(max_length=30)
+
+     class Meta:
+          managed = False
+          ordering = ('service_number',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_available_locs_v'
+
+class UmOscLocationsInUseV(models.Model):
+     campus_code = models.CharField(max_length=4)
+     campus_desc = models.CharField(max_length=30)
+     service_type = models.CharField(max_length=20)
+     service_number = models.CharField(max_length=60)
+     status = models.CharField(max_length=15)
+     service_id = models.IntegerField(9, null=False)
+     location_id = models.IntegerField(9, null=False)
+     path_id = models.IntegerField(9, null=False)
+     building_id = models.CharField(max_length=10, primary_key=True)
+     building_name = models.CharField(max_length=25)
+     floor = models.CharField(max_length=18)
+     floor_desc = models.CharField(max_length=50)
+     room = models.CharField(max_length=18)
+     room_desc = models.CharField(max_length=50)
+     jack = models.CharField(max_length=30)
+
+     class Meta:
+          managed = False
+          ordering = ('building_id','floor','room','jack')
+          db_table = 'PINN_CUSTOM\".\"um_osc_locations_in_use_v'
+
+class UmOscVoipLocChangeInput(models.Model):
+     uniqname = models.CharField(max_length=8) 
+     service_id = models.IntegerField(9, null=False)
+     service_number= models.CharField(max_length=60)
+     old_campus_code = models.CharField(max_length=4)
+     old_campus_desc = models.CharField(max_length=30)
+     old_location_id = models.IntegerField(9, null=False)
+     old_path_id = models.IntegerField(9, null=False)
+     old_building_id = models.CharField(max_length=10)
+     old_building_name = models.CharField(max_length=255)
+     old_floor = models.CharField(max_length=18)
+     old_floor_desc = models.CharField(max_length=50)
+     old_room = models.CharField(max_length=18)
+     old_room_desc = models.CharField(max_length=50)
+     old_jack = models.CharField(max_length=30)
+     service_id_at_new_loc = models.IntegerField(9, null=False)
+     service_nbr_at_new_loc = models.CharField(max_length=60)   
+     service_type_at_new_loc = models.CharField(max_length=20)
+     svc_status_at_new_loc = models.CharField(max_length=15)
+     new_campus_code = models.CharField(max_length=4)
+     new_campus_desc = models.CharField(max_length=30)
+     new_location_id = models.IntegerField(9, null=False)
+     new_path_id = models.IntegerField(9, null=False)
+     new_building_id = models.CharField(max_length=10)
+     new_building_name = models.CharField(max_length=255)
+     new_floor = models.CharField(max_length=18)
+     new_floor_desc = models.CharField(max_length=50)
+     new_room = models.CharField(max_length=18)
+     new_room_desc = models.CharField(max_length=50)
+     new_jack = models.CharField(max_length=30)
+     request_no = models.IntegerField(9, null=False, primary_key=True)
+     date_added = models.DateField
+     date_processed = models.DateField
+     messages = models.CharField(max_length=2000)
+
+     class Meta:
+          managed = False
+          ordering = ('request_no',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_voip_loc_change_input'
+
+
+class UmOscAcctsInUseV(models.Model):
+   short_code = models.CharField(max_length=10, blank=True, null=True)
+   account_number =  models.CharField(max_length=100,primary_key=True)
+   fund =  models.CharField(max_length=30, blank=True, null=True)
+   fund_desc =  models.CharField(max_length=30, blank=True, null=True)
+   deptid =  models.CharField(max_length=30, blank=True, null=True)
+   dept_desc =  models.CharField(max_length=30, blank=True, null=True)
+   program =  models.CharField(max_length=30, blank=True, null=True)
+   program_desc =  models.CharField(max_length=30, blank=True, null=True)
+   class_code =  models.CharField(max_length=30, blank=True, null=True)
+   class_desc =  models.CharField(max_length=30, blank=True, null=True)
+   project_grant =  models.CharField(max_length=30, blank=True, null=True)
+   project_grant_desc =  models.CharField(max_length=225, blank=True, null=True)
+   active =  models.CharField(max_length=1, blank=True, null=True)
+
+   class Meta:
+        managed = False
+        ordering = ('deptid', 'account_number')
+        db_table = 'PINN_CUSTOM\".\"um_osc_accts_in_use_v'
+
+class UmOscAcctChangeInput(models.Model):
+     uniqname = models.CharField(max_length=8) 
+     user_defined_id = models.CharField(max_length=20)
+     mrc_acct_number = models.CharField(max_length=100)
+     toll_acct_number = models.CharField(max_length=100)
+     local_acct_number = models.CharField(max_length=100)
+     date_added = models.DateField
+     date_processed = models.DateField
+     messages = models.CharField(max_length=2000)
+     request_no = models.IntegerField(9, null=False, primary_key=True)
+
+     class Meta:
+          managed = False
+          ordering = ('request_no',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_acct_change_input'
+
+class UmOscAcctSubscribersV(models.Model):
+     subscriber_id = models.CharField(max_length=7) 
+     user_defined_id = models.CharField(max_length=20)
+     chartcom = models.CharField(max_length=100, primary_key=True)
+     dn = models.CharField(max_length=60)
+     service_type = models.CharField(max_length=20)
+     service_status = models.CharField(max_length=15)
+     location_id = models.IntegerField(9, null=False)
+     building = models.CharField(max_length=25)
+     floor = models.CharField(max_length=18)
+     room = models.CharField(max_length=18)
+     jack = models.CharField(max_length=30)
+     mrc_charged = models.CharField(max_length=1)
+     toll_charged = models.CharField(max_length=1)
+     local_charged = models.CharField(max_length=1)
+ 
+     class Meta:
+          managed = False
+          ordering = ('chartcom',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_acct_subscribers_v'
+
+
+class UmOscAllAcctSubscribersV(models.Model):
+     subscriber_id = models.CharField(max_length=7) 
+     user_defined_id = models.CharField(max_length=20)
+     chartcom = models.CharField(max_length=100, primary_key=True)
+     dn = models.CharField(max_length=60)
+     service_type = models.CharField(max_length=20)
+     service_status = models.CharField(max_length=15)
+     location_id = models.IntegerField(9, null=False)
+     building = models.CharField(max_length=25)
+     floor = models.CharField(max_length=18)
+     room = models.CharField(max_length=18)
+     jack = models.CharField(max_length=30)
+     mrc_charged = models.CharField(max_length=1)
+     toll_charged = models.CharField(max_length=1)
+     local_charged = models.CharField(max_length=1)
+ 
+     class Meta:
+          managed = False
+          ordering = ('chartcom',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_all_acct_subscribers_v'
+
