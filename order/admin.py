@@ -11,7 +11,7 @@ class ActionAdmin(admin.ModelAdmin):
     list_filter = ('service','type')
     list_display  = ['display_seq_no','label','service','type']
     ordering = ('display_seq_no',)
-    fields = ('name','label', ('display_seq_no','active'),('service','type'), 'steps', ('route','destination'))
+    fields = ('name','label', ('display_seq_no','active'),('service','type'), 'description', 'steps', ('route','destination'))
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         step_list = Step.objects.all().filter(action = object_id).order_by('display_seq_no')
