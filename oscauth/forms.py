@@ -8,9 +8,6 @@ from django.contrib.auth import get_user_model
 
 from project.pinnmodels import UmCurrentDeptManagersV
 
-#from dal import autocomplete
-from django_select2.forms import Select2MultipleWidget, Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
-
 class AddUserForm(forms.Form):
     uniqname = forms.CharField(label='Uniqname', max_length=8)
 

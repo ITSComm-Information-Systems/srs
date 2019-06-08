@@ -3,11 +3,12 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+<div class="container">
 <form action="/reports/tolls/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
-    <h1>Toll Statements</h1>
-    <p style='font-size:20px'>Billing period</p> 
-        <select style='font-size:16px' type="select" name="bill_period" id="month" value="{{ i }}">
-            <option value="%">--Select--</option>
+    <div class="form-group col-md-6">
+    <p style='font-size:20px'>Billing period</p>
+        <select class="form-control" style='font-size:16px' type="select" name="bill_period" id="month" value="{{ i }}">
+            <option value="%">Select a billing period</option>
             {% for i in periods %}
             <option value="{{ i }}">{{ i }}</option>
             {% endfor %}
@@ -15,20 +16,20 @@
         <p></p>
         <p></p>
     {% if depts %}
-        <span style='font-size:20px'>Departments
-            <select style='font-size:16px, width:50%' requried type="select" name="dept_id" id="html_test" value="{{ i }}" onchange="display_dept({{dept_names}})">
+        <p style='font-size:20px'>Department ID</p>
+            <select style='font-size:16px' requried type="select" name="dept_id" id="html_test" value="{{ i }}" onchange="display_dept({{dept_names}})">
                 <option></option>
-                <!-- <option value="%">--Select--</option> -->
                 {% for dept in depts %}
                 <option value="{{ dept }}">{{ dept }}</option>
                 {% endfor %}
         </select>
-     </span>
      <span id="display"></span>
      <p></p>
      {% endif %}
     <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+    </div>
 </form>
+</div>
 
 {% if inactive %}
     <span style="color:red">{{dept_name}} ({{dept_id}})</span><i class="fas fa-exclamation-triangle" style="color:red"></i>
