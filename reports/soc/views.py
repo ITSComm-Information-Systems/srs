@@ -92,9 +92,12 @@ def get_soc(request):
         billing_period = billing_period + " " + request.POST.get('SECONDYEAR')
 
     if (unit != '' and billing_period != ''):
-        rows = list(get_rows(unit, grouping, billing_period, dateRange, request))
+        rows = get_rows(unit, grouping, billing_period, dateRange, request)
+        table = get_table(rows,request)
     else:
         rows = 'There is no data for the currect selection'
+        table = []
+    
 
     context = {
         'title': 'Summary of Charges',
@@ -112,7 +115,8 @@ def get_soc(request):
         'submit': submit,
         'active': active,
         'text': text,
-        'rows': rows,
+        'rows': list(rows),
+        'table': list(table),
     }
     return HttpResponse(template.render(context,request))
 
@@ -143,27 +147,50 @@ def select_month(request):
     return query
 
 def get_rows(unit, grouping, period, drange, request):
-    if (grouping == 'Department ID'):
-        values = UmOscDeptUnitsRept.objects.filter(deptid__exact = unit).order_by('account').values('calendar_yr','month','fiscal_yr').distinct()
-    elif (grouping == 'Department IDs'):
-        values = UmOscDeptUnitsRept.objects.filter(deptid__in = unit).order_by('account').values('calendar_yr','month','fiscal_yr').distinct()
-    elif (grouping == 'Department Group'):
-        values = UmOscDeptUnitsRept.objects.filter(dept_grp_descr__exact = unit).order_by('account').values('calendar_yr','month','fiscal_yr').distinct()
-    elif (grouping == 'Department Group VP Area'):
-        values = UmOscDeptUnitsRept.objects.filter(dept_grp_vp_descr__exact = unit).order_by('account').values('calendar_yr','month','fiscal_yr').distinct()
+   
 
     if (drange == 'Fiscal Year'):
-       return values.filter(fiscal_yr__exact = period)
+        values = UmOscDeptUnitsRept.objects.filter(fiscal_yr__exact = period)
     elif (drange == 'Calendar Year'):
-        return values.filter(calendar_yr__exact = period)
+        values = UmOscDeptUnitsRept.objects.filter(calendar_yr__exact = period)
     elif (drange == 'Single Month'):
         month = period.split(' ')[0]
         year = period.split(' ')[1]
-        return values.filter(calendar_yr__exact = year).filter(month__exact = month)
+        values = UmOscDeptUnitsRept.objects.filter(calendar_yr__exact = year).filter(month__exact = month)
     elif (drange == 'Month-to-Month'):
         month1 = period.split(' ')[0]
         year1 = period.split(' ')[1]
         month2 = period.split(' ')[3]
         year2 = period.split(' ')[4]
-        values = UmOscDeptUnitsRept.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).order_by('account').values('account','date').distinct()
-        return values.filter(date__range = [year1+''+month1,year2+''+month2])
+        values = UmOscDeptUnitsRept.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(date__range = [year1+''+month1,year2+''+month2]).order_by('account').values('account','date').distinct()
+
+    
+    if (grouping == 'Department ID'):
+        return values.filter(deptid__exact = unit).order_by('account_desc').values('account','account_desc','description','charge_code','unit_rate','quantity','amount')
+    elif (grouping == 'Department IDs'):
+        return values.filter(deptid__in = unit).order_by('account_desc').values('account','account_desc','description','charge_code','unit_rate','quantity','amount')
+    elif (grouping == 'Department Group'):
+        return values.filter(dept_grp_descr__exact = unit).order_by('account_desc').values('account','account_desc','description','charge_code','unit_rate','quantity','amount')
+    elif (grouping == 'Department Group VP Area'):
+        return values.filter(dept_grp_vp_descr__exact = unit).order_by('account_desc').values('account','account_desc','description','charge_code','unit_rate','quantity','amount')
+
+def get_table(rows,request):
+    accounts = rows.values_list('account',flat = True).distinct()
+    whole_table = []
+    account_table = []
+    for i in accounts:
+        services = accounts.filter(account__exact = i).order_by('account_desc').values_list('description',flat = True)
+        account_total = 0
+        account_table = []
+        for x in services:
+            orders = services.filter(description__exact = x).order_by('account_desc').values_list('account_desc','description','charge_code','unit_rate','quantity','amount').distinct()
+            total_cost =0.0
+
+            for y in orders:
+                total_cost = total_cost + float(y[5])
+                account_total = account_total + float(y[5])
+            account_table.append([orders,total_cost])
+        whole_table.append([i,account_table,account_total])
+    return whole_table
+
+
