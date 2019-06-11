@@ -175,22 +175,37 @@ def get_rows(unit, grouping, period, drange, request):
         return values.filter(dept_grp_vp_descr__exact = unit).order_by('account_desc').values('account','account_desc','description','charge_code','unit_rate','quantity','amount')
 
 def get_table(rows,request):
-    accounts = rows.values_list('account',flat = True).distinct()
+    accounts = rows.values_list('account','account_desc').distinct()
     whole_table = []
     account_table = []
+    final_table = []
     for i in accounts:
-        services = accounts.filter(account__exact = i).order_by('account_desc').values_list('description',flat = True)
-        account_total = 0
-        account_table = []
-        for x in services:
-            orders = services.filter(description__exact = x).order_by('account_desc').values_list('account_desc','description','charge_code','unit_rate','quantity','amount').distinct()
-            total_cost =0.0
-
-            for y in orders:
-                total_cost = total_cost + float(y[5])
-                account_total = account_total + float(y[5])
-            account_table.append([orders,total_cost])
-        whole_table.append([i,account_table,account_total])
-    return whole_table
+        services = accounts.filter(account__exact = i[0]).order_by('charge_group').values_list('description',flat = True)
+        # account_total = 0
+        # # account_table = []
+        orders = services.filter(description__in = services).order_by('charge_group').values_list('charge_group', flat = True).distinct()
+        total_cost =0.0
+        whole_table = []
+        for y in orders:
+            charge_together = orders.filter(charge_group__exact = y).order_by('description').values_list('description','charge_code').distinct()
+            charge_total = 0.0
+            account_table = []
+            for x in charge_together:
+                samecode = charge_together.filter(charge_code__exact = x[1]).order_by('charge_code').values_list('unit_rate','quantity','amount').distinct()
+                item_price = 0.0
+                rate = 0.0
+                quantity = 0
+                
+                for price in samecode:
+                    rate = float(price[0])
+                    quantity = quantity + int(price[1])
+                    item_price = item_price + float(price[2])
+                    charge_total = charge_total + float(price[2])
+                    total_cost = total_cost + float(price[2])
+               
+                account_table.append([x[0],x[1],rate,quantity,item_price])
+            whole_table.append([y,account_table, charge_total])
+        final_table.append([i[0],i[1],whole_table,total_cost])
+    return final_table
 
 
