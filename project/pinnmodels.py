@@ -500,7 +500,7 @@ class UmOscAttachmentApiV(UmOscAttachmentApiAbstract):
         return self.description                   
 
 
-class UmOscDeptUnitsRept(models.Model):
+class UmOscDeptUnitsReptV(models.Model):
      fiscal_yr = models.CharField(max_length=4)
      calendar_yr = models.CharField(max_length=4)
      month = models.CharField(max_length=2)
@@ -521,7 +521,7 @@ class UmOscDeptUnitsRept(models.Model):
     
      class Meta:
           managed = False
-          db_table = 'PINN_CUSTOM\".\"um_osc_dept_units_rept'
+          db_table = 'PINN_CUSTOM\".\"um_osc_dept_units_rept_v'
 
 class UmOscChartcomInitialLoadV(models.Model):
      fund = models.CharField(max_length=30)
@@ -705,25 +705,4 @@ class UmOscAcctSubscribersV(models.Model):
           ordering = ('chartcom',)
           db_table = 'PINN_CUSTOM\".\"um_osc_acct_subscribers_v'
 
-
-class UmOscAllAcctSubscribersV(models.Model):
-     subscriber_id = models.CharField(max_length=7) 
-     user_defined_id = models.CharField(max_length=20)
-     chartcom = models.CharField(max_length=100, primary_key=True)
-     dn = models.CharField(max_length=60)
-     service_type = models.CharField(max_length=20)
-     service_status = models.CharField(max_length=15)
-     location_id = models.IntegerField(9, null=False)
-     building = models.CharField(max_length=25)
-     floor = models.CharField(max_length=18)
-     room = models.CharField(max_length=18)
-     jack = models.CharField(max_length=30)
-     mrc_charged = models.CharField(max_length=1)
-     toll_charged = models.CharField(max_length=1)
-     local_charged = models.CharField(max_length=1)
- 
-     class Meta:
-          managed = False
-          ordering = ('chartcom',)
-          db_table = 'PINN_CUSTOM\".\"um_osc_all_acct_subscribers_v'
 
