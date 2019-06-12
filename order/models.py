@@ -113,8 +113,7 @@ class Action(Configuration):
     )
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='A')
-    #label = models.CharField(max_length=100)
-    #display_seq_no = models.PositiveIntegerField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=True)    
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     steps = models.ManyToManyField(Step)
@@ -161,6 +160,7 @@ class Cart(models.Model):
 class Item(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     description = models.CharField(max_length=100)
+    create_date = models.DateTimeField('Date Created', auto_now_add=True)
     data = JSONField()
 
     def __str__(self):
