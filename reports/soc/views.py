@@ -34,7 +34,6 @@ def get_soc(request):
     depts = find_depts(request)
     groups = UmOscDeptUnitsReptV.objects.filter(deptid__in=depts).order_by('dept_grp').values_list('dept_grp',flat = True).distinct()
     groups_descr = UmOscDeptUnitsReptV.objects.order_by('dept_grp_descr').values_list('dept_grp_descr',flat = True).distinct()
-    active = [None] * 255
     # for i in range(255):
     #     valid = UmOscDeptUnitsReptV.objects.filter(dept_grp_descr__exact = groups_descr[i]).order_by('fiscal_yr').values_list('fiscal_yr',flat =True).distinct()
     #     text = valid[0] + '-' + valid[valid.count()-1]
@@ -55,11 +54,12 @@ def get_soc(request):
     grouping = ''
     
     text = ''
-    submit = False
+    submit = True
+
     display_type = request.POST.get("unitGroupingGroup",None)
     if display_type in ['1']:
         grouping = 'Department ID'
-        unit = request.POST.get('department_id')
+        unit = request.POST.getlist('department_id')
     elif display_type in ['2']:
         grouping = 'Department IDs'
         unit = depts
@@ -90,13 +90,14 @@ def get_soc(request):
         billing_period = billing_period + " " + request.POST.get('FIRSTYEAR') + " to"
         billing_period = billing_period + " " + request.POST.get('SECONDMONTH')
         billing_period = billing_period + " " + request.POST.get('SECONDYEAR')
-
+    table = []
     if (unit != '' and billing_period != ''):
         rows = get_rows(unit, grouping, billing_period, dateRange, request)
         table = get_table(rows,request)
-    else:
+    if (list(table)[0][1]==0):
         rows = 'There is no data for the currect selection'
         table = []
+        submit = False
     
 
     context = {
@@ -113,9 +114,8 @@ def get_soc(request):
         'unit': unit,
         'billing_period': billing_period,
         'submit': submit,
-        'active': active,
         'text': text,
-        'rows': list(rows),
+        'rows': rows,
         'table': list(table),
     }
     return HttpResponse(template.render(context,request))
@@ -166,7 +166,7 @@ def get_rows(unit, grouping, period, drange, request):
 
     
     if (grouping == 'Department ID'):
-        return values.filter(deptid__exact = unit).order_by('account_desc').values().distinct()
+        return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
     elif (grouping == 'Department IDs'):
         return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
     elif (grouping == 'Department Group'):
@@ -180,6 +180,9 @@ def get_table(rows,request):
     account_table = []
     final_table = []
     throwaway = []
+    overall_cost = 0
+    complete_table = []
+
     for i in accounts:
         services = accounts.filter(account__exact = i[0]).order_by('charge_group').values_list('description',flat = True)
         # account_total = 0
@@ -193,7 +196,7 @@ def get_table(rows,request):
             account_table = []
             
             for x in charge_together:
-                samecode = charge_together.filter(charge_code__exact = x[1]).order_by('charge_code').values_list('unit_rate','quantity','amount','dept_descr','month').distinct()
+                samecode = charge_together.filter(charge_code__exact = x[1] or None).order_by('charge_code').values_list('unit_rate','quantity','amount','dept_descr','month').distinct()
                 item_price = 0.0
                 rate = 0.0
                 quantity = 0
@@ -203,17 +206,18 @@ def get_table(rows,request):
                         rate = 0
                     else:
                         rate = float(price[0])
-                    if (price[1]==''):
+                    if (price[1]=='' or price[1] == None):
                         quantity= quantity +1
                     else:
                         quantity = quantity + int(price[1])
-                    item_price =  rate*quantity
+                    item_price =  item_price + float(price[2])
                     total_cost =  total_cost + float(price[2]) 
-                # throwaway.append(x)
                 charge_total = charge_total + item_price
-                account_table.append([x[0],x[1],rate,quantity,round(item_price,2)])
+                account_table.append([x[0],x[1],round(rate),quantity,round(item_price,2)])
+            overall_cost = overall_cost + charge_total
             whole_table.append([y,account_table, round(charge_total,2)])
         final_table.append([i[0],i[1],whole_table,round(total_cost,2)])
-    return final_table
+    complete_table.append([final_table,round(overall_cost,2)])
+    return complete_table
 
 

@@ -5,8 +5,6 @@
     <form action="/reports/soc/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
     {% if depts %}
 
-
-
         <h2>Select Unit Grouping</h2>
         <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptid" value = '1' checked>  Department ID
         <select multiple style='font-size:16px' name="department_id">
@@ -41,7 +39,6 @@
                 {% endfor %}
             </select>
         </br>
-
 
 
 
@@ -111,7 +108,6 @@
         </br>
 
     {% endif %}
-
      <p></p>
      <p></p>
     <p><input type='submit' value='Submit' class="btn btn-primary"></p>
@@ -119,67 +115,91 @@
 
 <p>{{grouping}} - {{unit}}</p>
 <p>{{dateRange}} - {{billing_period}}</p>
-<table cellspacing = "50" cellpadding = "5" border = "1" style = "font-size:12px">
-    <tr>
-        <th>Expense Account</th>
-        <th>Item Description</th>
-        <th>Charge Codes</th>
-        <th>Rate</th>
-        <th>Billed Units</th>
-        <th>Item Total</th>
-        <th>Item Group Total</th>
-        <th>Account Total</th>
-        
-    </tr>
-    {% for row in rows%}
-        {% comment %} <p>{{ row }}</p> {% endcomment %}
-    {% endfor %}
-    {% for row in table %}
-        {% comment %} <p> {{ row }} </p> {% endcomment %}
-    <tr> 
-        <td><b style = "color:blue">{{ row.0 }} ({{ row.1 }})</b></td>
-        <td colspan = "6"></td>
-        <td><b style = "color:blue">{{ row.3 }}</b></td>
-    </tr>
-    {% for charge in row.2%}
-    <tr>
-        <td style = "color:red">{{ charge.0 }}</td>
-        <td colspan = "5"></td>
-        <td style = "color:red">{{ charge.2}}</td>
-        <td></td>
-    <tr>
-    {% for code in charge.1%}
-    <tr>
-    <td></td>
-        <td>{{ code.0 }}</td>
-        <td>{{ code.1 }}</td>
-        <td>{{ code.2 }}</td>
-        <td>{{ code.3 }}</td>
-        <td>{{ code.4 }}</td>
-        <td colspan = "2"></td>
-    </tr>
-    {% endfor %}
-    {% endfor %}
-    
-        
-    {% endfor %}
-</table> 
 
-<table class="table table-hover table-headings">
-        <thead>
-            <tr>
-                    <th>CSV</th>
+{% if submit == False%}
+<p>{{ rows }}</p>
+{% endif %}
+
+
+{% if submit %}
+<table cellspacing = "50" cellpadding = "2"  border = "1" style = "font-size:12px">
+    <thead>
+        <tr>
+            <th>Expense Account</th>
+            <th>Item Description</th>
+            <th>Charge Codes</th>
+            <th>Rate</th>
+            <th>Billed Units</th>
+            <th>Item Total</th>
+            <th>Item Group Total</th>
+            <th>Account Total</th>
+            
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for row in table.0.0 %}
+            <tr> 
+                <td><b style = "color:blue">{{ row.0 }} ({{ row.1 }})
+                    <input type= "checkbox" name = {{row.1}} id = "" data-toggle="toggle" checked>
+                </b></td>
+                    
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><b style = "color:blue">${{ row.3 }}</b></td>
             </tr>
-        </thead>
-        <tbody>
-            <tr>
-                {% comment %} have to put department on page when selection occurs  {% endcomment %}
-                    <td> 
-                        <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fas fa-file-csv" style="font-size:20px;color:green"></i></i> CSV Download</a>
+        <tbody class = "hide">
+        {% for charge in row.2%}
+                <tr>
+                    <td style = "color:red">{{ charge.0 }}
+                        {% comment %} <input type= "checkbox" name = {{charge.0}} id = "1" data-toggle="toggle2" checked> {% endcomment %}
                     </td>
-            </tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style = "color:red">${{ charge.2}}</td>
+                    <td></td>
+                <tr>
+            {% for code in charge.1%}
+                <tr class = "hide2">
+                    <td></td>
+                    <td>{{ code.0 }}</td>
+                    <td>{{ code.1 }}</td>
+                    <td>${{ code.2 }}</td>
+                    <td>{{ code.3 }}</td>
+                    <td>${{ code.4 }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            
+        {% endfor %}
         </tbody>
-    </table>
+    {% endfor %}
+    <tr>
+        <td><b style = "color:green">Total ITCom Charges</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><b style = "color:green">${{table.0.1}}</td>
+    </tr>
+    </tbody>
+
+</table>
+<p></p>
+<p></p>
+<button onclick="exportTableToCSV('{{grouping}}_{{billing_period}}.csv')">Download Table To CSV File</button>
+
+{% endif %}
 
 <script>
     function display_active(active) {
@@ -188,5 +208,57 @@
         document.getElementById("display").innerHTML = active[index]
         
     }
+</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('[data-toggle="toggle"]').change(function(){
+            $(this).parents().next('.hide').toggle();
+        });
+    });
+</script>
+<script>
+    function exportTableToCSV(filename) {
+    var csv = [];
+    var rows = document.querySelectorAll("table tr");
+    
+    for (var i = 0; i < rows.length; i++) {
+        var row = [], cols = rows[i].querySelectorAll("td, th");
+        
+        for (var j = 0; j < cols.length; j++) 
+            row.push(cols[j].innerText);
+        
+        csv.push(row.join(","));        
+    }
+
+    // Download CSV file
+    downloadCSV(csv.join("\n"), filename);
+}
+
+    function downloadCSV(csv, filename) {
+    var csvFile;
+    var downloadLink;
+
+    // CSV file
+    csvFile = new Blob([csv], {type: "text/csv"});
+
+    // Download link
+    downloadLink = document.createElement("a");
+
+    // File name
+    downloadLink.download = filename;
+
+    // Create a link to the file
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+
+    // Hide download link
+    downloadLink.style.display = "none";
+
+    // Add the link to DOM
+    document.body.appendChild(downloadLink);
+
+    // Click download link
+    downloadLink.click();
+}
 </script>
 {% endblock %}
