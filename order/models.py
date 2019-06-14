@@ -2,6 +2,9 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from oscauth.models import Role
 from project.pinnmodels import UmOscPreorderApiAbstract
+from django.contrib.auth.models import User
+from datetime import datetime, timedelta, date
+from django.utils import timezone
 
 
 class Configuration(models.Model):   #Common fields for configuration models
@@ -139,29 +142,38 @@ class Chartcom(models.Model):
     class_code = models.CharField(max_length=30)
     project_grant = models.CharField(max_length=30)
     name = models.CharField(max_length=100)
-    account_number = models.CharField(max_length=100)
+    #account_number = models.CharField(max_length=100)
+
+    #acct = self.fund
 
     def __str__(self):
-        return self.name 
+        return self.name
 
-class Cart(models.Model):
-    number = models.CharField(max_length=20)
-    description = models.CharField(max_length=100)
-    username = models.CharField(max_length=8)
+    @property
+    def account_number(self):
+        account_number = self.fund + '-' + self.dept + '-' + self.program + '-' + self.class_code
+        if self.project_grant:
+            account_number = account_number + '-' + self.project_grant
 
-    def __str__(self):
-        return self.description
-    
-    def leppard(self):
-        pour=['me']
-        pour.append('sugar')
-
+        return account_number
 
 class Item(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     description = models.CharField(max_length=100)
     create_date = models.DateTimeField('Date Created', auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    deptid = models.CharField(max_length=8)
+    chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
     data = JSONField()
 
     def __str__(self):
         return self.description
+
+    @property
+    def days_to_deletion(self):
+        delete_date = self.create_date + timedelta(days=180) 
+        days_to_deletion = delete_date - timezone.now()
+        return days_to_deletion.days
+
+    def leppard(self):
+        pour=['me']
+        pour.append('sugar')

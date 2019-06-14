@@ -3,10 +3,13 @@ from django.template import loader
 from django.shortcuts import render
 from django.views.generic import View
 from order.forms import *
-from project.pinnmodels import UmOscPreorderApiV
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_protect
+from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV
+from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from .models import Cart, Product, Action, Service, Step, Element, Item, Constant
+from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom
 
 def submit_order(request):
     if request.method == "POST":
@@ -57,18 +60,24 @@ def add_to_cart(request):
     else:
         form = PostForm()
 
-    c, created = Cart.objects.get_or_create(number='Not Submitted', description='Order',username=request.user.get_username())
+    #c, created = Cart.objects.get_or_create(number='Not Submitted', description='Order',username=request.user.get_username())
 
+    print(request.user.id)
     i = Item()
-    i.cart = c
+    #i.cart = c
+    i.created_by_id = request.user.id
     i.description = request.POST['action']
+    occ = request.POST['OneTimeCharges']
+    print(request.POST)
+    print(occ)
+    i.chartcom = Chartcom.objects.get(id=occ)
     i.data = request.POST
     i.save()
 
 
     #return render(request, 'blog/post_edit.html', {'form': form})
 
-    return HttpResponseRedirect('/orders/cart/') 
+    return HttpResponseRedirect('/orders/cart/0') 
 
 class Workflow(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
@@ -110,23 +119,49 @@ class Workflow(PermissionRequiredMixin, View):
 
         return render(request, 'order/workflow.html', 
             {'title': action.label,
+            'wfid':action_id,
             'tab_list': tabs})
 
 
-def get_cart(request):
-    try:
-        c = Cart.objects.get(username=request.user.username).id
-    except Cart.DoesNotExist:
-        c = 0
+class UserCart(PermissionRequiredMixin, View):
+    permission_required = 'oscauth.can_order'
 
-    item_list = Item.objects.order_by('-id').filter(cart=c)
+    def post(self, request):
+        return HttpResponseRedirect('/orders/cart/' + request.POST['deptid'])
 
-    template = loader.get_template('order/cart.html')
-    context = {
-        'title': 'Shopping Cart',
-        'item_list': item_list,
-    }
-    return HttpResponse(template.render(context, request))
+    def get(self, request, deptid):
+        dept_list = AuthUserDept.objects.filter(user=request.user.id).exclude(dept='All').order_by('dept').distinct('dept')
+
+        for dept in dept_list:
+            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
+            dept.name = deptinfo.dept_name
+
+            if deptid == int(dept.dept):
+                department = {'id': dept.dept, 'name': deptinfo.dept_name}
+
+        if deptid == 0:
+            department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
+            deptid = dept_list[0].dept
+
+        item_list = Item.objects.filter(deptid=deptid)
+        chartcoms = item_list.distinct('chartcom')
+        action_list = Action.objects.all()
+
+        for acct in chartcoms:
+            acct.items = item_list.filter(chartcom=acct.chartcom)
+            print(acct.chartcom.account_number)
+
+            for item in acct.items:
+                item.details = item.data.get('action')
+                item.service = action_list.get(id=item.data.get('action_id')).service
+
+        template = loader.get_template('order/cart.html')
+        context = {
+            'department': department,
+            'dept_list': dept_list,
+            'acct': chartcoms,
+        }
+        return HttpResponse(template.render(context, request))
 
 
 class Services(View):
@@ -145,7 +180,7 @@ class Services(View):
             service.actions = action_list.filter(service=service)
 
         context = {
-            'title': 'Request Service',
+            #'title': 'Request Service',
             'service_list': service_list,
         }
         return HttpResponse(template.render(context, request))
