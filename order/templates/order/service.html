@@ -61,14 +61,9 @@
                     <h3 class="alert-heading">
                         Helpful ITS Links
                     </h3>
-                    <a href="https://its.umich.edu/infrastructure/order-estimator?srv=movephoneactdata" class="btn btn-link">OSC Estimator Tool</a><br>
-                    <a href="#" class="btn btn-link">Rates & Service Expectations</a><br>
-                    <a href="#" class="btn btn-link">Find your Project Manager</a><br>
-                    <a href="#" class="btn btn-link">Network Operations Center</a><br>
-                    <a href="#" class="btn btn-link">UMNet Administration</a><br>
-                    <a href="#" class="btn btn-link">Chartfield Change Request Form</a><br>
-                    <a href="#" class="btn btn-link">Equipment Information</a><br>
-                    <a href="#" class="btn btn-link">Repairs</a><br>
+                    {% autoescape off %}
+                    {{ link_list.bodytext }}
+                    {% endautoescape %}
                     <p class="mb-0">
                         <em>
                             *All links redirect to links outside the OSC
