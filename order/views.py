@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV
 from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from pages.models import Page
 
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom
 
@@ -172,6 +173,8 @@ class Services(View):
         for x in p:
             print(x)
 
+        link_list = Page.objects.get(permalink='/links')
+
         template = loader.get_template('order/service.html')
         action_list = Action.objects.all().order_by('service','display_seq_no')
         service_list = Service.objects.all().order_by('display_seq_no')
@@ -182,5 +185,6 @@ class Services(View):
         context = {
             #'title': 'Request Service',
             'service_list': service_list,
+            'link_list': link_list,
         }
         return HttpResponse(template.render(context, request))
