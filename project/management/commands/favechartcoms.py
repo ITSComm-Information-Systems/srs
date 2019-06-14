@@ -21,6 +21,7 @@ class Command(BaseCommand):
                 new_record.program = row.program
                 new_record.class_code = row.class_code
                 new_record.project_grant = row.project_grant
+                new_record.name = row.name
                 new_record.save()                
                 fave_added_count = fave_added_count + 1
                 print("Added Chartcom for Fund: %s  Dept: %s  Program: %s  Class: %s  PG: %s" % (row.fund, row.dept, row.program, row.class_code, row.project_grant))
