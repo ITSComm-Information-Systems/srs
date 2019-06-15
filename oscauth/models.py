@@ -40,6 +40,15 @@ class Role(models.Model):
             ('can_impersonate', 'Can Impersonate'),            
         ]
 
+class AuthUserDeptV(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    codename = models.CharField(max_length=20, blank=True)
+    dept = models.CharField(max_length=10, blank=True, primary_key=True)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_user_dept_v'
+
 class AuthUserDept(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     group = models.ForeignKey(Group, on_delete=models.PROTECT)
@@ -48,6 +57,10 @@ class AuthUserDept(models.Model):
     class Meta:
         db_table = 'auth_user_dept'
         unique_together = (("user", "group", "dept"),)
+
+    def get_order_departments(self):
+        return AuthUserDeptV.objects.filter(user_id=self,codename='can_order')
+
 
 class Grantor(models.Model):
     grantor_role = models.ForeignKey(Group, on_delete=models.PROTECT)

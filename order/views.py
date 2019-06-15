@@ -49,36 +49,15 @@ def create_preorder(cart):
 
 def add_to_cart(request):
     if request.method == "POST":
-        print(request.POST)
-        form = FeaturesForm(request.POST)
-
-        if form.is_valid():
-            #print(form.cleaned_data['occ'])
-            print('valid')
-
-        else:
-            print('bad form')
-    else:
-        form = PostForm()
-
-    #c, created = Cart.objects.get_or_create(number='Not Submitted', description='Order',username=request.user.get_username())
-
-    print(request.user.id)
-    i = Item()
-    #i.cart = c
-    i.created_by_id = request.user.id
-    i.description = request.POST['action']
-    occ = request.POST['OneTimeCharges']
-    print(request.POST)
-    print(occ)
-    charge = Chartcom.objects.get(id=occ)
-    i.chartcom = charge
-    i.deptid = charge.dept
-    i.data = request.POST
-    i.save()
-
-
-    #return render(request, 'blog/post_edit.html', {'form': form})
+        i = Item()
+        i.created_by_id = request.user.id
+        i.description = request.POST['action']
+        occ = request.POST['oneTimeCharges']
+        charge = Chartcom.objects.get(id=occ)
+        i.chartcom = charge
+        i.deptid = charge.dept
+        i.data = request.POST
+        i.save()
 
     return HttpResponseRedirect('/orders/cart/0') 
 
@@ -110,7 +89,8 @@ class Workflow(PermissionRequiredMixin, View):
 
                     elif element.type == 'Chart':
                         field = forms.ChoiceField(label=element.label
-                                                , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user))
+                                                , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user.id))
+                                                                                #AuthUserDept.get_order_departments(request.user.id)
 
 
                     elif element.type == 'ST':
@@ -140,7 +120,7 @@ class UserCart(PermissionRequiredMixin, View):
         return HttpResponseRedirect('/orders/cart/' + request.POST['deptid'])
 
     def get(self, request, deptid):
-        dept_list = AuthUserDept.objects.filter(user=request.user.id).exclude(dept='All').order_by('dept').distinct('dept')
+        dept_list = AuthUserDept.get_order_departments(request.user.id)
 
         for dept in dept_list:
             deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
@@ -192,7 +172,6 @@ class Services(View):
             service.actions = action_list.filter(service=service)
 
         context = {
-            #'title': 'Request Service',
             'service_list': service_list,
             'link_list': link_list,
         }
