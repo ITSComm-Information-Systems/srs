@@ -139,7 +139,6 @@ class UserCart(PermissionRequiredMixin, View):
 
         for acct in chartcoms:
             acct.items = item_list.filter(chartcom=acct.chartcom)
-            print(acct.chartcom.account_number)
 
             for item in acct.items:
                 item.details = item.data.get('action')
@@ -154,13 +153,29 @@ class UserCart(PermissionRequiredMixin, View):
         return HttpResponse(template.render(context, request))
 
 
+class Review(PermissionRequiredMixin, View):
+    permission_required = 'oscauth.can_order'
+
+    def post(self, request):
+
+        items_selected = request.POST.getlist('includeInOrder')
+        item_list = Item.objects.filter(id__in=items_selected)
+        order_list = item_list.distinct('chartcom')
+
+        for num, order in enumerate(order_list, start=1):
+            order.items = item_list.filter(chartcom=order.chartcom)
+            order.num = num
+
+        template = loader.get_template('order/review_order.html')
+        context = {
+            'order_list': order_list,
+        }
+        return HttpResponse(template.render(context, request))
+
+
 class Services(View):
 
     def get(self, request):
-        u = request.user
-        p = u.user_permissions.all()
-        for x in p:
-            print(x)
 
         link_list = Page.objects.get(permalink='/links')
 
