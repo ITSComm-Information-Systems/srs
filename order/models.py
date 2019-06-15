@@ -43,6 +43,7 @@ class Element(Configuration):
         ('Radio', 'Radio'),
         ('ST', 'String'),
         ('NU', 'Number'),
+        ('Chart', 'Chartcom'),
         ('PH', 'Phone Set Type'),
     )
 
@@ -156,6 +157,16 @@ class Chartcom(models.Model):
             account_number = account_number + '-' + self.project_grant
 
         return account_number
+
+    def get_user_chartcoms(self):
+        print(self.get_username())
+        chartcom_list = Chartcom.objects.filter(dept='481054')
+        user_chartcoms = []
+        
+        for chartcom in chartcom_list:
+            user_chartcoms.append((chartcom.id, chartcom.name))
+
+        return user_chartcoms
 
 class Item(models.Model):
     description = models.CharField(max_length=100)

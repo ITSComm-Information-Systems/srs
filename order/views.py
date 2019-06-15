@@ -71,7 +71,9 @@ def add_to_cart(request):
     occ = request.POST['OneTimeCharges']
     print(request.POST)
     print(occ)
-    i.chartcom = Chartcom.objects.get(id=occ)
+    charge = Chartcom.objects.get(id=occ)
+    i.chartcom = charge
+    i.deptid = charge.dept
     i.data = request.POST
     i.save()
 
@@ -99,10 +101,17 @@ class Workflow(PermissionRequiredMixin, View):
 
                 for element in element_list:
                     if element.type == 'YN':
-                        #field = forms.ChoiceField(label=element.label, widget=forms.RadioSelect, choices=(('Y', 'Yes',), ('N', 'No',)))
-                        field = forms.ChoiceField(label=element.label, choices=(('Y', 'Yes',), ('N', 'No',)))
+                        field = forms.ChoiceField(label=element.label, widget=forms.RadioSelect, choices=(('Y', 'Yes',), ('N', 'No',)))
+                        #field = forms.ChoiceField(label=element.label, choices=Chartcom.get_user_chartcoms())
                     elif element.type == 'Radio':
-                        field = forms.ChoiceField(label=element.label, choices=eval(element.attributes))
+                        field = forms.ChoiceField(label=element.label
+                                                , choices=eval(element.attributes))
+
+
+                    elif element.type == 'Chart':
+                        field = forms.ChoiceField(label=element.label
+                                                , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user))
+
 
                     elif element.type == 'ST':
                         field = forms.CharField(label=element.label)
