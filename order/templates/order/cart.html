@@ -63,6 +63,7 @@
         <section class="row" role="contentinfo">
             <div class="container">
                 <div class="row cart-tables">
+                    <form action="/orders/review/" id="cart-department-dropdown" method="POST">{% csrf_token %}
                     <div class="col-lg-10 col-md-12">
                         {% for chartcom in acct %}
                         <div class="cart-table">
@@ -100,7 +101,7 @@
                                                 class="delete" href="#">Delete</a></td>
                                         <td>
                                             <div class="custom-control">
-                                                <input type="checkbox" id="customCheck1">
+                                                <input type="checkbox" name="includeInOrder" id="addItem{{item.id}}" value="{{item.id}}">
                                                 <label for="customCheck1">Add to order</label>
                                             </div>
                                             {% if item.days_to_deletion < 30 %}
@@ -123,6 +124,7 @@
                         <input type="submit" class="hidden" value="Review Order" id="cartReviewbtn">
                         <label for="cartReviewbtn" class="btn btn-primary">Review Order</label>
                     </div>
+                </form>
                 </div>
             </div>
         </section>
