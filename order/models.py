@@ -136,6 +136,7 @@ class Constant(models.Model):
     def __str__(self):
         return self.field 
 
+
 class Chartcom(models.Model):
     fund = models.CharField(max_length=30)
     dept = models.CharField(max_length=30)
@@ -159,14 +160,24 @@ class Chartcom(models.Model):
         return account_number
 
     def get_user_chartcoms(self):
-        print(self.get_username())
-        chartcom_list = Chartcom.objects.filter(dept='481054')
+        chartcom_list = UserChartcomV.objects.filter(user=self).order_by('name')
         user_chartcoms = []
         
         for chartcom in chartcom_list:
-            user_chartcoms.append((chartcom.id, chartcom.name))
+            user_chartcoms.append((chartcom.chartcom_id, chartcom.name))
 
         return user_chartcoms
+
+
+class UserChartcomV(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    chartcom = models.ForeignKey(Chartcom, on_delete=models.PROTECT)
+    name = models.CharField(max_length=20, blank=True, primary_key=True)
+
+    class Meta:
+        managed = False
+        db_table = 'order_user_chartcom'
+
 
 class Item(models.Model):
     description = models.CharField(max_length=100)
