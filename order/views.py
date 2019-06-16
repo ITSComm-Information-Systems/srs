@@ -33,8 +33,9 @@ class Submit(PermissionRequiredMixin, View):
 
         item_list = Item.objects.filter(id__in=order_items)
 
-        elements = Element.objects.all()
+        elements = Element.objects.exclude(target__isnull=True).exclude(target__exact='')
         map = {}
+
         for element in elements:
             map[element.name] = element.target
 
