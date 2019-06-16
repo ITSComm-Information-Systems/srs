@@ -50,7 +50,7 @@ class Element(Configuration):
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
     attributes = models.CharField(blank=True, max_length=100)
-    target = models.CharField(max_length=80)
+    target = models.CharField(max_length=80, blank=True, null=True)
 
 
 class ProductCategory(Configuration):
@@ -72,9 +72,6 @@ class Service(Configuration):
 
 
 class FeatureCategory(Configuration):
-    #name = models.CharField(max_length=40)
-    #label = models.CharField(max_length=100)
-    #display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -91,7 +88,6 @@ class Feature(Configuration):
         ('VM', 'Voice Mail'),
     )
 
-    #name = models.CharField(max_length=40)
     category = models.ManyToManyField(FeatureCategory)
     type = models.CharField(max_length=3, choices=TYPE_CHOICES)
     description = models.TextField(blank=True)
@@ -144,9 +140,6 @@ class Chartcom(models.Model):
     class_code = models.CharField(max_length=30)
     project_grant = models.CharField(max_length=30)
     name = models.CharField(max_length=100)
-    #account_number = models.CharField(max_length=100)
-
-    #acct = self.fund
 
     def __str__(self):
         return self.name

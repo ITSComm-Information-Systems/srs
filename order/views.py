@@ -17,14 +17,11 @@ class Submit(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def post(self, request):
-        print(request.POST)
         order_list = request.POST.getlist('orders')
         for order in order_list:
-            print(order)
             order_items = request.POST.getlist('orderItems[' + order +']')
             priority = request.POST['processingTime[' + order +']']
-            print(priority)
-            print(order_items)
+            self.create_preorder(order_items)
 
         template = loader.get_template('order/order_submitted.html')
         context = {
@@ -32,29 +29,35 @@ class Submit(PermissionRequiredMixin, View):
         }
         return HttpResponse(template.render(context, request))
 
-    def create_preorder(self):
+    def create_preorder(self, order_items):
 
-        item_list = Item.objects.filter(cart=cart.id)
+        item_list = Item.objects.filter(id__in=order_items)
+
+        elements = Element.objects.all()
+        map = {}
+        for element in elements:
+            map[element.name] = element.target
 
         for item in item_list:
             api = UmOscPreorderApiV()
-            api.add_info_text_3 = cart.id
+            #api.add_info_text_3 = cart.id
             api.add_info_text_4 = item.id
-            print(item.data)
-
             action_id = item.data['action_id']
+
             cons = Constant.objects.filter(action=action_id)
             for con in cons:             #Populate the model with constants
                 setattr(api, con.field, con.value)
+                print('Set:' + con.field + '=' + con.value )
                 
-                #for key, value in item.data.items():
-                #    if value:           #Populate the model with user supplied values
-                #        setattr(api, key, value)
-                #        print(key + '>' + value +'<')
+            for key, value in item.data.items():
+                if value:           #Populate the model with user supplied values
+                    target = map.get(key)
+                    if target != None:
+                        setattr(api, target, value)
+                        print('Set:' + target + '=' + value )
 
-        api.save()
-        print('saved')
-
+            api.save()
+            print('API Record Saved')
 
 def add_to_cart(request):
     if request.method == "POST":
