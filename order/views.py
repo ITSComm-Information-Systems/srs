@@ -12,39 +12,48 @@ from pages.models import Page
 
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom
 
-def submit_order(request):
-    if request.method == "POST":
-        c = Cart.objects.get(username=request.user.username)
-        create_preorder(c)
 
-    else:
-        print('fourOfour')
+class Submit(PermissionRequiredMixin, View):
+    permission_required = 'oscauth.can_order'
 
-    #return ('thanks')
-    return HttpResponseRedirect('/orders/cart/')
+    def post(self, request):
+        print(request.POST)
+        order_list = request.POST.getlist('orders')
+        for order in order_list:
+            print(order)
+            order_items = request.POST.getlist('orderItems[' + order +']')
+            priority = request.POST['processingTime[' + order +']']
+            print(priority)
+            print(order_items)
 
-def create_preorder(cart):
+        template = loader.get_template('order/order_submitted.html')
+        context = {
+            'order_list': order_list,
+        }
+        return HttpResponse(template.render(context, request))
 
-    item_list = Item.objects.filter(cart=cart.id)
+    def create_preorder(self):
 
-    for item in item_list:
-        api = UmOscPreorderApiV()
-        api.add_info_text_3 = cart.id
-        api.add_info_text_4 = item.id
-        print(item.data)
+        item_list = Item.objects.filter(cart=cart.id)
 
-        action_id = item.data['action_id']
-        cons = Constant.objects.filter(action=action_id)
-        for con in cons:             #Populate the model with constants
-            setattr(api, con.field, con.value)
-        
-        #for key, value in item.data.items():
-        #    if value:           #Populate the model with user supplied values
-        #        setattr(api, key, value)
-        #        print(key + '>' + value +'<')
+        for item in item_list:
+            api = UmOscPreorderApiV()
+            api.add_info_text_3 = cart.id
+            api.add_info_text_4 = item.id
+            print(item.data)
 
-    api.save()
-    print('saved')
+            action_id = item.data['action_id']
+            cons = Constant.objects.filter(action=action_id)
+            for con in cons:             #Populate the model with constants
+                setattr(api, con.field, con.value)
+                
+                #for key, value in item.data.items():
+                #    if value:           #Populate the model with user supplied values
+                #        setattr(api, key, value)
+                #        print(key + '>' + value +'<')
+
+        api.save()
+        print('saved')
 
 
 def add_to_cart(request):
