@@ -9,7 +9,9 @@
             <div class="row">
                 <div class="col-xl-6 col-lg-7 col-md-8 col-12 cards">
                     <div class="row">
+                        <form action="/orders/submit/" id="order-processing-form" method="POST">{% csrf_token %}    
                         {% for order in order_list %}
+                        <input type="hidden" id="order{{order.num}}" name="orders" value="{{order.num}}">
                         <strong>Order #{{order.num}}</strong>
                         <div class="col-12">
                             <div class="row">
@@ -21,13 +23,14 @@
                                     </div>
                                     <div class="card-body">
                                         <strong class="card-title">
-                                            Items inlcluded in order:
+                                            Items included in order:
                                         </strong>
                                         <ul>
                                             {% for item in order.items %}
                                             <li>
                                                 {{item}}
                                             </li>
+                                            <input type="hidden" id="item{{item.id}}" name="orderItems[{{order.num}}]" value="{{item.id}}">
                                             {% endfor %}
                                         </ul>
                                     </div>
@@ -36,13 +39,12 @@
                                             <p>
                                                 <strong>Date Request:</strong>
                                                 When would you like the items in this order processed?
-                                            </p>
-                                            <form id="order-processing-form">
+                                            </p>                                      
                                                 <div class="input-group mb-3">
                                                     <div class="input-group-prepend">
                                                         <div class="input-group-text">
-                                                            <input type="radio" name="processingTime{{order.num}}"
-                                                                id="standardProcessing{{order.num}}" value="standardProcessing"
+                                                            <input type="radio" name="processingTime[{{order.num}}]"
+                                                                id="standardProcessing{{order.num}}" value="standardProcessing" checked
                                                                 aria-label="Radio button for following text input"
                                                                 form="order-processing-form">
                                                         </div>
@@ -56,7 +58,7 @@
                                                 <div class="input-group mb-3">
                                                     <div class="input-group-prepend">
                                                         <div class="input-group-text">
-                                                            <input type="radio" name="processingTime{{order.num}}" id="specificDay{{order.num}}"
+                                                            <input type="radio" name="processingTime[{{order.num}}]" id="specificDay{{order.num}}"
                                                                 value="specificDay"
                                                                 aria-label="Radio button for following text input">
                                                         </div>
@@ -66,12 +68,12 @@
                                                     </div>
                                                     <input type="text" class="form-control" form="order-processing-form"
                                                         aria-label="Text input with radio button" placeholder="mm/dd/yyyy"
-                                                        name="specificDate{{order.num}}">
+                                                        name="specificDate[{{order.num}}]">
                                                 </div>
                                                 <div class="input-group">
                                                     <div class="input-group-prepend">
                                                         <div class="input-group-text">
-                                                            <input type="radio" name="processingTime{{order.num}}" value="expediteOrder"
+                                                            <input type="radio" name="processingTime[{{order.num}}]" value="expediteOrder"
                                                                 id="expedite{{order.num}}"
                                                                 aria-label="Radio button for following text input">
                                                         </div>
@@ -79,18 +81,18 @@
                                                             Expedite Order ($$)
                                                         </div>
                                                     </div>
-                                                    <input type="text" class="form-control" name="expediteDate{{order.num}}"
+                                                    <input type="text" class="form-control" name="expiditeDate[{{order.num}}]"
                                                         form="order-processing-form"
                                                         aria-label="Text input with radio button" placeholder="mm/dd/yyyy">
                                                 </div>
                                                 <input type="submit" id="submit-order" class="btn btn-primary hidden">
-                                            </form>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                         {% endfor %}
+                        </form>
                     </div>
 
                     <div class="row">
