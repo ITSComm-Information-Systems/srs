@@ -34,8 +34,9 @@ class Role(models.Model):
     class Meta:
         db_table = 'auth_role'
         permissions = [
+            ('can_administer_access_all', 'Can Modify All Access Privileges'),
+            ('can_administer_access', 'Can Modify Access Privileges (except proxy)'),
             ('can_order', 'All ordering functions'),
-            ('can_proxy', 'Can Proxy'),
             ('can_report', 'Can run reports'),
             ('can_impersonate', 'Can Impersonate'),            
         ]
