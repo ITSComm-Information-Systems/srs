@@ -37,8 +37,12 @@ def custom_login_action(request, user):
 
 def upsert_user(uniqname):
     # Get User from MCommunity.  Create them in OSC if they are not there otherwise update them.
-    conn = Connection('ldap.umich.edu', auto_bind=True)
-    conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","sn"])
+    conn = Connection(settings.MCOMMUNITY['SERVER'],
+                      user=settings.MCOMMUNITY['USERNAME'],
+                      password=settings.MCOMMUNITY['PASSWORD'],
+                      auto_bind=True)
+
+    conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","umichDisplaySn"])
     
     if conn.entries:
         mc_user = conn.entries[0]
@@ -51,7 +55,7 @@ def upsert_user(uniqname):
         osc_user = User()
 
     osc_user.username = mc_user.uid
-    osc_user.last_name = mc_user.sn
+    osc_user.last_name = mc_user.umichDisplaySn
     osc_user.first_name = mc_user.givenName
     osc_user.email = mc_user.mail
     osc_user.save()
