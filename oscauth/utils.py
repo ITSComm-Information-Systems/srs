@@ -37,7 +37,8 @@ def custom_login_action(request, user):
 
 def upsert_user(uniqname):
     # Get User from MCommunity.  Create them in OSC if they are not there otherwise update them.
-    conn = Connection(settings.MCOMMUNITY['SERVER'],
+    server = Server(settings.MCOMMUNITY['SERVER'], use_ssl=True, get_info=ALL)
+    conn = Connection(server,
                       user=settings.MCOMMUNITY['USERNAME'],
                       password=settings.MCOMMUNITY['PASSWORD'],
                       auto_bind=True)

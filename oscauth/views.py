@@ -387,9 +387,9 @@ def modpriv(request):
         for dept in dept_checked:
             new_auth = AuthUserDept()
             new_auth.user = osc_user
-            new_auth.role = Role.objects.get(role=role_checked).group
+            new_auth.group = Role.objects.get(role=role_checked).group
             new_auth.dept = dept
-            #new_auth.save()
+            new_auth.save()
             result = 'Added Privileges'
 #           print('Added User: %s  Role: %s   Dept: %s' % (uniqname_parm, new_auth.role, new_auth.dept))
     else:
