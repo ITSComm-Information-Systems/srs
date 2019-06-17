@@ -213,7 +213,7 @@ def get_table(rows,request):
                     item_price =  item_price + float(price[2])
                     total_cost =  total_cost + float(price[2]) 
                 charge_total = charge_total + item_price
-                account_table.append([x[0],x[1],round(rate),quantity,round(item_price,2)])
+                account_table.append([x[0],x[1],round(rate,2),quantity,round(item_price,2)])
             overall_cost = overall_cost + charge_total
             whole_table.append([y,account_table, round(charge_total,2)])
         final_table.append([i[0],i[1],whole_table,round(total_cost,2)])
