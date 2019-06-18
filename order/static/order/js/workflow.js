@@ -6,7 +6,7 @@ $(document).ready(function() {
       x[i].className += " form-control";
   }
 
-  $('#cfc1').removeClass('disabled');  // Enable first pill, that is how it all starts.
+  $('#pills-step1').removeClass('disabled');  // Enable first pill, that is how it all starts.
 
   currStep = 1;
   lastStep = document.getElementsByClassName("tab-pane").length;
