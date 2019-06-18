@@ -3,7 +3,7 @@ import warnings
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.template import loader
 from django.db import models
-
+from django.db.utils import IntegrityError
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.views.decorators.csrf import csrf_protect
@@ -389,12 +389,20 @@ def modpriv(request):
             new_auth.user = osc_user
             new_auth.group = Role.objects.get(role=role_checked).group
             new_auth.dept = dept
-            new_auth.save()
-            result = 'Added Privileges'
-#           print('Added User: %s  Role: %s   Dept: %s' % (uniqname_parm, new_auth.role, new_auth.dept))
+
+            try:
+                new_auth.save()
+                result = 'Privilege Added'
+            except IntegrityError: 
+                print('Record Exists')
+                result = 'Privilege already exists'
+            
     else:
+        role = Role.objects.get(role=role_checked).group
+        aud = AuthUserDept.objects.filter(user=osc_user,group=role,dept__in=dept_checked)
+        print(aud)
+        aud.delete()
         result = 'Deleted Privileges'
-        #TODO deletes
 
     context = {
         'title': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
