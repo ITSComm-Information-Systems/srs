@@ -7,6 +7,8 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
+# This view uses the Pinnacle location table and includes locations added by ITS staff
+#  as well as the official builfing codes from MPathways
 class UmOSCBuildingV(models.Model):
    building_code = models.CharField(max_length=15, primary_key=True)
    building_name = models.CharField(max_length=100,null=True) 
@@ -706,3 +708,18 @@ class UmOscAcctSubscribersV(models.Model):
           db_table = 'PINN_CUSTOM\".\"um_osc_acct_subscribers_v'
 
 
+# This view uses a copy of the Space Management building table
+#  and only includes the official builfing codes from MPathways
+class UmOSCCampusBuildingV(models.Model):
+     campus_code = models.CharField(max_length=4,null=True)
+     campus_desc = models.CharField(max_length=30,null=True)
+     building_code = models.CharField(max_length=10,primary_key=True)
+     building_name = models.CharField(max_length=25,null=True) 
+
+     class Meta:
+          managed = False
+          ordering = ('campus_code','building_code')
+          db_table = 'PINN_CUSTOM\".\"um_osc_campus_building_v'
+
+     def __str__(self):
+          return self.building_name

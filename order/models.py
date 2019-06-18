@@ -2,6 +2,9 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from oscauth.models import Role
 from project.pinnmodels import UmOscPreorderApiAbstract
+from django.contrib.auth.models import User
+from datetime import datetime, timedelta, date
+from django.utils import timezone
 
 
 class Configuration(models.Model):   #Common fields for configuration models
@@ -40,13 +43,14 @@ class Element(Configuration):
         ('Radio', 'Radio'),
         ('ST', 'String'),
         ('NU', 'Number'),
+        ('Chart', 'Chartcom'),
         ('PH', 'Phone Set Type'),
     )
 
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
     attributes = models.CharField(blank=True, max_length=100)
-    target = models.CharField(max_length=80)
+    target = models.CharField(max_length=80, blank=True, null=True)
 
 
 class ProductCategory(Configuration):
@@ -68,9 +72,6 @@ class Service(Configuration):
 
 
 class FeatureCategory(Configuration):
-    #name = models.CharField(max_length=40)
-    #label = models.CharField(max_length=100)
-    #display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -87,7 +88,6 @@ class Feature(Configuration):
         ('VM', 'Voice Mail'),
     )
 
-    #name = models.CharField(max_length=40)
     category = models.ManyToManyField(FeatureCategory)
     type = models.CharField(max_length=3, choices=TYPE_CHOICES)
     description = models.TextField(blank=True)
@@ -132,6 +132,7 @@ class Constant(models.Model):
     def __str__(self):
         return self.field 
 
+
 class Chartcom(models.Model):
     fund = models.CharField(max_length=30)
     dept = models.CharField(max_length=30)
@@ -139,29 +140,55 @@ class Chartcom(models.Model):
     class_code = models.CharField(max_length=30)
     project_grant = models.CharField(max_length=30)
     name = models.CharField(max_length=100)
-    account_number = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name 
+        return self.name
 
-class Cart(models.Model):
-    number = models.CharField(max_length=20)
-    description = models.CharField(max_length=100)
-    username = models.CharField(max_length=8)
+    @property
+    def account_number(self):
+        account_number = self.fund + '-' + self.dept + '-' + self.program + '-' + self.class_code
+        if self.project_grant:
+            account_number = account_number + '-' + self.project_grant
 
-    def __str__(self):
-        return self.description
-    
-    def leppard(self):
-        pour=['me']
-        pour.append('sugar')
+        return account_number
+
+    def get_user_chartcoms(self):
+        chartcom_list = UserChartcomV.objects.filter(user=self).order_by('name')
+        user_chartcoms = []
+        
+        for chartcom in chartcom_list:
+            user_chartcoms.append((chartcom.chartcom_id, chartcom.name))
+
+        return user_chartcoms
+
+
+class UserChartcomV(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    chartcom = models.ForeignKey(Chartcom, on_delete=models.PROTECT)
+    name = models.CharField(max_length=20, blank=True, primary_key=True)
+
+    class Meta:
+        managed = False
+        db_table = 'order_user_chartcom'
 
 
 class Item(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     description = models.CharField(max_length=100)
     create_date = models.DateTimeField('Date Created', auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    deptid = models.CharField(max_length=8)
+    chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
     data = JSONField()
 
     def __str__(self):
         return self.description
+
+    @property
+    def days_to_deletion(self):
+        delete_date = self.create_date + timedelta(days=180) 
+        days_to_deletion = delete_date - timezone.now()
+        return days_to_deletion.days
+
+    def leppard(self):
+        pour=['me']
+        pour.append('sugar')

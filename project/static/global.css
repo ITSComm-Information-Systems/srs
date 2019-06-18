@@ -395,11 +395,6 @@ margin: 0 auto;
 color:#fff;
 }
 
-.custom-control label{
-/* text-align: center; */
-display: none;
-}
-
 .card-deck {
 display: flex;
 flex-direction: column;
