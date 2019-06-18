@@ -25,7 +25,7 @@ from django.db.models.functions import Concat
 # from .models import Role, Group, User
 # from .forms import UserSuForm, AddUserForm
 # from .utils import su_login_callback, custom_login_action, upsert_user
-from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscDeptUnitsRept
+from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscDeptUnitsReptV
 from oscauth.forms import *
 import datetime
 

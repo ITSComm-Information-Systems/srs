@@ -17,7 +17,7 @@
         <p></p>
     {% if depts %}
         <p style='font-size:20px'>Department ID</p>
-            <select style='font-size:16px' requried type="select" name="dept_id" id="html_test" value="{{ i }}" onchange="display_dept({{dept_names}})">
+            <select style='font-size:16px' requried type="select" name="dept_id" id="tolls_deptids" value="{{ i }}" onchange="display_dept({{dept_names}})">
                 <option></option>
                 {% for dept in depts %}
                 <option value="{{ dept }}">{{ dept }}</option>
