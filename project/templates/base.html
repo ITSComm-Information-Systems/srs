@@ -14,8 +14,6 @@
 	<!-- FontAwesome CSS -->
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
-	<link rel="stylesheet" href="{% static 'select2-bootstrap4.css' %}">
-
 	<!-- Custom CSS -->
 	<link rel="stylesheet" type="text/css" href="/static/global.css">
 
@@ -24,6 +22,10 @@
 	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:400i"/>
 	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:700"/>
 	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:700i"/>
+
+	<!-- Searchable select -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css"/>
+	<link rel="stylesheet" href="/static/select2-bootstrap4.css">
 
 	
 	<style>
@@ -183,9 +185,19 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 	<!-- Select with search -->
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
+<!-- 	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="{% static 'select2-bootstrap4.css' %}">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
-	<link rel="stylesheet" href="/static/select2-bootstrap4.css">
+	<link rel="stylesheet" href="/static/select2-bootstrap4.css"> -->
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+
+	<!-- Select with search -->
+<!-- 	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+	<link rel="stylesheet" href="/static/select2.css">
+	<link rel="stylesheet" href="/static/select2-bootstrap4.css"> -->
+
 
   {% block js %}{% endblock js %}
   </body>
