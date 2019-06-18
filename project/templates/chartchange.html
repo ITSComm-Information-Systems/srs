@@ -1,9 +1,130 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container">
-    <div class="card card-body bg-light">
-    This form can be used by department managers or their designated proxies, orderers, or support persons.
-    To complete the form, please follow the instructions indicated on each page. See FAQ (Frequently Asked Questions) for additional information.
+  <h1>
+    ChartField Change
+    <small class="text-muted">
+      for <strong>Department: {{ select_dept }} - {{ dept_info.dept_name }}</strong>
+    </small>
+  </h1>
+
+  <form>
+    <div class="row align-items-start">
+      <label style="font-size:18px">Select Department:</label>
+      <div class="col-md-3">
+        <select class="form-control" type="select" name="deptids" id="chart_deptids" value="{{ dept }}">
+          <option></option>
+          {% for dept in deptids %}
+          <option value="{{ dept }}">{{ dept }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <p><input type='submit' value='Go' class="btn btn-primary"></p>
     </div>
+  </form>
+
+  <div class="row align-items-start">
+    <div class="col-md-7">
+      <div class="card card-body alert-primary">
+        This form can be used to change the billing accounts for existing services that are
+        billed to a department. To complete the form, please follow the instructions on each page. See FAQ (Frequently Asked Questions) for additional information.
+      </div>
+    </div>
+
+    <div class="col-md-5">
+      <table class="table table-striped table-sm">
+        <caption style="caption-side:top;color:black;font-size:18px">Department Details:</caption>
+        <thead>
+          <th scope="col">Dept. ID</th>
+          <th scope="col">Dept. Name</th>
+          <th scope="col">Dept. ID Manager</th>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ dept_info.dept_id }}</td>
+            <td>{{ dept_info.dept_name }}</td>
+            <td>{{ dept_info.dept_mgr }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <form method="post">
+    <ul class="nav justify-content-center nav-pills" id="chartchange_nav" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link disabled" data-toggle="tab" id="cfc-1" href="#" role="tab" name="Select Current Chartfield" aria-selected="false">Select Current Chartfield</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" data-toggle="tab" id="cfc-2" href="#" role="tab" name="Select User IDs" aria-selected="false">Select User IDs</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" data-toggle="tab" id="cfc-3" href="#" role="tab" name="Select New Chartfield" aria-selected="false">Select New Chartfield</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" data-toggle="tab" id="cfc-4" href="#" role="tab" name="Review & Submit" aria-selected="false">Review & Submit</a>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="cf-pills-tabContent">
+      <div class="tab-pane fade in active" id="cf-1" role="tabpanel" aria-labelledby="pills-contact-tab">
+        <p>test</p>
+        {% include test_template %}
+      </div>
+      <div class="tab-pane fade" id="cf-2" role="tabpanel" aria-labelledby="pills-contact-tab">
+        {% include test_template %}
+      </div>
+      <div class="tab-pane fade" id="cf-3" role="tabpanel" aria-labelledby="pills-contact-tab">
+        {% include test_template %}
+      </div>
+      <div class="tab-pane fade" id="cf-4" role="tabpanel" aria-labelledby="pills-contact-tab">
+        {% include test_template %}
+      </div>
+
+      <div style="float:right;">
+        <button type="button" class="btn btn-primary" id=cfPrevBtn>Previous</button>
+        <button type="button" class="btn btn-primary" id=cfNextBtn>Next</button>
+      </div>
+    </div>
+
+  </form>
 </div>
+
+<!-- <form action="/orders/addtocart/" method="post" id="workflowForm" >
+  {% csrf_token %}
+  <input type="hidden" id="wfid" name="action_id" value={{title.id}}>
+  <input type="hidden" id="wfname" name="action" value="{{title}}"">
+
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    {% for tab in tab_list %}
+      <li class="nav-item">
+        <a class="nav-link disabled" data-toggle="tab" id="pills-{{ tab.step }}" href="#{{ tab.step }}" role="tab" name="pills-{{ tab.name }}" aria-controls="pills-{{ tab.name }}" aria-selected="false">{{ tab.label }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+  <div class="tab-content" id="pills-tabContent">
+    {% for tab in tab_list %}
+      <div class="tab-pane fade" id="{{ tab.step }}" role="tabpanel" aria-labelledby="pills-contact-tab">
+          {% include tab.template %}
+      </div>
+    {% endfor %}
+
+    <div style="overflow:auto;">
+      <div style="float:right;">
+        <button type="button" class="btn btn-primary" id="prevBtn">Previous</button>
+        <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+      </div>
+    </div>
+
+  </div>
+
+
+</form>
+
+
+{% endblock %} -->
+
+{% block js %}
+<script type="text/javascript" src="/static/select.js"></script>
+<script src="/static/js/chartchange.js"></script>
 {% endblock %}
