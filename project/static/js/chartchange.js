@@ -35,10 +35,23 @@ function nextPrev(n) {
   currStep = currStep + n;
   $('#cfc-'+currStep).removeClass('disabled');
   $('#chartchange_nav li:nth-child(' + currStep + ') a').tab('show');
-  // if (currStep > lastStep) {
-  //     //$('#workflowForm').submit();
-  //     return false;
-  // }
+
+  // Details up top
+  if (n == 1 && currStep == 2) {
+  	$('#cfc_desc').hide();
+  	$('#dept_details').hide();
+  	$('#select_dept').hide();
+  }
+  if (n == -1 && currStep == 1) {
+  	$('#cfc_desc').show();
+  	$('#dept_details').show();
+  	$('#select_dept').show();
+  }
+
+  if (currStep > lastStep) {
+      //$('#workflowForm').submit();
+      return false;
+  }
 }
 
 

@@ -3,33 +3,36 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+<h1>Toll Statements</h1>
 <div class="container">
-<form action="/reports/tolls/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
-    <div class="form-group col-md-6">
-    <p style='font-size:20px'>Billing period</p>
-        <select class="form-control" style='font-size:16px' type="select" name="bill_period" id="month" value="{{ i }}">
-            <option value="%">Select a billing period</option>
-            {% for i in periods %}
-            <option value="{{ i }}">{{ i }}</option>
-            {% endfor %}
-        </select>
-        <p></p>
-        <p></p>
-    {% if depts %}
-        <p style='font-size:20px'>Department ID</p>
-            <select style='font-size:16px' requried type="select" name="dept_id" id="tolls_deptids" value="{{ i }}" onchange="display_dept({{dept_names}})">
-                <option></option>
-                {% for dept in depts %}
-                <option value="{{ dept }}">{{ dept }}</option>
-                {% endfor %}
-        </select>
-     <span id="display"></span>
-     <p></p>
-     {% endif %}
-    <p><input type='submit' value='Submit' class="btn btn-primary"></p>
-    </div>
-</form>
+    <form action="/reports/tolls/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
+        <div class="form-group col-md-6">
+            <h5>Billing period</h5>
+                <select class="form-control" style='font-size:16px' type="select" name="bill_period" id="tolls_billing" value="{{ i }}">
+                    <option></option>
+                    {% for i in periods %}
+                    <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <p></p>
+                <p></p>
+            {% if depts %}
+            <h5>Department ID</h5>
+                <select class="form-control" style='font-size:16px' requried type="select" name="dept_id" id="tolls_deptids" value="{{ i }}" onchange="display_dept({{dept_names}})">
+                    <option></option>
+                    {% for dept in depts %}
+                    <option value="{{ dept }}">{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            <p id="display"></p>
+            <p></p>
+            {% endif %}
+            <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+        </div>
+    </form>
 </div>
+
+
 
 {% if inactive %}
     <span style="color:red">{{dept_name}} ({{dept_id}})</span><i class="fas fa-exclamation-triangle" style="color:red"></i>

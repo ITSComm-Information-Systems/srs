@@ -2,14 +2,14 @@
 {% block content %}
 <div class="container">
   <h1>
-    ChartField Change
+    Chartfield Change
     <small class="text-muted">
       for <strong>Department: {{ select_dept }} - {{ dept_info.dept_name }}</strong>
     </small>
   </h1>
 
   <form>
-    <div class="row align-items-start">
+    <div class="row align-items-start" id="select_dept">
       <label style="font-size:18px">Select Department:</label>
       <div class="col-md-3">
         <select class="form-control" type="select" name="deptids" id="chart_deptids" value="{{ dept }}">
@@ -23,7 +23,7 @@
     </div>
   </form>
 
-  <div class="row align-items-start">
+  <div class="row align-items-start" id="cfc_desc">
     <div class="col-md-7">
       <div class="card card-body alert-primary">
         This form can be used to change the billing accounts for existing services that are
@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <div class="col-md-5">
+    <div class="col-md-5" id="dept_details">
       <table class="table table-striped table-sm">
         <caption style="caption-side:top;color:black;font-size:18px">Department Details:</caption>
         <thead>

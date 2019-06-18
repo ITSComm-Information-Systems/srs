@@ -40,6 +40,13 @@ $(document).ready(function() {
     	}
 	});
 
+	// tolls - choose billing period
+	$("#tolls_billing").select2({
+    	minimumResultsForSearch: Infinity,
+    	placeholder: "Select a billing period"
+	});
+
+
 	// Set select for chartfield change - choose dept
 	// $("#chart_deptids").select2({
  //    	placeholder: "Choose department",
