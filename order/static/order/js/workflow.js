@@ -46,7 +46,44 @@ $(document).ready(function() {
   $("#PhoneSetType").hide();
   $("#JackNumber").hide();
 
+  //Data
+  $("#activePhone").hide();
+  $("#jackNumber").hide();
+  $("#conduit").hide();
+  $("#linesToInstall").hide();
 
+  $("#jack_Y").click(function() {
+    $("#activePhone").show();
+    $("#conduit").hide();
+  });
+
+  $("#jack_N").click(function() {
+    $("#conduit").show();
+    $("#activePhone").hide();
+    $("#jackNumber").hide();
+  });
+
+  $("#activePhone_Y").click(function() {
+    $("#jackNumber").show();
+  });
+
+  $("#activePhone_N").click(function() {
+    $("#jackNumber").show();
+  });
+
+  $("#conduit_Y").click(function() {
+    $("#linesToInstall").show();
+  });
+
+  $("#conduit_N").click(function() {
+    $("#linesToInstall").show();
+  });
+
+  $("#jackNumber").keypress(function() {
+    $("#linesToInstall").show();
+  });
+
+  //Phone
   $("#PhoneSetType_B").click(function() {
     $("#cat3").show();
     $("#cat2").hide();

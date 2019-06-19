@@ -23,17 +23,36 @@ $(document).ready(function() {
   	$("#deptf").one('select2:open', function(e) {
     	$('input.select2-search__field').prop('placeholder', 'Search...');
 	});
-  	$("#html_test").one('select2:open', function(e) {
+  	$("#tolls_deptids").one('select2:open', function(e) {
+    	$('input.select2-search__field').prop('placeholder', 'Search...');
+	});
+	$("#chart_deptids").one('select2:open', function(e) {
     	$('input.select2-search__field').prop('placeholder', 'Search...');
 	});
 
-	// Set select placeholder
-	$("#html_test").select2({
+
+	// Set select for tolls- choose dept
+	$("#tolls_deptids").select2({
     	placeholder: "Select a department",
     	width: "100%",
     	matcher: function(params, data) {
         	return matchStart(params, data);
     	}
 	});
+
+	// tolls - choose billing period
+	$("#tolls_billing").select2({
+    	minimumResultsForSearch: Infinity,
+    	placeholder: "Select a billing period"
+	});
+
+
+	// Set select for chartfield change - choose dept
+	// $("#chart_deptids").select2({
+ //    	placeholder: "Choose department",
+ //    	matcher: function(params, data) {
+ //        	return matchStart(params, data);
+ //    	}
+	// });
 
 });
