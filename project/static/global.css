@@ -618,4 +618,6 @@ input:checked + .slider:before {
 	margin-left: 0.25rem;
 }
 
-
+.checkbox-label {
+	display: none;
+}
