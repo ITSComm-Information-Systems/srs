@@ -80,7 +80,9 @@
             	{% if request.session.exit_users_pk %}
               	<a class="dropdown-item" href="/auth/su/">Exit Impersonate</a>
 							{% endif %}
-							<a class="dropdown-item" href="/auth/get_uniqname/">Manage Access</a>
+							{% if perms.oscauth.can_administer_access %}
+								<a class="dropdown-item" href="/auth/get_uniqname/">Manage Access</a>
+							{% endif %}								
 							<a class="dropdown-item" href="/auth/mypriv/">View System Privileges</a>
 						</div>
 					</li>
@@ -123,7 +125,7 @@
 							Cart</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="#">View Orders</a>
+						<a class="nav-link" href="/orders/status/0">View Orders</a>
 					</li>
 					{% endif %}
 				</ul>

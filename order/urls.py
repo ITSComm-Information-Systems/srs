@@ -4,8 +4,10 @@ from order.views import Services, Workflow
 from . import views
 
 urlpatterns = [
-    path('cart/<int:deptid>', views.UserCart.as_view()),
-    path('cart/', views.UserCart.as_view()),
+    path('cart/<int:deptid>', views.Cart.as_view()),
+    path('cart/', views.Cart.as_view()),
+    path('status/<int:deptid>', views.Status.as_view()),
+
     path('addtocart/', views.add_to_cart),
     path('submit/', views.Submit.as_view()), 
     path('review/', views.Review.as_view()),

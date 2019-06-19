@@ -22,7 +22,7 @@ class Configuration(models.Model):   #Common fields for configuration models
 class Step(Configuration):
     FORM_CHOICES = (
         ('', ''),
-        ('LocationForm', 'Location'),
+        ('PhoneLocationForm', 'Phone Location'),
         ('EquipmentForm', 'Equipment'),
         ('NewLocationForm', 'New Location'),
         ('AddlInfoForm', 'Additional Information'),

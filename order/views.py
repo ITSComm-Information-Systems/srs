@@ -126,7 +126,7 @@ class Workflow(PermissionRequiredMixin, View):
             'tab_list': tabs})
 
 
-class UserCart(PermissionRequiredMixin, View):
+class Cart(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def post(self, request):
@@ -145,6 +145,7 @@ class UserCart(PermissionRequiredMixin, View):
         if deptid == 0:
             department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
             deptid = dept_list[0].dept
+
 
         item_list = Item.objects.filter(deptid=deptid)
         chartcoms = item_list.distinct('chartcom')
@@ -202,5 +203,41 @@ class Services(View):
         context = {
             'service_list': service_list,
             'link_list': link_list,
+        }
+        return HttpResponse(template.render(context, request))
+
+
+class Status(PermissionRequiredMixin, View):
+    permission_required = 'oscauth.can_order'
+
+    def get(self, request, deptid):
+        dept_list = AuthUserDept.get_order_departments(request.user.id)
+
+        for dept in dept_list:
+            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
+            dept.name = deptinfo.dept_name
+
+            if deptid == int(dept.dept):
+                department = {'id': dept.dept, 'name': deptinfo.dept_name}
+
+        if deptid == 0:
+            department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
+            deptid = dept_list[0].dept 
+
+        status_help = Page.objects.get(permalink='/status')
+
+        items_selected = request.POST.getlist('includeInOrder')
+        item_list = Item.objects.filter(id__in=items_selected)
+        order_list = item_list.distinct('chartcom')
+
+        for num, order in enumerate(order_list, start=1):
+            order.items = item_list.filter(chartcom=order.chartcom)
+            order.num = num
+
+        template = loader.get_template('order/status.html')
+        context = {
+            'dept_list': dept_list,
+            'order_list': order_list,
+            'status_help': status_help,
         }
         return HttpResponse(template.render(context, request))

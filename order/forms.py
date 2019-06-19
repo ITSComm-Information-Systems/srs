@@ -64,18 +64,17 @@ class ReviewForm(forms.Form):
 
 
 class NewLocationForm(forms.Form):
-    label = 'Location Form'
-    campuses= [
-    ('A', 'Ann Arbor'),
-    ('F', 'Flint'),
-    ('D', 'Dearborn'),
-    ('O', 'Off site'),
-    ]
+    #label = 'Location Form'
+    #campuses= [
+    #('A', 'Ann Arbor'),
+    #('F', 'Flint'),
+    #('D', 'Dearborn'),
+    #('O', 'Off site'),
+    #]
     
-
     building_list = UmOSCBuildingV.objects.all()
 
-    Campus = forms.ChoiceField(choices=campuses)
+    #Campus = forms.ChoiceField(choices=campuses)
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
@@ -93,17 +92,21 @@ class EquipmentForm(forms.Form):
     template = 'order/products.html'
 
 
-class LocationForm(forms.Form):
-    label = 'Location Form'
-    campuses= [
-    ('A', 'Ann Arbor'),
-    ('F', 'Flint'),
-    ('D', 'Dearborn'),
-    ]
+class PhoneLocationForm(forms.Form):
+    #label = 'Location Form'
+    #campuses= [
+    #('A', 'Ann Arbor'),
+    #('F', 'Flint'),
+    #('D', 'Dearborn'),
+    #]
+    #phone_list = UmOscServiceProfileV.objects.filter(user_defined_id__startswith='PH-')
+
+    #print(phone_list.count())
 
     phone_number = forms.CharField(label='Current Phone Number')
-    Campus = forms.ChoiceField(choices=campuses)
+    #Campus = forms.ChoiceField(choices=campuses)
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
-    template = 'order/location.html'
+    jack = forms.CharField(max_length=100)
+    template = 'order/phone_location.html'
