@@ -17,10 +17,18 @@ from django import forms
 from ldap3 import Server, Connection, ALL
 from oscauth.models import AuthUserDept, Grantor, Role
 from django.db.models import indexes
+from project.pinnmodels import UmOscLocationsInUseV
 
 def get_voip(request):
     template = loader.get_template('voip.html')
+    phone_number = request.POST.get('number', None)
+    current = UmOscLocationsInUseV.objects.filter(service_number__exact = phone_number).order_by('room').values_list().distinct()
+    locations = UmOscLocationsInUseV.objects.values_list('campuscd', 'campus_desc').order_by('campus_desc').distinct()
     context = {
-        'title': 'Voip Location Change',
+        'title': 'VOIP Location Change',
+        'phone_number': phone_number,
+        'current': current,
+        'locations': locations,
     }
     return HttpResponse(template.render(context,request))
+

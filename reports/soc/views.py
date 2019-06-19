@@ -94,7 +94,7 @@ def get_soc(request):
     if (unit != '' and billing_period != ''):
         rows = get_rows(unit, grouping, billing_period, dateRange, request)
         table = get_table(rows,request)
-    if (list(table)[0][1]==0):
+    if (table ==[] or list(table)[0][1]==0):
         rows = 'There is no data for the currect selection'
         table = []
         submit = False
