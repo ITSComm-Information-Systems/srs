@@ -52,6 +52,9 @@
                                                     <div class="input-group-append">
                                                         <div class="input-group-text">
                                                             Standard Processing Time (varies on request type)
+                                                            <a class="popover-icon" data-toggle="popover" tabindex="0" role="button" data-container="body" data-trigger="focus" data-placement="bottom" title="Standard Processing" data-content="The amount of time it takes ITCom to process your order depends on what you have requested. Most can be completed within 5-7 business days">
+                                                                <i class="fas fa-question-circle" aria-label="More informaiton about Standard Processing Time option"></i>
+                                                            </a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -64,6 +67,9 @@
                                                         </div>
                                                         <div class="input-group-text">
                                                             Do on specific day
+                                                            <a class="popover-icon" data-toggle="popover" tabindex="0" role="button" data-container="body" data-trigger="focus" data-placement="bottom" title="Do on Specific Day" data-content="Information goes here">
+                                                                <i class="fas fa-question-circle" aria-label="More informaiton about Do on Specific Day Processing Time option"></i>
+                                                            </a>
                                                         </div>
                                                     </div>
                                                     <input type="text" class="form-control" form="order-processing-form"
@@ -79,6 +85,9 @@
                                                         </div>
                                                         <div class="input-group-text">
                                                             Expedite Order ($$)
+                                                            <a class="popover-icon" data-toggle="popover" tabindex="0" role="button" data-container="body" data-trigger="focus" data-placement="bottom" title="Expedite Order" data-content="Expedited orders are done the next day or during non-standard business hours. A fee will be added to your order if appropriate">
+                                                                <i class="fas fa-question-circle" aria-label="More informaiton about Expedited Processing Time option"></i>
+                                                            </a>
                                                         </div>
                                                     </div>
                                                     <input type="text" class="form-control" name="expiditeDate[{{order.num}}]"
@@ -108,4 +117,10 @@
 
             </div>
         </div>
+        <!-- Please insert this line at the bottom of the "revieworder" page so that the popovers can work -->
+        <!-- <script>
+        $(document).ready(function () {
+            $('[data-toggle="popover"]').popover();
+        });
+    </script> -->
 {% endblock %}
