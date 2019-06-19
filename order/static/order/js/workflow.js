@@ -88,6 +88,8 @@ $(document).ready(function() {
   //Phone
   $("#PhoneSetType_B").click(function() {
     basicPhone();
+    $("#equip2").hide();
+    $("#equip1").show();
   });
 
   $("#PhoneSetType_A").click(function() {
@@ -96,6 +98,8 @@ $(document).ready(function() {
 
   $("#PhoneSetType_V").click(function() {
     voipPhone();
+    $("#equip1").hide();
+    $("#equip2").show();
   });
 
   $("#ModelInfo_V").click(function() {
