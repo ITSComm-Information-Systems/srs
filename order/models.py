@@ -138,7 +138,7 @@ class Chartcom(models.Model):
     program = models.CharField(max_length=30)
     class_code = models.CharField(max_length=30)
     project_grant = models.CharField(max_length=30)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=120)
     account_number = models.CharField(max_length=100)
 
     def __str__(self):
