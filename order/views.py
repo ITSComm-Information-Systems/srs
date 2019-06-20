@@ -17,6 +17,8 @@ class Submit(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def post(self, request):
+        return HttpResponseRedirect('/submitted') 
+
         order_list = request.POST.getlist('orders')
         for order in order_list:
             order_items = request.POST.getlist('orderItems[' + order +']')
