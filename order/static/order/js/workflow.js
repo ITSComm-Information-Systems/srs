@@ -65,12 +65,16 @@ $(document).ready(function() {
     $("#jackNumber").hide();
   });
 
+  $("#jackNumber").keypress(function() {
+    $("#activePhone").show();
+  });
+
   $("#activePhone_Y").click(function() {
-    $("#jackNumber").show();
+    $("#linesToInstall").show();
   });
 
   $("#activePhone_N").click(function() {
-    $("#jackNumber").show();
+    $("#linesToInstall").show();
   });
 
   $("#conduit_Y").click(function() {
@@ -81,9 +85,6 @@ $(document).ready(function() {
     $("#linesToInstall").show();
   });
 
-  $("#jackNumber").keypress(function() {
-    $("#linesToInstall").show();
-  });
 
   //Phone
   $("#PhoneSetType_B").click(function() {
