@@ -526,13 +526,14 @@ class UmOscDeptUnitsReptV(models.Model):
           db_table = 'PINN_CUSTOM\".\"um_osc_dept_units_rept_v'
 
 class UmOscChartcomInitialLoadV(models.Model):
+     short_code = models.CharField(max_length=10)
      fund = models.CharField(max_length=30)
      dept = models.CharField(max_length=30)
      program = models.CharField(max_length=30)
      class_code = models.CharField(max_length=30)
      project_grant = models.CharField(max_length=30)
      account_number = models.CharField(max_length=4000, primary_key=True)
-     name = models.CharField(max_length=100)
+     name = models.CharField(max_length=120)
 
      class Meta:
           managed = False
