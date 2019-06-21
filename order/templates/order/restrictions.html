@@ -3,7 +3,7 @@
   <h3> {{category.name}} </h3>
     {% for res in category.res %}
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="{{res.id}}" id="res{{res.id}}">
+            <input class="form-check-input" type="radio" value="{{res.id}}" id="res{{res.id}}">
             <label class="form-check-label" for="res{{res.id}}">
                 {{res}}
             </label>

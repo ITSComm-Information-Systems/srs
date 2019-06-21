@@ -3,7 +3,7 @@ import warnings
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.template import loader
 from django.db import models
-
+from django.db.utils import IntegrityError
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.views.decorators.csrf import csrf_protect
@@ -181,6 +181,7 @@ def deptpriv(request, dept_parm=''):
 
 def get_uniqname(request, uniqname_parm=''):
     template = loader.get_template('oscauth/setpriv.html')
+
     if request.method == 'POST':  #big work here
         print(request.POST)
         uniqname_parm = request.POST['uniqname_parm']
@@ -208,6 +209,9 @@ def get_uniqname(request, uniqname_parm=''):
                     osc_user = User.objects.filter(username=uniqname_parm)
                 except:
                     osc_user = User()
+
+                if osc_user:
+                    osc_user.exists = True
 
                 osc_user.username = mc_user.uid
 #                osc_user.last_name = mc_user.sn
@@ -257,8 +261,6 @@ def get_uniqname(request, uniqname_parm=''):
                 context = {
                     'uniqname_parm': uniqname_parm,
                     'osc_user': osc_user,
-#                    'osc_user.last_name': osc_user.last_name,
-#                    'osc_user.first_name': osc_user.first_name,
                     'last_name': last_name,
                     'first_name': first_name,
                     'grantor_depts': grantor_depts,
@@ -266,7 +268,6 @@ def get_uniqname(request, uniqname_parm=''):
                     'dept_name': dept_name,
                     'rows': rows,
                     'result': result,
-#                    'process_access': process_access,
                     'submit_msg': submit_msg,
                 }
 
@@ -288,10 +289,7 @@ def get_uniqname(request, uniqname_parm=''):
                         print('Incomplete input')
                         return  HttpResponse(template.render({'submit_msg': submit_msg}, request))
 
-#                print(POST)
-
                 return render(request, 'oscauth/setpriv.html', context)
-                #return HttpResponseRedirect('/auth/setpriv/' + uniqname_parm + '/' + last_name + '/' + first_name + '/')
 
             else:
                 result = uniqname_parm + ' is not in MCommunity'
@@ -306,12 +304,10 @@ def showpriv(request, uniqname_parm):
         return HttpResponseRedirect('/auth/setpriv/', request)
 
     else:
-
         try:
             osc_user = User.objects.get(username=uniqname_parm)
             user_id = osc_user.id
 
-    #        depts = AuthUserDept.objects.filter(user=osc_user.id).order_by('dept')
             depts = AuthUserDept.objects.filter(user=user_id).order_by('dept')
             rows = []
             prev_dept = ''
@@ -354,10 +350,8 @@ def showpriv(request, uniqname_parm):
                 'rows': rows
             }
         except:
-            context = {
-                'title': 'There currently are no privileges for: ' + osc_user.last_name + ', ' + osc_user.first_name + ' (' + uniqname_parm + ')'
-            }
-            
+            raise Http404
+
     return HttpResponse(template.render(context, request))
 
 
@@ -387,14 +381,22 @@ def modpriv(request):
         for dept in dept_checked:
             new_auth = AuthUserDept()
             new_auth.user = osc_user
-            new_auth.role = Role.objects.get(role=role_checked).group
+            new_auth.group = Role.objects.get(role=role_checked).group
             new_auth.dept = dept
-            #new_auth.save()
-            result = 'Added Privileges'
-#           print('Added User: %s  Role: %s   Dept: %s' % (uniqname_parm, new_auth.role, new_auth.dept))
+
+            try:
+                new_auth.save()
+                result = 'Privilege Added'
+            except IntegrityError: 
+                print('Record Exists')
+                result = 'Privilege already exists'
+            
     else:
+        role = Role.objects.get(role=role_checked).group
+        aud = AuthUserDept.objects.filter(user=osc_user,group=role,dept__in=dept_checked)
+        print(aud)
+        aud.delete()
         result = 'Deleted Privileges'
-        #TODO deletes
 
     context = {
         'title': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',

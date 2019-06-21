@@ -8,14 +8,34 @@
         <div class="form-check col">
         <legend>{{type.label}}</legend>
 
-          {% for feature in type %}
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="{{feature.id}}" id="feature{{feature.id}}">
-            <label class="form-check-label" for="feature{{feature.id}}">
-                {{feature}}
-            </label>
-          </div>
-          {% endfor %}
+          {% if type.label == 'Standard' %}
+          Standard features included with this phone type:
+            <ul>
+              {% for feature in type %}
+              <li>
+                  {{feature}}
+              </li>
+              {% endfor %}
+            </ul>
+          {% elif type.label == 'Optional' %} 
+            {% for feature in type %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="{{category.id}}" value="{{feature.id}}" id="feature{{feature.id}}">
+              <label class="form-check-label" for="feature{{feature.id}}">
+                  {{feature}}
+              </label>
+            </div>
+              {% endfor %}
+            {% else %} 
+            {% for feature in type %}
+              <div class="form-check">
+                <input class="form-check-input" type="radio" value="{{feature.id}}" id="feature{{feature.id}}">
+                <label class="form-check-label" for="feature{{feature.id}}">
+                    {{feature}}
+                </label>
+              </div>
+              {% endfor %}
+          {% endif %}
     </div>
     {% endfor %}
   </div>

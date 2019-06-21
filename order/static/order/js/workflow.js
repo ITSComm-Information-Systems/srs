@@ -37,41 +37,85 @@ $(document).ready(function() {
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
-  
+
   $("#buildingFields").hide();
+  $("#phLocationFields").hide();
   $("#buildingTable").hide();
   $("#Conduit").hide();
   $("#PurchasePhone").hide();
   $("#ModelInfo").hide();
   $("#PhoneSetType").hide();
   $("#JackNumber").hide();
+  $("#PhoneModelNum").hide();
+
+  //Data
+  $("#activePhone").hide();
+  $("#jackNumber").hide();
+  $("#conduit").hide();
+  $("#linesToInstall").hide();
+
+  $("#jack_Y").click(function() {
+    $("#activePhone").show();
+    $("#conduit").hide();
+  });
+
+  $("#jack_N").click(function() {
+    $("#conduit").show();
+    $("#activePhone").hide();
+    $("#jackNumber").hide();
+  });
+
+  $("#jackNumber").keypress(function() {
+    $("#activePhone").show();
+  });
+
+  $("#activePhone_Y").click(function() {
+    $("#linesToInstall").show();
+  });
+
+  $("#activePhone_N").click(function() {
+    $("#linesToInstall").show();
+  });
+
+  $("#conduit_Y").click(function() {
+    $("#linesToInstall").show();
+  });
+
+  $("#conduit_N").click(function() {
+    $("#linesToInstall").show();
+  });
 
 
+  //Phone
   $("#PhoneSetType_B").click(function() {
-    $("#cat3").show();
-    $("#cat2").hide();
-    $("#cat1").hide();
-    $("#rescat3").show();
-    $("#rescat2").hide();
-    $("#rescat1").hide();
+    basicPhone();
+    $("#equip2").hide();
+    $("#equip1").show();
   });
 
   $("#PhoneSetType_A").click(function() {
-    $("#cat2").show();
-    $("#cat1").hide();
-    $("#cat3").hide();
-    $("#rescat2").show();
-    $("#rescat1").hide();
-    $("#rescat3").hide();
+    advancedPhone();
   });
 
   $("#PhoneSetType_V").click(function() {
-    $("#cat1").show();
-    $("#cat2").hide();
-    $("#cat3").hide();
-    $("#rescat1").show();
-    $("#rescat2").hide();
-    $("#rescat3").hide();
+    voipPhone();
+    $("#equip1").hide();
+    $("#equip2").show();
+  });
+
+  $("#ModelInfo_V").click(function() {
+    voipPhone();
+    $("#PhoneModelNum").show();
+  });
+  
+  $("#ModelInfo_A").click(function() {
+    advancedPhone();
+    $("#PhoneModelNum").show();
+  });
+
+  $("#ModelInfo_B").click(function() {
+    basicPhone();
+    $("#PhoneModelNum").show();
   });
 
   // Phone Type Tab
@@ -109,6 +153,8 @@ $(document).ready(function() {
     $("#PhoneSetType_review").show();
     $("#ModelInfo").hide();
     $("#ModelInfo_review").hide();
+    $("#PhoneModelNum").hide();
+    $('#pills-step3').removeClass(' hidden');
   });
 
   $("#PurchasePhone_N").click(function() {
@@ -116,6 +162,7 @@ $(document).ready(function() {
     $("#ModelInfo_review").show();
     $("#PhoneSetType").hide();
     $("#PhoneSetType_review").hide();
+    $('#pills-step3').addClass(' hidden');
   });
 
 
@@ -155,6 +202,11 @@ function nextPrev(n) {
   if (n == 1 && !validateForm()) return false;
 
   currStep = currStep + n;
+
+  while ( $('#pills-step'+currStep).hasClass('hidden')) {
+    currStep = currStep + n;
+  }
+
   $('#pills-step'+currStep).removeClass('disabled');
   $('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
   if (currStep > lastStep) {
@@ -192,3 +244,32 @@ function validateForm() {
   }
   return valid; // return the valid status
 }
+
+
+// Features & Restrictions
+function basicPhone() {
+  $("#cat3").show();
+  $("#cat2").hide();
+  $("#cat1").hide();
+  $("#rescat3").show();
+  $("#rescat2").hide();
+  $("#rescat1").hide();
+}
+
+function advancedPhone() {
+    $("#cat2").show();
+    $("#cat1").hide();
+    $("#cat3").hide();
+    $("#rescat2").show();
+    $("#rescat1").hide();
+    $("#rescat3").hide();
+  }
+
+  function voipPhone() {
+    $("#cat1").show();
+    $("#cat2").hide();
+    $("#cat3").hide();
+    $("#rescat1").show();
+    $("#rescat2").hide();
+    $("#rescat3").hide();
+  }
