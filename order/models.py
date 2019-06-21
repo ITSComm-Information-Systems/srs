@@ -71,7 +71,10 @@ class Service(Configuration):
     active = models.BooleanField(default=True)
 
 
-class FeatureCategory(Configuration):
+class FeatureCategory(models.Model):
+    name = models.CharField(max_length=20)
+    label = models.CharField(max_length=100)
+    display_seq_no = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name
@@ -142,7 +145,7 @@ class Chartcom(models.Model):
     name = models.CharField(max_length=120)
 
     def __str__(self):
-        return self.name
+        return self.fund
 
     @property
     def account_number(self):
