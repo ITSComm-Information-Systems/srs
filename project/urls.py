@@ -17,6 +17,7 @@ urlpatterns = [
     path('reports/',include('reports.urls')),
     path('chartchange/', views.chartchange),
     path('', include('pages.urls')),
+    path('tools/',include('tools.urls'))
 ]
 if settings.DEBUG:
     import debug_toolbar

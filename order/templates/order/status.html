@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <!-- Beginning of Content -->
+    <div id="main-content" class="container" role="main">
+            <h1>Order Status</h1>
+            <div class="container" role="main">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <!-- Beginning of Department name/Search -->
+                        <div class="select-dept">
+                            <div class="dept-name">
+                                <h2>Viewing Department: {{department.id}} - {{department.name}}</h2>
+                            </div>
+                            <div class="input-group mb-3 dept-dropdown">
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text">
+                                        Select Department
+                                    </label>
+                                </div>
+                                <select class="custom-select order-status-dropdown" id="order-status-options">
+                                    <option selected>Select a department</option>
+                                    {% for dept in dept_list %}
+                                    <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <!-- End of Department Dropdown -->
+                        </div>
+                        <!-- End of Department Name/Search -->
+    
+                        <!-- Beginning of Filter/Search -->
+                        <div class="filter-container">
+                            <!-- Beginning of Search Bar -->
+                            <div class="input-group mb-3 search-bar">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search" aria-label="Search Icon"></i>
+                                    </span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Search by pre-order or uniqname…"
+                                    aria-label="Search by pre-order or uniqname…" aria-describedby="basic-addon2">
+                            </div>
+                            <!-- End of Search -->
+    
+                            <!-- Beginning of Order Status Filter Dropdown -->
+                            <div class="input-group mb-3 order-status">
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text">
+                                        Filter By Order Status
+                                    </label>
+                                </div>
+                                <select class="custom-select order-status-dropdown" id="order-status-options">
+                                    <option selected>Select a status indicator</option>
+                                    <option value="Submitted">Submitted</option>
+                                    <option value="Scheduled">Scheduled for</option>
+                                    <option value="Awaiting Billing">Done & Awaiting Billing</option>
+                                    <option value="Billed">Billed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <!-- End of Order Status Filter Dropdown -->
+    
+                            <!-- Beginning of Order Type Filter Dropdown -->
+                            <div class="input-group mb-3 order-type">
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text">Filter by Order Type</label>
+                                </div>
+                                <select class="custom-select order-type" id="order-type-options">
+                                    <option selected>Select an Order Type</option>
+                                    <option value="ITCOM">Telecommunications</option>
+                                    <option value="MiStorage">MiStorage</option>
+                                    <option value="MiServer">MiServer</option>
+                                </select>
+                            </div>
+                            <!-- End of Order Type Filter Dropdown -->
+                        </div>
+                        <!-- End of Filter/Search -->
+    
+                        <!-- Beginning of table -->
+                        <div class="table">
+                            <table class="table table-hover table-striped table-sm">
+                                <caption>List of Orders & their respective statuses</caption>
+                                <!-- beginning of Table headers -->
+                                <thead>
+                                    <tr>
+                                        <th scope="col">PreOrder #</th>
+                                        <th scope="col">Date Submitted</th>
+                                        <th scope="col">Submitted By</th>
+                                        <th scope="col"> Service Type</th>
+                                        <th scope="col">Order Details</th>
+                                        <th scope="col">Charfield Billed</th>
+                                        <th scope="col">Status <i class="fas fa-question-circle btn-link" aria-label="More Information icon" data-toggle="modal" data-target="#statusIndicatorModal"></i></th>
+                                        <th scope="col">Cancel</th>
+                                    </tr>
+                                </thead>
+                                <!-- End of table headers -->
+    
+                                <!-- Beginning of table body -->
+                                <tbody>
+    
+                                    <!-- First table row -->
+                                    <tr>
+                                        <th scope="row">12345</th>
+                                        <td>12/12/12</td>
+                                        <td>frga</td>
+                                        <td>Telecommunications</td>
+                                        <td>
+                                            <ul>
+                                                <li>
+                                                    Add/Activate a new phone line and activate a data line at 1100 N. UNIVERSITY
+                                                        BLDG (1000188)
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td>Academic Computing Site</td>
+                                        <td>Submitted</td>
+                                        <td>Cancel</td>
+                                    </tr>
+                                    <!-- end of table row 1 -->
+    
+                                    <!-- Beginning of second table row -->
+                                    <tr>
+                                        <th scope="row">678912</th>
+                                        <td>01/11/11</td>
+                                        <td>prddd</td>
+                                        <td>Telecommunications</td>
+                                        <td>
+                                            <ul>
+                                                <li>
+                                                    Add/Activate a new phone line and activate a data line at ADMINISTRATIVE SERVICES (1000815)
+                                                </li>
+                                                <li>
+                                                    Equipment Order: Order (1) Handset Cord Mod/Mod 12ft - Ash:Adirondak 9200-12-V (Z-000558)
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td>Academic Computing Site</td>
+                                        <td>Schedule for: 3/2/19</td>
+                                        <td>Cancel</td>
+                                    </tr>
+                                    <!-- End of second row -->
+    
+                                    <!-- Beginning of third Table row -->
+                                    <tr>
+                                        <th scope="row">45678</th>
+                                        <td>05/15/19</td>
+                                        <td>jwalfish</td>
+                                        <td>Telecommunications</td>
+                                        <td>
+                                            <ul>
+                                                <li>Change calling range/restrictions for phone number (734)555-5555</li>
+                                            </ul>
+                                        </td>
+                                        <td>Academic Computing Site</td>
+                                        <td>Done & Awaiting Billing</td>
+                                        <td>Cancel</td>
+                                    </tr>
+                                    <!-- End of thrid row -->
+                                </tbody>
+                                <!-- End of table body -->
+                            </table>
+                        </div>
+                        <!-- end of table  -->
+                        <!-- statusIndicatorModal -->
+                        <div class="modal fade" id="statusIndicatorModal" tabindex="-1" role="dialog"
+                        aria-labelledby="statusIndicatorModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="statusIndicatorModalLabel">Order Status Indicators</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {% autoescape off %}
+                                    {{ status_help.bodytext }}
+                                    {% endautoescape %}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="popover"]').popover();
+    });
+</script>
+{% endblock %}

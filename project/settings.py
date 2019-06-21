@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'order',
     'pages',
-    'reports'
+    'reports',
+    'tools',
 ]
 
 MIDDLEWARE = [
@@ -82,11 +83,16 @@ LOGIN_REDIRECT_URL = SITE_URL
 LOGOUT_REDIRECT_URL = SITE_URL
 LOGIN_URL = '/oidc/authenticate'
 
+MCOMMUNITY = {
+    'SERVER': os.getenv('MC_SERVER', 'ldap.umich.edu'),
+    'USERNAME': os.getenv('MC_USERNAME', 'cn=EAS-OSC-McDirApp001,ou=Applications,o=services'),
+    'PASSWORD': os.getenv('MC_PASSWORD', 'N/A'),
+}
+
 
 ROOT_URLCONF = 'project.urls'
 
-TEMPLATES = [
-    {
+TEMPLATES = {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
         'APP_DIRS': True,
@@ -99,8 +105,8 @@ TEMPLATES = [
                 'project.context_processors.menu',
             ],
         },
-    },
-]
+},
+
 
 WSGI_APPLICATION = 'wsgi.application'
 
