@@ -75,6 +75,7 @@ $(document).ready(function() {
 
   $("#activePhone_N").click(function() {
     $("#linesToInstall").show();
+    $('#pills-step2').addClass(' hidden');
   });
 
   $("#conduit_Y").click(function() {

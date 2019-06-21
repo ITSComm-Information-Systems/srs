@@ -49,7 +49,7 @@ class Element(Configuration):
 
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
-    attributes = models.CharField(blank=True, max_length=100)
+    attributes = models.CharField(blank=True, max_length=1000)
     target = models.CharField(max_length=80, blank=True, null=True)
 
 
