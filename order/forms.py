@@ -40,6 +40,13 @@ class RestrictionsForm(forms.Form):
 
 
 class AddlInfoForm(forms.Form):
+    TRUE_FALSE_CHOICES = (
+    (True, 'Yes'),
+    (False, 'No')
+    )
+
+    contact_yn = forms.ChoiceField(choices = TRUE_FALSE_CHOICES, label="Are you the on site contact?", required=True)
+    contact_yn.type = 'Radio'
     contact_id = forms.CharField(label='Uniqname', max_length=8)
     contact_name = forms.CharField(label='Name', max_length=40)
     contact_number = forms.CharField(label='Best number to contact.', max_length=8)
