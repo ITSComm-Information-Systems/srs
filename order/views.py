@@ -208,7 +208,7 @@ class Review(PermissionRequiredMixin, View):
 
 class Services(View):
     permission_required = 'oscauth.can_order'
-
+    
     def get(self, request):
 
         link_list = Page.objects.get(permalink='/links')
