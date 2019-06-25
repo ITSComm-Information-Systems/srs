@@ -36,5 +36,9 @@
 {% endblock %}
 
 {% block js %}
+<script>
+  var username='{{ user.get_full_name }}';
+  var uniqname='{{ user }}';
+</script>
 <script src="/static/order/js/workflow.js"></script>
 {% endblock %}

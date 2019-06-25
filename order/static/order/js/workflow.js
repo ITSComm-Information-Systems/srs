@@ -181,6 +181,10 @@ $(document).ready(function() {
     nextPrev(-1);
   });
 
+  $("#contact_yn_True").click(function(event) {
+    $('#id_contact_id').val(uniqname);
+    $('#id_contact_name').val(username);
+  });
 
 
 
