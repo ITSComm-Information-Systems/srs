@@ -86,6 +86,10 @@ $(document).ready(function() {
     $("#linesToInstall").show();
   });
 
+  // Addl info
+  $('#contact_id').hide();
+  $('#contact_name').hide();
+  $('#contact_number').hide();
 
   //Phone
   $("#PhoneSetType_B").click(function() {
@@ -181,11 +185,17 @@ $(document).ready(function() {
     nextPrev(-1);
   });
 
-  $("#contact_yn_True").click(function(event) {
-    $('#id_contact_id').val(uniqname);
-    $('#id_contact_name').val(username);
+  $("#contact_yn_False").click(function(event) {
+    $('#contact_id').show();
+    $('#contact_name').show();
+    $('#contact_number').show();
   });
 
+  $("#contact_yn_True").click(function(event) {
+    $('#contact_id').hide();
+    $('#contact_name').hide();
+    $('#contact_number').hide();
+  });
 
 
 });
@@ -226,7 +236,14 @@ function validateForm() {
   valid = true;
   for (i = 0; i < inp.length; i++) {
     id = "#" + $(inp[i]).attr('id') + "_review";
-    $(id).html($(inp[i]).val());
+    selected_text = $( "#" + inp[i].id + " option:selected" ).text()
+
+    if (selected_text) {
+      $(id).html(selected_text);
+    } else {
+      $(id).html($(inp[i]).val());
+    }
+
     if (!inp[i].checkValidity()) {
       inp[i].className += " invalid";
       valid = false;
@@ -238,8 +255,6 @@ function validateForm() {
         id = "#id_" + $(this).attr("name") + "_review";
         $(id).html($("label[for='"+idVal+"']").text());
     });
-
-  
   
   if (valid) {
     document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
