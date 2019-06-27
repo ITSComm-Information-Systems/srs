@@ -55,7 +55,7 @@
 							Tools
 						</a>
 						<div class="dropdown-menu" aria-labelledby="toolsDropdown">
-							<a class="dropdown-item" href="/auth/deptpriv/">Look Up</a>
+							<a class="dropdown-item" href="/auth/deptpriv/">Department Look Up</a>
 							<a class="dropdown-item" href="#">Cost Estimator</a>
 							<a class="dropdown-item" href="/chartchange/">Chartfield Change Request</a>
 							<a class="dropdown-item" href="/tools/voip/">VOIP Location Change</a>
@@ -63,7 +63,7 @@
 					</li>
 					{% endif %}
 					<li class="nav-item">
-						<a class="nav-link" href="/help">Help</a>
+						<a class="nav-link" href="/help">Get Help</a>
 					</li>
 					{% if user.is_authenticated %}
 					<li class="nav-item dropdown ">
@@ -104,13 +104,13 @@
 				<ul class="navbar-nav /nav-fill w-100">
 					{% if perms.oscauth.can_order %}
 					<li class="nav-item">
-						<a class="nav-link" href="/orders/services/">Services</a>
+						<a class="nav-link" href="/orders/services/">Request Service</a>
 					</li>
 					{% endif %}
 					<li class="nav-item dropdown">
 						{% if perms.oscauth.can_report %}
 						<a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							Reports
+							Run Reports
 						</a>
 						<div class="dropdown-menu" aria-labelledby="reportsDropdown">
 							<a class="dropdown-item" href="/reports/metrics/">Departmental Telephone Service Metrics</a>
@@ -124,8 +124,7 @@
 					</li>
 					{% if perms.oscauth.can_order %}
 					<li class="nav-item">
-						<a class="nav-link" href="/orders/cart/0"><i class="fas fa-shopping-cart"></i>
-							Cart</a>
+						<a class="nav-link" href="/orders/cart/0">View Cart</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="/orders/status/0">View Orders</a>
