@@ -5,6 +5,8 @@
     <form action="/reports/soc/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
     {% if depts %}
 
+    <div style="width: 600px; float: left;">
+
         <h2>Select Unit Grouping</h2>
         <input type="radio" style='font-size:20px' name = "unitGroupingGroup" id = "deptid" value = '1' checked>  Department ID
         <select multiple style='font-size:16px' name="department_id">
@@ -40,8 +42,11 @@
             </select>
         </br>
 
+    </div>
+    <div style="margin-left: 620px;">
+        <br>
 
-
+        <p></p>
         <h2>Choose Date Range</h2>
         <input type="radio" style='font-size:20px' name = "dateRangeGroup" id = "fiscal" value = '1' checked>  Fiscal Year
         <select style='font-size:16px' name="FISCALYEAR">
@@ -106,15 +111,16 @@
             {% endfor %}
         </select>
         </br>
+    </div>
 
     {% endif %}
-     <p></p>
-     <p></p>
+    <br>
+    <br>
     <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+    <br>
 </form>
-
-<p>{{grouping}} - {{unit}}</p>
-<p>{{dateRange}} - {{billing_period}}</p>
+<p>{{grouping}}{% if submitfirst %} - {% endif %}{{unit}}</p>
+<p>{{dateRange}}{% if submitfirst %} - {% endif %}{{billing_period}}</p>
 
 {% if submit == False%}
 <p>{{ rows }}</p>
@@ -197,7 +203,7 @@
 </table>
 <p></p>
 <p></p>
-<button onclick="exportTableToCSV('{{grouping}}_{{billing_period}}.csv')">Download Table To CSV File</button>
+<button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')">Download Table To CSV File</button>
 
 {% endif %}
 

@@ -2,14 +2,69 @@
 {% block content %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<form action="/tools/voip/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
-  
-    <h2>Phone Number:</h2>
-    <input type="text" style='font-size:20px' name = 'number' id = 'phone'><br><p></p>
-    <input type="submit" value="Submit" class="btn btn-primary"><br>
-    <p></p>
-</form>
-<p>{{ current }}</p>
-<p>{{ locations }}</p>
+<div class = "container">
+
+    <div class="row align-items-start" id="phoneselect">
+     <form action="/tools/voip/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
+    
+        <h2>Phone Number:</h2>
+        <input type="text" style='font-size:20px' name = 'number' id = 'phone'>
+        <input type="submit" value="Go" class="btn btn-primary"><br>
+        <p></p>
+    </form>
+    </div>
+    <div id = "current">
+    {% comment %} <p>{{ current }}</p> {% endcomment %}
+    </div>
+    <div id = "locations">
+    <p>{{ locations }}</p>
+    </div>
+    <div id = "available">
+    <p>{{ available }}</p>
+    </div>
+    
+    
+    <form method="post">
+        <ul class="nav justify-content-center nav-pills" id="voiplocation_nav" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link disabled" data-toggle="tab" id="vlc-1" href="#" role="tab" name="Select Phone Number" aria-selected="false">Select Phone Number</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" data-toggle="tab" id="vlc-2" href="#" role="tab" name="Select New Location" aria-selected="false">Select New Location</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" data-toggle="tab" id="vlc-3" href="#" role="tab" name="Confirm Change" aria-selected="false">Confirm Change</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="vl-pills-tabContent">
+            <div class="tab-pane fade in active" id="vl-1" role="tabpanel" aria-labelledby="pills-contact-tab">
+                {% include 'currentlocation.html'%}
+            </div>
+            <div class="tab-pane fade" id="vl-2" role="tabpanel" aria-labelledby="pills-contact-tab">
+                {% include 'newlocation.html' %}
+            </div>
+            <div class="tab-pane fade" id="vl-3" role="tabpanel" aria-labelledby="pills-contact-tab">
+               {% include 'confirmchange.html'%}
+            </div>
+            <div style = "overflow:auto;">
+                <div style="float:right;">
+                    <button type="button" class="btn btn-primary" id=vlPrevBtn>Previous</button>
+                    <button type="button" class="btn btn-primary" id=vlNextBtn>Next</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+    
+</div>
+
 
 {% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/static/select.js"></script>
+<script src="/static/js/voipchange.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+
+{% endblock %} 
