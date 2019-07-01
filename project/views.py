@@ -40,6 +40,8 @@ def change_dept(request, dept_parm):
 		return HttpResponseRedirect(request.get_full_path() + 'to' + change_dept + '/')
 
 
+
+
 @login_required
 @permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
 def chartchange(request, dept_parm='', change_dept=''):
@@ -57,6 +59,10 @@ def chartchange(request, dept_parm='', change_dept=''):
 	if select_dept not in user_depts:
 		template = loader.get_template('403.html')
 		return HttpResponse(template.render({'title':'uh oh'}, request))
+	# if request.POST.get('deptids') is None:
+	# 	select_dept = user_depts[0]
+	# else:
+	# 	select_dept = request.POST.get('deptids')
 
 	# Get dept info from selected dept
 	find_dept_info = UmOscDeptProfileV.objects.filter(deptid=select_dept)
@@ -126,6 +132,7 @@ def chartchange(request, dept_parm='', change_dept=''):
 		'cf_info': chartfield_list,
 		'nickname': nickname,
 		'users': users,
+		'selected_users': users, #FIX 
 		'new_dept': new_dept,
 		'new_cf': new_cf,
 		'choose_cf_template': 'choose_cf.html',
@@ -160,3 +167,8 @@ def get_chartfield(request):
 		'selected_cf': selected_cf
 	}
 	return HttpResponse(template.render(context, request))
+
+
+def get_table(request):
+	selected_users = request.GET.get('selected', None)
+	all_users = request.GET.get('all_users', None)
