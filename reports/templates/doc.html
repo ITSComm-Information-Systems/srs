@@ -1,5 +1,57 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <p>Number 5</p>
+<div class="container">
+    <form action="/reports/doc/report/" method="POST" name="Select">{% csrf_token %}
+        <div class="form-group">
+            <h5>Select Department</h5>
+            	<div class="row form-inline">
+	                <select class="form-control col-md-6" style='font-size:16px' type="select" name="select_dept" id="doc_depts" value="{{ dept }}">
+	                    <option></option>
+	                    {% for dept in user_depts %}
+	                    <option value="{{ dept }}">{{ dept }}</option>
+	                    {% endfor %}
+	                </select>
+	                <strong>&nbsp;&nbsp;DEPARTMENT NAME HERE</strong>
+                </div>
+            <h5>Select Billing Date</h5>
+            <div class="row form-inline">
+            	<select class="form-control col-md-6" style='font-size:16px' requried type="select" name="billing_date" id="doc_bill_date" value="{{ d }}">
+	                <option></option>
+	                {% for d in dates %}
+	                <option value="{{ d }}">{{ d }}</option>
+	                {% endfor %}
+	            </select>
+	            <strong>&nbsp;&nbsp;BILLING DATE HERE</strong>
+	        </div>
+            <h5>Select Chartfield(s)</h5>
+            <div class="row">
+	            <select class="form-control col-md-6" style='font-size:16px;float:left;' requried type="select" name="chartcoms" id="doc_chartcom" value="{{ cf }}">
+	                <option></option>
+	                {% for cf in dept_cfs %}
+	                <option value="{{ cf }}">{{ cf }}</option>
+	                {% endfor %}
+	            </select>
+	            <p style="float:left;">
+		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
+		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
+		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
+		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
+		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
+		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
+		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
+		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong>
+	        	</p>
+	        </div>
+        </div>
+        <p><input type='submit' value='Generate Report' class="btn btn-primary"></p>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block js %}
+
+<script src="/../static/doc.js"></script>
+
 {% endblock %}

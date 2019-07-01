@@ -52,17 +52,17 @@ def chartchange(request, dept_parm='', change_dept=''):
 	user_depts = list(user_depts)
 
 	# Set selected department
-	if dept_parm == '':
-		select_dept = user_depts[0]
-	else:
-		select_dept = dept_parm
-	if select_dept not in user_depts:
-		template = loader.get_template('403.html')
-		return HttpResponse(template.render({'title':'uh oh'}, request))
-	# if request.POST.get('deptids') is None:
+	# if dept_parm == '':
 	# 	select_dept = user_depts[0]
 	# else:
-	# 	select_dept = request.POST.get('deptids')
+	# 	select_dept = dept_parm
+	# if select_dept not in user_depts:
+	# 	template = loader.get_template('403.html')
+	# 	return HttpResponse(template.render({'title':'uh oh'}, request))
+	if request.GET.get('deptids') is None:
+		select_dept = user_depts[0]
+	else:
+		select_dept = request.GET.get('deptids')
 
 	# Get dept info from selected dept
 	find_dept_info = UmOscDeptProfileV.objects.filter(deptid=select_dept)

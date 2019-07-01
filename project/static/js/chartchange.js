@@ -155,19 +155,21 @@ $(document).ready(function() {
 	})
 
 	
-	// Update department for page 1
+	// Update department for page 1 - AJAX
 	$('#chart_deptids').on('change', function() {
 		var sel = document.getElementById("chart_deptids");
 		var selected = sel.options[sel.selectedIndex].value;
 		$.ajax({
 			url: '/chartchange/',
-			type: "POST",
 			data: {
 				'deptids':selected
 			},
 			dataType:'json',
 			success: function(data) {
 				alert('Congratulations, Rachel! You were successful.');
+			},
+			error: function(data) {
+				alert('uh oh');
 			}
 		})
 	})
