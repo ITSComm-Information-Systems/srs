@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+#scroll_up {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 30px;
+  z-index: 99;
+  font-size: 18px;
+  border: none;
+  outline: none;
+  background-color: red;
+  color: white;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 4px;
+}
+</style>
+
+<div class="container">
+	<div class="row-inline">
+		<strong>Your selection</strong>
+		<a class="offset-2" href="..">Edit your selection</a>
+	</div>
+
+	<div class="row">
+		<div class="card border-dark col-md-5">
+			<div class="card-body">
+				<strong>Department:&nbsp;&nbsp;</strong>Department goes here :-)<br>
+				<strong>Billing Date:&nbsp;&nbsp;</strong>I love Mamma Mia<br>
+				<strong style="float:left;">Chartfields:&nbsp;&nbsp;</strong>
+				<p style="float:left;">
+					This movie is great<br>
+					What if there are more chartfields?
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="row mt-5">
+		<strong>Chartfield:&nbsp;</strong>
+		<p>Chartfield 1 here</p>
+	</div>
+
+	<div class="row">
+		<div class="card border-dark col-md-10">
+			<div class="card-body">
+				<strong>Summary</strong>
+				<table class="table table-sm mb-5">
+					<thead>
+						<tr class="table-secondary">
+							<th scope="col">Type of Service</th>
+							<th scope="col" style="text-align:right">Total Charge</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><a href="detail/">linky-link</a></td>
+							<td style="text-align:right">charge</td>
+						</tr>
+						<tr style="background-color:#FC8D4D;">
+							<td><strong>Total</strong></td>
+							<td style="text-align:right">total charge</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<strong>Phone Charges</strong>
+				<table class="table table-sm mb-5">
+					<thead>
+						<tr class="table-secondary">
+							<th>Billing ID</th>
+							<th scope="col">One Time Charges & Credits</th>
+							<th scope="col">Monthly Charges</th>
+							<th scope="col">Call Usage</th>
+							<th scope="col">Surcharges</th>
+							<th scope="col" style="text-align:right">Total Charge</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="table-warning">
+							<td></td>
+							<td>Amount</td>
+							<td>Amount</td>
+							<td>Number&nbsp;&nbsp;Amount</td>
+							<td>Amount</td>
+							<td style="text-align:right">Amount</td>
+						</tr>
+						<tr>
+							<td>money</td>
+							<td>money</td>
+							<td>money</td>
+							<td>must</td>
+							<td>be</td>
+							<td style="text-align:right">funny</td>
+						</tr>
+						<tr style="background-color:#FC8D4D">
+							<td><strong>Total</strong></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td style="text-align:right">total charge</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<strong>Monthly Service Charges</strong>
+				<table class="table table-sm mb-5">
+					<thead>
+						<tr class="table-secondary">
+							<th scope="col">Item Code</th>
+							<th scope="col">Description</th>
+							<th scope="col">Unit Amount</th>
+							<th scope="col">Quantity</th>
+							<th scope="col" style="text-align:right">Total Charge</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>the</td>
+							<td>stars</td>
+							<td>were</td>
+							<td>bright</td>
+							<td style="text-align:right">fernando</td>
+						</tr>
+						<tr style="background-color:#FC8D4D">
+							<td><strong>Total</strong></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td style="text-align:right">total charge</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<strong>One-Time Charges & Credits Summary</strong>
+				<table class="table table-sm">
+					<thead>
+						<tr class="table-secondary">
+							<th scope="col">Item Code</th>
+							<th scope="col">Work Order (if applicable)</th>
+							<th scope="col">Description</th>
+							<th scope="col" style="text-align:right">Total Amount</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>there was</td>
+							<td><a href="tsr/">something in</a></td>
+							<td>the air</td>
+							<td style="text-align:right">that night</td>
+						</tr>
+						<tr style="background-color:#FC8D4D">
+							<td><strong>Total</strong></td>
+							<td></td>
+							<td></td>
+							<td style="text-align:right">total charge</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<button onclick="topFunction()" id="scroll_up" title="Go to top">Top</button>
+</div>
+
+{% endblock %}

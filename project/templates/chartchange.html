@@ -17,7 +17,7 @@
                 Select Department
             </label>
         </div>
-        <select name="deptids" class="custom-select" id="chart_deptids" value="{{ dept }}" onchange="submit()">
+        <select name="deptids" class="custom-select" id="chart_deptids" value="{{ dept }}">
             <option disabled selected>{{ dept_info.dept_id }}</option>
             {% for dept in deptids %}
             <option name="dept" value="{{ dept }}">{{ dept }}</option>
