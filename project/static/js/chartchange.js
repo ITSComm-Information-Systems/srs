@@ -154,6 +154,24 @@ $(document).ready(function() {
 	    }
 	})
 
+	
+	// Update department for page 1
+	$('#chart_deptids').on('change', function() {
+		var sel = document.getElementById("chart_deptids");
+		var selected = sel.options[sel.selectedIndex].value;
+		$.ajax({
+			url: '/chartchange/',
+			type: "POST",
+			data: {
+				'deptids':selected
+			},
+			dataType:'json',
+			success: function(data) {
+				alert('Congratulations, Rachel! You were successful.');
+			}
+		})
+	})
+
 });
 
 // Next->submit
@@ -170,7 +188,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
 // Next/prev functionality
 function nextPrev(n) {
 
-  //if (n == 1 && !validateForm()) return false;
+  //if (n == 1 && !validateForm()6) return false;
 
   currStep = currStep + n;
   $('#cfc-'+currStep).removeClass('disabled');
