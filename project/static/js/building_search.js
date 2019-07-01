@@ -1,6 +1,9 @@
 $(document).ready(function() {
+
     $("#buildingFields").hide();
     $("#buildingTable").hide();
+
+
     $("#buildingSearch").on("keyup", function() {
         $("#buildingTable").show();
         var value = $(this).val().toLowerCase();
