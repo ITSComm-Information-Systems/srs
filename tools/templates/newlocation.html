@@ -10,8 +10,6 @@
     </tr>
   {% endfor %}
   </table>
-
-
 </p>
 
 
@@ -24,39 +22,19 @@
         <input type="text" name="buildingName" required="" id="buildingName" class=" form-control">
 
         <label for="id_OneTimeCharges">Floor:</label>
-        <input type="text" name="buildingName" required="" id="buildingFloor" class=" form-control">
+        <input type="text" name="buildingFloor" required="" id="buildingFloor" class=" form-control">
         <div class="invalid-feedback">Please enter floor.</div>
 
         <label for="id_OneTimeCharges">Room:</label>
-        <input type="text" name="buildingName" required="" id="buildingRoom" class=" form-control">
+        <input type="text" name="buildingRoom" required="" id="buildingRoom" class=" form-control">
         <div class="invalid-feedback">Please enter room.</div>
 
         <label for="id_OneTimeCharges">Jack:</label>
-        <input type="text" name="buildingName" required="" id="buildingRoom" class=" form-control">
+        <input type="text" name="buildingJack" required="" id="buildingRoom" class=" form-control">
         <div class="invalid-feedback">Please enter jack.</div>
     </div>
 </div>
 
 <script>
-function myFunction() {
-  // Declare variables 
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("buildingSearch");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("buildingTable");
-  tr = table.getElementsByTagName("tr");
 
-  // Loop through all table rows, and hide those who don't match the search query
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    } 
-  }
-}
 </script>
