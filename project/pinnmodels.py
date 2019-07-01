@@ -526,13 +526,14 @@ class UmOscDeptUnitsReptV(models.Model):
           db_table = 'PINN_CUSTOM\".\"um_osc_dept_units_rept_v'
 
 class UmOscChartcomInitialLoadV(models.Model):
+     short_code = models.CharField(max_length=10)
      fund = models.CharField(max_length=30)
      dept = models.CharField(max_length=30)
      program = models.CharField(max_length=30)
      class_code = models.CharField(max_length=30)
      project_grant = models.CharField(max_length=30)
      account_number = models.CharField(max_length=4000, primary_key=True)
-     name = models.CharField(max_length=100)
+     name = models.CharField(max_length=120)
 
      class Meta:
           managed = False
@@ -566,7 +567,7 @@ class UmOscAllActiveAcctNbrsV(models.Model):
         db_table = 'PINN_CUSTOM\".\"um_osc_all_active_acct_nbrs_v'
 
 class UmOscAvailableLocsV(models.Model):
-     campus_code = models.CharField(max_length=4)
+     campuscd = models.CharField(max_length=4)
      campus_desc = models.CharField(max_length=30)
      service_type = models.CharField(max_length=20)
      service_number = models.CharField(max_length=60, primary_key=True)
@@ -588,7 +589,7 @@ class UmOscAvailableLocsV(models.Model):
           db_table = 'PINN_CUSTOM\".\"um_osc_available_locs_v'
 
 class UmOscLocationsInUseV(models.Model):
-     campus_code = models.CharField(max_length=4)
+     campuscd = models.CharField(max_length=4)
      campus_desc = models.CharField(max_length=30)
      service_type = models.CharField(max_length=20)
      service_number = models.CharField(max_length=60)

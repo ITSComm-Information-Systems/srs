@@ -1,0 +1,38 @@
+{% if submit %}
+<h3> Phone Number: {{ phone_number }}</h3>
+<table cellpadding = "10">
+    <th></th>
+    <th>Campus</th>
+    <th>Building</th>
+    <th>Bldg ID</th>
+    <th>Floor</th>
+    <th>Room</th>
+    <th>Jack</th>
+    {% for jack in current %}
+    
+    <tr id = '{{jack}}'>  
+        <td><input type="radio" method: "GET" style='font-size:20px' name = 'jacks' ></td>
+        <td> {{jack.1}} </td>
+        <td> {{jack.9}} </td>
+        <td> {{jack.8}} </td>
+        <td> {{jack.10}} </td>
+        <td> {{jack.12}} </td>
+        <td> {{jack.14}} </td>
+        
+    </tr>
+    {% endfor %}
+</table>
+<p>{{selected}}</p>
+{% endif %}
+{% comment %} <script>
+    function selected_jack(jack) {
+        console.log(typeof jack);
+        $.ajax({
+            type: "GET",
+            url: "/tools/voip/",
+            data: {
+                selected: jack
+            }
+        });
+    }
+</script> {% endcomment %}

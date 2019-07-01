@@ -7,7 +7,7 @@ from django.db.utils import IntegrityError
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth import login, authenticate, user_logged_in
+from django.contrib.auth import login, logout, authenticate, user_logged_in
 from django.contrib.auth.decorators import user_passes_test
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
@@ -440,6 +440,12 @@ def login_as_user(request, user_id):
     add_custom_permissions(user_id)
 
     return HttpResponseRedirect('/')
+
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect('/')
+
 
 def add_custom_permissions(user_id):
     # Add permissions for groups the user is in.  

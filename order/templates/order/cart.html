@@ -102,7 +102,7 @@
                                         <td>
                                             <div class="custom-control">
                                                 <input type="checkbox" name="includeInOrder" id="addItem{{item.id}}" value="{{item.id}}">
-                                                <label for="customCheck1">Add to order</label>
+                                                <label class="checkbox-label" for="addItem{{item.id}}">Add to order</label>
                                             </div>
                                             {% if item.days_to_deletion < 30 %}
                                             <a tabindex="0" role="button" data-toggle="popover" data-container="body"

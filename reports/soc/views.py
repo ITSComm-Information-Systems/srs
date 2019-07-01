@@ -55,6 +55,7 @@ def get_soc(request):
     
     text = ''
     submit = True
+    submitfirst = True
 
     display_type = request.POST.get("unitGroupingGroup",None)
     if display_type in ['1']:
@@ -65,10 +66,10 @@ def get_soc(request):
         unit = depts
     elif display_type in ['3']:
         grouping = 'Department Group'
-        unit = request.POST.get('department_group')
+        unit = [request.POST.get('department_group')]
     elif display_type in ['4']:
         grouping = 'Department Group VP Area'
-        unit = request.POST.get('department_vp')
+        unit = [request.POST.get('department_vp')]
 
     billing_period = ''
     dateRange = ''
@@ -94,10 +95,16 @@ def get_soc(request):
     if (unit != '' and billing_period != ''):
         rows = get_rows(unit, grouping, billing_period, dateRange, request)
         table = get_table(rows,request)
-    if (list(table)[0][1]==0):
-        rows = 'There is no data for the currect selection'
+    if (table ==[] or list(table)[0][1]==0):
+        if (table == []):
+            rows = ''
+            submitfirst = False
+        else:
+            rows = 'There is no data for the current selection'
         table = []
         submit = False
+        
+        
     
 
     context = {
@@ -117,6 +124,7 @@ def get_soc(request):
         'text': text,
         'rows': rows,
         'table': list(table),
+        'submitfirst': submitfirst,
     }
     return HttpResponse(template.render(context,request))
 
@@ -170,9 +178,9 @@ def get_rows(unit, grouping, period, drange, request):
     elif (grouping == 'Department IDs'):
         return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
     elif (grouping == 'Department Group'):
-        return values.filter(dept_grp_descr__exact = unit).order_by('account_desc').values().distinct()
+        return values.filter(dept_grp_descr__exact = unit[0]).order_by('account_desc').values().distinct()
     elif (grouping == 'Department Group VP Area'):
-        return values.filter(dept_grp_vp_descr__exact = unit).order_by('account_desc').values().distinct()
+        return values.filter(dept_grp_vp_descr__exact = unit[0]).order_by('account_desc').values().distinct()
 
 def get_table(rows,request):
     accounts = rows.values_list('account','account_desc').distinct()

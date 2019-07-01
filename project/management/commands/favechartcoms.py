@@ -16,6 +16,7 @@ class Command(BaseCommand):
         for row in fave_list:
             try:
                 new_record = Chartcom()
+#                new_record.short_code = row.short_code
                 new_record.fund = row.fund  
                 new_record.dept = row.dept
                 new_record.program = row.program
