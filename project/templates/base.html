@@ -49,19 +49,21 @@
 				</button>
 				<div class="collapse navbar-collapse navbars" aria-label="Auxiliary Navigation" role="navigation">
 				<ul class="navbar-nav ml-auto">
+					{% if user.is_authenticated %}
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="javascript;" id="toolsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							Tools
 						</a>
 						<div class="dropdown-menu" aria-labelledby="toolsDropdown">
-							<a class="dropdown-item" href="/auth/deptpriv/">Look Up</a>
+							<a class="dropdown-item" href="/auth/deptpriv/">Department Look Up</a>
 							<a class="dropdown-item" href="#">Cost Estimator</a>
 							<a class="dropdown-item" href="/chartchange/">Chartfield Change Request</a>
-							<a class="dropdown-item" href="/tools/voip/">Voip Location Change</a>
+							<a class="dropdown-item" href="/tools/voip/">VOIP Location Change</a>
 						</div>
 					</li>
+					{% endif %}
 					<li class="nav-item">
-						<a class="nav-link" href="/help">Help</a>
+						<a class="nav-link" href="/help">Get Help</a>
 					</li>
 					{% if user.is_authenticated %}
 					<li class="nav-item dropdown ">
@@ -75,13 +77,16 @@
 							{% endif %}
 
 							{% if not request.session.exit_users_pk %}
-              	<a class="dropdown-item" href="/auth/su_login/">Impersonate</a>
-            	{% endif %}
-            	{% if request.session.exit_users_pk %}
-              	<a class="dropdown-item" href="/auth/su/">Exit Impersonate</a>
+              					<a class="dropdown-item" href="/auth/su_login/">Impersonate</a>
+            				{% endif %}
+            				{% if request.session.exit_users_pk %}
+              					<a class="dropdown-item" href="/auth/su/">Exit Impersonate</a>
 							{% endif %}
-							<a class="dropdown-item" href="/auth/get_uniqname/">Manage Access</a>
+							{% if perms.oscauth.can_administer_access %}
+								<a class="dropdown-item" href="/auth/get_uniqname/">Manage Access</a>
+							{% endif %}								
 							<a class="dropdown-item" href="/auth/mypriv/">View System Privileges</a>
+							<a class="dropdown-item"  href="/auth/logout/">Logout</a>
 						</div>
 					</li>
 					{% else %}
@@ -99,13 +104,13 @@
 				<ul class="navbar-nav /nav-fill w-100">
 					{% if perms.oscauth.can_order %}
 					<li class="nav-item">
-						<a class="nav-link" href="/orders/services/">Services</a>
+						<a class="nav-link" href="/orders/services/">Request Service</a>
 					</li>
 					{% endif %}
 					<li class="nav-item dropdown">
 						{% if perms.oscauth.can_report %}
 						<a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							Reports
+							Run Reports
 						</a>
 						<div class="dropdown-menu" aria-labelledby="reportsDropdown">
 							<a class="dropdown-item" href="/reports/metrics/">Departmental Telephone Service Metrics</a>
@@ -119,11 +124,10 @@
 					</li>
 					{% if perms.oscauth.can_order %}
 					<li class="nav-item">
-						<a class="nav-link" href="/orders/cart/0"><i class="fas fa-shopping-cart"></i>
-							Cart</a>
+						<a class="nav-link" href="/orders/cart/0">View Cart</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="#">View Orders</a>
+						<a class="nav-link" href="/orders/status/0">View Orders</a>
 					</li>
 					{% endif %}
 				</ul>
@@ -132,7 +136,7 @@
 	</header>
 
 	<div id="main-content" class="container" role="main">
-		<h1 class="display-4">{{ title }}</h1>
+		<h1>{{ title }}</h1>
     
     {% block content %}{% endblock content %}
     {% autoescape off %}
@@ -180,9 +184,10 @@
 
   <!-- Optional JavaScript -->
 	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	
 
 	<!-- Select with search -->
 <!-- 	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />

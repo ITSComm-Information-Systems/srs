@@ -29,13 +29,7 @@ class FeaturesForm(forms.Form):
         fields = ('name', 'description',) 
 
 
-
 class RestrictionsForm(forms.Form):
-    #restrictions = forms.ModelMultipleChoiceField(
-    #    queryset=Restriction.objects.all(), 
-    #    widget=forms.CheckboxSelectMultiple(),
-    #)
-
     res = Restriction.objects.all()
     list = FeatureCategory.objects.all()
 
@@ -45,10 +39,14 @@ class RestrictionsForm(forms.Form):
     template = 'order/restrictions.html'
 
 
-
 class AddlInfoForm(forms.Form):
-    #contact = forms.BooleanField(label='Are you the on-site contact person?')
-    #contact = forms.ChoiceField(label='Are you the on-site contact person?', widget=YesNoInput, choices=(('Y', 'Yes',), ('N', 'No',)))
+    TRUE_FALSE_CHOICES = (
+    (True, 'Yes'),
+    (False, 'No')
+    )
+
+    contact_yn = forms.ChoiceField(choices = TRUE_FALSE_CHOICES, label="Are you the on site contact?", required=True)
+    contact_yn.type = 'Radio'
     contact_id = forms.CharField(label='Uniqname', max_length=8)
     contact_name = forms.CharField(label='Name', max_length=40)
     contact_number = forms.CharField(label='Best number to contact.', max_length=8)
@@ -64,18 +62,7 @@ class ReviewForm(forms.Form):
 
 
 class NewLocationForm(forms.Form):
-    label = 'Location Form'
-    campuses= [
-    ('A', 'Ann Arbor'),
-    ('F', 'Flint'),
-    ('D', 'Dearborn'),
-    ('O', 'Off site'),
-    ]
-    
-
     building_list = UmOSCBuildingV.objects.all()
-
-    Campus = forms.ChoiceField(choices=campuses)
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
@@ -84,26 +71,18 @@ class NewLocationForm(forms.Form):
 
 
 class EquipmentForm(forms.Form):
-    #equipment = forms.ModelMultipleChoiceField(
-    #    queryset=Product.objects.all(), 
-    #    widget=forms.RadioSelect,
-    #)
-    #  "/opt/app-root/src/media/pictures/Z-002968_2500w_tap.jpg"
-    list = Product.objects.all().filter(category=1).order_by('display_seq_no')  # TODO add more types
+    cat = ['Basic','VOIP']
+    cat[0] = Product.objects.all().filter(category=1).order_by('display_seq_no')
+    cat[0].id = 1
+    cat[1] = Product.objects.all().filter(category=2).order_by('display_seq_no') 
+    cat[1].id = 2
     template = 'order/products.html'
 
 
-class LocationForm(forms.Form):
-    label = 'Location Form'
-    campuses= [
-    ('A', 'Ann Arbor'),
-    ('F', 'Flint'),
-    ('D', 'Dearborn'),
-    ]
-
+class PhoneLocationForm(forms.Form):
     phone_number = forms.CharField(label='Current Phone Number')
-    Campus = forms.ChoiceField(choices=campuses)
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
-    template = 'order/location.html'
+    jack = forms.CharField(max_length=100)
+    template = 'order/phone_location.html'
