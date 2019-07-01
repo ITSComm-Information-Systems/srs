@@ -3,7 +3,8 @@ $(document).ready(function() {
 
 	currStep = 1;
     lastStep = 3; //document.getElementsByClassName("tab-pane").length;
-    
+    $("#buildingFields").hide();
+    $("#buildingTable").hide();
     $("#buildingSearch").on("keyup", function() {
         $("#buildingTable").show();
         var value = $(this).val().toLowerCase();
@@ -31,7 +32,6 @@ $(document).ready(function() {
 	$("#vlPrevBtn").click(function(event) {
 		nextPrev(-1);
 	});
-
 });
 
 function nextPrev(n) {
