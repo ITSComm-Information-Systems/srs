@@ -49,7 +49,7 @@ class Element(Configuration):
 
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
-    attributes = models.CharField(blank=True, max_length=100)
+    attributes = models.CharField(blank=True, max_length=1000)
     target = models.CharField(max_length=80, blank=True, null=True)
 
 
@@ -71,7 +71,10 @@ class Service(Configuration):
     active = models.BooleanField(default=True)
 
 
-class FeatureCategory(Configuration):
+class FeatureCategory(models.Model):
+    name = models.CharField(max_length=20)
+    label = models.CharField(max_length=100)
+    display_seq_no = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name
@@ -142,7 +145,7 @@ class Chartcom(models.Model):
     name = models.CharField(max_length=120)
 
     def __str__(self):
-        return self.name
+        return self.fund
 
     @property
     def account_number(self):
@@ -172,12 +175,22 @@ class UserChartcomV(models.Model):
         db_table = 'order_user_chartcom'
 
 
+class Order(models.Model):
+    order_reference = models.CharField(max_length=20)
+    create_date = models.DateTimeField('Date Created', auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20)
+
+
 class Item(models.Model):
     description = models.CharField(max_length=100)
     create_date = models.DateTimeField('Date Created', auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     deptid = models.CharField(max_length=8)
     chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True)
     data = JSONField()
 
     def __str__(self):

@@ -1,0 +1,40 @@
+<p>
+  Look Up Building Name or ID
+  <input id="buildingSearch" type="text" placeholder="Search.." onkeyup = "myFunction()">
+
+  <table id="buildingTable" class="table table-hover">
+  {% for building in building_list %}
+    <tr id="{{ building.0 }}">
+      <td>{{ building.0 }}</td>
+      <td name="buildingName">{{ building.1 }}</td>
+    </tr>
+  {% endfor %}
+  </table>
+</p>
+
+
+<div class="form-group" id="buildingFields">
+    <div class="col-xs-4">
+        <label for="id_OneTimeCharges">Building Code:</label>
+        <input type="text" name="buildingCode" required="" id="buildingID" class=" form-control">
+
+        <label for="id_OneTimeCharges">Building Name:</label>
+        <input type="text" name="buildingName" required="" id="buildingName" class=" form-control">
+
+        <label for="id_OneTimeCharges">Floor:</label>
+        <input type="text" name="buildingFloor" required="" id="buildingFloor" class=" form-control">
+        <div class="invalid-feedback">Please enter floor.</div>
+
+        <label for="id_OneTimeCharges">Room:</label>
+        <input type="text" name="buildingRoom" required="" id="buildingRoom" class=" form-control">
+        <div class="invalid-feedback">Please enter room.</div>
+
+        <label for="id_OneTimeCharges">Jack:</label>
+        <input type="text" name="buildingJack" required="" id="buildingRoom" class=" form-control">
+        <div class="invalid-feedback">Please enter jack.</div>
+    </div>
+</div>
+
+<script>
+
+</script>

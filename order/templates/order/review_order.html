@@ -11,7 +11,7 @@
             <div class="row">
                 <form action="/orders/submit/" id="order-processing-form" method="POST">{% csrf_token %}
                     {% for order in order_list %}
-                    <input type="hidden" id="order{{order.num}}" name="orders" value="{{order.num}}">
+                    <input type="hidden" id="order{{order.num}}" name="order[]" value="{{order.num}}">
                     <strong>Order #{{order.num}}</strong>
                     <div class="col-12">
                         <div class="row">
