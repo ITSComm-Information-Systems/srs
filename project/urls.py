@@ -16,6 +16,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('reports/',include('reports.urls')),
     path('cf_get_dept/', views.get_dept),
+    path('chartchange/ajax/', views.change_dept),
+    path('chartchange/old-cf/', views.get_cf_data),
     path('chartchange/<str:dept_parm>/change-dept/to<str:change_dept>/', views.chartchange),
     path('chartchange/<str:dept_parm>/change-dept/', views.change_dept),
     path('chartchange/<str:dept_parm>/', views.chartchange),

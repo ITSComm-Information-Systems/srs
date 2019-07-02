@@ -23,8 +23,11 @@ from oscauth.models import AuthUserDept
 from datetime import datetime
 from django.contrib.auth.decorators import login_required, permission_required
 
+import json
+from django.http import JsonResponse
 
-@login_required
+
+#@login_required
 @permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
 def get_dept(request):
     if request.method == 'POST':
@@ -32,17 +35,17 @@ def get_dept(request):
         return HttpResponseRedirect('/chartchange/' + dept_parm + '/')
 
 
-@login_required
-@permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
-def change_dept(request, dept_parm):
-	if request.method == "POST":
-		change_dept = request.POST['select_dept']
-		return HttpResponseRedirect(request.get_full_path() + 'to' + change_dept + '/')
+# @login_required
+# @permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
+# def change_dept(request, dept_parm):
+# 	if request.method == "POST":
+# 		change_dept = request.POST['select_dept']
+# 		return HttpResponseRedirect(request.get_full_path() + 'to' + change_dept + '/')
 
 
 
 
-@login_required
+#@login_required
 @permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
 def chartchange(request, dept_parm='', change_dept=''):
 	template = loader.get_template('chartchange.html')
@@ -59,21 +62,21 @@ def chartchange(request, dept_parm='', change_dept=''):
 	# if select_dept not in user_depts:
 	# 	template = loader.get_template('403.html')
 	# 	return HttpResponse(template.render({'title':'uh oh'}, request))
-	if request.GET.get('deptids') is None:
-		select_dept = user_depts[0]
-	else:
-		select_dept = request.GET.get('deptids')
+	# if request.GET.get('deptids') is None:
+	# 	select_dept = user_depts[0]
+	# else:
+	# 	select_dept = request.GET.get('deptids')
 
-	# Get dept info from selected dept
+	# Set intitial department
+	select_dept = user_depts[0]
 	find_dept_info = UmOscDeptProfileV.objects.filter(deptid=select_dept)
 	dept = find_dept_info[0]
 	dept_info = {
 		'dept_id': select_dept,
-		'dept_name': dept.dept_name,
-		'dept_mgr': dept.dept_mgr
+		'dept_name': dept.dept_name
 	}
 
-	# Find chartfields and details for selected department
+	# Set intitial chartfields
 	chartfield_list = UmOscAcctsInUseV.objects.filter(deptid=select_dept).order_by('account_number')
 
 	# Determine selected chartfield
@@ -157,7 +160,7 @@ def chartchange(request, dept_parm='', change_dept=''):
 	return HttpResponse(template.render(context, request))
 
 
-@login_required
+#@login_required
 @permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
 def get_chartfield(request):
 	template = loader.get_template('test.html')
@@ -172,3 +175,34 @@ def get_chartfield(request):
 def get_table(request):
 	selected_users = request.GET.get('selected', None)
 	all_users = request.GET.get('all_users', None)
+
+
+
+
+
+def change_dept(request):
+	selected_dept = request.GET.get('deptids', None)
+	cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
+
+	find_name = UmOscDeptProfileV.objects.filter(deptid=selected_dept)
+	find_name = find_name[0]
+	name = { 'name': find_name.dept_name }
+	cf_options.append(name)
+
+	return JsonResponse(cf_options, safe=False)
+
+def get_cf_data(request):
+	selected_cf = request.GET.get('selected', None)
+	cf_data = list(UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values())
+
+	# Find chartfield nickname
+	nickname = ''
+	nicknames = Chartcom.objects.all()
+	for n in nicknames:
+		if n.account_number == selected_cf:
+			nickname = n.name
+
+	nn = {'nickname': nickname }
+	cf_data.append(nn)
+
+	return JsonResponse(cf_data, safe=False)
