@@ -75,6 +75,49 @@ $(document).ready(function() {
   $('#contact_number').hide();
 
 
+  $("#analogIPpci_A").click(function() {
+    $('#pills-step4').addClass(' hidden');
+  
+    $('#pills-step2').removeClass(' hidden');
+    $('#pills-step3').removeClass(' hidden');
+    $('#pills-step5').removeClass(' hidden');
+
+    basicPhone()
+  });
+
+  $("#analogIPpci_IP").click(function() {
+    $('#pills-step4').removeClass(' hidden');
+  
+    $('#pills-step2').addClass(' hidden');
+    $('#pills-step3').addClass(' hidden');
+    $('#pills-step5').addClass(' hidden');
+
+    voipPhone();
+  });
+
+  $("#analogIPFax_A").click(function() {
+    $('#pills-step4').addClass(' hidden');
+    $('#pills-step5').addClass(' hidden');
+  
+    $('#pills-step2').removeClass(' hidden');
+    $('#pills-step3').removeClass(' hidden');
+    $('#pills-step6').removeClass(' hidden');
+
+    basicPhone()
+  });
+
+  $("#analogIPFax_IP").click(function() {
+    $('#pills-step4').removeClass(' hidden');
+    $('#pills-step5').removeClass(' hidden');
+
+    $('#pills-step2').addClass(' hidden');
+    $('#pills-step3').addClass(' hidden');
+    $('#pills-step6').addClass(' hidden');
+
+    voipPhone();
+  });
+
+
   //Phone
   $("#phoneSetType_B").click(function() {
     basicPhone();
@@ -178,7 +221,7 @@ $(document).ready(function() {
     $("#ModelInfo").hide();
     $("#ModelInfo_review").hide();
     $("#PhoneModelNum").hide();
-    $('#pills-step3').removeClass(' hidden');
+    $('#pills-step4').removeClass(' hidden');
   });
 
   $("#purchasePhone_N").click(function() {
@@ -186,7 +229,7 @@ $(document).ready(function() {
     $("#ModelInfo_review").show();
     $("#PhoneSetType").hide();
     $("#PhoneSetType_review").hide();
-    $('#pills-step3').addClass(' hidden');
+    $('#pills-step4').addClass(' hidden');
   });
 
 
