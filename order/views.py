@@ -123,6 +123,7 @@ class Workflow(PermissionRequiredMixin, View):
                         field = forms.ChoiceField(label=element.label
                                                 , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user.id))
                                                                                 #AuthUserDept.get_order_departments(request.user.id)
+                        field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
 
 
                     elif element.type == 'ST':

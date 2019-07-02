@@ -355,3 +355,12 @@ function advancedPhone() {
     $("#rescat2").hide();
     $("#rescat3").hide();
   }
+
+
+  function filterChartcom(id, value) {
+    console.log('usa:' + value);
+    //$("#edit-field-service-sub-cat-value option[value=" + title + "]").hide();
+    //$(id).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    //$('.city').find('option:contains('Aurangabad)').hide();
+    //$(#id_oneTimeCharges).find([data-dept='481060']).hide();
+  }
