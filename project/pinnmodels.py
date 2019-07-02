@@ -880,7 +880,7 @@ class UmOscRatedV(models.Model):
 
 
 class UmOscReptInvlocV(models.Model):
-     id =  models.BigIntegerField( null=True,primary_key=True)                                     
+     id =  models.BigIntegerField(primary_key=True)                                     
      billing_date =  models.DateField(null=True)                                  
      subscriber_id =  models.CharField(max_length=7, blank=True, null=True)       
      user_defined_id =  models.CharField(max_length=20, blank=True, null=True)    
@@ -920,7 +920,7 @@ class UmOscReptInvlocV(models.Model):
        
      class Meta:
           managed = False
-          ordering = ('billing_date','org','chartfield','user_deinfed_id','rptorder','item_code')
+          ordering = ('billing_date','org','chartfield','user_defined_id','rptorder','item_code')
           db_table = 'PINN_CUSTOM\".\"um_osc_rept_invloc_v'
 
 
