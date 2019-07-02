@@ -1,0 +1,75 @@
+{% if submit %}
+<div>
+ <p>Phone Number: {{ phone_number }}</p>
+</div>
+<table cellpadding = "10">
+    <th></th>
+    <th>Campus</th>
+    <th>Building</th>
+    <th>Bldg ID</th>
+    <th>Floor</th>
+    <th>Room</th>
+    <th>Jack</th>
+    {% for jack in current %}
+    
+    <tr id = '{{jack}}'>
+        <td><input type="radio" method: "GET" style='font-size:20px' name = 'jacks' value ="{{jack.14}}"></td>
+        <td> {{jack.1}} </td>
+        <td> {{jack.9}} </td>
+        <td> {{jack.8}} </td>
+        <td> {{jack.10}} </td>
+        <td> {{jack.12}} </td>
+        <td> {{jack.14}} </td>
+        
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+    $(document).ready( function(){
+         $('input[type=radio][name=jacks]').change(function () {
+            var jack = $(this).val();
+            $.ajax({
+                type: "GET",
+                url: "",
+                data: {
+                    'jacks': jack,
+            },
+            dataType: 'json',
+            success: function(data) {
+                console.log(typeof data.selected)
+                document.getElementById('r').innerHTML = "Phone Number: " + data.phone_number;
+                document.getElementById('r1').innerHTML = "Campus: " + data.selected[0][1];
+                document.getElementById('r2').innerHTML = "Building Name: " + data.selected[0][9];
+                document.getElementById('r3').innerHTML = "Building ID: " + data.selected[0][8];
+                document.getElementById('r4').innerHTML = "Floor: " + data.selected[0][10];
+                document.getElementById('r5').innerHTML = "Room: " + data.selected[0][12];      
+                document.getElementById('r6').innerHTML = "Jack: " + data.selected[0][14];
+            },
+            error: function(data) {
+                alert("this fucking sucks");
+            }
+    });
+  });
+    });
+</script>
+
+{% comment %} function selected_jack(jack) {
+        console.log(typeof jack);
+        document.getElementById("display").innerHTML = jack;
+        $.ajax({
+            type: "GET",
+            url: "/tools/voip/jack/",
+            data: {
+                'selected': jack,
+            },
+            dataType: 'json',
+            success: function(data) {
+                alert(data);
+            },
+            error: function(data) {
+                alert("this fucking sucks");
+            }
+        });
+    } {% endcomment %}

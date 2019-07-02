@@ -3,7 +3,13 @@
 
     <!-- Beginning of Content -->
     <div id="main-content" class="container" role="main">
-            <h1>Order Status</h1>
+            <h1>Orders 
+                <small class="text-muted">
+                for Department: 
+                    <strong>{{department.id}} - {{department.name}}
+                    </strong>
+                </small>
+            </h1>
             <div class="container" role="main">
                 <div class="row">
                     <div class="col-lg-12">
@@ -95,68 +101,32 @@
                                     </tr>
                                 </thead>
                                 <!-- End of table headers -->
-    
+
                                 <!-- Beginning of table body -->
                                 <tbody>
-    
+
+                                    {% for order in order_list %}
                                     <!-- First table row -->
                                     <tr>
-                                        <th scope="row">12345</th>
-                                        <td>12/12/12</td>
-                                        <td>frga</td>
-                                        <td>Telecommunications</td>
+                                        <th scope="row">{{order.order_reference}}</th>
+                                        <td>{{ order.create_date|date:"m/d/y" }}</td>
+                                        <td>{{ order.created_by }}</td>
+                                        <td>{{ order.service }}</td>
                                         <td>
                                             <ul>
+                                                {% for item in order.items %}
                                                 <li>
-                                                    Add/Activate a new phone line and activate a data line at 1100 N. UNIVERSITY
-                                                        BLDG (1000188)
+                                                    {{ item.description }}
                                                 </li>
+                                                {% endfor %}
                                             </ul>
                                         </td>
-                                        <td>Academic Computing Site</td>
-                                        <td>Submitted</td>
+                                        <td>{{ order.chartcom }}</td>
+                                        <td>{{order.status}}</td>
                                         <td>Cancel</td>
                                     </tr>
                                     <!-- end of table row 1 -->
-    
-                                    <!-- Beginning of second table row -->
-                                    <tr>
-                                        <th scope="row">678912</th>
-                                        <td>01/11/11</td>
-                                        <td>prddd</td>
-                                        <td>Telecommunications</td>
-                                        <td>
-                                            <ul>
-                                                <li>
-                                                    Add/Activate a new phone line and activate a data line at ADMINISTRATIVE SERVICES (1000815)
-                                                </li>
-                                                <li>
-                                                    Equipment Order: Order (1) Handset Cord Mod/Mod 12ft - Ash:Adirondak 9200-12-V (Z-000558)
-                                                </li>
-                                            </ul>
-                                        </td>
-                                        <td>Academic Computing Site</td>
-                                        <td>Schedule for: 3/2/19</td>
-                                        <td>Cancel</td>
-                                    </tr>
-                                    <!-- End of second row -->
-    
-                                    <!-- Beginning of third Table row -->
-                                    <tr>
-                                        <th scope="row">45678</th>
-                                        <td>05/15/19</td>
-                                        <td>jwalfish</td>
-                                        <td>Telecommunications</td>
-                                        <td>
-                                            <ul>
-                                                <li>Change calling range/restrictions for phone number (734)555-5555</li>
-                                            </ul>
-                                        </td>
-                                        <td>Academic Computing Site</td>
-                                        <td>Done & Awaiting Billing</td>
-                                        <td>Cancel</td>
-                                    </tr>
-                                    <!-- End of thrid row -->
+                                    {% endfor %}
                                 </tbody>
                                 <!-- End of table body -->
                             </table>

@@ -567,7 +567,7 @@ class UmOscAllActiveAcctNbrsV(models.Model):
         db_table = 'PINN_CUSTOM\".\"um_osc_all_active_acct_nbrs_v'
 
 class UmOscAvailableLocsV(models.Model):
-     campus_code = models.CharField(max_length=4)
+     campuscd = models.CharField(max_length=4)
      campus_desc = models.CharField(max_length=30)
      service_type = models.CharField(max_length=20)
      service_number = models.CharField(max_length=60, primary_key=True)
