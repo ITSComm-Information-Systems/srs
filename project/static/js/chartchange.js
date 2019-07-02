@@ -201,7 +201,6 @@ $(document).ready(function() {
 			},
 			dataType:'json',
 			success: function(data) {
-				alert('yay :-)))');
 				test = data;
 				$("#caption").html(data[0].account_number);
 				$("#fund").html(data[0].fund);
