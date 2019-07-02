@@ -74,6 +74,24 @@ $(document).ready(function() {
   $('#contact_name').hide();
   $('#contact_number').hide();
 
+
+  //Phone
+  $("#phoneSetType_B").click(function() {
+    basicPhone();
+    $("#equip2").hide();
+    $("#equip1").show();
+  });
+
+  $("#phoneSetType_A").click(function() {
+    advancedPhone();
+  });
+
+  $("#phoneSetType_V").click(function() {
+    voipPhone();
+    $("#equip1").hide();
+    $("#equip2").show();
+  });
+
   //Phone
   $("#PhoneSetType_B").click(function() {
     basicPhone();
@@ -146,6 +164,24 @@ $(document).ready(function() {
   });
 
   $("#PurchasePhone_N").click(function() {
+    $("#ModelInfo").show();
+    $("#ModelInfo_review").show();
+    $("#PhoneSetType").hide();
+    $("#PhoneSetType_review").hide();
+    $('#pills-step3').addClass(' hidden');
+  });
+
+
+  $("#purchasePhone_Y").click(function() {
+    $("#PhoneSetType").show();
+    $("#PhoneSetType_review").show();
+    $("#ModelInfo").hide();
+    $("#ModelInfo_review").hide();
+    $("#PhoneModelNum").hide();
+    $('#pills-step3').removeClass(' hidden');
+  });
+
+  $("#purchasePhone_N").click(function() {
     $("#ModelInfo").show();
     $("#ModelInfo_review").show();
     $("#PhoneSetType").hide();
