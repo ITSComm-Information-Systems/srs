@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container">
+<!-- <div class="container">
     <form action="/reports/doc/report/" method="POST" name="Select">{% csrf_token %}
         <div class="form-group">
             <h5>Select Department</h5>
@@ -52,6 +52,24 @@
 
 {% block js %}
 
-<script src="/../static/doc.js"></script>
+<script src="/../static/doc.js"></script> -->
 
+
+<div id="main-content" class="container" role="main">
+    <div class="container" role="main">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="message">
+                    <hr class="style1">
+                    <p>
+                        This report is currently under construction.<br>
+                        If you would like to run this report, please visit the Online Service Center and click on Detail of Charges under reports.
+                    </p>
+                    <a href="https://blue.itcom.itd.umich.edu/UofM/WebObjects/OnlineServiceCenter.woa/1/" class="btn btn-outline-primary" role="button">Online Service Center</a>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

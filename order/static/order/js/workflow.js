@@ -74,6 +74,67 @@ $(document).ready(function() {
   $('#contact_name').hide();
   $('#contact_number').hide();
 
+
+  $("#analogIPpci_A").click(function() {
+    $('#pills-step4').addClass(' hidden');
+  
+    $('#pills-step2').removeClass(' hidden');
+    $('#pills-step3').removeClass(' hidden');
+    $('#pills-step5').removeClass(' hidden');
+
+    basicPhone()
+  });
+
+  $("#analogIPpci_IP").click(function() {
+    $('#pills-step4').removeClass(' hidden');
+  
+    $('#pills-step2').addClass(' hidden');
+    $('#pills-step3').addClass(' hidden');
+    $('#pills-step5').addClass(' hidden');
+
+    voipPhone();
+  });
+
+  $("#analogIPFax_A").click(function() {
+    $('#pills-step4').addClass(' hidden');
+    $('#pills-step5').addClass(' hidden');
+  
+    $('#pills-step2').removeClass(' hidden');
+    $('#pills-step3').removeClass(' hidden');
+    $('#pills-step6').removeClass(' hidden');
+
+    basicPhone()
+  });
+
+  $("#analogIPFax_IP").click(function() {
+    $('#pills-step4').removeClass(' hidden');
+    $('#pills-step5').removeClass(' hidden');
+
+    $('#pills-step2').addClass(' hidden');
+    $('#pills-step3').addClass(' hidden');
+    $('#pills-step6').addClass(' hidden');
+
+    voipPhone();
+  });
+
+
+  //Phone
+  $("#phoneSetType_B").click(function() {
+    basicPhone();
+    $("#equip2").hide();
+    $("#equip1").show();
+  });
+
+  $("#phoneSetType_A").click(function() {
+    advancedPhone();
+  });
+
+  $("#phoneSetType_V").click(function() {
+    voipPhone();
+    $("#equip1").hide();
+    $("#equip2").show();
+  });
+
   //Phone
   $("#PhoneSetType_B").click(function() {
     basicPhone();
@@ -151,6 +212,24 @@ $(document).ready(function() {
     $("#PhoneSetType").hide();
     $("#PhoneSetType_review").hide();
     $('#pills-step3').addClass(' hidden');
+  });
+
+
+  $("#purchasePhone_Y").click(function() {
+    $("#PhoneSetType").show();
+    $("#PhoneSetType_review").show();
+    $("#ModelInfo").hide();
+    $("#ModelInfo_review").hide();
+    $("#PhoneModelNum").hide();
+    $('#pills-step4').removeClass(' hidden');
+  });
+
+  $("#purchasePhone_N").click(function() {
+    $("#ModelInfo").show();
+    $("#ModelInfo_review").show();
+    $("#PhoneSetType").hide();
+    $("#PhoneSetType_review").hide();
+    $('#pills-step4').addClass(' hidden');
   });
 
 
