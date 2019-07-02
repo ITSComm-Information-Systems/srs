@@ -159,14 +159,58 @@ $(document).ready(function() {
 	$('#chart_deptids').on('change', function() {
 		var sel = document.getElementById("chart_deptids");
 		var selected = sel.options[sel.selectedIndex].value;
+
 		$.ajax({
-			url: '/chartchange/',
+			url: '/chartchange/ajax/',
 			data: {
 				'deptids':selected
 			},
 			dataType:'json',
+			// Reset chartfield options when department changes
 			success: function(data) {
-				alert('Congratulations, Rachel! You were successful.');
+				test = data;
+				$('#cf_dropdown').empty();
+				for (i = 0; i < data.length - 1; ++i) {
+					var drp = document.getElementById('cf_dropdown');
+					var option = document.createElement("OPTION");
+					option.value = data[i].account_number;
+					option.text = data[i].account_number;
+					if (i == 0) {
+						// drp.addClass('disabled');
+						// drp.addClass('selected');
+						// drp.add(option);
+						// drp.removeClass('disabled');
+						// drp.removeClass('selected');
+					}
+					drp.add(option);
+				}
+				$('#dept_title').html('Department: ' + selected + ' - ' + data[data.length - 1].name);
+			}
+		})
+	})
+
+	// Select a chartfield
+	$('#cf_dropdown').on('change', function() {
+		var sel = document.getElementById("cf_dropdown");
+		var selected = sel.options[sel.selectedIndex].value;
+
+		$.ajax({
+			url: '/chartchange/old-cf/',
+			data: {
+				'selected': selected
+			},
+			dataType:'json',
+			success: function(data) {
+				alert('yay :-)))');
+				test = data;
+				$("#caption").html(data[0].account_number);
+				$("#fund").html(data[0].fund);
+				$("#dept_id").html(data[0].deptid);
+				$("#program").html(data[0].program);
+				$("#class_code").html(data[0].class_code);
+				$("#project_grant").html(data[0].project_grant);
+				$("#shortcode").html(data[0].shortcode);
+				$("#nickname").html(data[1].nickname);
 			},
 			error: function(data) {
 				alert('uh oh');
@@ -311,29 +355,3 @@ function maintain_checks(row_id) {
 		}
 	}
 }
-
-// function load_3() {
-// 	var selected = [];
-
-// 	cf_change_table.rows().every(function(index, element) {
-// 			var row = $(this.node());
-// 			var col0 = row.find('td:first-child input[type="checkbox"]'); // checkbox
-// 			var col1 = row.find('td:nth-child(2)').val(); // User ID
-
-// 			if (col0.is(':checked')) {
-// 				selected.append(col1);
-// 			}
-// 		})
-
-// 	$.ajax({
-// 		url: '/chartchange/{{ dept_info.dept_id }}/',
-// 		type: "POST",
-// 		data: {
-// 			'selected':selected
-// 		},
-// 		dataType:'json',
-// 		success: function(data) {
-// 			alert('Congratulations, Rachel! You were successful.');
-// 		}
-// 	})
-// }
