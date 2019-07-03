@@ -160,15 +160,24 @@ class Chartcom(models.Model):
         user_chartcoms = []
         
         for chartcom in chartcom_list:
-            user_chartcoms.append((chartcom.chartcom_id, chartcom.name))
+            user_chartcoms.append((chartcom.chartcom_id, chartcom.name, chartcom.dept))
 
         return user_chartcoms
 
+    def get_user_chartcom_depts(self):
+        dept_list = UserChartcomV.objects.filter(user=self).order_by('dept').distinct('dept')
+        user_chartcom_depts = []
+        
+        for chartcom in dept_list:
+            user_chartcom_depts.append((chartcom.dept))
+
+        return user_chartcom_depts
 
 class UserChartcomV(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     chartcom = models.ForeignKey(Chartcom, on_delete=models.PROTECT)
     name = models.CharField(max_length=20, blank=True, primary_key=True)
+    dept = models.CharField(max_length=30)
 
     class Meta:
         managed = False
