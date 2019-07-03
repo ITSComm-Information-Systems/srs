@@ -41,7 +41,7 @@
         <section class="row" role="contentinfo">
             <div class="container">
                 <div class="row cart-tables">
-                    <form action="/orders/review/" id="cart-department-dropdown" method="POST">{% csrf_token %}
+                    <form action="/orders/review/" id="cart-orders" method="POST" class="cart-table">{% csrf_token %}
                     <div class="col-12">
                         {% for chartcom in acct %}
                         <div class="cart-table">
