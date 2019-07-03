@@ -24,7 +24,6 @@
                                     </label>
                                 </div>
                                 <select name="deptid" class="custom-select order-status-dropdown" id="department-dropdown">
-                                    <option selected>-- Select --</option>
                                     {% for dept in dept_list %}
                                     <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
                                     {% endfor %}
@@ -61,7 +60,7 @@
                                         <th scope="col">Service Type</th>
                                         <th scope="col">Details</th>
                                         <th scope="col">Action</th>
-                                        <th scope="col">Include in Order</th>
+                                        <th scope="col">Ready to Order</th>
                                     </tr>
                                 </thead>
 
@@ -75,8 +74,10 @@
                                         <td>{{ item.created_by }}</td>
                                         <td>{{ item.service }}</td>
                                         <td>{{ item.details }}</td>
-                                        <td class="action"><a class="edit" href="#">Edit</a><br><a
-                                                class="delete" href="#">Delete</a></td>
+                                        <td class="action">
+                                            <a class="edit" href="#">Edit</a>
+                                            <a class="delete" href="#">Delete</a>
+                                        </td>
                                         <td>
                                             <div class="custom-control">
                                                 <input type="checkbox" name="includeInOrder" id="addItem{{item.id}}" value="{{item.id}}">
