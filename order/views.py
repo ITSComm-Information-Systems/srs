@@ -5,12 +5,27 @@ from django.views.generic import View
 from order.forms import *
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
-from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV
+from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceLocV
 from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from pages.models import Page
+from django.http import JsonResponse
 
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order
+
+
+def get_phone_location(request, phone_number):
+    #phone_number = request.GET.get('username', None)
+    loc = UmOscServiceLocV.objects.filter(service_number=phone_number).latest('billing_date')
+    print(loc)
+    data = {
+        'code': loc.building_id,
+        'name': loc.building,
+        'floor': loc.floor,
+        'room': loc.room,
+        'jack': loc.jack
+    }
+    return JsonResponse(data)
 
 
 class Submit(PermissionRequiredMixin, View):
