@@ -621,3 +621,7 @@ input:checked + .slider:before {
 .checkbox-label {
 	display: none;
 }
+
+.cart-table {
+	width: 100%;
+}
