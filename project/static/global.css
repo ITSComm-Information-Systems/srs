@@ -625,3 +625,20 @@ input:checked + .slider:before {
 .cart-table {
 	width: 100%;
 }
+
+.italic-msg {
+	margin-top:1rem;
+}
+
+.italic-msg em {
+	color:#D9534F;
+}
+.tracking-msg {
+	display: block;
+	color:#D9534F;
+}
+
+.cart-button {
+	display: flex;
+	justify-content: flex-end;
+}
