@@ -14,6 +14,9 @@ urlpatterns = [
     path('services/', Services.as_view()),
     path('wf/<int:action_id>', Workflow.as_view()),
 
+    path('chartcom/<int:deptid>', views.ManageChartcom.as_view()),
+    path('chartcom/', views.ManageChartcom.as_view()),
+
     path('ajax/get_phone_location/<str:phone_number>', views.get_phone_location, name='get_phone_location'),
 
 ]
