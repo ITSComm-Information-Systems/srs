@@ -27,6 +27,37 @@ def get_phone_location(request, phone_number):
     }
     return JsonResponse(data)
 
+class ManageChartcom(PermissionRequiredMixin, View):
+    permission_required = 'oscauth.can_order'
+
+    def post(self, request):
+        print(request.POST)
+        return HttpResponseRedirect('/orders/chartcom/' + request.POST['deptid'])
+
+    def get(self, request, deptid):
+        dept_list = AuthUserDept.get_order_departments(request.user.id)
+
+        for dept in dept_list:
+            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
+            dept.name = deptinfo.dept_name
+
+            if deptid == int(dept.dept):
+                department = {'id': dept.dept, 'name': deptinfo.dept_name}
+
+        if deptid == 0:
+            department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
+            deptid = dept_list[0].dept
+
+        chartcoms = Chartcom.objects.filter(dept=deptid)
+
+        template = loader.get_template('order/manage_chartfield.html')
+        context = {
+            'department': department,
+            'dept_list': dept_list,
+            'chartcoms': chartcoms,
+        }
+        return HttpResponse(template.render(context, request))
+
 
 class Submit(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
