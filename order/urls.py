@@ -13,4 +13,7 @@ urlpatterns = [
     path('review/', views.Review.as_view()),
     path('services/', Services.as_view()),
     path('wf/<int:action_id>', Workflow.as_view()),
+
+    path('ajax/get_phone_location/<str:phone_number>', views.get_phone_location, name='get_phone_location'),
+
 ]
