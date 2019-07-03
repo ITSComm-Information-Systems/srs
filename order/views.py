@@ -5,12 +5,58 @@ from django.views.generic import View
 from order.forms import *
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
-from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV
+from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceLocV
 from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from pages.models import Page
+from django.http import JsonResponse
 
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order
+
+
+def get_phone_location(request, phone_number):
+    #phone_number = request.GET.get('username', None)
+    loc = UmOscServiceLocV.objects.filter(service_number=phone_number).latest('billing_date')
+    print(loc)
+    data = {
+        'code': loc.building_id,
+        'name': loc.building,
+        'floor': loc.floor,
+        'room': loc.room,
+        'jack': loc.jack
+    }
+    return JsonResponse(data)
+
+class ManageChartcom(PermissionRequiredMixin, View):
+    permission_required = 'oscauth.can_order'
+
+    def post(self, request):
+        print(request.POST)
+        return HttpResponseRedirect('/orders/chartcom/' + request.POST['deptid'])
+
+    def get(self, request, deptid):
+        dept_list = AuthUserDept.get_order_departments(request.user.id)
+
+        for dept in dept_list:
+            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
+            dept.name = deptinfo.dept_name
+
+            if deptid == int(dept.dept):
+                department = {'id': dept.dept, 'name': deptinfo.dept_name}
+
+        if deptid == 0:
+            department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
+            deptid = dept_list[0].dept
+
+        chartcoms = Chartcom.objects.filter(dept=deptid)
+
+        template = loader.get_template('order/manage_chartfield.html')
+        context = {
+            'department': department,
+            'dept_list': dept_list,
+            'chartcoms': chartcoms,
+        }
+        return HttpResponse(template.render(context, request))
 
 
 class Submit(PermissionRequiredMixin, View):
@@ -123,6 +169,7 @@ class Workflow(PermissionRequiredMixin, View):
                         field = forms.ChoiceField(label=element.label
                                                 , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user.id))
                                                                                 #AuthUserDept.get_order_departments(request.user.id)
+                        field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
 
 
                     elif element.type == 'ST':

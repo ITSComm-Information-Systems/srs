@@ -303,7 +303,9 @@ function validateForm() {
     if (selected_text) {
       $(id).html(selected_text);
     } else {
-      $(id).html($(inp[i]).val());
+      text_box = $("#" + inp[i].id ).val();
+      console.log(id + '<>' + text_box);
+      $(id).html( text_box );
     }
 
     if (!inp[i].checkValidity()) {
@@ -355,3 +357,51 @@ function advancedPhone() {
     $("#rescat2").hide();
     $("#rescat3").hide();
   }
+
+
+  function filterChartcom(id, value) {
+    console.log('usa:' + value);
+    //$("#edit-field-service-sub-cat-value option[value=" + title + "]").hide();
+    //$(id).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    //$('.city').find('option:contains('Aurangabad)').hide();
+    //$(#id_oneTimeCharges).find([data-dept='481060']).hide();
+  }
+
+
+
+
+  $("#phoneLookup").click(function () {
+    var phone_number = $("#id_phone_number").val();
+    phone_number = phone_number.replace(/\D/g,'');
+
+    $("#phLocationFields").show();
+    $("#phBuildingID").val('');
+    $("#id_building").val('');
+    $("#id_floor").val('');
+    $("#id_room").val('');
+    $("#id_jack").val('');
+
+
+    $.ajax({
+      url: '/orders/ajax/get_phone_location/' + phone_number,
+      //data: {
+      //  'phone_number': '7347642793'
+      //},
+      dataType: 'json',
+      success: function (data) {
+
+        //alert(" phone found.");
+        if (data.code) {
+          $("#phLocationFields").show();
+          $("#phBuildingID").val(data.code);
+          $("#id_building").val(data.name);
+          $("#id_floor").val(data.floor);
+          $("#id_room").val(data.room);
+          $("#id_jack").val(data.jack);
+        } else {
+          alert("No phone found.");
+        }
+      }
+    });
+
+  });

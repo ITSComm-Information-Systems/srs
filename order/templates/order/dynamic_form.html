@@ -14,6 +14,31 @@
             {% endfor %}
             <br>
         </fieldset>
+    {% elif field.field.type == 'Chart' %}
+    <div class="form-group row col-12" id="oneTimeCharges">
+        <!--  -->
+        <div class="form-check">
+    <label for="id_{{ field.name }}">{{ field.label_tag }}</label>
+    <div class="input-group mb3">
+        <!-- Select a Department (based off user's department access) -->
+            <div class="input-group-prepend">
+                <select class="custom-select" id="id_deptOneTimeCharges" onchange="filterChartcom(this, this.value)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
+                    {% for dept in field.field.dept_list %}
+                        <option value="{{dept}}">{{dept}}</option>
+                    {% endfor %}                    
+                </select>
+            </div>
+
+            <!-- Select a Chartfield (based off user's selection for department that was selected above ^^^ - all options should be from department's shortlist) -->
+            <select class="custom-select" id="id_{{ field.name }}">
+                {% for choice in field.field.choices %}
+                    <option name="{{ field.name }} data-dept="{{ choice.2 }}" value="{{ choice.0 }}">{{ choice.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    </div>
+
     {% else %}
     <div class="form-group row col-4" id="{{ field.name }}">
         <div class = "form-check">
