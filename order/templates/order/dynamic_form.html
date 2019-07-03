@@ -30,7 +30,7 @@
             </div>
 
             <!-- Select a Chartfield (based off user's selection for department that was selected above ^^^ - all options should be from department's shortlist) -->
-            <select class="custom-select" id="id_{{ field.name }}">
+            <select name="{{ field.name }}" class="custom-select" id="id_{{ field.name }}">
                 {% for choice in field.field.choices %}
                     <option name="{{ field.name }} data-dept="{{ choice.2 }}" value="{{ choice.0 }}">{{ choice.1 }}</option>
                 {% endfor %}
