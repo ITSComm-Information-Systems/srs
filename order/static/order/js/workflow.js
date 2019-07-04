@@ -58,7 +58,7 @@ $(document).ready(function() {
 
   $("#activePhone_N").click(function() {
     $("#linesToInstall").show();
-    $('#pills-step2').addClass(' hidden');
+    $('#pills-step2').hide();  //.addClass(' hidden');
   });
 
   $("#conduit_Y").click(function() {
@@ -75,97 +75,148 @@ $(document).ready(function() {
   $('#contact_number').hide();
 
 
-  $("#analogIPpci_A").click(function() {
-    $('#pills-step4').addClass(' hidden');
+  //$("#analogIPpci_A").click(function() {
+  //  $('#pills-step4').addClass(' hidden');
   
-    $('#pills-step2').removeClass(' hidden');
-    $('#pills-step3').removeClass(' hidden');
-    $('#pills-step5').removeClass(' hidden');
+ //   $('#pills-step2').removeClass(' hidden');
+ //   $('#pills-step3').removeClass(' hidden');
+ //   $('#pills-step5').removeClass(' hidden');
 
-    basicPhone()
-  });
+ //   basicPhone()
+ // });
 
-  $("#analogIPpci_IP").click(function() {
-    $('#pills-step4').removeClass(' hidden');
+  //$("#analogIPpci_IP").click(function() {
+  //  $('#pills-step4').removeClass(' hidden');
   
-    $('#pills-step2').addClass(' hidden');
-    $('#pills-step3').addClass(' hidden');
-    $('#pills-step5').addClass(' hidden');
+  //  $('#pills-step2').addClass(' hidden');
+  //  $('#pills-step3').addClass(' hidden');
+  //  $('#pills-step5').addClass(' hidden');
 
-    voipPhone();
+  //  voipPhone();
+  //});
+
+
+  // data based radio actions
+  $('input[type=radio]').click(function(){
+
+    if(this.value=='basic'){
+      $('[data-phoneset="advanced"]').hide();
+      $('[data-phoneset="basic"]').show();
+      $('[data-phoneset="voip"]').hide();
+    }
+    if(this.value=='advanced'){
+      $('[data-phoneset="advanced"]').show();
+      $('[data-phoneset="basic"]').hide();
+      $('[data-phoneset="voip"]').hide();
+    }
+    if(this.value=='voip'){
+      $('[data-phoneset="advanced"]').hide();
+      $('[data-phoneset="basic"]').hide();
+      $('[data-phoneset="voip"]').show();
+    }
+
+    if (this.value=='buy'){
+      $('[data-tab="Equipment"]').show();
+    }
+
+    if (this.value=='nobuy'){
+      $('[data-tab="Equipment"]').hide();
+    }
+
+    if(this.name=='analogIPFax' || this.name=='analogIPpci'){
+      if(this.value=='basic') { // Analog
+        $('[data-tab="IPFaxInfo"]').hide();
+        $('[data-tab="2Chartfields"]').hide();
+        $('[data-tab="LocationNew"]').show();
+        $('[data-tab="Restrictions"]').show();
+        $('[data-tab="4Chartfields"]').show();
+      }
+      if(this.value=='voip'){
+        $('[data-tab="IPFaxInfo"]').show();
+        $('[data-tab="2Chartfields"]').show();
+        $('[data-tab="LocationNew"]').hide();
+        $('[data-tab="Restrictions"]').hide();
+        $('[data-tab="4Chartfields"]').hide();
+      }
+    }
+
+    console.log(this.name);
+
   });
 
-  $("#analogIPFax_A").click(function() {
-    $('#pills-step4').addClass(' hidden');
-    $('#pills-step5').addClass(' hidden');
+  //$("#analogIPFax_A").click(function() {
+    //$('#pills-step4').addClass(' hidden'); // IPFaxInfo
+    //$('#pills-step5').addClass(' hidden'); // 2Chartfields
   
-    $('#pills-step2').removeClass(' hidden');
-    $('#pills-step3').removeClass(' hidden');
-    $('#pills-step6').removeClass(' hidden');
+    //$('#pills-step2').removeClass(' hidden');  //LocationNew
+    //$('#pills-step3').removeClass(' hidden');  //Restrictions
+    //$('#pills-step6').removeClass(' hidden'); //4Chartfields
+    //$('[data-phoneset="advanced"]').show();
+    //$('[data-phoneset="basic"]').hide();
+    //$('[data-phoneset="voip"]').hide();
+    //basicPhone()
+  //});
 
-    basicPhone()
-  });
+  //$("#analogIPFax_IP").click(function() {
+    //$('#pills-step4').removeClass(' hidden'); // IPFaxInfo
+    //$('#pills-step5').removeClass(' hidden'); // 2Chartfields
 
-  $("#analogIPFax_IP").click(function() {
-    $('#pills-step4').removeClass(' hidden');
-    $('#pills-step5').removeClass(' hidden');
+    //$('#pills-step2').addClass(' hidden'); //LocationNew
+    //$('#pills-step3').addClass(' hidden'); //Restrictions
+    //$('#pills-step6').addClass(' hidden'); //4Chartfields
 
-    $('#pills-step2').addClass(' hidden');
-    $('#pills-step3').addClass(' hidden');
-    $('#pills-step6').addClass(' hidden');
-
-    voipPhone();
-  });
+    //voipPhone();
+  //});
 
 
   //Phone
-  $("#phoneSetType_B").click(function() {
-    basicPhone();
-    $("#equip2").hide();
-    $("#equip1").show();
-  });
+  //$("#phoneSetType_B").click(function() {
+  //  basicPhone();
+  //  $("#equip2").hide();
+  //  $("#equip1").show();
+  //});
 
-  $("#phoneSetType_A").click(function() {
-    advancedPhone();
-  });
+  //$("#phoneSetType_A").click(function() {
+  //  advancedPhone();
+  //});
 
-  $("#phoneSetType_V").click(function() {
-    voipPhone();
-    $("#equip1").hide();
-    $("#equip2").show();
-  });
+  //$("#phoneSetType_V").click(function() {
+  //  voipPhone();
+  //  $("#equip1").hide();
+  //  $("#equip2").show();
+  //});
 
   //Phone
-  $("#PhoneSetType_B").click(function() {
-    basicPhone();
-    $("#equip2").hide();
-    $("#equip1").show();
-  });
+  //$("#PhoneSetType_B").click(function() {
+  //  basicPhone();
+  //  $("#equip2").hide();
+  //  $("#equip1").show();
+  //});
 
-  $("#PhoneSetType_A").click(function() {
-    advancedPhone();
-  });
+  //$("#PhoneSetType_A").click(function() {
+  //  advancedPhone();
+  //});
 
-  $("#PhoneSetType_V").click(function() {
-    voipPhone();
-    $("#equip1").hide();
-    $("#equip2").show();
-  });
+  //$("#PhoneSetType_V").click(function() {
+  //  voipPhone();
+  //  $("#equip1").hide();
+  //  $("#equip2").show();
+  //});
 
-  $("#ModelInfo_V").click(function() {
-    voipPhone();
-    $("#PhoneModelNum").show();
-  });
+  //$("#ModelInfo_V").click(function() {
+  //  voipPhone();
+  //  $("#PhoneModelNum").show();
+  //});
   
-  $("#ModelInfo_A").click(function() {
-    advancedPhone();
-    $("#PhoneModelNum").show();
-  });
+  //$("#ModelInfo_A").click(function() {
+  //  advancedPhone();
+  //  $("#PhoneModelNum").show();
+  //});
 
-  $("#ModelInfo_B").click(function() {
-    basicPhone();
-    $("#PhoneModelNum").show();
-  });
+  //$("#ModelInfo_B").click(function() {
+  //  basicPhone();
+  //  $("#PhoneModelNum").show();
+  //});
 
   // Phone Type Tab
   $("#Jack_Y").click(function() {
@@ -203,7 +254,7 @@ $(document).ready(function() {
     $("#ModelInfo").hide();
     $("#ModelInfo_review").hide();
     $("#PhoneModelNum").hide();
-    $('#pills-step3').removeClass(' hidden');
+    //$('#pills-step3').show();  //removeClass(' hidden');
   });
 
   $("#PurchasePhone_N").click(function() {
@@ -211,7 +262,7 @@ $(document).ready(function() {
     $("#ModelInfo_review").show();
     $("#PhoneSetType").hide();
     $("#PhoneSetType_review").hide();
-    $('#pills-step3').addClass(' hidden');
+    //$('#pills-step3').hide();  //addClass(' hidden');
   });
 
 
@@ -221,7 +272,7 @@ $(document).ready(function() {
     $("#ModelInfo").hide();
     $("#ModelInfo_review").hide();
     $("#PhoneModelNum").hide();
-    $('#pills-step4').removeClass(' hidden');
+    $('#pills-step4').hide();  //.removeClass(' hidden');
   });
 
   $("#purchasePhone_N").click(function() {
@@ -229,7 +280,7 @@ $(document).ready(function() {
     $("#ModelInfo_review").show();
     $("#PhoneSetType").hide();
     $("#PhoneSetType_review").hide();
-    $('#pills-step4').addClass(' hidden');
+    $('#pills-step4').hide();  //.addClass(' hidden');
   });
 
 
@@ -280,7 +331,8 @@ function nextPrev(n) {
 
   currStep = currStep + n;
 
-  while ( $('#pills-step'+currStep).hasClass('hidden')) {
+  //while ( $('#pills-step'+currStep).hasClass('hidden')) {
+  while ( $('#pills-step'+currStep).is(':hidden')) {
     currStep = currStep + n;
   }
 
@@ -329,34 +381,6 @@ function validateForm() {
   return valid; // return the valid status
 }
 
-
-// Features & Restrictions
-function basicPhone() {
-  $("#cat3").show();
-  $("#cat2").hide();
-  $("#cat1").hide();
-  $("#rescat3").show();
-  $("#rescat2").hide();
-  $("#rescat1").hide();
-}
-
-function advancedPhone() {
-    $("#cat2").show();
-    $("#cat1").hide();
-    $("#cat3").hide();
-    $("#rescat2").show();
-    $("#rescat1").hide();
-    $("#rescat3").hide();
-  }
-
-  function voipPhone() {
-    $("#cat1").show();
-    $("#cat2").hide();
-    $("#cat3").hide();
-    $("#rescat1").show();
-    $("#rescat2").hide();
-    $("#rescat3").hide();
-  }
 
 
   function filterChartcom(id, value) {

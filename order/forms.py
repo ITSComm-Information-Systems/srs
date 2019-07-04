@@ -73,9 +73,9 @@ class NewLocationForm(forms.Form):
 class EquipmentForm(forms.Form):
     cat = ['Basic','VOIP']
     cat[0] = Product.objects.all().filter(category=1).order_by('display_seq_no')
-    cat[0].id = 1
+    cat[0].id = 'basic'
     cat[1] = Product.objects.all().filter(category=2).order_by('display_seq_no') 
-    cat[1].id = 2
+    cat[1].id = 'voip'
     template = 'order/products.html'
 
 
