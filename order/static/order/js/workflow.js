@@ -248,7 +248,7 @@ $(document).ready(function() {
     $("#PurchasePhone_review").show();
   });
 
-  $("#PurchasePhone_Y").click(function() {
+  $("#PurchasePhone_buy").click(function() {
     $("#PhoneSetType").show();
     $("#PhoneSetType_review").show();
     $("#ModelInfo").hide();
@@ -257,7 +257,7 @@ $(document).ready(function() {
     //$('#pills-step3').show();  //removeClass(' hidden');
   });
 
-  $("#PurchasePhone_N").click(function() {
+  $("#PurchasePhone_nobuy").click(function() {
     $("#ModelInfo").show();
     $("#ModelInfo_review").show();
     $("#PhoneSetType").hide();
@@ -266,21 +266,21 @@ $(document).ready(function() {
   });
 
 
-  $("#purchasePhone_Y").click(function() {
+  $("#purchasePhone_buy").click(function() {
     $("#PhoneSetType").show();
     $("#PhoneSetType_review").show();
     $("#ModelInfo").hide();
     $("#ModelInfo_review").hide();
     $("#PhoneModelNum").hide();
-    $('#pills-step4').hide();  //.removeClass(' hidden');
+    //$('#pills-step4').hide();  //.removeClass(' hidden');
   });
 
-  $("#purchasePhone_N").click(function() {
+  $("#purchasePhone_nobuy").click(function() {
     $("#ModelInfo").show();
     $("#ModelInfo_review").show();
     $("#PhoneSetType").hide();
     $("#PhoneSetType_review").hide();
-    $('#pills-step4').hide();  //.addClass(' hidden');
+    //$('#pills-step4').hide();  //.addClass(' hidden');
   });
 
 
