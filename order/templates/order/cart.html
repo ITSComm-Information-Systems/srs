@@ -24,47 +24,24 @@
                                     </label>
                                 </div>
                                 <select name="deptid" class="custom-select order-status-dropdown" id="department-dropdown">
-                                    <option selected>-- Select --</option>
                                     {% for dept in dept_list %}
                                     <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
                                     {% endfor %}
                                 </select>
-                                <input type="submit" class="btn btn-outline-secondary">
+                                <input type="submit" class="btn btn-outline-secondary" value="Go">
                             </div>
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
 
         <!-- <div class="row bulletin-announcements justify-content-start"> -->
-        <div class="row">
-            <div class="col-12 alert-row">
-                <!-- <div class="row alert-row"> -->
-                <div class="alert alert-primary alert-dismissable fade show" role="alert">
-                    <a href="#" class="alert-link">Learn</a>
-                    how to save money by bundling orders together
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="alert alert-danger alert dismissable fade show" role="alert">
-                    Cart items older than six months will be deleted,
-                    <a href="#" class="alert-link">Learn More</a>
-                    <button type="button" class="close " data-dismiss="alert" aria-label="close">
-                        <span class="dismiss-symbol" aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <!-- </div> -->
-            </div>
-        </div>
-
         <section class="row" role="contentinfo">
             <div class="container">
                 <div class="row cart-tables">
-                    <form action="/orders/review/" id="cart-department-dropdown" method="POST">{% csrf_token %}
-                    <div class="col-lg-10 col-md-12">
+                    <form action="/orders/review/" id="cart-orders" method="POST" class="cart-table">{% csrf_token %}
+                    <div class="col-12">
                         {% for chartcom in acct %}
                         <div class="cart-table">
                             <h2>
@@ -83,7 +60,7 @@
                                         <th scope="col">Service Type</th>
                                         <th scope="col">Details</th>
                                         <th scope="col">Action</th>
-                                        <th scope="col">Include in Order</th>
+                                        <th scope="col">Ready to Order</th>
                                     </tr>
                                 </thead>
 
@@ -97,8 +74,10 @@
                                         <td>{{ item.created_by }}</td>
                                         <td>{{ item.service }}</td>
                                         <td>{{ item.details }}</td>
-                                        <td class="action"><a class="edit" href="#">Edit</a><br><a
-                                                class="delete" href="#">Delete</a></td>
+                                        <td class="action">
+                                            <a class="edit" href="#">Edit</a>
+                                            <a class="delete" href="#">Delete</a>
+                                        </td>
                                         <td>
                                             <div class="custom-control">
                                                 <input type="checkbox" name="includeInOrder" id="addItem{{item.id}}" value="{{item.id}}">
@@ -120,9 +99,9 @@
                         {% endfor %}
 
                     </div>
-                    <div class="col-lg-10 col-md-12 cart-button">
+                    <div class="col-lg-11 col-md-12 cart-button">
                         <input type="submit" class="hidden" value="Review Order" id="cartReviewbtn">
-                        <label for="cartReviewbtn" class="btn btn-primary">Review Order</label>
+                        <label for="cartReviewbtn" class="btn btn-primary">Proceed to Checkout</label>
                     </div>
                 </form>
                 </div>
