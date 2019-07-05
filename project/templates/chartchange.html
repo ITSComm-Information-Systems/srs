@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container">
+{% comment %} <div class="container">
   <h1>
     Chartfield Change
     <small class="text-muted">
@@ -126,5 +126,25 @@
 
 {% block js %}
 <script type="text/javascript" src="/static/select.js"></script>
-<script src="/static/js/chartchange.js"></script>
+<script src="/static/js/chartchange.js"></script> {% endcomment %}
+<h1>
+    Chartfield Change
+    </h1>
+<div id="main-content" class="container" role="main">
+    <div class="container" role="main">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="message">
+                    <hr class="style1">
+                    <p>
+                        This tool is currently under construction.<br>
+                        If you would like to use this tool, click the button below.
+                    </p>
+                    <a href="https://itscommweb.itd.umich.edu/ChartfieldChange/" class="btn btn-outline-primary" role="button">Chartfield Change</a>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
