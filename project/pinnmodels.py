@@ -724,3 +724,203 @@ class UmOSCCampusBuildingV(models.Model):
 
      def __str__(self):
           return self.building_name
+
+
+class UmOscInvReptLogV(models.Model):
+     billing_date = models.DateField(null=True)
+     timestamp = models.DateTimeField(null=True)
+
+     class Meta:
+          managed = False
+          ordering = ('billing_date',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_inv_rept_log_v'
+
+
+class UmOscBillCycleV(models.Model):
+     billing_cycle = models.CharField(max_length=2)
+     description = models.CharField(max_length=25)
+     billing_month = models.CharField(max_length=3)
+     billing_year = models.CharField(max_length=4)
+     billing_date = models.DateField(null=True)
+     batch_id = models.CharField(max_length=6)
+     batch_date = models.DateField(null=True)
+     start_date = models.DateField(null=True)
+     end_date = models.DateField(null=True)
+     row_id = models.CharField(max_length=20, primary_key=True)
+
+     class Meta:
+          managed = False
+          ordering = ('billing_cycle','billing_date')
+          db_table = 'PINN_CUSTOM\".\"um_osc_bill_cycle_v'
+
+
+class UmOscDtDeptAcctListV(models.Model):
+     fund = models.CharField(max_length=30)
+     deptid = models.CharField(max_length=30)
+     program = models.CharField(max_length=30)
+     subclass = models.CharField(max_length=30)
+     project_grant = models.CharField(max_length=30)
+     account_number = models.CharField(max_length=100)
+     batch_date = models.DateField
+
+     class Meta:
+          managed = False
+          ordering = ('account_number',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_dt_dept_acct_list_v'
+
+
+class UmOscAcctdetailMrcOccV(models.Model):
+     subscriber_id = models.CharField(max_length=7)
+     billing_date = models.DateField
+     billing_cycle = models.CharField(max_length=2)
+     item_code = models.CharField(max_length=50)
+     batch_date = models.DateField
+     account_number = models.CharField(max_length=100)
+     account_subcode = models.CharField(max_length=10)
+     item_description = models.CharField(max_length=100)
+     charge_type = models.CharField(max_length=3)
+     charge_amount = models.DecimalField(decimal_places=2, max_digits=19,  null=False)
+     spec_process_ind = models.CharField(max_length=1)
+     package_code = models.CharField(max_length=95)
+     quantity = models.IntegerField(9, null=False)
+     unit_price = models.DecimalField(decimal_places=2, max_digits=19,  null=False)
+     charge_to_dept = models.CharField(max_length=10)
+     row_id = models.CharField(max_length=20, primary_key=True)
+
+     class Meta:
+          managed = False
+          ordering = ('account_number',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_acctdetail_mrc_occ_v'
+
+
+class UmOscOtsCallSummaryV(models.Model):
+     unique_key =  models.CharField(max_length=170, blank=True, null=True)        
+     account_number =  models.CharField(max_length=100, blank=True, null=True)    
+     fund =  models.CharField(max_length=30, blank=True, null=True)              
+     deptid =  models.CharField(max_length=30, blank=True, null=True)            
+     program =  models.CharField(max_length=30, blank=True, null=True)           
+     class_code =  models.CharField(max_length=30, blank=True, null=True)             
+     project_grant =  models.CharField(max_length=30, blank=True, null=True)     
+     billing_date =  models.DateField(null=True)                                  
+     user_defined_id =  models.CharField(max_length=20, blank=True, null=True)    
+     subscriber_id =  models.CharField(max_length=7, blank=True, null=True)      
+     ld_count =  models.BigIntegerField( null=True)                               
+     ld_amount =  models.BigIntegerField( null=True)                              
+     lcl_count =  models.BigIntegerField( null=True)                              
+     lcl_amount =  models.BigIntegerField( null=True)                             
+     tot_call_count =  models.BigIntegerField( null=True)                         
+     tot_call_amount =  models.BigIntegerField( null=True)                        
+     mrc_count =  models.BigIntegerField( null=True)                              
+     mrc_amount =  models.BigIntegerField( null=True)                             
+     occ_count =  models.BigIntegerField( null=True)                              
+     occ_amount =  models.BigIntegerField( null=True)                             
+     fcc_count =  models.BigIntegerField( null=True)                              
+     fcc_amount =  models.BigIntegerField( null=True)                             
+     tot_count =  models.BigIntegerField( null=True)                              
+     tot_amount =  models.BigIntegerField( null=True)                             
+     row_id =  models.CharField(max_length=170, blank=True, null=True)            
+
+     class Meta:
+          managed = False
+          ordering = ('account_number',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_ots_call_summary_v'
+
+
+class UmOscServiceLocV(models.Model):
+     id =  models.BigIntegerField( null=False,primary_key=True)                                    
+     billing_date =  models.DateField(null=True)                                  
+     subscriber_id =  models.CharField(max_length=7, blank=True, null=True)       
+     service_id =  models.BigIntegerField( null=False)                            
+     location_id =  models.BigIntegerField( null=False)                           
+     timestamp =  models.DateField(null=True)                                     
+     department_number =  models.CharField(max_length=15, blank=True, null=True)  
+     service_number =  models.CharField(max_length=60, blank=True, null=True)     
+     status =  models.CharField(max_length=15, blank=True, null=True)             
+     service_type =  models.CharField(max_length=20, blank=True, null=True)       
+     building_id =  models.CharField(max_length=18, blank=True, null=True)        
+     building =  models.CharField(max_length=25, blank=True, null=True)           
+     floor =  models.CharField(max_length=18, blank=True, null=True)              
+     floor_desc =  models.CharField(max_length=50, blank=True, null=True)         
+     room =  models.CharField(max_length=18, blank=True, null=True)               
+     room_desc =  models.CharField(max_length=50, blank=True, null=True)          
+     jack =  models.CharField(max_length=30, blank=True, null=True)               
+     service_class_id =  models.CharField(max_length=5, blank=True, null=True)    
+     service_class_desc =  models.CharField(max_length=25, blank=True, null=True) 
+
+     class Meta:
+          managed = False
+          ordering = ('billing_date',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_service_loc_v'
+
+class UmOscRatedV(models.Model):
+     row_id =  models.CharField(max_length=85, blank=True, null=True)            
+     subscriber_id =  models.CharField(max_length=7, blank=True, null=True)      
+     connect_date =  models.DateField(null=True)                                  
+     billing_cycle =  models.CharField(max_length=2, blank=True, null=True)       
+     batch_date =  models.DateField(null=True)                                    
+     cos_code =  models.CharField(max_length=2, blank=True, null=True)            
+     from_number =  models.CharField(max_length=20, blank=True, null=True)        
+     pbn =  models.CharField(max_length=15, blank=True, null=True)                
+     to_number =  models.CharField(max_length=20, blank=True, null=True)          
+     call_duration =  models.BigIntegerField( null=True)                          
+     dur_mn =  models.BigIntegerField( null=True)                                 
+     dur_ss =  models.BigIntegerField( null=True)                                 
+     call_type =  models.CharField(max_length=20, blank=True, null=True)          
+     place_name =  models.CharField(max_length=25, blank=True, null=True)        
+     state_name =  models.CharField(max_length=2, blank=True, null=True)          
+     amount_billed =  models.BigIntegerField( null=True)                          
+     posted_date =  models.DateField(null=True)                                   
+     call_description =  models.CharField(max_length=64, blank=True, null=True)  
+     expense_account =  models.CharField(max_length=100, blank=True, null=True)   
+
+     class Meta:
+          managed = False
+          ordering = ('batch_date','billing_cycle')
+          db_table = 'PINN_CUSTOM\".\"um_osc_rated_v'
+
+
+class UmOscReptInvlocV(models.Model):
+     id =  models.BigIntegerField(primary_key=True)                                     
+     billing_date =  models.DateField(null=True)                                  
+     subscriber_id =  models.CharField(max_length=7, blank=True, null=True)       
+     user_defined_id =  models.CharField(max_length=20, blank=True, null=True)    
+     user_defined_id_type =  models.CharField(max_length=80, blank=True, null=True)                                                                               
+     cd_descr =  models.CharField(max_length=100, blank=True, null=True)          
+     chartfield =  models.CharField(max_length=79, blank=True, null=True)         
+     fund =  models.CharField(max_length=15, blank=True, null=True)               
+     org =  models.CharField(max_length=15, blank=True, null=True)                
+     program =  models.CharField(max_length=15, blank=True, null=True)            
+     subclass =  models.CharField(max_length=15, blank=True, null=True)           
+     project_grant =  models.CharField(max_length=15, blank=True, null=True)      
+     l_use =  models.CharField(max_length=1, blank=True, null=True)               
+     t_use =  models.CharField(max_length=1, blank=True, null=True)               
+     m_use =  models.CharField(max_length=1, blank=True, null=True)               
+     usage =  models.CharField(max_length=5, blank=True, null=True)              
+     last_call_date =  models.DateField(null=True)                                
+     first_name =  models.CharField(max_length=15, blank=True, null=True)         
+     last_name =  models.CharField(max_length=20, blank=True, null=True)          
+     title =  models.CharField(max_length=20, blank=True, null=True)              
+     mrc_account =  models.CharField(max_length=10, blank=True, null=True)        
+     item_code =  models.CharField(max_length=50, blank=True, null=True)         
+     item_description =  models.CharField(max_length=100, blank=True, null=True)  
+     quantity =  models.BigIntegerField( null=True)                               
+     unit_price =  models.BigIntegerField( null=True)                             
+     charge_amount =  models.BigIntegerField( null=True)                          
+     remove_date =  models.DateField(null=True)                                   
+     rectype =  models.CharField(max_length=1, blank=True, null=True)             
+     location_since_date =  models.DateField(null=True)                           
+     multiple_locations_flag =  models.CharField(max_length=1, blank=True, null=True)                                                                             
+     building =  models.CharField(max_length=25, blank=True, null=True)           
+     floor =  models.CharField(max_length=18, blank=True, null=True)              
+     room =  models.CharField(max_length=18, blank=True, null=True)               
+     jack =  models.CharField(max_length=30, blank=True, null=True)               
+     ncos =  models.CharField(max_length=5, blank=True, null=True)                
+     ncos_desc =  models.CharField(max_length=25, blank=True, null=True)          
+     rptorder = models.CharField(max_length=1, blank=True, null=True)  
+       
+     class Meta:
+          managed = False
+          ordering = ('billing_date','org','chartfield','user_defined_id','rptorder','item_code')
+          db_table = 'PINN_CUSTOM\".\"um_osc_rept_invloc_v'
+
+

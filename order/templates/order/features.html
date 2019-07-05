@@ -1,6 +1,6 @@
 {% for category in tab.form.list %}
-  <div id="cat{{category.id}}" >
-  <h3> {{category.name}} </h3>
+  <div id="cat{{category.id}}" data-phoneset="{{category.name}}">
+  <h3> {{category}} </h3>
 
     <div class="form-row">
       {% for type in category.type %}

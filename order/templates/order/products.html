@@ -1,5 +1,5 @@
 {% for list in tab.form.cat %}
-  <div id="equip{{list.id}}" >
+  <div id="equip{{list.id}}" data-phoneset="{{list.id}}">
 
     <div class="card-columns">
     {% for field in list %}

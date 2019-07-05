@@ -49,7 +49,7 @@ class AddlInfoForm(forms.Form):
     contact_yn.type = 'Radio'
     contact_id = forms.CharField(label='Uniqname', max_length=8)
     contact_name = forms.CharField(label='Name', max_length=40)
-    contact_number = forms.CharField(label='Best number to contact.', max_length=8)
+    contact_number = forms.CharField(label='Best number to contact.', max_length=10)
     comments = forms.CharField(required=False, widget=forms.Textarea )
     file = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
@@ -73,9 +73,9 @@ class NewLocationForm(forms.Form):
 class EquipmentForm(forms.Form):
     cat = ['Basic','VOIP']
     cat[0] = Product.objects.all().filter(category=1).order_by('display_seq_no')
-    cat[0].id = 1
+    cat[0].id = 'basic'
     cat[1] = Product.objects.all().filter(category=2).order_by('display_seq_no') 
-    cat[1].id = 2
+    cat[1].id = 'voip'
     template = 'order/products.html'
 
 
