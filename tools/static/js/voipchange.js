@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	$("#vlc-1").removeClass('disabled');  // Enable first pill, that is how it all starts.
 
-	currStep = 1;
+  currStep = 1;
     lastStep = 3; //document.getElementsByClassName("tab-pane").length;
     $("#buildingFields").hide();
     $("#buildingTable").hide();
@@ -71,10 +71,20 @@ function nextPrev(n) {
         document.getElementById('vl-3').className = ""
     }  
   
+    // Next->submit
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+      if (currStep == lastStep) {
+          $('#vlNextBtn').html('Submit');
+      } else {
+          $('#vlNextBtn').html('Next');
+      }
+      $('#vlNextBtn').prop('disabled', false);
+    });
+
     if (currStep > lastStep) {
-        //$('#workflowForm').submit();
-        return false;
-    }
+      $('#voipLocationForm').submit();
+      return false;
   }
+}
 
   
