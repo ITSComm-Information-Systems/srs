@@ -1,7 +1,8 @@
 $(document).ready(function() {
 
   var x, i;
-  x = $('input:not(:checkbox)');
+  //x = $('input:not(:checkbox)');
+  x = $("input:not([type=radio], [type=checkbox])");
   for (i = 0; i < x.length; i++) {
       x[i].className += " form-control";
   }
@@ -74,28 +75,6 @@ $(document).ready(function() {
   $('#contact_name').hide();
   $('#contact_number').hide();
 
-
-  //$("#analogIPpci_A").click(function() {
-  //  $('#pills-step4').addClass(' hidden');
-  
- //   $('#pills-step2').removeClass(' hidden');
- //   $('#pills-step3').removeClass(' hidden');
- //   $('#pills-step5').removeClass(' hidden');
-
- //   basicPhone()
- // });
-
-  //$("#analogIPpci_IP").click(function() {
-  //  $('#pills-step4').removeClass(' hidden');
-  
-  //  $('#pills-step2').addClass(' hidden');
-  //  $('#pills-step3').addClass(' hidden');
-  //  $('#pills-step5').addClass(' hidden');
-
-  //  voipPhone();
-  //});
-
-
   // data based radio actions
   $('input[type=radio]').click(function(){
 
@@ -140,83 +119,9 @@ $(document).ready(function() {
       }
     }
 
-    console.log(this.name);
-
   });
 
-  //$("#analogIPFax_A").click(function() {
-    //$('#pills-step4').addClass(' hidden'); // IPFaxInfo
-    //$('#pills-step5').addClass(' hidden'); // 2Chartfields
   
-    //$('#pills-step2').removeClass(' hidden');  //LocationNew
-    //$('#pills-step3').removeClass(' hidden');  //Restrictions
-    //$('#pills-step6').removeClass(' hidden'); //4Chartfields
-    //$('[data-phoneset="advanced"]').show();
-    //$('[data-phoneset="basic"]').hide();
-    //$('[data-phoneset="voip"]').hide();
-    //basicPhone()
-  //});
-
-  //$("#analogIPFax_IP").click(function() {
-    //$('#pills-step4').removeClass(' hidden'); // IPFaxInfo
-    //$('#pills-step5').removeClass(' hidden'); // 2Chartfields
-
-    //$('#pills-step2').addClass(' hidden'); //LocationNew
-    //$('#pills-step3').addClass(' hidden'); //Restrictions
-    //$('#pills-step6').addClass(' hidden'); //4Chartfields
-
-    //voipPhone();
-  //});
-
-
-  //Phone
-  //$("#phoneSetType_B").click(function() {
-  //  basicPhone();
-  //  $("#equip2").hide();
-  //  $("#equip1").show();
-  //});
-
-  //$("#phoneSetType_A").click(function() {
-  //  advancedPhone();
-  //});
-
-  //$("#phoneSetType_V").click(function() {
-  //  voipPhone();
-  //  $("#equip1").hide();
-  //  $("#equip2").show();
-  //});
-
-  //Phone
-  //$("#PhoneSetType_B").click(function() {
-  //  basicPhone();
-  //  $("#equip2").hide();
-  //  $("#equip1").show();
-  //});
-
-  //$("#PhoneSetType_A").click(function() {
-  //  advancedPhone();
-  //});
-
-  //$("#PhoneSetType_V").click(function() {
-  //  voipPhone();
-  //  $("#equip1").hide();
-  //  $("#equip2").show();
-  //});
-
-  //$("#ModelInfo_V").click(function() {
-  //  voipPhone();
-  //  $("#PhoneModelNum").show();
-  //});
-  
-  //$("#ModelInfo_A").click(function() {
-  //  advancedPhone();
-  //  $("#PhoneModelNum").show();
-  //});
-
-  //$("#ModelInfo_B").click(function() {
-  //  basicPhone();
-  //  $("#PhoneModelNum").show();
-  //});
 
   // Phone Type Tab
   $("#Jack_Y").click(function() {
@@ -356,7 +261,6 @@ function validateForm() {
       $(id).html(selected_text);
     } else {
       text_box = $("#" + inp[i].id ).val();
-      console.log(id + '<>' + text_box);
       $(id).html( text_box );
     }
 
