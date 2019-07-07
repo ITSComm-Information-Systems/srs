@@ -312,24 +312,45 @@ function validateForm() {
 
     $.ajax({
       url: '/orders/ajax/get_phone_location/' + phone_number,
-      //data: {
-      //  'phone_number': '7347642793'
-      //},
-      dataType: 'json',
-      success: function (data) {
+      //dataType: 'json',
 
-        //alert(" phone found.");
-        if (data.code) {
+      beforeSend: function(){
+        $("#phLocationFields").hide();
+        $('#phoneLookup').html('Searching...').addClass(' disabled');
+        $("#buildingCode").html('');
+        $("#building").html('');
+        $("#floor").html('');
+        $("#room").html('');
+        $("#jack").html('');
+      },
+
+      success: function (data) {
+        if (data.code !== '') {
+          $("#buildingCode").html(data.code);
+          $("#building").html(data.name);
+          $("#floor").html(data.floor);
+          $("#room").html(data.room);
+          $("#jack").html(data.jack);
+
+          console.log('good:' + data.code)
+          $("#id_phone_number").addClass('is-valid');
+          $("#id_phone_number").removeClass('invalid');
+          $("#workflowForm").removeClass('was-validated');
           $("#phLocationFields").show();
-          $("#phBuildingID").val(data.code);
-          $("#id_building").val(data.name);
-          $("#id_floor").val(data.floor);
-          $("#id_room").val(data.room);
-          $("#id_jack").val(data.jack);
         } else {
           alert("No phone found.");
         }
-      }
-    });
+      },
 
+      error: function(){
+        $("#id_phone_number").addClass('is-invalid');
+        $("#id_phone_number").removeClass('is-valid');
+        $("#workflowForm").addClass('was-validated');
+      },
+
+      complete: function(){
+        $('#phoneLookup').html('Find').removeClass(' disabled');
+      }
+
+    })
   });
