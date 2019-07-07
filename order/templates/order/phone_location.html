@@ -1,41 +1,33 @@
 <div class="mb-3">
-    <div class="input-group">
-                <div class="input-group-prepend">
-                    <label class="input-group-text" for="validationServer01">Look up location by Phone Number </label>
-                </div>
-                <input type="text" class="form-control" id="id_phone_number" placeholder="734-867-5309" required>
-                <button type="button" class="btn btn-primary findBtn" id="phoneLookup" style="margin-left:1rem;">Find</button>
-                <div class="invalid-feedback">Number Not Found</div>
+    <div class="input-group form-check">
+        <div class="input-group-prepend">
+            <label class="input-group-text" for="validationServer01">Look up location by Phone Number </label>
+        </div>
+        <input type="tel" id="id_phone_number" name="phone" required>
+        <button type="button" class="btn btn-primary findBtn" id="phoneLookup" style="margin-left:1rem;">Find</button>
+        <div class="invalid-feedback">Number Not Found</div>
     </div>
-    </div>
-    
-    <div class="form-group" id="phLocationFields">
-        <div class="col-xs-4">
-            <div class="mb-3">
-                <label for="phBuildingID">Building Code:</label>
-                <input type="text" name="buildingCode" required="" id="phBuildingID" class=" form-control">
-            </div>
-            <div class="mb-3">
-                <label for="phBuildingName">Building Name:</label>
-                <input type="text" name="buildingName" required="" id="id_building" class=" form-control">
-            </div>
-    
-            <div class="mb-3">
-                <label for="phBuildingFloor">Floor:</label>
-                <input type="text" name="buildingFloor" required="" id="id_floor" class=" form-control">
-            </div>
-            <div class="invalid-feedback">Please enter floor.</div>
-    
-            <div class="mb-3">
-                <label for="phBuildingRoom">Room:</label>
-                <input type="text" name="buildingRoom" required="" id="id_room" class=" form-control">
-            </div>
-            <div class="invalid-feedback">Please enter room.</div>
-        
-            <div class="mb-3">
-                <label for="phBuildingJack">Jack Number (can be found on the faceplate of the jack)</label>
-                <input type="text" name="buildingRoom" required="" id="id_jack" class=" form-control">
-            </div>
-            <div class="invalid-feedback">Please enter jack.</div>
+    <br>
+    <div class="container" id="phLocationFields">
+        <div class="row">
+            <div class="col-1">ID:</div>
+            <span class="col-2" style="text-align: left" id="buildingCode"></span>
+        </div>
+        <div class="row">
+            <div class="col-1">Building:</div>
+            <span class="col-2" style="text-align: left" id="building"></span>
+        </div>
+        <div class="row">
+            <div class="col-1">Floor:</div>
+            <span class="col-2" style="text-align: left" id="floor"></span>
+        </div>
+        <div class="row">
+            <div class="col-1">Room:</div>
+            <span class="col-2" style="text-align: left" id="room"></span>
+        </div>
+        <div class="row">
+            <div class="col-1">Jack:</div>
+            <span class="col-2" style="text-align: left" id="jack"></span>
         </div>
     </div>
+</div>
