@@ -221,7 +221,13 @@ def get_uniqname(request, uniqname_parm=''):
 
                 print('Uniqname: %s   Last Name: %s   First Name: %s' % (uniqname_parm, last_name, first_name))
 
-                grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
+
+                if(request.user.has_perm('can_administer_access_all')):
+                    grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
+                else:
+                    grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).exclude(role='Proxy').order_by('role')
+
+                #grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
                 grantor_roles = Grantor.objects.values('grantor_role').distinct()
 #                print(len(grantor_roles))
                 this_grantors_roles = AuthUserDept.objects.filter(user=request.user.id).values("group").distinct()
