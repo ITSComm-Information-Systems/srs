@@ -13,7 +13,6 @@
                     </label>
                 </div>
                 <select name="chartcom" class="custom-select" id="cf_dropdown">
-                    <!-- <option selected>-- Select --</option> -->
                     <option disabled selected>{{ selected_cf.account_number }}</option>
                     {% for cf in cf_info %}
                     <option name="dept" value="{{cf.account_number}}">{{ cf.account_number }}</option>
@@ -42,7 +41,7 @@
         <tbody>
           <tr>
             <td id="fund">{{ selected_cf.fund }}</td>
-            <td id="dept_id">{{ dept_info.dept_id }}</td>
+            <td id="dept_id">{{ selected_cf.dept_id }}</td>
             <td id="program">{{ selected_cf.program }}</td>
             <td id="class_code">{{ selected_cf.class_code }}</td>
             <td id="project_grant">{{ selected_cf.project_grant }}</td>
