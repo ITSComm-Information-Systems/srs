@@ -32,7 +32,7 @@ def get_voip(request):
     if request.is_ajax():
         choice = request.GET.get('jacks',None)
         selected = UmOscLocationsInUseV.objects.filter(service_number__exact = phone_number, jack__exact = choice).order_by('room').values_list().distinct()
-        phone_number = '123489y128943'
+        
     context = {
         'title': 'VOIP Location Change',
         'phone_number': phone_number,
@@ -49,14 +49,56 @@ def get_voip(request):
     return HttpResponse(template.render(context,request))
     #return JsonResponse(context)
     
-def get_jack(request): # need to get this json working then we should be good
-    phone_number = request.GET.get('number', None)
-    choice = request.GET.get('jacks',None)
-    selected = UmOscLocationsInUseV.objects.filter(jack__exact = choice).order_by('room').values_list().distinct()
-    template = loader.get_template('voip.html')
-    data = {
-        'selected': selected,
-        'choice':choice,
 
+def new_building(request):
+    name = request.GET.get('buildingName',None)
+    code = request.GET.get('buildingID',None)
+    data = {
+        'name': name,
+        'code': code,
     }
     return JsonResponse(data)
+
+def new_floor(request):
+    floor = request.GET.get('buildingFloor',None)
+    data = {
+        'floor': floor,
+    }
+    return JsonResponse(data)
+
+def new_room(request):
+    room = request.GET.get('buildingRoom',None)
+    data = {
+        'room': room,
+    }
+    return JsonResponse(data)
+    
+def new_jack(request):
+    jack = request.GET.get('buildingJack',None)
+    data = {
+        'jack': jack,
+    }
+    return JsonResponse(data)
+    
+def confirm(request):
+    template = loader.get_template('confirm.html')
+    unique_name = 'TEST TEST TEST'
+
+    phone_number = request.GET.get('holder',None)
+    old_jack = request.GET.get('jacks',None)
+    selected = UmOscLocationsInUseV.objects.filter(service_number__exact = phone_number, jack__exact = old_jack).order_by('room').values_list().distinct()
+    
+    new_name = request.GET.get('buildingName',None)
+    new_code = request.GET.get('buildingID',None)
+    new_floor = request.GET.get('buildingFloor',None)
+    new_jack = request.GET.get('buildingJack',None)
+
+    context = {
+        'title': 'Voip Confirmation Page',
+        'phone_number': phone_number,
+        'old_jack': old_jack,
+        'selected': selected,
+
+    }
+    return HttpResponse(template.render(context,request))
+    

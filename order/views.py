@@ -213,12 +213,12 @@ class Cart(PermissionRequiredMixin, View):
             deptid = dept_list[0].dept
 
 
-        item_list = Item.objects.filter(deptid=deptid,order__isnull=True)
+        item_list = Item.objects.filter(deptid=deptid,order__isnull=True).order_by('chartcom','-create_date')
         chartcoms = item_list.distinct('chartcom')
         action_list = Action.objects.all()
 
         for acct in chartcoms:
-            acct.items = item_list.filter(chartcom=acct.chartcom)
+            acct.items = item_list.filter(chartcom=acct.chartcom) #.order_by('create_date')
 
             for item in acct.items:
                 item.details = item.data.get('action')
@@ -295,7 +295,7 @@ class Status(PermissionRequiredMixin, View):
 
         #items_selected = request.POST.getlist('includeInOrder')
         #order_list = item_list.distinct('chartcom')
-        order_list = Order.objects.all()
+        order_list = Order.objects.all().order_by('-create_date')
         item_list = Item.objects.filter(order__in=order_list)
 
         for num, order in enumerate(order_list, start=1):

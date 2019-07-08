@@ -77,7 +77,7 @@ class FeatureCategory(models.Model):
     display_seq_no = models.PositiveIntegerField()
 
     def __str__(self):
-        return self.name
+        return self.label
     
     class Meta:
         verbose_name_plural = "Feature Categories"
