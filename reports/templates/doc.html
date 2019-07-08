@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 
+{% comment %}
+
 <p>NOTE: Jared asked me to initially have the first department on the list selected. I'm not sure how this would work with have the select a chartfield appear
 	later on if they want to keep that first department. So for now, I'm just going to let the select a chartfield appear on load.</p>
 
@@ -58,7 +60,7 @@
 <script src="/../static/doc.js"></script> 
 
 
-{% comment %}
+{% endcomment %}
 <div id="main-content" class="container" role="main">
     <div class="container" role="main">
         <div class="row">
@@ -76,5 +78,4 @@
         </div>
     </div>
 </div>
-{% endcomment %}
 {% endblock %}
