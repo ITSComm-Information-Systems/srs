@@ -756,10 +756,10 @@ class UmOscBillCycleV(models.Model):
 
 class UmOscDtDeptAcctListV(models.Model):
      fund = models.CharField(max_length=30)
-     deptid = models.CharField(max_length=30)
+     deptid = models.CharField(max_length=30, primary_key=True) #made this a primary key
      program = models.CharField(max_length=30)
      subclass = models.CharField(max_length=30)
-     project_grant = models.CharField(max_length=30)
+     projectgrant = models.CharField(max_length=30) #changed name from project_grant
      account_number = models.CharField(max_length=100)
      batch_date = models.DateField
 
@@ -802,7 +802,7 @@ class UmOscOtsCallSummaryV(models.Model):
      class_code =  models.CharField(max_length=30, blank=True, null=True)             
      project_grant =  models.CharField(max_length=30, blank=True, null=True)     
      billing_date =  models.DateField(null=True)                                  
-     user_defined_id =  models.CharField(max_length=20, blank=True, null=True)    
+     user_defined_id =  models.CharField(max_length=20, blank=True, null=False, primary_key=True) #temporarily made this a primary key and set null to false    
      subscriber_id =  models.CharField(max_length=7, blank=True, null=True)      
      ld_count =  models.BigIntegerField( null=True)                               
      ld_amount =  models.BigIntegerField( null=True)                              
