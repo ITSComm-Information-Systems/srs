@@ -1,0 +1,63 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<div class="mt-4 row"></div>
+
+{% if cf_info %}
+<div class='row'>
+    <div class="col-md-6">
+        <form id="cf_dropdown" method="POST" name="cfs">{% csrf_token %}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="cf_dropdown">
+                        Select Chartfield
+                    </label>
+                </div>
+                <select name="chartcom" class="custom-select" id="cf_dropdown">
+                    <!-- <option selected>-- Select --</option> -->
+                    <option disabled selected>{{ selected_cf.account_number }}</option>
+                    {% for cf in cf_info %}
+                    <option name="dept" value="{{cf.account_number}}">{{ cf.account_number }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<div class="mt-4 row">
+    {% if cf_info %}
+    <div class="col-md-8" id="cf_details">
+      <table class="table table-striped table-sm">
+        <caption style="caption-side:top;color:black;font-size:18px">Details for Chartfield <strong id="caption">{{ selected_cf.account_number }}</strong>:</caption>
+        <thead>
+          <th scope="col">Fund</th>
+          <th scope="col">Dept.</th>
+          <th scope="col">Program</th>
+          <th scope="col">Class</th>
+          <th scope="col">Project/Grant</th>
+          <th scope="col">Shortcode</th>
+          <th scope="col">Nickname</th>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="fund">{{ selected_cf.fund }}</td>
+            <td id="dept_id">{{ dept_info.dept_id }}</td>
+            <td id="program">{{ selected_cf.program }}</td>
+            <td id="class_code">{{ selected_cf.class_code }}</td>
+            <td id="project_grant">{{ selected_cf.project_grant }}</td>
+            <td id="shortcode">{{ selected_cf.shortcode }}</td>
+            <td id ="nickname">{{ nickname }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="col-md-8">
+        <div class="alert alert-danger col-md-8" role="alert">
+            <i class="fas fa-exclamation-triangle" style="color:red"></i>
+            This department does not have any chartfields currently in use. Please select another department.
+        </div>
+    </div>
+    {% endif %}
+</div>
