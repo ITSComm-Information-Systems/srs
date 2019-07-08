@@ -63,7 +63,8 @@ class ReviewForm(forms.Form):
 
 class NewLocationForm(forms.Form):
     building_list = UmOSCBuildingV.objects.all()
-    building = forms.CharField(label='Building', max_length=100)
+    building_code = forms.CharField(label='Building Code', max_length=100)
+    building_name = forms.CharField(label='Building Name', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
 

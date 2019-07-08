@@ -159,6 +159,7 @@ $(document).ready(function() {
     $("#ModelInfo").hide();
     $("#ModelInfo_review").hide();
     $("#PhoneModelNum").hide();
+    $("#PhoneModelNum_review").hide();
     //$('#pills-step3').show();  //removeClass(' hidden');
   });
 
@@ -177,6 +178,7 @@ $(document).ready(function() {
     $("#ModelInfo").hide();
     $("#ModelInfo_review").hide();
     $("#PhoneModelNum").hide();
+    $("#PhoneModelNum_review").hide();
     //$('#pills-step4').hide();  //.removeClass(' hidden');
   });
 
@@ -207,12 +209,18 @@ $(document).ready(function() {
     $('#contact_id').show();
     $('#contact_name').show();
     $('#contact_number').show();
+    $('#contact_id_review').show();
+    $('#contact_name_review').show();
+    $('#contact_number_review').show();
   });
 
   $("#contact_yn_True").click(function(event) {
     $('#contact_id').hide();
     $('#contact_name').hide();
     $('#contact_number').hide();
+    $('#contact_id_review').hide();
+    $('#contact_name_review').hide();
+    $('#contact_number_review').hide();
   });
 
 
@@ -251,6 +259,7 @@ function nextPrev(n) {
 
 
 function validateForm() {
+
   inp = $("#step" + currStep + " :input:visible");
   valid = true;
   for (i = 0; i < inp.length; i++) {
@@ -295,9 +304,6 @@ function validateForm() {
     //$(#id_oneTimeCharges).find([data-dept='481060']).hide();
   }
 
-
-
-
   $("#phoneLookup").click(function () {
     var phone_number = $("#id_phone_number").val();
     phone_number = phone_number.replace(/\D/g,'');
@@ -331,6 +337,12 @@ function validateForm() {
           $("#floor").html(data.floor);
           $("#room").html(data.room);
           $("#jack").html(data.jack);
+
+          $("#id_buildingCode_review").html(data.code);
+          $("#id_building_review").html(data.name);
+          $("#id_floor_review").html(data.floor);
+          $("#id_room_review").html(data.room);
+          $("#id_jack_review").html(data.jack);
 
           console.log('good:' + data.code)
           $("#id_phone_number").addClass('is-valid');
