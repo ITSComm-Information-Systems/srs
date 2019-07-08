@@ -52,7 +52,7 @@ class RestrictionAdmin(admin.ModelAdmin):
     ordering = ('display_seq_no',)
 
 class FeatureCategoryAdmin(admin.ModelAdmin):
-    #list_display = ['display_seq_no','name']
+    list_display = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
 
 admin.site.register(Constant)

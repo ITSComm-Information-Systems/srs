@@ -1,6 +1,6 @@
 {% for category in tab.form.list %}
-  <div id="rescat{{category.id}}" >
-  <h3> {{category.name}} </h3>
+  <div id="rescat{{category.id}}" data-phoneset="{{category.name}}">
+  <h3> {{category}} </h3>
     {% for res in category.res %}
         <div class="form-check">
             <input class="form-check-input" type="radio" value="{{res.id}}" name="resrescat{{category.id}}" id="res{{res.id}}">
