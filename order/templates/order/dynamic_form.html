@@ -15,6 +15,12 @@
             <br>
         </fieldset>
     {% elif field.field.type == 'Chart' %}
+    {% if tab.name == '0chartfields' %}
+    <div id='dummyChartfield'>
+        <label>Chartfield for Tracking Purposes</label>
+        <em>There is no charge for this request. However, please select a chartfield for departmental tracking purposes.</em> 
+    </div>
+    {% endif %}
     <div class="form-group row col-12" id="oneTimeCharges">
         <!--  -->
         <div class="form-check">
