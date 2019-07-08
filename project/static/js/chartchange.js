@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	var ph_count = 0;
 
-// Enable first pill, that is how it all starts
+	// Enable first pill
 	$("#cfc-1").removeClass('disabled');
 
 
@@ -11,7 +11,7 @@ $(document).ready(function() {
 	$('#chartchange_nav li:first-child a').tab('show');
 
 
-	// Next/prev functionality
+	// Next/prev buttons
 	$("#cfNextBtn").click(function(event) {
 		nextPrev(1);
 	});
@@ -22,17 +22,20 @@ $(document).ready(function() {
 
 	// Create paginated tables
 	var table = $('#cf_users_table').DataTable({
+		"destroy": true,
 		"lengthChange": false,
 		"dom": 'rtp'
 	});
 
 	var cf_change_table = $('#cf_change_table').DataTable({
+		"destroy": true,
 		"lengthChange": false,
 		"bFilter": false,
 		"dom": 'rtp'
 	});
 
 	$('#review_table').DataTable({
+		"destroy": true,
 		"lengthChange": false,
 		"bFilter": false,
 		"dom": 'rtp'
@@ -236,18 +239,19 @@ function nextPrev(n) {
   //if (n == 1 && !validateForm()6) return false;
 
   currStep = currStep + n;
+
   $('#cfc-'+currStep).removeClass('disabled');
   $('#chartchange_nav li:nth-child(' + currStep + ') a').tab('show');
 
   // Details up top
   if (n == 1 && currStep == 2) {
-  	$('#cfc_desc').hide();
-  	$('#dept_details').hide();
+  	// $('#cfc_desc').hide();
+  	// $('#dept_details').hide();
   	$('#select_dept').hide();
   }
   if (n == -1 && currStep == 1) {
-  	$('#cfc_desc').show();
-  	$('#dept_details').show();
+  	// $('#cfc_desc').show();
+  	// $('#dept_details').show();
   	$('#select_dept').show();
   }
 

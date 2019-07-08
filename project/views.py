@@ -206,3 +206,4 @@ def get_cf_data(request):
 	cf_data.append(nn)
 
 	return JsonResponse(cf_data, safe=False)
+
