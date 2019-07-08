@@ -2,11 +2,14 @@
   <div id="rescat{{category.id}}" data-phoneset="{{category.name}}">
   <h3> {{category}} </h3>
     {% for res in category.res %}
-        <div class="form-check">
-            <input class="form-check-input" type="radio" value="{{res.id}}" name="resrescat{{category.id}}" id="res{{res.id}}">
+        <div class="custom-control custom-radio">
+            <input class="form-check-input" type="radio" value="{{res.id}}" name="resrescat{{category.id}}" id="res{{res.id}}" required>
             <label class="form-check-label" for="res{{res.id}}">
                 {{res}}
             </label>
+            {% if res == category.res.last %}
+            <div class="invalid-feedback">Please choose one.</div>
+            {% endif %}
         </div>
     {% endfor %}
   </div>
