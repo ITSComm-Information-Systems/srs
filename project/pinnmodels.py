@@ -614,7 +614,7 @@ class UmOscVoipLocChangeInput(models.Model):
      uniqname = models.CharField(max_length=8) 
      service_id = models.IntegerField(9, null=False)
      service_number= models.CharField(max_length=60)
-     old_campus_code = models.CharField(max_length=4)
+     old_campuscd = models.CharField(max_length=4)
      old_campus_desc = models.CharField(max_length=30)
      old_location_id = models.IntegerField(9, null=False)
      old_path_id = models.IntegerField(9, null=False)
@@ -629,7 +629,7 @@ class UmOscVoipLocChangeInput(models.Model):
      service_nbr_at_new_loc = models.CharField(max_length=60)   
      service_type_at_new_loc = models.CharField(max_length=20)
      svc_status_at_new_loc = models.CharField(max_length=15)
-     new_campus_code = models.CharField(max_length=4)
+     new_campuscd = models.CharField(max_length=4)
      new_campus_desc = models.CharField(max_length=30)
      new_location_id = models.IntegerField(9, null=False)
      new_path_id = models.IntegerField(9, null=False)
@@ -641,8 +641,8 @@ class UmOscVoipLocChangeInput(models.Model):
      new_room_desc = models.CharField(max_length=50)
      new_jack = models.CharField(max_length=30)
      request_no = models.IntegerField(9, null=False, primary_key=True)
-     date_added = models.DateField
-     date_processed = models.DateField
+     date_added = models.DateField()
+     date_processed = models.DateField()
      messages = models.CharField(max_length=2000)
 
      class Meta:

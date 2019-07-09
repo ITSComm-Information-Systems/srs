@@ -31,6 +31,34 @@ $(document).ready(function() {
   $("#PhoneSetType").hide();
   $("#JackNumber").hide();
   $("#PhoneModelNum").hide();
+  $("#voipPhoneMac").hide();
+  
+  
+  $("#ModelInfo_basic").click(function() {
+    $("#PhoneModelNum").show();
+    $("#voipPhoneMac").hide();
+  });
+
+  $("#ModelInfo_advanced").click(function() {
+    $("#PhoneModelNum").show();
+    $("#voipPhoneMac").hide();
+  });
+
+  $("#ModelInfo_voip").click(function() {
+    $("#PhoneModelNum").show();
+    $("#voipPhoneMac").show();
+  });
+
+
+  $("#activePhone_Y").click(function() {
+    $('[data-tab="LocationNew"]').hide();
+  });
+
+  $("#activePhone_N").click(function() {
+    $('[data-tab="LocationNew"]').show();
+  });
+  
+
 
   //Data
   $("#activePhone").hide();
@@ -59,7 +87,7 @@ $(document).ready(function() {
 
   $("#activePhone_N").click(function() {
     $("#linesToInstall").show();
-    $('#pills-step2').hide();  //.addClass(' hidden');
+    //$('#pills-step2').hide();  //.addClass(' hidden');
   });
 
   $("#conduit_Y").click(function() {
