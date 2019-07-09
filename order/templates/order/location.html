@@ -1,8 +1,11 @@
 
 
-<p>
-  Look Up Building Name or ID
-  <input id="buildingSearch" type="text" placeholder="Search..">
+
+<div class="form-group" id="searchBuilding">
+Look Up Building Name or ID
+    <input id="buildingSearch" type="text" placeholder="Search.." required>
+    <div class="invalid-feedback">Please enter a building.</div>
+</div>
 
   <table id="buildingTable" class="table table-hover">
   {% for building in tab.form.building_list %}
@@ -11,10 +14,13 @@
       <td name="buildingName">{{ building.building_name }}</td>
     </tr>
   {% endfor %}
+    <tr id="buildingNA">
+      <td>Not Listed</td>
+      <td name="buildingName"></td>
+    </tr>
   </table>
 
 
-</p>
 
 
 <div class="form-group" id="buildingFields">
