@@ -31,8 +31,14 @@ $(document).ready(function() {
 
 	$("#vlPrevBtn").click(function(event) {
 		nextPrev(-1);
-	});
+  });
+  
+  function getPathFromUrl(url) {
+    return url.split("?")[0];
+  }
 });
+
+
 
 function nextPrev(n) {
 
@@ -86,5 +92,32 @@ function nextPrev(n) {
       return false;
   }
 }
+
+function tab_func1() {
+	currStep = 1;
+	// $('#vlc_desc').show();
+ //  	$('#dept_details').show();
+  	$('#phoneselect').show();
+}
+
+function tab_func2() {
+	var test = $('#vlc-2');
+	if (!$('#vlc-2').hasClass('disabled')) {
+		currStep = 2;
+		// $('#vlc_desc').hide();
+	 //  	$('#dept_details').hide();
+	}
+	$('#phoneselect').hide();
+}
+
+function tab_func3() {
+	if (!$('#vlc-3').hasClass('disabled')) {
+		currStep = 3;
+		// $('#vlc_desc').hide();
+	 //  	$('#dept_details').hide();
+	  }
+	  $('#phoneselect').hide();
+}
+
 
   
