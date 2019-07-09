@@ -20,7 +20,7 @@ from oscauth.models import AuthUserDept
 # from .models import Role, Group, User
 # from .forms import UserSuForm, AddUserForm
 # from .utils import su_login_callback, custom_login_action, upsert_user
-from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscOtsCallSummaryV
+from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscOtsCallSummaryV, UmOscAcctdetailMrcOccV
 from oscauth.forms import *
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -61,6 +61,7 @@ def get_doc(request):
 
 
 # Generate basic report based on user selections
+@permission_required('oscauth.can_report', raise_exception=True)
 def generate_report(request):
 	template = loader.get_template('doc-report.html')
 
@@ -72,60 +73,107 @@ def generate_report(request):
 	bill_date = request.POST.get('billing_date')
 	chartcoms = request.POST.getlist('chartcoms[]')
 
-	# Fix date format
+	# Fix date format - this is way too messy
 	date = bill_date.replace('.', '')
 	date = date.replace(',', '')
+	date = date.split(' ')
+	date[0] = date[0][0:3]
+	date = date[0] + ' ' + date[1] + ' ' + date[2]
 	date = datetime.strptime(date, '%b %d %Y')
 	date = str(date.year) + '-' + str(date.month) + '-' + str(date.day)
 
 
-	too_much_data = []
-
-	# for cf in cfs:
-	# 	test = UmOscOtsCallSummaryV.objects.filter(billing_date=date, account_number=cf)
-	
-
-	# Type of Charges
+	charge_types = []
 	for cf in chartcoms:
-		all_data = UmOscOtsCallSummaryV.objects.filter(billing_date=date, account_number=cf)
+		all_data = UmOscOtsCallSummaryV.objects.filter(billing_date=date, account_number=cf).order_by('user_defined_id')
 
 		prefixes = {}
+		charges = {}
 		total = 0
 		for a in all_data:
 			prefix = a.user_defined_id.split('-')
 			prefix = prefix[0]
+
+			# Type of charges
 			if prefix in prefixes:
-				prefixes[prefix] += a.tot_amount #Is this the right value??
+				prefixes[prefix] += a.tot_amount
 			else:
 				prefixes[prefix] = a.tot_amount
 			total += a.tot_amount
 
+			# Charge tables
+			user_id = {
+				'user_defined_id': a.user_defined_id,
+				'monthly_charges': '${:,.2f}'.format(a.mrc_amount),
+				'call_number': a.tot_call_count,
+				'call_amount': '${:,.2f}'.format(a.tot_call_amount),
+				'total_charges': '${:,.2f}'.format(a.tot_amount)
+			}
+			if prefix not in charges:
+				charges[prefix] = []
+			charges[prefix].append(user_id)
+
+		
+		# Monthly Service Charges table
+		monthly_query = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf)
+		monthly_data = {}
+		for m in monthly_query:
+			if m.item_code in monthly_data:
+				monthly_data[m.item_code]['quantity'] += int(m.quantity)
+				monthly_data[m.item_code]['total'] += m.charge_amount
+			else:
+				monthly_data[m.item_code] = {
+					'desc': m.item_description,
+					'unit_amt': '${:,.2f}'.format(m.unit_price),
+					'quantity': int(m.quantity),
+					'total': m.charge_amount
+				}
+		for m in monthly_data.values():
+			m['total'] = '${:,.2f}'.format(m['total'])
+
 		data = {
 			'account_number': cf,
-			'type_keys': prefixes.keys(),
 			'type_summary': prefixes,
-			'type_total': total
+			'type_total': '${:,.2f}'.format(total),
+			'charge_tables': charges,
+			'monthly_data': monthly_data
 		}
-		too_much_data.append(data)
+		charge_types.append(data)
 
 	context= {
 		'title':'Detail of Charges',
 		'dept': selected_dept,
 		'billing_date': bill_date,
-		'cfs': too_much_data
+		'charge_types': charge_types,
 	}
 
 	return HttpResponse(template.render(context, request))
 
+
+
+@permission_required('oscauth.can_report', raise_exception=True)
 def show_detail(request):
 	template = loader.get_template('doc-detail.html')
 
+	# Get information from previous page
+	if request.method == 'GET':
+		selected_dept = request.GET.get('selected_dept')
+		bill_date = request.GET.get('billing_date')
+		chartcoms = request.GET.getlist('chartcoms[]')
+
 	context = {
-		'title':'Detail of Charges'
+		'title':'Detail of Charges',
+		'dept': selected_dept,
+		'billing_date': bill_date,
+		'chartcoms': chartcoms
 	}
 
+	#return JsonResponse(context, safe=False)
 	return HttpResponse(template.render(context, request))
 
+
+
+@permission_required('oscauth.can_report', raise_exception=True)
 def show_tsr(request):
 	template = loader.get_template('doc-tsr.html')
 
@@ -135,6 +183,9 @@ def show_tsr(request):
 
 	return HttpResponse(template.render(context, request))
 
+
+
+@permission_required('oscauth.can_report', raise_exception=True)
 def select_cf(request):
 	selected_dept = request.GET.get('select_dept', None)
 	dept_cfs = list(UmOscDtDeptAcctListV.objects.filter(deptid=selected_dept).order_by('account_number').values().distinct())

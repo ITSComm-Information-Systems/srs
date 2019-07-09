@@ -771,7 +771,7 @@ class UmOscDtDeptAcctListV(models.Model):
 
 class UmOscAcctdetailMrcOccV(models.Model):
      subscriber_id = models.CharField(max_length=7)
-     billing_date = models.DateField
+     billing_date = models.DateField(null=True) # made this null=True
      billing_cycle = models.CharField(max_length=2)
      item_code = models.CharField(max_length=50)
      batch_date = models.DateField
