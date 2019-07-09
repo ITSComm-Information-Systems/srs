@@ -2,17 +2,12 @@
 {% block content %}
 
 {% comment %}
-
-<p>NOTE: Jared asked me to initially have the first department on the list selected. I'm not sure how this would work with have the select a chartfield appear
-	later on if they want to keep that first department. So for now, I'm just going to let the select a chartfield appear on load.</p>
-
 <div class="container">
     <form action="/reports/doc/report/" method="POST" name="Select">{% csrf_token %}
         <div class="form-group">
             <h5>Select Department</h5>
             	<div class="row form-inline">
 	                <select class="form-control col-md-6" style='font-size:16px' type="select" name="select_dept" id="doc_depts" value="{{ dept }}">
-	                    <option></option>
 	                    {% for dept in user_depts %}
 	                    <option value="{{ dept }}">{{ dept }}</option>
 	                    {% endfor %}
@@ -22,7 +17,6 @@
             <h5>Select Billing Date</h5>
             <div class="row form-inline">
             	<select class="form-control col-md-6" style='font-size:16px' requried type="select" name="billing_date" id="doc_bill_date" value="{{ d }}">
-	                <option></option>
 	                {% for d in dates %}
 	                <option value="{{ d }}">{{ d }}</option>
 	                {% endfor %}
@@ -37,19 +31,11 @@
 	                <option value="{{ cf }}">{{ cf }}</option>
 	                {% endfor %}
 	            </select>
-	            <p style="float:left;">
-		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
-		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
-		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
-		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
-		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
-		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
-		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong><br>
-		            <strong>&nbsp;&nbsp;CHARTFIELDS HERE</strong>
-	        	</p>
+	            <p id='chartfield_list' style="float:left;"></p>
 	        </div>
         </div>
-        <p><input type='submit' value='Generate Report' class="btn btn-primary"></p>
+        <p id="error_message" class="hidden">Please select a chartfield.</p>
+        <p><input id="generate" type='submit' value='Generate Report' class="btn btn-primary"></p>
     </form>
 </div>
 
