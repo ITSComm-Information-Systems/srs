@@ -192,6 +192,10 @@ class Order(models.Model):
     chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
     status = models.CharField(max_length=20)
 
+    @property
+    def dept(self):
+        return self.chartcom.dept
+
 
 class Item(models.Model):
     description = models.CharField(max_length=100)

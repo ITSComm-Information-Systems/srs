@@ -40,13 +40,10 @@ class RestrictionsForm(forms.Form):
     res = Restriction.objects.all()
     list = FeatureCategory.objects.all()
 
-    print('omg')
-
     for cat in list:
         cat.res = res.filter(category=cat).order_by('display_seq_no')
         last = cat.res.count()
         cat.last = cat.res[last-1].id
-        print(cat.res[last-1].id)
 
     template = 'order/restrictions.html'
 
