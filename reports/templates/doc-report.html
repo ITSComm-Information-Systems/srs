@@ -36,167 +36,172 @@
 </style>
 
 <div class="container">
-	<div class="row-inline">
-		<strong>Your selection</strong>
-		<a class="offset-2" href="..">Edit your selection</a>
-	</div>
+	<form method="POST" action='detail/' id="report_details">{% csrf_token %}
+		<div class="row-inline">
+			<strong>Your selection</strong>
+			<a class="offset-2" href="..">Edit your selection</a>
+		</div>
 
-	<div class="row">
-		<div class="card border-dark col-md-5">
-			<div class="card-body">
-				<div id="selected_dept"><strong>Department:&nbsp;&nbsp;</strong>{{ dept }}<br></div>
-				<div id="billing_date"><strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_date }}<br></div>
-				<strong style="float:left;">Chartfields:&nbsp;&nbsp;</strong>
-				<p id="chartcoms" style="float:left;">
-				{% for c in charge_types %}
-					{{ c.account_number }}<br>
-				{% endfor %}
-				</p>
+		<div class="row">
+			<div class="card border-dark col-md-5">
+				<div class="card-body">
+					<div id="selected_dept"><strong>Department:&nbsp;&nbsp;</strong>{{ dept }}<br></div>
+					<div id="billing_date"><strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_date }}<br></div>
+					<strong style="float:left;">Chartfields:&nbsp;&nbsp;</strong>
+					<p id="chartcoms" style="float:left;">
+					{% for c in charge_types %}
+						{{ c.account_number }}<br>
+					{% endfor %}
+					</p>
+					<input type="hidden" name="selected_dept" value="{{ dept }}">
+					<input type="hidden" name="billing_date" value="{{ billing_date }}">
+					<input type="hidden" name="chartcoms" value="{{ chartfields }}">
+				</div>
 			</div>
 		</div>
-	</div>
 
 
-	{% for c in charge_types %}
-	<div class="row mt-5">
-		<strong>Chartfield:&nbsp;</strong>
-		<p>{{ c.account_number }}</p>
-	</div>
+		{% for c in charge_types %}
+		<div class="row mt-5">
+			<strong>Chartfield:&nbsp;</strong>
+			<p>{{ c.account_number }}</p>
+		</div>
 
-	{% if c.type_summary %}
-	<div class="row">
-		<div class="card border-dark col-md-10">
-			<div class="card-body">
-				<strong>Summary</strong>
-				<table class="table table-sm mb-5">
-					<thead>
-						<tr class="table-secondary">
-							<th scope="col">Type of Service</th>
-							<th scope="col" class='total-col'>Total Charge</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for key, value in c.type_summary.items %}
+		{% if c.type_summary %}
+		<div class="row">
+			<div class="card border-dark col-md-10">
+				<div class="card-body">
+					<strong>Summary</strong>
+					<table class="table table-sm mb-5">
+						<thead>
+							<tr class="table-secondary">
+								<th scope="col">Type of Service</th>
+								<th scope="col" class='total-col'>Total Charge</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for key, value in c.type_summary.items %}
+								<tr>
+									<td>{{ key }}</td>
+									<td class='total-col'>{{ value }}</td>
+								</tr>
+							{% endfor %}
+							<tr class='table-total'>
+								<td><strong>Total</strong></td>
+								<td class='total-col'>{{ c.type_total }}</td>
+							</tr>
+						</tbody>
+					</table>
+
+					{% for key, value in c.charge_tables.items %}
+					<strong>{{ key }} Charges</strong>
+					<table class="table table-sm mb-5" id='charge_table'>
+						<thead>
+							<tr class="table-secondary">
+								<th scope='col' style='text-align:left;'>Billing ID</th>
+								<th scope="col">Monthly Charges</th>
+								<th scope="col" colspan='2'>Call Usage</th>
+								<th scope="col" style='text-align:right;'>Total Charge</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="table-warning">
+								<td style='text-align:left;'></td>
+								<td>Amount</td>
+								<td>Number</td>
+								<td>Amount</td>
+								<td style='text-align:right;'>Amount</td>
+							</tr>
+							{% for v in value.rows %}
+							<tr>
+								<td style='text-align:left;'><a href="detail/" class="detail_link" id="{{ v.user_defined_id }}">{{ v.user_defined_id }}</a></td>
+								<input type="hidden" name="user_id" id="user_id_post" value="this is annoying">
+								<td>{{ v.monthly_charges }}</td>
+								<td>{{ v.call_number }}</td>
+								<td>{{ v.call_amount }}</td>
+								<td style='text-align:right;'>{{ v.total_charges }}</td>
+							</tr>
+							{% endfor %}
+							<tr class='table-total'>
+								<td style='text-align:left;'><strong>Total</strong></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td style='text-align:right;'>{{ value.total }}</td>
+							</tr>
+						</tbody>
+					</table>
+					{% endfor %}
+
+					<strong>Monthly Service Charges</strong>
+					<table class="table table-sm mb-5">
+						<thead>
+							<tr class="table-secondary">
+								<th scope="col">Item Code</th>
+								<th scope="col">Description</th>
+								<th scope="col">Unit Amount</th>
+								<th scope="col">Quantity</th>
+								<th scope="col" class='total-col'>Total Charge</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for key, value in c.monthly_data.items %}
 							<tr>
 								<td>{{ key }}</td>
-								<td class='total-col'>{{ value }}</td>
+								<td>{{ value.desc }}</td>
+								<td>{{ value.unit_amt }}</td>
+								<td>{{ value.quantity }}</td>
+								<td class='total-col'>{{ value.total }}</td>
 							</tr>
-						{% endfor %}
-						<tr class='table-total'>
-							<td><strong>Total</strong></td>
-							<td class='total-col'>{{ c.type_total }}</td>
-						</tr>
-					</tbody>
-				</table>
+							{% endfor %}
+							<tr class='table-total'>
+								<td><strong>Total</strong></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td class='total-col'>{{ c.monthly_total }}</td>
+							</tr>
+						</tbody>
+					</table>
 
-				{% for key, value in c.charge_tables.items %}
-				<strong>{{ key }} Charges</strong>
-				<table class="table table-sm mb-5" id='charge_table'>
-					<thead>
-						<tr class="table-secondary">
-							<th scope='col' style='text-align:left;'>Billing ID</th>
-							<th scope="col">Monthly Charges</th>
-							<th scope="col" colspan='2'>Call Usage</th>
-							<th scope="col" style='text-align:right;'>Total Charge</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="table-warning">
-							<td style='text-align:left;'></td>
-							<td>Amount</td>
-							<td>Number</td>
-							<td>Amount</td>
-							<td style='text-align:right;'>Amount</td>
-						</tr>
-						{% for v in value %}
-						<tr>
-							<td style='text-align:left;'><a href="detail/" class="detail_link">{{ v.user_defined_id }}</a></td>
-							<td>{{ v.monthly_charges }}</td>
-							<td>{{ v.call_number }}</td>
-							<td>{{ v.call_amount }}</td>
-							<td style='text-align:right;'>{{ v.total_charges }}</td>
-						</tr>
-						{% endfor %}
-						<tr class='table-total'>
-							<td style='text-align:left;'><strong>Total</strong></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td style='text-align:right;'>total charge</td>
-						</tr>
-					</tbody>
-				</table>
-				{% endfor %}
-
-				<strong>Monthly Service Charges</strong>
-				<table class="table table-sm mb-5">
-					<thead>
-						<tr class="table-secondary">
-							<th scope="col">Item Code</th>
-							<th scope="col">Description</th>
-							<th scope="col">Unit Amount</th>
-							<th scope="col">Quantity</th>
-							<th scope="col" class='total-col'>Total Charge</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for key, value in c.monthly_data.items %}
-						<tr>
-							<td>{{ key }}</td>
-							<td>{{ value.desc }}</td>
-							<td>{{ value.unit_amt }}</td>
-							<td>{{ value.quantity }}</td>
-							<td class='total-col'>{{ value.total }}</td>
-						</tr>
-						{% endfor %}
-						<tr class='table-total'>
-							<td><strong>Total</strong></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td class='total-col'>total charge</td>
-						</tr>
-					</tbody>
-				</table>
-
-				<strong>One-Time Charges & Credits Summary</strong>
-				<table class="table table-sm">
-					<thead>
-						<tr class="table-secondary">
-							<th scope="col">Item Code</th>
-							<th scope="col">Work Order (if applicable)</th>
-							<th scope="col">Description</th>
-							<th scope="col" style="text-align:right">Total Amount</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td></td>
-							<td><a href="tsr/"></a></td>
-							<td></td>
-							<td style="text-align:right"></td>
-						</tr>
-						<tr style="background-color:#F0AD4E;">
-							<td><strong>Total</strong></td>
-							<td></td>
-							<td></td>
-							<td style="text-align:right">total charge</td>
-						</tr>
-					</tbody>
-				</table>
+					<strong>One-Time Charges & Credits Summary</strong>
+					<table class="table table-sm">
+						<thead>
+							<tr class="table-secondary">
+								<th scope="col">Item Code</th>
+								<th scope="col">Work Order (if applicable)</th>
+								<th scope="col">Description</th>
+								<th scope="col" style="text-align:right">Total Amount</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td></td>
+								<td><a href="tsr/"></a></td>
+								<td></td>
+								<td style="text-align:right"></td>
+							</tr>
+							<tr style="background-color:#F0AD4E;">
+								<td><strong>Total</strong></td>
+								<td></td>
+								<td></td>
+								<td style="text-align:right">total charge</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
-	</div>
-	{% else %}
-	<div class="col-md-8">
-        <div class="alert alert-danger col-md-8" role="alert">
-            <i class="fas fa-exclamation-triangle" style="color:red"></i>
-            This chartfield does not have any data.
-        </div>
-    </div>
-	{% endif %}
-	{% endfor %}
-
+		{% else %}
+		<div class="col-md-8">
+	        <div class="alert alert-danger col-md-8" role="alert">
+	            <i class="fas fa-exclamation-triangle" style="color:red"></i>
+	            This chartfield does not have any data.
+	        </div>
+	    </div>
+		{% endif %}
+		{% endfor %}
+	</form>
 </div>
 
 {% endblock %}

@@ -107,16 +107,21 @@ def generate_report(request):
 				'monthly_charges': '${:,.2f}'.format(a.mrc_amount),
 				'call_number': a.tot_call_count,
 				'call_amount': '${:,.2f}'.format(a.tot_call_amount),
-				'total_charges': '${:,.2f}'.format(a.tot_amount)
+				'total_charges': a.tot_amount
 			}
 			if prefix not in charges:
-				charges[prefix] = []
-			charges[prefix].append(user_id)
+				charges[prefix] = {
+					'rows': [],
+					'total': 0
+				}
+			charges[prefix]['rows'].append(user_id)
+			charges[prefix]['total'] += user_id['total_charges']
 
 		
 		# Monthly Service Charges table
 		monthly_query = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf)
 		monthly_data = {}
+		monthly_total = 0
 		for m in monthly_query:
 			if m.item_code in monthly_data:
 				monthly_data[m.item_code]['quantity'] += int(m.quantity)
@@ -128,15 +133,28 @@ def generate_report(request):
 					'quantity': int(m.quantity),
 					'total': m.charge_amount
 				}
+				monthly_total += m.charge_amount
+
+		
+		# Make it look like money $$$$$
 		for m in monthly_data.values():
 			m['total'] = '${:,.2f}'.format(m['total'])
 
+		for p in prefixes:
+			prefixes[p] = '${:,.2f}'.format(prefixes[p])
+		for c in charges:
+			for r in charges[c]['rows']:
+				r['total_charges'] = '${:,.2f}'.format(r['total_charges'])
+			charges[c]['total'] = '${:,.2f}'.format(charges[c]['total'])
+
+		
 		data = {
 			'account_number': cf,
 			'type_summary': prefixes,
 			'type_total': '${:,.2f}'.format(total),
 			'charge_tables': charges,
-			'monthly_data': monthly_data
+			'monthly_data': monthly_data,
+			'monthly_total': '${:,.2f}'.format(monthly_total)
 		}
 		charge_types.append(data)
 
@@ -145,6 +163,7 @@ def generate_report(request):
 		'dept': selected_dept,
 		'billing_date': bill_date,
 		'charge_types': charge_types,
+		'chartfields': chartcoms
 	}
 
 	return HttpResponse(template.render(context, request))
@@ -156,16 +175,29 @@ def show_detail(request):
 	template = loader.get_template('doc-detail.html')
 
 	# Get information from previous page
-	if request.method == 'GET':
-		selected_dept = request.GET.get('selected_dept')
-		bill_date = request.GET.get('billing_date')
-		chartcoms = request.GET.getlist('chartcoms[]')
+	selected_dept = request.POST.get('selected_dept')
+	bill_date = request.POST.get('billing_date')
+	chartcoms = request.POST.get('chartcoms')
+	user_id = request.POST.get('user_id')
+
+	# Fix format of chartcom string list - this is messy
+	chartcoms = chartcoms.replace('[','')
+	chartcoms = chartcoms.replace(']','')
+	chartcoms = chartcoms.replace(',','')
+	chartcoms = chartcoms.replace(' ', '')
+	chartcoms = chartcoms.split('\'')
+	format_chartcoms = []
+	for c in chartcoms:
+		if len(c) != 0:
+			format_chartcoms.append(c)
+
 
 	context = {
 		'title':'Detail of Charges',
 		'dept': selected_dept,
 		'billing_date': bill_date,
-		'chartcoms': chartcoms
+		'chartcoms': format_chartcoms,
+		'user_id': user_id
 	}
 
 	#return JsonResponse(context, safe=False)
