@@ -295,7 +295,9 @@ class Status(PermissionRequiredMixin, View):
 
         #items_selected = request.POST.getlist('includeInOrder')
         #order_list = item_list.distinct('chartcom')
-        order_list = Order.objects.all().order_by('-create_date')
+        chartcoms = Chartcom.objects.filter(dept__in=dept_list);
+        order_list = Order.objects.filter(chartcom__in=chartcoms).order_by('-create_date')
+
         item_list = Item.objects.filter(order__in=order_list)
 
         for num, order in enumerate(order_list, start=1):
