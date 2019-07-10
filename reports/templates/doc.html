@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% comment %}
 <div class="container">
     <form action="/reports/doc/report/" method="POST" name="Select">{% csrf_token %}
         <div class="form-group">
@@ -46,7 +45,7 @@
 <script src="/../static/doc.js"></script> 
 
 
-{% endcomment %}
+{% comment %}
 <div id="main-content" class="container" role="main">
     <div class="container" role="main">
         <div class="row">
@@ -64,4 +63,5 @@
         </div>
     </div>
 </div>
+{% endcomment %}
 {% endblock %}

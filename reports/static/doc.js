@@ -53,36 +53,44 @@ $(document).ready(function() {
 	})
 
 	
-	// Send data to report page
+	// // Send data to report page
+	// $('.detail_link').on('click', function(e) {
+	// 	e.preventDefault();
+
+	// 	var selected = $('#selected_dept').text();
+	// 	var bill_date = $('#billing_date').text();
+	// 	// var chartcoms = $('#chartcoms').val();
+
+	// 	data = {
+	// 			selected_dept: 'test',
+	// 			billing_date: 'test',
+	// 			chartcoms: 'test'
+	// 		};
+	// 	$.post('/reports/doc/report/detail/', data);
+
+	// 	// $.ajax({
+	// 	// 	url: '/reports/doc/report/detail/',
+	// 	// 	data: {
+	// 	// 		'selected_dept': selected,
+	// 	// 		'billing_date': bill_date,
+	// 	// 		'chartcoms': chartcoms
+	// 	// 	},
+	// 	// 	dataType: 'json',
+	// 	// 	success: function(data) {
+	// 	// 		alert('success');
+	// 	// 	},
+	// 	// 	error: function(data) {
+	// 	// 		alert('error');
+	// 	// 	}
+	// 	// })
+	// })
+
 	$('.detail_link').on('click', function(e) {
 		e.preventDefault();
-
-		var selected = $('#selected_dept').text();
-		var bill_date = $('#billing_date').text();
-		// var chartcoms = $('#chartcoms').val();
-
-		data = {
-				selected_dept: 'test',
-				billing_date: 'test',
-				chartcoms: 'test'
-			};
-		$.post('/reports/doc/report/detail/', data);
-
-		// $.ajax({
-		// 	url: '/reports/doc/report/detail/',
-		// 	data: {
-		// 		'selected_dept': selected,
-		// 		'billing_date': bill_date,
-		// 		'chartcoms': chartcoms
-		// 	},
-		// 	dataType: 'json',
-		// 	success: function(data) {
-		// 		alert('success');
-		// 	},
-		// 	error: function(data) {
-		// 		alert('error');
-		// 	}
-		// })
+		var form = document.getElementById('report_details');
+		var selected_id = $(e.target).text();
+		document.getElementById('user_id_post').value = selected_id;
+		form.submit();
 	})
 
 
