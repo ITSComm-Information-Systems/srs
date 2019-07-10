@@ -775,15 +775,16 @@ class UmOscAcctdetailMrcOccV(models.Model):
      billing_cycle = models.CharField(max_length=2)
      item_code = models.CharField(max_length=50)
      batch_date = models.DateField
+     invoice_date = models.DateField
      account_number = models.CharField(max_length=100)
      account_subcode = models.CharField(max_length=10)
      item_description = models.CharField(max_length=100)
      charge_type = models.CharField(max_length=3)
-     charge_amount = models.DecimalField(decimal_places=2, max_digits=19,  null=False)
+     charge_amount = models.DecimalField(decimal_places=4, max_digits=19,  null=False)
      spec_process_ind = models.CharField(max_length=1)
-     package_code = models.CharField(max_length=95)
+     package_code = models.CharField(max_length=91)
      quantity = models.IntegerField(9, null=False)
-     unit_price = models.DecimalField(decimal_places=2, max_digits=19,  null=False)
+     unit_price = models.DecimalField(decimal_places=4, max_digits=19,  null=False)
      charge_to_dept = models.CharField(max_length=10)
      row_id = models.CharField(max_length=20, primary_key=True)
 
@@ -794,7 +795,7 @@ class UmOscAcctdetailMrcOccV(models.Model):
 
 
 class UmOscOtsCallSummaryV(models.Model):
-     unique_key =  models.CharField(max_length=170, blank=True, null=True)        
+     unique_key =  models.CharField(max_length=165, blank=True, null=True)        
      account_number =  models.CharField(max_length=100, blank=True, null=True)    
      fund =  models.CharField(max_length=30, blank=True, null=True)              
      deptid =  models.CharField(max_length=30, blank=True, null=True)            
@@ -818,7 +819,7 @@ class UmOscOtsCallSummaryV(models.Model):
      fcc_amount =  models.BigIntegerField( null=True)                             
      tot_count =  models.BigIntegerField( null=True)                              
      tot_amount =  models.BigIntegerField( null=True)                             
-     row_id =  models.CharField(max_length=170, blank=True, null=True)            
+     row_id =  models.CharField(max_length=165, blank=True, null=True)            
 
      class Meta:
           managed = False
@@ -880,7 +881,7 @@ class UmOscRatedV(models.Model):
 
 
 class UmOscReptInvlocV(models.Model):
-     id =  models.BigIntegerField( null=True,primary_key=True)                                     
+     id =  models.BigIntegerField( null=False,primary_key=True)                                     
      billing_date =  models.DateField(null=True)                                  
      subscriber_id =  models.CharField(max_length=7, blank=True, null=True)       
      user_defined_id =  models.CharField(max_length=20, blank=True, null=True)    
@@ -920,7 +921,16 @@ class UmOscReptInvlocV(models.Model):
        
      class Meta:
           managed = False
-          ordering = ('billing_date','org','chartfield','user_deinfed_id','rptorder','item_code')
+          ordering = ('billing_date','org','chartfield','user_defined_id','rptorder','item_code')
           db_table = 'PINN_CUSTOM\".\"um_osc_rept_invloc_v'
 
-
+class UmOscPhoneHistoryV(models.Model):
+     date_snapshot = models.DateField
+     user_defined_id = models.CharField(max_length=20)
+     phone_number = models.CharField(max_length=30)
+     description = models.CharField(max_length=60)
+       
+     class Meta:
+          managed = False
+          ordering = ('user_defined_id','date_snapshot')
+          db_table = 'PINN_CUSTOM\".\"um_osc_phone_history_v'
