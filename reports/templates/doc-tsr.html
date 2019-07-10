@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+	<div class="row-inline">
+		<strong>Report selection</strong>
+		<a class="offset-2" href="../..">Edit your selection</a>
+	</div>
+
+	<div class="row">
+		<div class="card border-dark col-md-5">
+			<div class="card-body">
+				<strong>Department:&nbsp;&nbsp;</strong>Department goes here :-)<br>
+				<strong>Billing Date:&nbsp;&nbsp;</strong>I love Mamma Mia<br>
+				<strong style="float:left;">Chartfields:&nbsp;&nbsp;</strong>
+				<p style="float:left;">
+					This movie is great<br>
+					What if there are more chartfields?
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="row-inline mt-5">
+		<strong>Subscriber Information</strong>
+		<a class="offset-7" href="..">Back to report</a>
+	</div>
+
+	<div class="row">
+		<div class="card border-dark col-md-10">
+			<div class="card-body">
+				<strong>Item Code:&nbsp;&nbsp;</strong>I can't wait<br>
+				<strong>Work Order:&nbsp;&nbsp;</strong>to eat cake when I get home<br>
+			</div>
+		</div>
+	</div>
+
+	<div class="row mt-5">
+		<strong>Charge Summary for Chartfield:&nbsp;</strong>
+		<p>ChartFIELD</p>
+	</div>
+	<div class="card border-dark">
+		<div class="card-body">
+			<table class="table table-sm">
+				<thead>
+					<tr class="table-secondary">
+						<th scope="col">Item Code</th>
+						<th scope="col">Description</th>
+						<th scope="col">Unit Price</th>
+						<th scope="col">Quantity</th>
+						<th scope="col" style="text-align:right;">Total Charge</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Thinking</td>
+						<td>about</td>
+						<td>cake</td>
+						<td></td>
+						<td style="text-align:right;""></td>
+					</tr>
+					<tr style="background-color:#F0AD4E;">
+						<td><strong>Total</strong></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td style="text-align:right;">total charges</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="row mt-5">
+		<strong>Total Charges for Chartfield:&nbsp;</strong>
+		<p>ChArTfIeLd</p>
+	</div>
+	<div class="card border-dark">
+		<div class="card-body">
+			<table class="table table-sm">
+				<tbody>
+					<tr style="background-color:#F0AD4E;">
+						<td><strong>Total</strong></td>
+						<td style="text-align:right">total charge</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+
+<script src="/../static/doc.js"></script> 
+
+{% endblock %}

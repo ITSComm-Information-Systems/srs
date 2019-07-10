@@ -641,8 +641,8 @@ class UmOscVoipLocChangeInput(models.Model):
      new_room_desc = models.CharField(max_length=50)
      new_jack = models.CharField(max_length=30)
      request_no = models.IntegerField(9, null=False, primary_key=True)
-     date_added = models.DateField
-     date_processed = models.DateField
+     date_added = models.DateField()
+     date_processed = models.DateField()
      messages = models.CharField(max_length=2000)
 
      class Meta:
@@ -756,10 +756,10 @@ class UmOscBillCycleV(models.Model):
 
 class UmOscDtDeptAcctListV(models.Model):
      fund = models.CharField(max_length=30)
-     deptid = models.CharField(max_length=30)
+     deptid = models.CharField(max_length=30, primary_key=True) #made this a primary key
      program = models.CharField(max_length=30)
      subclass = models.CharField(max_length=30)
-     project_grant = models.CharField(max_length=30)
+     projectgrant = models.CharField(max_length=30) #changed name from project_grant
      account_number = models.CharField(max_length=100)
      batch_date = models.DateField
 
@@ -771,7 +771,7 @@ class UmOscDtDeptAcctListV(models.Model):
 
 class UmOscAcctdetailMrcOccV(models.Model):
      subscriber_id = models.CharField(max_length=7)
-     billing_date = models.DateField
+     billing_date = models.DateField(null=True) # made this null=True
      billing_cycle = models.CharField(max_length=2)
      item_code = models.CharField(max_length=50)
      batch_date = models.DateField
@@ -803,7 +803,7 @@ class UmOscOtsCallSummaryV(models.Model):
      class_code =  models.CharField(max_length=30, blank=True, null=True)             
      project_grant =  models.CharField(max_length=30, blank=True, null=True)     
      billing_date =  models.DateField(null=True)                                  
-     user_defined_id =  models.CharField(max_length=20, blank=True, null=True)    
+     user_defined_id =  models.CharField(max_length=20, blank=True, null=False, primary_key=True) #temporarily made this a primary key and set null to false    
      subscriber_id =  models.CharField(max_length=7, blank=True, null=True)      
      ld_count =  models.BigIntegerField( null=True)                               
      ld_amount =  models.BigIntegerField( null=True)                              
@@ -925,7 +925,7 @@ class UmOscReptInvlocV(models.Model):
           db_table = 'PINN_CUSTOM\".\"um_osc_rept_invloc_v'
 
 class UmOscPhoneHistoryV(models.Model):
-     date_snapshot = models.DateField
+     date_snapshot = models.DateField(null=True)
      user_defined_id = models.CharField(max_length=20)
      phone_number = models.CharField(max_length=30)
      description = models.CharField(max_length=60)

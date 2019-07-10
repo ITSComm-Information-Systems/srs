@@ -13,14 +13,21 @@ class FeaturesForm(forms.Form):
 
     for cat in list:
         cat.type = ['STD','OPT','SC','VM']
-        cat.type[0] = features.filter(category=cat).filter(type='STD')
+        cat.type[0] = features.filter(category=cat).filter(type='STD').order_by('display_seq_no')
         cat.type[0].label = 'Standard'
-        cat.type[1] = features.filter(category=cat).filter(type='OPT')
+        cat.type[1] = features.filter(category=cat).filter(type='OPT').order_by('display_seq_no')
         cat.type[1].label = 'Optional'
-        cat.type[2] = features.filter(category=cat).filter(type='SPD')
+        cat.type[2] = features.filter(category=cat).filter(type='SPD').order_by('display_seq_no')
+
         cat.type[2].label = 'Speed Call'
-        cat.type[3] = features.filter(category=cat).filter(type='VM')
+        last = cat.type[2].count()
+        if last > 0:
+            cat.type[2].last = (cat.type[2][last-1].id)
+
+        cat.type[3] = features.filter(category=cat).filter(type='VM').order_by('display_seq_no')
         cat.type[3].label = 'Voicemail'
+        last = cat.type[3].count()
+        cat.type[3].last = (cat.type[3][last-1].id)
 
     template = 'order/features.html'
 
@@ -33,8 +40,13 @@ class RestrictionsForm(forms.Form):
     res = Restriction.objects.all()
     list = FeatureCategory.objects.all()
 
+    print('omg')
+
     for cat in list:
-        cat.res = res.filter(category=cat)
+        cat.res = res.filter(category=cat).order_by('display_seq_no')
+        last = cat.res.count()
+        cat.last = cat.res[last-1].id
+        print(cat.res[last-1].id)
 
     template = 'order/restrictions.html'
 
@@ -50,7 +62,7 @@ class AddlInfoForm(forms.Form):
     contact_id = forms.CharField(label='Uniqname', max_length=8)
     contact_name = forms.CharField(label='Name', max_length=40)
     contact_number = forms.CharField(label='Best number to contact.', max_length=10)
-    comments = forms.CharField(required=False, widget=forms.Textarea )
+    comments = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100'}) )
     file = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
     template = 'order/dynamic_form.html'
@@ -63,7 +75,8 @@ class ReviewForm(forms.Form):
 
 class NewLocationForm(forms.Form):
     building_list = UmOSCBuildingV.objects.all()
-    building = forms.CharField(label='Building', max_length=100)
+    building_code = forms.CharField(label='Building Code', max_length=100)
+    building_name = forms.CharField(label='Building Name', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
     room = forms.CharField(label='Room', max_length=100)
 
@@ -73,9 +86,9 @@ class NewLocationForm(forms.Form):
 class EquipmentForm(forms.Form):
     cat = ['Basic','VOIP']
     cat[0] = Product.objects.all().filter(category=1).order_by('display_seq_no')
-    cat[0].id = 1
+    cat[0].id = 'basic'
     cat[1] = Product.objects.all().filter(category=2).order_by('display_seq_no') 
-    cat[1].id = 2
+    cat[1].id = 'voip'
     template = 'order/products.html'
 
 
