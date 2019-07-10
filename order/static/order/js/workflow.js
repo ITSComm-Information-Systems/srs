@@ -1,7 +1,8 @@
 $(document).ready(function() {
 
   var x, i;
-  x = $('input:not(:checkbox)');
+  //x = $('input:not(:checkbox)');
+  x = $("input:not([type=radio], [type=checkbox])");
   for (i = 0; i < x.length; i++) {
       x[i].className += " form-control";
   }
@@ -30,6 +31,34 @@ $(document).ready(function() {
   $("#PhoneSetType").hide();
   $("#JackNumber").hide();
   $("#PhoneModelNum").hide();
+  $("#voipPhoneMac").hide();
+  
+  
+  $("#ModelInfo_basic").click(function() {
+    $("#PhoneModelNum").show();
+    $("#voipPhoneMac").hide();
+  });
+
+  $("#ModelInfo_advanced").click(function() {
+    $("#PhoneModelNum").show();
+    $("#voipPhoneMac").hide();
+  });
+
+  $("#ModelInfo_voip").click(function() {
+    $("#PhoneModelNum").show();
+    $("#voipPhoneMac").show();
+  });
+
+
+  $("#activePhone_Y").click(function() {
+    $('[data-tab="LocationNew"]').hide();
+  });
+
+  $("#activePhone_N").click(function() {
+    $('[data-tab="LocationNew"]').show();
+  });
+  
+
 
   //Data
   $("#activePhone").hide();
@@ -58,7 +87,7 @@ $(document).ready(function() {
 
   $("#activePhone_N").click(function() {
     $("#linesToInstall").show();
-    $('#pills-step2').addClass(' hidden');
+    //$('#pills-step2').hide();  //.addClass(' hidden');
   });
 
   $("#conduit_Y").click(function() {
@@ -74,55 +103,53 @@ $(document).ready(function() {
   $('#contact_name').hide();
   $('#contact_number').hide();
 
+  // data based radio actions
+  $('input[type=radio]').click(function(){
 
-  //Phone
-  $("#phoneSetType_B").click(function() {
-    basicPhone();
-    $("#equip2").hide();
-    $("#equip1").show();
+    if(this.value=='basic'){
+      $('[data-phoneset="advanced"]').hide();
+      $('[data-phoneset="basic"]').show();
+      $('[data-phoneset="voip"]').hide();
+    }
+    if(this.value=='advanced'){
+      $('[data-phoneset="advanced"]').show();
+      $('[data-phoneset="basic"]').hide();
+      $('[data-phoneset="voip"]').hide();
+    }
+    if(this.value=='voip'){
+      $('[data-phoneset="advanced"]').hide();
+      $('[data-phoneset="basic"]').hide();
+      $('[data-phoneset="voip"]').show();
+    }
+
+    if (this.value=='buy'){
+      $('[data-tab="Equipment"]').show();
+    }
+
+    if (this.value=='nobuy'){
+      $('[data-tab="Equipment"]').hide();
+    }
+
+    if(this.name=='analogIPFax' || this.name=='analogIPpci'){
+      if(this.value=='basic') { // Analog
+        $('[data-tab="IPFaxInfo"]').hide();
+        $('[data-tab="2Chartfields"]').hide();
+        $('[data-tab="LocationNew"]').show();
+        $('[data-tab="Restrictions"]').show();
+        $('[data-tab="4Chartfields"]').show();
+      }
+      if(this.value=='voip'){
+        $('[data-tab="IPFaxInfo"]').show();
+        $('[data-tab="2Chartfields"]').show();
+        $('[data-tab="LocationNew"]').hide();
+        $('[data-tab="Restrictions"]').hide();
+        $('[data-tab="4Chartfields"]').hide();
+      }
+    }
+
   });
 
-  $("#phoneSetType_A").click(function() {
-    advancedPhone();
-  });
-
-  $("#phoneSetType_V").click(function() {
-    voipPhone();
-    $("#equip1").hide();
-    $("#equip2").show();
-  });
-
-  //Phone
-  $("#PhoneSetType_B").click(function() {
-    basicPhone();
-    $("#equip2").hide();
-    $("#equip1").show();
-  });
-
-  $("#PhoneSetType_A").click(function() {
-    advancedPhone();
-  });
-
-  $("#PhoneSetType_V").click(function() {
-    voipPhone();
-    $("#equip1").hide();
-    $("#equip2").show();
-  });
-
-  $("#ModelInfo_V").click(function() {
-    voipPhone();
-    $("#PhoneModelNum").show();
-  });
   
-  $("#ModelInfo_A").click(function() {
-    advancedPhone();
-    $("#PhoneModelNum").show();
-  });
-
-  $("#ModelInfo_B").click(function() {
-    basicPhone();
-    $("#PhoneModelNum").show();
-  });
 
   // Phone Type Tab
   $("#Jack_Y").click(function() {
@@ -154,39 +181,41 @@ $(document).ready(function() {
     $("#PurchasePhone_review").show();
   });
 
-  $("#PurchasePhone_Y").click(function() {
+  $("#PurchasePhone_buy").click(function() {
     $("#PhoneSetType").show();
     $("#PhoneSetType_review").show();
     $("#ModelInfo").hide();
     $("#ModelInfo_review").hide();
     $("#PhoneModelNum").hide();
-    $('#pills-step3').removeClass(' hidden');
+    $("#PhoneModelNum_review").hide();
+    //$('#pills-step3').show();  //removeClass(' hidden');
   });
 
-  $("#PurchasePhone_N").click(function() {
+  $("#PurchasePhone_nobuy").click(function() {
     $("#ModelInfo").show();
     $("#ModelInfo_review").show();
     $("#PhoneSetType").hide();
     $("#PhoneSetType_review").hide();
-    $('#pills-step3').addClass(' hidden');
+    //$('#pills-step3').hide();  //addClass(' hidden');
   });
 
 
-  $("#purchasePhone_Y").click(function() {
+  $("#purchasePhone_buy").click(function() {
     $("#PhoneSetType").show();
     $("#PhoneSetType_review").show();
     $("#ModelInfo").hide();
     $("#ModelInfo_review").hide();
     $("#PhoneModelNum").hide();
-    $('#pills-step3').removeClass(' hidden');
+    $("#PhoneModelNum_review").hide();
+    //$('#pills-step4').hide();  //.removeClass(' hidden');
   });
 
-  $("#purchasePhone_N").click(function() {
+  $("#purchasePhone_nobuy").click(function() {
     $("#ModelInfo").show();
     $("#ModelInfo_review").show();
     $("#PhoneSetType").hide();
     $("#PhoneSetType_review").hide();
-    $('#pills-step3').addClass(' hidden');
+    //$('#pills-step4').hide();  //.addClass(' hidden');
   });
 
 
@@ -208,12 +237,18 @@ $(document).ready(function() {
     $('#contact_id').show();
     $('#contact_name').show();
     $('#contact_number').show();
+    $('#contact_id_review').show();
+    $('#contact_name_review').show();
+    $('#contact_number_review').show();
   });
 
   $("#contact_yn_True").click(function(event) {
     $('#contact_id').hide();
     $('#contact_name').hide();
     $('#contact_number').hide();
+    $('#contact_id_review').hide();
+    $('#contact_name_review').hide();
+    $('#contact_number_review').hide();
   });
 
 
@@ -237,7 +272,8 @@ function nextPrev(n) {
 
   currStep = currStep + n;
 
-  while ( $('#pills-step'+currStep).hasClass('hidden')) {
+  //while ( $('#pills-step'+currStep).hasClass('hidden')) {
+  while ( $('#pills-step'+currStep).is(':hidden')) {
     currStep = currStep + n;
   }
 
@@ -251,6 +287,7 @@ function nextPrev(n) {
 
 
 function validateForm() {
+
   inp = $("#step" + currStep + " :input:visible");
   valid = true;
   for (i = 0; i < inp.length; i++) {
@@ -260,7 +297,8 @@ function validateForm() {
     if (selected_text) {
       $(id).html(selected_text);
     } else {
-      $(id).html($(inp[i]).val());
+      text_box = $("#" + inp[i].id ).val();
+      $(id).html( text_box );
     }
 
     if (!inp[i].checkValidity()) {
@@ -285,30 +323,74 @@ function validateForm() {
 }
 
 
-// Features & Restrictions
-function basicPhone() {
-  $("#cat3").show();
-  $("#cat2").hide();
-  $("#cat1").hide();
-  $("#rescat3").show();
-  $("#rescat2").hide();
-  $("#rescat1").hide();
-}
 
-function advancedPhone() {
-    $("#cat2").show();
-    $("#cat1").hide();
-    $("#cat3").hide();
-    $("#rescat2").show();
-    $("#rescat1").hide();
-    $("#rescat3").hide();
+  function filterChartcom(id, value) {
+    console.log('usa:' + value);
+    //$("#edit-field-service-sub-cat-value option[value=" + title + "]").hide();
+    //$(id).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    //$('.city').find('option:contains('Aurangabad)').hide();
+    //$(#id_oneTimeCharges).find([data-dept='481060']).hide();
   }
 
-  function voipPhone() {
-    $("#cat1").show();
-    $("#cat2").hide();
-    $("#cat3").hide();
-    $("#rescat1").show();
-    $("#rescat2").hide();
-    $("#rescat3").hide();
-  }
+  $("#phoneLookup").click(function () {
+    var phone_number = $("#id_phone_number").val();
+    phone_number = phone_number.replace(/\D/g,'');
+
+    $("#phLocationFields").show();
+    $("#phBuildingID").val('');
+    $("#id_building").val('');
+    $("#id_floor").val('');
+    $("#id_room").val('');
+    $("#id_jack").val('');
+
+
+    $.ajax({
+      url: '/orders/ajax/get_phone_location/' + phone_number,
+      //dataType: 'json',
+
+      beforeSend: function(){
+        $("#phLocationFields").hide();
+        $('#phoneLookup').html('Searching...').addClass(' disabled');
+        $("#buildingCode").html('');
+        $("#building").html('');
+        $("#floor").html('');
+        $("#room").html('');
+        $("#jack").html('');
+      },
+
+      success: function (data) {
+        if (data.code !== '') {
+          $("#buildingCode").html(data.code);
+          $("#building").html(data.name);
+          $("#floor").html(data.floor);
+          $("#room").html(data.room);
+          $("#jack").html(data.jack);
+
+          $("#id_buildingCode_review").html(data.code);
+          $("#id_building_review").html(data.name);
+          $("#id_floor_review").html(data.floor);
+          $("#id_room_review").html(data.room);
+          $("#id_jack_review").html(data.jack);
+
+          console.log('good:' + data.code)
+          $("#id_phone_number").addClass('is-valid');
+          $("#id_phone_number").removeClass('invalid');
+          $("#workflowForm").removeClass('was-validated');
+          $("#phLocationFields").show();
+        } else {
+          alert("No phone found.");
+        }
+      },
+
+      error: function(){
+        $("#id_phone_number").addClass('is-invalid');
+        $("#id_phone_number").removeClass('is-valid');
+        $("#workflowForm").addClass('was-validated');
+      },
+
+      complete: function(){
+        $('#phoneLookup').html('Find').removeClass(' disabled');
+      }
+
+    })
+  });

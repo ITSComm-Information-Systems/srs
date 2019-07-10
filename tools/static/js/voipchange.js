@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	$("#vlc-1").removeClass('disabled');  // Enable first pill, that is how it all starts.
 
-	currStep = 1;
+  currStep = 1;
     lastStep = 3; //document.getElementsByClassName("tab-pane").length;
     $("#buildingFields").hide();
     $("#buildingTable").hide();
@@ -31,8 +31,14 @@ $(document).ready(function() {
 
 	$("#vlPrevBtn").click(function(event) {
 		nextPrev(-1);
-	});
+  });
+  
+  function getPathFromUrl(url) {
+    return url.split("?")[0];
+  }
 });
+
+
 
 function nextPrev(n) {
 
@@ -71,10 +77,47 @@ function nextPrev(n) {
         document.getElementById('vl-3').className = ""
     }  
   
+    // Next->submit
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+      if (currStep == lastStep) {
+          $('#vlNextBtn').html('Submit');
+      } else {
+          $('#vlNextBtn').html('Next');
+      }
+      $('#vlNextBtn').prop('disabled', false);
+    });
+
     if (currStep > lastStep) {
-        //$('#workflowForm').submit();
-        return false;
-    }
+      $('#voipLocationForm').submit();
+      return false;
   }
+}
+
+function tab_func1() {
+	currStep = 1;
+	// $('#vlc_desc').show();
+ //  	$('#dept_details').show();
+  	$('#phoneselect').show();
+}
+
+function tab_func2() {
+	var test = $('#vlc-2');
+	if (!$('#vlc-2').hasClass('disabled')) {
+		currStep = 2;
+		// $('#vlc_desc').hide();
+	 //  	$('#dept_details').hide();
+	}
+	$('#phoneselect').hide();
+}
+
+function tab_func3() {
+	if (!$('#vlc-3').hasClass('disabled')) {
+		currStep = 3;
+		// $('#vlc_desc').hide();
+	 //  	$('#dept_details').hide();
+	  }
+	  $('#phoneselect').hide();
+}
+
 
   

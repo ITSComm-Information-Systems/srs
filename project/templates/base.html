@@ -56,14 +56,14 @@
 						</a>
 						<div class="dropdown-menu" aria-labelledby="toolsDropdown">
 							<a class="dropdown-item" href="/auth/deptpriv/">Department Look Up</a>
-							<a class="dropdown-item" href="#">Cost Estimator</a>
+							<a class="dropdown-item" href="/tools/costestimator">Cost Estimator</a>
 							<a class="dropdown-item" href="/chartchange/">Chartfield Change Request</a>
 							<a class="dropdown-item" href="/tools/voip/">VOIP Location Change</a>
 						</div>
 					</li>
 					{% endif %}
 					<li class="nav-item">
-						<a class="nav-link" href="/help">Get Help</a>
+						<a class="nav-link" href="/help">Help</a>
 					</li>
 					{% if user.is_authenticated %}
 					<li class="nav-item dropdown ">
@@ -84,7 +84,8 @@
 							{% endif %}
 							{% if perms.oscauth.can_administer_access %}
 								<a class="dropdown-item" href="/auth/get_uniqname/">Manage Access</a>
-							{% endif %}								
+							{% endif %}
+							<a class="dropdown-item" href="/orders/chartcom/0">Manage Chartfields</a>								
 							<a class="dropdown-item" href="/auth/mypriv/">View System Privileges</a>
 							<a class="dropdown-item"  href="/auth/logout/">Logout</a>
 						</div>
@@ -127,7 +128,7 @@
 						<a class="nav-link" href="/orders/cart/0">View Cart</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="/orders/status/0">View Orders</a>
+						<a class="nav-link" href="/orders/status/0">Track Orders</a>
 					</li>
 					{% endif %}
 				</ul>

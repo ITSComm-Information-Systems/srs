@@ -1,30 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div class = "container">
 
     <div class="row align-items-start" id="phoneselect">
      <form action="/tools/voip/" method="GET" submit="return validate()" name="Select">{% csrf_token %}
     
         <h2>Phone Number:</h2>
-        <input type="text" style='font-size:20px' name = 'number' id = 'phone'>
+        <input type="text" style='font-size:20px' name = 'number' id = 'phone' placeholder>
         <input type="submit" value="Go" class="btn btn-primary"><br>
         <p></p>
     </form>
     </div>
-    <div id = "current">
-    {% comment %} <p>{{ current }}</p> {% endcomment %}
-    </div>
-    <div id = "locations">
-    <p>{{ locations }}</p>
-    </div>
-    <div id = "available">
-    <p>{{ available }}</p>
-    </div>
     
     
-    <form method="post">
+    <form action='/tools/voip/confirm/' method="GET" id = "voipLocationForm">
         <ul class="nav justify-content-center nav-pills" id="voiplocation_nav" role="tablist">
             <li class="nav-item">
                 <a class="nav-link disabled" data-toggle="tab" id="vlc-1" href="#" role="tab" name="Select Phone Number" aria-selected="false">Select Phone Number</a>
@@ -49,17 +40,32 @@
             </div>
             <div style = "overflow:auto;">
                 <div style="float:right;">
-                    <button type="button" class="btn btn-primary" id=vlPrevBtn>Previous</button>
-                    <button type="button" class="btn btn-primary" id=vlNextBtn>Next</button>
+                    <button type="button" class="btn btn-primary" id="vlPrevBtn">Previous</button>
+                    <button type="button" class="btn btn-primary" id="vlNextBtn">Next</button>
                 </div>
             </div>
         </div>
 
     </form>
     
+</div> {% endcomment %}
+<div id="main-content" class="container" role="main">
+    <div class="container" role="main">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="message">
+                    <hr class="style1">
+                    <p>
+                        This tool is currently under construction.<br>
+                        If you would like to use this tool, click the button below.
+                    </p>
+                    <a href="https://itscommweb.itd.umich.edu/LocationChange/" class="btn btn-outline-primary" role="button">VOIP Location Change</a>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-
 {% endblock %}
 
 {% block js %}
@@ -67,4 +73,4 @@
 <script src="/static/js/voipchange.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
 
-{% endblock %} 
+{% endblock %}

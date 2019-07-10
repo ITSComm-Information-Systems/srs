@@ -73,17 +73,24 @@
 <div class="row">
     <div class="column">
         <h2>Select Task</h2>
-        <input type='radio' name="taskrad" value='add'>Add Access<br>
-        <input type='radio' name="taskrad" value='remove'>Remove Access<br>
+        <input id="roleAdd" type='radio' name="taskrad" value='add'>Add Access<br>
+        <input id="roleDelete" type='radio' name="taskrad" value='remove'>Remove Access<br>
         <br>
     </div>
-    <div class="column">
+    <div class="column" id="addRole">
         <h2>Select Role</h2>
         {% for role in grantable_roles %}
         <input type='radio' name="rolerad" value={{ role.role }}>{{ role.role }}
         <br>
         {% endfor %}
     </div>
+    <div class="column" id="deleteRole">
+            <h2>Select Role</h2>
+            {% for role in grantable_roles %}
+            <input type='checkbox' name="rolerad" value={{ role.role }}>{{ role.role }}
+            <br>
+            {% endfor %}
+        </div>
     <div class="column deptid">
         <h2>Select Department</h2>
         <input type="checkbox" onclick="toggle(this);" />Select All Departments<br />
@@ -110,7 +117,23 @@
 {% block js %}
 <script language="JavaScript">
 
-console.log("you are here");
+$(document).ready(function() {
+
+    $('#deleteRole').hide();
+
+    $("#roleAdd").click(function(event) {
+        $('#deleteRole').hide();
+        $('#addRole').show();
+    });
+
+    $("#roleDelete").click(function(event) {
+        $('#deleteRole').show();
+        $('#addRole').hide();
+    });
+
+
+});
+
 
 function toggle(source) {
     var checkboxes = document.querySelectorAll('input[type="checkbox"]');

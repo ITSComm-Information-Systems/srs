@@ -1,5 +1,67 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <p>Number 5</p>
+{% comment %}
+<div class="container">
+    <form action="/reports/doc/report/" method="POST" name="Select">{% csrf_token %}
+        <div class="form-group">
+            <h5>Select Department</h5>
+            	<div class="row form-inline">
+	                <select class="form-control col-md-6" style='font-size:16px' type="select" name="select_dept" id="doc_depts" value="{{ dept }}">
+	                    {% for dept in user_depts %}
+	                    <option value="{{ dept }}">{{ dept }}</option>
+	                    {% endfor %}
+	                </select>
+	                <p>&nbsp;&nbsp;</p><strong id="dept_name">{{ name }}</strong>
+                </div>
+            <h5>Select Billing Date</h5>
+            <div class="row form-inline">
+            	<select class="form-control col-md-6" style='font-size:16px' requried type="select" name="billing_date" id="doc_bill_date" value="{{ d }}">
+	                {% for d in dates %}
+	                <option value="{{ d }}">{{ d }}</option>
+	                {% endfor %}
+	            </select>
+	            <p>&nbsp;&nbsp;</p><strong id="billing_label">{{ initial_date }}</strong>
+	        </div>
+            <h5>Select Chartfield(s)</h5>
+            <div class="row">
+	            <select multiple="multiple" class="form-control col-md-6" style='font-size:16px;float:left;' requried type="select" name="chartcoms[]" id="doc_chartcom" value="{{ cf }}">
+	                <option></option>
+	                {% for cf in dept_cfs %}
+	                <option value="{{ cf }}">{{ cf }}</option>
+	                {% endfor %}
+	            </select>
+	            <p id='chartfield_list' style="float:left;"></p>
+	        </div>
+        </div>
+        <p id="error_message" class="hidden">Please select a chartfield.</p>
+        <p><input id="generate" type='submit' value='Generate Report' class="btn btn-primary"></p>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block js %}
+
+<script src="/../static/doc.js"></script> 
+
+
+{% endcomment %}
+<div id="main-content" class="container" role="main">
+    <div class="container" role="main">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="message">
+                    <hr class="style1">
+                    <p>
+                        This report is currently under construction.<br>
+                        If you would like to run this report, please visit the Online Service Center and click on Detail of Charges under reports.
+                    </p>
+                    <a href="https://blue.itcom.itd.umich.edu/UofM/WebObjects/OnlineServiceCenter.woa/1/" class="btn btn-outline-primary" role="button">Online Service Center</a>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
