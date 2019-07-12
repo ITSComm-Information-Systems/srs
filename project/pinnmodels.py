@@ -567,7 +567,7 @@ class UmOscAllActiveAcctNbrsV(models.Model):
         db_table = 'PINN_CUSTOM\".\"um_osc_all_active_acct_nbrs_v'
 
 class UmOscAvailableLocsV(models.Model):
-     campuscd = models.CharField(max_length=4)
+     campus_code = models.CharField(max_length=4)
      campus_desc = models.CharField(max_length=30)
      service_type = models.CharField(max_length=20)
      service_number = models.CharField(max_length=60, primary_key=True)
@@ -589,7 +589,7 @@ class UmOscAvailableLocsV(models.Model):
           db_table = 'PINN_CUSTOM\".\"um_osc_available_locs_v'
 
 class UmOscLocationsInUseV(models.Model):
-     campuscd = models.CharField(max_length=4)
+     campus_code = models.CharField(max_length=4)
      campus_desc = models.CharField(max_length=30)
      service_type = models.CharField(max_length=20)
      service_number = models.CharField(max_length=60)
@@ -614,6 +614,7 @@ class UmOscVoipLocChangeInput(models.Model):
      uniqname = models.CharField(max_length=8) 
      service_id = models.IntegerField(9, null=False)
      service_number= models.CharField(max_length=60)
+     service_subscrib_id = models.IntegerField(9, null=False)
      old_campus_code = models.CharField(max_length=4)
      old_campus_desc = models.CharField(max_length=30)
      old_location_id = models.IntegerField(9, null=False)
