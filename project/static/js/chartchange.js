@@ -10,6 +10,10 @@ $(document).ready(function() {
 	lastStep = document.getElementsByClassName("tab-pane").length;
 	$('#chartchange_nav li:first-child a').tab('show');
 
+	// Select first option in dropdowns
+	$('#chart_deptids :first-child').prop('selected', true);
+	$('#cf_dropdown :first-child').prop('selected', true);
+
 
 	// Next/prev buttons
 	$("#cfNextBtn").click(function(event) {
@@ -31,7 +35,8 @@ $(document).ready(function() {
 		"destroy": true,
 		"lengthChange": false,
 		"bFilter": false,
-		"dom": 'rtp'
+		"dom": 'rtp',
+		//'ajax': '/chartchange/update-table/'
 	});
 
 	$('#review_table').DataTable({
@@ -171,23 +176,16 @@ $(document).ready(function() {
 			dataType:'json',
 			// Reset chartfield options when department changes
 			success: function(data) {
-				test = data;
 				$('#cf_dropdown').empty();
 				for (i = 0; i < data.length - 1; ++i) {
 					var drp = document.getElementById('cf_dropdown');
 					var option = document.createElement("OPTION");
 					option.value = data[i].account_number;
 					option.text = data[i].account_number;
-					if (i == 0) {
-						// drp.addClass('disabled');
-						// drp.addClass('selected');
-						// drp.add(option);
-						// drp.removeClass('disabled');
-						// drp.removeClass('selected');
-					}
 					drp.add(option);
 				}
 				$('#dept_title').html('Department: ' + selected + ' - ' + data[data.length - 1].name);
+				change_current_page(data[0].account_number);
 			}
 		})
 	})
@@ -197,27 +195,8 @@ $(document).ready(function() {
 		var sel = document.getElementById("cf_dropdown");
 		var selected = sel.options[sel.selectedIndex].value;
 
-		$.ajax({
-			url: '/chartchange/old-cf/',
-			data: {
-				'selected': selected
-			},
-			dataType:'json',
-			success: function(data) {
-				test = data;
-				$("#caption").html(data[0].account_number);
-				$("#fund").html(data[0].fund);
-				$("#dept_id").html(data[0].deptid);
-				$("#program").html(data[0].program);
-				$("#class_code").html(data[0].class_code);
-				$("#project_grant").html(data[0].project_grant);
-				$("#shortcode").html(data[0].shortcode);
-				$("#nickname").html(data[1].nickname);
-			},
-			error: function(data) {
-				alert('uh oh');
-			}
-		})
+		change_current_page(selected);
+		update_table(selected, cf_change_table);
 	})
 
 });
@@ -256,9 +235,9 @@ function nextPrev(n) {
   }
 
   // Load third page correctly
-  // if (n == 1 && currStep == 3) {
-  // 	load_3();
-  // }
+  if (n == 1 && currStep == 3) {
+  	load_3();
+  }
 
   if (currStep > lastStep) {
       //$('#workflowForm').submit();
@@ -357,4 +336,55 @@ function maintain_checks(row_id) {
 			local.addClass('disabled');
 		}
 	}
+}
+
+function change_current_page(selected) {
+	$.ajax({
+			url: '/chartchange/old-cf/',
+			data: {
+				'selected': selected
+			},
+			dataType:'json',
+			success: function(data) {
+				cf = data;
+				$("#caption").html(cf[0].account_number);
+				$("#fund").html(cf[0].fund);
+				$("#dept_id").html(cf[0].deptid);
+				$("#program").html(cf[0].program);
+				$("#class_code").html(cf[0].class_code);
+				$("#project_grant").html(cf[0].project_grant);
+				$("#shortcode").html(cf[0].shortcode);
+
+			},
+			error: function(data) {
+				alert('uh oh');
+			}
+		})
+}
+
+function update_table(selected, table) {
+	$.ajax({
+			url: '/chartchange/update-table/',
+			data: {
+				'selected': selected
+			},
+			success: function(data) {
+				$('#needs-refresh').html(data);
+				var table = $('#cf_change_table');
+				table.destroy();
+				// var cf_change_table = $('#cf_change_table').DataTable({
+				// 	"destroy": true,
+				// 	"lengthChange": false,
+				// 	"bFilter": false,
+				// 	"dom": 'rtp'
+				// });
+			},
+			error: function(data) {
+				alert('uh oh');
+			}
+		})
+}
+
+function load_3() {
+	alert('load 3');
 }

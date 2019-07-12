@@ -35,16 +35,6 @@ def get_dept(request):
         return HttpResponseRedirect('/chartchange/' + dept_parm + '/')
 
 
-# @login_required
-# @permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
-# def change_dept(request, dept_parm):
-# 	if request.method == "POST":
-# 		change_dept = request.POST['select_dept']
-# 		return HttpResponseRedirect(request.get_full_path() + 'to' + change_dept + '/')
-
-
-
-
 #@login_required
 @permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
 def chartchange(request, dept_parm='', change_dept=''):
@@ -54,18 +44,6 @@ def chartchange(request, dept_parm='', change_dept=''):
 	user_depts = (d.dept for d in AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept'))
 	user_depts = list(user_depts)
 
-	# Set selected department
-	# if dept_parm == '':
-	# 	select_dept = user_depts[0]
-	# else:
-	# 	select_dept = dept_parm
-	# if select_dept not in user_depts:
-	# 	template = loader.get_template('403.html')
-	# 	return HttpResponse(template.render({'title':'uh oh'}, request))
-	# if request.GET.get('deptids') is None:
-	# 	select_dept = user_depts[0]
-	# else:
-	# 	select_dept = request.GET.get('deptids')
 
 	# Set intitial department
 	select_dept = user_depts[0]
@@ -79,15 +57,8 @@ def chartchange(request, dept_parm='', change_dept=''):
 	# Set intitial chartfields
 	chartfield_list = UmOscAcctsInUseV.objects.filter(deptid=select_dept).order_by('account_number')
 
-	# Determine selected chartfield
-	if request.POST.get('chartcom') is None:
-		if chartfield_list:
-			selected_cf = chartfield_list[0]
-		else:
-			selected_cf = ''
-	else:
-		selected_cf = UmOscAcctsInUseV.objects.filter(account_number=request.POST.get('chartcom'))
-		selected_cf = selected_cf[0]
+	# Set intitial chartfield
+	selected_cf = chartfield_list[0]
 
 	# Find chartfield nickname
 	nickname = ''
@@ -98,24 +69,19 @@ def chartchange(request, dept_parm='', change_dept=''):
 				nickname = n.name
 
 
-	# Find all User IDs currently assigned to a chartfield
-	if selected_cf != '':
-		cf_users = UmOscAcctSubscribersV.objects.filter(chartcom=selected_cf.account_number).order_by('user_defined_id')
-		users = []
-		for c in cf_users:
-			user = {
-				'user_defined_id':c.user_defined_id,
-				'building':c.building,
-				'toll_charged':c.toll_charged,
-				'mrc_charged':c.mrc_charged,
-				'local_charged':c.local_charged,
-				'selected': 'false'
-			}
-			if request.method == 'POST':
-				user['selected'] = request.POST.get('select' + c.user_defined_id)
-			users.append(user)
-	else:
-		users = ''
+	# Find all User IDs currently assigned to initial chartfield
+	cf_users = UmOscAcctSubscribersV.objects.filter(chartcom=selected_cf.account_number).order_by('user_defined_id')
+	users = []
+	for c in cf_users:
+		user = {
+			'user_defined_id':c.user_defined_id,
+			'building':c.building,
+			'toll_charged':c.toll_charged,
+			'mrc_charged':c.mrc_charged,
+			'local_charged':c.local_charged,
+			'selected': 'false'
+		}
+		users.append(user)
 
 	# Select department to change to
 	if change_dept == '':
@@ -135,7 +101,7 @@ def chartchange(request, dept_parm='', change_dept=''):
 		'cf_info': chartfield_list,
 		'nickname': nickname,
 		'users': users,
-		'selected_users': users, #FIX 
+		'selected_users': '',
 		'new_dept': new_dept,
 		'new_cf': new_cf,
 		'choose_cf_template': 'choose_cf.html',
@@ -180,6 +146,7 @@ def get_table(request):
 
 
 
+# Gives new chartfields when user changes department
 def change_dept(request):
 	selected_dept = request.GET.get('deptids', None)
 	cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
@@ -191,6 +158,8 @@ def change_dept(request):
 
 	return JsonResponse(cf_options, safe=False)
 
+
+# Finds chartfield data when user changes chartfield
 def get_cf_data(request):
 	selected_cf = request.GET.get('selected', None)
 	cf_data = list(UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values())
@@ -206,4 +175,46 @@ def get_cf_data(request):
 	cf_data.append(nn)
 
 	return JsonResponse(cf_data, safe=False)
+
+
+# Finds users for selected cahrtfield
+def get_users(request):
+	selected_cf = request.GET.get('selected', None)
+
+	# Get info for selected chartfield
+	cf = UmOscAcctsInUseV.objects.filter(account_number=selected_cf)
+	cf = cf[0]
+
+	# Find chartfield nickname
+	nickname = ''
+	if selected_cf != '':
+		nicknames = Chartcom.objects.all()
+		for n in nicknames:
+			if n.account_number == selected_cf:
+				nickname = n.name
+
+	# Get users
+	cf_users = UmOscAcctSubscribersV.objects.filter(chartcom=selected_cf).order_by('user_defined_id')
+	users = []
+	for c in cf_users:
+		user = {
+			'user_defined_id':c.user_defined_id,
+			'building':c.building,
+			'toll_charged':c.toll_charged,
+			'mrc_charged':c.mrc_charged,
+			'local_charged':c.local_charged,
+			'selected': 'false'
+		}
+		if request.method == 'POST':
+			user['selected'] = request.POST.get('select' + c.user_defined_id)
+		users.append(user)
+
+
+	context = {
+		'selected_cf': cf,
+		'nickname': nickname,
+		'users': users
+	}
+
+	return render(request, 'choose_users.html', context)
 

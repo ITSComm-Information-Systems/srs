@@ -854,7 +854,7 @@ class UmOscServiceLocV(models.Model):
           db_table = 'PINN_CUSTOM\".\"um_osc_service_loc_v'
 
 class UmOscRatedV(models.Model):
-     row_id =  models.CharField(max_length=85, blank=True, null=True)            
+     row_id =  models.CharField(max_length=85, blank=True, null=False, primary_key=True) # made a primary key and set null to false            
      subscriber_id =  models.CharField(max_length=7, blank=True, null=True)      
      connect_date =  models.DateField(null=True)                                  
      billing_cycle =  models.CharField(max_length=2, blank=True, null=True)       
@@ -926,7 +926,7 @@ class UmOscReptInvlocV(models.Model):
 
 class UmOscPhoneHistoryV(models.Model):
      date_snapshot = models.DateField(null=True)
-     user_defined_id = models.CharField(max_length=20)
+     user_defined_id = models.CharField(max_length=20, primary_key=True) #made this a primary key
      phone_number = models.CharField(max_length=30)
      description = models.CharField(max_length=60)
        
