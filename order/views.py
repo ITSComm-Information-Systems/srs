@@ -121,7 +121,6 @@ class Submit(PermissionRequiredMixin, View):
                     if target != None:
                         setattr(api, target, value)
                         print('Set:' + target + '=' + value )
-            print(api)
 
             api.save()
             print('API Record Saved')
