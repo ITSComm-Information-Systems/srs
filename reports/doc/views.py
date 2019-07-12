@@ -20,7 +20,7 @@ from oscauth.models import AuthUserDept
 # from .models import Role, Group, User
 # from .forms import UserSuForm, AddUserForm
 # from .utils import su_login_callback, custom_login_action, upsert_user
-from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscOtsCallSummaryV, UmOscAcctdetailMrcOccV
+from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscOtsCallSummaryV, UmOscAcctdetailMrcOccV, UmOscPhoneHistoryV, UmOscServiceLocV, UmOscRatedV
 from oscauth.forms import *
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -67,11 +67,12 @@ def generate_report(request):
 
 	# Get information from previous page
 	selected_dept = request.POST.get('select_dept')
-	name = UmOscDeptProfileV.objects.filter(deptid=selected_dept)
-	selected_dept = selected_dept + ' - ' + name[0].dept_name
-
 	bill_date = request.POST.get('billing_date')
 	chartcoms = request.POST.getlist('chartcoms[]')
+
+	# Formatting
+	name = UmOscDeptProfileV.objects.filter(deptid=selected_dept)
+	selected_dept = selected_dept + ' - ' + name[0].dept_name
 
 	# Fix date format - this is way too messy
 	date = bill_date.replace('.', '')
@@ -104,6 +105,7 @@ def generate_report(request):
 			# Charge tables
 			user_id = {
 				'user_defined_id': a.user_defined_id,
+				'subscriber_id': a.subscriber_id,
 				'monthly_charges': '${:,.2f}'.format(a.mrc_amount),
 				'call_number': a.tot_call_count,
 				'call_amount': '${:,.2f}'.format(a.tot_call_amount),
@@ -119,7 +121,7 @@ def generate_report(request):
 
 		
 		# Monthly Service Charges table
-		monthly_query = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf)
+		monthly_query = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf, charge_type="MRC")
 		monthly_data = {}
 		monthly_total = 0
 		for m in monthly_query:
@@ -133,7 +135,7 @@ def generate_report(request):
 					'quantity': int(m.quantity),
 					'total': m.charge_amount
 				}
-				monthly_total += m.charge_amount
+			monthly_total += m.charge_amount
 
 		
 		# Make it look like money $$$$$
@@ -147,6 +149,21 @@ def generate_report(request):
 				r['total_charges'] = '${:,.2f}'.format(r['total_charges'])
 			charges[c]['total'] = '${:,.2f}'.format(charges[c]['total'])
 
+
+		# One Time Charges and Credits
+		occ_charges = UmOscAcctdetailMrcOccV.objects.filter(subscriber_id=a.subscriber_id, account_number=cf, charge_type="OCC")
+		occ_rows = []
+		occ_total = 0
+		for c in occ_charges:
+			row = {
+				'work_order': c.package_code,
+				'desc': c.item_description, # this should change
+				'total_amt': c.charge_amount
+			}
+			occ_total += c.charge_amount
+			row['total_amt'] = '${:,.2f}'.format(row['total_amt'])
+			occ_rows.append(row)
+
 		
 		data = {
 			'account_number': cf,
@@ -154,9 +171,12 @@ def generate_report(request):
 			'type_total': '${:,.2f}'.format(total),
 			'charge_tables': charges,
 			'monthly_data': monthly_data,
-			'monthly_total': '${:,.2f}'.format(monthly_total)
+			'monthly_total': '${:,.2f}'.format(monthly_total),
+			'occ': occ_rows,
+			'occ_total': occ_total
 		}
 		charge_types.append(data)
+
 
 	context= {
 		'title':'Detail of Charges',
@@ -179,6 +199,20 @@ def show_detail(request):
 	bill_date = request.POST.get('billing_date')
 	chartcoms = request.POST.get('chartcoms')
 	user_id = request.POST.get('user_id')
+	chartcom = request.POST.get('chartcom:' + user_id)
+	sub_id = request.POST.get('sub_id:' + user_id)
+	charge_type = request.POST.get('charge_type:' + user_id)
+
+	charge_type = 'Phone' # TEST - GET FROM OTHER PAGE
+
+	# Fix date format - this is way too messy - make into a function
+	date = bill_date.replace('.', '')
+	date = date.replace(',', '')
+	date = date.split(' ')
+	date[0] = date[0][0:3]
+	date = date[0] + ' ' + date[1] + ' ' + date[2]
+	date = datetime.strptime(date, '%b %d %Y')
+	date = str(date.year) + '-' + str(date.month) + '-' + str(date.day)
 
 	# Fix format of chartcom string list - this is messy
 	chartcoms = chartcoms.replace('[','')
@@ -191,16 +225,104 @@ def show_detail(request):
 		if len(c) != 0:
 			format_chartcoms.append(c)
 
+	# Return button functionality
+	return_button = {
+		'select_dept': selected_dept,
+		'bill_date': bill_date,
+		'chartcoms': format_chartcoms
+	}
+
+	# Find details for info box
+	box_detail = UmOscPhoneHistoryV.objects.filter(user_defined_id=user_id, date_snapshot=date)
+	if box_detail:
+		username = box_detail[0].description
+		phone_num = box_detail[0].phone_number
+	else:
+		username = 'No Name Match'
+	location_detail = UmOscServiceLocV.objects.filter(billing_date=date, subscriber_id=sub_id)
+	if (location_detail):
+		location = {
+			'building': location_detail[0].building,
+			'floor': location_detail[0].floor,
+			'room': location_detail[0].room,
+			'jack': location_detail[0].jack,
+			'last_updated': location_detail[0].timestamp
+		}
+	else:
+		location = ''
+
+	total = 0
+
+	# Monthly Charges table
+	rows = []
+	monthly_total = 0
+	monthly_data = UmOscAcctdetailMrcOccV.objects.filter(subscriber_id=sub_id, account_number=chartcom, billing_date=date, charge_type="MRC")
+	for m in monthly_data:
+		row = {
+			'item_code': m.item_code,
+			'desc': m.item_description,
+			'unit_price': '${:,.2f}'.format(m.unit_price),
+			'quantity': int(m.quantity),
+			'total_charge': m.charge_amount
+		}
+		monthly_total += m.charge_amount
+		row['total_charge'] = '${:,.2f}'.format(m.charge_amount)
+		rows.append(row)
+	total += monthly_total
+
+	# Local and Toll Charges tables
+	local = []
+	toll = []
+	local_total = 0
+	toll_total = 0
+	rated_data = UmOscRatedV.objects.filter(subscriber_id=sub_id, billing_cycle=date)
+	for r in rated_data:
+		if r.call_type == 'Local':
+			l = {
+				'connect_date': r.connect_date,
+				'to_num': r.to_number,
+				'location': r.place_name + ', ' + r.state_name,
+				'duration': r.call_duration,
+				'total_charge': r.amount_billed,
+			}
+			local_total += r.amount_billed
+			l['total_charge'] = '${:,.2f}'.format(l['total_charge'])
+			local.append(l)
+		elif r.call_type == 'Toll':
+			t = {
+				'connect_date': r.connect_date,
+				'to_num': r.to_number,
+				'location': r.place_name + ', ' + r.state_name,
+				'duration': r.call_duration,
+				'total_charge': r.amount_billed,
+			}
+			toll_total += r.amount_billed
+			t['total_charge'] = '${:,.2f}'.format(t['total_charge'])
+			toll.append(t)
+	total = total + local_total + toll_total
+
 
 	context = {
 		'title':'Detail of Charges',
 		'dept': selected_dept,
 		'billing_date': bill_date,
 		'chartcoms': format_chartcoms,
-		'user_id': user_id
+		'user_id': user_id,
+		'sub_id': sub_id,
+		'chartcom': chartcom,
+		'charge_type': charge_type,
+		'username': username,
+		'monthly_data': rows,
+		'monthly_total': '${:,.2f}'.format(monthly_total),
+		'local': local,
+		'local_total': '${:,.2f}'.format(local_total),
+		'toll': toll,
+		'toll_total': '${:,.2f}'.format(toll_total),
+		'total': '${:,.2f}'.format(total),
+		'location': location,
+		'return_button': return_button
 	}
 
-	#return JsonResponse(context, safe=False)
 	return HttpResponse(template.render(context, request))
 
 

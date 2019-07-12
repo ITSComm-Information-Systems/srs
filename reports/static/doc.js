@@ -52,48 +52,6 @@ $(document).ready(function() {
 		$('#chartfield_list').html(text);
 	})
 
-	
-	// // Send data to report page
-	// $('.detail_link').on('click', function(e) {
-	// 	e.preventDefault();
-
-	// 	var selected = $('#selected_dept').text();
-	// 	var bill_date = $('#billing_date').text();
-	// 	// var chartcoms = $('#chartcoms').val();
-
-	// 	data = {
-	// 			selected_dept: 'test',
-	// 			billing_date: 'test',
-	// 			chartcoms: 'test'
-	// 		};
-	// 	$.post('/reports/doc/report/detail/', data);
-
-	// 	// $.ajax({
-	// 	// 	url: '/reports/doc/report/detail/',
-	// 	// 	data: {
-	// 	// 		'selected_dept': selected,
-	// 	// 		'billing_date': bill_date,
-	// 	// 		'chartcoms': chartcoms
-	// 	// 	},
-	// 	// 	dataType: 'json',
-	// 	// 	success: function(data) {
-	// 	// 		alert('success');
-	// 	// 	},
-	// 	// 	error: function(data) {
-	// 	// 		alert('error');
-	// 	// 	}
-	// 	// })
-	// })
-
-	$('.detail_link').on('click', function(e) {
-		e.preventDefault();
-		var form = document.getElementById('report_details');
-		var selected_id = $(e.target).text();
-		document.getElementById('user_id_post').value = selected_id;
-		form.submit();
-	})
-
-
 	// Validate form
 	$('#generate').on('click', function(e) {
 		var chartfields = $('#doc_chartcom').val();
@@ -102,4 +60,26 @@ $(document).ready(function() {
 			$('#error_message').removeClass('hidden');
 		}
 	})
+
+	$('#return_link').on('click', function(e) {
+		e.preventDefault();
+		$('#return').submit();
+	})
 })
+
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    document.getElementById("myBtn").style.display = "block";
+  } else {
+    document.getElementById("myBtn").style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+}
