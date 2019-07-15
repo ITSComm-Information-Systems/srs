@@ -593,6 +593,7 @@ class UmOscLocationsInUseV(models.Model):
      campus_desc = models.CharField(max_length=30)
      service_type = models.CharField(max_length=20)
      service_number = models.CharField(max_length=60)
+     service_subscrib_id = models.IntegerField(9, null=False)
      status = models.CharField(max_length=15)
      service_id = models.IntegerField(9, null=False)
      location_id = models.IntegerField(9, null=False)
