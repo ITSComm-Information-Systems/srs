@@ -651,7 +651,7 @@ input:checked + .slider:before {
 	justify-content: flex-end;
 }
 
-.order-details-list u {
+.order-details-list ul {
 	/* list-style-type: none; */
   	margin-left: -20px;
   	/* padding: 0; */
