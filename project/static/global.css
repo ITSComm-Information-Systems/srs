@@ -650,3 +650,9 @@ input:checked + .slider:before {
 	display: flex;
 	justify-content: flex-end;
 }
+
+.order-details-list u {
+	/* list-style-type: none; */
+  	margin-left: -20px;
+  	/* padding: 0; */
+}
