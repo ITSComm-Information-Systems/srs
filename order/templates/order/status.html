@@ -95,8 +95,8 @@
                                 <th scope="row">{{order.order_reference}}</th>
                                 <td>{{ order.create_date|date:"m/d/y" }}</td>
                                 <td>{{ order.created_by }}</td>
-                                <td class="order-detail-list">
-                                    <ul>
+                                <td>
+                                    <ul class="order-detail-list">
                                         {% for item in order.items %}
                                         <li>
                                             {{ item.description }}
