@@ -40,7 +40,8 @@
     <h1>Manage Access</h1>
 
     <h2>Select Person</h2>
-    <p>Uniqname <input type='search' name="uniqname_parm"> <input type='submit' value='Search' class="btn btn-primary">
+    <label for="uniqname-field">Uniqname</label> <input type='search' name="uniqname_parm" id="uniqname-field"> 
+    <label for="search-btn">Search</label><input id="search-btn" type='submit' value='Search' class="btn btn-primary">
         {% if uniqname_parm is None or result != '' %}
         <font size=+1 color="#FF0000">{{ result }}</font>
         {% else %}
@@ -53,7 +54,6 @@
                  - User not found, add a role to create them.
             {% endif %}
         {% endif %}
-    </p>
     <br>
     <h6><font size=+1 color="#FF0000">{{ submit_msg }}</font></h6>
 
