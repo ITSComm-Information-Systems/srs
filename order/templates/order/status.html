@@ -3,7 +3,7 @@
 
 <!-- Beginning of Content -->
 <div id="main-content" class="container" role="main">
-    <h1>Orders
+    <h1>Track Orders
         <small class="text-muted">
             for Department:
             <strong>{{department.id}} - {{department.name}}
@@ -15,9 +15,7 @@
             <div class="col-lg-12">
                 <!-- Beginning of Department name/Search -->
                 <div class="select-dept">
-                    <div class="dept-name">
-                        <h2>Viewing Department: {{department.id}} - {{department.name}}</h2>
-                    </div>
+
                     <div class="input-group mb-3 dept-dropdown">
                         <div class="input-group-prepend">
                             <label class="input-group-text">
@@ -25,9 +23,8 @@
                             </label>
                         </div>
                         <select class="custom-select order-status-dropdown" id="selectDept">
-                            <option selected>Select a department</option>
                             {% for dept in dept_list %}
-                            <option id="mydept{{dept.dept}}" name="dept" data-filter"dept" value="{{dept.dept}}">
+                            <option id="mydept{{dept.dept}}" name="dept" data-filter="dept" value="{{dept.dept}}">
                                 {{dept.dept}} - {{dept.name}}</option>
                             {% endfor %}
                         </select>
@@ -111,7 +108,7 @@
                                 <td>{{order.status}}</td>
                                 <td class="action">
                                     <!-- <a class="delete" href="#">Cancel</a> -->
-                                    <a class="delete popover-test" href="#" data-toggle="modal"
+                                    <a class="cancel" href="#" data-toggle="modal"
                                         data-target="#cancelOrderModal">
                                         Cancel
                                     </a>
@@ -167,49 +164,48 @@
                                         <strong>Pre-Order #:</strong>
                                         <!-- Replace the following text with the value of the Pre Order Number that the user selected to be removed from the shortlist -->
                                         12345
-                                    </div>
+                                        <div>
+                                            <strong>
+                                                Date Submitted:
+                                            </strong>
+                                            <!-- Replace the following text with the value of the date of the order that the user selected to be removed from the shortlist -->
+                                            mm/dd/yyyy
+                                        </div>
 
-                                    <div class="card-body">
-                                        <strong>
-                                            Date Submitted:
-                                        </strong>
-                                        <!-- Replace the following text with the value of the date of the order that the user selected to be removed from the shortlist -->
-                                        mm/dd/yyyy
-                                    </div>
+                                        <div>
+                                            <strong>
+                                                Submitted by:
+                                            </strong>
+                                            <!-- Replace the following text with the value of the uniqname of the order's submitter that the user selected to be removed from the shortlist -->
+                                            uniqname here
+                                        </div>
 
-                                    <div class="card-body">
-                                        <strong>
-                                            Submitted by:
-                                        </strong>
-                                        <!-- Replace the following text with the value of the uniqname of the order's submitter that the user selected to be removed from the shortlist -->
-                                        uniqname here
-                                    </div>
+                                        <div>
+                                            <strong>
+                                                Order Details:
+                                            </strong>
+                                            <!-- Replace the following text with the value of the description of the order that the user selected to be removed from the shortlist -->
+                                            <ul>
+                                                <li>
+                                                    Items here
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <strong>
+                                                Chartfield:
+                                            </strong>
+                                            <!-- Replace the following text with the value of the chartfield of the order that the user selected to be removed from the shortlist -->
+                                            Chartfield here
+                                        </div>
 
-                                    <div class="card-body">
-                                        <strong>
-                                            Order Details:
-                                        </strong>
-                                        <!-- Replace the following text with the value of the description of the order that the user selected to be removed from the shortlist -->
-                                        <ul>
-                                            <li>
-                                                Items here
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-body">
-                                        <strong>
-                                            Chartfield:
-                                        </strong>
-                                        <!-- Replace the following text with the value of the chartfield of the order that the user selected to be removed from the shortlist -->
-                                        Chartfield here
-                                    </div>
-
-                                    <div class="card-body">
-                                        <strong>
-                                            Status:
-                                        </strong>
-                                        <!-- Replace the following text with the value of the status of the order that the user selected to be removed from the shortlist -->
+                                        <div>
+                                            <strong>
+                                                Status:
+                                            </strong>
+                                            <!-- Replace the following text with the value of the status of the order that the user selected to be removed from the shortlist -->
                                             Status here
+                                        </div>
                                     </div>
 
                                 </form>

@@ -380,6 +380,19 @@ text-align: center;
 text-decoration: underline;
 }
 
+.action .cancel {
+	color: #dc3545;
+	font-weight: 400;
+	border-color: transparent;
+	background-color: transparent;
+	text-decoration: underline;
+}
+
+.action .cancel:focus {
+	background-color: transparent;
+	background: transparent;
+	}
+
 .action .edit:focus {
 background-color: transparent;
 background: transparent;
@@ -652,7 +665,7 @@ input:checked + .slider:before {
 }
 
 .order-details-list ul {
-	/* list-style-type: none; */
+	list-style-type: none;
   	margin-left: -20px;
-  	/* padding: 0; */
+  	/* padding-left:20px; */
 }
