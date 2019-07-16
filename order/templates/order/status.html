@@ -110,7 +110,11 @@
                                 <td>{{ order.chartcom }}</td>
                                 <td>{{order.status}}</td>
                                 <td class="action">
-                                        <a class="delete" href="#">Cancel</a>
+                                    <!-- <a class="delete" href="#">Cancel</a> -->
+                                    <a class="delete popover-test" href="#" data-toggle="modal"
+                                        data-target="#cancelOrderModal">
+                                        Cancel
+                                    </a>
                                 </td>
                             </tr>
                             <!-- end of table row 1 -->
@@ -143,6 +147,86 @@
                     </div>
                 </div>
 
+                <!-- Cancel Order Modal -->
+                <div class="modal fade" id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrder"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="cancelOrder">Cancel Order</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body remove-chartfield-form-body">
+                                <strong class="remove-text">
+                                    Are you sure you want to cancel the following order?
+                                </strong>
+                                <form id="cancelOrderForm" method="GET" action="status.html">
+                                    <div class="card-body">
+                                        <strong>Pre-Order #:</strong>
+                                        <!-- Replace the following text with the value of the Pre Order Number that the user selected to be removed from the shortlist -->
+                                        12345
+                                    </div>
+
+                                    <div class="card-body">
+                                        <strong>
+                                            Date Submitted:
+                                        </strong>
+                                        <!-- Replace the following text with the value of the date of the order that the user selected to be removed from the shortlist -->
+                                        mm/dd/yyyy
+                                    </div>
+
+                                    <div class="card-body">
+                                        <strong>
+                                            Submitted by:
+                                        </strong>
+                                        <!-- Replace the following text with the value of the uniqname of the order's submitter that the user selected to be removed from the shortlist -->
+                                        uniqname here
+                                    </div>
+
+                                    <div class="card-body">
+                                        <strong>
+                                            Order Details:
+                                        </strong>
+                                        <!-- Replace the following text with the value of the description of the order that the user selected to be removed from the shortlist -->
+                                        <ul>
+                                            <li>
+                                                Items here
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong>
+                                            Chartfield:
+                                        </strong>
+                                        <!-- Replace the following text with the value of the chartfield of the order that the user selected to be removed from the shortlist -->
+                                        Chartfield here
+                                    </div>
+
+                                    <div class="card-body">
+                                        <strong>
+                                            Status:
+                                        </strong>
+                                        <!-- Replace the following text with the value of the status of the order that the user selected to be removed from the shortlist -->
+                                            Status here
+                                    </div>
+
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <!-- cancel Form button -->
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Keep Order</button>
+                                <!-- Submit Form button -->
+                                <label for="submitBtn" hidden>Cancel Order</label>
+                                <input type="submit" form="cancelOrderForm" id="submitBtn" class="btn btn-danger"
+                                    value="Cancel Order">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Cancel Order Modal -->
+
             </div>
         </div>
     </div>
@@ -154,10 +238,10 @@
     $(document).ready(function () {
         $('[data-toggle="popover"]').popover();
 
-        
+
         $('#selectDept').change(function () {
-            if(this.value == 'Select a department') {
-                $('[data-dept]').show();                
+            if (this.value == 'Select a department') {
+                $('[data-dept]').show();
             } else {
                 $('[data-dept]').hide();
                 $("[data-dept='" + this.value + "']").show();
