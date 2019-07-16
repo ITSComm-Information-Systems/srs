@@ -2,16 +2,15 @@
 {% block content %}
 
 <form action="/auth/get_dept/" method="POST">{% csrf_token %}
-    <h1>Select a Department</h1>
-    <p>Department ID
-        <select type="select" name="dept_parm" id="deptf" value="{{ dept.deptid }}">
-            <option></option>
-            {% for dept in dept_list %}
-            <option value={{ dept.deptid }}>{{ dept.deptid }}</option>
-            {% endfor %}
-        </select>
-    </p>
-    <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+    <h1>Department Look Up</h1>
+    <label for="deptf">Select a Department ID</label>
+    <select type="select" name="dept_parm" id="deptf" value="{{ dept.deptid }}">
+        <option></option>
+        {% for dept in dept_list %}
+        <option value={{ dept.deptid }}>{{ dept.deptid }}</option>
+        {% endfor %}
+    </select>
+    <input type='submit' value='Submit' class="btn btn-primary">
 </form>
 
 {% if dept_status != 'I' %}
@@ -22,7 +21,7 @@
 <h3><font color="#FF0000"> {{ subtitle1 }} </font></h3>
 <h4><font color="#FF0000"> {{ subtitle2 }} </font></h4>
 {% endif %}
-<table class="table table-hover table-headings">
+<table class="table table-hover table-striped table-sm">
     <thead>
         <tr>
                 <th>Uniqname</th>
