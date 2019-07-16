@@ -41,7 +41,7 @@
 
     <h2>Select Person</h2>
     <label for="uniqname-field">Uniqname</label> <input type='search' name="uniqname_parm" id="uniqname-field"> 
-    <label for="search-btn">Search</label><input id="search-btn" type='submit' value='Search' class="btn btn-primary">
+    <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
         {% if uniqname_parm is None or result != '' %}
         <font size=+1 color="#FF0000">{{ result }}</font>
         {% else %}
