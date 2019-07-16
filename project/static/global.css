@@ -669,3 +669,7 @@ input:checked + .slider:before {
   	/* margin-left: -20px; */
   	padding-left:20px;
 }
+
+.small-h2 {
+	font-size: 1rem;
+}
