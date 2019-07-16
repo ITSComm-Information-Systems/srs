@@ -61,26 +61,11 @@
                             <option selected>Select a status indicator</option>
                             <option value="Submitted">Submitted</option>
                             <option value="Scheduled">Scheduled for</option>
-                            <option value="Awaiting Billing">Done & Awaiting Billing</option>
                             <option value="Billed">Billed</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
                     </div>
                     <!-- End of Order Status Filter Dropdown -->
-
-                    <!-- Beginning of Order Type Filter Dropdown -->
-                    <div class="input-group mb-3 order-type">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text">Filter by Order Type</label>
-                        </div>
-                        <select class="custom-select order-type" id="order-type-options">
-                            <option selected>Select an Order Type</option>
-                            <option value="ITCOM">Telecommunications</option>
-                            <option value="MiStorage">MiStorage</option>
-                            <option value="MiServer">MiServer</option>
-                        </select>
-                    </div>
-                    <!-- End of Order Type Filter Dropdown -->
                 </div>
                 <!-- End of Filter/Search -->
 
@@ -94,7 +79,6 @@
                                 <th scope="col">PreOrder #</th>
                                 <th scope="col">Date Submitted</th>
                                 <th scope="col">Submitted By</th>
-                                <th scope="col"> Service Type</th>
                                 <th scope="col">Order Details</th>
                                 <th scope="col">Charfield Billed</th>
                                 <th scope="col">Status <i class="fas fa-question-circle btn-link"
@@ -114,8 +98,7 @@
                                 <th scope="row">{{order.order_reference}}</th>
                                 <td>{{ order.create_date|date:"m/d/y" }}</td>
                                 <td>{{ order.created_by }}</td>
-                                <td>{{ order.service }}</td>
-                                <td>
+                                <td class="order-detail-list">
                                     <ul>
                                         {% for item in order.items %}
                                         <li>
@@ -126,7 +109,9 @@
                                 </td>
                                 <td>{{ order.chartcom }}</td>
                                 <td>{{order.status}}</td>
-                                <td>Cancel</td>
+                                <td class="action">
+                                        <a class="delete" href="#">Cancel</a>
+                                </td>
                             </tr>
                             <!-- end of table row 1 -->
                             {% endfor %}
