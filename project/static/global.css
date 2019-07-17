@@ -685,3 +685,7 @@ input:checked + .slider:before {
 	display: inline;
 	width: auto;
 }
+
+.fa-exclamation-triangle .prv-msgs {
+	color: #ff0000;
+}

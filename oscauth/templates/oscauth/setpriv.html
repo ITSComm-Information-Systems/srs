@@ -45,19 +45,19 @@
         <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short">
         <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
         {% if uniqname_parm is None or result != '' %}
-        <font size=+1 color="#FF0000">{{ result }}</font>
+        <strong class="prv-msgs">{{ result }}</strong>
         {% else %}
 
             {% if osc_user.exists %}
-            <b><font size=+1>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</font></b> 
+            <strong>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
             <input type='button' value='Show Current Access' class="btn btn-outline-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
             {% else %}
-                <b><font size=+1>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</font></b> 
+                <strong>{{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
                  - User not found, add a role to create them.
             {% endif %}
         {% endif %}
         <br>
-        <h6><font size=+1 color="#FF0000">{{ submit_msg }}</font></h6>
+        <strong>{{ submit_msg }}</strong>
     </div>
 </form>
 
@@ -70,7 +70,7 @@
 
 <h6>Please select a Task, a Role, and at least one Department then click Submit.</h6>
 
-<h7>Inactive departments are shown in <font color="#FF0000">red.</font></h7>
+<h7>Inactive departments are shown with a <strong class="prv-msgs">red text and <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></h7>
 
 <div class="row access-action-row">
     <div class="column">
@@ -114,7 +114,7 @@
                 <label for="dept.{{ row.dept }}" class="form-check-label">{{ row.dept }} - {{ row.dept_name }}</label>
                 {% else %}
                 <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
-                <label for="dept.{{ row.dept }}" class="form-check-label" style="color:#FF0000;"><i class="fas fa-exclamation-triangle" style="color:#FF0000;" aria-label="Icon for inactive department"></i>{{ row.dept }} - {{ row.dept_name }}</label>
+                <label for="dept.{{ row.dept }}" class="form-check-label prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>  {{ row.dept }} - {{ row.dept_name }}</label>
                 {% endif %}
                 <br>
             {% endfor %} 
