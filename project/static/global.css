@@ -652,11 +652,11 @@ input:checked + .slider:before {
 }
 
 .italic-msg em {
-	color:#D9534F;
+	color:#FF0000;
 }
 .tracking-msg {
 	display: block;
-	color:#D9534F;
+	color:#FF0000;
 }
 
 .cart-button {
@@ -686,6 +686,6 @@ input:checked + .slider:before {
 	width: auto;
 }
 
-.fa-exclamation-triangle .prv-msgs {
-	color: #ff0000;
+.fa-exclamation-triangle, .prv-msgs {
+	color: #FF0000;
 }
