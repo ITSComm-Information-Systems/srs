@@ -40,26 +40,25 @@
     <h1>Manage Access</h1>
 
     <h2>Select Person</h2>
-    <div class="form-control">
+    <div>
         <label for="uniqname-field">Enter a Uniqname</label>
         <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short">
-    </div>
-    <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
+        <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
         {% if uniqname_parm is None or result != '' %}
         <font size=+1 color="#FF0000">{{ result }}</font>
         {% else %}
 
             {% if osc_user.exists %}
             <b><font size=+1>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</font></b> 
-            <input type='button' value='Show Current Access' class="btn btn-primary-outline" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
+            <input type='button' value='Show Current Access' class="btn btn-ourline-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
             {% else %}
                 <b><font size=+1>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</font></b> 
                  - User not found, add a role to create them.
             {% endif %}
         {% endif %}
-    <br>
-    <h6><font size=+1 color="#FF0000">{{ submit_msg }}</font></h6>
-
+        <br>
+        <h6><font size=+1 color="#FF0000">{{ submit_msg }}</font></h6>
+    </div>
 </form>
 
 <form action="/auth/modpriv/" method="POST">{% csrf_token %}
