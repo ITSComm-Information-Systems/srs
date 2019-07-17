@@ -73,38 +73,53 @@
 <div class="row access-action-row">
     <div class="column">
         <h2>Select Task</h2>
-        <input id="roleAdd" type='radio' name="taskrad" value='add'><label for="roleAdd">Add Access</label><br>
-        <input id="roleDelete" type='radio' name="taskrad" value='remove'><label for="roleDelete">Add Access</label>
+        <div class="form-check">
+            <input id="roleAdd" type='radio' name="taskrad" value='add' class="form-check-input">
+            <label for="roleAdd" class="form-check-label">Add Access</label><br>
+            <input id="roleDelete" type='radio' name="taskrad" value='remove' class="form-check-input">
+            <label for="roleDelete" class="form-check-label">Remove Access</label>
+        </div>
     </div>
     <div class="column" id="addRole">
         <h2>Select Role</h2>
-        {% for role in grantable_roles %}
-        <input type='radio' name="rolerad" value={{ role.role }} id={{ role.role }}><label for={{ role.role }}>{{ role.role }}</label>
-        <br>
+        <div class="form-check">
+            {% for role in grantable_roles %}
+            <input type='radio' name="rolerad" value={{ role.role }} id={{ role.role }} class="form-check-input">
+            <label for={{ role.role }} class="form-check-label">{{ role.role }}</label>
+            <br>
         {% endfor %}
+        </div>
     </div>
     <div class="column" id="deleteRole">
         <h2>Select Role</h2>
-        {% for role in grantable_roles %}
-        <input type='checkbox' name="rolerad" value={{ role.role }} id={{ role.role }}><label for={{ role.role }}>{{ role.role }}</label>
-        <br>
-        {% endfor %}
+        <div class="form-check">
+            {% for role in grantable_roles %}
+            <input type='checkbox' name="rolerad" value={{ role.role }} id={{ role.role }} class="form-check-input">
+            <label for={{ role.role }} class="form-check-label">{{ role.role }}</label>
+            <br>
+            {% endfor %}
+        </div>
+        
     </div>
     <div class="column deptid">
         <h2>Select Department</h2>
-        <input type="checkbox" onclick="toggle(this);">Select All Departments<br />
-        {% for row in rows %}
-        {% if row.dept_status != 'I' %}
-        <input type='checkbox' name="deptck" value={{ row.dept }}>{{ row.dept }} - {{ row.dept_name }}
-        {% else %}
-        <input type='checkbox' name="deptck" value={{ row.dept }}><font color="#FF0000">{{ row.dept }} - {{ row.dept_name }}</font>
-        {% endif %}
-        <br>
-        {% endfor %} 
+        <div class="form-check">
+            <input type="checkbox" onclick="toggle(this);" id="selectAllDepts">
+            <label for="selectAllDepts" class="form-check-label">Select All Departments</label><br>
+            {% for row in rows %}
+                {% if row.dept_status != 'I' %}
+                <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
+                <label for="dept.{{ row.dept }}" class="form-check-label">{{ row.dept }} - {{ row.dept_name }}</label>
+                {% else %}
+                <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
+                <label for="dept.{{ row.dept }}" class="form-check-label" style="color:#FF0000;">{{ row.dept }} - {{ row.dept_name }}</label>
+                {% endif %}
+                <br>
+            {% endfor %} 
+        </div>
     </div>
     <div class="column">
-        <h2></h2>
-        <p><input type='submit' name='process_access' value='Submit' class="btn btn-primary"></p>
+        <input type='submit' name='process_access' value='Submit' class="btn btn-primary">
     </div>
 </div>
 
