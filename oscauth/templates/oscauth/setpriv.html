@@ -40,7 +40,10 @@
     <h1>Manage Access</h1>
 
     <h2>Select Person</h2>
-    <label for="uniqname-field">Uniqname</label> <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control"> 
+    <div class="form-control">
+        <label for="uniqname-field">Enter a Uniqname</label>
+        <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short">
+    </div>
     <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
         {% if uniqname_parm is None or result != '' %}
         <font size=+1 color="#FF0000">{{ result }}</font>
@@ -48,7 +51,7 @@
 
             {% if osc_user.exists %}
             <b><font size=+1>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</font></b> 
-            <input type='button' Value='Show Current Access' class="btn btn-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
+            <input type='button' value='Show Current Access' class="btn btn-primary-outline" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
             {% else %}
                 <b><font size=+1>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</font></b> 
                  - User not found, add a role to create them.
@@ -104,7 +107,7 @@
     <div class="column deptid">
         <h2>Select Department</h2>
         <div class="form-check">
-            <input type="checkbox" onclick="toggle(this);" id="selectAllDepts">
+            <input type="checkbox" onclick="toggle(this);" id="selectAllDepts" class="form-check-input">
             <label for="selectAllDepts" class="form-check-label">Select All Departments</label><br>
             {% for row in rows %}
                 {% if row.dept_status != 'I' %}
