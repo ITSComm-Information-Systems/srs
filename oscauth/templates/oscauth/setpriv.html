@@ -14,7 +14,7 @@
     }
     
 
-        .left, .right {
+    .left, .right {
     width: 50%;
     }
 
@@ -40,7 +40,7 @@
     <h1>Manage Access</h1>
 
     <h2>Select Person</h2>
-    <label for="uniqname-field">Uniqname</label> <input type='search' name="uniqname_parm" id="uniqname-field"> 
+    <label for="uniqname-field">Uniqname</label> <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control"> 
     <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
         {% if uniqname_parm is None or result != '' %}
         <font size=+1 color="#FF0000">{{ result }}</font>
@@ -70,30 +70,29 @@
 
 <h7>Inactive departments are shown in <font color="#FF0000">red.</font></h7>
 
-<div class="row">
+<div class="row access-action-row">
     <div class="column">
         <h2>Select Task</h2>
-        <input id="roleAdd" type='radio' name="taskrad" value='add'>Add Access<br>
-        <input id="roleDelete" type='radio' name="taskrad" value='remove'>Remove Access<br>
-        <br>
+        <input id="roleAdd" type='radio' name="taskrad" value='add'><label for="roleAdd">Add Access</label><br>
+        <input id="roleDelete" type='radio' name="taskrad" value='remove'><label for="roleDelete">Add Access</label>
     </div>
     <div class="column" id="addRole">
         <h2>Select Role</h2>
         {% for role in grantable_roles %}
-        <input type='radio' name="rolerad" value={{ role.role }}>{{ role.role }}
+        <input type='radio' name="rolerad" value={{ role.role }} id={{ role.role }}><label for={{ role.role }}>{{ role.role }}</label>
         <br>
         {% endfor %}
     </div>
     <div class="column" id="deleteRole">
-            <h2>Select Role</h2>
-            {% for role in grantable_roles %}
-            <input type='checkbox' name="rolerad" value={{ role.role }}>{{ role.role }}
-            <br>
-            {% endfor %}
-        </div>
+        <h2>Select Role</h2>
+        {% for role in grantable_roles %}
+        <input type='checkbox' name="rolerad" value={{ role.role }} id={{ role.role }}><label for={{ role.role }}>{{ role.role }}</label>
+        <br>
+        {% endfor %}
+    </div>
     <div class="column deptid">
         <h2>Select Department</h2>
-        <input type="checkbox" onclick="toggle(this);" />Select All Departments<br />
+        <input type="checkbox" onclick="toggle(this);">Select All Departments<br />
         {% for row in rows %}
         {% if row.dept_status != 'I' %}
         <input type='checkbox' name="deptck" value={{ row.dept }}>{{ row.dept }} - {{ row.dept_name }}
