@@ -2,274 +2,272 @@
 
 {% block content %}
 
-    <!-- Beginning of Content -->
-    <div id="main-content" class="container" role="main">
-            <div class="row header-info">
+<!-- Beginning of Content -->
+<div id="main-content" class="container" role="main">
+    <div class="row header-info">
+        <div class="col-12">
+            <div class="row">
                 <div class="col-12">
-                    <div class="row">
-                        <div class="col-12">
-                            <h1>
-                                Manage Chartfields
-                                <small class="text-muted">
-                                    for Department: <strong>{{department.id}} - {{department.name}}</strong>
-                                </small>
-                            </h1>
+                    <h1>
+                        Manage Chartfields
+                        <small class="text-muted">
+                            for Department: <strong>{{department.id}} - {{department.name}}</strong>
+                        </small>
+                    </h1>
+                </div>
+                <div class="col-12 dept-select">
+                    <form action="/orders/chartcom/" id="cart-department-dropdown" method="POST">{% csrf_token %}
+                        <div class="input-group dept-dropdown">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="department-dropdown">
+                                    Switch Department
+                                </label>
+                            </div>
+                            <select class="custom-select order-status-dropdown" id="deptid" name="deptid">
+                                {% for dept in dept_list %}
+                                <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="submit" class="btn btn-outline-secondary dept-dropdown-btn" value="submit">
                         </div>
-                        <div class="col-12 dept-select">
-                            <form action="/orders/chartcom/" id="cart-department-dropdown" method="POST">{% csrf_token %}
-                                <div class="input-group dept-dropdown">
-                                    <div class="input-group-prepend">
-                                        <label class="input-group-text" for="department-dropdown">
-                                            Select Department
-                                        </label>
-                                    </div>
-                                    <select class="custom-select order-status-dropdown" id="deptid" name="deptid">
-                                        <option selected>-- Select --</option>
-                                        {% for dept in dept_list %}
-                                        <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <input type="submit" class="btn btn-outline-secondary dept-dropdown-btn" value="submit">
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12">
+                    <h2>
+                        Chartfield List
+                    </h2>
+                </div>
+                <div class="col-12 add-chartfield-link">
+                    <span>
+                        <a href="#" role="button" data-toggle="modal" data-target="#addChartfieldModal"
+                            class="popover-test">
+                            <i class="fas fa-plus-circle" aria-label="Add icon"></i> Add a Chartfield to List
+                        </a>
+                    </span>
                 </div>
             </div>
             <div class="row">
                 <div class="col-12">
-                    <div class="row">
-                        <div class="col-12">
-                            <h2>
-                                Add Chartfields to Shortlist
-                            </h2>
-                        </div>
-                        <div class="col-12 add-chartfield-link">
-                            <span>
-                                <a href="#" role="button" data-toggle="modal" data-target="#addChartfieldModal"
-                                    class="popover-test">
-                                    <i class="fas fa-plus-circle" aria-label="Add icon"></i> Add Chartfield to Shortlist
-                                </a>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="table-responsive-md">
-                                <table class="table table-hover table-striped table-sm">
-                                    <!-- table headers -->
-                                    <thead>
-                                        <tr class="col-headings">
-                                            <th scope="col">Description/Nickname</th>
-                                            <th scope="col">Fund</th>
-                                            <th scope="col">Dept. ID</th>
-                                            <th scope="col"> Program</th>
-                                            <th scope="col"> Class</th>
-                                            <th scope="col">Project Grant</th>
-                                            <th scope="col">Shortcode</th>
-                                            <th scope="col">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <!-- end of table headers -->
-                                    <tbody>
-                                        {% for chartcom in chartcoms %}
-                                        <tr data-cfid="{{chartcom.id}}">
-                                            <th scope="row">{{chartcom.name}}</th>
-                                            <th>{{chartcom.fund}}</th>
-                                            <th>{{chartcom.dept}}</th>
-                                            <th>{{chartcom.program}}</th>
-                                            <th>{{chartcom.class_code}}</th>
-                                            <th>{{chartcom.project_grant}}</th>
-                                            <th>{{chartcom.shortcode}}</th>
-                                            <th class="action">
-                                                <a id="{{chartcom.id}}" class="edit popover-test" href="#" data-toggle="modal" 
-                                                    data-target="#editChartfieldModal1">
-                                                    Edit
-                                                </a>
-                                                <br>
-                                                <a id="{{chartcom.id}}" class="delete popover-test" href="#" role="button" data-toggle="modal" 
-                                                    data-target="#deleteChartfieldModal1">
-                                                    Remove
-                                                </a>
-                                            </th>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <div class="table-responsive-md">
+                        <table class="table table-hover table-striped table-sm">
+                            <!-- table headers -->
+                            <thead>
+                                <tr class="col-headings">
+                                    <th scope="col">Associated Name</th>
+                                    <th scope="col">Fund</th>
+                                    <th scope="col">Dept. ID</th>
+                                    <th scope="col">Program</th>
+                                    <th scope="col">Class</th>
+                                    <th scope="col">Project Grant</th>
+                                    <th scope="col">Shortcode</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <!-- end of table headers -->
+                            <tbody>
+                                {% for chartcom in chartcoms %}
+                                <tr data-cfid="{{chartcom.id}}">
+                                    <th scope="row">{{chartcom.name}}</th>
+                                    <th>{{chartcom.fund}}</th>
+                                    <th>{{chartcom.dept}}</th>
+                                    <th>{{chartcom.program}}</th>
+                                    <th>{{chartcom.class_code}}</th>
+                                    <th>{{chartcom.project_grant}}</th>
+                                    <th>{{chartcom.shortcode}}</th>
+                                    <th class="action">
+                                        <a id="{{chartcom.id}}" class="edit" href="#" data-toggle="modal"
+                                            data-target="#editChartfieldModal1">
+                                            Edit
+                                        </a>
+                                        <a id="{{chartcom.id}}" class="delete" href="#" role="button"
+                                            data-toggle="modal" data-target="#deleteChartfieldModal1">
+                                            Remove
+                                        </a>
+                                    </th>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-    
-                <!-- Add Chartfield Modal -->
-                <div class="modal fade" id="addChartfieldModal" tabindex="-1" role="dialog"
-                    aria-labelledby="addChartfieldToShortlist" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="addChartfieldToShortlist">Add Chartfield to Modal</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="addChartfieldForm" method="GET" action="manage-chartfields.html">
-                                    <div class="form-group">
-                                        <label for="chartfieldSelectSearch">Select a Chartfield</label>
-                                        <!-- Replace this select widget to be searchable select widget with column headings (see Paco's wireframe for example) -->
-                                        <select class="form-control" id="chartfieldSelectSearch" name="chartfieldSelection">
-                                            <option>1</option>
-                                            <option>2</option>
-                                            <option>3</option>
-                                            <option>4</option>
-                                            <option>5</option>
-                                        </select>
-                                    </div>
-                                    <!-- After user select a chartfield from the select widget above, the chartfield should authomatically populate the following text input (read only so the user can't change the chartfield) -->
-                                    <div class="form-group">
-                                        <label for="chartfieldSelected">Chartfield</label>
-                                        <input type="text" class="form-control" id="chartfieldSelected"
-                                            name="chartfieldCode" readonly>
-                                    </div>
-                                    <!-- After user select a chartfield from the select widget above, the shortcode assocaited to chartfield (if any) should authomatically populate the following text input (read only so the user can't change the shortcode) -->
-                                    <div class="form-group">
-                                        <label for="chartfieldSelectedShortcode">
-                                            Shortcode
-                                        </label>
-                                        <input type="text" class="form-control" id="chartfieldSelectedShortcode"
-                                            name="shortcode" readonly>
-                                    </div>
-                                    <!-- user enters description/nickname in following text input field -->
-                                    <div class="form-group">
-                                        <label for="chartfieldDescription">
-                                            Description/Nickname
-                                        </label>
-                                        <input type="text" class="form-control" id="chartfieldDescription"
-                                            placeholder="Enter a description or nickname..." name="description">
-                                    </div>
-    
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <!-- cancel Form button -->
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <!-- Submit Form button -->
-                                <label for="submitBtn" hidden>Save to Shortlist</label>
-                                <input type="submit" form="addChartfieldForm" id="submitBtn" class="btn btn-primary"
-                                    value="Add to Shortlist">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- End of Add Cahrtfield Modal -->
-    
-                <!-- Edit Chartfield Modal #1 -->
-                <div class="modal fade" id="editChartfieldModal1" tabindex="-1" role="dialog"
-                    aria-labelledby="editChartfield" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editChartfield">Edit Chartfield</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="editChartfieldForm" method="GET" action="manage-chartfields.html">
-                                    <div class="form-group">
-                                        <label for="chartfieldComponent">Chartfield Selected</label>
-                                        <!-- Replace the value of the input form to be the chartfield that the user selected to edit -->
-                                        <input type="text" class="form-control" id="chartfieldComponent"
-                                            name="chartfieldVal" value="Chartfield code goes here" readonly>
-                                    </div>
-    
-                                    <div class="form-group">
-                                        <label for="shortcode">Shortcode</label>
-                                        <!-- Replace the value of the input form below to be the shortcode (if any) of the chartfield that the user selected to edit -->
-                                        <input type="text" class="form-control" id="shortcode" name="shortcodeVal"
-                                            value="Shortcode goes here (if there is one)" readonly>
-                                    </div>
-    
-                                    <div class="form-group">
-                                        <label for="newChartfieldDescription">
-                                            Enter new Description/Nickname
-                                        </label>
-                                        <!-- Replace the value of the input form below to be the description of the chartfield that the user selected to edit -->
-                                        <input type="text" class="form-control" id="newChartfieldDescription"
-                                            value="Current desciption goes here" name="newDescription">
-                                    </div>
-    
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <!-- cancel Form button -->
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <!-- Submit Form button -->
-                                <label for="submitBtn" hidden>Save to Shortlist</label>
-                                <input type="submit" form="editChartfieldForm" id="submitBtn" class="btn btn-primary"
-                                    value="Add to Shortlist">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- End of Edit Chartfield Modal #1 -->
-    
-                <!-- Delete Chartfield Modal #1 -->
-                <div class="modal fade" id="deleteChartfieldModal1" tabindex="-1" role="dialog"
-                    aria-labelledby="deleteChartfield" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="deleteChartfield">Remove Chartfield</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body remove-chartfield-form-body">
-                                <strong class="remove-text">
-                                    Are you sure you want to remove the following shortcode?
-                                </strong>
-                                <form id="deleteChartfieldForm" method="GET" action="manage-chartfields.html">
-                                    <div class="card-body">
-                                        <strong>Chartfield:</strong>
-                                        <!-- Replace the following text with the value of the chartfield that the user selected to be removed from the shortlist -->
-                                        Enter chartfield value here
-                                    </div>
-    
-                                    <div class="card-body">
-                                        <strong>
-                                            Shortcode:
-                                        </strong>
-                                        <!-- Replace the following text with the value of the shortcode of the chartfield that the user selected to be removed from the shortlist -->
-                                        Shortcode (if any) goes here
-                                    </div>
-    
-                                    <div class="card-body">
-                                        <strong>
-                                            Description/Nickname:
-                                        </strong>
-                                        <!-- Replace the following text with the value of the description of the chartfield that the user selected to be removed from the shortlist -->
-                                        <span id="chartcomDescr">Chartcom Description</span>
-                                    </div>
-    
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <!-- cancel Form button -->
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <!-- Submit Form button -->
-                                <label for="submitBtn" hidden>Save to Shortlist</label>
-                                <input type="submit" form="deleteChartfieldForm" id="submitBtn" class="btn btn-danger"
-                                    value="Remove from Shortlist">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Delete Chartfield Modal #1 -->
-    
             </div>
         </div>
-     
+
+        <!-- Add Chartfield Modal -->
+        <div class="modal fade" id="addChartfieldModal" tabindex="-1" role="dialog"
+            aria-labelledby="addChartfieldToShortlist" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addChartfieldToShortlist">Add Chartfield to Modal</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addChartfieldForm" method="GET" action="manage-chartfields.html">
+                            <div class="form-group">
+                                <label for="chartfieldSelectSearch">Select a Chartfield</label>
+                                <!-- Replace this select widget to be searchable select widget with column headings (see Paco's wireframe for example) -->
+                                <select class="form-control" id="chartfieldSelectSearch" name="chartfieldSelection">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                </select>
+                            </div>
+                            <!-- After user select a chartfield from the select widget above, the chartfield should authomatically populate the following text input (read only so the user can't change the chartfield) -->
+                            <div class="form-group">
+                                <label for="chartfieldSelected">Chartfield</label>
+                                <input type="text" class="form-control" id="chartfieldSelected" name="chartfieldCode"
+                                    readonly>
+                            </div>
+                            <!-- After user select a chartfield from the select widget above, the shortcode assocaited to chartfield (if any) should authomatically populate the following text input (read only so the user can't change the shortcode) -->
+                            <div class="form-group">
+                                <label for="chartfieldSelectedShortcode">
+                                    Shortcode
+                                </label>
+                                <input type="text" class="form-control" id="chartfieldSelectedShortcode"
+                                    name="shortcode" readonly>
+                            </div>
+                            <!-- user enters description/nickname in following text input field -->
+                            <div class="form-group">
+                                <label for="chartfieldDescription">
+                                    Associated Name
+                                </label>
+                                <input type="text" class="form-control" id="chartfieldDescription"
+                                    placeholder="Enter a description or nickname..." name="description">
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- cancel Form button -->
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <!-- Submit Form button -->
+                        <label for="submitBtn" hidden>Save to List</label>
+                        <input type="submit" form="addChartfieldForm" id="submitBtn" class="btn btn-primary"
+                            value="Add to List">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Add Cahrtfield Modal -->
+
+        <!-- Edit Chartfield Modal #1 -->
+        <div class="modal fade" id="editChartfieldModal1" tabindex="-1" role="dialog" aria-labelledby="editChartfield"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editChartfield">Edit Chartfield</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editChartfieldForm" method="GET" action="manage-chartfields.html">
+                            <div class="form-group">
+                                <label for="chartfieldComponent">Chartfield Selected</label>
+                                <!-- Replace the value of the input form to be the chartfield that the user selected to edit -->
+                                <input type="text" class="form-control" id="chartfieldComponent" name="chartfieldVal"
+                                    value="Chartfield code goes here" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="shortcode">Shortcode</label>
+                                <!-- Replace the value of the input form below to be the shortcode (if any) of the chartfield that the user selected to edit -->
+                                <input type="text" class="form-control" id="shortcode" name="shortcodeVal"
+                                    value="Shortcode goes here (if there is one)" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newChartfieldDescription">
+                                    Enter new Associated Name
+                                </label>
+                                <!-- Replace the value of the input form below to be the description of the chartfield that the user selected to edit -->
+                                <input type="text" class="form-control" id="newChartfieldDescription"
+                                    value="Current desciption goes here" name="newDescription">
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- cancel Form button -->
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <!-- Submit Form button -->
+                        <label for="submitBtn" hidden>Save to List</label>
+                        <input type="submit" form="editChartfieldForm" id="submitBtn" class="btn btn-primary"
+                            value="Add to List">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Edit Chartfield Modal #1 -->
+
+        <!-- Delete Chartfield Modal #1 -->
+        <div class="modal fade" id="deleteChartfieldModal1" tabindex="-1" role="dialog"
+            aria-labelledby="deleteChartfield" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteChartfield">Remove Chartfield</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body remove-chartfield-form-body">
+                        <strong class="remove-text">
+                            Are you sure you want to remove the following shortcode?
+                        </strong>
+                        <form id="deleteChartfieldForm" method="GET" action="manage-chartfields.html">
+                            <div class="card-body">
+                                <strong>Chartfield:</strong>
+                                <!-- Replace the following text with the value of the chartfield that the user selected to be removed from the shortlist -->
+                                Enter chartfield value here
+                            </div>
+
+                            <div class="card-body">
+                                <strong>
+                                    Shortcode:
+                                </strong>
+                                <!-- Replace the following text with the value of the shortcode of the chartfield that the user selected to be removed from the shortlist -->
+                                Shortcode (if any) goes here
+                            </div>
+
+                            <div class="card-body">
+                                <strong>
+                                    Associated Name
+                                </strong>
+                                <!-- Replace the following text with the value of the description of the chartfield that the user selected to be removed from the shortlist -->
+                                <span id="chartcomDescr">Chartcom Description</span>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- cancel Form button -->
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <!-- Submit Form button -->
+                        <label for="submitBtn" hidden>Remove from List</label>
+                        <input type="submit" form="deleteChartfieldForm" id="submitBtn" class="btn btn-danger"
+                            value="Remove from List">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Delete Chartfield Modal #1 -->
+
+    </div>
+</div>
+
 {% endblock %}
 
 {% block js %}
