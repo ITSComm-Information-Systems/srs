@@ -289,7 +289,7 @@ vertical-align: top;
 }
 .filter-container {
 display: grid;
-grid-template-columns: repeat(3, 1fr);
+grid-template-columns: repeat(2, 1fr);
 grid-column-gap: 20px;
 }
 @media (max-width:992px) {
@@ -670,4 +670,13 @@ input:checked + .slider:before {
 
 .small-h2 {
 	font-size: 1.3rem;
+}
+
+.wismo-order-details {
+	width: 40%;
+}
+
+.add-chartfield-link {
+	display: flex;
+	justify-content: flex-end;
 }
