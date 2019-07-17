@@ -74,13 +74,13 @@
                                 {% for chartcom in chartcoms %}
                                 <tr data-cfid="{{chartcom.id}}">
                                     <th scope="row">{{chartcom.name}}</th>
-                                    <th>{{chartcom.fund}}</th>
-                                    <th>{{chartcom.dept}}</th>
-                                    <th>{{chartcom.program}}</th>
-                                    <th>{{chartcom.class_code}}</th>
-                                    <th>{{chartcom.project_grant}}</th>
-                                    <th>{{chartcom.shortcode}}</th>
-                                    <th class="action">
+                                    <td>{{chartcom.fund}}</td>
+                                    <td>{{chartcom.dept}}</td>
+                                    <td>{{chartcom.program}}</td>
+                                    <td>{{chartcom.class_code}}</td>
+                                    <td>{{chartcom.project_grant}}</td>
+                                    <td>{{chartcom.shortcode}}</td>
+                                    <td class="action">
                                         <a id="{{chartcom.id}}" class="edit" href="#" data-toggle="modal"
                                             data-target="#editChartfieldModal1">
                                             Edit
@@ -89,7 +89,7 @@
                                             data-toggle="modal" data-target="#deleteChartfieldModal1">
                                             Remove
                                         </a>
-                                    </th>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
