@@ -17,9 +17,9 @@
 <h3>{{ subtitle1 }}</h3>
 <h4>{{ subtitle2 }}</h4>
 {% else %}
-<br><font size=+2 color="#FF0000">This department is inactive.</font>
-<h3><font color="#FF0000"> {{ subtitle1 }} </font></h3>
-<h4><font color="#FF0000"> {{ subtitle2 }} </font></h4>
+<strong class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i> This department is inactive.</strong>
+<h3 class="prv-msgs"> {{ subtitle1 }}</h3>
+<h4 class="prv-msgs"> {{ subtitle2 }} </h4>
 {% endif %}
 <table class="table table-hover table-striped table-sm">
     <thead>
