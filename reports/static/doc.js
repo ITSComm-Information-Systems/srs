@@ -27,7 +27,7 @@ $(document).ready(function() {
 					option.text = data[i].account_number;
 					drp.add(option);
 				}
-				$('#dept_name').html(data[data.length - 1].name);
+				$('#chartfield_list').html('');
 			}
 		})
 	})
@@ -65,6 +65,16 @@ $(document).ready(function() {
 		e.preventDefault();
 		$('#return').submit();
 	})
+
+	// Select all chartfields
+	$('#select-all').on('click', function() {
+		if ($('#select-all').is(':checked')) {
+			$('#doc_chartcom option').prop('selected', 'selected');
+		}
+		else {
+			$('#doc_chartcom option').prop('selected', '');
+		}
+	})
 })
 
 // When the user scrolls down 20px from the top of the document, show the button
@@ -72,9 +82,9 @@ window.onscroll = function() {scrollFunction()};
 
 function scrollFunction() {
   if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    document.getElementById("myBtn").style.display = "block";
+    document.getElementById("scrollTop").style.display = "block";
   } else {
-    document.getElementById("myBtn").style.display = "none";
+    document.getElementById("scrollTop").style.display = "none";
   }
 }
 

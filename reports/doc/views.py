@@ -17,9 +17,6 @@ from django import forms
 from ldap3 import Server, Connection, ALL
 
 from oscauth.models import AuthUserDept
-# from .models import Role, Group, User
-# from .forms import UserSuForm, AddUserForm
-# from .utils import su_login_callback, custom_login_action, upsert_user
 from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscOtsCallSummaryV, UmOscAcctdetailMrcOccV, UmOscPhoneHistoryV, UmOscServiceLocV, UmOscRatedV
 from oscauth.forms import *
 from django.contrib.auth.decorators import login_required, permission_required
@@ -38,8 +35,15 @@ def get_doc(request):
     user_depts = (d.dept for d in AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept'))
     user_depts = list(user_depts)
 
-    # Initial dept name
-    name = UmOscDeptProfileV.objects.filter(deptid=user_depts[0])
+    # Find dept names
+    names = []
+    name_query = list(d.dept_name for d in UmOscDeptProfileV.objects.filter(deptid__in=user_depts).order_by('deptid'))
+    for i in range(0, len(user_depts)):
+    	name = {
+    		'deptid': user_depts[i],
+    		'name': name_query[i]
+    	}
+    	names.append(name)
 
     # Find associated chartfields
     selected_dept = user_depts[0]
@@ -50,8 +54,8 @@ def get_doc(request):
 
     context = {
         'title': 'Detail of Charges',
-        'user_depts': user_depts,
-        'name': name[0].dept_name,
+        #'user_depts': user_depts,
+        'names': names,
         'dates': billing_dates,
         'initial_date':billing_dates[0],
         'dept_cfs': dept_cfs
@@ -151,18 +155,22 @@ def generate_report(request):
 
 
 		# One Time Charges and Credits
-		occ_charges = UmOscAcctdetailMrcOccV.objects.filter(subscriber_id=a.subscriber_id, account_number=cf, charge_type="OCC")
+		occ_charges = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf, charge_type="OCC")
 		occ_rows = []
 		occ_total = 0
 		for c in occ_charges:
-			row = {
-				'work_order': c.package_code,
-				'desc': c.item_description, # this should change
-				'total_amt': c.charge_amount
-			}
+			if not any(r['work_order'] == c.package_code for r in occ_rows):
+				row = {
+					'work_order': c.package_code,
+					'desc': 'Labor/Service Order and Equipment',
+					'total_amt': c.charge_amount
+				}
+				occ_rows.append(row)
+			else:
+				row['total_amt'] += c.charge_amount
 			occ_total += c.charge_amount
-			row['total_amt'] = '${:,.2f}'.format(row['total_amt'])
-			occ_rows.append(row)
+		for r in occ_rows:
+			r['total_amt'] = '${:,.2f}'.format(r['total_amt'])
 
 		
 		data = {
@@ -173,7 +181,7 @@ def generate_report(request):
 			'monthly_data': monthly_data,
 			'monthly_total': '${:,.2f}'.format(monthly_total),
 			'occ': occ_rows,
-			'occ_total': occ_total
+			'occ_total':'${:,.2f}'.format(occ_total)
 		}
 		charge_types.append(data)
 
@@ -239,35 +247,29 @@ def show_detail(request):
 		phone_num = box_detail[0].phone_number
 	else:
 		username = 'No Name Match'
-	location_detail = UmOscServiceLocV.objects.filter(billing_date=date, subscriber_id=sub_id)
-	if (location_detail):
-		location = {
-			'building': location_detail[0].building,
-			'floor': location_detail[0].floor,
-			'room': location_detail[0].room,
-			'jack': location_detail[0].jack,
-			'last_updated': location_detail[0].timestamp
-		}
-	else:
-		location = ''
 
 	total = 0
 
 	# Monthly Charges table
 	rows = []
 	monthly_total = 0
-	monthly_data = UmOscAcctdetailMrcOccV.objects.filter(subscriber_id=sub_id, account_number=chartcom, billing_date=date, charge_type="MRC")
+	monthly_data = UmOscAcctdetailMrcOccV.objects.filter(account_number=chartcom, billing_date=date, charge_type="MRC", subscriber_id=sub_id)
 	for m in monthly_data:
-		row = {
-			'item_code': m.item_code,
-			'desc': m.item_description,
-			'unit_price': '${:,.2f}'.format(m.unit_price),
-			'quantity': int(m.quantity),
-			'total_charge': m.charge_amount
-		}
+		if not any(r['item_code'] == m.item_code for r in rows):
+			row = {
+				'item_code': m.item_code,
+				'desc': m.item_description,
+				'unit_price': '${:,.2f}'.format(m.unit_price),
+				'quantity': int(m.quantity),
+				'total_charge': m.charge_amount
+			}
+			rows.append(row)
+		else:
+			row['quantity'] += int(m.quantity)
+			row['total_charge'] += m.charge_amount
 		monthly_total += m.charge_amount
-		row['total_charge'] = '${:,.2f}'.format(m.charge_amount)
-		rows.append(row)
+	for r in rows:
+		r['total_charge'] = '${:,.2f}'.format(r['total_charge'])
 	total += monthly_total
 
 	# Local and Toll Charges tables
@@ -275,9 +277,11 @@ def show_detail(request):
 	toll = []
 	local_total = 0
 	toll_total = 0
-	rated_data = UmOscRatedV.objects.filter(subscriber_id=sub_id, billing_cycle=date)
+	phone_num = user_id.split('-')
+	phone_num = phone_num[1]
+	rated_data = UmOscRatedV.objects.filter(subscriber_id=sub_id, from_number=phone_num, batch_date=date)
 	for r in rated_data:
-		if r.call_type == 'Local':
+		if r.call_description == 'Local':
 			l = {
 				'connect_date': r.connect_date,
 				'to_num': r.to_number,
@@ -288,7 +292,7 @@ def show_detail(request):
 			local_total += r.amount_billed
 			l['total_charge'] = '${:,.2f}'.format(l['total_charge'])
 			local.append(l)
-		elif r.call_type == 'Toll':
+		elif r.call_description == 'Toll':
 			t = {
 				'connect_date': r.connect_date,
 				'to_num': r.to_number,
@@ -319,7 +323,6 @@ def show_detail(request):
 		'toll': toll,
 		'toll_total': '${:,.2f}'.format(toll_total),
 		'total': '${:,.2f}'.format(total),
-		'location': location,
 		'return_button': return_button
 	}
 

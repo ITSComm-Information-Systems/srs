@@ -2,31 +2,6 @@
 {% block content %}
 
 <style>
-	#myBtn {
-		display: none;
-		position: fixed;
-		bottom: 20px;
-		right: 30px;
-		z-index: 99;
-		font-size: 18px;
-		border: none;
-		outline: none;
-		background-color: #CFC9C9;
-		color: black;
-		cursor: pointer;
-		padding: 15px;
-		border-radius: 12px;
-		font-weight:bold;
-	}
-
-	#myBtn:hover {
-		background-color: #A5A3A3;
-	}
-
-	#charge_table td, #charge_table th {
-		text-align:center;
-	}
-
 	.table-total {
 		background-color:#F0AD4E;
 	}
@@ -41,25 +16,25 @@
 	    background:none!important;
 	    border:none; 
 	    padding:0!important;
-	    color:#069;
-	    /*text-decoration:underline;*/
+	    text-decoration:underline;
 	    cursor:pointer;
 	}
 
-	#submit-link:hover {
+	#edit-selection {
 		text-decoration:underline;
 	}
+
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <div class="container">
-	<button onclick="topFunction()" id="myBtn" title="Go to top">Scroll to top</button>
+	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
 
 	<form method="POST" action='detail/' id="report_details">{% csrf_token %}
 		<div class="row-inline">
 			<strong>Your selection</strong>
-			<a class="offset-2" href="..">Edit your selection</a>
+			<a class="offset-2 btn btn-link" id="edit-selection" href="..">Edit your selection</a>
 		</div>
 
 		<div class="row">
@@ -134,7 +109,7 @@
 							</tr>
 							{% for v in value.rows %}
 							<tr>
-								<td><input style="text-align:left;" id="submit-link" type="submit" name="user_id" value="{{ v.user_defined_id }}"></td>
+								<td><input class="btn btn-link" style="text-align:left;" id="submit-link" type="submit" name="user_id" value="{{ v.user_defined_id }}"></td>
 								<input type="hidden" name="sub_id:{{ v.user_defined_id}}" value="{{ v.subscriber_id }}">
 								<input type="hidden" name="chartcom:{{ v.user_defined_id }}" value="{{ c.account_number }}">
 								<input type="hidden" name="charge_type:{{ v.user_defined_id }}" value="IDK YET">
@@ -156,6 +131,7 @@
 					{% endfor %}
 
 					<strong>Monthly Service Charges</strong>
+					{% if c.monthly_data %}
 					<table class="table table-sm mb-5">
 						<thead>
 							<tr class="table-secondary">
@@ -185,8 +161,17 @@
 							</tr>
 						</tbody>
 					</table>
+					{% else %}
+					<div class="col-md-9 mt-2">
+				        <div class="alert alert-danger col-md-9" role="alert">
+				            <i class="fas fa-exclamation-triangle" style="color:red"></i>
+				            This chartfield does not have any monthly charges this month.
+				        </div>
+				    </div>
+					{% endif %}
 
 					<strong>One-Time Charges & Credits Summary</strong>
+					{% if c.occ %}
 					<table class="table table-sm">
 						<thead>
 							<tr class="table-secondary">
@@ -198,7 +183,7 @@
 						<tbody>
 							{% for o in c.occ %}
 							<tr>
-								<td><a href="tsr/">{{ o.work_order }}</a></td>
+								<td><a class="btn btn-link" style="text-decoration:underline;" href="tsr/">{{ o.work_order }}</a></td>
 								<td>{{ o.desc }}</td>
 								<td style="text-align:right">{{ o.total_amt }}</td>
 							</tr>
@@ -210,6 +195,14 @@
 							</tr>
 						</tbody>
 					</table>
+					{% else %}
+					<div class="col-md-9 mt-2">
+				        <div class="alert alert-danger col-md-9" role="alert">
+				            <i class="fas fa-exclamation-triangle" style="color:red"></i>
+				            This chartfield does not have any one time charges this month.
+				        </div>
+				    </div>
+					{% endif %}
 				</div>
 			</div>
 		</div>
@@ -217,7 +210,7 @@
 		<div class="col-md-8">
 	        <div class="alert alert-danger col-md-8" role="alert">
 	            <i class="fas fa-exclamation-triangle" style="color:red"></i>
-	            This chartfield does not have any data.
+	            This chartfield does not have any data this month.
 	        </div>
 	    </div>
 		{% endif %}

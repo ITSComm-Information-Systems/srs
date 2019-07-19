@@ -2,7 +2,6 @@
 {% block content %}
 
 <div class="container">
-  {% comment %}
   <h1>
     Chartfield Change
     <small class="text-muted">
@@ -10,21 +9,32 @@
     </small>
   </h1>
 
-  <form method="POST">{% csrf_token %}
+  <p hidden id="dept_mgr">{{ dept_info.dept_mgr }}</p>
+
+  <form  id="choose_dept" method="POST">{% csrf_token %}
+    {% if user.is_superuser %}
+    <div class="input-group mb-3 mb-4 col-md-5" id="dept_search">
+      <input type="text" name="select_dept" class="form-control" placeholder="Enter department" aria-label="Enter department" aria-describedby="basic-addon2">
+      <div class="input-group-append">
+        <button class="btn" type="Submit">Submit</button>
+      </div>
+    </div>
+    {% else %}
     <div class="row align-items-start mb-4" id="select_dept">
-      <div class="input-group" style="width:600px">
+      <div class="input-group col-md-5">
         <div class="input-group-prepend">
             <label class="input-group-text" for="cf_dropdown">
-                Select Department
+                Change Department
             </label>
         </div>
         <select name="deptids" class="custom-select" id="chart_deptids" value="{{ dept }}">
             {% for dept in deptids %}
-            <option name="dept" value="{{ dept }}">{{ dept }}</option>
+            <option name="dept" value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.name }}</option>
             {% endfor %}
         </select>
       </div>
     </div>
+    {% endif %}
 
   </form> 
 
@@ -80,7 +90,7 @@
 <script src="/static/js/chartchange.js"></script>
 
 
-{% endcomment %}
+{% comment %}
 <h1>
     Chartfield Change
     </h1>
@@ -101,4 +111,5 @@
         </div>
     </div>
 </div>
+{% endcomment %}
 {% endblock %}

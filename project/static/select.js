@@ -47,12 +47,18 @@ $(document).ready(function() {
 	});
 
 
-	// Set select for chartfield change - choose dept
-	// $("#chart_deptids").select2({
- //    	placeholder: "Choose department",
- //    	matcher: function(params, data) {
- //        	return matchStart(params, data);
- //    	}
-	// });
+	// Set select for DOC - departments
+	$('#doc_depts').select2({
+		width: '33%',
+		matcher: function(params, data) {
+        	return matchStart(params, data);
+    	}
+	})
+
+	// Set select for DOC - date
+	$('#doc_bill_date').select2({
+		minimumResultsForSearch: Infinity,
+		width: '33%'
+	})
 
 });
