@@ -1,5 +1,7 @@
+<p></p>
+<h5>Search for New Location</h5>
 <p>
-  Look Up Building Name or ID
+  New Location Building Name or ID: 
   <input id="buildingSearch" type="text" placeholder="Search..">
 
   <table id="buildingTable" class="table table-hover">
@@ -26,19 +28,33 @@
         <input type="text" method: "GET" name="buildingFloor" id="buildingFloor" class=" form-control">
         <div class="invalid-feedback">Please enter floor.</div>
 
-        <label for="id_OneTimeCharges">Room:</label>
-        <input type="text" method: "GET" name="buildingRoom" id="buildingRoom" class=" form-control">
-        <div class="invalid-feedback">Please enter room.</div>
-
-        <label for="id_OneTimeCharges">Jack:</label>
-        <input type="text" method: "GET" name="buildingJack" id="buildingJack" class=" form-control">
-        <div class="invalid-feedback">Please enter jack.</div>
+        <div id = "roomselect">
+          <label for="id_OneTimeCharges">Room:</label>
+            <select type = "GET" name = "buildingRoom" id="buildingRoom" class=" form-control">
+              <option value = "%">--Select--</option>
+            </select>
+          {% comment %} <input type="text" method: "GET" name="buildingRoom" id="buildingRoom" class=" form-control"> {% endcomment %}
+          <div class="invalid-feedback">Please enter room.</div>
+        </div>
+        <div id = "jackselect">
+          <label for="id_OneTimeCharges">Jack:</label>
+          <select type = "GET" name = "buildingJack" id="buildingJack" class=" form-control">
+                <option value = "%">--Select--</option>
+              </select>
+          {% comment %} <input type="text" method: "GET" name="buildingJack" id="buildingJack" class=" form-control"> {% endcomment %}
+          <div class="invalid-feedback">Please enter jack.</div>
+        </div>
     </div>
 </div>
 
 <script>
   $(document).ready( function(){
+    
+
     $('#buildingTable tr').click(function() {
+        $("#roomselect").hide();
+        $("#jackselect").hide();
+        document.getElementById('buildingFloor').value = '';  
         var name = $(this).find("td").eq(1).html();   
         var code = $(this).find("td").eq(0).html();   
         $.ajax({
@@ -60,17 +76,36 @@
         });
     });
 
-    $('input[type=text][name=buildingFloor]').change(function () {
+    $('input[type=text][name=buildingFloor]').on("keyup", function () {
+        var code = $('#buildingID').val();
         var floor = $(this).val();
+        $("#roomselect").hide();
+        $("#jackselect").hide();
         $.ajax({
           type: "GET",
           url: "floor/",
           data:{
+            "buildingID": code,
             "buildingFloor": floor,
           },
           dataType:'json',
           success: function(data) {
+            
+            $('#buildingRoom').empty();
+            var option = document.createElement("option");
+            option.value = "%";
+            option.text = "--Select--";
+            document.getElementById('buildingRoom').appendChild(option);
+
             document.getElementById('n4').innerHTML = "Floor: " + data.floor;
+            for (var i =0; i < data.rooms.length; i++) {
+              var option = document.createElement("option");
+              option.value = data.rooms[i];
+              option.text = data.rooms[i];
+              document.getElementById('buildingRoom').appendChild(option);
+            }
+            if (data.floor != '')
+              $("#roomselect").show();
             console.log(typeof data);
           },
           error: function(data) {
@@ -79,18 +114,36 @@
         });
     });
 
-    $('input[type=text][name=buildingRoom]').change(function () {
+    $('#buildingRoom').change(function () {
+        var code = $('#buildingID').val();
+        var floor = $("#buildingFloor").val();
         var room = $(this).val();
         $.ajax({
           type: "GET",
           url: "room/",
           data:{
+            "buildingID": code,
+            "buildingFloor": floor,
             "buildingRoom": room,
           },
           dataType:'json',
           success: function(data) {
             document.getElementById('n5').innerHTML = "Room: " + data.room;
+
+            $('#buildingJack').empty();
+            var option = document.createElement("option");
+            option.value = "%";
+            option.text = "--Select--";
+            document.getElementById('buildingJack').appendChild(option);
+
+            for (var i =0; i < data.jacks.length; i++) {
+              var option = document.createElement("option");
+              option.value = data.jacks[i];
+              option.text = data.jacks[i];
+              document.getElementById('buildingJack').appendChild(option);
+            }
             console.log(typeof data);
+            $("#jackselect").show();
           },
           error: function(data) {
             alert("ok nice try guy");
@@ -98,7 +151,7 @@
         });
     });
 
-    $('input[type=text][name=buildingJack]').change(function () {
+    $('#buildingJack').change(function () {
         var jack = $(this).val();
         $.ajax({
           type: "GET",

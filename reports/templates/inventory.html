@@ -17,4 +17,87 @@
         </div>
     </div>
 </div>
+{% endblock %} {% endcomment %}
+ {% comment %} onsubmit="return validate()"
+{% block content %}
+{% comment %} 
+<form action="/reports/inventory/" method="POST" name="Select">{% csrf_token %}
+        <div class="form-group col-md-6">
+            {% if depts %}
+            <h5>Department ID</h5>
+                <select class="form-control" style='font-size:16px' requried type="select" name="dept_id" id="dept_id" value="{{ i }}">
+                    <option>--Select--</option>
+                    {% for dept in depts %}
+                    <option value="{{ dept }}">{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            <p id="display"></p>
+            <p></p>
+            <h5>Billing Period</h5>
+                <select class="form-control" style='font-size:16px' requried type="select" name="bill_period" id="bill_period" value="{{ i }}">
+                    <option>--Select--</option>
+                    {% for date in dates %}
+                    <option value={{ date }}>{{ date }}</option>
+                    {% endfor %}
+                </select>
+            <p id="display"></p>
+            <p></p>
+            {% endif %}
+            <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+        </div>
+</form>
+{% if submit %}
+    <p>{{ dept_id }}</p>
+    <p>{{ bill_period }}</p>
+    <p>{{ data }}</p>
+
+<table>
+        <thead>
+            <tr>
+                <th>User Id</th>
+                <th>Usage</th>
+                <th>User ID Type</th>
+                <th>User ID Description</th>
+                <th>Calling Range/Restrictions</th>
+                <th>Last Outbound Call Date</th>
+                <th>Account</th>
+                <th>Charge Code</th>
+                <th>Charge Description</th>
+                <th>Quantity</th>
+                <th>Rate</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+    {% for project_grant in data%}
+    
+    <tbody>
+        <tr>
+            <td>{{project_grant.3}}</td>
+            <td>{{project_grant.12}}{{project_grant.13}}{{project_grant.14}}</td>
+            <td>{{project_grant.5}}</td>
+            <td>User: {{project_grant.18}}</td>
+            <td></td>
+            <td>{{project_grant.16}}</td>
+            <td>{{project_grant.20}}</td>
+            <td>{{project_grant.21}}</td>
+            <td>{{project_grant.22}}</td>
+            <td>{{project_grant.23}}</td>
+            <td>{{project_grant.24}}</td>
+            <td>{{project_grant.25}}</td>
+        <tr>
+    </tbody>
+    {% endfor %}
+</table>
+
+
+
+
+
+{% endif %}
+
+
+
+  {% endcomment %}
+
+
 {% endblock %}

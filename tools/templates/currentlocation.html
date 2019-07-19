@@ -3,7 +3,8 @@
 
 {% if submit %}
 <div>
- <p>Phone Number: </p><input type="text" style='font-size:20px' method = "GET"name = 'holder' id = 'phone' value = {{phone_number}} readonly>
+    <h5>Please Select Location for Following Number: </h5>
+    <p></p><input type="text" style='font-size:20px' method = "GET"name = 'holder' id = 'phone' value = {{phone_number}} readonly>
 
  
 </div>
@@ -18,13 +19,13 @@
     {% for jack in current %}
     
     <tr id = '{{jack}}'>
-        <td><input type="radio" method: "GET" style='font-size:20px' name = 'jacks' value ="{{jack.14}}"></td>
+        <td><input type="radio" method: "GET" style='font-size:20px' name = 'jacks' value ="{{jack.15}}"></td>
         <td> {{jack.1}} </td>
         <td> {{jack.9}} </td>
         <td> {{jack.8}} </td>
         <td> {{jack.10}} </td>
-        <td> {{jack.12}} </td>
-        <td> {{jack.14}} </td>
+        <td> {{jack.13}} </td>
+        <td> {{jack.15}} </td>
     </tr>
     {% endfor %}
 </table>
@@ -39,6 +40,7 @@
                 url: "",
                 data: {
                     'jacks': jack,
+
                 },
                 dataType: 'json',
                 success: function(data) {
@@ -47,10 +49,10 @@
                     document.getElementById('n').innerHTML = "Phone Number: " + data.phone_number;
                     document.getElementById('n1').innerHTML = "Campus: " + data.selected[0][1];
                     document.getElementById('r2').innerHTML = "Building Name: " + data.selected[0][9];
-                    document.getElementById('r3').innerHTML = "Building ID: " + data.selected[0][8];
-                    document.getElementById('r4').innerHTML = "Floor: " + data.selected[0][10];      
-                    document.getElementById('r5').innerHTML = "Room: " + data.selected[0][12];      
-                    document.getElementById('r6').innerHTML = "Jack: " + data.selected[0][14];
+                    document.getElementById('r3').innerHTML = "Building ID: " + data.selected[0][9];
+                    document.getElementById('r4').innerHTML = "Floor: " + data.selected[0][11];      
+                    document.getElementById('r5').innerHTML = "Room: " + data.selected[0][13];      
+                    document.getElementById('r6').innerHTML = "Jack: " + data.selected[0][15];
                 },
                 error: function(data) {
                     alert("this fucking sucks");
