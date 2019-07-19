@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div class = "container">
 
     <div class="row align-items-start" id="phoneselect">
@@ -18,13 +18,13 @@
     <form action='/tools/voip/confirm/' method="GET" id = "voipLocationForm">
         <ul class="nav justify-content-center nav-pills" id="voiplocation_nav" role="tablist">
             <li class="nav-item">
-                <a class="nav-link disabled" data-toggle="tab" id="vlc-1" href="#" role="tab" name="Select Phone Number" aria-selected="false">Select Phone Number</a>
+                <a class="nav-link disabled" onclick="tab_func1()" data-toggle="tab" id="vlc-1" href="#vl-1" role="tab" name="Select Phone Number" aria-selected="false">Select Phone Number</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link disabled" data-toggle="tab" id="vlc-2" href="#" role="tab" name="Select New Location" aria-selected="false">Select New Location</a>
+                <a class="nav-link disabled" onclick="tab_func2()" data-toggle="tab" id="vlc-2" href="#vl-2" role="tab" name="Select New Location" aria-selected="false">Select New Location</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link disabled" data-toggle="tab" id="vlc-3" href="#" role="tab" name="Confirm Change" aria-selected="false">Confirm Change</a>
+                <a class="nav-link disabled" onclick="tab_func3()" data-toggle="tab" id="vlc-3" href="vl-3" role="tab" name="Confirm Change" aria-selected="false">Confirm Change</a>
             </li>
         </ul>
 
@@ -48,8 +48,8 @@
 
     </form>
     
-</div> {% endcomment %}
-<div id="main-content" class="container" role="main">
+</div>
+{% comment %} <div id="main-content" class="container" role="main">
     <div class="container" role="main">
         <div class="row">
             <div class="col-lg-12">
@@ -65,7 +65,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> {% endcomment %}
 {% endblock %}
 
 {% block js %}
