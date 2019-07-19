@@ -51,27 +51,18 @@ function nextPrev(n) {
     // Details up top
     if (currStep == 1) {
         $('#phoneselect').show();
-        $('#current').show();
-        $('#locations').show();
-        $('#available').show();
         document.getElementById("vl-1").className = "";
         document.getElementById("vl-2").className = "tab-pane fade";
         document.getElementById("vl-3").className = "tab-pane fade";
     }
     if (currStep == 2) {
         $('#phoneselect').hide();
-        $('#current').hide();
-        $('#locations').hide();
-        $('#available').hide();
         document.getElementById("vl-1").className = "tab-pane fade";
         document.getElementById("vl-2").className = "";
         document.getElementById('vl-3').className = "tab-pane fade"
     }
     if (currStep == 3) {
         $('#phoneselect').hide();
-        $('#current').hide();
-        $('#locations').hide();
-        $('#available').hide();
         document.getElementById("vl-1").className = "tab-pane fade";
         document.getElementById("vl-2").className = "tab-pane fade";
         document.getElementById('vl-3').className = ""
@@ -97,7 +88,13 @@ function tab_func1() {
 	currStep = 1;
 	// $('#vlc_desc').show();
  //  	$('#dept_details').show();
-  	$('#phoneselect').show();
+  
+  $('#phoneselect').show();
+  $('#phoneselect').show();
+  document.getElementById("vl-1").className = "";
+  document.getElementById("vl-2").className = "tab-pane fade";
+    document.getElementById("vl-3").className = "tab-pane fade";
+
 }
 
 function tab_func2() {
@@ -107,7 +104,10 @@ function tab_func2() {
 		// $('#vlc_desc').hide();
 	 //  	$('#dept_details').hide();
 	}
-	$('#phoneselect').hide();
+  $('#phoneselect').hide();
+  document.getElementById("vl-1").className = "tab-pane fade";
+  document.getElementById("vl-2").className = "";
+  document.getElementById('vl-3').className = "tab-pane fade"
 }
 
 function tab_func3() {
@@ -116,7 +116,10 @@ function tab_func3() {
 		// $('#vlc_desc').hide();
 	 //  	$('#dept_details').hide();
 	  }
-	  $('#phoneselect').hide();
+  $('#phoneselect').hide();
+  document.getElementById("vl-1").className = "tab-pane fade";
+  document.getElementById("vl-2").className = "tab-pane fade";
+  document.getElementById('vl-3').className = ""
 }
 
 
