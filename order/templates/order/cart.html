@@ -20,7 +20,7 @@
                             <div class="input-group dept-dropdown">
                                 <div class="input-group-prepend">
                                     <label class="input-group-text" for="department-dropdown">
-                                        Change Department
+                                        Switch Department
                                     </label>
                                 </div>
                                 <select name="deptid" class="custom-select order-status-dropdown" id="department-dropdown">
@@ -44,9 +44,8 @@
                     <div class="col-12">
                         {% for chartcom in acct %}
                         <div class="cart-table">
-                            <h2>
-                                For Chartfield: 
-                            
+                            <h2 class="small-h2">
+                                Chartfield: 
                                 <!-- Insert Chartfield Nickname here -->
                                 <small class="text-muted">{{chartcom.chartcom}} ({{chartcom.chartcom.account_number}}) </small>
                             </h2>
@@ -57,7 +56,6 @@
                                     <tr class="col-headings">
                                         <th scope="col">Date Created</th>
                                         <th scope="col">Created By</th>
-                                        <th scope="col">Service Type</th>
                                         <th scope="col">Details</th>
                                         <th scope="col">Action</th>
                                         <th scope="col">Ready to Order</th>
@@ -72,7 +70,6 @@
                                     <tr>
                                         <th scope="row">{{ item.create_date|date:"m/d/y" }}</th>
                                         <td>{{ item.created_by }}</td>
-                                        <td>{{ item.service }}</td>
                                         <td>{{ item.details }}</td>
                                         <td class="action">
                                             <a class="edit" href="#">Edit</a>

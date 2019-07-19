@@ -20,11 +20,17 @@ from ldap3 import Server, Connection, ALL
 from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput
 from order.models import Chartcom
 from oscauth.models import AuthUserDept
-from datetime import datetime
+from datetime import datetime, date
 from django.contrib.auth.decorators import login_required, permission_required
 
 import json
 from django.http import JsonResponse
+
+import os
+from django.db.models import indexes, Max
+from django.db import connections
+from django import db
+import cx_Oracle
 
 
 @permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
@@ -198,27 +204,32 @@ def submit(request):
 		string = request.POST.get(key)
 		if '/' in string:
 			strings = string.split('//')
+			# Set toll and local to MRC if non-phone type
+			if strings[2] == 'N/A':
+				strings[2] = strings[1]
+				strings[3] = strings[1]
 			new_entry = UmOscAcctChangeInput(
 				uniqname=request.user.username,
 				user_defined_id=strings[0],
-				mrc_acct_number=strings[1],
-				toll_acct_number=strings[2],
-				local_acct_number=string[3])
-				#date_added=datetime.date,
-				# date_processed=None,
-				# messages=None,
-				# request_no=None)
-			# new_entry.save()
+				mrc_account_number=strings[1],
+				toll_account_number=strings[2],
+				local_account_number=strings[3],
+				date_added=date.today(),
+				date_processed=None,
+				messages=None,
+				request_no=None)
+			new_entry.save()
 
 			# Add record to Pinnacle
 			# curr = connections['pinnacle'].cursor()
-		 #    uniqname = request.user.username
-		 #    datetime_added = date.today()
-		 #    curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIBE_FROM_WEB_P',[uniqname, datetime_added])
-		 #    curr.close()
+			# uniqname = request.user.username
+			# datetime_added = date.today()
+			# curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
+			# curr.close()
+
 
 		context = {
-			'title': ''
+			'title': '',
 		}
 
 	return HttpResponse(template.render(context, request))
