@@ -593,6 +593,7 @@ class UmOscLocationsInUseV(models.Model):
      campus_desc = models.CharField(max_length=30)
      service_type = models.CharField(max_length=20)
      service_number = models.CharField(max_length=60)
+     service_subscrib_id = models.IntegerField(9, null=False)
      status = models.CharField(max_length=15)
      service_id = models.IntegerField(9, null=False)
      location_id = models.IntegerField(9, null=False)
@@ -675,11 +676,11 @@ class UmOscAcctsInUseV(models.Model):
 class UmOscAcctChangeInput(models.Model):
      uniqname = models.CharField(max_length=8) 
      user_defined_id = models.CharField(max_length=20)
-     mrc_acct_number = models.CharField(max_length=100)
-     toll_acct_number = models.CharField(max_length=100)
-     local_acct_number = models.CharField(max_length=100)
-     date_added = models.DateField
-     date_processed = models.DateField
+     mrc_account_number = models.CharField(max_length=100)
+     toll_account_number = models.CharField(max_length=100)
+     local_account_number = models.CharField(max_length=100)
+     date_added = models.DateField(null=True) # added null=True
+     date_processed = models.DateField(null=True) # added null=True
      messages = models.CharField(max_length=2000)
      request_no = models.IntegerField(9, null=False, primary_key=True)
 

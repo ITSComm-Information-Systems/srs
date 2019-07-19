@@ -3,7 +3,7 @@
 
 <!-- Beginning of Content -->
 <div id="main-content" class="container" role="main">
-    <h1>Orders
+    <h1>Track Orders
         <small class="text-muted">
             for Department:
             <strong>{{department.id}} - {{department.name}}
@@ -15,19 +15,16 @@
             <div class="col-lg-12">
                 <!-- Beginning of Department name/Search -->
                 <div class="select-dept">
-                    <div class="dept-name">
-                        <h2>Viewing Department: {{department.id}} - {{department.name}}</h2>
-                    </div>
+
                     <div class="input-group mb-3 dept-dropdown">
                         <div class="input-group-prepend">
                             <label class="input-group-text">
-                                Select Department
+                                Switch Department
                             </label>
                         </div>
                         <select class="custom-select order-status-dropdown" id="selectDept">
-                            <option selected>Select a department</option>
                             {% for dept in dept_list %}
-                            <option id="mydept{{dept.dept}}" name="dept" data-filter"dept" value="{{dept.dept}}">
+                            <option id="mydept{{dept.dept}}" name="dept" data-filter="dept" value="{{dept.dept}}">
                                 {{dept.dept}} - {{dept.name}}</option>
                             {% endfor %}
                         </select>
@@ -61,26 +58,11 @@
                             <option selected>Select a status indicator</option>
                             <option value="Submitted">Submitted</option>
                             <option value="Scheduled">Scheduled for</option>
-                            <option value="Awaiting Billing">Done & Awaiting Billing</option>
                             <option value="Billed">Billed</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
                     </div>
                     <!-- End of Order Status Filter Dropdown -->
-
-                    <!-- Beginning of Order Type Filter Dropdown -->
-                    <div class="input-group mb-3 order-type">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text">Filter by Order Type</label>
-                        </div>
-                        <select class="custom-select order-type" id="order-type-options">
-                            <option selected>Select an Order Type</option>
-                            <option value="ITCOM">Telecommunications</option>
-                            <option value="MiStorage">MiStorage</option>
-                            <option value="MiServer">MiServer</option>
-                        </select>
-                    </div>
-                    <!-- End of Order Type Filter Dropdown -->
                 </div>
                 <!-- End of Filter/Search -->
 
@@ -94,8 +76,7 @@
                                 <th scope="col">PreOrder #</th>
                                 <th scope="col">Date Submitted</th>
                                 <th scope="col">Submitted By</th>
-                                <th scope="col"> Service Type</th>
-                                <th scope="col">Order Details</th>
+                                <th scope="col" class="wismo-order-details">Order Details</th>
                                 <th scope="col">Charfield Billed</th>
                                 <th scope="col">Status <i class="fas fa-question-circle btn-link"
                                         aria-label="More Information icon" data-toggle="modal"
@@ -114,9 +95,8 @@
                                 <th scope="row">{{order.order_reference}}</th>
                                 <td>{{ order.create_date|date:"m/d/y" }}</td>
                                 <td>{{ order.created_by }}</td>
-                                <td>{{ order.service }}</td>
                                 <td>
-                                    <ul>
+                                    <ul class="order-details-list">
                                         {% for item in order.items %}
                                         <li>
                                             {{ item.description }}
@@ -126,7 +106,13 @@
                                 </td>
                                 <td>{{ order.chartcom }}</td>
                                 <td>{{order.status}}</td>
-                                <td>Cancel</td>
+                                <td class="action">
+                                    <!-- <a class="delete" href="#">Cancel</a> -->
+                                    <a class="cancel" href="#" data-toggle="modal"
+                                        data-target="#cancelOrderModal">
+                                        Cancel
+                                    </a>
+                                </td>
                             </tr>
                             <!-- end of table row 1 -->
                             {% endfor %}
@@ -158,6 +144,85 @@
                     </div>
                 </div>
 
+                <!-- Cancel Order Modal -->
+                <div class="modal fade" id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrder"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="cancelOrder">Cancel Order</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body remove-chartfield-form-body">
+                                <strong class="remove-text">
+                                    Are you sure you want to cancel the following order?
+                                </strong>
+                                <form id="cancelOrderForm" method="GET" action="status.html">
+                                    <div class="card-body">
+                                        <strong>Pre-Order #:</strong>
+                                        <!-- Replace the following text with the value of the Pre Order Number that the user selected to be removed from the shortlist -->
+                                        12345
+                                        <div>
+                                            <strong>
+                                                Date Submitted:
+                                            </strong>
+                                            <!-- Replace the following text with the value of the date of the order that the user selected to be removed from the shortlist -->
+                                            mm/dd/yyyy
+                                        </div>
+
+                                        <div>
+                                            <strong>
+                                                Submitted by:
+                                            </strong>
+                                            <!-- Replace the following text with the value of the uniqname of the order's submitter that the user selected to be removed from the shortlist -->
+                                            uniqname here
+                                        </div>
+
+                                        <div>
+                                            <strong>
+                                                Order Details:
+                                            </strong>
+                                            <!-- Replace the following text with the value of the description of the order that the user selected to be removed from the shortlist -->
+                                            <ul>
+                                                <li>
+                                                    Items here
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <strong>
+                                                Chartfield:
+                                            </strong>
+                                            <!-- Replace the following text with the value of the chartfield of the order that the user selected to be removed from the shortlist -->
+                                            Chartfield here
+                                        </div>
+
+                                        <div>
+                                            <strong>
+                                                Status:
+                                            </strong>
+                                            <!-- Replace the following text with the value of the status of the order that the user selected to be removed from the shortlist -->
+                                            Status here
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <!-- cancel Form button -->
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Keep Order</button>
+                                <!-- Submit Form button -->
+                                <label for="submitBtn" hidden>Cancel Order</label>
+                                <input type="submit" form="cancelOrderForm" id="submitBtn" class="btn btn-danger"
+                                    value="Cancel Order">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Cancel Order Modal -->
+
             </div>
         </div>
     </div>
@@ -169,10 +234,10 @@
     $(document).ready(function () {
         $('[data-toggle="popover"]').popover();
 
-        
+
         $('#selectDept').change(function () {
-            if(this.value == 'Select a department') {
-                $('[data-dept]').show();                
+            if (this.value == 'Select a department') {
+                $('[data-dept]').show();
             } else {
                 $('[data-dept]').hide();
                 $("[data-dept='" + this.value + "']").show();

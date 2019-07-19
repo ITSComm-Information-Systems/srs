@@ -274,10 +274,6 @@ $(document).ready(function() {
 	$('#apply').on("click", function() {
 		selected = $("#select_cf_3 option:selected").text();
 
-		var mrc_checked = false;
-		var toll_checked = false;
-		var local_checked = false;
-
 		cf_change_table.rows().every(function(index, element) {
 			var row = $(this.node());
 			var col0 = row.find('td:first-child input[type="checkbox"]'); // checkbox
@@ -291,21 +287,18 @@ $(document).ready(function() {
 			    if (col1.startsWith("PH")) {
 			    	// Set MRC
 			    	if ($('#mrc').is(':checked')) {
-			    		mrc_checked = true;
 			    		col3.html(selected);
 			    		col3.val(selected);
 			    	}
 
 			    	// Set toll
 			    	if ($('#toll').is(':checked')) {
-			    		toll_checked = true;
 			    		col4.html(selected);
 			    		col4.val(selected);
 			    	}
 
 			    	// Set local
 			    	if ($('#local').is(':checked')) {
-			    		local_checked = true;
 			    		col5.html(selected);
 			    		col5.val(selected);
 			    	}
@@ -321,13 +314,13 @@ $(document).ready(function() {
 		})
 
 		// Uncheck when necessary
-		if (mrc_checked) {
+		if (document.getElementById('mrc').checked) {
 			document.getElementById('mrc').click();
 		}
-		if (toll_checked) {
+		if (document.getElementById('toll').checked) {
 			document.getElementById('toll').click();
 		}
-		if (local_checked) {
+		if (document.getElementById('local').checked) {
 			document.getElementById('local').click();
 		}
 		if (document.getElementById('select_all_an').checked) {

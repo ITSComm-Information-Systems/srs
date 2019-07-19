@@ -14,7 +14,7 @@
     }
     
 
-        .left, .right {
+    .left, .right {
     width: 50%;
     }
 
@@ -40,23 +40,25 @@
     <h1>Manage Access</h1>
 
     <h2>Select Person</h2>
-    <p>Uniqname <input type='search' name="uniqname_parm"> <input type='submit' value='Search' class="btn btn-primary">
+    <div>
+        <label for="uniqname-field">Enter a Uniqname</label>
+        <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short">
+        <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
         {% if uniqname_parm is None or result != '' %}
-        <font size=+1 color="#FF0000">{{ result }}</font>
+        <strong class="prv-msgs">{{ result }}</strong>
         {% else %}
 
             {% if osc_user.exists %}
-            <b><font size=+1>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</font></b> 
-            <input type='button' Value='Show Current Access' class="btn btn-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
+            <strong>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
+            <input type='button' value='Show Current Access' class="btn btn-outline-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
             {% else %}
-                <b><font size=+1>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</font></b> 
+                <strong>{{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
                  - User not found, add a role to create them.
             {% endif %}
         {% endif %}
-    </p>
-    <br>
-    <h6><font size=+1 color="#FF0000">{{ submit_msg }}</font></h6>
-
+        <br>
+        <strong>{{ submit_msg }}</strong>
+    </div>
 </form>
 
 <form action="/auth/modpriv/" method="POST">{% csrf_token %}
@@ -68,44 +70,58 @@
 
 <h6>Please select a Task, a Role, and at least one Department then click Submit.</h6>
 
-<h7>Inactive departments are shown in <font color="#FF0000">red.</font></h7>
+<h7>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></h7>
 
-<div class="row">
+<div class="row access-action-row">
     <div class="column">
         <h2>Select Task</h2>
-        <input id="roleAdd" type='radio' name="taskrad" value='add'>Add Access<br>
-        <input id="roleDelete" type='radio' name="taskrad" value='remove'>Remove Access<br>
-        <br>
+        <div class="form-check">
+            <input id="roleAdd" type='radio' name="taskrad" value='add' class="form-check-input">
+            <label for="roleAdd" class="form-check-label">Add Access</label><br>
+            <input id="roleDelete" type='radio' name="taskrad" value='remove' class="form-check-input">
+            <label for="roleDelete" class="form-check-label">Remove Access</label>
+        </div>
     </div>
     <div class="column" id="addRole">
         <h2>Select Role</h2>
-        {% for role in grantable_roles %}
-        <input type='radio' name="rolerad" value={{ role.role }}>{{ role.role }}
-        <br>
+        <div class="form-check">
+            {% for role in grantable_roles %}
+            <input type='radio' name="rolerad" value={{ role.role }} id={{ role.role }} class="form-check-input">
+            <label for={{ role.role }} class="form-check-label">{{ role.role }}</label>
+            <br>
         {% endfor %}
+        </div>
     </div>
     <div class="column" id="deleteRole">
-            <h2>Select Role</h2>
+        <h2>Select Role</h2>
+        <div class="form-check">
             {% for role in grantable_roles %}
-            <input type='checkbox' name="rolerad" value={{ role.role }}>{{ role.role }}
+            <input type='checkbox' name="rolerad" value={{ role.role }} id={{ role.role }} class="form-check-input">
+            <label for={{ role.role }} class="form-check-label">{{ role.role }}</label>
             <br>
             {% endfor %}
         </div>
+        
+    </div>
     <div class="column deptid">
         <h2>Select Department</h2>
-        <input type="checkbox" onclick="toggle(this);" />Select All Departments<br />
-        {% for row in rows %}
-        {% if row.dept_status != 'I' %}
-        <input type='checkbox' name="deptck" value={{ row.dept }}>{{ row.dept }} - {{ row.dept_name }}
-        {% else %}
-        <input type='checkbox' name="deptck" value={{ row.dept }}><font color="#FF0000">{{ row.dept }} - {{ row.dept_name }}</font>
-        {% endif %}
-        <br>
-        {% endfor %} 
+        <div class="form-check">
+            <input type="checkbox" onclick="toggle(this);" id="selectAllDepts" class="form-check-input">
+            <label for="selectAllDepts" class="form-check-label">Select All Departments</label><br>
+            {% for row in rows %}
+                {% if row.dept_status != 'I' %}
+                <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
+                <label for="dept.{{ row.dept }}" class="form-check-label">{{ row.dept }} - {{ row.dept_name }}</label>
+                {% else %}
+                <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
+                <label for="dept.{{ row.dept }}" class="form-check-label prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>  {{ row.dept }} - {{ row.dept_name }}</label>
+                {% endif %}
+                <br>
+            {% endfor %} 
+        </div>
     </div>
     <div class="column">
-        <h2></h2>
-        <p><input type='submit' name='process_access' value='Submit' class="btn btn-primary"></p>
+        <input type='submit' name='process_access' value='Submit' class="btn btn-primary">
     </div>
 </div>
 

@@ -289,7 +289,7 @@ vertical-align: top;
 }
 .filter-container {
 display: grid;
-grid-template-columns: repeat(3, 1fr);
+grid-template-columns: repeat(2, 1fr);
 grid-column-gap: 20px;
 }
 @media (max-width:992px) {
@@ -379,6 +379,19 @@ background: transparent;
 text-align: center;
 text-decoration: underline;
 }
+
+.action .cancel {
+	color: #dc3545;
+	font-weight: 400;
+	border-color: transparent;
+	background-color: transparent;
+	text-decoration: underline;
+}
+
+.action .cancel:focus {
+	background-color: transparent;
+	background: transparent;
+	}
 
 .action .edit:focus {
 background-color: transparent;
@@ -639,11 +652,11 @@ input:checked + .slider:before {
 }
 
 .italic-msg em {
-	color:#D9534F;
+	color:#FF0000;
 }
 .tracking-msg {
 	display: block;
-	color:#D9534F;
+	color:#FF0000;
 }
 
 .cart-button {
@@ -675,3 +688,29 @@ input:checked + .slider:before {
 .inline {
 		display:inline;
 	}
+
+.order-details-list{
+  	padding-left:20px;
+}
+
+.small-h2 {
+	font-size: 1.3rem;
+}
+
+.wismo-order-details {
+	width: 40%;
+}
+
+.add-chartfield-link {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.text-field-short {
+	display: inline;
+	width: auto;
+}
+
+.fa-exclamation-triangle, .prv-msgs {
+	color: #FF0000;
+}

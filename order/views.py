@@ -85,7 +85,7 @@ class Submit(PermissionRequiredMixin, View):
 
             Item.objects.filter(id__in=order_items).update(order=o)
 
-        #self.create_preorder(order_items)  # move this to batch processing
+        self.create_preorder(order_items)  # move this to batch processing
         return HttpResponseRedirect('/submitted') 
 
         template = loader.get_template('order/order_submitted.html')
