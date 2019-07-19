@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<p>{{ response }}</p>
+
 <div class="container">
+	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
+
 	<form action=".." method="POST" id="return">{% csrf_token %}
 		<input type="hidden" name="chartcoms[]" value="{{ return_button.chartcoms }}">
 		<input type="hidden" name="select_dept" value="{{ return_button.select_dept }}">
@@ -28,7 +32,7 @@
 
 		<div class="row-inline mt-5">
 			<strong>Subscriber Information</strong>
-			<a id="return_link" class="offset-7" href="#">Back to report</a>
+			<a id="return_link" class="offset-7" href="#" onclick="window.history.back();">Back to report</a>
 		</div>
 
 		<div class="row">
@@ -38,12 +42,6 @@
 					<strong>Subscriber ID:&nbsp;&nbsp;</strong>{{ sub_id }}<br>
 					<strong>Type:&nbsp;&nbsp;</strong>{{ charge_type }}<br>
 					<strong>Username:&nbsp;&nbsp;</strong>{{ username }}<br>
-					<strong>Locations</strong><br>
-					<strong class="ml-3">Building:&nbsp;&nbsp;</strong>{{ location.building }}<br>
-					<strong class="ml-3">Floor:&nbsp;&nbsp;</strong>{{ location.floor }}<br>
-					<strong class="ml-3">Room:&nbsp;&nbsp;</strong>{{ location.room }}<br>
-					<strong class="ml-3">Jack:&nbsp;&nbsp;</strong>{{ location.jack }}<br>
-					<strong class="ml-3">Last Updated:&nbsp;&nbsp;</strong>{{ location.last_updated }}
 				</div>
 			</div>
 		</div>
@@ -54,6 +52,7 @@
 		</div>
 		<div class="card border-dark">
 			<div class="card-body">
+				{% if monthly_data %}
 				<table class="table table-sm">
 					<thead>
 						<tr class="table-secondary">
@@ -83,6 +82,14 @@
 						</tr>
 					</tbody>
 				</table>
+				{% else %}
+				<div class="col-md-9 mt-2">
+			        <div class="alert alert-danger col-md-9" role="alert">
+			            <i class="fas fa-exclamation-triangle" style="color:red"></i>
+			            This billing ID does not have any monthly charges this month.
+			        </div>
+			    </div>
+				{% endif %}
 			</div>
 		</div>
 
@@ -92,6 +99,7 @@
 		</div>
 		<div class="card border-dark">
 			<div class="card-body">
+				{% if local %}
 				<table class="table table-sm">
 					<thead>
 						<tr class="table-secondary">
@@ -117,11 +125,18 @@
 							<td></td>
 							<td></td>
 							<td></td>
-							<td></td>
 							<td style="text-align:right;">{{ local_total }}</td>
 						</tr>
 					</tbody>
 				</table>
+				{% else %}
+				<div class="col-md-9 mt-2">
+			        <div class="alert alert-danger col-md-9" role="alert">
+			            <i class="fas fa-exclamation-triangle" style="color:red"></i>
+			            This chartfield does not have any local charges this month.
+			        </div>
+			    </div>
+				{% endif %}
 			</div>
 		</div>
 
@@ -131,12 +146,12 @@
 		</div>
 		<div class="card border-dark">
 			<div class="card-body">
+				{% if toll %}
 				<table class="table table-sm">
 					<thead>
 						<tr class="table-secondary">
 							<th scope="col">Connect Date</th>
 							<th scope="col">To Number</th>
-							<th scope="col">Call Type</th>
 							<th scope="col">Location</th>
 							<th scope="col">Duration</th>
 							<th scope="col" style="text-align:right;">Total Charge</th>
@@ -157,11 +172,18 @@
 							<td></td>
 							<td></td>
 							<td></td>
-							<td></td>
 							<td style="text-align:right;">{{ toll_total }}</td>
 						</tr>
 					</tbody>
 				</table>
+				{% else %}
+				<div class="col-md-9 mt-2">
+			        <div class="alert alert-danger col-md-9" role="alert">
+			            <i class="fas fa-exclamation-triangle" style="color:red"></i>
+			            This chartfield does not have any toll charges this month.
+			        </div>
+			    </div>
+				{% endif %}
 			</div>
 		</div>
 

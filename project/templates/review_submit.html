@@ -8,9 +8,9 @@
 					Contact Information
 				</div>
 				<div class="card-body">
-					<strong>Department:</strong> &nbsp; {{ dept_info.dept_id }} ({{ dept_info.dept_name }}) <br>
-					<strong>Department Manager:</strong> &nbsp; {{ dept_info.dept_mgr }} <br>
-					<strong>Contact Name:</strong> &nbsp; {{ user.last_name }}, {{ user.first_name }} <br>
+					<div class="dept_full_name">Department:&nbsp; {{ dept_info.dept_id }} ({{ dept_info.dept_name }})</div>
+					<div class="dept_mgr">Department Manager:</strong> &nbsp; {{ dept_info.dept_mgr }}</div>
+					<strong>Contact Name:</strong> &nbsp; {{ user.last_name }},{{ user.first_name }}
 				</div>
 			</div>
 			<div class="card">
@@ -19,25 +19,24 @@
 				</div>
 				<div class="card-body">
 					<strong>Enter notes or comments for our own records:</strong>
-					<input type="text" class="form-control" placeholder="Enter text here...">
+					<textarea type="text" class="form-control" placeholder="Enter text here..."></textarea>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
-<p class="mt-4">You have chosen to change the following User IDs to a new chartfield.<br> Current Chartfield: &nbsp;
-	<strong>{{ selected_cf.account_number }}</strong> &numsp;
-	{% if selected_cf.shortcode %}
-		Shortcode: &nbsp; <strong>{{ selected_cf.shortcode }}</strong> &numsp;
-	{% endif %}
+<p class="mt-4">You have chosen to change the following User IDs from Chartfield: &nbsp;
+	<strong class="cf_num">{{ selected_cf.account_number }}</strong>
 	{% if nickname %}
-		Nickname/Description: &nbsp; <strong>{{ nickname }}</strong>
+		<strong class="cf_nickname">({{ nickname }})</strong>
 	{% endif %}
+	<strong class="cf_nickname"></strong>
 </p>
 
 <div class="row">	
 	<div class="mt-4 col-md-12 mb-4" id="cf_change">
+		<form action="submit/" method="POST" id="submit-form">{% csrf_token %}
 	    <table class="table table-striped table-sm" id="review_table">
 	        <thead>
 	          	<th scope="col">User ID</th>
@@ -46,22 +45,7 @@
 	          	<th scope="col">New Toll Charge</th>
 	          	<th scope="col">New Local Charge</th>
 	        </thead>
-	        <tbody>
-	        	{% for user in users %}
-	        		<tr>
-	        			<td>{{ user.user_defined_id }}</td>
-	        			<td>{{ user.building }}</td>
-	        			<td></td>
-	        			{% if "PH"|slice:":2" in user.user_defined_id %}
-	        				<td></td>
-	        				<td></td>
-	        			{% else %}
-	        				<td style="text-align:center;">N/A</td>
-	        				<td style="text-align:center;">N/A</td>
-	        			{% endif %}
-	        		</tr>
-	        	{% endfor %}
-	        </tbody>
 	    </table>
+		</form>
 	</div>
 </div>

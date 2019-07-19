@@ -1,9 +1,9 @@
 $(document).ready(function() {
-	var ph_count = 0;
+	ph_count = 0;
+	record_count = 0;
 
 	// Enable first pill
 	$("#cfc-1").removeClass('disabled');
-
 
 	// Select first tab
 	currStep = 1;
@@ -17,10 +17,10 @@ $(document).ready(function() {
 
 	// Next/prev buttons
 	$("#cfNextBtn").click(function(event) {
-		nextPrev(1);
+		nextPrev(1, table, cf_change_table, review_table);
 	});
 	$("#cfPrevBtn").click(function(event) {
-		nextPrev(-1);
+		nextPrev(-1, table, cf_change_table, review_table);
 	});
 
 
@@ -28,7 +28,61 @@ $(document).ready(function() {
 	var table = $('#cf_users_table').DataTable({
 		"destroy": true,
 		"lengthChange": false,
-		"dom": 'rtp'
+		"dom": 'rtp',
+		"autoWidth":false,
+		"ordering":false,
+		'ajax': {
+			url: '/chartchange/update-table/',
+			method: 'GET',
+			data: function(d) {
+				d.selected = $('#cf_dropdown option:selected').text();
+			},
+			dataSrc: ""
+		},
+		'columns': [
+			{ data: 'selected'},
+			{ data: 'user_defined_id' },
+			{ data: 'building' },
+			{ data: 'mrc_charged' },
+			{ data: 'toll_charged' },
+			{ data: 'local_charged' }
+		],
+		'aoColumnDefs': [
+			{ "targets": 0,
+              "mRender": function (data, type, full, meta) {
+                  return '<input type="checkbox" class="minimal"' + (data ? ' checked' : '') + '/>'; // this returns opposite???
+              }
+            },
+            { "targets": [3],
+              "mRender": function (data, type, full, meta) {
+              	 if (data == 'Y') {
+          			return '<i class="fa fa-check-circle" style="color:green;" aria-hidden="true"></i>';
+          		 }
+          		 else {
+          		 	return '<i class="far fa-times-circle" style="color:red;"></i>';
+          		 }
+              }
+
+            },
+            { "targets": [4, 5],
+              "mRender": function (data, type, row, full, meta) {
+              	var type = row['user_defined_id'];
+              	type = type.split('-');
+              	type = type[0];
+              	if (type == 'PH') {
+              		if (data == 'Y') {
+              			return '<i class="fa fa-check-circle" style="color:green;" aria-hidden="true"></i>';
+              		}
+              		else {
+              			return '<i class="far fa-times-circle" style="color:red;"></i>';
+              		}
+              	}
+              	else {
+	                return 'N/A';
+              	}
+              }
+            }
+          ]
 	});
 
 	var cf_change_table = $('#cf_change_table').DataTable({
@@ -36,14 +90,15 @@ $(document).ready(function() {
 		"lengthChange": false,
 		"bFilter": false,
 		"dom": 'rtp',
-		//'ajax': '/chartchange/update-table/'
+		"ordering":false,
 	});
 
-	$('#review_table').DataTable({
+	var review_table =  $('#review_table').DataTable({
 		"destroy": true,
 		"lengthChange": false,
 		"bFilter": false,
-		"dom": 'rtp'
+		"dom": 'rtp',
+		"ordering":false
 	});
 
 
@@ -52,15 +107,22 @@ $(document).ready(function() {
     	table.search($('#search_test').val()).draw();
   	});
 
+  	// Prevent search from submitting
+  	$('.noEnterSubmit').keypress(function(e){
+    if ( e.which == 13 ) return false;
+});
+
   	
 	// Select all button - choose users
   	$("#select_all").on( "change", function() {
+  		record_count = 0;
   		isChecked = false;
 	 	if (document.getElementById('select_all').checked) {
 	 		isChecked = true;
 	 	}
 
 	 	table.rows().every(function(index, element) {
+	 		record_count += 1;
 			var row = $(this.node());
 			var col0 = row.find('td:first-child input[type="checkbox"]');
 			 
@@ -73,7 +135,39 @@ $(document).ready(function() {
 				col0.click();
 			}
 		});
+
+		// Maintain record count
+		if (isChecked) {
+			$('#record-count').html(record_count + ' Records Selected');
+		}
+		else {
+			$('#record-count').html('0 Records Selected');
+			record_count = 0;
+		}
 	});
+
+	// Select all from current page
+	$('#select_all_page').on('change', function() {
+		isChecked = false;
+		if (document.getElementById('select_all_page').checked) {
+			isChecked = true;
+		}
+
+		// Select 10 records
+		table.rows({page:'current'}).every(function(index, element) {
+			var row = $(this.node());
+			var col0 = row.find('td:first-child input[type="checkbox"]');
+			 
+			insideChecked = false;
+			if (col0.is(':checked')) {
+			    insideChecked = true;
+			}
+
+			if (isChecked != insideChecked) {
+				col0.click();
+			}
+		})
+	})
 
 
 	// Select all button - assign new
@@ -86,6 +180,7 @@ $(document).ready(function() {
 	 	cf_change_table.rows().every(function(index, element) {
 			var row = $(this.node());
 			var col0 = row.find('td:first-child input[type="checkbox"]');
+			var starts_with = row.find('td:nth-child(2)').text().startsWith('PH');
 			 
 			insideChecked = false;
 			if (col0.is(':checked')) {
@@ -94,79 +189,158 @@ $(document).ready(function() {
 
 			if (isChecked != insideChecked) {
 				col0.click();
+				maintain_checks(isChecked, starts_with);
 			}
 		});
 	});
 
 
+	// Change chartfields on page 3 with selected department
+	$('#dept_dropdown_3').on('submit', function(e) {
+		e.preventDefault();
+		$.ajax({
+			url: '/chartchange/ajax/',
+			data: {
+				'deptids':$('#dept_text_search').val()
+			},
+			dataType:'json',
+			// Reset chartfield options when department changes
+			success: function(data) {
+				$('#select_cf_3').empty();
+				for (i = 0; i < data.length - 1; ++i) {
+					var drp = document.getElementById('select_cf_3');
+					var option = document.createElement("OPTION");
+					option.value = data[i].account_number;
+					option.text = data[i].account_number;
+					drp.add(option);
+				}
+			}
+		})	
+	})
+
+	$('#select_dept_3').on('change', function(e) {
+		e.preventDefault();
+		$.ajax({
+			url: '/chartchange/ajax/',
+			data: {
+				'deptids':$('#select_dept_3 option:selected').val()
+			},
+			dataType:'json',
+			// Reset chartfield options when department changes
+			success: function(data) {
+				$('#select_cf_3').empty();
+				for (i = 0; i < data.length - 1; ++i) {
+					var drp = document.getElementById('select_cf_3');
+					var option = document.createElement("OPTION");
+					option.value = data[i].account_number;
+					option.text = data[i].account_number;
+					drp.add(option);
+				}
+			}
+		})
+	})
+
+	
+	// Record count
+	$('#cf_users_table').on('change', 'tr', function() {
+		var box = $(this).find('td:first-child input[type="checkbox"]');
+		var checked = box.is(':checked');
+		if (checked) {
+			record_count += 1;
+		}
+		else {
+			record_count -= 1;
+		}
+		$('#record-count').html(record_count + ' Records Selected');
+	})
+
+	// Uncheck select from page when you switch page
+	$('#cf_users_table').on('page.dt', function() {
+		if ($('#select_all_page').is(':checked')) {
+			$('#select_all_page').click();
+		}
+	})
+
+	// MRC/Toll/Local checkbox functionality
+	$('#cf_change_table').on('change', 'tr', function() {
+		var box = $(this).find('td:first-child input[type="checkbox"]');
+		var checked = box.is(':checked');
+		var starts_with = $(this).find('td:nth-child(2)').text().startsWith('PH');
+		maintain_checks(checked, starts_with);
+	})
+
+
   	// Applies changes to table
 	$('#apply').on("click", function() {
-		selected = $("#select_cf option:selected").text();
+		selected = $("#select_cf_3 option:selected").text();
+
+		var mrc_checked = false;
+		var toll_checked = false;
+		var local_checked = false;
 
 		cf_change_table.rows().every(function(index, element) {
 			var row = $(this.node());
 			var col0 = row.find('td:first-child input[type="checkbox"]'); // checkbox
-			var col1 = row.find('td:nth-child(2)').val(); // User ID
-			var col2 = row.find('td:nth-child(3)'); // building
+			var col1 = row.find('td:nth-child(2)').text(); // User ID
 			var col3 = row.find('td:nth-child(4)'); // MRC
 			var col4 = row.find('td:nth-child(5)'); // toll
 			var col5 = row.find('td:nth-child(6)'); // local
-
-			var mrc, toll, local = false;
 			 
 			if (col0.is(':checked')) {
 			    // If PH
-			    if (col1.startsWith("PH") == 0) {
-			    	// Set MRC - DONT FORGET TO SET VALUE
+			    if (col1.startsWith("PH")) {
+			    	// Set MRC
 			    	if ($('#mrc').is(':checked')) {
-			    		mrc = true;
+			    		mrc_checked = true;
 			    		col3.html(selected);
-			    		//col3.html('test');
+			    		col3.val(selected);
 			    	}
 
-			    	// Set toll - DONT FORGET TO SET VALUE
+			    	// Set toll
 			    	if ($('#toll').is(':checked')) {
-			    		toll = true;
+			    		toll_checked = true;
 			    		col4.html(selected);
-			    		$('#toll').click();
+			    		col4.val(selected);
 			    	}
 
-			    	// Set local - DONT FORGET TO SET VALUE
+			    	// Set local
 			    	if ($('#local').is(':checked')) {
-			    		local = true;
+			    		local_checked = true;
 			    		col5.html(selected);
-			    		$('#local').click();
+			    		col5.val(selected);
 			    	}
 			    }
 			    // Non-PH
 			    else {
 			    	// Set MRC charges
 			    	col3.html(selected);
+			    	col3.val(selected);
 			    }
 			    col0.click();
 			}
 		})
 
 		// Uncheck when necessary
-		if (mrc) {
+		if (mrc_checked) {
 			document.getElementById('mrc').click();
 		}
-		if (toll) {
+		if (toll_checked) {
 			document.getElementById('toll').click();
 		}
-		if (local) {
+		if (local_checked) {
 			document.getElementById('local').click();
 		}
 		if (document.getElementById('select_all_an').checked) {
 	    	document.getElementById('select_all_an').click();
 	    }
+	    $('#toll').attr('disabled', 'disabled');
+	    $('#local').attr('disabled', 'disabled');
 	})
 
 	
 	// Update department for page 1 - AJAX
 	$('#chart_deptids').on('change', function() {
-		var sel = document.getElementById("chart_deptids");
-		var selected = sel.options[sel.selectedIndex].value;
+		var selected = $('#chart_deptids').val();
 
 		$.ajax({
 			url: '/chartchange/ajax/',
@@ -190,13 +364,13 @@ $(document).ready(function() {
 		})
 	})
 
-	// Select a chartfield
+	// Reload data when new chartfield is selected
 	$('#cf_dropdown').on('change', function() {
 		var sel = document.getElementById("cf_dropdown");
 		var selected = sel.options[sel.selectedIndex].value;
 
 		change_current_page(selected);
-		update_table(selected, cf_change_table);
+		$('#cf_users_table').DataTable().ajax.reload();
 	})
 
 });
@@ -213,9 +387,18 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
 
 
 // Next/prev functionality
-function nextPrev(n) {
+function nextPrev(n, table, cf_change_table, review_table) {
+  // Validate before submit
+  if (n ==1 && currStep == 3) {
+  	if (!validate(cf_change_table)) {
+  		$('#validate').removeClass('hidden');
+  		return false;
+  	}
+  	else {
+  		$('#validate').addClass('hidden');
+  	}
+  }
 
-  //if (n == 1 && !validateForm()6) return false;
 
   currStep = currStep + n;
 
@@ -224,167 +407,210 @@ function nextPrev(n) {
 
   // Details up top
   if (n == 1 && currStep == 2) {
-  	// $('#cfc_desc').hide();
-  	// $('#dept_details').hide();
+  	$('#dept_search').hide();
   	$('#select_dept').hide();
   }
   if (n == -1 && currStep == 1) {
-  	// $('#cfc_desc').show();
-  	// $('#dept_details').show();
+  	$('#dept_search').show();
   	$('#select_dept').show();
   }
 
   // Load third page correctly
   if (n == 1 && currStep == 3) {
-  	load_3();
+  	load_3(table, cf_change_table);
+  }
+
+  if (n == 1 && currStep == 4) {
+  	load_4(cf_change_table, review_table);
   }
 
   if (currStep > lastStep) {
-      //$('#workflowForm').submit();
-      return false;
+      $('#submit-form').submit();
   }
+
+  // Scroll to top
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
 }
 
 
-// function validateForm() {
-//   inp = $("#step" + currStep + " :input:visible");
-//   valid = true;
-//   for (i = 0; i < inp.length; i++) {
-//     id = "#" + $(inp[i]).attr('id') + "_review";
-//     $(id).html($(inp[i]).val());
-//     if (!inp[i].checkValidity()) {
-//       inp[i].className += " invalid";
-//       valid = false;
-//     }
-//   }
-
-//     $("input[type='radio']:checked").each(function() { // Update review form with radio data
-//         var idVal = $(this).attr("id");
-//         id = "#id_" + $(this).attr("name") + "_review";
-//         $(id).html($("label[for='"+idVal+"']").text());
-//     });
-
-  
-  
-//   if (valid) {
-//     document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
-//     $("#workflowForm").removeClass('was-validated');
-//   } else {
-//     $("#workflowForm").addClass('was-validated');
-//   }
-//   return valid; // return the valid status
-
-
+// Navigation bar functionality
 function tab_func1() {
 	currStep = 1;
-	// $('#cfc_desc').show();
- //  	$('#dept_details').show();
+ 	$('#dept_search').show();
   	$('#select_dept').show();
 }
 
 function tab_func2() {
-	var test = $('#cfc-2');
 	if (!$('#cfc-2').hasClass('disabled')) {
 		currStep = 2;
-		// $('#cfc_desc').hide();
-	 //  	$('#dept_details').hide();
 	}
+	$('#dept_search').hide();
 	$('#select_dept').hide();
 }
 
 function tab_func3() {
 	if (!$('#cfc-3').hasClass('disabled')) {
 		currStep = 3;
-		// $('#cfc_desc').hide();
-	 //  	$('#dept_details').hide();
 	  }
+	  $('#dept_search').hide();
 	  $('#select_dept').hide();
 }
 
 function tab_func4() {
 	if (!$('#cfc-4').hasClass('disabled')) {
 		currStep = 4;
-		// $('#cfc_desc').hide();
-	 //  	$('#dept_details').hide();
 	  }
+	  $('#dept_search').hide();
 	  $('#select_dept').hide();
 }
 
-function maintain_checks(row_id) {
-	//var tr = $(this).closest('tr');
-	//var row = cf_change_table.rows('#' + row_id);
-	var row = cf_change_table.row( $(this).parents('tr') ).data();
-	var col = row.find('td:first-child input[type="checkbox"]'); // checkbox
+
+
+// MRC/Toll/Local checkbox functionality
+function maintain_checks(checked, starts_with) {
 	var toll = $('#toll');
 	var local = $('#local');
-	var user_id = row.find('td:nth-child(1)');
 
 	// Enable toll and local if necessary
-	if (col.is(':checked') && user_id.startsWith('PH')) {
+	if (checked && starts_with) {
 		ph_count = ph_count + 1;
-		if (toll.hasClass(disabled)) {
-			toll.removeClass('disabled');
-			local.removeClass('disabled');
+		if (toll.is(':disabled')) {
+			toll.removeAttr('disabled');
+			local.removeAttr('disabled');
 		}
 
 	}
 	// Disable toll and local if necessary
-	else if (!col.is(':checked') && user_id.startsWith('PH')) {
-		ph_count = ph_count -1;
+	else if (!checked && starts_with) {
+		ph_count = ph_count - 1;
 		if (ph_count == 0) {
-			toll.addClass('disabled');
-			local.addClass('disabled');
+			if (toll.is(':checked')) {
+				toll.click();
+			}
+			if (local.is(':checked')) {
+				local.click();
+			}
+			toll.attr('disabled', 'disabled');
+			local.attr('disabled', 'disabled');
 		}
 	}
+	return ph_count;
 }
 
+// Updates chartfield information when changed
 function change_current_page(selected) {
+	var dept_title = $('#dept_title').text();
+	dept_title = dept_title.split(':');
+	dept_title = dept_title[1];
+	var dept_mgr = $('#dept_mgr').text();
+
 	$.ajax({
-			url: '/chartchange/old-cf/',
-			data: {
-				'selected': selected
-			},
-			dataType:'json',
-			success: function(data) {
-				cf = data;
-				$("#caption").html(cf[0].account_number);
-				$("#fund").html(cf[0].fund);
-				$("#dept_id").html(cf[0].deptid);
-				$("#program").html(cf[0].program);
-				$("#class_code").html(cf[0].class_code);
-				$("#project_grant").html(cf[0].project_grant);
-				$("#shortcode").html(cf[0].shortcode);
-
-			},
-			error: function(data) {
-				alert('uh oh');
+		url: '/chartchange/old-cf/',
+		data: {
+			'selected': selected
+		},
+		dataType:'json',
+		success: function(data) {
+			cf = data;
+			$("#fund").html(cf[0].fund);
+			$("#dept_id").html(cf[0].deptid);
+			$("#program").html(cf[0].program);
+			$("#class_code").html(cf[0].class_code);
+			$("#project_grant").html(cf[0].project_grant);
+			$('#cf_shortcode').html(cf[0].shortcode);
+			$('#cf_nickname').html(cf[1].nickname);
+			$('.cf_num').html(cf[0].account_number);
+			if (cf[1].nickname) {
+				$('.cf_nickname').html('(' + cf[1].nickname + ')');
 			}
-		})
+			$('.dept_full_name').html('<strong>Department:&nbsp;</strong>' + dept_title);
+			$('.dept_mgr').html('<strong>Department Manager:&nbsp;</strong>' + dept_mgr);
+		},
+		error: function(data) {
+			alert('uh oh');
+		}
+	})
 }
 
-function update_table(selected, table) {
-	$.ajax({
-			url: '/chartchange/update-table/',
-			data: {
-				'selected': selected
-			},
-			success: function(data) {
-				$('#needs-refresh').html(data);
-				var table = $('#cf_change_table');
-				table.destroy();
-				// var cf_change_table = $('#cf_change_table').DataTable({
-				// 	"destroy": true,
-				// 	"lengthChange": false,
-				// 	"bFilter": false,
-				// 	"dom": 'rtp'
-				// });
-			},
-			error: function(data) {
-				alert('uh oh');
+
+// Add selected rows to page 3
+function load_3(table, cf_change_table) {
+	cf_change_table.clear();
+
+	table.rows().every(function(index, element) {
+		var row = $(this.node());
+		var col0 = row.find('td:first-child input[type="checkbox"]'); // checkbox
+		var col1 = row.find('td:nth-child(2)').text();
+		var charges = '';
+		if (!col1.startsWith('PH')) {
+			charges = 'N/A';
+		}
+
+		if (col0.is(':checked')) {
+			cf_change_table.row.add([
+				'<input type="checkbox">',
+				row.find('td:nth-child(2)').text(),
+				row.find('td:nth-child(3)').text(),
+				'',
+				charges,
+				charges
+			]).draw();
+			//col0.removeAttr('checked');
+		}
+	})
+}
+
+// Make sure table is filled out before submitting - this would be nice with a break statement
+function validate(cf_change_table) {
+	var get_out = false;
+	cf_change_table.rows().every(function(index, element) {
+		var row = $(this.node());
+		var col1 = row.find('td:nth-child(2)').text(); // user defined ID
+		var col3 = row.find('td:nth-child(4)').text(); // MRC
+		var col4 = row.find('td:nth-child(5)').text(); // Toll
+		var col5 = row.find('td:nth-child(6)').text(); // Local
+
+		if (col1.startsWith('PH')) {
+			if (col3 == '' || col4 == '' || col5 == '') {
+				get_out = true;
 			}
-		})
+		}
+		else {
+			if (col3 == '') {
+				get_out = true;
+			}
+		}
+	})
+	return !get_out;
 }
 
-function load_3() {
-	alert('load 3');
+
+// Load review and submit page
+function load_4(cf_change_table, review_table) {
+	review_table.clear();
+
+	cf_change_table.rows().every(function(index, element) {
+		var row = $(this.node());
+		var user_id = row.find('td:nth-child(2)').text()
+		var building = row.find('td:nth-child(3)').text()
+		var mrc = row.find('td:nth-child(4)').text()
+		var toll = row.find('td:nth-child(5)').text()
+		var local = row.find('td:nth-child(6)').text()
+
+		review_table.row.add([
+			user_id,
+			building,
+			mrc,
+			toll,
+			local
+		]).draw();
+
+		var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = user_id;
+        input.value = user_id + '//' + mrc + '//' + toll + '//' + local;
+		document.getElementById('submit-form').appendChild(input);
+	})
 }
+

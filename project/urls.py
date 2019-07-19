@@ -18,6 +18,7 @@ urlpatterns = [
     path('chartchange/ajax/', views.change_dept),
     path('chartchange/old-cf/', views.get_cf_data),
     path('chartchange/update-table/', views.get_users),
+    path('chartchange/submit/', views.submit),
     path('chartchange/', views.chartchange),
     path('', include('pages.urls')),
     path('tools/',include('tools.urls'))
