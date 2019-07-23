@@ -322,14 +322,10 @@ function validateForm() {
   return valid; // return the valid status
 }
 
-
-
-  function filterChartcom(id, value) {
-    console.log('usa:' + value);
-    //$("#edit-field-service-sub-cat-value option[value=" + title + "]").hide();
-    //$(id).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-    //$('.city').find('option:contains('Aurangabad)').hide();
-    //$(#id_oneTimeCharges).find([data-dept='481060']).hide();
+  function filterChartcom(obj) { 
+    id = '#id_' + obj.dataset.target;
+    $(id).find('[data-dept]').hide();
+    $(id).find("[data-dept='" + obj.value + "']").show();
   }
 
   $("#phoneLookup").click(function () {
