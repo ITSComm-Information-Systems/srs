@@ -92,3 +92,8 @@ function topFunction() {
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
 }
+
+// Return 2 pages
+function return2() {
+	window.history.go(-2);
+}
