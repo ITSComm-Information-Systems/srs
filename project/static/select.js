@@ -49,7 +49,7 @@ $(document).ready(function() {
 
 	// Set select for DOC - departments
 	$('#doc_depts').select2({
-		width: '33%',
+		// width: '33%',
 		matcher: function(params, data) {
         	return matchStart(params, data);
     	}

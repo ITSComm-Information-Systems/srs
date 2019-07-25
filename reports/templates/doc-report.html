@@ -10,7 +10,7 @@
 		text-align:right;
 	}
 
-	#submit-link {
+	.submit-link {
 		text-align:left;
 		float:left;
 	    background:none!important;
@@ -30,16 +30,14 @@
 
 <div class="container">
 	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
-
-	<form method="POST" action='detail/' id="report_details">{% csrf_token %}
 		<div class="row-inline">
 			<strong>Your selection</strong>
-			<a class="offset-2 btn btn-link" id="edit-selection" href="..">Edit your selection</a>
+			<button class="btn btn-link col-offset-1" onclick="location.href='..'"><i class="fas fa-edit"></i>Edit Your Selection</button>
 		</div>
 
 		<div class="row">
 			<div class="card border-dark col-md-5">
-				<div class="card-body">
+				<div class="card-body" style="padding-bottom:0;">
 					<div id="selected_dept"><strong>Department:&nbsp;&nbsp;</strong>{{ dept }}<br></div>
 					<div id="billing_date"><strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_date }}<br></div>
 					<strong style="float:left;">Chartfields:&nbsp;&nbsp;</strong>
@@ -48,26 +46,22 @@
 						{{ c.account_number }}<br>
 					{% endfor %}
 					</p>
-					<input type="hidden" name="selected_dept" value="{{ dept }}">
-					<input type="hidden" name="billing_date" value="{{ billing_date }}">
-					<input type="hidden" name="chartcoms" value="{{ chartfields }}">
 				</div>
 			</div>
 		</div>
 
 
 		{% for c in charge_types %}
+		{% if c.data %}
 		<div class="row mt-5">
-			<strong>Chartfield:&nbsp;</strong>
-			<p>{{ c.account_number }}</p>
-		</div>
-
-		{% if c.type_summary %}
-		<div class="row">
 			<div class="card border-dark col-md-10">
+				<h6 class="card-header" style="margin-top:0;">
+					Chartfield:&nbsp;{{ c.account_number }}
+				</h6>
 				<div class="card-body">
+					{% if c.type_summary %}
 					<strong>Summary</strong>
-					<table class="table table-sm mb-5">
+					<table class="table table-sm">
 						<thead>
 							<tr class="table-secondary">
 								<th scope="col">Type of Service</th>
@@ -87,135 +81,201 @@
 							</tr>
 						</tbody>
 					</table>
+					{% endif %}
 
 					{% for key, value in c.charge_tables.items %}
-					<strong>{{ key }} Charges</strong>
-					<table class="table table-sm mb-5" id='charge_table'>
-						<thead>
-							<tr class="table-secondary">
-								<th scope='col' style='text-align:left;'>Billing ID</th>
-								<th scope="col">Monthly Charges</th>
-								<th scope="col" colspan='2'>Call Usage</th>
-								<th scope="col" style='text-align:right;'>Total Charge</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr class="table-warning">
-								<td style='text-align:left;'></td>
-								<td>Amount</td>
-								<td>Number</td>
-								<td>Amount</td>
-								<td style='text-align:right;'>Amount</td>
-							</tr>
-							{% for v in value.rows %}
-							<tr>
-								<td><input class="btn btn-link" style="text-align:left;" id="submit-link" type="submit" name="user_id" value="{{ v.user_defined_id }}"></td>
-								<input type="hidden" name="sub_id:{{ v.user_defined_id}}" value="{{ v.subscriber_id }}">
-								<input type="hidden" name="chartcom:{{ v.user_defined_id }}" value="{{ c.account_number }}">
-								<input type="hidden" name="charge_type:{{ v.user_defined_id }}" value="IDK YET">
-								<td>{{ v.monthly_charges }}</td>
-								<td>{{ v.call_number }}</td>
-								<td>{{ v.call_amount }}</td>
-								<td style='text-align:right;'>{{ v.total_charges }}</td>
-							</tr>
-							{% endfor %}
-							<tr class='table-total'>
-								<td style='text-align:left;'><strong>Total</strong></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td style='text-align:right;'>{{ value.total }}</td>
-							</tr>
-						</tbody>
-					</table>
+					<div class="mt-5">
+						<strong>{{ key }} Charges</strong>
+						<table class="table table-sm" id='charge_table'>
+							<thead>
+								<tr class="table-secondary">
+									<th scope='col' style='text-align:left;'>Billing ID</th>
+									<th scope="col">Monthly Charges</th>
+									<th scope="col" colspan='2'>Call Usage</th>
+									<th scope="col" style='text-align:right;'>Total Charge</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="table-warning">
+									<td style='text-align:left;'></td>
+									<td>Amount</td>
+									<td>Number</td>
+									<td>Amount</td>
+									<td style='text-align:right;'>Amount</td>
+								</tr>
+								{% for v in value.rows %}
+								<tr>
+									<form method="POST" action='detail/' id="report_details">{% csrf_token %}
+										<input type="hidden" name="selected_dept" value="{{ dept }}">
+										<input type="hidden" name="billing_date" value="{{ billing_date }}">
+										<input type="hidden" name="chartcoms" value="{{ chartfields }}">
+
+										<td><input class="btn btn-link submit-link" style="text-align:left;" type="submit" name="user_id" value="{{ v.user_defined_id }}"></td>
+										<input type="hidden" name="sub_id:{{ v.user_defined_id}}" value="{{ v.subscriber_id }}">
+										<input type="hidden" name="chartcom:{{ v.user_defined_id }}" value="{{ c.account_number }}">
+										<input type="hidden" name="charge_type:{{ v.user_defined_id }}" value="{{ key }}">
+										<td>{{ v.monthly_charges }}</td>
+										<td>{{ v.call_number }}</td>
+										<td>{{ v.call_amount }}</td>
+										<td style='text-align:right;'>{{ v.total_charges }}</td>
+									</form>
+								</tr>
+								{% endfor %}
+								<tr class='table-total'>
+									<td style='text-align:left;'><strong>Total</strong></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td style='text-align:right;'>{{ value.total }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					{% endfor %}
 
-					<strong>Monthly Service Charges</strong>
 					{% if c.monthly_data %}
-					<table class="table table-sm mb-5">
-						<thead>
-							<tr class="table-secondary">
-								<th scope="col">Item Code</th>
-								<th scope="col">Description</th>
-								<th scope="col">Unit Amount</th>
-								<th scope="col">Quantity</th>
-								<th scope="col" class='total-col'>Total Charge</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for key, value in c.monthly_data.items %}
-							<tr>
-								<td>{{ key }}</td>
-								<td>{{ value.desc }}</td>
-								<td>{{ value.unit_amt }}</td>
-								<td>{{ value.quantity }}</td>
-								<td class='total-col'>{{ value.total }}</td>
-							</tr>
-							{% endfor %}
-							<tr class='table-total'>
-								<td><strong>Total</strong></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td class='total-col'>{{ c.monthly_total }}</td>
-							</tr>
-						</tbody>
-					</table>
-					{% else %}
-					<div class="col-md-9 mt-2">
-				        <div class="alert alert-danger col-md-9" role="alert">
-				            <i class="fas fa-exclamation-triangle" style="color:red"></i>
-				            This chartfield does not have any monthly charges this month.
-				        </div>
-				    </div>
+					<div class="mt-5">
+						<strong>Monthly Service Charges</strong>
+						<table class="table table-sm">
+							<thead>
+								<tr class="table-secondary">
+									<th scope="col">Item Code</th>
+									<th scope="col">Description</th>
+									<th scope="col">Unit Amount</th>
+									<th scope="col">Quantity</th>
+									<th scope="col" class='total-col'>Total Charge</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for key, value in c.monthly_data.items %}
+								<tr>
+									<td>{{ key }}</td>
+									<td>{{ value.desc }}</td>
+									<td>{{ value.unit_amt }}</td>
+									<td>{{ value.quantity }}</td>
+									<td class='total-col'>{{ value.total }}</td>
+								</tr>
+								{% endfor %}
+								<tr class='table-total'>
+									<td><strong>Total</strong></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td class='total-col'>{{ c.monthly_total }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					{% endif %}
 
-					<strong>One-Time Charges & Credits Summary</strong>
-					{% if c.occ %}
-					<table class="table table-sm">
-						<thead>
-							<tr class="table-secondary">
-								<th scope="col">Work Order (if applicable)</th>
-								<th scope="col">Description</th>
-								<th scope="col" style="text-align:right">Total Amount</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for o in c.occ %}
-							<tr>
-								<td><a class="btn btn-link" style="text-decoration:underline;" href="tsr/">{{ o.work_order }}</a></td>
-								<td>{{ o.desc }}</td>
-								<td style="text-align:right">{{ o.total_amt }}</td>
-							</tr>
-							{% endfor %}
-							<tr style="background-color:#F0AD4E;">
-								<td><strong>Total</strong></td>
-								<td></td>
-								<td style="text-align:right">{{ c.occ_total }}</td>
-							</tr>
-						</tbody>
-					</table>
-					{% else %}
-					<div class="col-md-9 mt-2">
-				        <div class="alert alert-danger col-md-9" role="alert">
-				            <i class="fas fa-exclamation-triangle" style="color:red"></i>
-				            This chartfield does not have any one time charges this month.
-				        </div>
-				    </div>
+					{% if c.otc %}
+					<div class="mt-5">
+						<strong>One Time Charges</strong>
+						<table class="table table-sm">
+							<thead>
+								<tr class="table-secondary">
+									<th scope="col">Item Code</th>
+									<th scope="col">Description</th>
+									<th scope="col">Quantity</th>
+									<th scope="col" style="text-align:right;">Total Amount</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for a in c.otc %}
+								<tr>
+									<td>{{ a.item_code }}</td>
+									<td>{{ a.desc }}</td>
+									<td>{{ a.qty }}</td>
+									<td style="text-align:right;">{{ a.total }}</td>
+								</tr>
+								{% endfor %}
+								<tr style="background-color:#F0AD4E;">
+									<td><strong>Total</strong></td>
+									<td></td>
+									<td></td>
+									<td style="text-align:right;">{{ c.otc_total }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					{% endif %}
+
+					{% if c.occ %}
+					<div class="mt-5">
+						<strong>Work Order Charges</strong>
+						<table class="table table-sm">
+							<thead>
+								<tr class="table-secondary">
+									<th scope="col">Work Order</th>
+									<th scope="col">Service Order/Equipment</th>
+									<th scope="col">Labor</th>
+									<th scope="col" style="text-align:right">Total Charge</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for o in c.occ %}
+								<tr>						
+									<td>{{ o.work_order }}</td>
+									<td>{{ o.equip }}</td>
+									<td>{{ o.sol }}</td>
+									<td style="text-align:right">{{ o.total_amt }}</td>
+								</tr>
+								{% endfor %}
+								<tr style="background-color:#F0AD4E;">
+									<td><strong>Total</strong></td>
+									<td></td>
+									<td></td>
+									<td style="text-align:right">{{ c.occ_total }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					{% endif %}
+
+					{% if c.credits %}
+					<div class="mt-5">
+						<strong>Credits Summary</strong>
+						<table class="table table-sm">
+							<thead>
+								<tr class="table-secondary">
+									<th scope="col">Item Code</th>
+									<th scope="col" style="text-align:right;">Credit</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for cr in c.credits %}
+								<tr>
+									<td>{{ cr.item_code }}</td>
+									<td style="text-align:right;"> {{ cr.credit }}</td>
+								</tr>
+								{% endfor %}
+								<tr style="background-color:#F0AD4E;">
+									<td><strong>Total</strong></td>
+									<td style="text-align:right;">{{ c.credit_total }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				    {% endif %}
 				</div>
 			</div>
 		</div>
 		{% else %}
-		<div class="col-md-8">
-	        <div class="alert alert-danger col-md-8" role="alert">
-	            <i class="fas fa-exclamation-triangle" style="color:red"></i>
-	            This chartfield does not have any data this month.
-	        </div>
-	    </div>
+		<div class="row">
+			<div class="card border-dark col-md-10 mt-5">
+				<h6 class="card-header">Chartfield:&nbsp;{{ c.account_number }}</h6>
+				<div class="card-body">
+					<div class="col-md-9">
+				        <div class="alert alert-danger col-md-9" role="alert">
+				            <i class="fas fa-exclamation-triangle prv-msgs"></i>
+				            This chartfield does not have any data this month.
+				        </div>
+				    </div>
+				</div>
+			</div>
+		</div>
 		{% endif %}
 		{% endfor %}
-	</form>
 </div>
 
 {% endblock %}

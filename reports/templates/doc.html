@@ -1,26 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<!-- <style>
+.select2-dropdown--below {
+    top: -1.9rem;
+}
+</style> -->
+
 <div class="container">
     <form action="/reports/doc/report/" method="POST" name="Select">{% csrf_token %}
         <div class="form-group">
-            <h5>Select Department</h5>
-            <div class="row form-inline">
-                <select class="form-control col-md-3" style='font-size:16px' type="select" name="select_dept" id="doc_depts" value="{{ dept }}">
+            <h5>Select Department<span class="prv-msgs">*</span></h5>
+            <p class="mb-0"><span class="prv-msgs">*</span>Required fields</p>
+            <div class="row">
+                <select class="form-control col-md-4 mt-0" style='font-size:16px' type="select" name="select_dept" id="doc_depts" value="{{ dept }}">
                     {% for dept in names %}
                     <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.name }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <h5>Select Billing Date</h5>
-            <div class="row form-inline">
-            	<select class="form-control col-md-3" style='font-size:16px' requried type="select" name="billing_date" id="doc_bill_date" value="{{ d }}">
-	                {% for d in dates %}
-	                <option value="{{ d }}">{{ d }}</option>
-	                {% endfor %}
-	            </select>
-	            <p>&nbsp;&nbsp;</p><strong id="billing_label">{{ initial_date }}</strong>
-	        </div>
+            <h5 class='mb-0'>Select Billing Date<span class="prv-msgs">*</span></h5>
+            <div class="row">
+            	<select class="form-control col-md-4 mt-0" style='font-size:16px' requried type="select" name="billing_date" id="doc_bill_date" value="{{ d }}">
+                    {% for d in dates %}
+                    <option value="{{ d }}">{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             <h5>Select Chartfield(s)*</h5>
             <p>*To select multiple chartfields, hold "CTRL" and select.</p>
             <div class="form-check">
