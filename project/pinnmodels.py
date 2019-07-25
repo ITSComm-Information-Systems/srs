@@ -938,3 +938,25 @@ class UmOscPhoneHistoryV(models.Model):
           managed = False
           ordering = ('user_defined_id','date_snapshot')
           db_table = 'PINN_CUSTOM\".\"um_osc_phone_history_v'
+
+class UmOscRptSubscrib_Api_V(models):
+     um_osc_rpt_subscrib_id = models.PositiveIntegerField()
+     subscriber_prefix = models.CharField(max_length=3, primary_key=True)
+     subscriber_desc = models.CharField(max_length=100)
+     active = models.PositiveIntegerField()
+     chartfield_change = models.PositiveIntegerField()
+     dtl_of_chrgs_telephony = models.PositiveIntegerField()
+     dtl_of_chrgs_nontelephony = models.PositiveIntegerField()
+     inv_loc_rept = models.PositiveIntegerField()
+     created_date = models.DateField()
+     created_by = models.CharField(max_length=50)
+     last_update_date = models.DateField(null=True)
+     last_updated_by = models.CharField(max_length=50, null=True)
+     inactivation_date = models.DateField(null=True)
+     inactivated_by = models.CharField(max_length=50, null=True)
+       
+     class Meta:
+          managed = False
+          ordering = ('subscriber_prefix',)
+          db_table = 'PS_RATING\".\"um_osc_rpt_subscrib_api_v'
+
