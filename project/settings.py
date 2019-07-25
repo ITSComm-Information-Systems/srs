@@ -143,13 +143,13 @@ DATABASE_ROUTERS = ['project.settings.DBRouter']
 class DBRouter(object):
   def db_for_read(self, model, **hints):
 
-    if model._meta.db_table.startswith('PINN_CUSTOM'):
+    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING'):
       return 'pinnacle'
     return 'default'
 
   def db_for_write(self, model, **hints):
    
-    if model._meta.db_table.startswith('PINN_CUSTOM'):
+    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING'):
       return 'pinnacle'
     return 'default'
 

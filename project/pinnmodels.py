@@ -939,7 +939,7 @@ class UmOscPhoneHistoryV(models.Model):
           ordering = ('user_defined_id','date_snapshot')
           db_table = 'PINN_CUSTOM\".\"um_osc_phone_history_v'
 
-class UmOscRptSubscrib_Api_V(models):
+class UmOscRptSubscrib_Api_V(models.Model):
      um_osc_rpt_subscrib_id = models.PositiveIntegerField()
      subscriber_prefix = models.CharField(max_length=3, primary_key=True)
      subscriber_desc = models.CharField(max_length=100)
