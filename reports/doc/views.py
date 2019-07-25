@@ -17,7 +17,7 @@ from django import forms
 from ldap3 import Server, Connection, ALL
 
 from oscauth.models import AuthUserDept
-from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscOtsCallSummaryV, UmOscAcctdetailMrcOccV, UmOscPhoneHistoryV, UmOscServiceLocV, UmOscRatedV, UmOscAcctSubscribersV
+from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscOtsCallSummaryV, UmOscAcctdetailMrcOccV, UmOscPhoneHistoryV, UmOscServiceLocV, UmOscRatedV, UmOscRptSubscrib_Api_V
 from oscauth.forms import *
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -95,11 +95,13 @@ def generate_report(request):
 		total = 0
 		for a in all_data:
 			# Only include 'telephony'
-			prefix_query = UmOscAcctSubscribersV.objects.filter(user_defined_id=a.user_defined_id) #this will be coming from new view
+			initial_prefix = a.user_defined_id.split('-')[0]
+			#prefix_query = UmOscRptSubscrib_Api_V.objects.filter(subscriber_prefix=initial_prefix)
+			prefix_query = ''
 			if a.dtl_of_chrgs_telephony:
 				# Determine user defined ID type - will come from new view
 				if prefix_query:
-					prefix = prefix_query[0].service_type
+					prefix = prefix_query[0].subscriber_desc
 					if prefix == '':
 						prefix = 'Misc.'
 				else:
