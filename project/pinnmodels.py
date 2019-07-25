@@ -821,7 +821,9 @@ class UmOscOtsCallSummaryV(models.Model):
      fcc_amount =  models.BigIntegerField( null=True)                             
      tot_count =  models.BigIntegerField( null=True)                              
      tot_amount =  models.BigIntegerField( null=True)                             
-     row_id =  models.CharField(max_length=165, blank=True, null=True)            
+     row_id =  models.CharField(max_length=165, blank=True, null=True)
+     dtl_of_chrgs_telephony = models.PositiveIntegerField(null=True)            
+     dtl_of_chrgs_nontelephony = models.PositiveIntegerField(null=True)            
 
      class Meta:
           managed = False

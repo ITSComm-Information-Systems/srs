@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-{% block content %}
+{% load index %}
+{% comment %} {% block content %}
 <div id="main-content" class="container" role="main">
     <div class="container" role="main">
         <div class="row">
@@ -18,9 +19,9 @@
     </div>
 </div>
 {% endblock %} {% endcomment %}
- {% comment %} onsubmit="return validate()"
+ {% comment %} onsubmit="return validate()" {% endcomment %}
 {% block content %}
-{% comment %} 
+
 <form action="/reports/inventory/" method="POST" name="Select">{% csrf_token %}
         <div class="form-group col-md-6">
             {% if depts %}
@@ -37,67 +38,83 @@
                 <select class="form-control" style='font-size:16px' requried type="select" name="bill_period" id="bill_period" value="{{ i }}">
                     <option>--Select--</option>
                     {% for date in dates %}
-                    <option value={{ date }}>{{ date }}</option>
+                    <option value="{{ date }}">{{ date }}</option>
                     {% endfor %}
                 </select>
             <p id="display"></p>
             <p></p>
             {% endif %}
-            <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+            <p><input type='submit' value='Generate Report' class="btn btn-primary"></p>
         </div>
 </form>
 {% if submit %}
-    <p>{{ dept_id }}</p>
-    <p>{{ bill_period }}</p>
-    <p>{{ data }}</p>
+    <h5>Department: {{ dept_id }}</h5>
+    <h5>Billing Period: {{ bill_period }}</h5>
+    <br><br>
 
-<table>
-        <thead>
-            <tr>
-                <th>User Id</th>
-                <th>Usage</th>
-                <th>User ID Type</th>
-                <th>User ID Description</th>
-                <th>Calling Range/Restrictions</th>
-                <th>Last Outbound Call Date</th>
-                <th>Account</th>
-                <th>Charge Code</th>
-                <th>Charge Description</th>
-                <th>Quantity</th>
-                <th>Rate</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-    {% for project_grant in data%}
+
+
+{% for classification in formated_data %}
+
+<table class = "table table-sm mb-5" style="font-size:11px" >
     
-    <tbody>
-        <tr>
-            <td>{{project_grant.3}}</td>
-            <td>{{project_grant.12}}{{project_grant.13}}{{project_grant.14}}</td>
-            <td>{{project_grant.5}}</td>
-            <td>User: {{project_grant.18}}</td>
-            <td></td>
-            <td>{{project_grant.16}}</td>
-            <td>{{project_grant.20}}</td>
-            <td>{{project_grant.21}}</td>
-            <td>{{project_grant.22}}</td>
-            <td>{{project_grant.23}}</td>
-            <td>{{project_grant.24}}</td>
-            <td>{{project_grant.25}}</td>
-        <tr>
+    <caption class= "text-dark font-weight-bold" style='caption-side:top; font-size:15px;'>
+        Fund: {{classification.0.fund}} Department: {{classification.0.org}} 
+        Program: {{classification.0.program}} Class: {{classification.0.subclass}}
+        Project Grant: {{classification.0.project_grant}}
+    </caption>
+    <thead> 
+        <tr style = "background-color: orange">
+            <th>User Id</th>
+            <th>Usage</th>
+            <th>User ID Type</th>
+            <th>User ID Description</th>
+            <th>Calling Range/Restrictions</th>
+            <th>Last Outbound Call Date</th>
+            <th>Account</th>
+            <th>Charge Code</th>
+            <th>Charge Description</th>
+            <th>Quantity</th>
+            <th>Rate</th>
+            <th>Amount</th>
+        </tr>
+        
+    </thead>
+     <tbody>
+        {% for item in classification %}
+            <tr>
+                <td>{{item.user_defined_id}}</td>
+                <td>
+                    {% if item.t_use %}T {% endif %}
+                    {% if item.l_use %}L {% endif %}
+                    {% if item.m_use %}M {% endif %}
+                </td>
+                <td>{{item.cd_descr}}</td>
+                <td>{{item.last_name}}</td>
+                <td>{{item.ncos_desc}} {% if item.ncos %} ({{item.ncos}}) {% endif %}</td>
+                <td>{{item.last_call_date}}</td>
+                <td>{{item.mrc_account}}</td>
+                <td>{{item.item_code}}</td>
+                <td>{{item.item_description}}</td>
+                <td>{% if item.quantity %}{{item.quantity}}{% endif %}</td>
+                <td>{% if item.unit_price %}${{item.unit_price}}{% endif %}</td>
+                <td>{% if item.charge_amount %}${{item.charge_amount}}{% endif %}</td>
+            </tr>
+        {% endfor %}
     </tbody>
-    {% endfor %}
+    <tr style= 'background-color:silver'>
+        <td>Total Monthly Charges to this Chartfield:</td>
+        <td colspan = '10'</td>
+        <td>${{cost_table|index:forloop.counter0}}</td>
+    </tr>
 </table>
-
-
-
-
-
+<br>
+{% endfor %}
 {% endif %}
 
 
 
-  {% endcomment %}
+ 
 
 
 {% endblock %}

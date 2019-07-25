@@ -104,6 +104,9 @@ TEMPLATES = {
                 'django.contrib.messages.context_processors.messages',
                 'project.context_processors.menu',
             ],
+            'libraries':{
+                'index': 'reports.inventory.templatetags.index'
+            }
         },
 },
 
