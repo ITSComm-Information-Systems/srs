@@ -28,7 +28,7 @@
     <div class="input-group mb3">
         <!-- Select a Department (based off user's department access) -->
             <div class="input-group-prepend">
-                <select class="custom-select" id="id_deptOneTimeCharges" onchange="filterChartcom(this, this.value)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
+                <select class="custom-select" id="id_deptOneTimeCharges" data-target="{{ field.name }}" onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
                     {% for dept in field.field.dept_list %}
                         <option value="{{dept}}">{{dept}}</option>
                     {% endfor %}                    
@@ -38,7 +38,7 @@
             <!-- Select a Chartfield (based off user's selection for department that was selected above ^^^ - all options should be from department's shortlist) -->
             <select name="{{ field.name }}" class="custom-select" id="id_{{ field.name }}">
                 {% for choice in field.field.choices %}
-                    <option name="{{ field.name }} data-dept="{{ choice.2 }}" value="{{ choice.0 }}">{{ choice.1 }}</option>
+                    <option name="{{ field.name }}" data-dept="{{ choice.2 }}" value="{{ choice.0 }}">{{ choice.1 }}</option>
                 {% endfor %}
             </select>
         </div>
