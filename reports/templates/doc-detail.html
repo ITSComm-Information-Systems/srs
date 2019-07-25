@@ -9,15 +9,15 @@
 	<form action=".." method="POST" id="return">{% csrf_token %}
 		<input type="hidden" name="chartcoms[]" value="{{ return_button.chartcoms }}">
 		<input type="hidden" name="select_dept" value="{{ return_button.select_dept }}">
-		<input type="hidden" name="bill_date" value="{{ return_button.bill_date }}">
+		<input type="hidden" name="billing_date" value="{{ return_button.bill_date }}">
 		<div class="row-inline">
-			<strong>Report selection</strong>
-			<a class="offset-2" href="../..">Edit your selection</a>
+			<strong>Report selection&nbsp;&nbsp;&nbsp;</strong>
+			<a id="edit-selection" href="../.."><i class="fas fa-edit btn-link"></i></a>
 		</div>
 
 		<div class="row">
 			<div class="card border-dark col-md-5">
-				<div class="card-body">
+				<div class="card-body" style="padding-bottom:0;">
 					<strong>Department:&nbsp;&nbsp;</strong>{{ dept }}<br>
 					<strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_date }}<br>
 					<strong style="float:left;">Chartfields:&nbsp;&nbsp;</strong>
@@ -32,179 +32,171 @@
 
 		<div class="row-inline mt-5">
 			<strong>Subscriber Information</strong>
-			<a id="return_link" class="offset-7" href="#" onclick="window.history.back();">Back to report</a>
+			<button class="btn btn-link" type="submit"><i class="fas fa-edit"></i></button>
 		</div>
+	</form>
 
-		<div class="row">
-			<div class="card border-dark col-md-10">
-				<div class="card-body">
+	<div class="row">
+		<div class="card border-dark col-md-10">
+			<div class="card-body">
+				<div style="float:left;">
 					<strong>Billing ID:&nbsp;&nbsp;</strong>{{ user_id }}<br>
 					<strong>Subscriber ID:&nbsp;&nbsp;</strong>{{ sub_id }}<br>
 					<strong>Type:&nbsp;&nbsp;</strong>{{ charge_type }}<br>
-					<strong>Username:&nbsp;&nbsp;</strong>{{ username }}<br>
+					<strong>Username:&nbsp;&nbsp;</strong>{{ username }}
 				</div>
-			</div>
-		</div>
-
-		<div class="row mt-5">
-			<strong>Monthly Charges for Chartfield:&nbsp;</strong>
-			<p>{{ chartcom }}</p>
-		</div>
-		<div class="card border-dark">
-			<div class="card-body">
-				{% if monthly_data %}
-				<table class="table table-sm">
-					<thead>
-						<tr class="table-secondary">
-							<th scope="col">Billing ID</th>
-							<th scope="col">Description</th>
-							<th scope="col">Unit Price</th>
-							<th scope="col">Quantity</th>
-							<th scope="col" style="text-align:right;">Total Charge</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for m in monthly_data %}
-						<tr>
-							<td>{{ m.item_code }}</td>
-							<td>{{ m.desc }}</td>
-							<td>{{ m.unit_price }}</td>
-							<td>{{ m.quantity }}</td>
-							<td style="text-align:right;">{{ m.total_charge }}</td>
-						</tr>
-						{% endfor %}
-						<tr style="background-color:#F0AD4E;">
-							<td><strong>Total</strong></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td style="text-align:right;">{{ monthly_total }}</td>
-						</tr>
-					</tbody>
-				</table>
-				{% else %}
-				<div class="col-md-9 mt-2">
-			        <div class="alert alert-danger col-md-9" role="alert">
-			            <i class="fas fa-exclamation-triangle" style="color:red"></i>
-			            This billing ID does not have any monthly charges this month.
-			        </div>
+				<div class="alert alert-info col-md-4" role="alert" style="float:right;">
+		            This information comes from MCommunity. To edit, visit <a class="alert-link" href="https://mcommunity.umich.edu/">https://mcommunity.umich.edu/</a>.
+		        </div>
 			    </div>
-				{% endif %}
 			</div>
 		</div>
+	</div>
 
-		<div class="row mt-5">
-			<strong>Local Charges for Chartfield:&nbsp;</strong>
-			<p>{{ chartcom }}</p>
-		</div>
-		<div class="card border-dark">
-			<div class="card-body">
-				{% if local %}
-				<table class="table table-sm">
-					<thead>
-						<tr class="table-secondary">
-							<th scope="col">Connect Date</th>
-							<th scope="col">To Number</th>
-							<th scope="col">Location</th>
-							<th scope="col">Duration</th>
-							<th scope="col" style="text-align:right;">Total Charge</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for l in local %}
-						<tr>
-							<td>{{ l.connect_date }}</td>
-							<td>{{ l.to_num }}</td>
-							<td>{{ l.location }}</td>
-							<td>{{ l.duration }}</td>
-							<td style="text-align:right;">{{ l.total_charge }}</td>
-						</tr>
-						{% endfor %}
-						<tr style="background-color:#F0AD4E;">
-							<td><strong>Total</strong></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td style="text-align:right;">{{ local_total }}</td>
-						</tr>
-					</tbody>
-				</table>
-				{% else %}
-				<div class="col-md-9 mt-2">
-			        <div class="alert alert-danger col-md-9" role="alert">
-			            <i class="fas fa-exclamation-triangle" style="color:red"></i>
-			            This chartfield does not have any local charges this month.
-			        </div>
-			    </div>
-				{% endif %}
+
+	{% for cf in chartfields %}
+	<div class="row mt-5">
+		<strong>Charges for Chartfield:&nbsp;</strong>
+		<p>{{ cf.account }}</p>
+	</div>
+	<div class="card border-dark col-md-10">
+		<div class="card-body">
+			{% if cf.monthly %}
+			<div class="row">
+				<strong>Monthly Charges</strong>
 			</div>
-		</div>
+			<table class="table table-sm">
+				<thead>
+					<tr class="table-secondary">
+						<th scope="col">Billing ID</th>
+						<th scope="col">Description</th>
+						<th scope="col">Unit Price</th>
+						<th scope="col">Quantity</th>
+						<th scope="col" style="text-align:right;">Total Charge</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for m in cf.monthly %}
+					<tr>
+						<td>{{ m.item_code }}</td>
+						<td>{{ m.desc }}</td>
+						<td>{{ m.unit_price }}</td>
+						<td>{{ m.quantity }}</td>
+						<td style="text-align:right;">{{ m.total_charge }}</td>
+					</tr>
+					{% endfor %}
+					<tr style="background-color:#F0AD4E;">
+						<td><strong>Total</strong></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td style="text-align:right;">{{ cf.monthly_total }}</td>
+					</tr>
+				</tbody>
+			</table>
+			{% endif %}
 
-		<div class="row mt-5">
-			<strong>Toll Charges for Chartfield:&nbsp;</strong>
-			<p>{{ chartcom }}</p>
-		</div>
-		<div class="card border-dark">
-			<div class="card-body">
-				{% if toll %}
-				<table class="table table-sm">
-					<thead>
-						<tr class="table-secondary">
-							<th scope="col">Connect Date</th>
-							<th scope="col">To Number</th>
-							<th scope="col">Location</th>
-							<th scope="col">Duration</th>
-							<th scope="col" style="text-align:right;">Total Charge</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for t in toll %}
-						<tr>
-							<td>{{ t.connect_date }}</td>
-							<td>{{ t.to_num }}</td>
-							<td>{{ t.location }}</td>
-							<td>{{ t.duration }}</td>
-							<td style="text-align:right;">{{ t.total_charge }}</td>
-						</tr>
-						{% endfor %}
-						<tr style="background-color:#F0AD4E;">
-							<td><strong>Total</strong></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td style="text-align:right;">{{ toll_total }}</td>
-						</tr>
-					</tbody>
-				</table>
-				{% else %}
-				<div class="col-md-9 mt-2">
-			        <div class="alert alert-danger col-md-9" role="alert">
-			            <i class="fas fa-exclamation-triangle" style="color:red"></i>
-			            This chartfield does not have any toll charges this month.
-			        </div>
-			    </div>
-				{% endif %}
+			{% if cf.local %}
+			<div class="row mt-5">
+				<strong>Local Charges</strong>
 			</div>
-		</div>
+			<table class="table table-sm">
+				<thead>
+					<tr class="table-secondary">
+						<th scope="col">Connect Date</th>
+						<th scope="col">To Number</th>
+						<th scope="col">Location</th>
+						<th scope="col">Duration</th>
+						<th scope="col" style="text-align:right;">Total Charge</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for l in cf.local %}
+					<tr>
+						<td>{{ l.connect_date }}</td>
+						<td>{{ l.to_num }}</td>
+						<td>{{ l.location }}</td>
+						<td>{{ l.duration }}</td>
+						<td style="text-align:right;">{{ l.total_charge }}</td>
+					</tr>
+					{% endfor %}
+					<tr style="background-color:#F0AD4E;">
+						<td><strong>Total</strong></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td style="text-align:right;">{{ cf.local_total }}</td>
+					</tr>
+				</tbody>
+			</table>
+			{% endif %}
 
-		<div class="row mt-5">
-			<strong>Total Charges for Chartfield:&nbsp;</strong>
-			<p>{{ chartcom }}</p>
-		</div>
-		<div class="card border-dark">
-			<div class="card-body">
-				<table class="table table-sm">
-					<tbody>
-						<tr style="background-color:#F0AD4E;">
-							<td><strong>Total</strong></td>
-							<td style="text-align:right">{{ total }}</td>
-						</tr>
-					</tbody>
-				</table>
+			{% if cf.toll %}
+			<div class="row mt-5">
+				<strong>Toll Charges</strong>
 			</div>
-		</div>
+			<table class="table table-sm">
+				<thead>
+					<tr class="table-secondary">
+						<th scope="col">Connect Date</th>
+						<th scope="col">To Number</th>
+						<th scope="col">Location</th>
+						<th scope="col">Duration</th>
+						<th scope="col" style="text-align:right;">Total Charge</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for t in cf.toll %}
+					<tr>
+						<td>{{ t.connect_date }}</td>
+						<td>{{ t.to_num }}</td>
+						<td>{{ t.location }}</td>
+						<td>{{ t.duration }}</td>
+						<td style="text-align:right;">{{ t.total_charge }}</td>
+					</tr>
+					{% endfor %}
+					<tr style="background-color:#F0AD4E;">
+						<td><strong>Total</strong></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td style="text-align:right;">{{ cf.toll_total }}</td>
+					</tr>
+				</tbody>
+			</table>
+			{% endif %}
 
-	</form>
+			<div class="row mt-5">
+				<strong>Total Charges for Chartfield {{cf.account }}</strong>
+			</div>
+			<table class="table table-sm">
+				<tbody>
+					<tr style="background-color:#F0AD4E;">
+						<td><strong>Total</strong></td>
+						<td style="text-align:right;">{{ cf.cf_total }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	{% endfor %}
+
+	<div class="row mt-5">
+		<strong>Total Charges for Billing ID:&nbsp;</strong>
+		<p>{{ user_id }}</p>
+	</div>
+	<div class="card border-dark col-md-10">
+		<div class="card-body">
+			<table class="table table-sm">
+				<tbody>
+					<tr style="background-color:#F0AD4E;">
+						<td><strong>Total</strong></td>
+						<td style="text-align:right">{{ total }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 
 </div>
 

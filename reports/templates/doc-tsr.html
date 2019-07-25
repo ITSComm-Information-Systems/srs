@@ -4,76 +4,89 @@
 <div class="container">
 	<div class="row-inline">
 		<strong>Report selection</strong>
-		<a class="offset-2" href="../..">Edit your selection</a>
+		<a class="btn" id="edit-selection" href="../.."><i class="fas fa-edit"></i></a>
+		<!-- <a class="offset-2" href="../..">Edit your selection</a> -->
 	</div>
 
 	<div class="row">
 		<div class="card border-dark col-md-5">
 			<div class="card-body">
-				<strong>Department:&nbsp;&nbsp;</strong>Department goes here :-)<br>
-				<strong>Billing Date:&nbsp;&nbsp;</strong>I love Mamma Mia<br>
+				<strong>Department:&nbsp;&nbsp;</strong>{{ dept }}<br>
+				<strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_date }}<br>
 				<strong style="float:left;">Chartfields:&nbsp;&nbsp;</strong>
 				<p style="float:left;">
-					This movie is great<br>
-					What if there are more chartfields?
+					{% for c in chartcoms %}
+						{{ c }}<br>
+					{% endfor %}
 				</p>
 			</div>
 		</div>
 	</div>
 
 	<div class="row-inline mt-5">
-		<strong>Subscriber Information</strong>
-		<a class="offset-7" href="..">Back to report</a>
+		<form action=".." method="POST" id="return">{% csrf_token %}
+			<input type="hidden" name="chartcoms[]" value="{{ return_button.chartcoms }}">
+			<input type="hidden" name="select_dept" value="{{ return_button.select_dept }}">
+			<input type="hidden" name="billing_date" value="{{ return_button.bill_date }}">
+
+			<strong>Subscriber Information</strong>
+			<button class="btn btn-link" type="submit"><i class="fas fa-edit"></i></button>
+		</form>
+		<!-- <input class="btn btn-link submit-link offset-7" style="text-align:left;" type="submit" name="return" value="Back to report"> -->
 	</div>
 
 	<div class="row">
 		<div class="card border-dark col-md-10">
 			<div class="card-body">
-				<strong>Item Code:&nbsp;&nbsp;</strong>I can't wait<br>
-				<strong>Work Order:&nbsp;&nbsp;</strong>to eat cake when I get home<br>
+				<strong>Work Order:&nbsp;&nbsp;</strong>{{ work_order }}<br>
 			</div>
 		</div>
 	</div>
 
 	<div class="row mt-5">
 		<strong>Charge Summary for Chartfield:&nbsp;</strong>
-		<p>ChartFIELD</p>
+		<p>{{ current_cf }}</p>
 	</div>
 	<div class="card border-dark">
 		<div class="card-body">
+			{% if data %}
 			<table class="table table-sm">
 				<thead>
 					<tr class="table-secondary">
-						<th scope="col">Item Code</th>
 						<th scope="col">Description</th>
-						<th scope="col">Unit Price</th>
 						<th scope="col">Quantity</th>
 						<th scope="col" style="text-align:right;">Total Charge</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td>Thinking</td>
-						<td>about</td>
-						<td>cake</td>
-						<td></td>
-						<td style="text-align:right;""></td>
-					</tr>
+					{% for d in data %}
+						<tr>
+							<td>{{ d.desc }}</td>
+							<td>{{ d.quantity }}</td>
+							<td style="text-align:right;"">{{ d.total_charge }}</td>
+						</tr>
+					{% endfor %}
 					<tr style="background-color:#F0AD4E;">
 						<td><strong>Total</strong></td>
 						<td></td>
-						<td></td>
-						<td></td>
-						<td style="text-align:right;">total charges</td>
+						<td style="text-align:right;">{{ total }}</td>
 					</tr>
 				</tbody>
 			</table>
+			{% else %}
+			<div class="col-md-9 mt-2">
+		        <div class="alert alert-danger col-md-9" role="alert">
+		            <i class="fas fa-exclamation-triangle prv-msgs"></i>
+		            This work order does not have any charges this month.
+		        </div>
+		    </div>
+			{% endif %}
 		</div>
 	</div>
 
 	<div class="row mt-5">
 		<strong>Total Charges for Chartfield:&nbsp;</strong>
-		<p>ChArTfIeLd</p>
+		<p>{{ current_cf }}</p>
 	</div>
 	<div class="card border-dark">
 		<div class="card-body">
@@ -81,7 +94,7 @@
 				<tbody>
 					<tr style="background-color:#F0AD4E;">
 						<td><strong>Total</strong></td>
-						<td style="text-align:right">total charge</td>
+						<td style="text-align:right">{{ total }}</td>
 					</tr>
 				</tbody>
 			</table>
