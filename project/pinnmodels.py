@@ -948,7 +948,7 @@ class UmOscRptSubscrib_Api_V(models.Model):
      dtl_of_chrgs_telephony = models.PositiveIntegerField()
      dtl_of_chrgs_nontelephony = models.PositiveIntegerField()
      inv_loc_rept = models.PositiveIntegerField()
-     created_date = models.DateField()
+     create_date = models.DateField()
      created_by = models.CharField(max_length=50)
      last_update_date = models.DateField(null=True)
      last_updated_by = models.CharField(max_length=50, null=True)

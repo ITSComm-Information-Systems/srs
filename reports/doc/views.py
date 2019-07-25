@@ -25,6 +25,7 @@ import json
 from django.http import JsonResponse
 
 from datetime import datetime
+from django.shortcuts import redirect
 
 # Load intial Detail of Charge page
 @permission_required('oscauth.can_report', raise_exception=True)
@@ -96,9 +97,9 @@ def generate_report(request):
 		for a in all_data:
 			# Only include 'telephony'
 			initial_prefix = a.user_defined_id.split('-')[0]
-			#prefix_query = UmOscRptSubscrib_Api_V.objects.filter(subscriber_prefix=initial_prefix)
-			prefix_query = ''
-			if a.dtl_of_chrgs_telephony:
+			prefix_query = UmOscRptSubscrib_Api_V.objects.filter(subscriber_prefix=initial_prefix)
+			# prefix_query = ''
+			if a.dtl_of_chrgs_telephony and not (a.mrc_amount == 0 and a.tot_call_amount == 0):
 				# Determine user defined ID type - will come from new view
 				if prefix_query:
 					prefix = prefix_query[0].subscriber_desc
@@ -268,6 +269,7 @@ def generate_report(request):
 			'otc_total': '${:,.2f}'.format(otc_total)
 		}
 		charge_types.append(data)
+		has_data = False
 
 
 	context= {
@@ -513,3 +515,8 @@ def format_chartcoms(chartcoms):
 		if len(c) != 0:
 			format_chartcoms.append(c)
 	return format_chartcoms
+
+
+# Return to DOC base
+def restart(request):
+	return redirect('reports/doc/')
