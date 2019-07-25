@@ -30,9 +30,9 @@
 
 <div class="container">
 	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
-		<div class="row-inline">
-			<strong>Your selection</strong>
-			<button class="btn btn-link col-offset-1" onclick="location.href='..'"><i class="fas fa-edit"></i>Edit Your Selection</button>
+		<strong class="d-inline">Your selection</strong>
+		<div class="d-inline offset-md-2">
+			<button class="btn btn-link d-inline" onclick="location.href='..'"><i class="fas fa-edit"></i>Edit Your Selection</button>
 		</div>
 
 		<div class="row">
@@ -54,10 +54,10 @@
 		{% for c in charge_types %}
 		{% if c.data %}
 		<div class="row mt-5">
-			<div class="card border-dark col-md-10">
-				<h6 class="card-header" style="margin-top:0;">
-					Chartfield:&nbsp;{{ c.account_number }}
-				</h6>
+			<div class="card border-dark" style="width:83%;">
+				<div class="card-header">
+					<strong>Chartfield:</strong>&nbsp;{{ c.account_number }}
+				</div>
 				<div class="card-body">
 					{% if c.type_summary %}
 					<strong>Summary</strong>

@@ -11,7 +11,7 @@
     <form action="/reports/doc/report/" method="POST" name="Select">{% csrf_token %}
         <div class="form-group">
             <h5>Select Department<span class="prv-msgs">*</span></h5>
-            <p class="mb-0"><span class="prv-msgs">*</span>Required fields</p>
+            <p class="mb-0"><span class="prv-msgs">*</span> Required fields</p>
             <div class="row">
                 <select class="form-control col-md-4 mt-0" style='font-size:16px' type="select" name="select_dept" id="doc_depts" value="{{ dept }}">
                     {% for dept in names %}
@@ -27,8 +27,10 @@
                     {% endfor %}
                 </select>
             </div>
-            <h5>Select Chartfield(s)*</h5>
-            <p>*To select multiple chartfields, hold "CTRL" and select.</p>
+            <h5 class="mb-0">Select Chartfield(s)</h5>
+            <div class="alert mt-0 mb-0">To select multiple, on Mac press and hold
+               “Command” and select. On PC,
+               Press and hold “Ctrl” and select.</div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="select-all">
                 <label class="form-check-label" for="select-all">
