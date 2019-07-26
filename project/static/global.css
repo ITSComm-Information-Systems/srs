@@ -356,11 +356,14 @@ display:flex;
 align-items: center;
 }
 
-.action {
-	display: inline-block;
-}
+
 .action a {
 	display: inline;
+}
+
+.action a:nth-child(even) {
+	padding-left: 1rem;
+	padding-right:1rem;
 }
 
 .action .delete{
@@ -369,15 +372,17 @@ font-weight: 400;
 border-color: transparent;
 background-color: transparent;
 text-decoration: underline;
-padding-left: 1rem;
 }
+
 .action .delete:focus {
 background-color: transparent;
 background: transparent;
 }
 .action {
-text-align: center;
-text-decoration: underline;
+	display: inline-block;
+	width: 100%;
+	text-align: left;
+	text-decoration: underline;
 }
 
 .action .cancel {
@@ -713,4 +718,18 @@ input:checked + .slider:before {
 
 .fa-exclamation-triangle, .prv-msgs {
 	color: #FF0000;
+}
+.cart-chartfield-title {
+	font-size: 1.1rem;
+}
+
+.cart-chartfield-title small {
+	font-size: 100%;
+}
+#service-menu ul li a {
+	color: #000000;
+}
+
+#service-menu ul li a:active {
+	font-weight: bold;
 }

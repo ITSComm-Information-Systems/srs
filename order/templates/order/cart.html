@@ -36,12 +36,12 @@
             </div>
         </div>
 
-        <!-- <div class="row bulletin-announcements justify-content-start"> -->
         <section class="row" role="contentinfo">
             <div class="container">
                 <div class="row cart-tables">
                     <form action="/orders/review/" id="cart-orders" method="POST" class="cart-table">{% csrf_token %}
                     <div class="col-12">
+                        <div class="ready-to-order">
                         {% for chartcom in acct %}
                         <div class="cart-table">
                             <h2 class="small-h2">
@@ -58,7 +58,6 @@
                                         <th scope="col">Created By</th>
                                         <th scope="col">Details</th>
                                         <th scope="col">Action</th>
-                                        <th scope="col">Ready to Order</th>
                                     </tr>
                                 </thead>
 
@@ -74,17 +73,13 @@
                                         <td class="action">
                                             <a class="edit" href="#">Edit</a>
                                             <a class="delete" href="#">Delete</a>
-                                        </td>
-                                        <td>
-                                            <div class="custom-control">
-                                                <input type="checkbox" name="includeInOrder" id="addItem{{item.id}}" value="{{item.id}}">
-                                                <label class="checkbox-label" for="addItem{{item.id}}">Add to order</label>
-                                            </div>
+                                            <a class="saved-for-later" href="#">Save for Later</a>
                                             {% if item.days_to_deletion < 30 %}
                                             <a tabindex="0" role="button" data-toggle="popover" data-container="body"
                                                 data-trigger="focus" data-placement="right"
-                                                data-content="This item will be erased in {{ item.days_to_deletion }} days"><i
-                                                    class="fas fa-exclamation-circle"></i></a>
+                                                data-content="This item will be erased in {{ item.days_to_deletion }} days">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                            </a>
                                             {% endif %}
                                         </td>                                        
                                     </tr>
@@ -94,13 +89,57 @@
                             </table>
                         </div>
                         {% endfor %}
-
                     </div>
+                </div>
                     <div class="col-lg-11 col-md-12 cart-button">
                         <input type="submit" class="hidden" value="Review Order" id="cartReviewbtn">
                         <label for="cartReviewbtn" class="btn btn-primary">Proceed to Checkout</label>
                     </div>
                 </form>
+                </div>
+                <div class="row cart-tables">
+                    <div class="col-12">
+                        <div class="saved-cart-table">
+                            <h2>Saved for Later</h2>
+                            <div class="cart-table">
+                                <h4 class="cart-chartfield-title">
+                                    Chartfield:
+                                    <small>Chartfield information goes here</small>
+                                </h4>
+                            </div>
+                            <div class="table-responsive-md">
+                                <table class="table table-hover table-striped table-sm table-bordered">
+                                    <thead>
+                                        <tr class="col-headings">
+                                            <th scope="col">Date Created</th>
+                                            <th scope="col">Created By</th>
+                                            <th scope="col">Details</th>
+                                            <th scope="col">Action</th>
+                                        </tr>    
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">Date Here</th>
+                                            <td>FRGA</td>
+                                            <td>Add/Activate my super powers!</td>
+                                            <td class="action">
+                                                <a class="edit" href="#">Edit</a>
+                                                <a class="delete" href="#">Delete</a>
+                                                <a class="ready-link" href="#">Move to Cart</a>
+                                                {% if item.days_to_deletion < 30 %}
+                                                    <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+                                                    data-trigger="focus" data-placement="right"
+                                                    data-content="This item will be erased in {{ item.days_to_deletion }} days">
+                                                        <i class="fas fa-exclamation-circle"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
