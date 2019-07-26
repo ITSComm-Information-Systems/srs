@@ -32,14 +32,6 @@ $(document).ready(function() {
 		})
 	})
 
-	
-	// Change date label
-	$('#doc_bill_date').on('change', function() {
-		var sel = document.getElementById("doc_bill_date");
-		var selected = sel.options[sel.selectedIndex].value;
-
-		$('#billing_label').html(selected);
-	})
 
 	
 	// List selected chartfields
@@ -47,7 +39,7 @@ $(document).ready(function() {
 		var selected = $('#doc_chartcom').val();
 		var text = '';
 		for (i = 0; i < selected.length; ++i) {
-			text += '<strong>&nbsp;&nbsp;' + selected[i] + '</strong><br>'
+			text += '<strong>&nbsp;&nbsp;' + selected[i] + '</strong><br>';
 		}
 		$('#chartfield_list').html(text);
 	})
@@ -68,12 +60,19 @@ $(document).ready(function() {
 
 	// Select all chartfields
 	$('#select-all').on('click', function() {
+		var selected = $('#doc_chartcom').val();
+		var text = '';
+	
 		if ($('#select-all').is(':checked')) {
 			$('#doc_chartcom option').prop('selected', 'selected');
+			$('#doc_chartcom option').each(function() {
+				text += '<strong>&nbsp;&nbsp;' + $(this).val() + '</strong><br>';
+			})
 		}
 		else {
 			$('#doc_chartcom option').prop('selected', '');
 		}
+		$('#chartfield_list').html(text);
 	})
 })
 
