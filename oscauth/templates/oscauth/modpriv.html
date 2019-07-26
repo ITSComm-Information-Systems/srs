@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form action="/auth/addpriv/" method="POST">{% csrf_token %}
+
+<p>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></p>
+<br>
+
+<table class="table table-hover table-striped table-sm">
+    <thead>
+        <tr>
+                <th>Department</th>
+                <th>Role</th>
+                <th>Result</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dept in dept_checked %}
+        <tr>
+                {% if row.dept_status != 'I' %}
+                <td> {{ dept }}</td>
+                <td> {{ role_checked }}</td>
+                <td> {{ result }}</td>
+                <td> {{ row.result }}</td>
+                {% else %}
+                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i> {{ row.col1 }}</td>
+                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i> {{ row.col2 }}</td>
+                <td> {{ row.role }}</td>
+                <td> {{ row.result }}</td>
+                {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</form>
+
+{% endblock %}

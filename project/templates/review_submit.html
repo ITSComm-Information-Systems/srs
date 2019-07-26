@@ -1,0 +1,42 @@
+<div class="container" id="review_submit">
+	<p class="mt-4">Please review the following information.</p>
+	
+	<div class="row mt-4">
+		<div class="col-md-5">
+			<div class="card">
+				<div class="card-header">
+					Contact Information
+				</div>
+				<div class="card-body">
+					<div class="dept_full_name"><strong>Department:</strong>&nbsp; {{ dept_info.dept_id }} ({{ dept_info.dept_name }})</div>
+					<div class="dept_mgr"><strong>Department Manager:</strong> &nbsp; {{ dept_info.dept_mgr }}</div>
+					<strong>Contact Name:</strong> &nbsp; {{ user.last_name }},{{ user.first_name }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<p class="mt-4">You have chosen to change the following User IDs from Chartfield: &nbsp;
+	<strong class="cf_num">{{ selected_cf.account_number }}</strong>
+	{% if nickname %}
+		<strong class="cf_nickname">({{ nickname }})</strong>
+	{% endif %}
+	<strong class="cf_nickname"></strong>
+</p>
+
+<div class="row">	
+	<div class="mt-4 col-md-12 mb-4" id="cf_change">
+		<form action="submit/" method="POST" id="submit-form">{% csrf_token %}
+	    <table class="table table-striped table-sm" id="review_table">
+	        <thead>
+	          	<th scope="col">User ID</th>
+	          	<th scope="col">Building</th>
+	          	<th scope="col">New MRC Charge</th>
+	          	<th scope="col">New Toll Charge</th>
+	          	<th scope="col">New Local Charge</th>
+	        </thead>
+	    </table>
+		</form>
+	</div>
+</div>

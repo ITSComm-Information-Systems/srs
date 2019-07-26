@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Beginning of Content -->
+    <div id="main-content" class="container" role="main">
+        <div class="row header-info">
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-12">
+                        <h1>
+                            Cart
+                            <small class="text-muted">
+                                for Department: <strong>{{department.id}} - {{department.name}}</strong>
+                            </small>
+                        </h1>
+                    </div>
+                </div>
+                <div class='row'>
+                    <div class="col-xl-8 col-12 dept-select">
+                        <form action="/orders/cart/" id="cart-department-dropdown" method="POST">{% csrf_token %}
+                            <div class="input-group dept-dropdown">
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text" for="department-dropdown">
+                                        Switch Department
+                                    </label>
+                                </div>
+                                <select name="deptid" class="custom-select order-status-dropdown" id="department-dropdown">
+                                    {% for dept in dept_list %}
+                                    <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="submit" class="btn btn-outline-secondary" value="Go">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="row" role="contentinfo">
+            <div class="container">
+                <div class="row cart-tables">
+                    <form action="/orders/review/" id="cart-orders" method="POST" class="cart-table">{% csrf_token %}
+                    <div class="col-12">
+                        <div class="ready-to-order">
+                            <h2>Ready to Order</h2>   
+                        {% for chartcom in acct %}
+                        <div class="cart-table">
+                            <h4 class="cart-chartfield-title">
+                                Chartfield: 
+                                <!-- Insert Chartfield Nickname here -->
+                                <small >{{chartcom.chartcom}} ({{chartcom.chartcom.account_number}}) </small>
+                            </h4>
+                        </div>
+                        <div class="table-responsive-md">
+                            <table class="table table-hover table-striped table-sm">
+                                <thead>
+                                    <tr class="col-headings">
+                                        <th scope="col">Date Created</th>
+                                        <th scope="col">Created By</th>
+                                        <th scope="col">Details</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+
+                                <!-- Beginning of table body -->
+                                <tbody>
+
+                                    
+                                    {% for item in chartcom.items %}
+                                    <tr>
+                                        <th scope="row">{{ item.create_date|date:"m/d/y" }}</th>
+                                        <td>{{ item.created_by }}</td>
+                                        <td>{{ item.details }}</td>
+                                        <td class="action">
+                                            <a class="edit" href="#">Edit</a>
+                                            <a class="delete" href="#">Delete</a>
+                                            <a class="saved-for-later" href="#">Save for Later</a>
+                                            {% if item.days_to_deletion < 30 %}
+                                            <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+                                                data-trigger="focus" data-placement="right"
+                                                data-content="This item will be erased in {{ item.days_to_deletion }} days">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                            </a>
+                                            {% endif %}
+                                        </td>                                        
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <!-- End of table body -->
+                            </table>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                    <div class="col-lg-11 col-md-12 cart-button">
+                        <input type="submit" class="hidden" value="Review Order" id="cartReviewbtn">
+                        <label for="cartReviewbtn" class="btn btn-primary">Proceed to Checkout</label>
+                    </div>
+                </form>
+                </div>
+                <div class="row cart-tables">
+                    <div class="col-12">
+                        <div class="saved-cart-table">
+                            <h2>Saved for Later</h2>
+                            <div class="cart-table">
+                                <h4 class="cart-chartfield-title">
+                                    Chartfield:
+                                    <small>Chartfield information goes here</small>
+                                </h4>
+                            </div>
+                            <div class="table-responsive-md">
+                                <table class="table table-hover table-striped table-sm">
+                                    <thead>
+                                        <tr class="col-headings">
+                                            <th scope="col">Date Created</th>
+                                            <th scope="col">Created By</th>
+                                            <th scope="col">Details</th>
+                                            <th scope="col">Action</th>
+                                        </tr>    
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">Date Here</th>
+                                            <td>FRGA</td>
+                                            <td>Add/Activate my super powers!</td>
+                                            <td class="action">
+                                                <a class="edit" href="#">Edit</a>
+                                                <a class="delete" href="#">Delete</a>
+                                                <a class="ready-link" href="#">Move to Cart</a>
+                                                {% if item.days_to_deletion < 30 %}
+                                                    <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+                                                    data-trigger="focus" data-placement="right"
+                                                    data-content="This item will be erased in {{ item.days_to_deletion }} days">
+                                                        <i class="fas fa-exclamation-circle"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- End of Content -->
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="popover"]').popover();
+    });
+</script>
+{% endblock %}

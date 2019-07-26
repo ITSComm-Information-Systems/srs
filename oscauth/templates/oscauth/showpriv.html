@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+{{ result }}
+<p>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></p>
+<br>
+<table class="table table-hover table-striped table-sm">
+    <thead>
+        <tr>
+                <th>Department ID</th>
+                <th>Department Name</th>
+                <th>Role</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+                {% if row.dept_status != 'I' %}
+                <td> {{ row.col1 }}</td>
+                <td> {{ row.col2 }}</td>
+                <td> {{ row.roles }}</td>
+                {% else %}
+                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i> {{ row.col1 }}</td>
+                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i> {{ row.col2 }}</td>
+                <td class="prv-msgs"> {{ row.roles }}</td>
+                {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<button class="btn btn-primary" onclick="window.history.back()">Back</button>
+{% endblock %}

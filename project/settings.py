@@ -33,21 +33,21 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'oscauth',
+    'project',
     'django.contrib.admin',
     'django.contrib.auth',
+    'mozilla_django_oidc',  # Load after auth
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'debug_toolbar',
-    'project',
     'order',
-    'oscauth',
     'pages',
-    'wismo',
-    'reports.soc',
-    'reports.doc',
-    'reports.toll',
+    'reports',
+    'tools',
 ]
 
 MIDDLEWARE = [
@@ -62,10 +62,37 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    'oscauth.backends.SuBackend',
+]
+
+# mozilla-django-oidc
+SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')
+OIDC_RP_CLIENT_ID = os.getenv('OIDC_RP_CLIENT_ID', 'N/A')
+OIDC_RP_CLIENT_SECRET = os.getenv('OIDC_RP_CLIENT_SECRET','N/A')
+AUTH_BASE_URL = os.getenv('AUTH_BASE_URL','https://shib-idp-test.www.umich.edu')
+OIDC_CALLBACK = SITE_URL + '/oidc/callback/'
+OIDC_OP_AUTHORIZATION_ENDPOINT = AUTH_BASE_URL + '/idp/profile/oidc/authorize'
+OIDC_OP_TOKEN_ENDPOINT = AUTH_BASE_URL + '/idp/profile/oidc/token'
+OIDC_OP_USER_ENDPOINT = AUTH_BASE_URL + '/idp/profile/oidc/userinfo'
+OIDC_OP_JWKS_ENDPOINT = AUTH_BASE_URL + '/oidc/keyset.jwk'
+OIDC_RP_SIGN_ALGO = 'RS256'
+LOGIN_REDIRECT_URL = SITE_URL
+LOGOUT_REDIRECT_URL = SITE_URL
+LOGIN_URL = '/oidc/authenticate'
+
+MCOMMUNITY = {
+    'SERVER': os.getenv('MC_SERVER', 'ldap.umich.edu'),
+    'USERNAME': os.getenv('MC_USERNAME', 'cn=EAS-OSC-McDirApp001,ou=Applications,o=services'),
+    'PASSWORD': os.getenv('MC_PASSWORD', 'N/A'),
+}
+
+
 ROOT_URLCONF = 'project.urls'
 
-TEMPLATES = [
-    {
+TEMPLATES = {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
         'APP_DIRS': True,
@@ -75,10 +102,14 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'project.context_processors.menu',
             ],
+            'libraries':{
+                'index': 'reports.inventory.templatetags.index'
+            }
         },
-    },
-]
+},
+
 
 WSGI_APPLICATION = 'wsgi.application'
 
@@ -86,17 +117,16 @@ WSGI_APPLICATION = 'wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
-        'NAME': os.getenv('DATABASE_NAME','postgres'),
+        'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
         'USER': os.getenv('DATABASE_USER','postgres'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD','magpie'),
-        'HOST': os.getenv('DATABASE_SERVICE_NAME','localhost'),
-        #'PORT': '15432',
+        'PASSWORD': os.getenv('DATABASE_PASSWORD','w94zLR2dkkfo'),
+        'HOST': os.getenv('DATABASE_SERVICE_NAME','pgoscdev.cvwq7quwqs3k.us-east-2.rds.amazonaws.com'),
     },
     'pinnacle': {
         'NAME': os.getenv('ORACLE_DATABASE','pinntst.dsc.umich.edu:1521/pinndev.world'),
         'ENGINE': 'django.db.backends.oracle',
-        'USER': os.getenv('ORACLE_USER','RMTITCOMOSC_DJ_PINNDEV1'),
-        'PASSWORD': os.getenv('ORACLE_PASSWORD','wPJ5edcH'),
+        'USER': os.getenv('ORACLE_USER','PINN_CUSTOM'),
+        'PASSWORD': os.getenv('ORACLE_PASSWORD','wpfx8rea'),
         'TEST': {
           'NAME': 'pinntst.dsc.umich.edu:1521/pinndev.world',
           'CREATE_DB': False,
@@ -107,16 +137,20 @@ DATABASES = {
     },
 }
 
+
 DATABASE_ROUTERS = ['project.settings.DBRouter']
 
 class DBRouter(object):
   def db_for_read(self, model, **hints):
 
-    if model._meta.db_table.startswith('PINN_CUSTOM'):
+    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING'):
       return 'pinnacle'
     return 'default'
 
   def db_for_write(self, model, **hints):
+   
+    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING'):
+      return 'pinnacle'
     return 'default'
 
   def allow_migrate(self, db, app_label, **hints):
@@ -142,7 +176,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 
@@ -159,6 +192,14 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/media' # Use persistent volume in openshift
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 INTERNAL_IPS = ['127.0.0.1']
+
+try:
+    from local_settings import *
+except ImportError:
+    pass

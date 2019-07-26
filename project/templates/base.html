@@ -1,139 +1,209 @@
+
 <!doctype html>
 <html lang="en">
+  <head>
+  	{% load static %}
+	<link rel="shortcut icon" href="/static/favicon.ico" />
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<!-- FontAwesome CSS -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
-  <!-- FontAwesome CSS -->
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" href="/static/global.css">
 
-  <!-- Custom CSS -->
-  <link rel="stylesheet" type="text/css" href="static/styles.css">
+	<!-- Fonts -->
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:400"/>
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:400i"/>
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:700"/>
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:700i"/>
 
-  <title>OSC | Home</title>
-</head>
+	<!-- Searchable select -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css"/>
+	<link rel="stylesheet" href="/static/select2-bootstrap4.css">
 
-<body>
-  <nav class="navbar navbar-expand-xl navbar-dark">
-    <a class="navbar-brand" href="index.html">
-      <img src="static/itcom-homebanner.jpg" alt="ITCOM Logo">
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarLinks"
-      aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+	
+	<style>
+	#aux-nav {
+		background-color: /* background_color}*/ {{ background_color }}
+	 } 
+	</style>
 
-    <div class="collapse navbar-collapse" id="navbarLinks">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="#navbarServicesTypes" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">Request Service</a>
-          <div class="dropdown-menu" aria-labelledby="#navbarServicesTypes">
-            <a class="dropdown-item" href="#">Phones</a>
-            <a class="dropdown-item" href="#">Audio/Visual</a>
-            <a class="dropdown-item" href="#">Other</a>
-          </div>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="#navbarReports" data-toggle="dropdown" aria-haspopup="true"
-            aria-expanded="false">Reports</a>
-          <div class="dropdown-menu" aria-labelledby="#navbarReports">
-            <a class="dropdown-item"
-              href="https://osc-nonprod.miserver.it.umich.edu/UofM/WebObjects/OSC-dev-reggie.woa/1/wo/4wNViEKBIwCqv7LX7kW2EM/0.16.3.0.1.5.1">Summary
-              of Charges</a>
-            <a class="dropdown-item"
-              href="https://osc-nonprod.miserver.it.umich.edu/UofM/WebObjects/OSC-dev-reggie.woa/1/wo/LO9UXWSld0uJOKbyeo5yjM/0.16.3.0.1.9">Detail
-              of Charges</a>
-            <a class="dropdown-item" href="https://www.itcom.itd.umich.edu/osc/tollstmts/">Toll Statements</a>
-            <a class="dropdown-item" href="https://www.itcom.itd.umich.edu/osc/invloc/">Inventory and Location
-              Report</a>
-            <a class="dropdown-item"
-              href="https://tableau.dsc.umich.edu/t/UM/views/telecom_dashboard_db_conn_month_actives/DepartmentalTelephoneServiceMetrics?:embed=y&:showShareOptions=true&:display_count=no&:showVizHome=no">Departmental
-              Telephone Service Metrics
-            </a>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="cart.html">Cart</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="#navbarOrderOptions" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-            Orders
-          </a>
-          <!-- <a class="nav-link" href="orders.html">Orders</a> -->
-          <div class="dropdown-menu" aria-labelledby="#navbarOrderOptions">
-            <a class="dropdown-item" href="#">My Past Orders</a>
-            <a class="dropdown-item" href="#">Department's Past Orders</a>
-          </div>
-        </li>
+	<title>OSC | Dashboard</title>
+  </head>
+  <body>
+	<div id="skip-link">
+		<a href="#main-content" class="sr-only sr-only-focusable">Skip to main content</a>
+	</div>
+	<header role="banner">
+		<nav class="navbar navbar-expand-lg" id="aux-nav">
+			<div class="container">
+				<div class="navbar-brand"><a class="logo" href="/">Online Service Center</a></div>
+				<button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target=".navbars" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+						<i class="fas fa-bars text-light"></i>
+				</button>
+				<div class="collapse navbar-collapse navbars" aria-label="Auxiliary Navigation" role="navigation">
+				<ul class="navbar-nav ml-auto">
+					{% if user.is_authenticated %}
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="javascript;" id="toolsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Tools
+						</a>
+						<div class="dropdown-menu" aria-labelledby="toolsDropdown">
+							<a class="dropdown-item" href="/auth/deptpriv/">Department Look Up</a>
+							<a class="dropdown-item" href="/tools/costestimator">Cost Estimator</a>
+							<a class="dropdown-item" href="/chartchange/">Chartfield Change Request</a>
+							<a class="dropdown-item" href="/tools/voip/">VOIP Location Change</a>
+						</div>
+					</li>
+					{% endif %}
+					<li class="nav-item">
+						<a class="nav-link" href="/help">Help</a>
+					</li>
+					{% if user.is_authenticated %}
+					<li class="nav-item dropdown ">
+						<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								{{ user.get_full_name }}
 
-      </ul>
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="#navbarSupportOptions" role="button" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">Support</a>
-          <div class="dropdown-menu" aria-labelledby="#navbarSupportOptions">
-            <a class="dropdown-item" href="http://osc-dev.openshift.dsc.umich.edu/intro">Introduction</a>
-            <a class="dropdown-item" href="http://osc-dev.openshift.dsc.umich.edu/howtouse">How to Use</a>
-            <a class="dropdown-item" href="http://osc-dev.openshift.dsc.umich.edu/palo">Placing a large Order</a>
-            <a class="dropdown-item" href="http://osc-dev.openshift.dsc.umich.edu/andb">Authorization and Billing</a>
-            <a class="dropdown-item" href="http://osc-dev.openshift.dsc.umich.edu/contactus">Contact Us</a>
-          </div>
-        </li>
+						</a>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+							{% if user.is_superuser %}
+								<a class="dropdown-item" href="/admin/">Admin</a>
+							{% endif %}
 
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="#navbarAccountSettings" role="button" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-            Account Settings
-          </a>
-          <div class="dropdown-menu" aria-labelledby="#navbarAccountSettings">
-            <a class="dropdown-item" href="#">Manage Access</a> <!-- Link to Manage Access similar to Manage Access in current OSC-->
-            <a class="dropdown-item" href="#">My Privileges</a> <!-- Link to view personal profile similar to view my system priveleges in current OSC-->
-            <a class="dropdown-item" href="#">ChartField Change Request</a> <!-- Link to view ChartField Change Request app-->
-          </div>
-        </li>
+							{% if not request.session.exit_users_pk %}
+              					<a class="dropdown-item" href="/auth/su_login/">Impersonate</a>
+            				{% endif %}
+            				{% if request.session.exit_users_pk %}
+              					<a class="dropdown-item" href="/auth/su/">Exit Impersonate</a>
+							{% endif %}
+							{% if perms.oscauth.can_administer_access %}
+								<a class="dropdown-item" href="/auth/get_uniqname/">Manage Access</a>
+							{% endif %}
+							<a class="dropdown-item" href="/orders/chartcom/0">Manage Chartfields</a>								
+							<a class="dropdown-item" href="/auth/mypriv/">View System Privileges</a>
+							<a class="dropdown-item"  href="/auth/logout/">Logout</a>
+						</div>
+					</li>
+					{% else %}
+					<li class="nav-item">
+							<a class="nav-link" href="{% url 'oidc_authentication_init' %}">Login</a>
+					</li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<nav class="navbar navbar-expand-lg" id="main-nav">
+		<div class="container">
+			<div class="collapse navbar-collapse navbars" aria-label="Main Site Navigation" role="navigation">
+				<ul class="navbar-nav /nav-fill w-100">
+					{% if perms.oscauth.can_order %}
+					<li class="nav-item">
+						<a class="nav-link" href="/orders/services/">Request Service</a>
+					</li>
+					{% endif %}
+					<li class="nav-item dropdown">
+						{% if perms.oscauth.can_report %}
+						<a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Run Reports
+						</a>
+						<div class="dropdown-menu" aria-labelledby="reportsDropdown">
+							<a class="dropdown-item" href="/reports/metrics/">Departmental Telephone Service Metrics</a>
+							<a class="dropdown-item" href="/reports/doc/">Detail of Charges</a>
+							<a class="dropdown-item" href="/reports/inventory/">Inventory and Location Report</a>
+							<a class="dropdown-item" href="/reports/soc">Summary of Charges</a>
+							<a class="dropdown-item" href="/reports/tolls/">Toll Statements</a>
+						</div>
+						{% endif %}
+					</li>
+					{% if perms.oscauth.can_order %}
+					<li class="nav-item">
+						<a class="nav-link" href="/orders/cart/0">View Cart</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/orders/status/0">Track Orders</a>
+					</li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+	</header>
 
-      </ul>
-    </div>
-  </nav>
-  <div class="container" role="main">
-    <h1>Title of the Page Goes Here</h1>
-    <div class="row">
-      <div class="col-lg-9">
-        <div class="alert alert-primary" role="alert">
-          <h4 class="alert-heading">This is a bulletin message</h4>
-          <p>Coming Soon - A New version of the Online Service Center stay tuned. </p>
-          <hr>
-          <p>We can hide this message. Just an idea of how we can show bulletins on OSC</p>
-        </div>
+	<div id="main-content" class="container" role="main">
+		<h1>{{ title }}</h1>
+    
+    {% block content %}{% endblock content %}
+    {% autoescape off %}
+    {{ content }}
+    {% endautoescape %}
 
-      </div>
+	</div>
+  
+	<footer role="contentinfo">
+		<div class="container">
 
-    </div>
-  </div>
+		<div class="umich"><a href="https://umich.edu/">University of Michigan</a></div>
+
+		<div class="links">
+			<h2><a href="https://its.umich.edu/">Information and Technology Services</a></h2>
+			<ul>
+			<li><a href="https://its.umich.edu/about">About ITS</a></li>
+			<li><a href="https://safecomputing.umich.edu/">Safe Computing</a></li>
+			<li><a href="https://status.its.umich.edu/">ITS Service Status</a></li>
+			<li><a href="https://its.umich.edu/web-strategy/">ITS Web Strategy</a></li>
+			</ul>
+		</div>
+
+		<div class="links">
+			<h2>Stay Connected</h2>
+			<div class="socialmedia">
+			<a href="https://twitter.com/umichTECH"><span class="fab fa-twitter"><span class="sr-only">Twitter</span></span></a>
+			<a href="https://www.youtube.com/user/UMITSCommunications"><span class="fab fa-youtube"><span class="sr-only">YouTube</span></span></a>
+			</div>
+			<p><a href="/help">Contact ITS</a></p>
+		</div>
+
+		<div class="links right">
+			<ul>
+			<li><a href="https://maizelink.umich.edu/">MaizeLink</a></li>
+			<li><a href="https://wolverineaccess.umich.edu/">Wolverine Access</a></li>
+			<li><a href="https://it.umich.edu/">Office of the VPIT-CIO</a></li>
+			</ul>
+		</div>
+
+		<div class="copyright"><a href="http://www.regents.umich.edu/">&copy; 2019 The Regents of the University of Michigan</a></div>
+		
+		</div>
+	</footer>
 
   <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
-</body>
+	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	
 
+	<!-- Select with search -->
+<!-- 	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="{% static 'select2-bootstrap4.css' %}">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+	<link rel="stylesheet" href="/static/select2-bootstrap4.css"> -->
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+
+	<!-- Select with search -->
+<!-- 	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+	<link rel="stylesheet" href="/static/select2.css">
+	<link rel="stylesheet" href="/static/select2-bootstrap4.css"> -->
+
+
+  {% block js %}{% endblock js %}
+  </body>
 </html>

@@ -1,0 +1,35 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+{% block after_field_sets %}
+
+
+    <fieldset class="module aligned {{ fieldset.classes }}">
+        <h4>Rendering:</h4>
+
+        <table>
+        {% for step in step_list %}
+        <tr><td><a href="/admin/order/step/{{ step.id }}/change/">{{ step.label }}</a></td></tr>
+            {% for element in step.element_list %}
+            <tr>
+                <td></td>
+                <td> <a href="/admin/order/element/{{ element.id }}/change/">{{ element.label }}</a> </td>
+                <td> {{ element.type }} </td>
+                <td> {{ element.target }} </td>
+            </tr>
+            {% endfor %}
+        {% endfor %}
+        </table>
+        <hr>
+        <h4>Constants</h4>
+        <table>
+            {% for con in consts %}
+            <tr>
+            <td><a href="/admin/order/constant/{{ con.id }}/change/">{{ con.field }}</a></td><td>{{ con.value }}</td> 
+            </tr>
+            {% endfor %}
+        </table>
+
+    </fieldset>
+    
+
+{% endblock %}

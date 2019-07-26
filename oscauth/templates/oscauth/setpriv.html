@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    /* Create four columns that floats next to each other */
+    .column {
+      float: left;
+      width: 20%;
+      padding: 10px;
+    }
+    
+
+    .left, .right {
+    width: 50%;
+    }
+
+    .middle {
+    width: 20%;
+    }
+
+    .deptid {
+    column-width:500px;
+    width:500px;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+</style>
+    
+
+<form action="/auth/get_uniqname/" method="POST">{% csrf_token %}
+    <h1>Manage Access</h1>
+
+    <h2>Select Person</h2>
+    <div>
+        <label for="uniqname-field">Enter a Uniqname</label>
+        <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short">
+        <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
+        {% if uniqname_parm is None or result != '' %}
+        <strong class="prv-msgs">{{ result }}</strong>
+        {% else %}
+
+            {% if osc_user.exists %}
+            <strong>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
+            <input type='button' value='Show Current Access' class="btn btn-outline-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
+            {% else %}
+                <strong>{{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
+                 - User not found, add a role to create them.
+            {% endif %}
+        {% endif %}
+        <br>
+        <strong>{{ submit_msg }}</strong>
+    </div>
+</form>
+
+<form action="/auth/modpriv/" method="POST">{% csrf_token %}
+    <input type="hidden" id="uniqname" name="uniqname_parm" value="{{uniqname_parm}}">
+    <input type="hidden" id="last_name" name="last_name" value="{{last_name}}">
+    <input type="hidden" id="first_name" name="first_name" value="{{first_name}}">
+
+{% if last_name %}
+
+<h6>Please select a Task, a Role, and at least one Department then click Submit.</h6>
+
+<h7>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></h7>
+
+<div class="row access-action-row">
+    <div class="column">
+        <h2>Select Task</h2>
+        <div class="form-check">
+            <input id="roleAdd" type='radio' name="taskrad" value='add' class="form-check-input">
+            <label for="roleAdd" class="form-check-label">Add Access</label><br>
+            <input id="roleDelete" type='radio' name="taskrad" value='remove' class="form-check-input">
+            <label for="roleDelete" class="form-check-label">Remove Access</label>
+        </div>
+    </div>
+    <div class="column" id="addRole">
+        <h2>Select Role</h2>
+        <div class="form-check">
+            {% for role in grantable_roles %}
+            <input type='radio' name="rolerad" value={{ role.role }} id={{ role.role }} class="form-check-input">
+            <label for={{ role.role }} class="form-check-label">{{ role.role }}</label>
+            <br>
+        {% endfor %}
+        </div>
+    </div>
+    <div class="column" id="deleteRole">
+        <h2>Select Role</h2>
+        <div class="form-check">
+            {% for role in grantable_roles %}
+            <input type='checkbox' name="rolerad" value={{ role.role }} id={{ role.role }} class="form-check-input">
+            <label for={{ role.role }} class="form-check-label">{{ role.role }}</label>
+            <br>
+            {% endfor %}
+        </div>
+        
+    </div>
+    <div class="column deptid">
+        <h2>Select Department</h2>
+        <div class="form-check">
+            <input type="checkbox" onclick="toggle(this);" id="selectAllDepts" class="form-check-input">
+            <label for="selectAllDepts" class="form-check-label">Select All Departments</label><br>
+            {% for row in rows %}
+                {% if row.dept_status != 'I' %}
+                <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
+                <label for="dept.{{ row.dept }}" class="form-check-label">{{ row.dept }} - {{ row.dept_name }}</label>
+                {% else %}
+                <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
+                <label for="dept.{{ row.dept }}" class="form-check-label prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>  {{ row.dept }} - {{ row.dept_name }}</label>
+                {% endif %}
+                <br>
+            {% endfor %} 
+        </div>
+    </div>
+    <div class="column">
+        <input type='submit' name='process_access' value='Submit' class="btn btn-primary">
+    </div>
+</div>
+
+{% endif %}
+</form>
+
+{% endblock %}
+
+{% block js %}
+<script language="JavaScript">
+
+$(document).ready(function() {
+
+    $('#deleteRole').hide();
+
+    $("#roleAdd").click(function(event) {
+        $('#deleteRole').hide();
+        $('#addRole').show();
+    });
+
+    $("#roleDelete").click(function(event) {
+        $('#deleteRole').show();
+        $('#addRole').hide();
+    });
+
+
+});
+
+
+function toggle(source) {
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    for (var i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i] != source)
+            checkboxes[i].checked = source.checked;
+    }
+}
+
+</script>
+{% endblock js %}
