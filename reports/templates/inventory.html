@@ -8,7 +8,7 @@
                 <div class="message">
                     <hr class="style1">
                     <p>
-                        This report is currently under construction.<br>
+                        This report is currently under construction.<br/>
                         If you would like to run this report, please visit the Online Service Center and click on Inventory & Location Report under Reports.
                     </p>
                     <a href="https://blue.itcom.itd.umich.edu/UofM/WebObjects/OnlineServiceCenter.woa/1/" class="btn btn-outline-primary" role="button">Online Service Center</a>
@@ -22,99 +22,25 @@
  {% comment %} onsubmit="return validate()" {% endcomment %}
 {% block content %}
 
-<form action="/reports/inventory/" method="POST" name="Select">{% csrf_token %}
+<form action="/reports/inventory/report" method="POST" name="Select">{% csrf_token %}
         <div class="form-group col-md-6">
             {% if depts %}
             <h5>Department ID</h5>
                 <select class="form-control" style='font-size:16px' requried type="select" name="dept_id" id="dept_id" value="{{ i }}">
-                    <option>--Select--</option>
                     {% for dept in depts %}
-                    <option value="{{ dept }}">{{ dept }}</option>
-                    {% endfor %}
+                    <option value="{{ dept }}">{{ dept}}{% endfor %}
                 </select>
             <p id="display"></p>
             <p></p>
             <h5>Billing Period</h5>
                 <select class="form-control" style='font-size:16px' requried type="select" name="bill_period" id="bill_period" value="{{ i }}">
-                    <option>--Select--</option>
                     {% for date in dates %}
-                    <option value="{{ date }}">{{ date }}</option>
-                    {% endfor %}
+                    <option value="{{ date }}">{{ date }}{% endfor %}
                 </select>
             <p id="display"></p>
             <p></p>
             {% endif %}
-            <p><input type='submit' value='Generate Report' class="btn btn-primary"></p>
+            <p><input type='submit' value='Generate Report' class=""></p>
         </div>
 </form>
-{% if submit %}
-    <h5>Department: {{ dept_id }}</h5>
-    <h5>Billing Period: {{ bill_period }}</h5>
-    <br><br>
-
-
-
-{% for classification in formated_data %}
-
-<table class = "table table-sm mb-5" style="font-size:11px" >
-    
-    <caption class= "text-dark font-weight-bold" style='caption-side:top; font-size:15px;'>
-        Fund: {{classification.0.fund}} Department: {{classification.0.org}} 
-        Program: {{classification.0.program}} Class: {{classification.0.subclass}}
-        Project Grant: {{classification.0.project_grant}}
-    </caption>
-    <thead> 
-        <tr style = "background-color: orange">
-            <th>User Id</th>
-            <th>Usage</th>
-            <th>User ID Type</th>
-            <th>User ID Description</th>
-            <th>Calling Range/Restrictions</th>
-            <th>Last Outbound Call Date</th>
-            <th>Account</th>
-            <th>Charge Code</th>
-            <th>Charge Description</th>
-            <th>Quantity</th>
-            <th>Rate</th>
-            <th>Amount</th>
-        </tr>
-        
-    </thead>
-     <tbody>
-        {% for item in classification %}
-            <tr>
-                <td>{{item.user_defined_id}}</td>
-                <td>
-                    {% if item.t_use %}T {% endif %}
-                    {% if item.l_use %}L {% endif %}
-                    {% if item.m_use %}M {% endif %}
-                </td>
-                <td>{{item.cd_descr}}</td>
-                <td>{{item.last_name}}</td>
-                <td>{{item.ncos_desc}} {% if item.ncos %} ({{item.ncos}}) {% endif %}</td>
-                <td>{{item.last_call_date}}</td>
-                <td>{{item.mrc_account}}</td>
-                <td>{{item.item_code}}</td>
-                <td>{{item.item_description}}</td>
-                <td>{% if item.quantity %}{{item.quantity}}{% endif %}</td>
-                <td>{% if item.unit_price %}${{item.unit_price}}{% endif %}</td>
-                <td>{% if item.charge_amount %}${{item.charge_amount}}{% endif %}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-    <tr style= 'background-color:silver'>
-        <td>Total Monthly Charges to this Chartfield:</td>
-        <td colspan = '10'</td>
-        <td>${{cost_table|index:forloop.counter0}}</td>
-    </tr>
-</table>
-<br>
-{% endfor %}
-{% endif %}
-
-
-
- 
-
-
 {% endblock %}
