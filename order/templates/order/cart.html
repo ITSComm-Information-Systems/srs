@@ -45,11 +45,11 @@
                             <h2>Ready to Order</h2>   
                         {% for chartcom in acct %}
                         <div class="cart-table">
-                            <h2 class="small-h2">
+                            <h4 class="cart-chartfield-title">
                                 Chartfield: 
                                 <!-- Insert Chartfield Nickname here -->
-                                <small class="text-muted">{{chartcom.chartcom}} ({{chartcom.chartcom.account_number}}) </small>
-                            </h2>
+                                <small >{{chartcom.chartcom}} ({{chartcom.chartcom.account_number}}) </small>
+                            </h4>
                         </div>
                         <div class="table-responsive-md">
                             <table class="table table-hover table-striped table-sm">
@@ -109,7 +109,7 @@
                                 </h4>
                             </div>
                             <div class="table-responsive-md">
-                                <table class="table table-hover table-striped table-sm table-bordered">
+                                <table class="table table-hover table-striped table-sm">
                                     <thead>
                                         <tr class="col-headings">
                                             <th scope="col">Date Created</th>
