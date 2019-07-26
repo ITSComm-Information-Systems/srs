@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load i18n admin_static %}
+
+{% block content %}
+
+<form action="." method="POST">{% csrf_token %}
+ 
+    {{ form }}
+    <div class="submit-row">
+      <input type="submit" name="submit" class="btn btn-primary" value="{% trans "Change Login" %}"/>
+    </div>
+
+  </form>
+
+{% endblock %}
+

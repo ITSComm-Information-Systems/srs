@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load index %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="fas fa-file-csv btn btn-success" style="font-size:20px;"> CSV Download</button>
+{% for classification in formated_data %}
+<div class = "table-responsive">
+<table class = "table table-sm mb-5 table-striped" style="font-size:12px" >
+    
+    <h3 class= "text-dark font-weight-bold">
+        Fund: {{classification.1.1.fund}} Department: {{classification.1.1.org}} 
+        Program: {{classification.1.1.program}} Class: {{classification.1.1.subclass}}
+        Project Grant: {{classification.1.1.project_grant}}
+    </h3>
+    <thead class = "thead-dark"> 
+        <tr >
+            <th>User Id</th>
+            <th>Usage</th>
+            <th>User ID Type</th>
+            <th>User ID Name</th>
+            <th>Location</th>
+            <th>Calling Range/Restrictions</th>
+            <th>Last Outbound Call</th>
+            <th>Account</th>
+            <th>Charge Code</th>
+            <th>Charge Description</th>
+            <th>Quantity</th>
+            <th>Rate</th>
+            <th>Amount</th>
+        </tr>
+        
+    </thead>
+     <tbody>
+        {% for phone in classification %}
+            <tr>
+                <td style = "vertical-align:middle">{{phone.0.user_defined_id}}</td>
+                <td style = "vertical-align:middle">{{phone.0.usage}}</td>
+                <td style = "vertical-align:middle">{{phone.0.cd_descr}}</td>
+                <td style = "vertical-align:middle">{{phone.0.first_name}} {{phone.0.last_name}}</td>
+                <td>{% for charge in phone %}{% if charge.jack%}Location: {{charge.building}}<br> Floor: {{charge.floor}} Room: {{charge.room}}<br>Jack: {{charge.jack}}<br>(As of {{charge.location_since_date}})<br>{% endif %}{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.ncos_desc%} {{charge.ncos_desc}} {% if charge.ncos %} ({{charge.ncos}})<br>{% endif %}{% endif %}{% endfor %}</td>
+                <td>{{phone.0.last_call_date}}</td>
+                <td>{{phone.0.mrc_account}}</td>
+                <td>{% for charge in phone %}{% if charge.item_code%}{{charge.item_code}}<br>{% endif%} {% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.item_description%} {{charge.item_description}}<br>{% endif %}{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.quantity%} {{charge.quantity}}{% endif %}<br>{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.unit_price%} {{charge.unit_price}}{% endif %}<br>{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.charge_amount%} ${{charge.charge_amount}}{% endif %}<br>{% endfor %}</td>
+                {% comment %} <td>{{item.ncos_desc}} {% if item.ncos %} ({{item.ncos}}) {% endif %}</td>
+                <td>{{item.last_call_date}}</td>
+                <td>{{item.mrc_account}}</td>
+                <td>{{item.item_code}}</td>
+                <td>{{item.item_description}}</td>
+                <td>{% if item.quantity %}{{item.quantity}}{% endif %}</td>
+                <td>{% if item.unit_price %}${{item.unit_price}}{% endif %}</td>
+                <td>{% if item.charge_amount %}${{item.charge_amount}}{% endif %}</td> {% endcomment %}
+            </tr>
+        {% endfor %}
+    </tbody>
+    <tr style= 'background-color:orange'>
+        <td>Total Charges:</td>
+        <td colspan = '11'></td>
+        <td>${{cost_table|index:forloop.counter0}}</td>
+    </tr>
+</table>
+</div>
+
+
+
+{% endfor %}
+
+
+<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
+
+
+
+ 
+<script>
+ // When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+ if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+   document.getElementById("scrollTop").style.display = "block";
+ } else {
+   document.getElementById("scrollTop").style.display = "none";
+ }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+}
+ 
+</script>
+
+<script>
+    function exportTableToCSV(filename) {
+        var csv = [];
+        var rows = document.querySelectorAll("table tr");
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll("td, th");
+
+            for (var j = 0; j < cols.length; j++) {
+                string = cols[j].innerHTML;
+                if (string.split("<br>").length==3)
+                    string = string.replace("<br>", " ||");
+                if (string.split("<br>").length==4) {
+                    string = string.replace("<br>", " ||");
+                    string = string.replace("<br>", " ||");
+                }
+                string = string.replace("<br>", "");
+                string = string.replace(',', '')
+                row.push(string);
+            }
+
+            csv.push(row.join(","));
+        }
+
+        // Download CSV file
+        downloadCSV(csv.join("\n"), filename);
+    }
+
+    function downloadCSV(csv, filename) {
+        var csvFile;
+        var downloadLink;
+
+        // CSV file
+        csvFile = new Blob([csv], { type: "text/csv" });
+
+        // Download link
+        downloadLink = document.createElement("a");
+
+        // File name
+        downloadLink.download = filename;
+
+        // Create a link to the file
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+
+        // Hide download link
+        downloadLink.style.display = "none";
+
+        // Add the link to DOM
+        document.body.appendChild(downloadLink);
+
+        // Click download link
+        downloadLink.click();
+    }
+</script>
+{% endblock %}

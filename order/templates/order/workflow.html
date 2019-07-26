@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form action="/orders/addtocart/" method="post" id="workflowForm" >
+  {% csrf_token %}
+  <input type="hidden" id="wfid" name="action_id" value="{{wfid}}">
+  <input type="hidden" id="wfname" name="action" value="{{title}}">
+
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    {% for tab in tab_list %}
+      <li class="nav-item">
+        <a class="nav-link disabled" data-toggle="tab" data-tab="{{ tab.name }}" id="pills-{{ tab.step }}" href="#{{ tab.step }}" role="tab" name="pills-{{ tab.name }}" aria-controls="pills-{{ tab.name }}" aria-selected="false">{{ tab.label }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+  <div class="tab-content" id="pills-tabContent">
+    {% for tab in tab_list %}
+      <div class="tab-pane fade" id="{{ tab.step }}" role="tabpanel" aria-labelledby="pills-contact-tab">
+          {% include tab.form.template %}
+      </div>
+    {% endfor %}
+
+    <div style="overflow:auto;">
+      <div style="float:right;">
+        <button type="button" class="btn btn-primary" id="prevBtn">Previous</button>
+        <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+      </div>
+    </div>
+
+  </div>
+
+
+</form>
+
+{% endblock %}
+
+{% block js %}
+<script src="/static/order/js/workflow.js"></script>
+<script src="/static/js/building_search.js"></script>
+{% endblock %}

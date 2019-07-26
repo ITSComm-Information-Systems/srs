@@ -1,0 +1,16 @@
+{% for tab in tab_list %}
+{% if tab.name != 'Review' %}
+<div data-tab="{{ tab.name }}" class="card border-secondary mb-3"">
+  <div class="card-header">{{tab.label}}</div>
+  <div class="card-body">
+    <p class="card-text">
+      {% for field in tab.form %}
+      <div id="{{field.name}}_review">
+        <b>{{ field.label_tag }} </b><span id="id_{{field.name}}_review"></span></br>
+      </div>
+      {% endfor %}
+    </p>
+  </div>
+</div>
+{% endif %}
+{% endfor %}

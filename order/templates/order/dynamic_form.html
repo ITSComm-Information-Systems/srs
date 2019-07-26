@@ -1,0 +1,60 @@
+{% for field in tab.form %}
+    {% if field.field.type == 'Radio' %}
+        <fieldset id="{{ field.name }}">
+            <legend>{{ field.label_tag }}</legend>
+            {% for choice in field.field.choices %}
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="{{ field.name }}_{{ choice|first }}"
+                    value="{{ choice|first }}" name="{{ field.name }}" required>
+                    <label class="custom-control-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
+                    {% if choice == field.field.choices|last %}
+                    <div class="invalid-feedback">Please choose one.</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <br>
+        </fieldset>
+    {% elif field.field.type == 'Chart' %}
+    {% if tab.name == '0chartfields' %}
+    <div id='dummyChartfield'>
+        <label>Chartfield for Tracking Purposes</label>
+        <em>There is no charge for this request. However, please select a chartfield for departmental tracking purposes.</em> 
+    </div>
+    {% endif %}
+    <div class="form-group row col-12" id="oneTimeCharges">
+        <!--  -->
+        <div class="form-check">
+    <label for="id_{{ field.name }}">{{ field.label_tag }}</label>
+    <div class="input-group mb3">
+        <!-- Select a Department (based off user's department access) -->
+            <div class="input-group-prepend">
+                <select class="custom-select" id="id_deptOneTimeCharges" data-target="{{ field.name }}" onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
+                    {% for dept in field.field.dept_list %}
+                        <option value="{{dept}}">{{dept}}</option>
+                    {% endfor %}                    
+                </select>
+            </div>
+
+            <!-- Select a Chartfield (based off user's selection for department that was selected above ^^^ - all options should be from department's shortlist) -->
+            <select name="{{ field.name }}" class="custom-select" id="id_{{ field.name }}">
+                {% for choice in field.field.choices %}
+                    <option name="{{ field.name }}" data-dept="{{ choice.2 }}" value="{{ choice.0 }}">{{ choice.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    </div>
+
+    {% else %}
+    <div class="form-group row col-4" id="{{ field.name }}">
+        <div class = "form-check">
+        {{ field.errors }}
+        {{ field.label_tag }} {{ field }}
+        <div class="invalid-feedback">Please enter a value.</div>
+        <div class="valid-feedback">Good.</div>
+        </div>
+    </div>
+    {% endif %}
+
+{% endfor %}
+ 

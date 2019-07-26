@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div id="main-content" class="container" role="main">
+    <div class="container" role="main">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="message">
+                    <hr class="style1">
+                    <p>
+                        This report is currently under construction.<br>
+                        If you would like to run this report, please visit the Online Service Center and click on Summary of Charges under reports.
+                    </p>
+                    <a href="https://blue.itcom.itd.umich.edu/UofM/WebObjects/OnlineServiceCenter.woa/1/" class="btn btn-outline-primary" role="button">Online Service Center</a>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ <form action="/reports/soc/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
+    {% if depts %}
+
+    <div style="width: 600px; float: left;">
+
+        <h2>Select Unit Grouping</h2>
+        <input type="radio" style='font-size:20px' name="unitGroupingGroup" id="deptid" value='1' checked> Department ID
+        <select multiple style='font-size:16px' name="department_id">
+            <option value="%">--Select--</option>
+            {% for dept in depts %}
+            <option value="{{ dept }}">{{ dept }}</option>
+            {% endfor %}
+        </select>
+        </br>
+        <p></p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name="unitGroupingGroup" id="deptidtext" value='2'> Select All
+        Departments (you have access to)
+        <p></p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name="unitGroupingGroup" id="deptgroup" value='3'> Department Group
+        <select style='font-size:16px' name="department_group" onchange="display_active({{active}})">
+            <option value="%">--Select--</option>
+            {% for group in groups_descr %}
+            <option value="{{ group }}">{{ group }}</option>
+            {% endfor %}
+        </select>
+        {% comment %} <span id="display">(Fiscal Years Active)</span> {% endcomment %}
+        </br>
+
+        <p></p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name="unitGroupingGroup" id="deptvp" value='4'> Department Group VP
+        Area
+        <select style='font-size:16px' name="department_vp">
+            <option value="%">--Select--</option>
+            {% for vp in vps %}
+            <option value="{{ vp }}">{{ vp }}</option>
+            {% endfor %}
+        </select>
+        </br>
+
+    </div>
+    <div style="margin-left: 620px;">
+        <br>
+
+        <p></p>
+        <h2>Choose Date Range</h2>
+        <input type="radio" style='font-size:20px' name="dateRangeGroup" id="fiscal" value='1' checked> Fiscal Year
+        <select style='font-size:16px' name="FISCALYEAR">
+            <option value="%">--Select--</option>
+            {% for year in fiscal %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+        </br>
+        <p></p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name="dateRangeGroup" id="calender" value='2'> Calender Year
+        <select style='font-size:16px' name="CALENDARYEAR">
+            <option value="%">--Select--</option>
+            {% for year in calendar %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+        </br>
+        <p></p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name="dateRangeGroup" id="single" value='3'> Single Month
+        <select style='font-size:16px' name="SINGLEMONTH">
+            <option value="%">--Select--</option>
+            {% for month in months %}
+            <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+        </select>
+        <select style='font-size:16px' name="SINGLEYEAR">
+            <option value="%">--Select--</option>
+            {% for year in calendar %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+        </br>
+        <p></p>
+        <p></p>
+        <input type="radio" style='font-size:20px' name="dateRangeGroup" id="multiple" value='4'> Month-to-month
+        <select style='font-size:16px' name="FIRSTMONTH">
+            <option value="%">--Select--</option>
+            {% for month in months %}
+            <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+        </select>
+        <select style='font-size:16px' name="FIRSTYEAR">
+            <option value="%">--Select--</option>
+            {% for year in calendar %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+        <span>to</span>
+        <select style='font-size:16px' name="SECONDMONTH">
+            <option value="%">--Select--</option>
+            {% for month in months %}
+            <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+        </select>
+        <select style='font-size:16px' name="SECONDYEAR">
+            <option value="%">--Select--</option>
+            {% for year in calendar %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+        </br>
+    </div>
+
+    {% endif %}
+    <br>
+    <br>
+    <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+    <br>
+</form>
+<p>{{grouping}}{% if submitfirst %} - {% endif %}{{unit}}</p>
+<p>{{dateRange}}{% if submitfirst %} - {% endif %}{{billing_period}}</p>
+
+{% if submit == False%}
+<p>{{ rows }}</p>
+{% endif %}
+
+
+{% if submit %}
+<table cellspacing="50" cellpadding="2" border="1" style="font-size:12px">
+    <thead>
+        <tr>
+            <th>Expense Account</th>
+            <th>Item Description</th>
+            <th>Charge Codes</th>
+            <th>Rate</th>
+            <th>Billed Units</th>
+            <th>Item Total</th>
+            <th>Item Group Total</th>
+            <th>Account Total</th>
+
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for row in table.0.0 %}
+        <tr>
+            <td><b style="color:blue">{{ row.0 }} ({{ row.1 }})
+                    <input type="checkbox" name={{row.1}} id="" data-toggle="toggle" checked>
+                </b></td>
+
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><b style="color:blue">${{ row.3 }}</b></td>
+        </tr>
+    <tbody class="hide">
+        {% for charge in row.2%}
+        <tr>
+            <td style="color:red">{{ charge.0 }}
+                {% comment %} <input type="checkbox" name={{charge.0}} id="1" data-toggle="toggle2" checked>
+                {% endcomment %}
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="color:red">${{ charge.2}}</td>
+            <td></td>
+        <tr>
+            {% for code in charge.1%}
+        <tr class="hide2">
+            <td></td>
+            <td>{{ code.0 }}</td>
+            <td>{{ code.1 }}</td>
+            <td>${{ code.2 }}</td>
+            <td>{{ code.3 }}</td>
+            <td>${{ code.4 }}</td>
+            <td></td>
+            <td></td>
+        </tr>
+        {% endfor %}
+
+        {% endfor %}
+    </tbody>
+    {% endfor %}
+    <tr>
+        <td><b style="color:green">Total ITCom Charges</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><b style="color:green">${{table.0.1}}</td>
+    </tr>
+    </tbody>
+
+</table>
+<p></p>
+<p></p>
+<button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')">Download Table To
+    CSV File</button>
+
+{% endif %} -->
+
+<script>
+    function display_active(active) {
+        var group = document.forms["Select"]["department_group"];
+        var index = group.selectedIndex - 1;
+        document.getElementById("display").innerHTML = active[index]
+
+    }
+</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="toggle"]').change(function () {
+            $(this).parents().next('.hide').toggle();
+        });
+    });
+</script>
+<script>
+    function exportTableToCSV(filename) {
+        var csv = [];
+        var rows = document.querySelectorAll("table tr");
+
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll("td, th");
+
+            for (var j = 0; j < cols.length; j++)
+                row.push(cols[j].innerText);
+
+            csv.push(row.join(","));
+        }
+
+        // Download CSV file
+        downloadCSV(csv.join("\n"), filename);
+    }
+
+    function downloadCSV(csv, filename) {
+        var csvFile;
+        var downloadLink;
+
+        // CSV file
+        csvFile = new Blob([csv], { type: "text/csv" });
+
+        // Download link
+        downloadLink = document.createElement("a");
+
+        // File name
+        downloadLink.download = filename;
+
+        // Create a link to the file
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+
+        // Hide download link
+        downloadLink.style.display = "none";
+
+        // Add the link to DOM
+        document.body.appendChild(downloadLink);
+
+        // Click download link
+        downloadLink.click();
+    }
+</script>
+{% endblock %}
