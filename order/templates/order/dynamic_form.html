@@ -4,9 +4,10 @@
             <legend>{{ field.label_tag }}</legend>
             {% for choice in field.field.choices %}
                 <div class="custom-control custom-radio">
-                    <input type="radio" class="custom-control-input" id="{{ field.name }}_{{ choice|first }}"
-                    value="{{ choice|first }}" name="{{ field.name }}" required>
-                    <label class="custom-control-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
+                    <label class="custom-control-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}
+                        <input type="radio" class="custom-control-input" id="{{ field.name }}_{{ choice|first }}"
+                        value="{{ choice|first }}" name="{{ field.name }}" required>
+                    </label>
                     {% if choice == field.field.choices|last %}
                     <div class="invalid-feedback">Please choose one.</div>
                     {% endif %}
