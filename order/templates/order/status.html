@@ -3,22 +3,23 @@
 
 <!-- Beginning of Content -->
 <div id="main-content" class="container" role="main">
-    <h1>Track Orders
-        <small class="text-muted">
-            for Department:
-            <strong>{{department.id}} - {{department.name}}
-            </strong>
-        </small>
-    </h1>
-    <div class="container" role="main">
-        <div class="row">
-            <div class="col-lg-12">
-                <!-- Beginning of Department name/Search -->
-                <div class="select-dept">
-
+    <div class="row header-info">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12">
+                    <h1>
+                        Track Orders
+                        <small class="text-muted">
+                            for Department: <strong>{{department.id}} - {{department.name}}</strong>
+                        </small>
+                    </h1>
+                </div>
+            </div>
+            <div class='row'>
+                <div class="col-xl-8 col-12 dept-select">
                     <div class="input-group mb-3 dept-dropdown">
                         <div class="input-group-prepend">
-                            <label class="input-group-text">
+                            <label class="input-group-text" for="selectDept">
                                 Switch Department
                             </label>
                         </div>
@@ -29,10 +30,14 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <!-- End of Department Dropdown -->
                 </div>
-                <!-- End of Department Name/Search -->
+            </div>
+        </div>
+    </div>
 
+    <div class="container" role="main">
+        <div class="row">
+            <div class="col-lg-12">
                 <!-- Beginning of Filter/Search -->
                 <div class="filter-container">
                     <!-- Beginning of Search Bar -->
