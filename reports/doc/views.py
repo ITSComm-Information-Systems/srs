@@ -17,7 +17,7 @@ from django import forms
 from ldap3 import Server, Connection, ALL
 
 from oscauth.models import AuthUserDept
-from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscOtsCallSummaryV, UmOscAcctdetailMrcOccV, UmOscPhoneHistoryV, UmOscServiceLocV, UmOscRatedV
+from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscOtsCallSummaryV, UmOscAcctdetailMrcOccV, UmOscPhoneHistoryV, UmOscServiceLocV, UmOscRatedV, UmOscRptSubscrib_Api_V
 from oscauth.forms import *
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -25,6 +25,7 @@ import json
 from django.http import JsonResponse
 
 from datetime import datetime
+from django.shortcuts import redirect
 
 # Load intial Detail of Charge page
 @permission_required('oscauth.can_report', raise_exception=True)
@@ -78,60 +79,72 @@ def generate_report(request):
 	name = UmOscDeptProfileV.objects.filter(deptid=selected_dept)
 	selected_dept = selected_dept + ' - ' + name[0].dept_name
 
-	# Fix date format - this is way too messy
-	date = bill_date.replace('.', '')
-	date = date.replace(',', '')
-	date = date.split(' ')
-	date[0] = date[0][0:3]
-	date = date[0] + ' ' + date[1] + ' ' + date[2]
-	date = datetime.strptime(date, '%b %d %Y')
-	date = str(date.year) + '-' + str(date.month) + '-' + str(date.day)
+	# Fix date format
+	date = format_date(bill_date)
+
+	# Fix chartfield format
+	chartcoms = format_chartcoms(chartcoms)
 
 
+	has_data = False
 	charge_types = []
 	for cf in chartcoms:
+		# Create tables for each user defined ID type
 		all_data = UmOscOtsCallSummaryV.objects.filter(billing_date=date, account_number=cf).order_by('user_defined_id')
-
 		prefixes = {}
 		charges = {}
 		total = 0
 		for a in all_data:
-			prefix = a.user_defined_id.split('-')
-			prefix = prefix[0]
+			# Only include 'telephony'
+			initial_prefix = a.user_defined_id.split('-')[0]
+			prefix_query = UmOscRptSubscrib_Api_V.objects.filter(subscriber_prefix=initial_prefix)
+			# prefix_query = ''
+			if a.dtl_of_chrgs_telephony and not (a.mrc_amount == 0 and a.tot_call_amount == 0):
+				# Determine user defined ID type - will come from new view
+				if prefix_query:
+					prefix = prefix_query[0].subscriber_desc
+					if prefix == '':
+						prefix = 'Misc.'
+				else:
+					prefix = 'Misc.'
 
-			# Type of charges
-			if prefix in prefixes:
-				prefixes[prefix] += a.tot_amount
-			else:
-				prefixes[prefix] = a.tot_amount
-			total += a.tot_amount
+				# Add new user defined ID type if applicable
+				if prefix in prefixes:
+					prefixes[prefix] += a.tot_amount
+				else:
+					prefixes[prefix] = a.tot_amount
+				total += a.tot_amount
 
-			# Charge tables
-			user_id = {
-				'user_defined_id': a.user_defined_id,
-				'subscriber_id': a.subscriber_id,
-				'monthly_charges': '${:,.2f}'.format(a.mrc_amount),
-				'call_number': a.tot_call_count,
-				'call_amount': '${:,.2f}'.format(a.tot_call_amount),
-				'total_charges': a.tot_amount
-			}
-			if prefix not in charges:
-				charges[prefix] = {
-					'rows': [],
-					'total': 0
+				# Create a row for the charges table
+				user_id = {
+					'user_defined_id': a.user_defined_id,
+					'subscriber_id': a.subscriber_id,
+					'monthly_charges': '${:,.2f}'.format(a.mrc_amount),
+					'call_number': a.tot_call_count,
+					'call_amount': '${:,.2f}'.format(a.tot_call_amount),
+					'total_charges': a.tot_amount
 				}
-			charges[prefix]['rows'].append(user_id)
-			charges[prefix]['total'] += user_id['total_charges']
+				if prefix not in charges:
+					charges[prefix] = {
+						'rows': [],
+						'total': 0
+					}
+				# Add row to appropriate table
+				has_data = True
+				charges[prefix]['rows'].append(user_id)
+				charges[prefix]['total'] += user_id['total_charges']
 
 		
-		# Monthly Service Charges table
-		monthly_query = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf, charge_type="MRC")
+		# Create Monthly Service Charges table
+		monthly_query = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf, charge_type="MRC").order_by('item_code')
 		monthly_data = {}
 		monthly_total = 0
 		for m in monthly_query:
+			# Item code already exists in table
 			if m.item_code in monthly_data:
 				monthly_data[m.item_code]['quantity'] += int(m.quantity)
 				monthly_data[m.item_code]['total'] += m.charge_amount
+			# New item code for table
 			else:
 				monthly_data[m.item_code] = {
 					'desc': m.item_description,
@@ -139,6 +152,7 @@ def generate_report(request):
 					'quantity': int(m.quantity),
 					'total': m.charge_amount
 				}
+			has_data = True
 			monthly_total += m.charge_amount
 
 		
@@ -154,36 +168,108 @@ def generate_report(request):
 			charges[c]['total'] = '${:,.2f}'.format(charges[c]['total'])
 
 
-		# One Time Charges and Credits
-		occ_charges = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf, charge_type="OCC")
+		# Create One Time Charges, Work Order Summary, and Credits tables
+		occ_charges = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf, charge_type="OCC").order_by('item_code')
 		occ_rows = []
 		occ_total = 0
+		credits = []
+		credit_total = 0
+		otc_rows = []
+		otc_total = 0
 		for c in occ_charges:
-			if not any(r['work_order'] == c.package_code for r in occ_rows):
-				row = {
-					'work_order': c.package_code,
-					'desc': 'Labor/Service Order and Equipment',
-					'total_amt': c.charge_amount
-				}
-				occ_rows.append(row)
+			has_data = True
+			# If OCC is a credit
+			if c.charge_amount < 0:
+				# New item code for table
+				if not any (c['item_code'] == c.item_code for c in credits):
+					credit = {
+						'item_code': c.item_code,
+						'credit': abs(c.charge_amount)
+					}
+					credits.append(credit)
+				# Item code already exists in table
+				for cr in credits:
+					if cr['item_code'] == c.item_code:
+						cr['credit'] += abs(c.charge_amount)
+				credit_total += abs(c.charge_amount)
+			# If OCC is a work order
+			elif c.package_code:
+				# New work order for table
+				if not any(rw['work_order'] == c.package_code for rw in occ_rows):
+					row = {
+						'work_order': c.package_code,
+						'total_amt': c.charge_amount,
+						'equip': 0,
+						'sol': 0
+					}
+					# If labor charge
+					if c.item_code.startswith('LB'):
+						row['sol'] = c.charge_amount
+					# If Service Order/Equipment charge
+					else:
+						row['equip'] = c.charge_amount
+					occ_rows.append(row)
+				# Work order already exists in table
+				else:
+					for row in occ_rows:
+						if row['work_order'] == c.package_code:
+							row['total_amt'] += c.charge_amount
+							# If equipment charge
+							if c.item_code.startswith('LB'):
+								row['sol'] += c.charge_amount
+							# If Service Order/Labor charge
+							else:
+								row['equip'] += c.charge_amount
+				occ_total += c.charge_amount
+			# Create One Time Charges table
 			else:
-				row['total_amt'] += c.charge_amount
-			occ_total += c.charge_amount
+				# New item code for table
+				if not any(rw['item_code'] == c.item_code for rw in otc_rows):
+					row = {
+						'item_code': c.item_code,
+						'desc': c.item_description,
+						'qty': int(c.quantity),
+						'total': c.charge_amount
+					}
+					otc_rows.append(row)
+				# Item code already exists in table
+				else:
+					for o in otc_rows:
+						if o['item_code'] == c.item_code:
+							o['qty'] += int(c.quantity)
+							o['total'] += c.charge_amount
+				otc_total += c.charge_amount
+
+
+		# Make it look like money $$
 		for r in occ_rows:
 			r['total_amt'] = '${:,.2f}'.format(r['total_amt'])
+			r['equip'] = '${:,.2f}'.format(r['equip'])
+			r['sol'] = '${:,.2f}'.format(r['sol'])
+		for c in credits:
+			c['credit'] = '${:,.2f}'.format(c['credit'])
+		for o in otc_rows:
+			o['total'] = '${:,.2f}'.format(o['total'])
 
 		
+		# Add all tables to that chartfield
 		data = {
 			'account_number': cf,
+			'data': has_data,
 			'type_summary': prefixes,
 			'type_total': '${:,.2f}'.format(total),
 			'charge_tables': charges,
 			'monthly_data': monthly_data,
 			'monthly_total': '${:,.2f}'.format(monthly_total),
 			'occ': occ_rows,
-			'occ_total':'${:,.2f}'.format(occ_total)
+			'occ_total':'${:,.2f}'.format(occ_total),
+			'credits':credits,
+			'credit_total': '${:,.2f}'.format(credit_total),
+			'otc': otc_rows,
+			'otc_total': '${:,.2f}'.format(otc_total)
 		}
 		charge_types.append(data)
+		has_data = False
 
 
 	context= {
@@ -211,34 +297,20 @@ def show_detail(request):
 	sub_id = request.POST.get('sub_id:' + user_id)
 	charge_type = request.POST.get('charge_type:' + user_id)
 
-	charge_type = 'Phone' # TEST - GET FROM OTHER PAGE
+	# Fix date format
+	date = format_date(bill_date)
 
-	# Fix date format - this is way too messy - make into a function
-	date = bill_date.replace('.', '')
-	date = date.replace(',', '')
-	date = date.split(' ')
-	date[0] = date[0][0:3]
-	date = date[0] + ' ' + date[1] + ' ' + date[2]
-	date = datetime.strptime(date, '%b %d %Y')
-	date = str(date.year) + '-' + str(date.month) + '-' + str(date.day)
-
-	# Fix format of chartcom string list - this is messy
-	chartcoms = chartcoms.replace('[','')
-	chartcoms = chartcoms.replace(']','')
-	chartcoms = chartcoms.replace(',','')
-	chartcoms = chartcoms.replace(' ', '')
-	chartcoms = chartcoms.split('\'')
-	format_chartcoms = []
-	for c in chartcoms:
-		if len(c) != 0:
-			format_chartcoms.append(c)
+	# Fix format of chartcom string list
+	chartcoms = format_chartcoms(chartcoms)
 
 	# Return button functionality
+	return_dept = selected_dept.split(' ')[0]
 	return_button = {
-		'select_dept': selected_dept,
+		'select_dept': return_dept,
 		'bill_date': bill_date,
-		'chartcoms': format_chartcoms
+		'chartcoms': chartcoms
 	}
+
 
 	# Find details for info box
 	box_detail = UmOscPhoneHistoryV.objects.filter(user_defined_id=user_id, date_snapshot=date)
@@ -250,92 +322,155 @@ def show_detail(request):
 
 	total = 0
 
-	# Monthly Charges table
-	rows = []
-	monthly_total = 0
-	monthly_data = UmOscAcctdetailMrcOccV.objects.filter(account_number=chartcom, billing_date=date, charge_type="MRC", subscriber_id=sub_id)
-	for m in monthly_data:
-		if not any(r['item_code'] == m.item_code for r in rows):
-			row = {
-				'item_code': m.item_code,
-				'desc': m.item_description,
-				'unit_price': '${:,.2f}'.format(m.unit_price),
-				'quantity': int(m.quantity),
-				'total_charge': m.charge_amount
-			}
-			rows.append(row)
-		else:
-			row['quantity'] += int(m.quantity)
-			row['total_charge'] += m.charge_amount
-		monthly_total += m.charge_amount
-	for r in rows:
-		r['total_charge'] = '${:,.2f}'.format(r['total_charge'])
-	total += monthly_total
+	monthly_data = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, charge_type="MRC", subscriber_id=sub_id).order_by('item_code')
+	toll_data = UmOscRatedV.objects.filter(subscriber_id=sub_id, batch_date=date, call_description="Toll").order_by('connect_date')
+	local_data = UmOscRatedV.objects.filter(subscriber_id=sub_id, batch_date=date, call_description="Local").order_by('connect_date')
 
-	# Local and Toll Charges tables
-	local = []
-	toll = []
-	local_total = 0
-	toll_total = 0
-	phone_num = user_id.split('-')
-	phone_num = phone_num[1]
-	rated_data = UmOscRatedV.objects.filter(subscriber_id=sub_id, from_number=phone_num, batch_date=date)
-	for r in rated_data:
-		if r.call_description == 'Local':
-			l = {
-				'connect_date': r.connect_date,
-				'to_num': r.to_number,
-				'location': r.place_name + ', ' + r.state_name,
-				'duration': r.call_duration,
-				'total_charge': r.amount_billed,
+	chartfields = []
+
+	# Find monthly charges
+	for m in monthly_data:
+		# New chartfield
+		if not any(c['account'] == m.account_number for c in chartfields):
+			chartfield = {
+				'account': m.account_number,
+				'monthly': [],
+				'monthly_total': 0,
+				'toll': [],
+				'toll_total': 0,
+				'local': [],
+				'local_total': 0,
+				'cf_total': 0
 			}
-			local_total += r.amount_billed
-			l['total_charge'] = '${:,.2f}'.format(l['total_charge'])
-			local.append(l)
-		elif r.call_description == 'Toll':
-			t = {
-				'connect_date': r.connect_date,
-				'to_num': r.to_number,
-				'location': r.place_name + ', ' + r.state_name,
-				'duration': r.call_duration,
-				'total_charge': r.amount_billed,
+
+			# Create a row of monthly data
+			monthly_row = {
+				'item_code': m.item_code,
+	 			'desc': m.item_description,
+	 			'unit_price': '${:,.2f}'.format(m.unit_price),
+	 			'quantity': int(m.quantity),
+ 				'total_charge': m.charge_amount
 			}
-			toll_total += r.amount_billed
+			chartfield['monthly'].append(monthly_row)
+			chartfield['monthly_total'] += m.charge_amount
+			chartfield['cf_total'] += m.charge_amount
+			chartfields.append(chartfield)
+
+		# Chartfield already accounted for
+		else:
+			for c in chartfields:
+				if c['account'] == m.account_number:
+					# New item code for table
+					if not any(month['item_code'] == m.item_code for month in c['monthly']):
+						# Create a row of monthly data
+						monthly_row = {
+							'item_code': m.item_code,
+				 			'desc': m.item_description,
+				 			'unit_price': '${:,.2f}'.format(m.unit_price),
+				 			'quantity': int(m.quantity),
+			 				'total_charge': m.charge_amount
+						}
+						c['monthly'].append(monthly_row)
+					# Roll up by item code
+					else:
+						for m in monthly:
+							if m['item_code'] == m.item_code:
+								m['quantity'] += int(m.quantity)
+								m['total_charge'] += m.charge_amount
+					c['monthly_total'] += m.charge_amount
+					c['cf_total'] += m.charge_amount
+		total += m.charge_amount
+
+	# Find toll charges
+	for t in toll_data:
+		# Create new chartfield if necessary
+		if not any(c['account'] == t.expense_account for c in chartfields):
+			chartfield = {
+				'account': t.expense_account,
+				'monthly': [],
+				'monthly_total': 0,
+				'toll': [],
+				'toll_total': 0,
+				'local': [],
+				'local_total': 0,
+				'cf_total': 0
+			}
+			chartfields.append(chartfield)
+
+		for c in chartfields:
+			if c['account'] == t.expense_account:
+				# Create a row of toll data
+				toll_row = {
+					'connect_date': t.connect_date,
+		 			'to_num': t.to_number,
+		 			'location': t.place_name + ', ' + t.state_name,
+		 			'duration': t.call_duration,
+					'total_charge': t.amount_billed
+				}
+				c['toll'].append(toll_row)
+				c['toll_total'] += t.amount_billed
+				c['cf_total'] += t.amount_billed
+		total += t.amount_billed
+
+	# Find local charges
+	for l in local_data:
+		# Creat new chartfield if necessary
+		if not any(c['account'] == l.expense_account for c in chartfields):
+			chartfield = {
+				'account': l.expense_account,
+				'monthly': [],
+				'monthly_total': 0,
+				'toll': [],
+				'toll_total': 0,
+				'local': [],
+				'local_total': 0,
+				'cf_total': 0
+			}
+			chartfields.append(chartfield)
+
+		for c in chartfields:
+			if c['account'] == l.expense_account:
+				# Create a row of toll data
+				local_row = {
+					'connect_date': l.connect_date,
+		 			'to_num': l.to_number,
+		 			'location': l.place_name + ', ' + l.state_name,
+		 			'duration': l.call_duration,
+					'total_charge': l.amount_billed
+				}
+				c['local'].append(local_row)
+				c['local_total'] += l.amount_billed
+				c['cf_total'] += l.amount_billed
+		total += l.amount_billed
+
+	# Make everything look like money $$$$$
+	for c in chartfields:
+		c['monthly_total'] = '${:,.2f}'.format(c['monthly_total'])
+		c['toll_total'] = '${:,.2f}'.format(c['toll_total'])
+		c['local_total'] = '${:,.2f}'.format(c['local_total'])
+		c['cf_total'] = '${:,.2f}'.format(c['cf_total'])
+
+		for m in c['monthly']:
+			m['total_charge'] = '${:,.2f}'.format(m['total_charge'])
+		for t in c['toll']:
 			t['total_charge'] = '${:,.2f}'.format(t['total_charge'])
-			toll.append(t)
-	total = total + local_total + toll_total
+		for l in c['local']:
+			l['total_charge'] = '${:,.2f}'.format(l['total_charge'])
 
 
 	context = {
 		'title':'Detail of Charges',
 		'dept': selected_dept,
 		'billing_date': bill_date,
-		'chartcoms': format_chartcoms,
+		'chartcoms': chartcoms,
 		'user_id': user_id,
 		'sub_id': sub_id,
 		'chartcom': chartcom,
 		'charge_type': charge_type,
 		'username': username,
-		'monthly_data': rows,
-		'monthly_total': '${:,.2f}'.format(monthly_total),
-		'local': local,
-		'local_total': '${:,.2f}'.format(local_total),
-		'toll': toll,
-		'toll_total': '${:,.2f}'.format(toll_total),
 		'total': '${:,.2f}'.format(total),
-		'return_button': return_button
-	}
-
-	return HttpResponse(template.render(context, request))
-
-
-
-@permission_required('oscauth.can_report', raise_exception=True)
-def show_tsr(request):
-	template = loader.get_template('doc-tsr.html')
-
-	context = {
-		'title': 'Detail of Charges'
+		'return_button': return_button,
+		'chartfields': chartfields
 	}
 
 	return HttpResponse(template.render(context, request))
@@ -354,3 +489,34 @@ def select_cf(request):
 	dept_cfs.append(name)
 
 	return JsonResponse(dept_cfs, safe=False)
+
+# Format date for query use
+def format_date(bill_date):
+	date = bill_date.replace('.', '')
+	date = date.replace(',', '')
+	date = date.split(' ')
+	date[0] = date[0][0:3]
+	date = date[0] + ' ' + date[1] + ' ' + date[2]
+	date = datetime.strptime(date, '%b %d %Y')
+	date = str(date.year) + '-' + str(date.month) + '-' + str(date.day)
+	return date
+
+# Format chartcoms as list
+def format_chartcoms(chartcoms):
+	chartcoms = str(chartcoms)
+	chartcoms = chartcoms.replace('"','')
+	chartcoms = chartcoms.replace('[','')
+	chartcoms = chartcoms.replace(']','')
+	chartcoms = chartcoms.replace(',','')
+	chartcoms = chartcoms.replace(' ', '')
+	chartcoms = chartcoms.split('\'')
+	format_chartcoms = []
+	for c in chartcoms:
+		if len(c) != 0:
+			format_chartcoms.append(c)
+	return format_chartcoms
+
+
+# Return to DOC base
+def restart(request):
+	return redirect('reports/doc/')

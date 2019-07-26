@@ -1,25 +1,16 @@
 <div class="container" id="review_submit">
 	<p class="mt-4">Please review the following information.</p>
-
-	<div clsas="row mt-4">
-		<div class="card-deck">
+	
+	<div class="row mt-4">
+		<div class="col-md-5">
 			<div class="card">
 				<div class="card-header">
 					Contact Information
 				</div>
 				<div class="card-body">
-					<div class="dept_full_name">Department:&nbsp; {{ dept_info.dept_id }} ({{ dept_info.dept_name }})</div>
-					<div class="dept_mgr">Department Manager:</strong> &nbsp; {{ dept_info.dept_mgr }}</div>
+					<div class="dept_full_name"><strong>Department:</strong>&nbsp; {{ dept_info.dept_id }} ({{ dept_info.dept_name }})</div>
+					<div class="dept_mgr"><strong>Department Manager:</strong> &nbsp; {{ dept_info.dept_mgr }}</div>
 					<strong>Contact Name:</strong> &nbsp; {{ user.last_name }},{{ user.first_name }}
-				</div>
-			</div>
-			<div class="card">
-				<div class="card-header">
-					Additional Comments
-				</div>
-				<div class="card-body">
-					<strong>Enter notes or comments for our own records:</strong>
-					<textarea type="text" class="form-control" placeholder="Enter text here..."></textarea>
 				</div>
 			</div>
 		</div>

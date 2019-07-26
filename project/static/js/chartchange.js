@@ -353,6 +353,9 @@ $(document).ready(function() {
 				}
 				$('#dept_title').html('Department: ' + selected + ' - ' + data[data.length - 1].name);
 				change_current_page(data[0].account_number);
+				$('#cfc-2').addClass('disabled');
+				$('#cfc-3').addClass('disabled');
+				$('#cfc-4').addClass('disabled');
 			}
 		})
 	})
@@ -364,6 +367,10 @@ $(document).ready(function() {
 
 		change_current_page(selected);
 		$('#cf_users_table').DataTable().ajax.reload();
+
+		$('#cfc-2').addClass('disabled');
+		$('#cfc-3').addClass('disabled');
+		$('#cfc-4').addClass('disabled');
 	})
 
 });
