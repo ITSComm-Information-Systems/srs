@@ -183,7 +183,6 @@ def get_uniqname(request, uniqname_parm=''):
     template = loader.get_template('oscauth/setpriv.html')
 
     if request.method == 'POST':  #big work here
-        print(request.POST)
         uniqname_parm = request.POST['uniqname_parm']
 
 
@@ -194,7 +193,6 @@ def get_uniqname(request, uniqname_parm=''):
         # Check for valid uniqname format
         if len(uniqname_parm) < 3 or len(uniqname_parm) > 8 or uniqname_parm.isalpha is False:
             result = uniqname_parm + ' is not a valid uniqname'
-#            print('uniqname_parm: %s %s' % (uniqname_parm, result))
             return  HttpResponse(template.render({'result': result}, request))
         else:
             # Get User from MCommunity
@@ -219,22 +217,19 @@ def get_uniqname(request, uniqname_parm=''):
                 last_name = mc_user.sn
                 first_name = mc_user.givenName
 
-                print('Uniqname: %s   Last Name: %s   First Name: %s' % (uniqname_parm, last_name, first_name))
-
-
-                if(request.user.has_perm('can_administer_access_all')):
+                if(request.user.has_perm('oscauth.can_administer_access_all')):
                     grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
+                    dept_manager = AuthUserDept.objects.filter(user=request.user.id,group=3)
                 else:
                     grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).exclude(role='Proxy').order_by('role')
+                    dept_manager = []
 
+                print(dept_manager)
                 #grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
                 grantor_roles = Grantor.objects.values('grantor_role').distinct()
-#                print(len(grantor_roles))
                 this_grantors_roles = AuthUserDept.objects.filter(user=request.user.id).values("group").distinct()
-#                print(len(this_grantors_roles))
 # The list of roles should only include those that this particular user can grant
 #                grantable_roles = Grantor.objects.filter(grantor_role__in=this_grantors_roles).values("granted_role_id").distinct()
-#                print(len(grantable_roles))
 
 # The list of depts should be dependent on the role selected
 #   e.g. if proxy is selected, only those depts for which thia grantor has the dept manager role should be displayed
@@ -246,8 +241,6 @@ def get_uniqname(request, uniqname_parm=''):
                 process_access = ''
                 submit_msg = ''
 
-                print(grantable_roles)
-
                 for role in grantable_roles:
                     role = role.role
 #                    role = grantable_roles.granted_role_id
@@ -255,14 +248,18 @@ def get_uniqname(request, uniqname_parm=''):
 
                 for dept in grantor_depts:
                     dept = dept.dept
+
+                    if dept_manager.filter(dept=dept).exists():
+                    #if dept in dept_manager:
+                        manager = True
+                    else:
+                        manager = False
+
                     dept_info = UmCurrentDeptManagersV.objects.get(deptid=dept)
                     dept_name = dept_info.dept_name
                     dept_status = dept_info.dept_status
-                    data = {'dept_status' : dept_status,'dept' : dept, 'dept_name' : dept_name}
+                    data = {'dept_status' : dept_status,'dept' : dept, 'dept_name' : dept_name, 'dept_manager': manager}
                     rows.append(data)
-
-                print('Dept status: %s  Dept Name: %s' % (dept_status, dept_name))
-
 
                 context = {
                     'uniqname_parm': uniqname_parm,
@@ -278,21 +275,16 @@ def get_uniqname(request, uniqname_parm=''):
                 }
 
                 if request.method=='POST' and request.POST.get('process_access'):
-                    print('Submitted')
                     if request.POST.get('rolerad') and request.POST.get('deptck'):
                         submit_msg = 'Ready to Process'
-                        print('Ready to Process')
                         if request.POST.get('taskrad') == 'add':
-                            print('Add access')
 #                            return render(request,'oscauth/addpriv.html', context)
                             return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not')
                         if request.POST.get('taskrad') == 'remove':
-                            print('Remove Access')
                             return render(request, 'oscauth/removepriv.html', context)
 
                     else:
                         submit_msg = 'Please select a Task, a Role, and at least one Department then click Submit.'
-                        print('Incomplete input')
                         return  HttpResponse(template.render({'submit_msg': submit_msg}, request))
 
                 return render(request, 'oscauth/setpriv.html', context)
@@ -367,42 +359,39 @@ def modpriv(request):
             uniqname_parm = request.POST['uniqname_parm']
             last_name = request.POST['last_name']
             first_name = request.POST['first_name']
-            role_checked = request.POST['rolerad']
             action_checked = request.POST['taskrad']
             dept_checked = request.POST.getlist('deptck')
-            print('Add access for %s' % uniqname_parm)
-    
-    print(action_checked)
 
     try:
         osc_user = User.objects.get(username=uniqname_parm)
         result = 'User already exists'
-        print('User already exists')
     except:
         osc_user = upsert_user(uniqname_parm) 
         result = 'Added user'
-        print('Added user')
 
     if action_checked == 'add':
+        add_checked = request.POST['roleAdd']
+        role_checked = add_checked
         for dept in dept_checked:
             new_auth = AuthUserDept()
             new_auth.user = osc_user
-            new_auth.group = Role.objects.get(role=role_checked).group
+            new_auth.group = Role.objects.get(role=add_checked).group
             new_auth.dept = dept
 
             try:
                 new_auth.save()
                 result = 'Privilege Added'
             except IntegrityError: 
-                print('Record Exists')
                 result = 'Privilege already exists'
             
     else:
-        role = Role.objects.get(role=role_checked).group
-        aud = AuthUserDept.objects.filter(user=osc_user,group=role,dept__in=dept_checked)
-        print(aud)
-        aud.delete()
-        result = 'Deleted Privileges'
+        del_checked = request.POST.getlist('roleDelete')
+        role_checked = del_checked
+        for del_role in del_checked:
+            role = Role.objects.get(role=del_role).group
+            aud = AuthUserDept.objects.filter(user=osc_user,group=role,dept__in=dept_checked)
+            aud.delete()
+            result = 'Deleted Privileges'
 
     context = {
         'title': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
@@ -421,7 +410,6 @@ def modpriv(request):
 @require_http_methods(['POST'])
 @user_passes_test(su_login_callback)
 def login_as_user(request, user_id):
-    print('oscauth.login_as_user')
     userobj = authenticate(request=request, su=True, user_id=user_id)
     if not userobj:
         raise Http404("User not found")
@@ -482,14 +470,12 @@ def su_login(request, form_class=UserSuForm, template_name='oscauth/su_login.htm
 
 
 def su_logout(request):
-    print('oscauth.login_as_user')
     exit_users_pk = request.session.get("exit_users_pk", default=[])
     if not exit_users_pk:
         return HttpResponseBadRequest(
             ("This session was not su'ed into. Cannot exit."))
 
     user_id, backend = exit_users_pk.pop()
-    print('oscauth.su_logout')
 
     userobj = get_object_or_404(get_user_model(), pk=user_id)
     userobj.backend = backend
