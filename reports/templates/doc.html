@@ -8,7 +8,7 @@
 </style> -->
 
 <div class="container">
-    <form action="/reports/doc/report/" method="POST" name="Select">{% csrf_token %}
+    <form action="{{ form_action }}" method="POST" name="Select">{% csrf_token %}
         <div class="form-group">
             <h5>Select Department<span class="prv-msgs">*</span></h5>
             <p class="mb-0"><span class="prv-msgs">*</span> Required fields</p>
