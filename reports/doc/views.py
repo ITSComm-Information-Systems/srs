@@ -55,7 +55,7 @@ def get_doc(request):
 
     context = {
         'title': 'Detail of Charges',
-        #'user_depts': user_depts,
+        'form_action': '/reports/doc/report/telephony/',
         'names': names,
         'dates': billing_dates,
         'initial_date':billing_dates[0],
@@ -67,7 +67,17 @@ def get_doc(request):
 
 # Generate basic report based on user selections
 @permission_required('oscauth.can_report', raise_exception=True)
-def generate_report(request):
+def generate_report(request, type):
+	# Telephony vs. nontelephony report
+	telephony = False
+	nontelephony = False
+	if type == 'nontelephony':
+		nontelephony = True
+		title = 'New Report'
+	else:
+		telephony = True
+		title = 'Detail of Charges'
+
 	template = loader.get_template('doc-report.html')
 
 	# Get information from previous page
@@ -99,7 +109,7 @@ def generate_report(request):
 			initial_prefix = a.user_defined_id.split('-')[0]
 			prefix_query = UmOscRptSubscrib_Api_V.objects.filter(subscriber_prefix=initial_prefix)
 			# prefix_query = ''
-			if a.dtl_of_chrgs_telephony and not (a.mrc_amount == 0 and a.tot_call_amount == 0):
+			if ((telephony and a.dtl_of_chrgs_telephony) or (nontelephony and a.dtl_of_chrgs_nontelephony)) and (a.mrc_amount != 0 or a.tot_call_amount != 0):
 				# Determine user defined ID type - will come from new view
 				if prefix_query:
 					prefix = prefix_query[0].subscriber_desc
@@ -140,20 +150,21 @@ def generate_report(request):
 		monthly_data = {}
 		monthly_total = 0
 		for m in monthly_query:
-			# Item code already exists in table
-			if m.item_code in monthly_data:
-				monthly_data[m.item_code]['quantity'] += int(m.quantity)
-				monthly_data[m.item_code]['total'] += m.charge_amount
-			# New item code for table
-			else:
-				monthly_data[m.item_code] = {
-					'desc': m.item_description,
-					'unit_amt': '${:,.2f}'.format(m.unit_price),
-					'quantity': int(m.quantity),
-					'total': m.charge_amount
-				}
-			has_data = True
-			monthly_total += m.charge_amount
+			if ((telephony and m.dtl_of_chrgs_telephony) or (nontelephony and m.dtl_of_chrgs_nontelephony)):
+				# Item code already exists in table
+				if m.item_code in monthly_data:
+					monthly_data[m.item_code]['quantity'] += int(m.quantity)
+					monthly_data[m.item_code]['total'] += m.charge_amount
+				# New item code for table
+				else:
+					monthly_data[m.item_code] = {
+						'desc': m.item_description,
+						'unit_amt': '${:,.2f}'.format(m.unit_price),
+						'quantity': int(m.quantity),
+						'total': m.charge_amount
+					}
+				has_data = True
+				monthly_total += m.charge_amount
 
 		
 		# Make it look like money $$$$$
@@ -177,68 +188,69 @@ def generate_report(request):
 		otc_rows = []
 		otc_total = 0
 		for c in occ_charges:
-			has_data = True
-			# If OCC is a credit
-			if c.charge_amount < 0:
-				# New item code for table
-				if not any (c['item_code'] == c.item_code for c in credits):
-					credit = {
-						'item_code': c.item_code,
-						'credit': abs(c.charge_amount)
-					}
-					credits.append(credit)
-				# Item code already exists in table
-				for cr in credits:
-					if cr['item_code'] == c.item_code:
-						cr['credit'] += abs(c.charge_amount)
-				credit_total += abs(c.charge_amount)
-			# If OCC is a work order
-			elif c.package_code:
-				# New work order for table
-				if not any(rw['work_order'] == c.package_code for rw in occ_rows):
-					row = {
-						'work_order': c.package_code,
-						'total_amt': c.charge_amount,
-						'equip': 0,
-						'sol': 0
-					}
-					# If labor charge
-					if c.item_code.startswith('LB'):
-						row['sol'] = c.charge_amount
-					# If Service Order/Equipment charge
+			if ((telephony and c.dtl_of_chrgs_telephony) or (nontelephony and c.dtl_of_chrgs_nontelephony)):
+				has_data = True
+				# If OCC is a credit
+				if c.charge_amount < 0:
+					# New item code for table
+					if not any (c['item_code'] == c.item_code for c in credits):
+						credit = {
+							'item_code': c.item_code,
+							'credit': abs(c.charge_amount)
+						}
+						credits.append(credit)
+					# Item code already exists in table
+					for cr in credits:
+						if cr['item_code'] == c.item_code:
+							cr['credit'] += abs(c.charge_amount)
+					credit_total += abs(c.charge_amount)
+				# If OCC is a work order
+				elif c.package_code:
+					# New work order for table
+					if not any(rw['work_order'] == c.package_code for rw in occ_rows):
+						row = {
+							'work_order': c.package_code,
+							'total_amt': c.charge_amount,
+							'equip': 0,
+							'sol': 0
+						}
+						# If labor charge
+						if c.item_code.startswith('LB'):
+							row['sol'] = c.charge_amount
+						# If Service Order/Equipment charge
+						else:
+							row['equip'] = c.charge_amount
+						occ_rows.append(row)
+					# Work order already exists in table
 					else:
-						row['equip'] = c.charge_amount
-					occ_rows.append(row)
-				# Work order already exists in table
+						for row in occ_rows:
+							if row['work_order'] == c.package_code:
+								row['total_amt'] += c.charge_amount
+								# If equipment charge
+								if c.item_code.startswith('LB'):
+									row['sol'] += c.charge_amount
+								# If Service Order/Labor charge
+								else:
+									row['equip'] += c.charge_amount
+					occ_total += c.charge_amount
+				# Create One Time Charges table
 				else:
-					for row in occ_rows:
-						if row['work_order'] == c.package_code:
-							row['total_amt'] += c.charge_amount
-							# If equipment charge
-							if c.item_code.startswith('LB'):
-								row['sol'] += c.charge_amount
-							# If Service Order/Labor charge
-							else:
-								row['equip'] += c.charge_amount
-				occ_total += c.charge_amount
-			# Create One Time Charges table
-			else:
-				# New item code for table
-				if not any(rw['item_code'] == c.item_code for rw in otc_rows):
-					row = {
-						'item_code': c.item_code,
-						'desc': c.item_description,
-						'qty': int(c.quantity),
-						'total': c.charge_amount
-					}
-					otc_rows.append(row)
-				# Item code already exists in table
-				else:
-					for o in otc_rows:
-						if o['item_code'] == c.item_code:
-							o['qty'] += int(c.quantity)
-							o['total'] += c.charge_amount
-				otc_total += c.charge_amount
+					# New item code for table
+					if not any(rw['item_code'] == c.item_code for rw in otc_rows):
+						row = {
+							'item_code': c.item_code,
+							'desc': c.item_description,
+							'qty': int(c.quantity),
+							'total': c.charge_amount
+						}
+						otc_rows.append(row)
+					# Item code already exists in table
+					else:
+						for o in otc_rows:
+							if o['item_code'] == c.item_code:
+								o['qty'] += int(c.quantity)
+								o['total'] += c.charge_amount
+					otc_total += c.charge_amount
 
 
 		# Make it look like money $$
@@ -273,7 +285,7 @@ def generate_report(request):
 
 
 	context= {
-		'title':'Detail of Charges',
+		'title':title,
 		'dept': selected_dept,
 		'billing_date': bill_date,
 		'charge_types': charge_types,
@@ -285,7 +297,7 @@ def generate_report(request):
 
 
 @permission_required('oscauth.can_report', raise_exception=True)
-def show_detail(request):
+def show_detail(request, type):
 	template = loader.get_template('doc-detail.html')
 
 	# Get information from previous page

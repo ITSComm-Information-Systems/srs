@@ -733,3 +733,9 @@ input:checked + .slider:before {
 #service-menu ul li a:active {
 	font-weight: bold;
 }
+
+@media (min-width:768px) {
+	.service-cards {
+		margin-top: 4.25rem;
+	}
+}

@@ -789,6 +789,9 @@ class UmOscAcctdetailMrcOccV(models.Model):
      unit_price = models.DecimalField(decimal_places=4, max_digits=19,  null=False)
      charge_to_dept = models.CharField(max_length=10)
      row_id = models.CharField(max_length=20, primary_key=True)
+     user_defined_id =  models.CharField(max_length=20, blank=True)
+     dtl_of_chrgs_telephony = models.PositiveIntegerField(null=True)            
+     dtl_of_chrgs_nontelephony = models.PositiveIntegerField(null=True) 
 
      class Meta:
           managed = False
