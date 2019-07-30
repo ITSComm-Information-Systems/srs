@@ -86,7 +86,7 @@
         <h2>Select Role</h2>
         <div class="form-check">
             {% for role in grantable_roles %}
-            <input type='radio' name="rolerad" value={{ role.role }} id={{ role.role }} class="form-check-input">
+            <input type='radio' name="roleAdd" value={{ role.role }} id={{ role.role }} class="form-check-input">
             <label for={{ role.role }} class="form-check-label">{{ role.role }}</label>
             <br>
         {% endfor %}
@@ -96,8 +96,8 @@
         <h2>Select Role</h2>
         <div class="form-check">
             {% for role in grantable_roles %}
-            <input type='checkbox' name="rolerad" value={{ role.role }} id={{ role.role }} class="form-check-input">
-            <label for={{ role.role }} class="form-check-label">{{ role.role }}</label>
+            <input type='checkbox' name="roleDelete" value="{{ role.role }}"" id="{{ role.role }}"" class="form-check-input">
+            <label for="{{ role.role }}" class="form-check-label">{{ role.role }}</label>
             <br>
             {% endfor %}
         </div>
@@ -109,6 +109,7 @@
             <input type="checkbox" onclick="toggle(this);" id="selectAllDepts" class="form-check-input">
             <label for="selectAllDepts" class="form-check-label">Select All Departments</label><br>
             {% for row in rows %}
+                <div data-manager="{{ row.dept_manager }}">
                 {% if row.dept_status != 'I' %}
                 <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
                 <label for="dept.{{ row.dept }}" class="form-check-label">{{ row.dept }} - {{ row.dept_name }}</label>
@@ -117,6 +118,7 @@
                 <label for="dept.{{ row.dept }}" class="form-check-label prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>  {{ row.dept }} - {{ row.dept_name }}</label>
                 {% endif %}
                 <br>
+                </div>
             {% endfor %} 
         </div>
     </div>
@@ -147,6 +149,18 @@ $(document).ready(function() {
         $('#addRole').hide();
     });
 
+    $("#Proxy").click(function(event) {
+        $('[data-manager="False"]').hide();
+        toggle('False');
+    });
+
+    $("#Orderer").click(function(event) {
+        $('[data-manager="False"]').show();
+    });
+
+    $("#Reporter").click(function(event) {
+        $('[data-manager="False"]').show();
+    });
 
 });
 
