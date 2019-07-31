@@ -52,6 +52,7 @@ class ManageChartcom(PermissionRequiredMixin, View):
 
         template = loader.get_template('order/manage_chartfield.html')
         context = {
+            'title': 'Manage Chartfields',
             'department': department,
             'dept_list': dept_list,
             'chartcoms': chartcoms,
@@ -212,7 +213,7 @@ class Cart(PermissionRequiredMixin, View):
             department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
             deptid = dept_list[0].dept
 
-
+        status = ['Ready to Order','Saved for Later']
         item_list = Item.objects.filter(deptid=deptid,order__isnull=True).order_by('chartcom','-create_date')
         chartcoms = item_list.distinct('chartcom')
         action_list = Action.objects.all()
@@ -223,12 +224,31 @@ class Cart(PermissionRequiredMixin, View):
             for item in acct.items:
                 item.details = item.data.get('action')
                 item.service = action_list.get(id=item.data.get('action_id')).service
+        status[0] = chartcoms
+        status[0].label = 'Ready to Order'
+        status[0].id = 'tableReady'        
+
+        item_list = Item.objects.filter(deptid=deptid,order=0).order_by('chartcom','-create_date')
+        saved_later = item_list.distinct('chartcom')
+        action_list = Action.objects.all()
+
+        for acct in saved_later:
+            acct.items = item_list.filter(chartcom=acct.chartcom) #.order_by('create_date')
+
+            for item in acct.items:
+                item.details = item.data.get('action')
+                item.service = action_list.get(id=item.data.get('action_id')).service
+        status[1] = saved_later
+        status[1].label = 'Saved for Later'
+        status[1].id = 'tableSaved'
 
         template = loader.get_template('order/cart.html')
         context = {
+            'title': 'Cart',
             'department': department,
             'dept_list': dept_list,
             'acct': chartcoms,
+            'status': status,
         }
         return HttpResponse(template.render(context, request))
 
@@ -237,7 +257,8 @@ class Review(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def post(self, request):
-
+        print(request.POST)
+        dept = request.POST.get('deptSubmit')
         items_selected = request.POST.getlist('includeInOrder')
         item_list = Item.objects.filter(id__in=items_selected)
         order_list = item_list.distinct('chartcom')
@@ -248,7 +269,9 @@ class Review(PermissionRequiredMixin, View):
 
         template = loader.get_template('order/review_order.html')
         context = {
+            'title': 'Review Order',
             'order_list': order_list,
+            'dept': dept
         }
         return HttpResponse(template.render(context, request))
 
@@ -268,6 +291,7 @@ class Services(View):
             service.actions = action_list.filter(service=service)
 
         context = {
+            'title': 'Request Service',
             'service_list': service_list,
             'link_list': link_list,
         }
@@ -306,6 +330,7 @@ class Status(PermissionRequiredMixin, View):
 
         template = loader.get_template('order/status.html')
         context = {
+            'title': 'Track Orders',
             'dept_list': dept_list,
             'order_list': order_list,
             'status_help': status_help,
