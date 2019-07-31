@@ -8,7 +8,7 @@
 <div class='row'>
     <div class="col-md-5">
         <form id="cf_dropdown" method="POST" name="cfs">{% csrf_token %}
-            <div class="input-group">
+            <div class="input-group" id="cf_dropdown_group">
                 <div class="input-group-prepend">
                     <label class="input-group-text" for="cf_dropdown">
                         Select Chartfield
@@ -53,11 +53,17 @@
       </table>
     </div>
     {% else %}
-    <div class="col-md-8">
+    <div class="col-md-8" id="no_cfs_alert">
         <div class="alert alert-danger col-md-8" role="alert">
             <i class="fas fa-exclamation-triangle" style="color:red"></i>
             This department does not have any chartfields currently in use. Please select another department.
         </div>
     </div>
     {% endif %}
+    <div class="col-md-8" id="no_cfs_alert" hidden>
+        <div class="alert alert-danger col-md-8" role="alert">
+            <i class="fas fa-exclamation-triangle" style="color:red"></i>
+            This department does not have any chartfields currently in use. Please select another department.
+        </div>
+    </div>
 </div>

@@ -91,11 +91,14 @@
 								<tr class="table-secondary">
 									<th scope='col' style='text-align:left;'>Billing ID</th>
 									<th scope="col">Monthly Charges</th>
+									{% if title == 'Detail of Charges' %}
 									<th scope="col" colspan='2'>Call Usage</th>
+									{% endif %}
 									<th scope="col" style='text-align:right;'>Total Charge</th>
 								</tr>
 							</thead>
 							<tbody>
+								{% if title == 'Detail of Charges' %}
 								<tr class="table-warning">
 									<td style='text-align:left;'></td>
 									<td>Amount</td>
@@ -103,6 +106,7 @@
 									<td>Amount</td>
 									<td style='text-align:right;'>Amount</td>
 								</tr>
+								{% endif %}
 								{% for v in value.rows %}
 								<tr>
 									<form method="POST" action='detail/' id="report_details">{% csrf_token %}
@@ -110,13 +114,19 @@
 										<input type="hidden" name="billing_date" value="{{ billing_date }}">
 										<input type="hidden" name="chartcoms" value="{{ chartfields }}">
 
+										{% if title == 'Detail of Charges' %}
 										<td><input class="btn btn-link submit-link" style="text-align:left;" type="submit" name="user_id" value="{{ v.user_defined_id }}"></td>
+										{% else %}
+										<td>{{ v.user_defined_id }}</td>
+										{% endif %}
 										<input type="hidden" name="sub_id:{{ v.user_defined_id}}" value="{{ v.subscriber_id }}">
 										<input type="hidden" name="chartcom:{{ v.user_defined_id }}" value="{{ c.account_number }}">
 										<input type="hidden" name="charge_type:{{ v.user_defined_id }}" value="{{ key }}">
 										<td>{{ v.monthly_charges }}</td>
+										{% if title == 'Detail of Charges' %}
 										<td>{{ v.call_number }}</td>
 										<td>{{ v.call_amount }}</td>
+										{% endif %}
 										<td style='text-align:right;'>{{ v.total_charges }}</td>
 									</form>
 								</tr>
@@ -124,8 +134,10 @@
 								<tr class='table-total'>
 									<td style='text-align:left;'><strong>Total</strong></td>
 									<td></td>
+									{% if title == 'Detail of Charges' %}
 									<td></td>
 									<td></td>
+									{% endif %}
 									<td style='text-align:right;'>{{ value.total }}</td>
 								</tr>
 							</tbody>

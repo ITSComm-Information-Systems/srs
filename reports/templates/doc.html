@@ -1,12 +1,5 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<!-- <style>
-.select2-dropdown--below {
-    top: -1.9rem;
-}
-</style> -->
-
 <div class="container">
     <form action="{{ form_action }}" method="POST" name="Select">{% csrf_token %}
         <div class="form-group">
@@ -47,7 +40,7 @@
 	        </div>
         </div>
         <strong id="error_message" class="hidden">Please select a chartfield.</strong>
-        <p><input id="generate" type='submit' value='Generate Report' class="btn btn-primary mt-2"></p>
+        <p><input id="generate" type='submit' value='Generate Report' class="btn btn-primary mt-2" disabled></p>
     </form>
 </div>
 
