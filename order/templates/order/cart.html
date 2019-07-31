@@ -39,11 +39,12 @@
         <section class="row" role="contentinfo">
             <div class="container">
                 <div class="row cart-tables">
-                    <form action="/orders/review/" id="cart-orders" method="POST" class="cart-table">{% csrf_token %}
                     <div class="col-12">
+                        <form action="/orders/review/" id="cart-orders" method="POST" class="cart-table">{% csrf_token %}
+                        {% for section in status %}
                         <div class="ready-to-order">
-                            <h2>Ready to Order</h2>   
-                        {% for chartcom in acct %}
+                            <h2>{{section.label}}</h2>   
+                        {% for chartcom in section %}
                         <div class="cart-table">
                             <h4 class="cart-chartfield-title">
                                 Chartfield: 
@@ -52,7 +53,7 @@
                             </h4>
                         </div>
                         <div class="table-responsive-md">
-                            <table class="table table-hover table-striped table-sm">
+                            <table class="table table-hover table-striped table-sm" id="{{section.id}}">
                                 <thead>
                                     <tr class="col-headings">
                                         <th scope="col">Date Created</th>
@@ -74,73 +75,40 @@
                                         <td class="action">
                                             <a class="edit" href="#">Edit</a>
                                             <a class="delete" href="#">Delete</a>
-                                            <a class="saved-for-later" href="#">Save for Later</a>
+                                            {% if section == status|first %}
+                                            <a class="ready-link" onclick="moveRow(this)" href="#">Save for Later</a>
+                                            {% else %}
+                                            <a class="saved-for-later" onclick="moveRow(this)" href="#">Move to Cart</a>
+                                            {% endif %}
                                             {% if item.days_to_deletion < 30 %}
                                             <a tabindex="0" role="button" data-toggle="popover" data-container="body"
                                                 data-trigger="focus" data-placement="right"
                                                 data-content="This item will be erased in {{ item.days_to_deletion }} days">
                                                 <i class="fas fa-exclamation-circle"></i>
                                             </a>
+
                                             {% endif %}
-                                        </td>                                        
+                                        </td>                    
+                                        <input type="hidden" id="custId" name="includeInOrder" value="{{item.id}}">                    
                                     </tr>
+                                    
                                     {% endfor %}
                                 </tbody>
                                 <!-- End of table body -->
                             </table>
                         </div>
                         {% endfor %}
-                    </div>
-                </div>
-                    <div class="col-lg-11 col-md-12 cart-button">
-                        <input type="submit" class="hidden" value="Review Order" id="cartReviewbtn">
-                        <label for="cartReviewbtn" class="btn btn-primary">Proceed to Checkout</label>
-                    </div>
-                </form>
-                </div>
-                <div class="row cart-tables">
-                    <div class="col-12">
-                        <div class="saved-cart-table">
-                            <h2>Saved for Later</h2>
-                            <div class="cart-table">
-                                <h4 class="cart-chartfield-title">
-                                    Chartfield:
-                                    <small>Chartfield information goes here</small>
-                                </h4>
-                            </div>
-                            <div class="table-responsive-md">
-                                <table class="table table-hover table-striped table-sm">
-                                    <thead>
-                                        <tr class="col-headings">
-                                            <th scope="col">Date Created</th>
-                                            <th scope="col">Created By</th>
-                                            <th scope="col">Details</th>
-                                            <th scope="col">Action</th>
-                                        </tr>    
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Date Here</th>
-                                            <td>FRGA</td>
-                                            <td>Add/Activate my super powers!</td>
-                                            <td class="action">
-                                                <a class="edit" href="#">Edit</a>
-                                                <a class="delete" href="#">Delete</a>
-                                                <a class="ready-link" href="#">Move to Cart</a>
-                                                {% if item.days_to_deletion < 30 %}
-                                                    <a tabindex="0" role="button" data-toggle="popover" data-container="body"
-                                                    data-trigger="focus" data-placement="right"
-                                                    data-content="This item will be erased in {{ item.days_to_deletion }} days">
-                                                        <i class="fas fa-exclamation-circle"></i>
-                                                    </a>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                        {% if section == status|first %}
+                        <div class="col-lg-11 col-md-12 cart-button">
+                            <input type="hidden" name="deptSubmit" value="{{department.id}}">
+                            <input type="submit" class="hidden" value="Review Order" id="cartReviewbtn">
+                            <label for="cartReviewbtn" class="btn btn-primary">Proceed to Checkout</label>
                         </div>
+                        </form>
+                        {% endif %}
                     </div>
+                    {% endfor %}         
+                </div>
                 </div>
             </div>
         </section>
@@ -150,8 +118,29 @@
 
 {% block js %}
 <script>
-    $(document).ready(function () {
-        $('[data-toggle="popover"]').popover();
-    });
+$(document).ready(function () {
+    $('[data-toggle="popover"]').popover();
+});
+
+function moveRow(row) {
+    console.log(row);
+    var tr = $(row).closest("tr").remove().clone();
+    console.log(tr);
+
+    //tr.getElementsByClassName("ready-link").innerHTML = "new";
+
+    if(row.className == 'ready-link') {
+        tr.find("a.ready-link").text('Move to Cart').attr("class", "saved-for-later")
+        $("#tableSaved tbody").append(tr);
+
+    }
+
+    if(row.className == 'saved-for-later') {
+        tr.find("a.saved-for-later").text('Save for Later').attr("class", "ready-link")
+        $("#tableReady tbody").append(tr);
+    }
+}
+
+
 </script>
 {% endblock %}

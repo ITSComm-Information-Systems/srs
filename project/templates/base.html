@@ -34,7 +34,7 @@
 	 } 
 	</style>
 
-	<title>OSC | Dashboard</title>
+	<title>SRS - {{ title }}</title>
   </head>
   <body>
 	<div id="skip-link">
@@ -137,8 +137,7 @@
 	</header>
 
 	<div id="main-content" class="container" role="main">
-		<h1>{{ title }}</h1>
-    
+		    
     {% block content %}{% endblock content %}
     {% autoescape off %}
     {{ content }}
