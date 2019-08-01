@@ -695,7 +695,8 @@ input:checked + .slider:before {
 	}
 
 .order-details-list{
-  	padding-left:20px;
+	  padding-left:20px;
+	  margin-bottom: 0rem;
 }
 
 .small-h2 {
@@ -738,4 +739,8 @@ input:checked + .slider:before {
 	.service-cards {
 		margin-top: 4.25rem;
 	}
+}
+
+.remove-chartfield-form-body form .card-body p {
+	display: inline-block;
 }
