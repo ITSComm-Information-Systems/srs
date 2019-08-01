@@ -1,145 +1,202 @@
 {% extends 'base.html' %}
 {% block content %}
 <!-- Beginning of Content -->
-    <div id="main-content" class="container" role="main">
-        <div class="row header-info">
-            <div class="col-12">
-                <div class="row">
-                    <div class="col-12">
-                        <h1>
-                            Cart
-                            <small class="text-muted">
-                                for Department: <strong>{{department.id}} - {{department.name}}</strong>
-                            </small>
-                        </h1>
-                    </div>
+<div id="main-content" class="container" role="main">
+    <div class="row header-info">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12">
+                    <h1>
+                        Cart
+                        <small class="text-muted">
+                            for Department: <strong>{{department.id}} - {{department.name}}</strong>
+                        </small>
+                    </h1>
                 </div>
-                <div class='row'>
-                    <div class="col-xl-8 col-12 dept-select">
-                        <form action="/orders/cart/" id="cart-department-dropdown" method="POST">{% csrf_token %}
-                            <div class="input-group dept-dropdown">
-                                <div class="input-group-prepend">
-                                    <label class="input-group-text" for="department-dropdown">
-                                        Switch Department
-                                    </label>
-                                </div>
-                                <select name="deptid" class="custom-select order-status-dropdown" id="department-dropdown">
-                                    {% for dept in dept_list %}
-                                    <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
-                                    {% endfor %}
-                                </select>
-                                <input type="submit" class="btn btn-outline-secondary" value="Go">
+            </div>
+            <div class='row'>
+                <div class="col-xl-8 col-12 dept-select">
+                    <form action="/orders/cart/" id="cart-department-dropdown" method="POST">{% csrf_token %}
+                        <div class="input-group dept-dropdown">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="department-dropdown">
+                                    Switch Department
+                                </label>
                             </div>
-                        </form>
-                    </div>
+                            <select name="deptid" class="custom-select order-status-dropdown" id="department-dropdown">
+                                {% for dept in dept_list %}
+                                <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="submit" class="btn btn-outline-secondary" value="Go">
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
 
-        <section class="row" role="contentinfo">
-            <div class="container">
-                <div class="row cart-tables">
-                    <div class="col-12">
-                        <form action="/orders/review/" id="cart-orders" method="POST" class="cart-table">{% csrf_token %}
+    <section class="row" role="contentinfo">
+        <div class="container">
+            <div class="row cart-tables">
+                <div class="col-12">
+                    <form action="/orders/review/" id="cart-orders" method="POST" class="cart-table">{% csrf_token %}
                         {% for section in status %}
                         <div class="ready-to-order">
-                            <h2>{{section.label}}</h2>   
-                        {% for chartcom in section %}
-                        <div class="cart-table">
-                            <h4 class="cart-chartfield-title">
-                                Chartfield: 
-                                <!-- Insert Chartfield Nickname here -->
-                                <small >{{chartcom.chartcom}} ({{chartcom.chartcom.account_number}}) </small>
-                            </h4>
-                        </div>
-                        <div class="table-responsive-md">
-                            <table class="table table-hover table-striped table-sm" id="{{section.id}}">
-                                <thead>
-                                    <tr class="col-headings">
-                                        <th scope="col">Date Created</th>
-                                        <th scope="col">Created By</th>
-                                        <th scope="col">Details</th>
-                                        <th scope="col">Action</th>
-                                    </tr>
-                                </thead>
+                            <h2>{{section.label}}</h2>
+                            {% for chartcom in section %}
+                            <div class="cart-table">
+                                <h4 class="cart-chartfield-title">
+                                    Chartfield:
+                                    <!-- Insert Chartfield Nickname here -->
+                                    <small>{{chartcom.chartcom}} ({{chartcom.chartcom.account_number}}) </small>
+                                </h4>
+                            </div>
+                            <div class="table-responsive-md">
+                                <table class="table table-hover table-striped table-sm" id="{{section.id}}">
+                                    <thead>
+                                        <tr class="col-headings">
+                                            <th scope="col">Date Created</th>
+                                            <th scope="col">Created By</th>
+                                            <th scope="col">Details</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
 
-                                <!-- Beginning of table body -->
-                                <tbody>
+                                    <!-- Beginning of table body -->
+                                    <tbody>
 
-                                    
-                                    {% for item in chartcom.items %}
-                                    <tr>
-                                        <th scope="row">{{ item.create_date|date:"m/d/y" }}</th>
-                                        <td>{{ item.created_by }}</td>
-                                        <td>{{ item.details }}</td>
-                                        <td class="action">
-                                            <a class="edit" href="#">Edit</a>
-                                            <a class="delete" href="#">Delete</a>
-                                            {% if section == status|first %}
-                                            <a class="ready-link" onclick="moveRow(this)" href="#">Save for Later</a>
-                                            {% else %}
-                                            <a class="saved-for-later" onclick="moveRow(this)" href="#">Move to Cart</a>
-                                            {% endif %}
-                                            {% if item.days_to_deletion < 30 %}
-                                            <a tabindex="0" role="button" data-toggle="popover" data-container="body"
-                                                data-trigger="focus" data-placement="right"
-                                                data-content="This item will be erased in {{ item.days_to_deletion }} days">
-                                                <i class="fas fa-exclamation-circle"></i>
-                                            </a>
 
-                                            {% endif %}
-                                        </td>                    
-                                        <input type="hidden" id="custId" name="includeInOrder" value="{{item.id}}">                    
-                                    </tr>
-                                    
-                                    {% endfor %}
-                                </tbody>
-                                <!-- End of table body -->
-                            </table>
-                        </div>
-                        {% endfor %}
-                        {% if section == status|first %}
-                        <div class="col-lg-11 col-md-12 cart-button">
-                            <input type="hidden" name="deptSubmit" value="{{department.id}}">
-                            <input type="submit" class="hidden" value="Review Order" id="cartReviewbtn">
-                            <label for="cartReviewbtn" class="btn btn-primary">Proceed to Checkout</label>
-                        </div>
-                        </form>
-                        {% endif %}
-                    </div>
-                    {% endfor %}         
+                                        {% for item in chartcom.items %}
+                                        <tr>
+                                            <th scope="row">{{ item.create_date|date:"m/d/y" }}</th>
+                                            <td>{{ item.created_by }}</td>
+                                            <td>{{ item.details }}</td>
+                                            <td class="action">
+                                                <a class="delete" href="#" data-toggle="modal" data-target="#deleteCartItem" role="button">Delete</a>
+                                                {% if section == status|first %}
+                                                <a class="ready-link" onclick="moveRow(this)" href="#">Save for
+                                                    Later</a>
+                                                {% else %}
+                                                <a class="saved-for-later" onclick="moveRow(this)" href="#">Move to
+                                                    Cart</a>
+                                                {% endif %}
+                                                {% if item.days_to_deletion < 30 %}
+                                                <a tabindex="0" role="button" data-toggle="popover"
+                                                    data-container="body" data-trigger="focus" data-placement="right"
+                                                    data-content="This item will be erased in {{ item.days_to_deletion }} days">
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                </a>
+
+                                                {% endif %}
+                                            </td>
+                                            <input type="hidden" id="custId" name="includeInOrder" value="{{item.id}}">
+                                        </tr>
+
+                                        {% endfor %}
+                                    </tbody>
+                                    <!-- End of table body -->
+                                </table>
+                            </div>
+                            {% endfor %}
+                            {% if section == status|first %}
+                            <div class="col-lg-11 col-md-12 cart-button">
+                                <input type="hidden" name="deptSubmit" value="{{department.id}}">
+                                <input type="submit" class="hidden" value="Review Order" id="cartReviewbtn">
+                                <label for="cartReviewbtn" class="btn btn-primary">Proceed to Checkout</label>
+                            </div>
+                    </form>
+                    {% endif %}
                 </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Delete Cart Item Modal -->
+        <div class="modal fade" id="deleteCartItem" tabindex="-1" role="dialog" aria-labelledby="deleteCartItem"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCartItem">Delete Cart Item</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <strong class="remove-text">
+                        Are you sure you want to delete the following cart item?
+                    </strong>
+                    <form id="deleteCartItemForm" method="GET" action="status.html">
+                        <div class="card-body">
+                                <strong class="card-text">
+                                    Date Submitted:
+                                </strong>
+                                <!-- Replace the following text with the value of the date of the order that the user selected to be removed from the shortlist -->
+                                <p class="card-text">mm/dd/yyyy</p>
+                                <br>
+                                <strong class="card-text">
+                                    Submitted by:
+                                </strong>
+                                <!-- Replace the following text with the value of the uniqname of the order's submitter that the user selected to be removed from the shortlist -->
+                                <p class="card-text">uniqname here</p>
+                                <br>
+
+                                <strong class="card-text">
+                                    Cart Item Details:
+                                </strong>
+                                <!-- Replace the following text with the value of the description of the order that the user selected to be removed from the shortlist -->
+                                <p class="card-text">Detailed information goes here</p>
+                                <br>
+                                <strong class="card-text">
+                                    Chartfield:
+                                </strong>
+                                <!-- Replace the following text with the value of the chartfield of the order that the user selected to be removed from the shortlist -->
+                                <p class="card-text">Chartfield here</p>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <!-- cancel Form button -->
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Keep Cart Item</button>
+                    <!-- Submit Form button -->
+                    <label for="submitBtn" hidden>Delete</label>
+                    <input type="submit" form="deleteCartItemForm" id="submitBtn" class="btn btn-danger"
+                        value="Delete Item">
                 </div>
             </div>
-        </section>
+        </div>
     </div>
-    <!-- End of Content -->
+    <!-- End of Cancel Order Modal -->
+    </section>
+</div>
+<!-- End of Content -->
 {% endblock %}
 
 {% block js %}
 <script>
-$(document).ready(function () {
-    $('[data-toggle="popover"]').popover();
-});
+    $(document).ready(function () {
+        $('[data-toggle="popover"]').popover();
+    });
 
-function moveRow(row) {
-    console.log(row);
-    var tr = $(row).closest("tr").remove().clone();
-    console.log(tr);
+    function moveRow(row) {
+        console.log(row);
+        var tr = $(row).closest("tr").remove().clone();
+        console.log(tr);
 
-    //tr.getElementsByClassName("ready-link").innerHTML = "new";
+        //tr.getElementsByClassName("ready-link").innerHTML = "new";
 
-    if(row.className == 'ready-link') {
-        tr.find("a.ready-link").text('Move to Cart').attr("class", "saved-for-later")
-        $("#tableSaved tbody").append(tr);
+        if (row.className == 'ready-link') {
+            tr.find("a.ready-link").text('Move to Cart').attr("class", "saved-for-later")
+            $("#tableSaved tbody").append(tr);
 
+        }
+
+        if (row.className == 'saved-for-later') {
+            tr.find("a.saved-for-later").text('Save for Later').attr("class", "ready-link")
+            $("#tableReady tbody").append(tr);
+        }
     }
-
-    if(row.className == 'saved-for-later') {
-        tr.find("a.saved-for-later").text('Save for Later').attr("class", "ready-link")
-        $("#tableReady tbody").append(tr);
-    }
-}
 
 
 </script>
