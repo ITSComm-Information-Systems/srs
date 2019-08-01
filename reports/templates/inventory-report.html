@@ -2,16 +2,131 @@
 {% load index %}
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<div class="">
+		<strong>Report selection</strong>
+        <a class="float-right" href="../inventory">Edit your selection</a>
+        <a class="float-right" id="edit-selection" href="../inventory"><i class="fas fa-edit"></i></a>
+	</div>
 
-<button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="fas fa-file-csv btn btn-success" style="font-size:20px;"> CSV Download</button>
+	<div class="">
+		<div class="card border-dark">
+			<div class="card-body">
+				<strong>Department:&nbsp;&nbsp;</strong>{{ dept_id }}
+                <strong>&nbsp;&nbsp;&nbsp;&nbsp;Department Name:&nbsp;&nbsp;</strong>{{dept_name}}
+				<strong>&nbsp;&nbsp;&nbsp;&nbsp;Billing Date:&nbsp;&nbsp;</strong>{{ bill_period }}<br>
+		</div>
+	</div>
+</div>
+
+
+{% if formated_data or location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%}
+<form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
+    <input type="text" style='font-size:20px' name = "dept_id" id = "dept_id" value = "{{dept_id}}-{{dept_name}}" readonly hidden>
+    <input type="text" style='font-size:20px' name = "bill_period" id = "bill_period" value = "{{bill_period}}" readonly hidden>
+    <div class = "form-row">
+    <div id="main-content" class="container" role="main">
+        <div class="container" role="main">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="message">
+                        <h5>Filters<h5>
+                        <hr class="style1">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class = "row align-items-start col-md-3" id = "select_loc">
+        <div class = "input-group col-md-10">
+            <div class ="input-group-prepend">
+                <label class = "input-group-text" for="inv_dropdown">Location</label>
+            </div>
+
+            <select class="custom-select" style='font-size:16px' requried type="select" name="location" id="location" >
+                <option value = ''>--Select--
+                {% for building in buildings %}
+                <option value="{{ building }}">{{ building }}{% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class = "row align-items-start col-3" id = "select_type">
+        <div class = "input-group col-md-10">
+            <div class ="input-group-prepend">
+                <label class = "input-group-text" for="inv_dropdown">User ID Type</label>
+            </div>
+
+            <select class="custom-select" style='font-size:16px' requried type="select" name="type" id="type">
+                <option value = ''>--Select--
+                {% for type in user_types %}
+                <option value="{{ type }}">{{ type }}{% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class = "row align-items-start col-3" id = "select_cf">
+        <div class = "input-group col-md-10">
+            <div class ="input-group-prepend">
+                <label class = "input-group-text" for="inv_dropdown">Chartfield</label>
+            </div>
+
+            <select class="custom-select" style='font-size:16px' requried type="select" name="cf" id="cf">
+                <option  value = ''>--Select--
+                {% for chartfield in chartfields %}
+                <option value="{{ chartfield }}">{{ chartfield }}{% endfor %}
+            </select>
+        </div>
+    </div>
+    {% if first%}
+    <div class = "row align-items-start col-3" id = "select_date">
+        <div class = "input-group col-md-10">
+            <div class ="input-group-prepend">
+                <label class = "input-group-text" for="inv_dropdown">Last Call Date</label>
+            </div>
+
+            <select class="custom-select" style='font-size:16px' requried type="select" name="date" id="date">
+                <option value = ''>--Select--
+                <option value="6-12">Greater than 6 months and less than 12 months
+                <option value="12+">Greater than 12 months
+            </select>
+        </div>
+    </div>
+    {% endif %}
+
+    <input type='submit' value='Apply Filters' class="btn btn-primary mb-1 float-right">
+    
+    {% if location_filter or type_filter or cf_filter or date_filter%}
+        {% if first %}<div class = "row align-items-start col-11"></div>{% else %}
+        <pre>     </pre>
+        {% endif %}
+
+    <input type = 'submit' value = 'Remove Filters' class = "btn btn-danger mb-1">
+    {% endif %}
+    </div>
+</form>
+<hr class="style1">
+{% endif %}
+
+
+{% if location_filter or type_filter or cf_filter or date_filter%}
+    <h5>Current Filters</h5>
+    
+    <p> {% if location_filter %}Location filter: {% endif %} {{ location_filter }}</p>
+    <p>{% if type_filter %}User ID Type filter: {% endif %}{{ type_filter }}</p>
+    <p>{% if cf_filter %}Chartfield filter: {% endif %}{{ cf_filter }}</p>
+    <p>{% if date_filter %}Last Call Date filter: {% endif %}{{ date_filter }}</p>
+    <hr class="style1">
+{% endif %}
+
+{% if formated_data %}
+<button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right" style="font-size:20px;font-family:Roboto,sans-serif"> CSV Download</button>
+
 {% for classification in formated_data %}
 <div class = "table-responsive">
 <table class = "table table-sm mb-5 table-striped" style="font-size:12px" >
     
     <h3 class= "text-dark font-weight-bold">
-        Fund: {{classification.1.1.fund}} Department: {{classification.1.1.org}} 
-        Program: {{classification.1.1.program}} Class: {{classification.1.1.subclass}}
-        Project Grant: {{classification.1.1.project_grant}}
+        Chartfield: {{classification.0.0.chartfield}}
     </h3>
     <thead class = "thead-dark"> 
         <tr >
@@ -69,6 +184,16 @@
 
 
 {% endfor %}
+{% else %}
+<hr class="style1">
+    <div class="mt-2">
+		<div class="alert alert-danger col-md-8" role="alert">
+		    <i class="fas fa-exclamation-triangle prv-msgs"></i>
+		    No charges for {{dept_name}} on {{bill_period}} {% if location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%} with the current filters. {% endif %}
+		</div>
+	</div>
+{% endif%}
+
 
 
 <button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>

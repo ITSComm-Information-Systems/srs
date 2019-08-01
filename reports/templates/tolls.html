@@ -3,7 +3,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-<h1>Toll Statements</h1>
+{% comment %} <h1>Toll Statements</h1>
 <div id="main-content" class="container" role="main">
     <div class="container" role="main">
         <div class="row">
@@ -20,9 +20,9 @@
             </div>
         </div>
     </div>
-</div>
-<!-- <div class="container">
-    <form action="/reports/tolls/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
+</div> {% endcomment %}
+<div class="container">
+    <form action="/reports/tolls/downloads" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
         <div class="form-group col-md-6">
             <h5>Billing period</h5>
                 <select class="form-control" style='font-size:16px' type="select" name="bill_period" id="tolls_billing" value="{{ i }}">
@@ -49,45 +49,6 @@
     </form>
 </div>
 
-
-
-{% if inactive %}
-    <span style="color:red">{{dept_name}} ({{dept_id}})</span><i class="fas fa-exclamation-triangle" style="color:red"></i>
-    <p></p>
-    <p></p>
-{% elif submit %}
-    <h5>{{dept_name}} ({{dept_id}})</h5>
-{% endif %}
-
-{% if inactive %}
-    <p>No reports created for inactive departments.</p>
-{% elif submit %}
-    <h5>{{bill_period}}</h5>
-    <table class="table table-hover table-headings">
-        <thead>
-            <tr>
-                    <th>CSV</th>
-                    <th>PDF</th>
-                    <th>Condensed PDF</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                {% comment %} have to put department on page when selection occurs  {% endcomment %}
-                    <td> 
-                        <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/' download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv"></td>
-                    <td> 
-                        <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> PDF Download</a></td>
-                    <td>
-                        <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> Condensed PDF Download</a></td>
-            </tr>
-        </tbody>
-    </table>
-{% endif %}
-
-{% if inactive %}
-    <i class="fas fa-exclamation-triangle" style="color:red"></i><span style="color:red">Department is inactive.</span>
-{% endif %} -->
 
 <script>
     function validate() {
