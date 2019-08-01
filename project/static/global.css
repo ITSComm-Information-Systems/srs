@@ -741,6 +741,54 @@ input:checked + .slider:before {
 	}
 }
 
+<<<<<<< HEAD
+.doc.table-striped>tbody>tr:last-child {
+	background-color:#F0AD4E;
+}
+
+.table-total {
+	background-color:#F0AD4E;
+}
+
+.total-col {
+	text-align:right;
+}
+
+.submit-link {
+	text-align:left;
+	float:left;
+    background:none!important;
+    border:none; 
+    padding:0!important;
+    text-decoration:underline;
+    cursor:pointer;
+}
+
+#edit-selection {
+	text-decoration:underline;
+}
+
+.card-bottom {
+	padding-bottom:0;
+}
+
+.floatleft {
+	float:left;
+}
+
+.card-width {
+	width:83%;
+}
+
+.first-col {
+	text-align:left;
+}
+
+.linky-link {
+	text-decoration:underline;
+}
+
 .remove-chartfield-form-body form .card-body p {
 	display: inline-block;
 }
+
