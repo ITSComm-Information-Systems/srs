@@ -84,7 +84,7 @@ def generate_report(request):
     charge_types = []
     for cf in chartcoms:
         # Create tables for each user defined ID type
-        all_data = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf).order_by('user_defined_id')
+        all_data = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf).order_by('voucher_comment', 'item_description', 'invoice_date')
         prefixes = {}
         charges = {}
         total = 0
@@ -110,7 +110,6 @@ def generate_report(request):
 
                 # Create a non-telephony row for the charges table
                 user_id = {
-                    'user_defined_id': a.user_defined_id,
                     'descr': a.item_description,
                     'qty': int(a.quantity),
                     'total_charges': a.charge_amount,
@@ -138,8 +137,13 @@ def generate_report(request):
                 breakout = False
                 for r in charges[prefix]['rows']:
                     unit_price = r['unit_price'].replace('$', '')
+                    # Container Services
+                    if prefix == 'Container Services' and r['project_name'] == a.voucher_comment and r['descr'] == a.item_description and unit_price == '{:,.2f}'.format(a.unit_price):
+                        r['qty'] += int(a.quantity)
+                        r['total_charges'] += a.charge_amount
+                        breakout = True
                     # Non-container Services
-                    if prefix != 'Container Services' and r['user_defined_id'] == a.user_defined_id and unit_price == '{:,.2f}'.format(a.unit_price):
+                    elif prefix != 'Container Services' and r['user_defined_id'] == a.user_defined_id and unit_price == '{:,.2f}'.format(a.unit_price):
                         r['qty'] += int(a.quantity)
                         r['total_charges'] += a.charge_amount
                         breakout = True
