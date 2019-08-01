@@ -695,7 +695,8 @@ input:checked + .slider:before {
 	}
 
 .order-details-list{
-  	padding-left:20px;
+	  padding-left:20px;
+	  margin-bottom: 0rem;
 }
 
 .small-h2 {
@@ -740,6 +741,7 @@ input:checked + .slider:before {
 	}
 }
 
+<<<<<<< HEAD
 .doc.table-striped>tbody>tr:last-child {
 	background-color:#F0AD4E;
 }
@@ -785,3 +787,8 @@ input:checked + .slider:before {
 .linky-link {
 	text-decoration:underline;
 }
+
+.remove-chartfield-form-body form .card-body p {
+	display: inline-block;
+}
+
