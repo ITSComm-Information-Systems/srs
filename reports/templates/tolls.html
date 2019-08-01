@@ -2,120 +2,37 @@
 {% block content %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-<h1>Toll Statements</h1>
-<div id="main-content" class="container" role="main">
-    <div class="container" role="main">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="message">
-                    <hr class="style1">
-                    <p>
-                        This report is currently under construction.<br>
-                        If you would like to run this report, please visit the Online Service Center and click on Departmental Telephone Service Metrics under reports.
-                    </p>
-                    <a href="https://blue.itcom.itd.umich.edu/UofM/WebObjects/OnlineServiceCenter.woa/1/" class="btn btn-outline-primary" role="button">Online Service Center</a>
-                    
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- <div class="container">
-    <form action="/reports/tolls/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
-        <div class="form-group col-md-6">
-            <h5>Billing period</h5>
-                <select class="form-control" style='font-size:16px' type="select" name="bill_period" id="tolls_billing" value="{{ i }}">
-                    <option></option>
+<div class="container">
+    <h1>{{ title }}</h1>
+    <form action="/reports/tolls/downloads" method="POST" name="Select">{% csrf_token %}
+        <div class="form-group col-md-6">     
+            {% if depts %}
+            <h5>Department ID<span class="prv-msgs">*</span></h5>
+            <p class="mb-0"><span class="prv-msgs">*</span> Required fields</p>
+            <select class="form-control mt-0" style='font-size:16px;width:65%;' requried type="select" name="dept_id" id="tolls_deptids" value="{{ i }}">
+                {% for dept in depts %}
+                <option value="{{ dept.id }}">{{ dept.id }} - {{ dept.name }}</option>
+                {% endfor %}
+            </select>
+            <p id="display"></p>
+            <p></p>
+            {% endif %}
+            <h5 class='mb-0'>Billing period<span class="prv-msgs">*</span></h5>
+                <select class="form-control mt-0" style='font-size:16px;width:65%;' type="select" name="bill_period" id="tolls_billing" value="{{ i }}">
                     {% for i in periods %}
                     <option value="{{ i }}">{{ i }}</option>
                     {% endfor %}
                 </select>
                 <p></p>
                 <p></p>
-            {% if depts %}
-            <h5>Department ID</h5>
-                <select class="form-control" style='font-size:16px' requried type="select" name="dept_id" id="tolls_deptids" value="{{ i }}" onchange="display_dept({{dept_names}})">
-                    <option></option>
-                    {% for dept in depts %}
-                    <option value="{{ dept }}">{{ dept }}</option>
-                    {% endfor %}
-                </select>
-            <p id="display"></p>
-            <p></p>
-            {% endif %}
-            <p><input type='submit' value='Submit' class="btn btn-primary"></p>
+            <p><input type='submit' value='Generate Report' class="btn btn-primary"></p>
         </div>
     </form>
 </div>
 
-
-
-{% if inactive %}
-    <span style="color:red">{{dept_name}} ({{dept_id}})</span><i class="fas fa-exclamation-triangle" style="color:red"></i>
-    <p></p>
-    <p></p>
-{% elif submit %}
-    <h5>{{dept_name}} ({{dept_id}})</h5>
-{% endif %}
-
-{% if inactive %}
-    <p>No reports created for inactive departments.</p>
-{% elif submit %}
-    <h5>{{bill_period}}</h5>
-    <table class="table table-hover table-headings">
-        <thead>
-            <tr>
-                    <th>CSV</th>
-                    <th>PDF</th>
-                    <th>Condensed PDF</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                {% comment %} have to put department on page when selection occurs  {% endcomment %}
-                    <td> 
-                        <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/' download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv"></td>
-                    <td> 
-                        <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> PDF Download</a></td>
-                    <td>
-                        <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> Condensed PDF Download</a></td>
-            </tr>
-        </tbody>
-    </table>
-{% endif %}
-
-{% if inactive %}
-    <i class="fas fa-exclamation-triangle" style="color:red"></i><span style="color:red">Department is inactive.</span>
-{% endif %} -->
-
-<script>
-    function validate() {
-        var bill_date = document.forms["Select"]["bill_period"];
-        var deptid = document.forms["Select"]["dept_id"];
-
-        if (bill_date.selectedIndex < 1) {
-            window.alert("Please select a billing date.");
-            bill_date.focus();
-            return false;
-        }
-        if (deptid.selectedIndex < 1) {
-            deptid.focus();
-            window.alert("Please select a department.");
-            return false;
-        }
-        return true;
-    }
-
-    function display_dept(depts) {
-        var deptid = document.forms["Select"]["dept_id"];
-        var index = deptid.selectedIndex - 1;
-        document.getElementById("display").innerHTML = depts[index];
-    }
-</script>
-
 {% endblock %}
 
 {% block js %}
+<script src="/../static/toll.js"></script> 
 <script type="text/javascript" src="/static/select.js"></script>
 {% endblock %}

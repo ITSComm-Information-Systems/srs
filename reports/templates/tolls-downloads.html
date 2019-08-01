@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<h1>Toll Statements Report</h1>
+<div class="">
+	<strong>Report selection</strong>
+    <a class="float-right" href="../tolls">Edit your selection</a>
+    <a class="float-right" id="edit-selection" href="../tolls"><i class="fas fa-edit"></i></a>
+</div>
+
+<div class="">
+	<div class="card border-dark">
+		<div class="card-body">
+			<strong>Department:&nbsp;&nbsp;</strong>{{ dept_id }}
+            <strong>&nbsp;&nbsp;&nbsp;&nbsp;Department Name:&nbsp;&nbsp;</strong>{{dept_name}}
+			<strong>&nbsp;&nbsp;&nbsp;&nbsp;Billing Date:&nbsp;&nbsp;</strong>{{ bill_period }}<br>
+	   </div>
+    </div>
+</div>
+ <hr class="style1">
+
+{% if inactive %}
+    <span style="color:red">{{dept_name}} ({{dept_id}})</span><i class="fas fa-exclamation-triangle" style="color:red"></i>
+    <p></p>
+    <p></p>
+{% endif %}
+
+{% if inactive %}
+    <p>No reports created for inactive departments.</p>
+{% elif submit %}
+    <h5>Report Downloads</h5><br>
+    <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/' download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv"><i class="fas fa-file-csv" style="font-size:24px;color:green"></i> CSV Download</a><br><br>
+    <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:24px;color:red"></i> PDF Download</a><br><br>
+    <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:24px;color:red"></i> Condensed PDF Download</a>
+    {% comment %} <table class="table table-hover table-headings">
+        <thead>
+            <tr>
+                    <th>CSV</th>
+                    <th>PDF</th>
+                    <th>Condensed PDF</th>
+            </tr>
+        </thead>
+        <tbody>
+           
+                    <td> 
+                        <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/' download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv"><i class="fas fa-file-csv" style="font-size:20px;color:green"></i> CSV Download</a></td>
+                    <td> 
+                        <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> PDF Download</a></td>
+                    <td>
+                        <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> Condensed PDF Download</a></td>
+
+        </tbody>
+    </table> {% endcomment %}
+{% endif %}
+
+{% if inactive %}
+    <i class="fas fa-exclamation-triangle" style="color:red"></i><span style="color:red">Department is inactive.</span>
+{% endif %}
+
+{% endblock %}

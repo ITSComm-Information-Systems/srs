@@ -98,6 +98,7 @@ def chartchange(request):
 
 	
 	context = {
+		'title': 'Chartfield Change',
 		'deptids': user_depts,
 		'dept_info': dept_info,
 		'selected_cf': selected_cf,
