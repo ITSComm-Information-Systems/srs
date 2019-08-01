@@ -740,8 +740,6 @@ input:checked + .slider:before {
 		margin-top: 4.25rem;
 	}
 }
-
-<<<<<<< HEAD
 .doc.table-striped>tbody>tr:last-child {
 	background-color:#F0AD4E;
 }
