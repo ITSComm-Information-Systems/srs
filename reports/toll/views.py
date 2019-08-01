@@ -30,35 +30,39 @@ from os import listdir
 from project import settings
 
 # Generate report
-def generate(request):
+def select(request):
 	template = loader.get_template('tolls.html')
 
 	dropdown = select_billing(request)
 	depts = find_depts(request)
 	dept_names = []
 
+	query = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('deptid')
+	for q in query:
+		dept_names.append(q.dept_name)
 
+	context = {
+		'periods': dropdown,
+		'depts': depts,	
+		'dept_names': dept_names,
+	}
+
+	return HttpResponse(template.render(context, request))
+
+def generate(request):
+	template = loader.get_template('tolls-downloads.html')
 	# Set default billing period/dept ID
 	bill_period = ''
 	dept_id = ''
-	submit = False
-	if request.POST.get('bill_period') is None:
-		bill_period = dropdown[0]
-	else:
-		bill_period = request.POST.get('bill_period')
-		submit = True
-	if request.POST.get('dept_id') is None:
-		dept_id = depts[0]
-	else:
-		dept_id = request.POST.get('dept_id')
+	submit = True
+	
+	bill_period = request.POST.get('bill_period')
+	dept_id = request.POST.get('dept_id')
 
 
 	dept = UmOscDeptProfileV.objects.filter(deptid=dept_id)
 	dept_name = dept[0]
 
-	query = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('deptid')
-	for q in query:
-		dept_names.append(q.dept_name)
 
 	inactive = False
 	if dept[0].dept_eff_status == 'I':
@@ -68,11 +72,8 @@ def generate(request):
 	year = bill_period.split(' ')[1]
 
 	context = {
-		'periods': dropdown,
-		'depts': depts,
 		'dept_id': dept_id,
 		'dept_name': dept_name,
-		'dept_names': dept_names,
 		'inactive': inactive,
 		'bill_period': bill_period,
 		'bill_month': month,
@@ -81,6 +82,8 @@ def generate(request):
 	}
 
 	return HttpResponse(template.render(context, request))
+	
+
 
 # Select billing period and department ID
 def select_billing(request):
@@ -92,7 +95,7 @@ def select_billing(request):
  	months = ['null', 'January', 'February', 'March', 'April', 'May', 'June', 'July',
  	 		  'August', 'September', 'October', 'November', 'December']
 
- 	og_format = os.listdir(settings.MEDIA_ROOT + '/toll/')
+ 	og_format = os.listdir(settings.MEDIA_ROOT + '/toll')
  	og_format.sort()
  	for date in og_format:
  		pieces = date.split('_')
