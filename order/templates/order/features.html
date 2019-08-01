@@ -2,6 +2,14 @@
   <div id="cat{{category.id}}" data-phoneset="{{category.name}}">
   <h3> {{category}} </h3>
 
+  <em>
+    We can't display the current features for this phone. Review the Inventory and Location Report to see your phone's features.
+  </em>
+
+  <strong>
+    Select the additional features you want this phone to have.
+  </strong>
+
     <div class="form-row">
       {% for type in category.type %}
         <div class="form-check col">

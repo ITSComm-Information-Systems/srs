@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container">
+    <h1>{{title}}</h1>
     <form action="{{ form_action }}" method="POST" name="Select">{% csrf_token %}
         <div class="form-group">
             <h5>Select Department<span class="prv-msgs">*</span></h5>
@@ -31,12 +32,12 @@
                 </label>
             </div>
             <div class="row">
-	            <select multiple="multiple" class="form-control col-md-4" style='font-size:16px;float:left;' requried type="select" name="chartcoms[]" id="doc_chartcom" value="{{ cf }}">
+	            <select multiple="multiple" class="form-control col-md-4 floatleft" style='font-size:16px;' requried type="select" name="chartcoms[]" id="doc_chartcom" value="{{ cf }}">
 	                {% for cf in dept_cfs %}
 	                <option value="{{ cf }}">{{ cf }}</option>
 	                {% endfor %}
 	            </select>
-	            <p id='chartfield_list' style="float:left;"></p>
+	            <p id='chartfield_list' class='floatleft'></p>
 	        </div>
         </div>
         <strong id="error_message" class="hidden">Please select a chartfield.</strong>
