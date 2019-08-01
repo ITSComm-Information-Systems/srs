@@ -21,7 +21,7 @@
 {% endblock %} {% endcomment %}
  {% comment %} onsubmit="return validate()" {% endcomment %}
 {% block content %}
-
+<h1>Inventory and Location Report</h1>
 <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
         <div class="form-group col-md-6">
             {% if depts %}
@@ -30,8 +30,6 @@
                     {% for dept in depts %}
                     <option value="{{ dept.deptid }}-{{dept.name}}">{{ dept.deptid }} - {{ dept.name }}{% endfor %}
                 </select>
-            <p id="display"></p>
-            <p></p>
             <h5>Billing Period</h5>
                 <select class="form-control" style='font-size:16px' requried type="select" name="bill_period" id="bill_period" value="{{ i }}">
                     {% for date in dates %}

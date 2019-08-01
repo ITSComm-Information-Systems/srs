@@ -78,7 +78,7 @@ def generate(request):
 		'bill_period': bill_period,
 		'bill_month': month,
 		'bill_year': year,
-		'submit': submit
+		'submit': submit,
 	}
 
 	return HttpResponse(template.render(context, request))
