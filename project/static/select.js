@@ -33,8 +33,6 @@ $(document).ready(function() {
 
 	// Set select for tolls- choose dept
 	$("#tolls_deptids").select2({
-    	placeholder: "Select a department",
-    	width: "100%",
     	matcher: function(params, data) {
         	return matchStart(params, data);
     	}
@@ -42,14 +40,12 @@ $(document).ready(function() {
 
 	// tolls - choose billing period
 	$("#tolls_billing").select2({
-    	minimumResultsForSearch: Infinity,
-    	placeholder: "Select a billing period"
+    	minimumResultsForSearch: Infinity
 	});
 
 
 	// Set select for DOC - departments
 	$('#doc_depts').select2({
-		// width: '33%',
 		matcher: function(params, data) {
         	return matchStart(params, data);
     	}
@@ -57,8 +53,7 @@ $(document).ready(function() {
 
 	// Set select for DOC - date
 	$('#doc_bill_date').select2({
-		minimumResultsForSearch: Infinity,
-		width: '33%'
+		minimumResultsForSearch: Infinity
 	})
 
 });
