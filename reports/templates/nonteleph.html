@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<div class="container">
+	<h1>{{title}}</h1>
+	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
+		<strong class="d-inline">Report Selection</strong>
+		<a class="d-inline offset-md-2" href='..'><i class="fas fa-edit"></i>Edit Your Selection</a>
+
+		<div class="row">
+			<div class="card border-dark col-md-5">
+				<div class="card-body card-bottom">
+					<div id="selected_dept"><strong>Department:&nbsp;&nbsp;</strong>{{ dept }}<br></div>
+					<div id="billing_date"><strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_date }}<br></div>
+					<strong class="floatleft">Chartfields:&nbsp;&nbsp;</strong>
+					<p id="chartcoms" class="floatleft">
+					{% for c in charge_types %}
+						{{ c.account_number }}<br>
+					{% endfor %}
+					</p>
+				</div>
+			</div>
+		</div>
+
+
+		{% for c in charge_types %}
+		{% if c.data %}
+		<div class="row mt-5">
+			<div class="card border-dark card-width">
+				<div class="card-header">
+					<strong>Chartfield:</strong>&nbsp;{{ c.account_number }}
+				</div>
+				<div class="card-body">
+					{% for key, value in c.charge_tables.items %}
+						<strong>{{ key }}</strong>
+						<table class="doc table table-sm table-striped mt-2" id='charge_table'>
+							<thead>
+								<tr class="thead-dark">
+									{% if key == 'Container Services' %}
+									<th scope='col' class='first-col'>Project Name</th>
+									{% else %}
+									<th scope='col' class="first-col">Billing ID</th>
+									{% endif %}
+									<th scope="col">Description</th>
+									{% if key == 'Container Services' %}
+									<th scope='col'>Date</th>
+									{% endif %}
+									<th scope="col">Transaction Type</th>
+									<th scope="col">Unit Price</th>
+									<th scope="col">Quantity</th>
+									<th scope="col" class='total-col'>Total Charge</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for v in value.rows %}
+								<tr>
+									{% if key == 'Container Services' %}
+									<td class='first-col'>{{ v.project_name }}</td>
+									{% else %}
+									<td class='first-col'>{{ v.user_defined_id }}</td>
+									{% endif %}
+
+									<td>{{ v.descr }}</td>
+
+									{% if key == 'Container Services' %}
+									<td>{{ v.date }}</td>
+									{% endif %}
+
+									<td>{{ v.type }}</td>
+
+									{% if v.type == 'Credit' %}
+										<td style='color:red;'>{{ v.unit_price }}</td>
+									{% else %}
+										<td>{{ v.unit_price }}</td>
+									{% endif %}
+
+									<td>{{ v.qty }}</td>
+
+									{% if v.type == 'Credit' %}
+										<td class='total-col' style='color:red;'>{{ v.total_charges }}</td>
+									{% else %}
+										<td class='total-col'>{{ v.total_charges }}</td>
+									{% endif %}
+								</tr>
+								{% endfor %}
+								<tr class='table-total'>
+									<td class='first-col'><strong>Total</strong></td>
+									<td></td>
+									{% if key == 'Container Services' %}
+									<td></td>
+									{% endif %}
+									<td></td>
+									<td></td>
+									<td></td>
+									<td class='total-col'>{{ value.total }}</td>
+								</tr>
+							</tbody>
+						</table>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		{% else %}
+		<div class="row mt-5">
+			<div class="card border-dark card-width">
+				<div class="card-header">
+					<strong>Chartfield:&nbsp;</strong>{{ c.account_number }}
+				</div>
+				<div class="card-body">
+					<div class="col-md-9">
+				        <div class="alert alert-danger col-md-9" role="alert">
+				            <i class="fas fa-exclamation-triangle prv-msgs"></i>
+				            This chartfield does not have any data this month.
+				        </div>
+				    </div>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+		{% endfor %}
+</div>
+
+{% endblock %}
+
+{% block js %}
+
+<script src="/../static/doc.js"></script> 
+
+{% endblock %}

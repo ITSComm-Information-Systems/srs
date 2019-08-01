@@ -792,6 +792,12 @@ class UmOscAcctdetailMrcOccV(models.Model):
      user_defined_id =  models.CharField(max_length=20, blank=True)
      dtl_of_chrgs_telephony = models.PositiveIntegerField(null=True)            
      dtl_of_chrgs_nontelephony = models.PositiveIntegerField(null=True) 
+     unique_identifier = models.CharField(max_length=200)
+     charge_name = models.CharField(max_length=100)
+     shortcode = models.CharField(max_length=6)
+     invoice_id = models.CharField(max_length=30)
+     uniqname = models.CharField(max_length=8)
+     voucher_comment = models.CharField(max_length=30)
 
      class Meta:
           managed = False
