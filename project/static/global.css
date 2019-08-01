@@ -790,3 +790,6 @@ input:checked + .slider:before {
 	display: inline-block;
 }
 
+.features-restriction-msg strong {
+	display: block;
+}
