@@ -6,27 +6,22 @@
 <div class="container">
 	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
 
+	<h1>{{title}}</h1>
 	<form action=".." method="POST" id="return">{% csrf_token %}
 		<input type="hidden" name="chartcoms[]" value="{{ return_button.chartcoms }}">
 		<input type="hidden" name="select_dept" value="{{ return_button.select_dept }}">
 		<input type="hidden" name="billing_date" value="{{ return_button.bill_date }}">
-		
-		<strong class="d-inline">Report selection</strong>
-		<div class="d-inline offset-md-2">
-			<a class="btn btn-link" href="../../.."><i class="fas fa-edit btn-link"></i>Edit Your Selection</a>
-		</div>
 
-		<!-- <strong class="d-inline">Report Selection</strong>
-		<div class="d-inline offset-md-2">
-			<button class="btn btn-link d-inline" onclick="location.href='../..';"><i class="fas fa-edit"></i>Edit Your Selection</button>
-		</div> -->
+		<strong class="d-inline">Report Selection</strong>
+		<a class="d-inline offset-md-2" href='../..'><i class="fas fa-edit"></i>Edit Your Selection</a>
+
 		<div class="row mb-5">
 			<div class="card border-dark col-md-5">
-				<div class="card-body" style="padding-bottom:0;">
+				<div class="card-body card-bottom">
 					<strong>Department:&nbsp;&nbsp;</strong>{{ dept }}<br>
 					<strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_date }}<br>
-					<strong style="float:left;">Chartfields:&nbsp;&nbsp;</strong>
-					<p style="float:left;">
+					<strong class='floatleft'>Chartfields:&nbsp;&nbsp;</strong>
+					<p class='floatleft'>
 					{% for c in chartcoms %}
 						{{ c }}<br>
 					{% endfor %}
@@ -36,13 +31,11 @@
 		</div>
 
 		<strong class="d-inline">Subscriber Information</strong>
-		<div class="d-inline offset-md-7">
-			<button class="btn btn-link" type="submit"><i class="fas fa-edit"></i>Return to Report</button>
-		</div>
+		<a class="d-inline offset-md-7" href='#' onclick="$('#return').submit();"><i class="fas fa-edit"></i>Return to Report</a>
 	</form>
 
 	<div class="row">
-		<div class="card border-dark col-md-10">
+		<div class="card border-dark col-md-10"> href='#'
 			<div class="card-body">
 				<div>
 					<strong>Billing ID:&nbsp;&nbsp;</strong>{{ user_id }}<br>
@@ -60,7 +53,7 @@
 
 
 	{% for cf in chartfields %}
-	<div class="card border-dark mt-5 mb-5" style="width:83%;">
+	<div class="card border-dark mt-5 mb-5 card-width">
 		<div class="card-header">
 			<strong>Charges for Chartfield:&nbsp;</strong>{{ cf.account }}
 		</div>
@@ -68,14 +61,14 @@
 			{% if cf.monthly %}
 			<div>
 				<strong>Monthly Charges</strong>
-				<table class="table table-sm">
+				<table class="doc table table-sm table-striped mt-2">
 					<thead>
-						<tr class="table-secondary">
+						<tr class="thead-dark">
 							<th scope="col">Billing ID</th>
 							<th scope="col">Description</th>
 							<th scope="col">Unit Price</th>
 							<th scope="col">Quantity</th>
-							<th scope="col" style="text-align:right;">Total Charge</th>
+							<th scope="col" class='total-col'>Total Charge</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -85,15 +78,15 @@
 							<td>{{ m.desc }}</td>
 							<td>{{ m.unit_price }}</td>
 							<td>{{ m.quantity }}</td>
-							<td style="text-align:right;">{{ m.total_charge }}</td>
+							<td class='total-col'>{{ m.total_charge }}</td>
 						</tr>
 						{% endfor %}
-						<tr style="background-color:#F0AD4E;">
+						<tr class='table-total'>
 							<td><strong>Total</strong></td>
 							<td></td>
 							<td></td>
 							<td></td>
-							<td style="text-align:right;">{{ cf.monthly_total }}</td>
+							<td class='total-col'>{{ cf.monthly_total }}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -101,16 +94,18 @@
 			{% endif %}
 
 			{% if cf.local %}
-			<div class="mt-5">
+				{% if cf.monthly %}
+				<div class="mt-5"></div>
+				{% endif %}
 				<strong>Local Charges</strong>
-				<table class="table table-sm">
+				<table class="doc table table-sm table-striped mt-2">
 					<thead>
-						<tr class="table-secondary">
+						<tr class="thead-dark">
 							<th scope="col">Connect Date</th>
 							<th scope="col">To Number</th>
 							<th scope="col">Location</th>
 							<th scope="col">Duration</th>
-							<th scope="col" style="text-align:right;">Total Charge</th>
+							<th scope="col" class='total-col'>Total Charge</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -120,32 +115,33 @@
 							<td>{{ l.to_num }}</td>
 							<td>{{ l.location }}</td>
 							<td>{{ l.duration }}</td>
-							<td style="text-align:right;">{{ l.total_charge }}</td>
+							<td class='total-col'>{{ l.total_charge }}</td>
 						</tr>
 						{% endfor %}
-						<tr style="background-color:#F0AD4E;">
+						<tr class='table-total'>
 							<td><strong>Total</strong></td>
 							<td></td>
 							<td></td>
 							<td></td>
-							<td style="text-align:right;">{{ cf.local_total }}</td>
+							<td class='total-col'>{{ cf.local_total }}</td>
 						</tr>
 					</tbody>
 				</table>
-			</div>
 			{% endif %}
 
 			{% if cf.toll %}
-			<div class="mt-5">
+				{% if cf.monthly or cf.local %}
+				<div class="mt-5"></div>
+				{% endif %}
 				<strong>Toll Charges</strong>
-				<table class="table table-sm">
+				<table class="doc table table-sm table-striped mt-2">
 					<thead>
-						<tr class="table-secondary">
+						<tr class="thead-dark">
 							<th scope="col">Connect Date</th>
 							<th scope="col">To Number</th>
 							<th scope="col">Location</th>
 							<th scope="col">Duration</th>
-							<th scope="col" style="text-align:right;">Total Charge</th>
+							<th scope="col" class='total-col'>Total Charge</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -155,32 +151,32 @@
 							<td>{{ t.to_num }}</td>
 							<td>{{ t.location }}</td>
 							<td>{{ t.duration }}</td>
-							<td style="text-align:right;">{{ t.total_charge }}</td>
+							<td class='total-col'>{{ t.total_charge }}</td>
 						</tr>
 						{% endfor %}
-						<tr style="background-color:#F0AD4E;">
+						<tr class='table-total'>
 							<td><strong>Total</strong></td>
 							<td></td>
 							<td></td>
 							<td></td>
-							<td style="text-align:right;">{{ cf.toll_total }}</td>
+							<td class='total-col'>{{ cf.toll_total }}</td>
 						</tr>
 					</tbody>
 				</table>
-			</div>
 			{% endif %}
 
-			<div class="mt-5">
-				<strong class="d-inline">Total Charges for Chartfield:&nbsp;</strong><p class="d-inline">{{cf.account }}</p>
-				<table class="table table-sm">
-					<tbody>
-						<tr style="background-color:#F0AD4E;">
-							<td><strong>Total</strong></td>
-							<td style="text-align:right;">{{ cf.cf_total }}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+			{% if cf.monthly or cf.local or cf.toll %}
+			<div class="mt-5"></div>
+			{% endif %}
+			<strong class="d-inline">Total Charges for Chartfield:&nbsp;</strong><p class="d-inline">{{cf.account }}</p>
+			<table class="doc table table-sm mt-2">
+				<tbody>
+					<tr class='table-total'>
+						<td><strong>Total</strong></td>
+						<td class='total-col'>{{ cf.cf_total }}</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 	{% endfor %}
@@ -189,11 +185,11 @@
 	<p class="d-inline">{{ user_id }}</p>
 	<div class="card border-dark col-md-10">
 		<div class="card-body">
-			<table class="table table-sm">
+			<table class="doc table table-sm">
 				<tbody>
-					<tr style="background-color:#F0AD4E;">
+					<tr class='table-total'>
 						<td><strong>Total</strong></td>
-						<td style="text-align:right">{{ total }}</td>
+						<td class='total-col'>{{ total }}</td>
 					</tr>
 				</tbody>
 			</table>

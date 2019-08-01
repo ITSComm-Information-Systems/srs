@@ -55,7 +55,7 @@ def get_doc(request):
 
     context = {
         'title': 'Detail of Charges',
-        'form_action': '/reports/doc/report/telephony/',
+        'form_action': '/reports/doc/report/',
         'names': names,
         'dates': billing_dates,
         'initial_date':billing_dates[0],
@@ -67,17 +67,7 @@ def get_doc(request):
 
 # Generate basic report based on user selections
 @permission_required('oscauth.can_report', raise_exception=True)
-def generate_report(request, type):
-	# Telephony vs. nontelephony report
-	telephony = False
-	nontelephony = False
-	if type == 'nontelephony':
-		nontelephony = True
-		title = 'New Report'
-	else:
-		telephony = True
-		title = 'Detail of Charges'
-
+def generate_report(request):
 	template = loader.get_template('doc-report.html')
 
 	# Get information from previous page
@@ -108,9 +98,8 @@ def generate_report(request, type):
 			# Only include 'telephony'
 			initial_prefix = a.user_defined_id.split('-')[0]
 			prefix_query = UmOscRptSubscrib_Api_V.objects.filter(subscriber_prefix=initial_prefix)
-			# prefix_query = ''
-			if ((telephony and a.dtl_of_chrgs_telephony) or (nontelephony and a.dtl_of_chrgs_nontelephony)) and (a.mrc_amount != 0 or a.tot_call_amount != 0):
-				# Determine user defined ID type - will come from new view
+			if (a.dtl_of_chrgs_telephony and (a.mrc_amount != 0 or a.tot_call_amount != 0)):
+				# Determine user defined ID type
 				if prefix_query:
 					prefix = prefix_query[0].subscriber_desc
 					if prefix == '':
@@ -118,14 +107,14 @@ def generate_report(request, type):
 				else:
 					prefix = 'Misc.'
 
-				# Add new user defined ID type if applicable
+				# Add new user defined ID type if applicable - telephony vs non telephony considered
 				if prefix in prefixes:
 					prefixes[prefix] += a.tot_amount
 				else:
 					prefixes[prefix] = a.tot_amount
 				total += a.tot_amount
 
-				# Create a row for the charges table
+				# Create a telephony row for the charges table
 				user_id = {
 					'user_defined_id': a.user_defined_id,
 					'subscriber_id': a.subscriber_id,
@@ -134,6 +123,7 @@ def generate_report(request, type):
 					'call_amount': '${:,.2f}'.format(a.tot_call_amount),
 					'total_charges': a.tot_amount
 				}
+
 				if prefix not in charges:
 					charges[prefix] = {
 						'rows': [],
@@ -150,7 +140,7 @@ def generate_report(request, type):
 		monthly_data = {}
 		monthly_total = 0
 		for m in monthly_query:
-			if ((telephony and m.dtl_of_chrgs_telephony) or (nontelephony and m.dtl_of_chrgs_nontelephony)):
+			if m.dtl_of_chrgs_telephony:
 				# Item code already exists in table
 				if m.item_code in monthly_data:
 					monthly_data[m.item_code]['quantity'] += int(m.quantity)
@@ -175,7 +165,10 @@ def generate_report(request, type):
 			prefixes[p] = '${:,.2f}'.format(prefixes[p])
 		for c in charges:
 			for r in charges[c]['rows']:
-				r['total_charges'] = '${:,.2f}'.format(r['total_charges'])
+				if r['total_charges'] < 0:
+					r['total_charges'] = '-' + '${:,.2f}'.format(abs(r['total_charges']))
+				else:
+					r['total_charges'] = '${:,.2f}'.format(r['total_charges'])
 			charges[c]['total'] = '${:,.2f}'.format(charges[c]['total'])
 
 
@@ -188,12 +181,12 @@ def generate_report(request, type):
 		otc_rows = []
 		otc_total = 0
 		for c in occ_charges:
-			if ((telephony and c.dtl_of_chrgs_telephony) or (nontelephony and c.dtl_of_chrgs_nontelephony)):
+			if c.dtl_of_chrgs_telephony:
 				has_data = True
 				# If OCC is a credit
 				if c.charge_amount < 0:
 					# New item code for table
-					if not any (c['item_code'] == c.item_code for c in credits):
+					if not any (cr['item_code'] == c.item_code for cr in credits):
 						credit = {
 							'item_code': c.item_code,
 							'credit': abs(c.charge_amount)
@@ -285,7 +278,7 @@ def generate_report(request, type):
 
 
 	context= {
-		'title':title,
+		'title':'Detail of Charges',
 		'dept': selected_dept,
 		'billing_date': bill_date,
 		'charge_types': charge_types,
@@ -297,7 +290,7 @@ def generate_report(request, type):
 
 
 @permission_required('oscauth.can_report', raise_exception=True)
-def show_detail(request, type):
+def show_detail(request):
 	template = loader.get_template('doc-detail.html')
 
 	# Get information from previous page
