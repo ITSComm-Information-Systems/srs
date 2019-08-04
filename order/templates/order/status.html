@@ -8,9 +8,9 @@
             <div class="row">
                 <div class="col-12">
                     <h1>
-                        Track Orders
+                        {{title}}
                         <small class="text-muted">
-                            for Department: <strong>{{department.id}} - {{department.name}}</strong>
+                            for Department: <strong><span id=deptHeading></span></strong>
                         </small>
                     </h1>
                 </div>
@@ -47,7 +47,7 @@
                                 <i class="fas fa-search" aria-label="Search Icon"></i>
                             </span>
                         </div>
-                        <input type="text" class="form-control" placeholder="Search by pre-order or uniqname…"
+                        <input id="orderSearch" type="text" class="form-control" placeholder="Search by pre-order or uniqname…"
                             aria-label="Search by pre-order or uniqname…" aria-describedby="basic-addon2">
                     </div>
                     <!-- End of Search -->
@@ -82,7 +82,7 @@
                                 <th scope="col">Date Submitted</th>
                                 <th scope="col">Submitted By</th>
                                 <th scope="col" class="wismo-order-details">Order Details</th>
-                                <th scope="col">Charfield Billed</th>
+                                <th scope="col">Chartfield Billed</th>
                                 <th scope="col">Status <i class="fas fa-question-circle btn-link"
                                         aria-label="More Information icon" data-toggle="modal"
                                         data-target="#statusIndicatorModal"></i></th>
@@ -92,7 +92,7 @@
                         <!-- End of table headers -->
 
                         <!-- Beginning of table body -->
-                        <tbody>
+                        <tbody id="statusTable" >
 
                             {% for order in order_list %}
                             <!-- First table row -->
@@ -239,6 +239,17 @@
     $(document).ready(function () {
         $('[data-toggle="popover"]').popover();
 
+        dept = $("#selectDept option:selected").text();
+        $('#deptHeading').text(dept);
+
+        
+        $('#order-status-options').change(function () {
+            status = $("#order-status-options option:selected").text();
+            $("#statusTable tr:visible").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(status) > -1)
+            });
+            console.log(status);
+        });
 
         $('#selectDept').change(function () {
             if (this.value == 'Select a department') {
@@ -246,7 +257,16 @@
             } else {
                 $('[data-dept]').hide();
                 $("[data-dept='" + this.value + "']").show();
+                dept = $("#selectDept option:selected").text();
+                $('#deptHeading').text(dept);
             }
+        });
+
+        $("#orderSearch").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#statusTable tr:visible").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
         });
 
     });
