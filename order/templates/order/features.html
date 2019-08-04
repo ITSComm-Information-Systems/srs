@@ -2,6 +2,15 @@
   <div id="cat{{category.id}}" data-phoneset="{{category.name}}">
   <h3> {{category}} </h3>
 
+  <div class="features-restriction-msg mb-4">
+      <em>
+        We can't display the current calling restrictions for this phone. Review the Inventory and Location Report to see your phone's restrictions.
+      </em>
+      <strong>
+          Select the calling restirctions you want this phone to have.
+      </strong>
+    </div>
+
     <div class="form-row">
       {% for type in category.type %}
         <div class="form-check col">

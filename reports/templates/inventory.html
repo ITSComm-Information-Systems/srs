@@ -25,13 +25,14 @@
 <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
         <div class="form-group col-md-6">
             {% if depts %}
-            <h5>Department ID</h5>
-                <select class="form-control" style='font-size:16px' requried type="select" name="dept_id" id="dept_id" value="{{ i }}">
+            <h5>Department ID<span class="prv-msgs">*</span></h5>
+            <p class="mb-0"><span class="prv-msgs">*</span> Required fields</p>
+                <select class="form-control mt-0" style='font-size:16px; width:65%;' requried type="select" name="dept_id" id="dept_id" value="{{ i }}">
                     {% for dept in depts %}
                     <option value="{{ dept.deptid }}-{{dept.name}}">{{ dept.deptid }} - {{ dept.name }}{% endfor %}
                 </select>
-            <h5>Billing Period</h5>
-                <select class="form-control" style='font-size:16px' requried type="select" name="bill_period" id="bill_period" value="{{ i }}">
+            <h5 class='mb-0'>Billing Period<span class="prv-msgs">*</span></h5>
+                <select class="form-control mt-0" style='font-size:16px;width:65%;' requried type="select" name="bill_period" id="bill_period" value="{{ i }}">
                     {% for date in dates %}
                     <option value="{{ date }}">{{ date }}{% endfor %}
                 </select>
@@ -41,4 +42,8 @@
             <p><input type='submit' value='Generate Report' class="btn btn-primary"></p>
         </div>
 </form>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/static/select.js"></script>
 {% endblock %}

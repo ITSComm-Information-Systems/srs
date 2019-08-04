@@ -777,7 +777,7 @@ class UmOscAcctdetailMrcOccV(models.Model):
      billing_cycle = models.CharField(max_length=2)
      item_code = models.CharField(max_length=50)
      batch_date = models.DateField
-     invoice_date = models.DateField
+     invoice_date = models.DateField(null=True) # made this null=True
      account_number = models.CharField(max_length=100)
      account_subcode = models.CharField(max_length=10)
      item_description = models.CharField(max_length=100)

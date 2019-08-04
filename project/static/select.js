@@ -56,4 +56,16 @@ $(document).ready(function() {
 		minimumResultsForSearch: Infinity
 	})
 
+	// Set select for Inventory and Location - departments
+	$('#dept_id').select2({
+		matcher: function(params, data) {
+        	return matchStart(params, data);
+    	}
+	})
+
+	// Set select for Inventory and Location - bill period
+	$('#bill_period').select2({
+		minimumResultsForSearch: Infinity
+	})
+
 });
