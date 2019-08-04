@@ -210,11 +210,6 @@ class Order(models.Model):
 
         for num, item in enumerate(item_list, start=1):
 
-            if num == 2:
-                status = 'Received'
-                first = UmOscPreorderApiV.objects.get(add_info_text_3=self.id)
-                preorder = first.pre_order_number
-
             api = UmOscPreorderApiV()
             api.add_info_text_3 = self.id
             api.add_info_text_4 = item.id  #This causes an error - PRE_ORDER_ID: 5: Value cannot be changed
@@ -242,6 +237,10 @@ class Order(models.Model):
             api.default_one_time_expense_acct=self.chartcom.account_number
 
             api.save()
+
+            if num == 1:
+                status = 'Received'
+                preorder = UmOscPreorderApiV.objects.get(add_info_text_3=self.id).pre_order_number
 
         #Trigger completion of entries so Pinnacle rolls up and sends an email
         one = UmOscPreorderApiV.objects.filter(add_info_text_3=self.id, work_status_name=None)
