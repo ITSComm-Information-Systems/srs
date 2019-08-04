@@ -103,9 +103,7 @@
                                 <td>
                                     <ul class="order-details-list">
                                         {% for item in order.items %}
-                                        <li>
-                                            {{ item.description }}
-                                        </li>
+                                        <pre style='font-family: Arial; font-size: 16px;'>{{ item.description }}</pre>
                                         {% endfor %}
                                     </ul>
                                 </td>
