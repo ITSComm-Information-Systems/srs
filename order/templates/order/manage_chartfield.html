@@ -72,7 +72,7 @@
                             <!-- end of table headers -->
                             <tbody>
                                 {% for chartcom in chartcoms %}
-                                <tr data-cfid="{{chartcom.id}}">
+                                <tr data-cfid="{{chartcom.id}}" data-chartcom="{{chartcom.account_number}}">
                                     <th scope="row">{{chartcom.name}}</th>
                                     <td>{{chartcom.fund}}</td>
                                     <td>{{chartcom.dept}}</td>
@@ -184,12 +184,12 @@
                             <div class="form-group">
                                 <label for="shortcode">Shortcode</label>
                                 <!-- Replace the value of the input form below to be the shortcode (if any) of the chartfield that the user selected to edit -->
-                                <input type="text" class="form-control" id="shortcode" name="shortcodeVal"
+                                <input type="text" class="form-control" id="shortCode1" name="shortcodeVal"
                                     value="Shortcode goes here (if there is one)" readonly>
                             </div>
 
                             <div class="form-group">
-                                <label for="newChartfieldDescription">
+                                <label for="newChartfieldDescription" id="chartComDescr1">
                                     Enter a New Associated Name
                                 </label>
                                 <!-- Replace the value of the input form below to be the description of the chartfield that the user selected to edit -->
@@ -231,19 +231,19 @@
                             <div class="card-body">
                                 <strong class="card-text" >Chartfield:</strong>
                                 <!-- Replace the following text with the value of the chartfield that the user selected to be removed from the shortlist -->
-                                <p class="card-text">Enter chartfield value here</p>
+                                <p id="chartCom" class="card-text">Enter chartfield value here</p>
                                 <br>
                                 <strong class="card-text" >
                                     Shortcode:
                                 </strong>
                                 <!-- Replace the following text with the value of the shortcode of the chartfield that the user selected to be removed from the shortlist -->
-                                <p class="card-text">Shortcode (if any) goes here</p>
+                                <p id="shortCode" class="card-text">Shortcode (if any) goes here</p>
                                 <br>
                                 <strong class="card-text" >
                                     Associated Name
                                 </strong>
                                 <!-- Replace the following text with the value of the description of the chartfield that the user selected to be removed from the shortlist -->
-                                <p class="card-text" id="chartcomDescr">Chartcom Description</p>
+                                <p id="chartComDescr" class="card-text" id="chartcomDescr">Chartcom Description</p>
                             </div>
 
                         </form>
@@ -269,17 +269,18 @@
 {% block js %}
 <script>
     $('#editChartfieldModal1').on('show.bs.modal', function (e) {
-        tar = e.relatedTarget;
-        console.log(tar.id);
+        id = e.relatedTarget.id;
+        row = $("tr[data-cfid='" + id + "']");
+        $("#chartfieldComponent").val(row.data('chartcom'));
+        $("#shortCode1").val(row.find("td").eq(5).html());
+        $("#newChartfieldDescription").val(row.find("th").html());
     })
     $('#deleteChartfieldModal1').on('show.bs.modal', function (e) {
-        tar = e.relatedTarget;
-        console.log(tar.id);
-        rec = $('[data-cfid="5830"]');
-        var name = $(rec[0]).find("th").eq(0).html();
-        console.log(name);
-        $("#chartcomDescr").html(name);
-        //console.log(rec[0]);
+        id = e.relatedTarget.id;
+        row = $("tr[data-cfid='" + id + "']");
+        $("#chartComDescr").text(row.find("th").html());
+        $("#shortCode").text(row.find("td").eq(5).html());
+        $("#chartCom").text(row.data('chartcom'));
     })
 </script>
 {% endblock %}
