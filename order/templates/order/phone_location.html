@@ -1,11 +1,9 @@
 <div class="mb-3">
-    <div class="input-group form-check col-6">
-        <div class="input-group-prepend">
-            <label class="input-group-text" for="validationServer01">Enter your phone number to look for the location </label>
-        </div>
-        <input type="tel" id="id_phone_number" name="phone" required>
+    <div class="form-group col-6">
+        <label class="input-group-text" for="validationServer01">Enter your phone number to look for the location <span class="required">*</span></label>
+        <input type="tel" id="id_phone_number" name="phone" aria-describedby="required-field" required>
         <button type="button" class="btn btn-primary findBtn" id="phoneLookup" style="margin-left:1rem;">Find</button>
-        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that number was not found"></i>Number Not Found</div>
+        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that number was not found"></i> Number Not Found</div>
     </div>
     <br>
     <div class="container" id="phLocationFields">
