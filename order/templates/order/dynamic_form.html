@@ -3,11 +3,10 @@
         <fieldset id="{{ field.name }}">
             <legend>{{ field.label_tag }}</legend>
             {% for choice in field.field.choices %}
-                <div class="custom-control custom-radio">
-                    <label class="custom-control-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}
-                        <input type="radio" class="custom-control-input" id="{{ field.name }}_{{ choice|first }}"
+                <div class="form-check custom-radio">
+                        <input type="radio" class="form-check-input" id="{{ field.name }}_{{ choice|first }}"
                         value="{{ choice|first }}" name="{{ field.name }}" required>
-                    </label>
+                        <label class="form-check-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
                     {% if choice == field.field.choices|last %}
                     <div class="invalid-feedback">Please choose one.</div>
                     {% endif %}
