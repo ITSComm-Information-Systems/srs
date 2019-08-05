@@ -3,13 +3,12 @@
 {% block content %}
 
 <!-- Beginning of Content -->
-<div id="main-content" class="container" role="main">
     <div class="row header-info">
         <div class="col-12">
             <div class="row">
                 <div class="col-12">
                     <h1>
-                        Manage Chartfields
+                        {{ title }}
                         <small class="text-muted">
                             for Department: <strong>{{department.id}} - {{department.name}}</strong>
                         </small>
@@ -28,7 +27,7 @@
                                 <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
                                 {% endfor %}
                             </select>
-                            <input type="submit" class="btn btn-outline-secondary dept-dropdown-btn" value="submit">
+                            <input type="submit" class="btn btn-outline-secondary dept-dropdown-btn" value="Go">
                         </div>
                     </form>
                 </div>
@@ -262,7 +261,6 @@
         <!-- Delete Chartfield Modal #1 -->
 
     </div>
-</div>
 
 {% endblock %}
 
