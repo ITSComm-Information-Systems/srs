@@ -1,14 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<!-- <style>
-.select2-dropdown--below {
-    top: -1.9rem;
-}
-</style> -->
-
 <div class="container">
-    <form action="/reports/doc/report/" method="POST" name="Select">{% csrf_token %}
+    <h1>{{title}}</h1>
+    <form action="{{ form_action }}" method="POST" name="Select">{% csrf_token %}
         <div class="form-group">
             <h5>Select Department<span class="prv-msgs">*</span></h5>
             <p class="mb-0"><span class="prv-msgs">*</span> Required fields</p>
@@ -38,16 +32,16 @@
                 </label>
             </div>
             <div class="row">
-	            <select multiple="multiple" class="form-control col-md-4" style='font-size:16px;float:left;' requried type="select" name="chartcoms[]" id="doc_chartcom" value="{{ cf }}">
+	            <select multiple="multiple" class="form-control col-md-4 floatleft" style='font-size:16px;' requried type="select" name="chartcoms[]" id="doc_chartcom" value="{{ cf }}">
 	                {% for cf in dept_cfs %}
 	                <option value="{{ cf }}">{{ cf }}</option>
 	                {% endfor %}
 	            </select>
-	            <p id='chartfield_list' style="float:left;"></p>
+	            <p id='chartfield_list' class='floatleft'></p>
 	        </div>
         </div>
         <strong id="error_message" class="hidden">Please select a chartfield.</strong>
-        <p><input id="generate" type='submit' value='Generate Report' class="btn btn-primary mt-2"></p>
+        <p><input id="generate" type='submit' value='Generate Report' class="btn btn-primary mt-2" disabled></p>
     </form>
 </div>
 

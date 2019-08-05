@@ -38,7 +38,9 @@ class Role(models.Model):
             ('can_administer_access', 'Can Modify Access Privileges (except proxy)'),
             ('can_order', 'All ordering functions'),
             ('can_report', 'Can run reports'),
-            ('can_impersonate', 'Can Impersonate'),            
+            ('can_impersonate', 'Can Impersonate'),       
+            ('can_move_voip', 'Can Submit VOIP Location Changes'),          
+            ('can_report_all', 'Can run all reports without restrictions'), 
         ]
 
 class AuthUserDeptV(models.Model):

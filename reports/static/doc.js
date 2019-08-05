@@ -38,6 +38,15 @@ $(document).ready(function() {
 	$('#doc_chartcom').on('change', function() {
 		var selected = $('#doc_chartcom').val();
 		var text = '';
+
+		// Enable submit
+		if (selected.length > 0) {
+			$('#generate').removeAttr('disabled');
+		}
+		else {
+			$('#generate').attr('disabled', 'disabled');
+		}
+
 		for (i = 0; i < selected.length; ++i) {
 			text += '<strong>&nbsp;&nbsp;' + selected[i] + '</strong><br>';
 		}
@@ -68,9 +77,11 @@ $(document).ready(function() {
 			$('#doc_chartcom option').each(function() {
 				text += '<strong>&nbsp;&nbsp;' + $(this).val() + '</strong><br>';
 			})
+			$('#generate').removeAttr('disabled');
 		}
 		else {
 			$('#doc_chartcom option').prop('selected', '');
+			$('#generate').attr('disabled', 'disabled');
 		}
 		$('#chartfield_list').html(text);
 	})
