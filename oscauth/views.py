@@ -190,12 +190,12 @@ def get_uniqname(request, uniqname_parm=''):
 
     if uniqname_parm == '':
         set_priv = ''
-        return  HttpResponse(template.render({'uniqname_parm': uniqname_parm}, request))
+        return  HttpResponse(template.render({'uniqname_parm': uniqname_parm, 'title':"Manage Access"}, request))
     else:
         # Check for valid uniqname format
         if len(uniqname_parm) < 3 or len(uniqname_parm) > 8 or uniqname_parm.isalpha is False:
             result = uniqname_parm + ' is not a valid uniqname'
-            return  HttpResponse(template.render({'result': result}, request))
+            return  HttpResponse(template.render({'result': result, 'title':"Manage Access"}, request))
         else:
             # Get User from MCommunity
             conn = Connection('ldap.umich.edu', auto_bind=True)
@@ -264,6 +264,7 @@ def get_uniqname(request, uniqname_parm=''):
                     rows.append(data)
 
                 context = {
+                    'title':"Manage Access",
                     'uniqname_parm': uniqname_parm,
                     'osc_user': osc_user,
                     'last_name': last_name,
@@ -281,19 +282,19 @@ def get_uniqname(request, uniqname_parm=''):
                         submit_msg = 'Ready to Process'
                         if request.POST.get('taskrad') == 'add':
 #                            return render(request,'oscauth/addpriv.html', context)
-                            return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not')
+                            return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not') # do I need to pass in the page title here?
                         if request.POST.get('taskrad') == 'remove':
-                            return render(request, 'oscauth/removepriv.html', context)
+                            return render(request, 'oscauth/removepriv.html', context) # do I need to pass in the page title here?
 
                     else:
                         submit_msg = 'Please select a Task, a Role, and at least one Department then click Submit.'
-                        return  HttpResponse(template.render({'submit_msg': submit_msg}, request))
+                        return  HttpResponse(template.render({'submit_msg': submit_msg, 'title':"Manage Access"}, request)) # do I need to pass in the page title here?
 
                 return render(request, 'oscauth/setpriv.html', context)
 
             else:
                 result = uniqname_parm + ' is not in MCommunity'
-                return  HttpResponse(template.render({'result': result}, request))
+                return  HttpResponse(template.render({'result': result, 'title':"Manage Access"}, request))
 
 
 def showpriv(request, uniqname_parm):
