@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<div id="main-content" class="container" role="main">
+<h1>Summary of Charges</h1>
+{% comment %} <div id="main-content" class="container" role="main">
     <div class="container" role="main">
         <div class="row">
             <div class="col-lg-12">
@@ -17,9 +17,9 @@
             </div>
         </div>
     </div>
-</div>
+</div> {% endcomment %}
 
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
  <form action="/reports/soc/" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
     {% if depts %}
 
@@ -227,7 +227,7 @@
 <button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')">Download Table To
     CSV File</button>
 
-{% endif %} -->
+{% endif %}
 
 <script>
     function display_active(active) {

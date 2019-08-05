@@ -2,20 +2,23 @@
 
 
 {% if submit %}
+<br>
 <div>
-    <h5>Please Select Location for Following Number: </h5>
-    <p></p><input type="text" style='font-size:20px' method = "GET"name = 'holder' id = 'phone' value = {{phone_number}} readonly>
+    <p>Location information for:  <strong>{{phone_number}}</strong>. Please select the current service location.</p>
+    <p></p><input type="text" style='font-size:20px' method = "GET"name = 'holder' id = 'phone' value = {{phone_number}} hidden readonly>
 
  
 </div>
-<table cellpadding = "10">
-    <th></th>
-    <th>Campus</th>
-    <th>Building</th>
-    <th>Bldg ID</th>
-    <th>Floor</th>
-    <th>Room</th>
-    <th>Jack</th>
+<table class = "table table-sm mb-5 table-striped" cellpadding = "10">
+    <thead class = "thead-light">
+        <th></th>
+        <th>Campus</th>
+        <th>Building</th>
+        <th>Bldg ID</th>
+        <th>Floor</th>
+        <th>Room</th>
+        <th>Jack</th>
+    </thead>
     {% for jack in current %}
     
     <tr id = '{{jack}}'>

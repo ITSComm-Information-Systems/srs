@@ -37,8 +37,9 @@
             </div>
         </div>
     </div>
-    <div class = "row align-items-start col-md-3" id = "select_loc">
-        <div class = "input-group col-md-10">
+    
+    <div class = "row align-items-start col-3" id = "select_loc">
+        <div class = "input-group col-auto">
             <div class ="input-group-prepend">
                 <label class = "input-group-text" for="inv_dropdown">Location</label>
             </div>
@@ -52,7 +53,7 @@
     </div>
 
     <div class = "row align-items-start col-3" id = "select_type">
-        <div class = "input-group col-md-10">
+        <div class = "input-group col-auto">
             <div class ="input-group-prepend">
                 <label class = "input-group-text" for="inv_dropdown">User ID Type</label>
             </div>
@@ -66,7 +67,7 @@
     </div>
 
     <div class = "row align-items-start col-3" id = "select_cf">
-        <div class = "input-group col-md-10">
+        <div class = "input-group col-auto">
             <div class ="input-group-prepend">
                 <label class = "input-group-text" for="inv_dropdown">Chartfield</label>
             </div>
@@ -78,9 +79,9 @@
             </select>
         </div>
     </div>
-    {% if first%}
+    {% if first %}
     <div class = "row align-items-start col-3" id = "select_date">
-        <div class = "input-group col-md-10">
+        <div class = "input-group col-auto">
             <div class ="input-group-prepend">
                 <label class = "input-group-text" for="inv_dropdown">Last Call Date</label>
             </div>
@@ -94,15 +95,17 @@
     </div>
     {% endif %}
 
+    {% if first is False%}
+    <div class = "row align-items-start col-3"></div>
+    {% endif %}
     <input type='submit' value='Apply Filters' class="btn btn-primary mb-1 float-right">
     
     {% if location_filter or type_filter or cf_filter or date_filter%}
-        {% if first %}<div class = "row align-items-start col-11"></div>{% else %}
-        <pre>     </pre>
-        {% endif %}
-
+    <div class = "row align-items-start col-10"></div>
+    <pre>            </pre>
     <input type = 'submit' value = 'Remove Filters' class = "btn btn-danger mb-1">
     {% endif %}
+
     </div>
 </form>
 <hr class="style1">
@@ -231,7 +234,7 @@ function topFunction() {
 
             for (var j = 0; j < cols.length; j++) {
                 string = cols[j].innerHTML;
-                if (string.split("<br>").length==3)
+                if (string.split("<br>").lengtauto)
                     string = string.replace("<br>", " ||");
                 if (string.split("<br>").length==4) {
                     string = string.replace("<br>", " ||");
