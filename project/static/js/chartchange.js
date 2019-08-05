@@ -458,28 +458,28 @@ function tab_func1() {
 function tab_func2() {
 	if (!$('#cfc-2').hasClass('disabled')) {
 		currStep = 2;
+		$('#dept_search').hide();
+		$('#select_dept').hide();
+		$("#cfPrevBtn").removeAttr('disabled');
 	}
-	$('#dept_search').hide();
-	$('#select_dept').hide();
-	$("#cfPrevBtn").removeAttr('disabled');
 }
 
 function tab_func3() {
 	if (!$('#cfc-3').hasClass('disabled')) {
 		currStep = 3;
+		$('#dept_search').hide();
+	  	$('#select_dept').hide();
+	  	$("#cfPrevBtn").removeAttr('disabled');
 	  }
-	  $('#dept_search').hide();
-	  $('#select_dept').hide();
-	  $("#cfPrevBtn").removeAttr('disabled');
 }
 
 function tab_func4() {
 	if (!$('#cfc-4').hasClass('disabled')) {
 		currStep = 4;
+		$('#dept_search').hide();
+		$('#select_dept').hide();
+		$("#cfPrevBtn").removeAttr('disabled');
 	  }
-	  $('#dept_search').hide();
-	  $('#select_dept').hide();
-	  $("#cfPrevBtn").removeAttr('disabled');
 }
 
 
