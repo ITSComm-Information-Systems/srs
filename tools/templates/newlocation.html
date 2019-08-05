@@ -28,8 +28,21 @@
 <!-- <p>
   New Location Building Name or ID: 
   <input id="buildingSearch" type="text" placeholder="Search..">
+=======
+<p></p>
+<h5>Search for New Location</h5>
+  <div class = "row align-items-start" id = "select_loc">
+      <div class = "input-group col-md-10">
+          <div class ="input-group-prepend">
+              <label class = "input-group-text" for="inv_dropdown">Building Name or ID</label>
+          </div>
+          <input id="buildingSearch" type="text" class = "form-control col-3" placeholder="Search..">
+      </div>
+  </div>
+>>>>>>> f8e073aa96b8f0ceceeb7d4cf26acfbb81dabe8b
 
-  <table id="buildingTable" class="table table-hover">
+
+<table id="buildingTable" class="table table-hover">
   {% for building in building_list %}
     <tr id="{{ building.0 }}">
       <td>{{ building.0 }}</td>

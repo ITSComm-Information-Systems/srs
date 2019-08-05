@@ -77,7 +77,7 @@ def generate(request):
 	year = bill_period.split(' ')[1]
 
 	context = {
-		'title': 'Toll Statements',
+		'title': "Toll Statements Report",
 		'dept_id': dept_id,
 		'dept_name': dept_name,
 		'inactive': inactive,
