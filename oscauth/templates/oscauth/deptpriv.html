@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-
+<h1>{{ title }}</h1>
 <form action="/auth/get_dept/" method="POST">{% csrf_token %}
-    <h1>{{ title }}</h1>
     <label for="deptf">Select a Department ID</label>
     <select type="select" name="dept_parm" id="deptf" value="{{ dept.deptid }}">
         <option></option>
