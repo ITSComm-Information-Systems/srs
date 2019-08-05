@@ -714,7 +714,6 @@ input:checked + .slider:before {
 
 .text-field-short {
 	display: inline;
-	width: auto;
 }
 
 .fa-exclamation-triangle, .prv-msgs {
@@ -788,6 +787,7 @@ input:checked + .slider:before {
 
 .remove-chartfield-form-body form .card-body p {
 	display: inline-block;
+	margin-bottom: 0rem;
 }
 
 .features-restriction-msg strong {
