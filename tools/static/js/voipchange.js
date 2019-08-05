@@ -100,31 +100,35 @@ function nextPrev(n) {
 }
 
 function tab_func1() {
-	currStep = 1;
-	// $('#vlc_desc').show();
- //  	$('#dept_details').show();
-  
-  $('#old_error').hide();
-  $('#phoneselect').show();
-  $('#phoneselect').show();
-  document.getElementById("vl-1").className = "";
-  document.getElementById("vl-2").className = "tab-pane fade";
+  if (!$('#vlc-1').hasClass('disabled')) {
+  	currStep = 1;
+  	// $('#vlc_desc').show();
+   //  	$('#dept_details').show();
+    
+    $('#old_error').hide();
+    $('#phoneselect').show();
+    $('#phoneselect').show();
+    document.getElementById("vl-1").className = "";
+    document.getElementById("vl-2").className = "tab-pane fade";
     document.getElementById("vl-3").className = "tab-pane fade";
+  }
 
 }
 
 function tab_func2() {
-  $('#new_error').hide();
-	var test = $('#vlc-2');
-	if (!$('#vlc-2').hasClass('disabled')) {
-		currStep = 2;
-		// $('#vlc_desc').hide();
-	 //  	$('#dept_details').hide();
-	}
-  $('#phoneselect').hide();
-  document.getElementById("vl-1").className = "tab-pane fade";
-  document.getElementById("vl-2").className = "";
-  document.getElementById('vl-3').className = "tab-pane fade"
+  if (!$('#vlc-2').hasClass('disabled')) {
+    $('#new_error').hide();
+  	var test = $('#vlc-2');
+  	if (!$('#vlc-2').hasClass('disabled')) {
+  		currStep = 2;
+  		// $('#vlc_desc').hide();
+  	 //  	$('#dept_details').hide();
+  	}
+    $('#phoneselect').hide();
+    document.getElementById("vl-1").className = "tab-pane fade";
+    document.getElementById("vl-2").className = "";
+    document.getElementById('vl-3').className = "tab-pane fade"
+  }
 }
 
 function tab_func3() {
@@ -132,11 +136,11 @@ function tab_func3() {
 		currStep = 3;
 		// $('#vlc_desc').hide();
 	 //  	$('#dept_details').hide();
-	  }
-  $('#phoneselect').hide();
+   $('#phoneselect').hide();
   document.getElementById("vl-1").className = "tab-pane fade";
   document.getElementById("vl-2").className = "tab-pane fade";
   document.getElementById('vl-3').className = ""
+	  }
 }
 
 function validateForm() {
