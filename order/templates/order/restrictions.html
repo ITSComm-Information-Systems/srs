@@ -16,7 +16,7 @@
             {{res}}
         </label>
         {% if res == category.res.last %}
-        <div class="invalid-feedback">Please choose one.</div>
+        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
         {% endif %}
       </div>
     {% endfor %}
