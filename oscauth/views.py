@@ -132,6 +132,7 @@ def deptpriv(request, dept_parm=''):
     dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
     if dept_parm == '':
         context = {
+            'title' : 'Department Look Up',
             'dept_list': dept_list
         }
         return  HttpResponse(template.render(context, request))
@@ -170,6 +171,7 @@ def deptpriv(request, dept_parm=''):
     data = {'col1' : col1, 'col2' : col2, 'roles': roles}
     rows.append(data)
     context = {
+        'title' : 'Department Look Up',
         'dept_list': dept_list,
         'dept_status': dept_status,
         'subtitle1': 'Access For Department: ' + dept_parm + ' - '+ dept_name ,
