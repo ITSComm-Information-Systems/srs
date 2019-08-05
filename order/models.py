@@ -1,7 +1,7 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from oscauth.models import Role
-from project.pinnmodels import UmOscPreorderApiAbstract
+from project.pinnmodels import UmOscPreorderApiV
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from django.utils import timezone
@@ -46,10 +46,11 @@ class Element(Configuration):
         ('Chart', 'Chartcom'),
         ('PH', 'Phone Set Type'),
     )
-
+    label = models.TextField()
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
     attributes = models.CharField(blank=True, max_length=1000)
+    display_condition = models.CharField(blank=True, max_length=100)
     target = models.CharField(max_length=80, blank=True, null=True)
 
 
@@ -196,6 +197,58 @@ class Order(models.Model):
     def dept(self):
         return self.chartcom.dept
 
+    def create_preorder(self):
+        item_list = Item.objects.filter(order_id=self.id)
+
+        elements = Element.objects.exclude(target__isnull=True).exclude(target__exact='')
+        map = {}
+
+        for element in elements:
+            map[element.name] = element.target
+
+        preorder = None
+        status = None
+
+        for num, item in enumerate(item_list, start=1):
+
+            api = UmOscPreorderApiV()
+            api.add_info_text_3 = self.id
+            api.add_info_text_4 = item.id  #This causes an error - PRE_ORDER_ID: 5: Value cannot be changed
+
+            action_id = item.data['action_id']
+
+            api.pre_order_number = preorder
+            api.work_status_name = status
+
+            cons = Constant.objects.filter(action=action_id)
+            for con in cons:             #Populate the model with constants
+                setattr(api, con.field, con.value)
+                
+            for key, value in item.data.items():
+                if value:           #Populate the model with user supplied values
+                    if key == 'MRC' or key == 'localCharges' or key == 'LD':
+                        value = Chartcom.objects.get(id=value).account_number
+                        #print(key, acct)
+
+                    target = map.get(key)
+                    if target != None:
+                        setattr(api, target, value)
+                    
+            api.comment_text = item.description
+            api.default_one_time_expense_acct=self.chartcom.account_number
+
+            api.save()
+
+            if num == 1:
+                status = 'Received'
+                preorder = UmOscPreorderApiV.objects.get(add_info_text_3=self.id).pre_order_number
+
+        #Trigger completion of entries so Pinnacle rolls up and sends an email
+        one = UmOscPreorderApiV.objects.filter(add_info_text_3=self.id, work_status_name=None)
+        one.update(work_status_name = status)
+
+        self.order_reference = preorder
+        self.save()
 
 class Item(models.Model):
     description = models.CharField(max_length=100)

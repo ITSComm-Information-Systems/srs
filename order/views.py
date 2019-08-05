@@ -11,6 +11,8 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from pages.models import Page
 from django.http import JsonResponse
 
+import threading
+
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order
 
 
@@ -64,6 +66,7 @@ class Submit(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def post(self, request):
+        print(request)
 
         order_list = request.POST.getlist('order[]')
 
@@ -76,55 +79,20 @@ class Submit(PermissionRequiredMixin, View):
             service = Action.objects.get(id=action).service
  
 
-            o = Order()
-            o.order_reference = 'TBD'
-            o.created_by_id = request.user.id
-            o.chartcom = firstitem.chartcom
-            o.service = service
-            o.status = 'Submitted'
-            o.save()
+            order = Order()  # Create new order and tie items to it.
+            order.order_reference = 'TBD'
+            order.created_by_id = request.user.id
+            order.chartcom = firstitem.chartcom
+            order.service = service
+            order.status = 'Submitted'
+            order.save()
 
-            Item.objects.filter(id__in=order_items).update(order=o)
+            Item.objects.filter(id__in=order_items).update(order=order) #associate Items with order
+            thread = threading.Thread(target=order.create_preorder)
+            thread.start()
 
-        self.create_preorder(order_items)  # move this to batch processing
         return HttpResponseRedirect('/submitted') 
 
-        template = loader.get_template('order/order_submitted.html')
-        context = {
-            'order_list': order_list,
-        }
-        return HttpResponse(template.render(context, request))
-
-    def create_preorder(self, order_items):
-
-        item_list = Item.objects.filter(id__in=order_items)
-
-        elements = Element.objects.exclude(target__isnull=True).exclude(target__exact='')
-        map = {}
-
-        for element in elements:
-            map[element.name] = element.target
-
-        for item in item_list:
-            api = UmOscPreorderApiV()
-            #api.add_info_text_3 = cart.id
-            api.add_info_text_4 = item.id
-            action_id = item.data['action_id']
-
-            cons = Constant.objects.filter(action=action_id)
-            for con in cons:             #Populate the model with constants
-                setattr(api, con.field, con.value)
-                print('Set:' + con.field + '=' + con.value )
-                
-            for key, value in item.data.items():
-                if value:           #Populate the model with user supplied values
-                    target = map.get(key)
-                    if target != None:
-                        setattr(api, target, value)
-                        print('Set:' + target + '=' + value )
-
-            api.save()
-            print('API Record Saved')
 
 def add_to_cart(request):
     if request.method == "POST":
@@ -324,10 +292,15 @@ class Status(PermissionRequiredMixin, View):
 
         item_list = Item.objects.filter(order__in=order_list)
 
+        print('get items')
         for num, order in enumerate(order_list, start=1):
-            order.items = item_list.filter(order=order)
-            order.num = num
+            if order.order_reference == 'TBD':
+                order.items = item_list.filter(order=order)
+            else:
+                pin = UmOscPreorderApiV.objects.get(pre_order_number=order.order_reference,pre_order_issue=1)
+                order.items = [{'description': pin.comment_text}]
 
+        print('render')
         template = loader.get_template('order/status.html')
         context = {
             'title': 'Track Orders',

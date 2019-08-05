@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div id="main-content" class="container" role="main">
-    <h1>Review Order</h1>
+
+    <h1>{{ title }}</h1>
     <div class="row directions">
-        Please review your order
+        Your items have been grouped into <strong># of orders goes here</strong> based on the activation chartfields.
     </div>
     <div class="row">
         <div class="col-xl-6 col-lg-7 col-md-8 col-12 cards">
@@ -129,7 +129,7 @@
         </div>
 
     </div>
-</div>
+
 <!-- Please insert this line at the bottom of the "revieworder" page so that the popovers can work -->
 
 {% endblock %}
