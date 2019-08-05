@@ -531,7 +531,7 @@ function change_current_page(selected) {
 		success: function(data) {
 			cf = data;
 			$("#fund").html(cf[0].fund);
-			$("#dept_id").html(cf[0].deptid);
+			$("#deptid").html(cf[0].deptid);
 			$("#program").html(cf[0].program);
 			$("#class_code").html(cf[0].class_code);
 			$("#project_grant").html(cf[0].project_grant);
