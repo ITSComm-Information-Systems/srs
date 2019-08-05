@@ -86,7 +86,7 @@
                                 <th scope="col">Status <i class="fas fa-question-circle btn-link"
                                         aria-label="More Information icon" data-toggle="modal"
                                         data-target="#statusIndicatorModal"></i></th>
-                                <th scope="col">Cancel</th>
+                                <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <!-- End of table headers -->
@@ -102,7 +102,7 @@
                                 <td>{{ order.created_by }}</td>
                                 <td>
                                     {% for item in order.items %}
-                                    <pre style='font-family: Arial; font-size: 16px;'>{{ item.description }}</pre>
+                                    <pre style='font-family: Roboto; font-size: 1rem; margin-bottom: 0rem;'>{{ item.description }}</pre>
                                     {% endfor %}
                                 </td>
                                 <td>{{ order.chartcom }}</td>
