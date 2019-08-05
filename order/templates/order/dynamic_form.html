@@ -8,7 +8,7 @@
                         value="{{ choice|first }}" name="{{ field.name }}" required>
                         <label class="form-check-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
                     {% if choice == field.field.choices|last %}
-                    <div class="invalid-feedback">Please choose one.</div>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
                     {% endif %}
                 </div>
             {% endfor %}
@@ -50,7 +50,7 @@
         <div class = "form-check">
         {{ field.errors }}
         {{ field.label_tag }} {{ field }}
-        <div class="invalid-feedback">Please enter a value.</div>
+        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must enter a value"></i>Please enter a value.</div>
         <div class="valid-feedback">Good.</div>
         </div>
     </div>
