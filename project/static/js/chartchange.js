@@ -122,7 +122,7 @@ $(document).ready(function() {
 	 	}
 
 	 	table.rows().every(function(index, element) {
-	 		record_count += 1;
+	 		record_count = record_count + 1;
 			var row = $(this.node());
 			var col0 = row.find('td:first-child input[type="checkbox"]');
 			 
@@ -245,10 +245,11 @@ $(document).ready(function() {
 	$('#cf_users_table').on('change', 'tr', function() {
 		var box = $(this).find('td:first-child input[type="checkbox"]');
 		var checked = box.is(':checked');
-		if (checked) {
+		var select_all_checked = $('#select_all').is(':checked');
+		if (checked && !select_all_checked) {
 			record_count += 1;
 		}
-		else {
+		else if (!checked) {
 			record_count -= 1;
 		}
 		$('#record-count').html(record_count + ' Records Selected');
@@ -344,12 +345,22 @@ $(document).ready(function() {
 			// Reset chartfield options when department changes
 			success: function(data) {
 				$('#cf_dropdown').empty();
-				for (i = 0; i < data.length - 1; ++i) {
-					var drp = document.getElementById('cf_dropdown');
-					var option = document.createElement("OPTION");
-					option.value = data[i].account_number;
-					option.text = data[i].account_number;
-					drp.add(option);
+				if (data.length < 2) {
+					$('#cf_dropdown_group').hide();
+					$('#cf_details').hide();
+					$('#no_cfs_alert').removeAttr('hidden');
+				}
+				else {
+					$('#cf_dropdown_group').show();
+					$('#cf_details').show();
+					$('#no_cfs_alert').attr('hidden', 'hidden');
+					for (i = 0; i < data.length - 1; ++i) {
+						var drp = document.getElementById('cf_dropdown');
+						var option = document.createElement("OPTION");
+						option.value = data[i].account_number;
+						option.text = data[i].account_number;
+						drp.add(option);
+					}
 				}
 				$('#dept_title').html('Department: ' + selected + ' - ' + data[data.length - 1].name);
 				change_current_page(data[0].account_number);
@@ -409,10 +420,12 @@ function nextPrev(n, table, cf_change_table, review_table) {
   if (n == 1 && currStep == 2) {
   	$('#dept_search').hide();
   	$('#select_dept').hide();
+  	$("#cfPrevBtn").removeAttr('disabled');
   }
   if (n == -1 && currStep == 1) {
   	$('#dept_search').show();
   	$('#select_dept').show();
+  	$("#cfPrevBtn").attr('disabled', 'disabled');
   }
 
   // Load third page correctly
@@ -439,6 +452,7 @@ function tab_func1() {
 	currStep = 1;
  	$('#dept_search').show();
   	$('#select_dept').show();
+  	$("#cfPrevBtn").attr('disabled', 'disabled');
 }
 
 function tab_func2() {
@@ -447,6 +461,7 @@ function tab_func2() {
 	}
 	$('#dept_search').hide();
 	$('#select_dept').hide();
+	$("#cfPrevBtn").removeAttr('disabled');
 }
 
 function tab_func3() {
@@ -455,6 +470,7 @@ function tab_func3() {
 	  }
 	  $('#dept_search').hide();
 	  $('#select_dept').hide();
+	  $("#cfPrevBtn").removeAttr('disabled');
 }
 
 function tab_func4() {
@@ -463,6 +479,7 @@ function tab_func4() {
 	  }
 	  $('#dept_search').hide();
 	  $('#select_dept').hide();
+	  $("#cfPrevBtn").removeAttr('disabled');
 }
 
 

@@ -777,7 +777,7 @@ class UmOscAcctdetailMrcOccV(models.Model):
      billing_cycle = models.CharField(max_length=2)
      item_code = models.CharField(max_length=50)
      batch_date = models.DateField
-     invoice_date = models.DateField
+     invoice_date = models.DateField(null=True) # made this null=True
      account_number = models.CharField(max_length=100)
      account_subcode = models.CharField(max_length=10)
      item_description = models.CharField(max_length=100)
@@ -789,6 +789,15 @@ class UmOscAcctdetailMrcOccV(models.Model):
      unit_price = models.DecimalField(decimal_places=4, max_digits=19,  null=False)
      charge_to_dept = models.CharField(max_length=10)
      row_id = models.CharField(max_length=20, primary_key=True)
+     user_defined_id =  models.CharField(max_length=20, blank=True)
+     dtl_of_chrgs_telephony = models.PositiveIntegerField(null=True)            
+     dtl_of_chrgs_nontelephony = models.PositiveIntegerField(null=True) 
+     unique_identifier = models.CharField(max_length=200)
+     charge_name = models.CharField(max_length=100)
+     shortcode = models.CharField(max_length=6)
+     invoice_id = models.CharField(max_length=30)
+     uniqname = models.CharField(max_length=8)
+     voucher_comment = models.CharField(max_length=30)
 
      class Meta:
           managed = False
