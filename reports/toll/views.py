@@ -42,6 +42,7 @@ def select(request):
 		dept_names.append(q.dept_name)
 
 	context = {
+		'title': "Toll Statements",
 		'periods': dropdown,
 		'depts': depts,	
 		'dept_names': dept_names,
@@ -72,6 +73,7 @@ def generate(request):
 	year = bill_period.split(' ')[1]
 
 	context = {
+		'title': "Toll Statements Report",
 		'dept_id': dept_id,
 		'dept_name': dept_name,
 		'inactive': inactive,
