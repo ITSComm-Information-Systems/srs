@@ -716,7 +716,7 @@ input:checked + .slider:before {
 	display: inline;
 }
 
-.fa-exclamation-triangle, .prv-msgs .required{
+.fa-exclamation-triangle, .prv-msgs, .required{
 	color: #FF0000;
 }
 .cart-chartfield-title {

@@ -1,12 +1,12 @@
 {% for field in tab.form %}
     {% if field.field.type == 'Radio' %}
         <fieldset id="{{ field.name }}">
-            <legend>{{ field.label_tag }}</legend>
+            <legend>{{ field.label_tag }}<span class="required">*</span></legend>
             {% for choice in field.field.choices %}
                 <div class="form-check custom-radio">
                         <input type="radio" class="form-check-input" id="{{ field.name }}_{{ choice|first }}"
                         value="{{ choice|first }}" name="{{ field.name }}" aria-describedby="required-field" required>
-                        <label class="form-check-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}<span class="required">*</span></label>
+                        <label class="form-check-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
                     {% if choice == field.field.choices|last %}
                     <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
                     {% endif %}
