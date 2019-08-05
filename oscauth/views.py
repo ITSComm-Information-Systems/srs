@@ -397,7 +397,8 @@ def modpriv(request):
             result = 'Deleted Privileges'
 
     context = {
-        'title': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
+        'title': "Manage Access",
+        'subtitle': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
         'uniqname_parm': uniqname_parm,
         'last_name': last_name,
         'first_name': first_name,
