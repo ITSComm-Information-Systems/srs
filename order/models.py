@@ -46,10 +46,11 @@ class Element(Configuration):
         ('Chart', 'Chartcom'),
         ('PH', 'Phone Set Type'),
     )
-
+    label = models.TextField()
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
     attributes = models.CharField(blank=True, max_length=1000)
+    display_condition = models.CharField(blank=True, max_length=100)
     target = models.CharField(max_length=80, blank=True, null=True)
 
 
