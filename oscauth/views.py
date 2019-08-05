@@ -113,7 +113,8 @@ def mypriv(request):
     rows.append(data)
     template = loader.get_template('oscauth/mypriv.html')
     context = {
-        'title': 'My Privileges: ' + request.user.username,
+        'title': "View My System Priveleges",
+        'subtitle': 'My Privileges: ' + request.user.username,
         'rows': rows
     }
     return HttpResponse(template.render(context, request))
