@@ -96,23 +96,21 @@
 
                             {% for order in order_list %}
                             <!-- First table row -->
-                            <tr data-dept="{{order.dept}}">
+                            <tr data-dept="{{order.dept}}" data-order="{{order.id}}">
                                 <th scope="row">{{order.order_reference}}</th>
                                 <td>{{ order.create_date|date:"m/d/y" }}</td>
                                 <td>{{ order.created_by }}</td>
                                 <td>
-                                    <ul class="order-details-list">
-                                        {% for item in order.items %}
-                                        <pre style='font-family: Arial; font-size: 16px;'>{{ item.description }}</pre>
-                                        {% endfor %}
-                                    </ul>
+                                    {% for item in order.items %}
+                                    <pre style='font-family: Arial; font-size: 16px;'>{{ item.description }}</pre>
+                                    {% endfor %}
                                 </td>
                                 <td>{{ order.chartcom }}</td>
                                 <td>{{order.status}}</td>
                                 <td class="action">
                                     <!-- <a class="delete" href="#">Cancel</a> -->
                                     <a class="cancel" href="#" data-toggle="modal"
-                                        data-target="#cancelOrderModal">
+                                        data-target="#cancelOrderModal" data-order="{{order.id}}">
                                         Cancel
                                     </a>
                                 </td>
@@ -164,50 +162,36 @@
                                 </strong>
                                 <form id="cancelOrderForm" method="GET" action="status.html">
                                     <div class="card-body">
-                                        <strong>Pre-Order #:</strong>
-                                        <!-- Replace the following text with the value of the Pre Order Number that the user selected to be removed from the shortlist -->
-                                        12345
+                                        <strong>Pre-Order #:</strong><span id="preOrder"></span>
                                         <div>
                                             <strong>
                                                 Date Submitted:
                                             </strong>
-                                            <!-- Replace the following text with the value of the date of the order that the user selected to be removed from the shortlist -->
-                                            mm/dd/yyyy
+                                            <span id="dateSubmitted"></span>
                                         </div>
 
                                         <div>
                                             <strong>
                                                 Submitted by:
                                             </strong>
-                                            <!-- Replace the following text with the value of the uniqname of the order's submitter that the user selected to be removed from the shortlist -->
-                                            uniqname here
+                                            <span id="uniqname"></span>
                                         </div>
 
                                         <div>
-                                            <strong>
-                                                Order Details:
-                                            </strong>
-                                            <!-- Replace the following text with the value of the description of the order that the user selected to be removed from the shortlist -->
-                                            <ul>
-                                                <li>
-                                                    Items here
-                                                </li>
-                                            </ul>
+                                            <strong>Order Details:</strong><span style="text-align: left" id='orderDetails'></span>
                                         </div>
                                         <div>
                                             <strong>
                                                 Chartfield:
                                             </strong>
-                                            <!-- Replace the following text with the value of the chartfield of the order that the user selected to be removed from the shortlist -->
-                                            Chartfield here
+                                            <span id="chartCom"></span>
                                         </div>
 
                                         <div>
                                             <strong>
                                                 Status:
                                             </strong>
-                                            <!-- Replace the following text with the value of the status of the order that the user selected to be removed from the shortlist -->
-                                            Status here
+                                            <span id="status"></span>
                                         </div>
                                     </div>
 
@@ -240,6 +224,18 @@
         dept = $("#selectDept option:selected").text();
         $('#deptHeading').text(dept);
 
+        $('#cancelOrderModal').on('show.bs.modal', function (e) {
+
+            order = e.relatedTarget.dataset.order
+            row = $("tr[data-order='" + order + "']");
+
+            $("#preOrder").text(row.find("th").html());
+            $("#dateSubmitted").text(row.find("td").eq(0).html());
+            $("#uniqname").text(row.find("td").eq(1).html());
+            $("#orderDetails").html(row.find("td").eq(2).html());
+            $("#chartCom").text(row.find("td").eq(3).html());
+            $("#status").text(row.find("td").eq(4).html());
+        })
         
         $('#order-status-options').change(function () {
             status = $("#order-status-options option:selected").text();
