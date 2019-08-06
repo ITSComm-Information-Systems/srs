@@ -801,3 +801,33 @@ input:checked + .slider:before {
 .features-restriction-msg strong {
 	display: block;
 }
+
+.location-card p {
+	display: inline-block;
+}
+
+.select-button {
+	display: block;
+	margin: 0 auto;
+}
+
+.selected-card {
+	border-color: #28a745;
+	box-shadow: 5px 5px 10px grey;
+
+}
+
+@media (max-width:576px) {
+	.phone-location-cards div {
+		margin-top: 1rem;
+	}
+}
+
+.select-loc-directions {
+	display: block;
+	color: #FF0000
+}
+
+.location-card .card-text {
+	margin-bottom: 0;
+}
