@@ -1,11 +1,19 @@
 <div class="mb-3">
     <div class="form-group col-6">
-        <label class="input-group-text" for="validationServer01">Enter your phone number to look for the location <span
-                class="required">*</span></label>
-        <input type="tel" id="id_phone_number" name="phone" aria-describedby="required-field" required>
-        <button type="button" class="btn btn-primary findBtn" id="phoneLookup" style="margin-left:1rem;">Find</button>
-        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
-                aria-label="Icon signfying that number was not found"></i> Number Not Found</div>
+        <label for="validationServer01">Enter your phone number to look for the
+            current location <span class="required">*</span></label>
+        <div class="row">
+            <div class="col">
+                <input type="tel" class="form-control" id="id_phone_number" name="phone"
+                    aria-describedby="required-field" required>
+                <div class="invalid-feedback">
+                    <i class="fas fa-exclamation-triangle" aria-label="Icon signfying that number was not found"></i> Number Not Found
+                </div>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-primary findBtn" id="phoneLookup">Find</button>
+            </div>
+        </div>
     </div>
     <br>
     <div class="container" id="phLocationFields">
@@ -129,6 +137,29 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <!-- This following DIV should be hidden unless the user selected the 3rd card (one that says "Update Your Location")  -->
+    <div class="container mt-3" id="newLocationFields">
+        <div class="mb-3">
+            <strong>Please update the current service location</strong>
+        </div>
+
+        <div class="form-group">
+            <label for="newBuildingName">Building Name</label>
+            <input type="text" class="form-control col-lg-4 col-sm-6" id="newBuildingName">
+        </div>
+        <div class="form-group">
+            <label for="newBuildingFloor">Floor</label>
+            <input type="text" class="form-control col-lg-4 col-sm-6" id="newBuildingFloor">
+        </div>
+        <div class="form-group">
+            <label for="newBuildingRoom">Room</label>
+            <input type="text" class="form-control col-lg-4 col-sm-6" id="newBuildingRoom">
+        </div>
+        <div class="form-group">
+            <label for="newBuildingJack">Jack</label>
+            <input type="text" class="form-control col-lg-4 col-sm-6" id="newBuildingJack">
         </div>
     </div>
 </div>
