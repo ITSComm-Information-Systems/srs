@@ -773,6 +773,10 @@ input:checked + .slider:before {
 	padding-bottom:0;
 }
 
+.card-top {
+	padding-top:0;
+}
+
 .floatleft {
 	float:left;
 }
