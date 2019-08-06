@@ -1,5 +1,5 @@
 {% if submit %}
-<p class='mt-3'>Location information for <strong>{{ phone_number }}</strong>. Please select the current service location.</p>
+<p class='mt-3'>Please select the current service location for the phone number:&nbsp;<strong>{{ phone_number }}</strong>.</p>
 
 <div class='col-md-10'>
     <table class='table table-sm table-striped mt-3 mb-3' id='curr_loc_table'>
@@ -17,13 +17,6 @@
         <tbody>
             {% for jack in current %}
             <tr id='{{ jack }}'>
-                <!-- <td><input type="radio" method="GET" style='font-size:20px' name ='jacks' value ="{{jack.15}}"></td>
-                <td>{{jack.1}}</td>
-                <td>{{jack.9}}</td>
-                <td>{{jack.8}}</td>
-                <td>{{jack.10}}</td>
-                <td>{{jack.13}}</td>
-                <td>{{jack.15}}</td> -->
                 <td><input type="radio" method="GET" style='font-size:20px' name ='jacks' value ="{{jack.jack}}"></td>
                 <td id='campus{{ jack.jack}}'>{{jack.campus_desc}}</td>
                 <td id='name{{ jack.jack}}'>{{jack.building_name}}</td>
@@ -74,46 +67,15 @@
         $('input[type=radio][name=jacks]').change(function () {
             var jack = $(this).val();
             $('#old-num').html({{ phone_number }});
+            $('#phone-num').val({{phone_number}});
             $('#new-num').html({{ phone_number }});
             $('#old-campus').html($('#campus' + jack).text());
+            $('#campus').val($('#campus' + jack).text());
             $('#old-name').html($('#name' + jack).text());
             $('#old-id').html($('#id' + jack).text());
             $('#old-floor').html($('#floor' + jack).text());
             $('#old-room').html($('#room' + jack).text());
             $('#old-jack').html($('#jack' + jack).text());
-
-            // $.ajax({
-            //     type: "GET",
-            //     url: "",
-            //     data: {
-            //         'jacks': jack,
-
-            //     },
-            //     dataType: 'json',
-            //     success: function(data) {
-            //         // document.getElementById('r').innerHTML = "Phone Number: " + data.phone_number;
-            //         // document.getElementById('r1').innerHTML = "Campus: " + data.selected[0][1];
-            //         // document.getElementById('n').innerHTML = "Phone Number: " + data.phone_number;
-            //         // document.getElementById('n1').innerHTML = "Campus: " + data.selected[0][1];
-            //         // document.getElementById('r2').innerHTML = "Building Name: " + data.selected[0][9];
-            //         // document.getElementById('r3').innerHTML = "Building ID: " + data.selected[0][9];
-            //         // document.getElementById('r4').innerHTML = "Floor: " + data.selected[0][11];      
-            //         // document.getElementById('r5').innerHTML = "Room: " + data.selected[0][13];      
-            //         // document.getElementById('r6').innerHTML = "Jack: " + data.selected[0][15];
-            //         // $('#old-num').html(data.phone_number);
-            //         // $('#old-campus').html(data.selected[0].campus_desc);
-            //         // $('#old-name').html(data.selected[0][9]);
-            //         // $('#old-id').html(data.selected[0][8]);
-            //         // $('#old-floor').html(data.selected[0][11]);
-            //         // $('#old-room').html(data.selected[0][13]);
-            //         // $('#old-jack').html(data.selected[0][15]);
-
-            //         $('#new-num').html(data.phone_number);
-            //     },
-            //     error: function(data) {
-            //         alert("this fucking sucks");
-            //     }
-            // });
         });
     });
 </script>

@@ -19,14 +19,19 @@ $(document).ready(function() {
       var buildingCode = $(this).find("td").eq(0).html(); 
       var buildingCampus = $(this).find('td').eq(2).html();  
 
-      $('#new_loc_table').removeAttr('hidden');
-      $('#buildingID').html(buildingCode);
-      $('#buildingName').html(building);
-      $('#campus').html(buildingCampus);
+      //$('#new_loc_table').removeAttr('hidden');
+      $('#buildingID').val(buildingCode);
+      $('#buildingName').val(building);
+      $('#campus').val(buildingCampus);
       $('#buildingSearch').val('');
       
       $("#buildingTable").hide();
       $('#buildingFields').show();
+      $("#roomselect").hide();
+      $("#jackselect").hide();
+      $('#buildingFloor').val('');
+      $('#buildingRoom').val('');
+      $('#buildingJack').val('');
     });
 
   $('#voiplocation_nav li:first-child a').tab('show'); // Select first tab
@@ -160,15 +165,15 @@ function validateForm() {
   }
   // Make sure floor, room, and jack are supplied
   if (currStep == 2) {
-    old_strings = ['campus', 'buildingName', 'buildingID', 'floor', 'room', 'jack'];
+    old_strings = ['campus', 'buildingName', 'buildingID', 'buildingFloor', 'buildingRoom', 'buildingJack'];
 
     for (i = 0; i < old_strings.length; ++i) {
-      if (!$('#' + old_strings[i]).text()) {
+      if (!$('#' + old_strings[i]).val()) {
         return 'Please provide the required information.';
       }
       else {
         var new_string = '#new-' + old_strings[i];
-        $(new_string).html($('#' + old_strings[i]).text());
+        $(new_string).html($('#' + old_strings[i]).val());
       }
     }
     return 'valid';

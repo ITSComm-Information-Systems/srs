@@ -97,12 +97,12 @@ def confirm(request):
     template = loader.get_template('confirm.html')
     unique_name = request.user.username
 
-    phone_number = request.GET.get('holder',None)
+    phone_number = request.GET.get('phone-num',None)
     current_jack = request.GET.get('jacks',None)
     selected = UmOscLocationsInUseV.objects.filter(service_number__exact = phone_number, jack__exact = current_jack).order_by('room').values().distinct()
     
     new_name = request.GET.get('buildingName',None)
-    new_code = request.GET.get('buildingCode',None)
+    new_code = request.GET.get('buildingID',None)
     new_floor = request.GET.get('buildingFloor',None)
     new_room = request.GET.get('buildingRoom', None)
     new_jack = request.GET.get('buildingJack',None)
