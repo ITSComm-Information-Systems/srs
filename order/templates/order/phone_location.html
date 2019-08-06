@@ -1,31 +1,134 @@
 <div class="mb-3">
     <div class="form-group col-6">
-        <label class="input-group-text" for="validationServer01">Enter your phone number to look for the location <span class="required">*</span></label>
+        <label class="input-group-text" for="validationServer01">Enter your phone number to look for the location <span
+                class="required">*</span></label>
         <input type="tel" id="id_phone_number" name="phone" aria-describedby="required-field" required>
         <button type="button" class="btn btn-primary findBtn" id="phoneLookup" style="margin-left:1rem;">Find</button>
-        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that number was not found"></i> Number Not Found</div>
+        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signfying that number was not found"></i> Number Not Found</div>
     </div>
     <br>
     <div class="container" id="phLocationFields">
-        <div class="row">
-            <div class="col-1">ID:</div>
-            <span class="col-2" style="text-align: left" id="buildingCode"></span>
+        <div class="col-12 mb-3">
+            <strong>Select the Current Service Location for Phone number:</strong> <em>123-123-1234</em>
+            <em class="prv-msgs select-loc-directions">You can only select one location</em>
         </div>
-        <div class="row">
-            <div class="col-1">Building:</div>
-            <span class="col-2" style="text-align: left" id="building"></span>
-        </div>
-        <div class="row">
-            <div class="col-1">Floor:</div>
-            <span class="col-2" style="text-align: left" id="floor"></span>
-        </div>
-        <div class="row">
-            <div class="col-1">Room:</div>
-            <span class="col-2" style="text-align: left" id="room"></span>
-        </div>
-        <div class="row">
-            <div class="col-1">Jack:</div>
-            <span class="col-2" style="text-align: left" id="jack"></span>
+        <div class="col-12">
+            <div class="row card-columns">
+                <div class="col-sm-12 col-md-6 col-lg-4">
+                    <!-- Beginning of service location cards: Please pass in the appropriate parameters for the location that are shown in the card -->
+                    <div class="card location-card">
+                        <div class="card-body">
+                            <strong class="card-text">
+                                Building Name:
+                            </strong>
+                            <p class="card-text">
+                                ARBOR LAKES 2
+                            </p>
+
+                            <br>
+
+                            <strong class="card-text">
+                                Building ID:
+                            </strong>
+                            <p class="card-text">
+                                1008080
+                            </p>
+
+                            <br>
+
+                            <strong class="card-text">
+                                Floor:
+                            </strong>
+                            <p class="card-text">
+                                1
+                            </p>
+
+                            <br>
+
+                            <strong class="card-text">
+                                Room:
+                            </strong>
+                            <p class="card-text">
+                                1806
+                            </p>
+                            <br>
+                            <strong class="card-text">
+                                Jack #:
+                            </strong>
+                            <p class="card-text">
+
+                            </p>
+                            <hr class="style">
+                            <input type="button" class="btn btn-outline-success select-button" value="Select">
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Message to Dave: When the user selects a location card, enable the class "selected-card" to display the effects that the location card was selected -->
+                <div class="col-sm-12 col-md-6 col-lg-4">
+                    <div class="card location-card selected-card">
+                        <div class="card-body">
+                            <strong class="card-text">
+                                Building Name:
+                            </strong>
+                            <p class="card-text">
+                                ARBOR LAKES 2
+                            </p>
+                            <br>
+                            <strong class="card-text">
+                                Building ID:
+                            </strong>
+                            <p class="card-text">
+                                1008080
+                            </p>
+                            <br>
+                            <strong class="card-text">
+                                Floor:
+                            </strong>
+                            <p class="card-text">
+                                1
+                            </p>
+                            <br>
+                            <strong class="card-text">
+                                Room:
+                            </strong>
+
+                            <p class="card-text">
+                                2241
+                            </p>
+                            <br>
+                            <strong class="card-text">
+                                Jack #:
+                            </strong>
+                            <p class="card-text">
+                                1C-W2
+                            </p>
+                            <hr class="style">
+                            <!-- When a card is selected, please enable the class "btn-success" and disable the class "btn-outline-success" -->
+                            <input type="button" class="btn btn-success select-button" value="Selected">
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Message to Dave: If the current location isn't on the card and the following card is selected, please display the DIV with the ID called "newLocationFields" -->
+                <div class="col-sm-12 col-md-6 col-lg-4">
+                    <div class="card location-card">
+                        <div class="card-body">
+                            <strong class="card-text">
+                                Can't find the correct service location?
+                            </strong>
+                            <p class="card-text">
+                                Update the current service location with the correct information
+                            </p>
+
+                            <hr class="style">
+                            <input type="button" class="btn btn-outline-success select-button"
+                                value="Update Your Location">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
