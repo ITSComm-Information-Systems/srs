@@ -265,7 +265,7 @@ def get_uniqname(request, uniqname_parm=''):
                     rows.append(data)
 
                 context = {
-                    'title':"Manage Access",
+                    'title':"Manage User Access",
                     'uniqname_parm': uniqname_parm,
                     'osc_user': osc_user,
                     'last_name': last_name,
@@ -398,7 +398,7 @@ def modpriv(request):
             result = 'Deleted Privileges'
 
     context = {
-        'title': "Manage Access",
+        'title': "Manage User Access",
         'subtitle': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
         'uniqname_parm': uniqname_parm,
         'last_name': last_name,

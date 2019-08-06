@@ -496,6 +496,10 @@ background-color: #EAEAEA;
 border-radius: 4px;
 }
 
+.navbar-nav > .nav-item.active {
+	background-color: #6189b7 !important;
+}
+
 .buttons {
 margin:auto;
 padding:10px;
