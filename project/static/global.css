@@ -496,6 +496,10 @@ background-color: #EAEAEA;
 border-radius: 4px;
 }
 
+.navbar-nav > .nav-item.active {
+	background-color: #6189b7 !important;
+}
+
 .buttons {
 margin:auto;
 padding:10px;
@@ -714,10 +718,9 @@ input:checked + .slider:before {
 
 .text-field-short {
 	display: inline;
-	width: auto;
 }
 
-.fa-exclamation-triangle, .prv-msgs {
+.fa-exclamation-triangle, .prv-msgs, .required{
 	color: #FF0000;
 }
 .cart-chartfield-title {
@@ -770,6 +773,10 @@ input:checked + .slider:before {
 	padding-bottom:0;
 }
 
+.card-top {
+	padding-top:0;
+}
+
 .floatleft {
 	float:left;
 }
@@ -788,8 +795,39 @@ input:checked + .slider:before {
 
 .remove-chartfield-form-body form .card-body p {
 	display: inline-block;
+	margin-bottom: 0rem;
 }
 
 .features-restriction-msg strong {
 	display: block;
+}
+
+.location-card p {
+	display: inline-block;
+}
+
+.select-button {
+	display: block;
+	margin: 0 auto;
+}
+
+.selected-card {
+	border-color: #28a745;
+	box-shadow: 5px 5px 10px grey;
+
+}
+
+@media (max-width:576px) {
+	.phone-location-cards div {
+		margin-top: 1rem;
+	}
+}
+
+.select-loc-directions {
+	display: block;
+	color: #FF0000
+}
+
+.location-card .card-text {
+	margin-bottom: 0;
 }

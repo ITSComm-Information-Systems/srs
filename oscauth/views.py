@@ -113,7 +113,8 @@ def mypriv(request):
     rows.append(data)
     template = loader.get_template('oscauth/mypriv.html')
     context = {
-        'title': 'My Privileges: ' + request.user.username,
+        'title': "View My System Priveleges",
+        'subtitle': 'My Privileges: ' + request.user.username,
         'rows': rows
     }
     return HttpResponse(template.render(context, request))
@@ -132,6 +133,7 @@ def deptpriv(request, dept_parm=''):
     dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
     if dept_parm == '':
         context = {
+            'title' : 'Department Look Up',
             'dept_list': dept_list
         }
         return  HttpResponse(template.render(context, request))
@@ -170,6 +172,7 @@ def deptpriv(request, dept_parm=''):
     data = {'col1' : col1, 'col2' : col2, 'roles': roles}
     rows.append(data)
     context = {
+        'title' : 'Department Look Up',
         'dept_list': dept_list,
         'dept_status': dept_status,
         'subtitle1': 'Access For Department: ' + dept_parm + ' - '+ dept_name ,
@@ -188,12 +191,12 @@ def get_uniqname(request, uniqname_parm=''):
 
     if uniqname_parm == '':
         set_priv = ''
-        return  HttpResponse(template.render({'uniqname_parm': uniqname_parm}, request))
+        return  HttpResponse(template.render({'uniqname_parm': uniqname_parm, 'title':"Manage Access"}, request))
     else:
         # Check for valid uniqname format
         if len(uniqname_parm) < 3 or len(uniqname_parm) > 8 or uniqname_parm.isalpha is False:
             result = uniqname_parm + ' is not a valid uniqname'
-            return  HttpResponse(template.render({'result': result}, request))
+            return  HttpResponse(template.render({'result': result, 'title':"Manage Access"}, request))
         else:
             # Get User from MCommunity
             conn = Connection('ldap.umich.edu', auto_bind=True)
@@ -262,6 +265,7 @@ def get_uniqname(request, uniqname_parm=''):
                     rows.append(data)
 
                 context = {
+                    'title':"Manage User Access",
                     'uniqname_parm': uniqname_parm,
                     'osc_user': osc_user,
                     'last_name': last_name,
@@ -279,19 +283,19 @@ def get_uniqname(request, uniqname_parm=''):
                         submit_msg = 'Ready to Process'
                         if request.POST.get('taskrad') == 'add':
 #                            return render(request,'oscauth/addpriv.html', context)
-                            return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not')
+                            return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not') # do I need to pass in the page title here?
                         if request.POST.get('taskrad') == 'remove':
-                            return render(request, 'oscauth/removepriv.html', context)
+                            return render(request, 'oscauth/removepriv.html', context) # do I need to pass in the page title here?
 
                     else:
                         submit_msg = 'Please select a Task, a Role, and at least one Department then click Submit.'
-                        return  HttpResponse(template.render({'submit_msg': submit_msg}, request))
+                        return  HttpResponse(template.render({'submit_msg': submit_msg, 'title':"Manage Access"}, request)) # do I need to pass in the page title here?
 
                 return render(request, 'oscauth/setpriv.html', context)
 
             else:
                 result = uniqname_parm + ' is not in MCommunity'
-                return  HttpResponse(template.render({'result': result}, request))
+                return  HttpResponse(template.render({'result': result, 'title':"Manage Access"}, request))
 
 
 def showpriv(request, uniqname_parm):
@@ -394,7 +398,8 @@ def modpriv(request):
             result = 'Deleted Privileges'
 
     context = {
-        'title': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
+        'title': "Manage User Access",
+        'subtitle': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
         'uniqname_parm': uniqname_parm,
         'last_name': last_name,
         'first_name': first_name,

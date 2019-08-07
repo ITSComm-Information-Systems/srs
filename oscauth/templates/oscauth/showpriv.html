@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
+<h1>{{ title }}</h1>
+
 {{ result }}
 <p>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></p>
 <br>
@@ -19,8 +21,8 @@
                 <td> {{ row.col2 }}</td>
                 <td> {{ row.roles }}</td>
                 {% else %}
-                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i> {{ row.col1 }}</td>
-                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i> {{ row.col2 }}</td>
+                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>{{ row.col1 }}</td>
+                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>INACTIVE: {{ row.col2 }}</td>
                 <td class="prv-msgs"> {{ row.roles }}</td>
                 {% endif %}
         </tr>
