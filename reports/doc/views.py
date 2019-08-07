@@ -16,7 +16,7 @@ from django import forms
 
 from ldap3 import Server, Connection, ALL
 
-from oscauth.models import AuthUserDept
+from oscauth.models import AuthUserDept, AuthUserDeptV
 from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscOtsCallSummaryV, UmOscAcctdetailMrcOccV, UmOscPhoneHistoryV, UmOscServiceLocV, UmOscRatedV, UmOscRptSubscrib_Api_V
 from oscauth.forms import *
 from django.contrib.auth.decorators import login_required, permission_required
@@ -33,7 +33,7 @@ def get_doc(request):
     template = loader.get_template('doc.html')
 
     # Find all departments user has access to
-    user_depts = (d.dept for d in AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept'))
+    user_depts = (d.dept for d in AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept').exclude(dept='All').distinct('dept'))
     user_depts = list(user_depts)
 
     # Find dept names

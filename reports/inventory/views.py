@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404, render
 from django.contrib.auth import get_user_model
 from django import forms
 from ldap3 import Server, Connection, ALL
-from oscauth.models import AuthUserDept, Grantor, Role
+from oscauth.models import AuthUserDept, Grantor, Role, AuthUserDeptV
 from django.contrib.auth.decorators import login_required, permission_required
 
 # from .models import AuthUserDept
@@ -27,7 +27,7 @@ from datetime import datetime
 
 @permission_required('oscauth.can_report', raise_exception=True)
 def get_inventory(request):
-    depts = AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').values().distinct('dept')
+    depts = AuthUserDeptV.objects.filter(user=request.user.id, codename ='can_report').order_by('dept').exclude(dept='All').values().distinct('dept')
     departments = []
     for dept in depts:
         departments.append(dept['dept'])
