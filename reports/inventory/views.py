@@ -15,6 +15,7 @@ from django.contrib.auth import get_user_model
 from django import forms
 from ldap3 import Server, Connection, ALL
 from oscauth.models import AuthUserDept, Grantor, Role
+from django.contrib.auth.decorators import login_required, permission_required
 
 # from .models import AuthUserDept
 # from .models import Role, Group, User
@@ -24,6 +25,7 @@ from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscR
 from oscauth.forms import *
 from datetime import datetime
 
+@permission_required('oscauth.can_report', raise_exception=True)
 def get_inventory(request):
     depts = AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').values().distinct('dept')
     departments = []
@@ -49,7 +51,7 @@ def get_inventory(request):
     }
     return HttpResponse(template.render(context,request))
     
-
+@permission_required('oscauth.can_report', raise_exception=True)
 def make_report(request):
     data = []
     total_charge = 0

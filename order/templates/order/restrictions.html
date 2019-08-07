@@ -7,16 +7,17 @@
       </em>
       <strong>
           Select the calling restirctions you want this phone to have.
+          <span class="required">*</span>
       </strong>
     </div>
     {% for res in category.res %}
       <div class="custom-control custom-radio">
-        <input class="form-check-input" type="radio" value="{{res.id}}" name="resrescat{{category.id}}" id="res{{res.id}}" required>
+        <input class="form-check-input" type="radio" value="{{res.id}}" name="resrescat{{category.id}}" id="res{{res.id}}" aria-describedby="required-field" required>
         <label class="form-check-label" for="res{{res.id}}">
             {{res}}
         </label>
         {% if res == category.res.last %}
-        <div class="invalid-feedback">Please choose one.</div>
+        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
         {% endif %}
       </div>
     {% endfor %}

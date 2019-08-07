@@ -261,6 +261,7 @@ class Services(View):
             'title': 'Request Service',
             'service_list': service_list,
             'link_list': link_list,
+            'page_name': 'Request Service'
         }
         return HttpResponse(template.render(context, request))
 

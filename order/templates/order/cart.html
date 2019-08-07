@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 <!-- Beginning of Content -->
-<div id="main-content" class="container" role="main">
+
     <div class="row header-info">
         <div class="col-12">
             <div class="row">
                 <div class="col-12">
                     <h1>
-                        Cart
+                        {{ title }}
                         <small class="text-muted">
                             for Department: <strong>{{department.id}} - {{department.name}}</strong>
                         </small>
@@ -47,7 +47,7 @@
                             {% for chartcom in section %}
                             <div class="cart-table">
                                 <h4 class="cart-chartfield-title">
-                                    Chartfield:
+                                    Billed to:
                                     <!-- Insert Chartfield Nickname here -->
                                     <small>{{chartcom.chartcom}} ({{chartcom.chartcom.account_number}}) </small>
                                 </h4>
@@ -172,7 +172,7 @@
     </div>
     <!-- End of Cancel Order Modal -->
     </section>
-</div>
+
 <!-- End of Content -->
 {% endblock %}
 

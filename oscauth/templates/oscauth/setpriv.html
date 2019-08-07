@@ -35,15 +35,16 @@
     }
 </style>
     
-
+<h1>{{ title }}</h1>
 <form action="/auth/get_uniqname/" method="POST">{% csrf_token %}
-    <h1>Manage Access</h1>
 
     <h2>Select Person</h2>
     <div>
-        <label for="uniqname-field">Enter a Uniqname</label>
-        <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short">
-        <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
+        <div class="form-group">
+            <label for="uniqname-field">Enter a Uniqname</label>
+            <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short col-3">
+            <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
+        </div>
         {% if uniqname_parm is None or result != '' %}
         <strong class="prv-msgs">{{ result }}</strong>
         {% else %}
@@ -115,7 +116,7 @@
                 <label for="dept.{{ row.dept }}" class="form-check-label">{{ row.dept }} - {{ row.dept_name }}</label>
                 {% else %}
                 <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
-                <label for="dept.{{ row.dept }}" class="form-check-label prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>  {{ row.dept }} - {{ row.dept_name }}</label>
+                <label for="dept.{{ row.dept }}" class="form-check-label prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>INACTIVE:  {{ row.dept }} - {{ row.dept_name }}</label>
                 {% endif %}
                 <br>
                 </div>

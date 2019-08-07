@@ -5,11 +5,12 @@
     {% for field in list %}
 
     <div class="card" style="width: 18rem;">
-        <img class="card-img-top" src="/media/{{field.picture}}" alt="Product Image">
+        <img class="card-img-top" src="/media/{{field.picture}}" alt="Product Image of {{ field }}">
         <div class="card-body">
-          <h5 class="card-title">{{ field }}</h5>
+          <p class="card-title h5">{{ field }}</p>
           <p class="card-text">{{ field.description }}</p>
-          <a href="#" class="btn btn-primary">Select</a><p>${{ field.price }}</p>
+          <button type="button" class="btn btn-outline-success">Select</button>
+          <p><strong>Price: ${{ field.price }}</strong></p>
         </div>
     </div>
 
