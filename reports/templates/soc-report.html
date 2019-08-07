@@ -1,0 +1,199 @@
+{% extends 'base.html'%}
+
+{% block content %}
+<h1>Summary of Charges</h1>
+<div class="">
+		<strong>Report selection</strong>
+        <a class="float-right" href="../soc">Edit your selection</a>
+        <a class="float-right" id="edit-selection" href="../soc"><i class="fas fa-edit"></i></a>
+	</div>
+
+	<div class="">
+		<div class="card border-dark">
+			<div class="card-body">
+				<strong>Grouping:&nbsp;&nbsp;</strong>{{ grouping }}
+                <strong>&nbsp;&nbsp;&nbsp;&nbsp;Billed Unit(s):&nbsp;&nbsp;</strong>{{unit}}
+				<strong>&nbsp;&nbsp;&nbsp;&nbsp;Billing Date Range:&nbsp;&nbsp;</strong>{{ billing_period }}<br>
+		</div>
+	</div>
+</div>
+
+<hr class="style1">
+
+{% if table %}
+<button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')"class="btn btn-success float-right" style="font-size:16px;font-family:Roboto,sans-serif">Download Table To
+    CSV File</button>
+<br>
+<br>
+<table class ="table table-sm"  border="1" style="font-size:12px">
+    <thead class = "thead-dark">
+        <tr>
+            <th>Expense Account</th>
+            <th>Item Description</th>
+            <th>Charge Codes</th>
+            <th>Rate</th>
+            <th>Billed Units</th>
+            <th>Item Total</th>
+            <th>Item Group Total</th>
+            <th>Account Total</th>
+
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for row in table.0.0 %}
+        <tr class = "table-warning">
+            <td><b style="color:blue">{{ row.0 }} ({{ row.1 }})
+                    <input type="checkbox" name="{{row.1}}" id="" data-toggle="toggle">
+                </b></td>
+
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><b style="color:blue">${{ row.3 }}</b></td>
+        </tr>
+    <tbody class="hide" id = "{{row.0}}">
+        {% for charge in row.2%}
+        <tr class = "table-secondary">
+            <td style="color:red">{{ charge.0 }}
+            <input type="checkbox" name="{{charge.0}}" id="1" data-toggle="toggle2">
+                
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="color:red">${{ charge.2}}</td>
+            <td></td>
+        </tr>
+        <div id = "" name = "{{charge.0}}">    
+            {% for code in charge.1%}
+                <tr class = "{{charge.0}}" style = "display: none">
+                    <td></td>
+                    <td>{{ code.0 }}</td>
+                    <td>{{ code.1 }}</td>
+                    <td>${{ code.2 }}</td>
+                    <td>{{ code.3 }}</td>
+                    <td>${{ code.4 }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            {% endfor %}   
+        </div>
+        {% endfor %}
+        </tbody>
+    {% endfor %}
+    
+    <tr>
+        <td><b style="color:green">Total ITCom Charges</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><b style="color:green">${{table.0.1}}</td>
+    </tr>
+    </tbody>
+
+</table>
+<p></p>
+<p></p>
+
+{% else %}
+    <div class="mt-2">
+		<div class="alert alert-danger col-md-8" role="alert">
+		    <i class="fas fa-exclamation-triangle prv-msgs"></i>
+		    No charges for current selection
+		</div>
+	</div>
+{% endif%}
+
+
+<script>
+    function display_active(active) {
+        var group = document.forms["Select"]["department_group"];
+        var index = group.selectedIndex - 1;
+        document.getElementById("display").innerHTML = active[index]
+
+    }
+</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $('[data-toggle="toggle"]').parents().next('.hide').toggle();
+        $('[data-toggle="toggle2"]').parents().next('.hide').toggle();
+
+        $('[data-toggle="toggle"]').change(function () {
+            $(this).parents().next('.hide').toggle();
+        });
+
+         
+
+        $('[data-toggle="toggle2"]').change(function () {
+            var name = this.name;
+            var bet = '#'+name;
+            var hey = $(bet)
+            $('#Centrex Lines').hide();
+            var result_style = document.getElementsByClassName(name);
+            for(var i=0; i<result_style.length; i++) {
+                if (result_style[i].style.display == 'table-row') {
+                    result_style[i].style.display = 'none';
+                }
+                else {
+                    result_style[i].style.display = 'table-row';
+                }
+            }
+        });
+    });
+</script>
+<script>
+    function exportTableToCSV(filename) {
+        var csv = [];
+        var rows = document.querySelectorAll("table tr");
+
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll("td, th");
+
+            for (var j = 0; j < cols.length; j++)
+                row.push(cols[j].innerText);
+
+            csv.push(row.join(","));
+        }
+
+        // Download CSV file
+        downloadCSV(csv.join("\n"), filename);
+    }
+
+    function downloadCSV(csv, filename) {
+        var csvFile;
+        var downloadLink;
+
+        // CSV file
+        csvFile = new Blob([csv], { type: "text/csv" });
+
+        // Download link
+        downloadLink = document.createElement("a");
+
+        // File name
+        downloadLink.download = filename;
+
+        // Create a link to the file
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+
+        // Hide download link
+        downloadLink.style.display = "none";
+
+        // Add the link to DOM
+        document.body.appendChild(downloadLink);
+
+        // Click download link
+        downloadLink.click();
+    }
+</script>
+{% endblock %}
