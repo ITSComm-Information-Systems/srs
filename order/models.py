@@ -39,12 +39,10 @@ class Step(Configuration):
 class Element(Configuration):
     ELEMENT_CHOICES = (
         ('', ''),
-        ('YN', 'Yes/No'),
         ('Radio', 'Radio'),
         ('ST', 'String'),
         ('NU', 'Number'),
         ('Chart', 'Chartcom'),
-        ('PH', 'Phone Set Type'),
     )
     label = models.TextField()
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
