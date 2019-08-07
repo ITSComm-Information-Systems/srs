@@ -844,3 +844,11 @@ input:checked + .slider:before {
 	display:none;
 	margin-left: 2rem;
 }
+
+#order-processing-form {
+	width:100%;
+}
+
+#order-processing-form > .card {
+	width:100%;
+}

@@ -7,7 +7,7 @@
     Your items have been grouped into <strong># of orders goes here</strong> based on the activation chartfields.
 </div>
 <div class="row">
-    <div class="col-xl-6 col-lg-7 col-md-8 col-12 cards">
+    <div class="col-xl-12 col-lg-10 col-12 cards">
         <div class="row">
             <form action="/orders/submit/" id="order-processing-form" method="POST">{% csrf_token %}
                 {% for order in order_list %}
