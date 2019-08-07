@@ -831,3 +831,16 @@ input:checked + .slider:before {
 .location-card .card-text {
 	margin-bottom: 0;
 }
+
+.horizontal-card {
+	display: flex;
+
+}
+
+.card-order-details {
+	border-right: 1px solid rgba(0, 0, 0, .125);
+}
+#specificDayDivForm, #expediteDivForm {
+	display:none;
+	margin-left: 2rem;
+}

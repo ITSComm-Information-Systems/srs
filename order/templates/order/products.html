@@ -1,15 +1,22 @@
 {% for list in tab.form.cat %}
+<style>
+  .selected-card {
+			border-color: #28a745;
+			box-shadow: 5px 5px 10px grey;
+		}
+</style>
   <div id="equip{{list.id}}" data-phoneset="{{list.id}}">
 
     <div class="card-columns">
     {% for field in list %}
-
+      <!-- if card is selected, enable the class "selected-card" to the following DIV -->
     <div class="card" style="width: 18rem;">
         <img class="card-img-top" src="/media/{{field.picture}}" alt="Product Image of {{ field }}">
         <div class="card-body">
           <p class="card-title h5">{{ field }}</p>
           <p class="card-text">{{ field.description }}</p>
-          <button type="button" class="btn btn-outline-success">Select</button>
+          <!-- if card is selected, enable the class "btn-success" and remove the class "btn-outline-success" to the following button -->
+          <button type="button" class="btn btn-outline-success">Select <span class="sr-only">{{ field }}</span></button>
           <p><strong>Price: ${{ field.price }}</strong></p>
         </div>
     </div>
