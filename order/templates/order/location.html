@@ -1,42 +1,52 @@
-
-
-
-<div class="form-group" id="searchBuilding">
-Look Up Building Name or ID
-    <input id="buildingSearch" type="text" placeholder="Search.." required>
-    <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must enter a value"></i>Please enter a building.</div>
-</div>
+<div class="col-lg-5 col-md-6 col-12">
+  <div class="form-group" id="searchBuilding">
+    <label for="buildingSearch">Search for a Building Name or Building ID</label>
+    <input id="buildingSearch" class="form-group" type="text" aria-describedby="buildingSearchBlock"
+      placeholder="Search.." required>
+    <small id="buildingSearchBlock" class="form-text text-muted">
+      Search for the building name or building ID of where you want the new service to be activated at.
+    </small>
+    <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+        aria-label="Icon signfying that user must enter a value"></i>Please enter a building.
+    </div>
+  </div>
 
   <table id="buildingTable" class="table table-hover">
-  {% for building in tab.form.building_list %}
+    {% for building in tab.form.building_list %}
     <tr id="{{ building.building_code }}">
       <td>{{ building.building_code }}</td>
       <td name="buildingName">{{ building.building_name }}</td>
     </tr>
-  {% endfor %}
+    {% endfor %}
     <tr id="buildingNA">
       <td>Not Listed</td>
       <td name="buildingName"></td>
     </tr>
   </table>
+</div>
 
 
-
-
-<div class="form-group" id="buildingFields">
-    <div class="col-xs-4">
-        <label for="buildingID">Building Code:</label>
-        <input type="text" name="buildingCode" required="" id="id_new_building_code" class=" form-control">
-
-        <label for="buildingName">Building Name:</label>
-        <input type="text" name="buildingName" required="" id="id_new_building_name" class=" form-control">
-
-        <label for="buildingFloor">Floor:</label>
-        <input type="text" name="buildingFloor" required="" id="id_new_floor" class=" form-control">
-        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must enter a value"></i>Please enter floor.</div>
-
-        <label for="buildingRoom">Room:</label>
-        <input type="text" name="buildingRoom" required="" id="id_new_room" class=" form-control">
-        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must enter a value"></i>Please enter room.</div>
+<div class="col-lg-5 col-md-6 col-12" id="buildingFields">
+  <div class="form-group">
+    <label for="buildingID">Building Code:</label>
+    <input type="text" name="buildingCode" required="" id="id_new_building_code" class=" form-control">
+  </div>
+  <div class="form-group">
+    <label for="buildingName">Building Name:</label>
+    <input type="text" name="buildingName" required="" id="id_new_building_name" class=" form-control">
+  </div>
+  <div class="form-group">
+    <label for="buildingFloor">Floor:</label>
+    <input type="text" name="buildingFloor" required="" id="id_new_floor" class=" form-control">
+    <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+        aria-label="Icon signfying that user must enter a value"></i>Please enter floor.
     </div>
+  </div>
+  <div class="form-group">
+    <label for="buildingRoom">Room:</label>
+    <input type="text" name="buildingRoom" required="" id="id_new_room" class=" form-control">
+    <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+        aria-label="Icon signfying that user must enter a value"></i>Please enter room.
+    </div>
+  </div>
 </div>

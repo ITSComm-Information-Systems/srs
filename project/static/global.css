@@ -496,7 +496,7 @@ background-color: #EAEAEA;
 border-radius: 4px;
 }
 
-.navbar-nav > .nav-item.active {
+.navbar-nav .nav-item > .nav-link.active {
 	background-color: #6189b7 !important;
 }
 
@@ -830,4 +830,42 @@ input:checked + .slider:before {
 
 .location-card .card-text {
 	margin-bottom: 0;
+}
+
+.horizontal-card {
+	display: flex;
+
+}
+
+.card-order-details {
+	border-right: 1px solid rgba(0, 0, 0, .125);
+}
+#specificDayDivForm, #expediteDivForm {
+	display:none;
+	margin-left: 2rem;
+}
+
+#order-processing-form {
+	width:100%;
+}
+
+.row-cards > .card {
+	width:100%;
+}
+
+@media (max-width:910px) and (min-width:600px) {
+	.card-columns {
+		column-count: 2;
+	}
+	.card-columns > .card {
+		margin:0 auto;
+	}
+}
+@media (max-width:599px) {
+	.card-columns {
+		column-count: 1;
+	}
+	.card-columns > .card {
+		margin:0 auto;
+	}
 }
