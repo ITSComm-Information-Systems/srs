@@ -849,6 +849,6 @@ input:checked + .slider:before {
 	width:100%;
 }
 
-#order-processing-form > .card {
+.row-cards > .card {
 	width:100%;
 }
