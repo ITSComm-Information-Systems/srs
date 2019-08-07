@@ -496,7 +496,7 @@ background-color: #EAEAEA;
 border-radius: 4px;
 }
 
-.navbar-nav > .nav-item.active {
+.navbar-nav .nav-item > .nav-link.active {
 	background-color: #6189b7 !important;
 }
 
@@ -851,8 +851,4 @@ input:checked + .slider:before {
 
 .row-cards > .card {
 	width:100%;
-}
-
-#buildingTable {
-	max-width:41.666667% !important;
 }
