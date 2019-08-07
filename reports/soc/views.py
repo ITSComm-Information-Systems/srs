@@ -29,6 +29,8 @@ from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscD
 from oscauth.forms import *
 import datetime
 
+
+@permission_required('oscauth.can_report', raise_exception=True)
 def get_soc(request):
     template = loader.get_template('soc.html')
     depts = find_depts(request)
@@ -49,27 +51,43 @@ def get_soc(request):
     vps = []
     vps = UmOscDeptUnitsReptV.objects.order_by('dept_grp_vp_area').values_list('dept_grp_vp_area_descr',flat =True).distinct()
 
-
-    unit = ''
-    grouping = ''
+        
+        
     
-    text = ''
-    submit = True
-    submitfirst = True
+
+    context = {
+        'title': 'Summary of Charges',
+        'depts': depts,
+        'groups': groups,
+        'groups_descr':groups_descr,
+        'fiscal':fiscal,
+        'calendar':calendar,
+        'months':months,
+        'vps': vps,
+    }
+    return HttpResponse(template.render(context,request))
+
+@permission_required('oscauth.can_report', raise_exception=True)
+def generate(request):
+    depts = find_depts(request)
+    grouping = ''
+    unit = ''
 
     display_type = request.POST.get("unitGroupingGroup",None)
+    
     if display_type in ['1']:
         grouping = 'Department ID'
         unit = request.POST.getlist('department_id')
-    elif display_type in ['2']:
-        grouping = 'Department IDs'
-        unit = depts
+        if request.POST.get('selectall',None) in ['2']:
+            grouping = 'Department IDs'
+            unit = depts
     elif display_type in ['3']:
         grouping = 'Department Group'
         unit = [request.POST.get('department_group')]
     elif display_type in ['4']:
         grouping = 'Department Group VP Area'
         unit = [request.POST.get('department_vp')]
+    
 
     billing_period = ''
     dateRange = ''
@@ -98,35 +116,26 @@ def get_soc(request):
     if (table ==[] or list(table)[0][1]==0):
         if (table == []):
             rows = ''
-            submitfirst = False
         else:
             rows = 'There is no data for the current selection'
         table = []
-        submit = False
-        
-        
-    
 
+    template = loader.get_template('soc-report.html')
     context = {
         'title': 'Summary of Charges',
-        'depts': depts,
-        'groups': groups,
-        'groups_descr':groups_descr,
-        'fiscal':fiscal,
-        'calendar':calendar,
-        'months':months,
-        'vps': vps,
+        
         'grouping': grouping,
         'dateRange': dateRange,
         'unit': unit,
         'billing_period': billing_period,
-        'submit': submit,
-        'text': text,
         'rows': rows,
         'table': list(table),
-        'submitfirst': submitfirst,
     }
+
     return HttpResponse(template.render(context,request))
+
+
+
 
 
 def find_depts(request):
