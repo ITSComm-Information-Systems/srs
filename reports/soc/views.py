@@ -145,7 +145,7 @@ def find_depts(request):
  	query = AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept')
 
  	for dept in query:
- 		if Group.objects.get(name=dept.group).name != 'Orderer':
+ 		if Group.objects.get(name=dept.group).name != 'Reporter':
  			depts.append(dept.dept)
 
  	return depts

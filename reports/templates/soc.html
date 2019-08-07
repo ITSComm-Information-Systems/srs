@@ -28,6 +28,8 @@
         <h2>Select Unit Grouping</h2>
         <input type="radio" style='font-size:20px' name="unitGroupingGroup" id="deptid" value='1'> Department ID
         <div id = "department_id">
+        <br>
+        <strong>Select ID(s)</strong>
         <select class = "custom-select" multiple style='font-size:16px' name="department_id">
             <option value="%">--Select--</option>
             {% for dept in depts %}
@@ -35,35 +37,41 @@
             {% endfor %}
         </select>
         </br>
-        <p></p>
-        <p></p>
-        <input type="radio" style='font-size:20px' name="selectall" id="deptidall" value='2'> Select All
+        <input type="checkbox" style='font-size:20px' name="selectall" id="deptidall" value='2'> Select All
         Departments (you have access to)
+        <br>
+        <br>
         </div>
         <p></p>
         <p></p>
+
         <input type="radio" style='font-size:20px' name="unitGroupingGroup" id="deptgroup" value='3'> Department Group
+        <div id = "department_group">
+        <br>
+        <strong>Select a Department Group</strong>
         <select class = "custom-select" style='font-size:16px' name="department_group" onchange="display_active({{active}})" id = 'department_group'>
             <option value="%">--Select--</option>
             {% for group in groups_descr %}
             <option value="{{ group }}">{{ group }}</option>
             {% endfor %}
         </select>
+        </div>
         {% comment %} <span id="display">(Fiscal Years Active)</span> {% endcomment %}
         </br>
 
         <p></p>
         <p></p>
-        <input type="radio" style='font-size:20px' name="unitGroupingGroup" id="deptvp" value='4'> Department Group VP
-        Area
+        <input type="radio" style='font-size:20px' name="unitGroupingGroup" id="deptvp" value='4'> Department Group VPArea
+        <div id = "department_vp">
+        <br>
+        <strong>Select a Department VP</strong>
         <select class = "custom-select" style='font-size:16px' name="department_vp" id = "department_vp">
             <option value="%">--Select--</option>
             {% for vp in vps %}
             <option value="{{ vp }}">{{ vp }}</option>
             {% endfor %}
         </select>
-        </br>
-
+        </div>
     </div>
 
 
@@ -72,7 +80,7 @@
         <br>
 
         <p></p>
-        <h2>Choose Date Range</h2>
+        <h2>Select Date Range</h2>
         <input type="radio" style='font-size:20px' name="dateRangeGroup" id="fiscal" value='1'> Fiscal Year
         <select class = "custom-select" style='font-size:16px' name="FISCALYEAR" id = "fiscalyear">
             <option value="%">--Select--</option>
