@@ -1,4 +1,7 @@
 $(document).ready(function() {
+	// Hide loading
+	$('#loading').hide();
+	$('#go-back-loading').hide();
 
 	// Select first options by default
 	$("#doc_depts").prop("selectedIndex", 0);
@@ -84,6 +87,14 @@ $(document).ready(function() {
 			$('#generate').attr('disabled', 'disabled');
 		}
 		$('#chartfield_list').html(text);
+	})
+
+	// Show loading icon
+	$('#report_details').on('submit', function() {
+		$('#loading').show();
+	})
+	$('#return').on('submit', function() {
+		$('#go-back-loading').show();
 	})
 })
 

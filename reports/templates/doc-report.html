@@ -4,7 +4,11 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <div class="container">
-	<h1>{{title}}</h1>
+	<div class='row'>
+		<h1>{{title}}</h1>
+		<i class="fa fa-spinner fa-spin offset-1" id='loading' style='font:40px;'></i>
+	</div>
+
 	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
 
 	<strong class="d-inline">Report Selection</strong>
