@@ -2,12 +2,15 @@
 
 
 <div class="form-group" id="searchBuilding">
-Look Up Building Name or ID
-    <input id="buildingSearch" type="text" placeholder="Search.." required>
+    <label for="buildingSearch">Search for a Building Name or Building ID</label>
+    <input id="buildingSearch" class="col-5 form-group" type="text" aria-describedby="buildingSearchBlock" placeholder="Search.." required>
+    <small id="buildingSearchBlock" class="form-text text-muted">
+      Search for the building name or building ID of where you want the new service to be activated at.
+    </small>
     <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must enter a value"></i>Please enter a building.</div>
 </div>
 
-  <table id="buildingTable" class="table table-hover">
+  <table id="buildingTable" class="table table-hover col-5">
   {% for building in tab.form.building_list %}
     <tr id="{{ building.building_code }}">
       <td>{{ building.building_code }}</td>
