@@ -852,3 +852,7 @@ input:checked + .slider:before {
 .row-cards > .card {
 	width:100%;
 }
+
+#buildingTable {
+	max-width:41.666667% !important;
+}
