@@ -8,6 +8,7 @@ urlpatterns = [
     path('cart/', views.Cart.as_view()),
     path('status/<int:deptid>', views.Status.as_view()),
 
+    path('deletefromcart/', views.delete_from_cart),
     path('addtocart/', views.add_to_cart),
     path('submit/', views.Submit.as_view()), 
     path('review/', views.Review.as_view()),

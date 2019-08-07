@@ -105,14 +105,19 @@ def add_to_cart(request):
         i.deptid = charge.dept
         i.data = request.POST
         i.save()
+        return HttpResponseRedirect('/orders/cart/' + charge.dept) 
 
-    return HttpResponseRedirect('/orders/cart/0') 
+def delete_from_cart(request):
+    if request.method == "POST":
+        item = request.POST['itemId']
+        Item.objects.filter(id=item).delete()
+        dept = request.POST['itemIdDept']
+        return HttpResponseRedirect('/orders/cart/' + dept) 
 
 class Workflow(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def get(self, request, action_id):
-    #def get_workflow(request, action_id):
 
         tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
         action = Action.objects.get(id=action_id)
@@ -126,25 +131,19 @@ class Workflow(PermissionRequiredMixin, View):
                 element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
 
                 for element in element_list:
-                    if element.type == 'YN':
-                        field = forms.ChoiceField(label=element.label, widget=forms.RadioSelect, choices=(('Y', 'Yes',), ('N', 'No',)))
-                        #field = forms.ChoiceField(label=element.label, choices=Chartcom.get_user_chartcoms())
-                    elif element.type == 'Radio':
+                    if element.type == 'Radio':
                         field = forms.ChoiceField(label=element.label
                                                 , choices=eval(element.attributes))
-
-
                     elif element.type == 'Chart':
                         field = forms.ChoiceField(label=element.label
                                                 , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user.id))
                                                                                 #AuthUserDept.get_order_departments(request.user.id)
                         field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
-
-
+                    elif element.type == 'NU':
+                        field = forms.ChoiceField(label=element.label
+                                                , widget=forms.NumberInput(attrs={'min': "1"}))
                     elif element.type == 'ST':
                         field = forms.CharField(label=element.label)
-                    elif element.type == 'PH':
-                        field = forms.ChoiceField(label=element.label, widget=PhoneSetType, choices=(('B', 'Basic',), ('A', 'Advanced',),('V', 'VOIP',)))
                     else:
                         field = forms.IntegerField(label=element.label)
 
