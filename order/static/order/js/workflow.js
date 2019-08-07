@@ -282,7 +282,12 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
   } else {
       $('#nextBtn').html('Next');
   }
-  $('#nextBtn').prop('disabled', false);
+  if (currStep == 1) {
+    $('#prevBtn').hide();
+  } else {
+    $('#prevBtn').show();
+  }
+  //$('#nextBtn').prop('disabled', false);
 })
 
 

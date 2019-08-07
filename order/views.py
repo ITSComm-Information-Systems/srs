@@ -181,31 +181,30 @@ class Cart(PermissionRequiredMixin, View):
             deptid = dept_list[0].dept
 
         status = ['Ready to Order','Saved for Later']
-        item_list = Item.objects.filter(deptid=deptid,order__isnull=True).order_by('chartcom','-create_date')
-        chartcoms = item_list.distinct('chartcom')
-        action_list = Action.objects.all()
+        item_list = Item.objects.filter(deptid=deptid).exclude(order_id__gt=0).order_by('chartcom','-create_date')
+        chartcoms = item_list.distinct('chartcom') #, 'chartcom_id')
+        saved = item_list.distinct('chartcom')
+
+        #print(item_list)
+
+        #item_list = Item.objects.filter(deptid=deptid,order__isnull=True).order_by('chartcom','-create_date')
 
         for acct in chartcoms:
-            acct.items = item_list.filter(chartcom=acct.chartcom) #.order_by('create_date')
+            acct.items = item_list.filter(chartcom=acct.chartcom,order__isnull=True) #.order_by('create_date')
+            acct.table = 'tableReady' + str(acct.chartcom_id)
 
-            for item in acct.items:
-                item.details = item.data.get('action')
-                item.service = action_list.get(id=item.data.get('action_id')).service
         status[0] = chartcoms
         status[0].label = 'Ready to Order'
         status[0].id = 'tableReady'        
 
         item_list = Item.objects.filter(deptid=deptid,order=0).order_by('chartcom','-create_date')
-        saved_later = item_list.distinct('chartcom')
-        action_list = Action.objects.all()
+        #saved_later = item_list.distinct('chartcom')
 
-        for acct in saved_later:
+        for acct in saved:
             acct.items = item_list.filter(chartcom=acct.chartcom) #.order_by('create_date')
+            acct.table = 'tableSaved' + str(acct.chartcom_id)
 
-            for item in acct.items:
-                item.details = item.data.get('action')
-                item.service = action_list.get(id=item.data.get('action_id')).service
-        status[1] = saved_later
+        status[1] = saved
         status[1].label = 'Saved for Later'
         status[1].id = 'tableSaved'
 
