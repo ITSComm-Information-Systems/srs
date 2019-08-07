@@ -15,6 +15,7 @@ from django.contrib.auth import get_user_model
 from django import forms
 from ldap3 import Server, Connection, ALL
 from oscauth.models import AuthUserDept, Grantor, Role
+from django.contrib.auth.decorators import login_required, permission_required
 
 # from .models import AuthUserDept
 # from .models import Role, Group, User

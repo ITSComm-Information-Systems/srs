@@ -28,6 +28,7 @@ from django.db.models.functions import Concat
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscDeptUnitsReptV
 from oscauth.forms import *
 import datetime
+from django.contrib.auth.decorators import login_required, permission_required
 
 
 @permission_required('oscauth.can_report', raise_exception=True)
