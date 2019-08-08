@@ -5,7 +5,7 @@ from django.views.generic import View
 from order.forms import *
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
-from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceLocV
+from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceLocV, UmOscChartfieldV
 from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from pages.models import Page
@@ -34,7 +34,25 @@ class ManageChartcom(PermissionRequiredMixin, View):
 
     def post(self, request):
         print(request.POST)
-        return HttpResponseRedirect('/orders/chartcom/' + request.POST['deptid'])
+        action = request.POST.get('action')
+        id = request.POST.get('chartcomId')
+        deptid = request.POST.get('deptid')
+        
+        if action == 'add':
+            print('add ')
+
+        if action == 'edit':
+            chartcom = Chartcom.objects.get(id=id)
+            #descr = request.POST.get('newDescription')
+            chartcom.name = request.POST.get('newDescription')
+            chartcom.save()
+            print('edit',chartcom)
+
+        if action == 'delete':
+            x = Chartcom.objects.get(id=id).delete()
+            print(x)
+
+        return HttpResponseRedirect('/orders/chartcom/' + deptid)
 
     def get(self, request, deptid):
         dept_list = AuthUserDept.get_order_departments(request.user.id)
@@ -51,6 +69,7 @@ class ManageChartcom(PermissionRequiredMixin, View):
             deptid = dept_list[0].dept
 
         chartcoms = Chartcom.objects.filter(dept=deptid)
+        add_chartcoms = UmOscChartfieldV.objects.filter(deptid=deptid)
 
         template = loader.get_template('order/manage_chartfield.html')
         context = {
@@ -58,6 +77,7 @@ class ManageChartcom(PermissionRequiredMixin, View):
             'department': department,
             'dept_list': dept_list,
             'chartcoms': chartcoms,
+            'add_chartcoms': add_chartcoms,
         }
         return HttpResponse(template.render(context, request))
 
