@@ -16,6 +16,8 @@
           <p class="card-title h5">{{ field }}</p>
           <p class="card-text">{{ field.description }}</p>
           <!-- if card is selected, enable the class "btn-success" and remove the class "btn-outline-success" to the following link -->
+          <!-- Paco: Dave, do we need the select button to be an "a" tag? 
+            If not, can we make it a button element since it won't actually be a link -->
           <a href="#" class="btn btn-outline-success">Select <span class="sr-only">{{ field }}</span></a>
           <p><strong>Price: ${{ field.price }}</strong></p>
         </div>

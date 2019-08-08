@@ -8,13 +8,11 @@
     </em>
     <strong>
       Select the calling restirctions you want this phone to have.
-      <span class="required">*</span>
     </strong>
   </div>
   {% for res in category.res %}
   <div class="custom-control custom-radio">
-    <input class="form-check-input" type="radio" value="{{res.id}}" name="resrescat{{category.id}}" id="res{{res.id}}"
-      aria-describedby="required-field" required>
+    <input class="form-check-input" type="radio" value="{{res.id}}" name="resrescat{{category.id}}" id="res{{res.id}}" required>
     <label class="form-check-label" for="res{{res.id}}">
       {{res}}
     </label>
