@@ -82,27 +82,39 @@
         <p></p>
         <h2>Select Date Range</h2>
         <input type="radio" style='font-size:20px' name="dateRangeGroup" id="fiscal" value='1'> Fiscal Year
+        <div id = "fiscalyear">
+        <br>
+        <strong>Select a Fiscal Year</strong>
         <select class = "custom-select" style='font-size:16px' name="FISCALYEAR" id = "fiscalyear">
             <option value="%">--Select--</option>
             {% for year in fiscal %}
             <option value="{{ year }}">{{ year }}</option>
             {% endfor %}
         </select>
+        </div>
         </br>
         <p></p>
         <p></p>
+        
         <input type="radio" style='font-size:20px' name="dateRangeGroup" id="calendar" value='2'> Calender Year
+        <div id = "calendaryear">
+        <br>
+        <strong>Select a Calendar Year</strong>
         <select class = "custom-select" style='font-size:16px' name="CALENDARYEAR" id = "calendaryear">
             <option value="%">--Select--</option>
             {% for year in calendar %}
             <option value="{{ year }}">{{ year }}</option>
             {% endfor %}
         </select>
+        </div>
         </br>
         <p></p>
         <p></p>
+        
         <input type="radio" style='font-size:20px' name="dateRangeGroup" id="single" value='3'> Single Month
         <div id = 'singlemonth'>
+        <br>
+        <strong>Select a Month</strong>
         <select class = "custom-select" style='font-size:16px' name="SINGLEMONTH">
             <option value="%">--Select--</option>
             {% for month in months %}
@@ -121,6 +133,8 @@
         <p></p>
         <input type="radio" style='font-size:20px' name="dateRangeGroup" id="multiple" value='4'> Month-to-month
         <div id = "multimonth">
+        <br>
+        <strong>Select Billing Range</strong>
         <select class = "custom-select" style='font-size:16px' name="FIRSTMONTH">
             <option value="%">--Select--</option>
             {% for month in months %}
