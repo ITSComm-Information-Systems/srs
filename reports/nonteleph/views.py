@@ -110,6 +110,7 @@ def generate_report(request):
 
                 # Create a non-telephony row for the charges table
                 user_id = {
+                    'user_defined_id': a.user_defined_id,
                     'descr': a.item_description,
                     'qty': int(a.quantity),
                     'total_charges': a.charge_amount,
