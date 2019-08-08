@@ -41,13 +41,13 @@
 		<a href="#main-content" class="sr-only sr-only-focusable">Skip to main content</a>
 	</div>
 	<header role="banner">
-		<nav class="navbar navbar-expand-lg" id="aux-nav">
+		<nav class="navbar navbar-expand-lg" id="aux-nav" aria-label="Auxiliary Navigation">
 			<div class="container">
 				<div class="navbar-brand"><a class="logo" href="/">Online Service Center</a></div>
 				<button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target=".navbars" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<i class="fas fa-bars text-light"></i>
 				</button>
-				<div class="collapse navbar-collapse navbars" aria-label="Auxiliary Navigation" role="navigation">
+				<div class="collapse navbar-collapse navbars" aria-labelledby="aux-nav" role="navigation">
 				<ul class="navbar-nav ml-auto">
 					{% if user.is_authenticated %}
 					<li class="nav-item dropdown">
@@ -103,9 +103,9 @@
 			</div>
 		</div>
 	</nav>
-	<nav class="navbar navbar-expand-lg" id="main-nav">
+	<nav class="navbar navbar-expand-lg" id="main-nav" aria-label="Main Site Navigation">
 		<div class="container">
-			<div class="collapse navbar-collapse navbars" aria-label="Main Site Navigation" role="navigation">
+			<div class="collapse navbar-collapse navbars" aria-labelledby="main-nav" role="navigation">
 				<ul class="navbar-nav /nav-fill w-100">
 					{% if perms.oscauth.can_order %}
 					<li class="nav-item {% if page_name == 'Request Service' %}active{% endif %}">

@@ -1,6 +1,10 @@
 {% for category in tab.form.list %}
 <div id="cat{{category.id}}" data-phoneset="{{category.name}}">
-  <p class="h2"> {{category}} </p>
+  <p class="h2"> {{category}}
+    <small>
+      <a href="#">Learn More</a>
+    </small>
+  </p>
 
   <div class="features-restriction-msg mb-4">
     <em>
@@ -8,7 +12,7 @@
       features.
     </em>
     <strong>
-      Select the calling restirctions you want this phone to have.
+      Select the features you want this phone to have.
     </strong>
   </div>
 
