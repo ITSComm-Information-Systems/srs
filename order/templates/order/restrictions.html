@@ -1,13 +1,17 @@
 {% for category in tab.form.list %}
 <div id="rescat{{category.id}}" data-phoneset="{{category.name}}">
-  <p class="h2"> {{category}} </p>
+  <p class="h2"> {{category}}
+    <small>
+      <a href="#">Learn More</a>
+    </small> 
+  </p>
   <div class="features-restriction-msg mb-4">
     <em>
       We can't display the current calling restrictions for this phone. Review the Inventory and Location Report to see
       your phone's restrictions.
     </em>
     <strong>
-      Select the calling restirctions you want this phone to have.
+      Select the calling restrictions you want this phone to have.
     </strong>
   </div>
   {% for res in category.res %}
