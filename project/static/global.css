@@ -507,7 +507,8 @@ padding:10px;
 
 }
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link, 
-.btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, 
+.btn-primary, .btn-primary:not(:disabled):not(.disabled).active, 
+.btn-primary:not(:disabled):not(.disabled):active, 
 .show>.btn-primary.dropdown-toggle {
     background-color:#0075bc;
 }
