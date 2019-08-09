@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
 <h1>Toll Statements Report</h1>
-<div class="">
+<div >
 	<strong>Report selection</strong>
     <a class="float-right" href="../tolls">Edit your selection</a>
     <a class="float-right" id="edit-selection" href="../tolls"><i class="fas fa-edit"></i></a>
 </div>
 
-<div class="">
+<div >
 	<div class="card border-dark">
 		<div class="card-body">
 			<strong>Department:&nbsp;&nbsp;</strong>{{ dept_id }}
@@ -21,9 +21,7 @@
  <hr class="style1">
 
 {% if inactive %}
-    <span style="color:red">{{dept_name}} ({{dept_id}})</span><i class="fas fa-exclamation-triangle" style="color:red"></i>
-    <p></p>
-    <p></p>
+    <span class=".prv-msgs">{{dept_name}} ({{dept_id}})</span><i class="fas fa-exclamation-triangle"></i>
 {% endif %}
 
 {% if inactive %}
