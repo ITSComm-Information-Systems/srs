@@ -334,7 +334,7 @@ margin-left: 10px;
 }
 
 span{
-padding-left:10px;
+/*padding-left:10px;*/
 text-align: center
 }
 .alert-row {
@@ -505,6 +505,12 @@ margin:auto;
 padding:10px;
 /* width: 50%; */
 
+}
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link, 
+.btn-primary, .btn-primary:not(:disabled):not(.disabled).active, 
+.btn-primary:not(:disabled):not(.disabled):active, 
+.show>.btn-primary.dropdown-toggle {
+    background-color:#0075bc;
 }
 
 .chartfield-text {

@@ -1,21 +1,26 @@
 {% for category in tab.form.list %}
 <div id="cat{{category.id}}" data-phoneset="{{category.name}}">
-  <p class="h2"> {{category}} </p>
+  <p class="h2"> {{category}}
+  </p>
 
   <div class="features-restriction-msg mb-4">
     <em>
       We can't display the current features for this phone. Review the Inventory and Location Report to see your phone's
-      restrictions.
+      current features.
     </em>
     <strong>
-      Select the calling restirctions you want this phone to have.
+      Select the features you want this phone to have.
     </strong>
   </div>
 
   <div class="form-row">
     {% for type in category.type %}
     <div class="form-check col">
-      <legend>{{type.label}} <span class="required">*</span></legend>
+      <legend>{{type.label}}
+        <small>
+          <a href="#">Learn More</a>
+        </small>
+      </legend>
 
       {% if type.label == 'Standard' %}
       Standard features included with this phone type:
@@ -30,7 +35,7 @@
       {% for feature in type %}
       <div class="form-check">
         <input class="form-check-input" type="checkbox" value="{{feature.id}}" name="{{category.name}}{{type.label}}"
-          id="feature{{feature.id}}" aria-describedby="required-field">
+          id="feature{{feature.id}}">
         <label class="form-check-label" for="feature{{feature.id}}">
           {{feature}}
         </label>
@@ -40,7 +45,7 @@
       {% for feature in type %}
       <div class="form-check">
         <input class="form-check-input" type="radio" value="{{feature.id}}" name="{{category.name}}{{type.label}}"
-          id="feature{{feature.id}}" aria-describedby="required-field" required>
+          id="feature{{feature.id}}" required>
         <label class="form-check-label" for="feature{{feature.id}}">{{feature}}</label>
         {% if feature.id == type.last %}
         <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"

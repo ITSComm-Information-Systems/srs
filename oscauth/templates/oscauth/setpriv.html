@@ -38,20 +38,23 @@
 <h1>{{ title }}</h1>
 <form action="/auth/get_uniqname/" method="POST">{% csrf_token %}
 
-    <h2>Select Person</h2>
     <div>
+        <h6>Search by Uniqname</h6>
         <div class="form-group">
-            <label for="uniqname-field">Enter a Uniqname</label>
-            <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short col-3">
-            <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
+            <!-- <label for="uniqname-field">Search by Uniqname</label> -->
+            <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short col-4">
+            <input id="search-btn" type='submit' value='Go' class="btn btn-primary">
         </div>
         {% if uniqname_parm is None or result != '' %}
         <strong class="prv-msgs">{{ result }}</strong>
         {% else %}
 
             {% if osc_user.exists %}
-            <strong>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
-            <input type='button' value='Show Current Access' class="btn btn-outline-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
+            <div class='mt-5'>
+                <h2 class='d-inline'>Permissions for </h2><h3 class='d-inline'>{{ first_name }} {{ last_name }} ({{ uniqname_parm }})</h3>
+                <!-- <strong>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong>  -->
+                <input type='button' value='Show Current Access' class="btn btn-outline-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
+            </div>
             {% else %}
                 <strong>{{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
                  - User not found, add a role to create them.
