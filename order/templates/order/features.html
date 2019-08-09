@@ -1,15 +1,12 @@
 {% for category in tab.form.list %}
 <div id="cat{{category.id}}" data-phoneset="{{category.name}}">
   <p class="h2"> {{category}}
-    <small>
-      <a href="#">Learn More</a>
-    </small>
   </p>
 
   <div class="features-restriction-msg mb-4">
     <em>
       We can't display the current features for this phone. Review the Inventory and Location Report to see your phone's
-      features.
+      current features.
     </em>
     <strong>
       Select the features you want this phone to have.
@@ -19,7 +16,11 @@
   <div class="form-row">
     {% for type in category.type %}
     <div class="form-check col">
-      <legend>{{type.label}}</legend>
+      <legend>{{type.label}}
+        <small>
+          <a href="#">Learn More</a>
+        </small>
+      </legend>
 
       {% if type.label == 'Standard' %}
       Standard features included with this phone type:
