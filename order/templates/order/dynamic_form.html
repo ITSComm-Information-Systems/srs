@@ -28,7 +28,7 @@
     <div class="input-group mb3">
         <!-- Select a Department (based off user's department access) -->
             <div class="input-group-prepend">
-                <select class="custom-select" data-target="{{ field.name }}" onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
+                <select class="custom-select" id="{{ field.name }}" data-target="{{ field.name }}" onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
                     <option value="all">All Depts</option>
                     {% for dept in field.field.dept_list %}
                         <option value="{{dept}}">{{dept}}</option>
