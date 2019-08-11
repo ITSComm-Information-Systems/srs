@@ -351,8 +351,13 @@ function validateForm() {
 
   function filterChartcom(obj) { 
     id = '#id_' + obj.dataset.target;
-    $(id).find('[data-dept]').hide();
-    $(id).find("[data-dept='" + obj.value + "']").show();
+    if (obj.value=='all') {
+      $(id).find('[data-dept]').show();
+    } else {
+      $(id).find('[data-dept]').hide();
+      $(id).find("[data-dept='" + obj.value + "']").show();
+    }
+
   }
 
   $("#phoneLookup").click(function () {
