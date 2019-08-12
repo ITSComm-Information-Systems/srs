@@ -762,7 +762,7 @@
 	}
 
 	#service-menu ul li a:active {
-		font-weight:bold;
+/*		font-weight:bold;*/
 	}
 
 	@media (min-width:768px) {
