@@ -26,6 +26,11 @@ body {
 .navbar a:link, .navbar a:visited {
 	color:#ffffff;
 }
+@media (max-width: 768px) {
+	.navbar .navbar-brand {
+		display:none;
+	}
+}
 
 .container {
 	max-width:1280px;
@@ -721,6 +726,7 @@ div h2:first-of-type, div h3:first-of-type {
 }
 h2.service-menu-header {
 	margin-top:.75rem !important;
+	font-size:1.75rem;
 }
 h3.lead {
 	font-size:1.75rem;
