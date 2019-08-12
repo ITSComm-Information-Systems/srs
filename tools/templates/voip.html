@@ -1,72 +1,65 @@
 {% extends 'base.html' %}
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<div class = "container">
-    <h1>{{ title }}</h1>
+<h1>{{ title }}</h1>
+
+<form action='/tools/voip/confirm/' method="GET" id="voipLocationForm">
+    <ul class="nav justify-content-center nav-pills mt-5" id="voiplocation_nav" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link disabled" onclick="tab_func1()" data-toggle="tab" id="vlc-1" href="#vl-1" role="tab"
+                name="Select Phone Number" aria-selected="false">Current Location</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" onclick="tab_func2()" data-toggle="tab" id="vlc-2" href="#vl-2" role="tab"
+                name="Select New Location" aria-selected="false">New Location</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" onclick="tab_func3()" data-toggle="tab" id="vlc-3" href="vl-3" role="tab"
+                name="Confirm Change" aria-selected="false">Review & Submit</a>
+        </li>
+    </ul>
 
     <div id='phoneselect'>
-        <h6 class='d-inline'>Enter VOIP Service Number</h6><p class='d-inline'>&nbsp;(e.g. 7347632000 or 734-763-2000)</p>
-        <form action='/tools/voip/' mthod='GET' submit=' return validate()' name="Select">{% csrf_token %}
-            <div class='form-row mt-2'>
-                <div class='input-group col-md-4'>
-                    <input type='text' name='number' id='phone' class='form-control'>
-                </div>
-                <input type='submit' value='Search' class='btn btn-primary'>
+        <!-- <form action='/tools/voip/' mthod='GET' submit=' return validate()' name="Select">{% csrf_token %}
+                    <div class='form-row mt-2'>
+                        <div class='input-group col-md-4'>
+                            <label class='d-inline' for="phone">
+                                Enter VOIP Service Number (e.g. 7347632000 or 734-763-2000)
+                            </label>
+                            <input type='text' name='number' id='phone' class='form-control'>
+                        </div>
+                        <input type='submit' value='Search' class='btn btn-primary'>
+                    </div>
+                </form> -->
+        <form action="/tools/voip/" mthod="GET" submit=" return validate()" name="Select">
+            {% csrf_token %}
+            <label for="phone">Enter VOIP Service Number (e.g. 7347632000 or 734-763-2000)</label>
+            <div class="form-group col-md-4 form-check-inline">
+                <input type="tel" name="number" id="phone" class="form-control">
+                <input type="submit" value="Search" class="btn btn-primary">
             </div>
         </form>
     </div>
-    
-    <form action='/tools/voip/confirm/' method="GET" id ="voipLocationForm">
-        <ul class="nav justify-content-center nav-pills mt-5" id="voiplocation_nav" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link disabled" onclick="tab_func1()" data-toggle="tab" id="vlc-1" href="#vl-1" role="tab" name="Select Phone Number" aria-selected="false">Current Location</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled" onclick="tab_func2()" data-toggle="tab" id="vlc-2" href="#vl-2" role="tab" name="Select New Location" aria-selected="false">New Location</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled" onclick="tab_func3()" data-toggle="tab" id="vlc-3" href="vl-3" role="tab" name="Confirm Change" aria-selected="false">Review & Submit</a>
-            </li>
-        </ul>
 
-        <div class="tab-content" id="vl-pills-tabContent">
-            <div class="tab-pane fade in active" id="vl-1" role="tabpanel" aria-labelledby="pills-contact-tab">
-                {% include 'currentlocation.html'%}
-            </div>
-            <div class="tab-pane fade" id="vl-2" role="tabpanel" aria-labelledby="pills-contact-tab">
-                {% include 'newlocation.html' %}
-            </div>
-            <div class="tab-pane fade" id="vl-3" role="tabpanel" aria-labelledby="pills-contact-tab">
-               {% include 'confirmchange.html'%}
-            </div>
-            <div style = "overflow:auto;">
-                <div style="float:right;">
-                    <button type="button" class="btn btn-primary" id="vlPrevBtn">Previous</button>
-                    <button type="button" class="btn btn-primary" id="vlNextBtn">Next</button>
-                </div>
-            </div>
+    <div class="tab-content" id="vl-pills-tabContent">
+        <div class="tab-pane fade in active" id="vl-1" role="tabpanel" aria-labelledby="pills-contact-tab">
+            {% include 'currentlocation.html'%}
         </div>
-
-    </form>
-    
-</div>
-{% comment %} <div id="main-content" class="container" role="main">
-    <div class="container" role="main">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="message">
-                    <hr class="style1">
-                    <p>
-                        This tool is currently under construction.<br>
-                        If you would like to use this tool, click the button below.
-                    </p>
-                    <a href="https://itscommweb.itd.umich.edu/LocationChange/" class="btn btn-outline-primary" role="button">VOIP Location Change</a>
-                    
-                </div>
+        <div class="tab-pane fade" id="vl-2" role="tabpanel" aria-labelledby="pills-contact-tab">
+            {% include 'newlocation.html' %}
+        </div>
+        <div class="tab-pane fade" id="vl-3" role="tabpanel" aria-labelledby="pills-contact-tab">
+            {% include 'confirmchange.html'%}
+        </div>
+        <div style="overflow:auto;">
+            <div style="float:right;">
+                <button type="button" class="btn btn-primary" id="vlPrevBtn">Previous</button>
+                <button type="button" class="btn btn-primary" id="vlNextBtn">Next</button>
             </div>
         </div>
     </div>
-</div> {% endcomment %}
+
+</form>
 {% endblock %}
 
 {% block js %}
