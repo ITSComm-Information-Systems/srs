@@ -444,27 +444,27 @@ margin: 10px;
 margin-bottom: 0;
 font-style: italic;
 }
+
 .helpful-links {
 width: inherit;
-margin:0 auto;
-max-width: 400px;
-min-width: 345px;;
+/* margin:0 auto; */
 }
-.helpful-links a{
+
+.hlinks a{
 word-wrap: break-word;
 border-color: transparent;
 background-color: transparent;
-
 }
 
-.helpful-links a:focus {
+.hlinks a:focus {
 color: #0075bc;
 border-color: transparent;
 background-color: transparent;
 }
+
 @media (min-width:768px) and (max-width:1199px){
 .helpful-links {
-	margin:auto 0;
+	margin:0 auto;
 }
 }
 /* nav ul li a:active {
@@ -503,7 +503,6 @@ border-radius: 4px;
 .buttons {
 margin:auto;
 padding:10px;
-/* width: 50%; */
 
 }
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link, 
@@ -874,4 +873,9 @@ input:checked + .slider:before {
 	.card-columns > .card {
 		margin:0 auto;
 	}
+}
+
+.total-charges-inv {
+	font-size: 1rem;
+	font-weight: bold;
 }
