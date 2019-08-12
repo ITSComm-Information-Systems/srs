@@ -716,6 +716,14 @@ a.popover-icon:hover {
 	font-size:1.3rem;
 }
 
+div h2:first-of-type, div h3:first-of-type {
+	margin-top:0;
+}
+h3.lead {
+	font-size:initial;
+	font-weight:700;
+}
+
 .wismo-order-details {
 	width:40%;
 }
@@ -749,15 +757,15 @@ a.popover-icon:hover {
 
 @media (min-width:768px) {
 	.service-cards {
-		margin-top:4.25rem;
+/*		margin-top:4.25rem;*/
 	}
 }
 .doc.table-striped>tbody>tr:last-child {
-	background-color:#F0AD4E;
+	background-color:#f4f3f2;
 }
 
 .table-total {
-	background-color:#F0AD4E;
+	background-color:#f4f3f2;
 }
 
 .total-col {
