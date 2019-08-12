@@ -3,108 +3,101 @@
 {% block content %}
 <h1>Inventory and Location Report</h1>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<div class="">
-		<strong>Report selection</strong>
-        <a class="float-right" href="../inventory">Edit your selection</a>
-        <a class="float-right" id="edit-selection" href="../inventory"><i class="fas fa-edit"></i></a>
-	</div>
+<div>
+    <strong>Report selection</strong>
+    <a class="float-right" href="../inventory">Edit your selection</a>
+    <a class="float-right" id="edit-selection" href="../inventory"><i class="fas fa-edit"></i></a>
+</div>
 
-	<div class="">
-		<div class="card border-dark">
-			<div class="card-body">
-				<strong>Department:&nbsp;&nbsp;</strong>{{ dept_id }}
-                <strong>&nbsp;&nbsp;&nbsp;&nbsp;Department Name:&nbsp;&nbsp;</strong>{{dept_name}}
-				<strong>&nbsp;&nbsp;&nbsp;&nbsp;Billing Date:&nbsp;&nbsp;</strong>{{ bill_period }}<br>
-		</div>
-	</div>
+<div>
+    <div class="card border-dark">
+        <div class="card-body">
+            <strong>Department:&nbsp;&nbsp;</strong>{{ dept_id }}
+            <strong>&nbsp;&nbsp;&nbsp;&nbsp;Department Name:&nbsp;&nbsp;</strong>{{dept_name}}
+            <strong>&nbsp;&nbsp;&nbsp;&nbsp;Billing Date:&nbsp;&nbsp;</strong>{{ bill_period }}<br>
+        </div>
+    </div>
 </div>
 
 
 {% if formated_data or location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%}
 <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
-    <input type="text" style='font-size:20px' name = "dept_id" id = "dept_id" value = "{{dept_id}}-{{dept_name}}" readonly hidden>
-    <input type="text" style='font-size:20px' name = "bill_period" id = "bill_period" value = "{{bill_period}}" readonly hidden>
-    <div class = "form-row">
-    <div id="main-content" class="container" role="main">
-        <div class="container" role="main">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="message">
-                        <h5>Filters<h5>
-                        <hr class="style1">
-                    </div>
+    <input type="text" name="dept_id" id="dept_id" value="{{dept_id}}-{{dept_name}}" readonly hidden>
+    <input type="text" name="bill_period" id="bill_period" value="{{bill_period}}" readonly hidden>
+    <div class="form-row">
+        <div class="container">
+            <h2>Filters<h2>
+            <hr class="style1">
+        </div>
+
+        <div class="row align-items-start col-3" id="select_loc">
+            <div class="input-group col-auto">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="inv_dropdown">Location</label>
                 </div>
+
+                <select class="custom-select" style='font-size:16px' requried type="select" name="location"
+                    id="location">
+                    <option value=''>--Select--
+                        {% for building in buildings %}
+                    <option value="{{ building }}">{{ building }}{% endfor %}
+                </select>
             </div>
         </div>
-    </div>
-    
-    <div class = "row align-items-start col-3" id = "select_loc">
-        <div class = "input-group col-auto">
-            <div class ="input-group-prepend">
-                <label class = "input-group-text" for="inv_dropdown">Location</label>
+
+        <div class="row align-items-start col-3" id="select_type">
+            <div class="input-group col-auto">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="inv_dropdown">User ID Type</label>
+                </div>
+
+                <select class="custom-select" style='font-size:16px' requried type="select" name="type" id="type">
+                    <option value=''>--Select--
+                        {% for type in user_types %}
+                    <option value="{{ type }}">{{ type }}{% endfor %}
+                </select>
             </div>
-
-            <select class="custom-select" style='font-size:16px' requried type="select" name="location" id="location" >
-                <option value = ''>--Select--
-                {% for building in buildings %}
-                <option value="{{ building }}">{{ building }}{% endfor %}
-            </select>
         </div>
-    </div>
 
-    <div class = "row align-items-start col-3" id = "select_type">
-        <div class = "input-group col-auto">
-            <div class ="input-group-prepend">
-                <label class = "input-group-text" for="inv_dropdown">User ID Type</label>
+        <div class="row align-items-start col-3" id="select_cf">
+            <div class="input-group col-auto">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="inv_dropdown">Chartfield</label>
+                </div>
+
+                <select class="custom-select" style='font-size:16px' requried type="select" name="cf" id="cf">
+                    <option value=''>--Select--
+                        {% for chartfield in chartfields %}
+                    <option value="{{ chartfield }}">{{ chartfield }}{% endfor %}
+                </select>
             </div>
-
-            <select class="custom-select" style='font-size:16px' requried type="select" name="type" id="type">
-                <option value = ''>--Select--
-                {% for type in user_types %}
-                <option value="{{ type }}">{{ type }}{% endfor %}
-            </select>
         </div>
-    </div>
+        {% if first %}
+        <div class="row align-items-start col-3" id="select_date">
+            <div class="input-group col-auto">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="inv_dropdown">Last Call Date</label>
+                </div>
 
-    <div class = "row align-items-start col-3" id = "select_cf">
-        <div class = "input-group col-auto">
-            <div class ="input-group-prepend">
-                <label class = "input-group-text" for="inv_dropdown">Chartfield</label>
+                <select class="custom-select" style='font-size:16px' requried type="select" name="date" id="date">
+                    <option value=''>--Select--
+                    <option value="6-12">Greater than 6 months and less than 12 months
+                    <option value="12+">Greater than 12 months
+                </select>
             </div>
-
-            <select class="custom-select" style='font-size:16px' requried type="select" name="cf" id="cf">
-                <option  value = ''>--Select--
-                {% for chartfield in chartfields %}
-                <option value="{{ chartfield }}">{{ chartfield }}{% endfor %}
-            </select>
         </div>
-    </div>
-    {% if first %}
-    <div class = "row align-items-start col-3" id = "select_date">
-        <div class = "input-group col-auto">
-            <div class ="input-group-prepend">
-                <label class = "input-group-text" for="inv_dropdown">Last Call Date</label>
-            </div>
+        {% endif %}
 
-            <select class="custom-select" style='font-size:16px' requried type="select" name="date" id="date">
-                <option value = ''>--Select--
-                <option value="6-12">Greater than 6 months and less than 12 months
-                <option value="12+">Greater than 12 months
-            </select>
-        </div>
-    </div>
-    {% endif %}
+        {% if first is False%}
+        <div class="row align-items-start col-3"></div>
+        {% endif %}
+        <input type='submit' value='Apply Filters' class="btn btn-primary mb-1 float-right">
 
-    {% if first is False%}
-    <div class = "row align-items-start col-3"></div>
-    {% endif %}
-    <input type='submit' value='Apply Filters' class="btn btn-primary mb-1 float-right">
-    
-    {% if location_filter or type_filter or cf_filter or date_filter%}
-    <div class = "row align-items-start col-10"></div>
-    <pre>            </pre>
-    <input type = 'submit' value = 'Remove Filters' class = "btn btn-danger mb-1">
-    {% endif %}
+        {% if location_filter or type_filter or cf_filter or date_filter%}
+        <div class="row align-items-start col-10"></div>
+        <pre>            </pre>
+        <input type='submit' value='Remove Filters' class="btn btn-danger mb-1">
+        {% endif %}
 
     </div>
 </form>
@@ -113,59 +106,68 @@
 
 
 {% if location_filter or type_filter or cf_filter or date_filter%}
-    <h5>Current Filters</h5>
-    
-    <p> {% if location_filter %}Location filter: {% endif %} {{ location_filter }}</p>
-    <p>{% if type_filter %}User ID Type filter: {% endif %}{{ type_filter }}</p>
-    <p>{% if cf_filter %}Chartfield filter: {% endif %}{{ cf_filter }}</p>
-    <p>{% if date_filter %}Last Call Date filter: {% endif %}{{ date_filter }}</p>
-    <hr class="style1">
+<h2>Current Filters</h2>
+
+<p><strong>{% if location_filter %}Location filter:</strong> {% endif %} {{ location_filter }}</p>
+<p><strong>{% if type_filter %}User ID Type filter:</strong> {% endif %}{{ type_filter }}</p>
+<p><strong>{% if cf_filter %}Chartfield filter:</strong> {% endif %}{{ cf_filter }}</p>
+<p><strong>{% if date_filter %}Last Call Date filter:</strong> {% endif %}{{ date_filter }}</p>
+<hr class="style1">
 {% endif %}
 
 {% if formated_data %}
-<button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right" style="font-size:20px;font-family:Roboto,sans-serif"> CSV Download</button>
+<button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right">
+    CSV Download
+</button>
 
 {% for classification in formated_data %}
-<div class = "table-responsive">
-<table class = "table table-sm mb-5 table-striped" style="font-size:12px" >
-    
-    <h3 class= "text-dark font-weight-bold">
-        Chartfield: {{classification.0.0.chartfield}}
-    </h3>
-    <thead class = "thead-dark"> 
-        <tr >
-            <th>User Id</th>
-            <th>Usage</th>
-            <th>User ID Type</th>
-            <th>User ID Name</th>
-            <th>Location</th>
-            <th>Calling Range/Restrictions</th>
-            <th>Last Outbound Call</th>
-            <th>Account</th>
-            <th>Charge Code</th>
-            <th>Charge Description</th>
-            <th>Quantity</th>
-            <th>Rate</th>
-            <th>Amount</th>
-        </tr>
-        
-    </thead>
-     <tbody>
-        {% for phone in classification %}
+<div class="table-responsive">
+    <table class="table table-sm mb-5 table-striped" style="font-size:12px">
+
+        <h3 class="text-dark font-weight-bold">
+            Chartfield: <small class="text-muted">{{classification.0.0.chartfield}}</small>
+        </h3>
+        <thead class="thead-dark">
             <tr>
-                <td style = "vertical-align:middle">{{phone.0.user_defined_id}}</td>
-                <td style = "vertical-align:middle">{{phone.0.usage}}</td>
-                <td style = "vertical-align:middle">{{phone.0.cd_descr}}</td>
-                <td style = "vertical-align:middle">{{phone.0.first_name}} {{phone.0.last_name}}</td>
-                <td>{% for charge in phone %}{% if charge.jack%}Location: {{charge.building}}<br> Floor: {{charge.floor}} Room: {{charge.room}}<br>Jack: {{charge.jack}}<br>(As of {{charge.location_since_date}})<br>{% endif %}{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.ncos_desc%} {{charge.ncos_desc}} {% if charge.ncos %} ({{charge.ncos}})<br>{% endif %}{% endif %}{% endfor %}</td>
+                <th>User Id</th>
+                <th>Usage</th>
+                <th>User ID Type</th>
+                <th>User ID Name</th>
+                <th>Location</th>
+                <th>Calling Range/Restrictions</th>
+                <th>Last Outbound Call</th>
+                <th>Account</th>
+                <th>Charge Code</th>
+                <th>Charge Description</th>
+                <th>Quantity</th>
+                <th>Rate</th>
+                <th>Amount</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            {% for phone in classification %}
+            <tr>
+                <td style="vertical-align:middle">{{phone.0.user_defined_id}}</td>
+                <td style="vertical-align:middle">{{phone.0.usage}}</td>
+                <td style="vertical-align:middle">{{phone.0.cd_descr}}</td>
+                <td style="vertical-align:middle">{{phone.0.first_name}} {{phone.0.last_name}}</td>
+                <td>{% for charge in phone %}{% if charge.jack%}Location: {{charge.building}}<br> Floor:
+                    {{charge.floor}} Room: {{charge.room}}<br>Jack: {{charge.jack}}<br>(As of
+                    {{charge.location_since_date}})<br>{% endif %}{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.ncos_desc%} {{charge.ncos_desc}} {% if charge.ncos %}
+                    ({{charge.ncos}})<br>{% endif %}{% endif %}{% endfor %}</td>
                 <td>{{phone.0.last_call_date}}</td>
                 <td>{{phone.0.mrc_account}}</td>
-                <td>{% for charge in phone %}{% if charge.item_code%}{{charge.item_code}}<br>{% endif%} {% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.item_description%} {{charge.item_description}}<br>{% endif %}{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.item_code%}{{charge.item_code}}<br>{% endif%} {% endfor %}
+                </td>
+                <td>{% for charge in phone %}{% if charge.item_description%}
+                    {{charge.item_description}}<br>{% endif %}{% endfor %}</td>
                 <td>{% for charge in phone %}{% if charge.quantity%} {{charge.quantity}}{% endif %}<br>{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.unit_price%} {{charge.unit_price}}{% endif %}<br>{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.charge_amount%} ${{charge.charge_amount}}{% endif %}<br>{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.unit_price%} {{charge.unit_price}}{% endif %}<br>{% endfor %}
+                </td>
+                <td>{% for charge in phone %}{% if charge.charge_amount%}
+                    ${{charge.charge_amount}}{% endif %}<br>{% endfor %}</td>
                 {% comment %} <td>{{item.ncos_desc}} {% if item.ncos %} ({{item.ncos}}) {% endif %}</td>
                 <td>{{item.last_call_date}}</td>
                 <td>{{item.mrc_account}}</td>
@@ -175,14 +177,14 @@
                 <td>{% if item.unit_price %}${{item.unit_price}}{% endif %}</td>
                 <td>{% if item.charge_amount %}${{item.charge_amount}}{% endif %}</td> {% endcomment %}
             </tr>
-        {% endfor %}
-    </tbody>
-    <tr style= 'background-color:orange'>
-        <td>Total Charges:</td>
-        <td colspan = '11'></td>
-        <td>${{cost_table|index:forloop.counter0}}</td>
-    </tr>
-</table>
+            {% endfor %}
+        </tbody>
+        <tr class="bg-warning total-charges-inv">
+            <td colspan="2">Total Charges:</td>
+            <td colspan='8'></td>
+            <td colspan="3" class="total-col">${{cost_table|index:forloop.counter0}}</td>
+        </tr>
+    </table>
 </div>
 
 
@@ -190,39 +192,42 @@
 {% endfor %}
 {% else %}
 <hr class="style1">
-    <div class="mt-2">
-		<div class="alert alert-danger col-md-8" role="alert">
-		    <i class="fas fa-exclamation-triangle prv-msgs"></i>
-		    No charges for {{dept_name}} on {{bill_period}} {% if location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%} with the current filters. {% endif %}
-		</div>
-	</div>
+<div class="mt-2">
+    <div class="alert alert-danger col-md-8" role="alert">
+        <i class="fas fa-exclamation-triangle prv-msgs"></i>
+        No charges for {{dept_name}} on {{bill_period}}
+        {% if location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%} with the current
+        filters. {% endif %}
+    </div>
+</div>
 {% endif%}
 
 
 
-<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
+<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to
+    top</button>
 
 
 
- 
+
 <script>
- // When the user scrolls down 20px from the top of the document, show the button
-window.onscroll = function() {scrollFunction()};
+    // When the user scrolls down 20px from the top of the document, show the button
+    window.onscroll = function () { scrollFunction() };
 
-function scrollFunction() {
- if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-   document.getElementById("scrollTop").style.display = "block";
- } else {
-   document.getElementById("scrollTop").style.display = "none";
- }
-}
+    function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            document.getElementById("scrollTop").style.display = "block";
+        } else {
+            document.getElementById("scrollTop").style.display = "none";
+        }
+    }
 
-// When the user clicks on the button, scroll to the top of the document
-function topFunction() {
-    document.body.scrollTop = 0;
-    document.documentElement.scrollTop = 0;
-}
- 
+    // When the user clicks on the button, scroll to the top of the document
+    function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+
 </script>
 
 <script>
@@ -236,7 +241,7 @@ function topFunction() {
                 string = cols[j].innerHTML;
                 if (string.split("<br>").lengtauto)
                     string = string.replace("<br>", " ||");
-                if (string.split("<br>").length==4) {
+                if (string.split("<br>").length == 4) {
                     string = string.replace("<br>", " ||");
                     string = string.replace("<br>", " ||");
                 }
