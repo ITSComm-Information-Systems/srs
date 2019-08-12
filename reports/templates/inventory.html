@@ -8,7 +8,8 @@
             <label for="dept_id">Select a Department ID</label>
                 <select class="form-control" requried type="select" name="dept_id" id="dept_id" value="{{ i }}">
                     {% for dept in depts %}
-                    <option value="{{ dept.deptid }}-{{dept.name}}">{{ dept.deptid }} - {{ dept.name }}{% endfor %}
+                    <option value="{{ dept.deptid }}-{{dept.name}}">{{ dept.deptid }} - {{ dept.name }}
+                    {% endfor %}
                 </select>
         </div>
         <div class="form-group col-md-6">
@@ -17,9 +18,11 @@
             </label>
             <select class="form-control mt-0" requried type="select" name="bill_period" id="bill_period" value="{{ i }}">
                 {% for date in dates %}
-                <option value="{{ date }}">{{ date }}{% endfor %}
+                <option value="{{ date }}">{{ date }}
+                {% endfor %}
             </select>
         </div>
+        {% endif %}
         <input type='submit' value='Generate Report' class="btn btn-primary">
 </form>
 {% endblock %}
