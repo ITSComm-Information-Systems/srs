@@ -758,6 +758,7 @@ h3.lead {
 @media (min-width:768px) {
 	.service-cards {
 /*		margin-top:4.25rem;*/
+		margin-top:.75rem;
 	}
 }
 .doc.table-striped>tbody>tr:last-child {
