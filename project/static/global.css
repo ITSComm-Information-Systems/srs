@@ -785,6 +785,10 @@ a.popover-icon:hover {
 	padding-top:0;
 }
 
+.card-body .learn-more-link {
+	display:none;
+}
+
 .floatleft {
 	float:left;
 }
