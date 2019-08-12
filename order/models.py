@@ -222,10 +222,10 @@ class Order(models.Model):
             for con in cons:             #Populate the model with constants
                 setattr(api, con.field, con.value)
             
-            detail = ''
+            #detail = ''
             for key, value in item.data.items():
                 if value:           #Populate the model with user supplied values
-                    detail = detail + key + ':' + value + '\n'
+                    #detail = detail + key + ':' + value + '\n'
                     if key == 'MRC' or key == 'localCharges' or key == 'LD':
                         value = Chartcom.objects.get(id=value).account_number
                         #print(key, acct)
@@ -243,7 +243,7 @@ class Order(models.Model):
 
             with connections['pinnacle'].cursor() as cursor:
                 id = preorder.pre_order_id
-                cursor.callproc('um_note_procedures_k.um_add_wo_tcom_note_p', [id, 'Order Details', detail, ''])
+                cursor.callproc('um_note_procedures_k.um_add_wo_tcom_note_p', [id, 'Order Details', item.data['reviewSummary'], ''])
 
             if num == 1:
                 status = 'Received'
