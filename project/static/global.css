@@ -720,7 +720,7 @@ div h2:first-of-type, div h3:first-of-type {
 	margin-top:0;
 }
 h3.lead {
-	font-size:initial;
+	font-size:1.75rem;
 	font-weight:700;
 }
 
