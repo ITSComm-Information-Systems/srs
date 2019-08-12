@@ -496,7 +496,7 @@ span {
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link, 
 .btn-primary, .btn-primary:not(:disabled):not(.disabled).active, 
 .btn-primary:not(:disabled):not(.disabled):active, 
-.show>.btn-primary.dropdown-toggle {
+.show>.btn-primary.dropdown-toggle, .nav-link.disabled:active {
 	background-color:#0075bc;
 	color:#ffffff;
 }
