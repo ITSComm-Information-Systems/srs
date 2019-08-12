@@ -720,7 +720,7 @@ div h2:first-of-type, div h3:first-of-type {
 	margin-top:0;
 }
 h2.service-menu-header {
-	margin-top:.5rem;
+	margin-top:.5rem !important;
 }
 h3.lead {
 	font-size:1.75rem;
