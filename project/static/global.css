@@ -719,6 +719,9 @@ a.popover-icon:hover {
 div h2:first-of-type, div h3:first-of-type {
 	margin-top:0;
 }
+h2.service-menu-header {
+	margin-top:.5rem;
+}
 h3.lead {
 	font-size:1.75rem;
 	font-weight:700;
