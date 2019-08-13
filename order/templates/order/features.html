@@ -35,8 +35,8 @@
       {% for feature in type %}
       <div class="form-check">
         <input class="form-check-input" type="checkbox" value="{{feature.id}}" name="{{category.name}}{{type.label}}"
-          id="feature{{feature.id}}">
-        <label class="form-check-label" for="feature{{feature.id}}">
+          id="cat{{category.id}}feature{{feature.id}}">
+        <label class="form-check-label" for="cat{{category.id}}feature{{feature.id}}">
           {{feature}}
         </label>
       </div>
@@ -45,8 +45,8 @@
       {% for feature in type %}
       <div class="form-check">
         <input class="form-check-input" type="radio" value="{{feature.id}}" name="{{category.name}}{{type.label}}"
-          id="feature{{feature.id}}" required>
-        <label class="form-check-label" for="feature{{feature.id}}">{{feature}}</label>
+          id="cat{{category.id}}feature{{feature.id}}" required>
+        <label class="form-check-label" for="cat{{category.id}}feature{{feature.id}}">{{feature}}</label>
         {% if feature.id == type.last %}
         <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
             aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
