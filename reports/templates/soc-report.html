@@ -1,7 +1,7 @@
 {% extends 'base.html'%}
 
 {% block content %}
-<h1>Summary of Charges</h1>
+<h1>{{ title }}</h1>
 <div >
 		<strong>Report selection</strong>
         <a class="float-right" href="../soc">Edit your selection</a>
@@ -21,11 +21,11 @@
 <hr class="style1">
 
 {% if table %}
-<button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')"class="btn btn-success float-right" style="font-size:16px;font-family:Roboto,sans-serif">Download Table To
-    CSV File</button>
-<br>
-<br>
-<table class ="table table-sm"  border="1">
+<button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')" class="btn btn-success float-right">Download Table To
+    CSV File
+</button>
+
+<table class ="table table-sm mt-4"  border="1">
     <thead class = "thead-dark">
         <tr>
             <th>Expense Account</th>

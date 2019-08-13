@@ -1,42 +1,43 @@
 {% extends 'base.html' %}
 {% load index %}
 {% block content %}
-<h1>Inventory and Location Report</h1>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<h1>{{ title }}</h1>
 <div>
-    <strong>Report selection</strong>
+    <strong>Report Details</strong>
     <a class="float-right" href="../inventory">Edit your selection</a>
     <a class="float-right" id="edit-selection" href="../inventory"><i class="fas fa-edit"></i></a>
 </div>
 
-<div>
+<div class='mb-2'>
     <div class="card border-dark">
         <div class="card-body">
-            <strong>Department:&nbsp;&nbsp;</strong>{{ dept_id }}
-            <strong>&nbsp;&nbsp;&nbsp;&nbsp;Department Name:&nbsp;&nbsp;</strong>{{dept_name}}
-            <strong>&nbsp;&nbsp;&nbsp;&nbsp;Billing Date:&nbsp;&nbsp;</strong>{{ bill_period }}<br>
+            <strong>Department ID: </strong>{{ dept_id }}
+            <strong>Department Name: </strong>{{dept_name}}
+            <strong>Department Manager: </strong>{{dept_mgr}} ({{ dept_mgr_uniq }})
+            <strong>Billing Date: </strong>{{ bill_period }}
         </div>
     </div>
 </div>
+
+<hr class="style1">
 
 
 {% if formated_data or location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%}
 <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
     <input type="text" name="dept_id" id="dept_id" value="{{dept_id}}-{{dept_name}}" readonly hidden>
     <input type="text" name="bill_period" id="bill_period" value="{{bill_period}}" readonly hidden>
-    <div class="form-row">
-        <div class="container">
-            <h2>Filters<h2>
-            <hr class="style1">
-        </div>
 
+    <strong class='mt-2 mb-1'>Filter by:</strong>
+
+    <div class="form-row">
         <div class="row align-items-start col-3" id="select_loc">
             <div class="input-group col-auto">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inv_dropdown">Location</label>
+                    <label class="input-group-text" for="location">
+                        Location
+                    </label>
                 </div>
-
-                <select class="custom-select" style='font-size:16px' requried type="select" name="location"
+                <select class="custom-select" name="location"
                     id="location">
                     <option value=''>--Select--
                         {% for building in buildings %}
@@ -48,10 +49,10 @@
         <div class="row align-items-start col-3" id="select_type">
             <div class="input-group col-auto">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inv_dropdown">User ID Type</label>
+                    <label class="input-group-text" for="type">User ID Type</label>
                 </div>
 
-                <select class="custom-select" style='font-size:16px' requried type="select" name="type" id="type">
+                <select class="custom-select" name="type" id="type">
                     <option value=''>--Select--
                         {% for type in user_types %}
                     <option value="{{ type }}">{{ type }}{% endfor %}
@@ -62,10 +63,10 @@
         <div class="row align-items-start col-3" id="select_cf">
             <div class="input-group col-auto">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inv_dropdown">Chartfield</label>
+                    <label class="input-group-text" for="cf">Chartfield</label>
                 </div>
 
-                <select class="custom-select" style='font-size:16px' requried type="select" name="cf" id="cf">
+                <select class="custom-select" name="cf" id="cf">
                     <option value=''>--Select--
                         {% for chartfield in chartfields %}
                     <option value="{{ chartfield }}">{{ chartfield }}{% endfor %}
@@ -76,10 +77,10 @@
         <div class="row align-items-start col-3" id="select_date">
             <div class="input-group col-auto">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inv_dropdown">Last Call Date</label>
+                    <label class="input-group-text" for="date">Last Call Date</label>
                 </div>
 
-                <select class="custom-select" style='font-size:16px' requried type="select" name="date" id="date">
+                <select class="custom-select" name="date" id="date">
                     <option value=''>--Select--
                     <option value="6-12">Greater than 6 months and less than 12 months
                     <option value="12+">Greater than 12 months
@@ -108,11 +109,11 @@
 {% if location_filter or type_filter or cf_filter or date_filter%}
 <h2>Current Filters</h2>
 
-<p><strong>{% if location_filter %}Location filter:</strong> {% endif %} {{ location_filter }}</p>
-<p><strong>{% if type_filter %}User ID Type filter:</strong> {% endif %}{{ type_filter }}</p>
-<p><strong>{% if cf_filter %}Chartfield filter:</strong> {% endif %}{{ cf_filter }}</p>
-<p><strong>{% if date_filter %}Last Call Date filter:</strong> {% endif %}{{ date_filter }}</p>
-<hr class="style1">
+    {% if location_filter %}<p><strong>Location filter:</strong> {{ location_filter }}</p>{% endif %}
+    {% if type_filter %}<p><strong>User ID Type filter:</strong> {{ type_filter }}</p>{% endif %}
+    {% if cf_filter %}<p><strong>Chartfield filter:</strong> {{ cf_filter }}</p>{% endif %}
+    {% if date_filter %}<p><strong>Last Call Date filter:</strong> {{ date_filter }}</p>{% endif %}
+    <hr class="style1">
 {% endif %}
 
 {% if formated_data %}
@@ -122,11 +123,10 @@
 
 {% for classification in formated_data %}
 <div class="table-responsive">
+    <h3 class="text-dark font-weight-bold">
+        Chartfield: <small class="text-muted">{{classification.0.0.chartfield}}</small>
+    </h3>
     <table class="table table-sm mb-5 table-striped" style="font-size:12px">
-
-        <h3 class="text-dark font-weight-bold">
-            Chartfield: <small class="text-muted">{{classification.0.0.chartfield}}</small>
-        </h3>
         <thead class="thead-dark">
             <tr>
                 <th>User Id</th>
@@ -164,18 +164,16 @@
                 <td>{% for charge in phone %}{% if charge.item_description%}
                     {{charge.item_description}}<br>{% endif %}{% endfor %}</td>
                 <td>{% for charge in phone %}{% if charge.quantity%} {{charge.quantity}}{% endif %}<br>{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.unit_price%} {{charge.unit_price}}{% endif %}<br>{% endfor %}
-                </td>
-                <td>{% for charge in phone %}{% if charge.charge_amount%}
-                    ${{charge.charge_amount}}{% endif %}<br>{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.unit_price%} {{charge.unit_price | currency }}{% endif %}<br>{% endfor %}</td> 
+                <td>{% for charge in phone %}{% if charge.charge_amount%} ${{charge.charge_amount}}{% endif %}<br>{% endfor %}</td>
                 {% comment %} <td>{{item.ncos_desc}} {% if item.ncos %} ({{item.ncos}}) {% endif %}</td>
                 <td>{{item.last_call_date}}</td>
                 <td>{{item.mrc_account}}</td>
                 <td>{{item.item_code}}</td>
                 <td>{{item.item_description}}</td>
                 <td>{% if item.quantity %}{{item.quantity}}{% endif %}</td>
-                <td>{% if item.unit_price %}${{item.unit_price}}{% endif %}</td>
-                <td>{% if item.charge_amount %}${{item.charge_amount}}{% endif %}</td> {% endcomment %}
+                <td>{% if item.unit_price %}{{item.unit_price | currency }}{% endif %}</td>
+                <td>{% if item.charge_amount %}{{item.charge_amount | currency }}{% endif %}</td> {% endcomment %}
             </tr>
             {% endfor %}
         </tbody>

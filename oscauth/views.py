@@ -191,12 +191,12 @@ def get_uniqname(request, uniqname_parm=''):
 
     if uniqname_parm == '':
         set_priv = ''
-        return  HttpResponse(template.render({'uniqname_parm': uniqname_parm, 'title':"Manage Access"}, request))
+        return  HttpResponse(template.render({'uniqname_parm': uniqname_parm, 'title':"Manage User Access"}, request))
     else:
         # Check for valid uniqname format
         if len(uniqname_parm) < 3 or len(uniqname_parm) > 8 or uniqname_parm.isalpha is False:
             result = uniqname_parm + ' is not a valid uniqname'
-            return  HttpResponse(template.render({'result': result, 'title':"Manage Access"}, request))
+            return  HttpResponse(template.render({'result': result, 'title':"Manage User Access"}, request))
         else:
             # Get User from MCommunity
             conn = Connection('ldap.umich.edu', auto_bind=True)
@@ -289,7 +289,7 @@ def get_uniqname(request, uniqname_parm=''):
 
                     else:
                         submit_msg = 'Please select a Task, a Role, and at least one Department then click Submit.'
-                        return  HttpResponse(template.render({'submit_msg': submit_msg, 'title':"Manage Access"}, request)) # do I need to pass in the page title here?
+                        return  HttpResponse(template.render({'submit_msg': submit_msg, 'title':"Manage User Access"}, request)) # do I need to pass in the page title here?
 
                 return render(request, 'oscauth/setpriv.html', context)
 
