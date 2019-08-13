@@ -2,7 +2,6 @@
 {% load index %}
 {% block content %}
 <h1>{{ title }}</h1>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div>
     <strong>Report Details</strong>
     <a class="float-right" href="../inventory">Edit your selection</a>
@@ -34,10 +33,11 @@
         <div class="row align-items-start col-3" id="select_loc">
             <div class="input-group col-auto">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inv_dropdown">Location</label>
+                    <label class="input-group-text" for="inv_dropdown">
+                        Location
+                    </label>
                 </div>
-
-                <select class="custom-select" style='font-size:16px' requried type="select" name="location"
+                <select class="custom-select" name="location"
                     id="location">
                     <option value=''>--Select--
                         {% for building in buildings %}
@@ -52,7 +52,7 @@
                     <label class="input-group-text" for="inv_dropdown">User ID Type</label>
                 </div>
 
-                <select class="custom-select" style='font-size:16px' requried type="select" name="type" id="type">
+                <select class="custom-select" name="type" id="type">
                     <option value=''>--Select--
                         {% for type in user_types %}
                     <option value="{{ type }}">{{ type }}{% endfor %}
@@ -66,7 +66,7 @@
                     <label class="input-group-text" for="inv_dropdown">Chartfield</label>
                 </div>
 
-                <select class="custom-select" style='font-size:16px' requried type="select" name="cf" id="cf">
+                <select class="custom-select" name="cf" id="cf">
                     <option value=''>--Select--
                         {% for chartfield in chartfields %}
                     <option value="{{ chartfield }}">{{ chartfield }}{% endfor %}
@@ -80,7 +80,7 @@
                     <label class="input-group-text" for="inv_dropdown">Last Call Date</label>
                 </div>
 
-                <select class="custom-select" style='font-size:16px' requried type="select" name="date" id="date">
+                <select class="custom-select" name="date" id="date">
                     <option value=''>--Select--
                     <option value="6-12">Greater than 6 months and less than 12 months
                     <option value="12+">Greater than 12 months
@@ -123,11 +123,10 @@
 
 {% for classification in formated_data %}
 <div class="table-responsive">
+    <h3 class="text-dark font-weight-bold">
+        Chartfield: <small class="text-muted">{{classification.0.0.chartfield}}</small>
+    </h3>
     <table class="table table-sm mb-5 table-striped" style="font-size:12px">
-
-        <h3 class="text-dark font-weight-bold">
-            Chartfield: <small class="text-muted">{{classification.0.0.chartfield}}</small>
-        </h3>
         <thead class="thead-dark">
             <tr>
                 <th>User Id</th>
