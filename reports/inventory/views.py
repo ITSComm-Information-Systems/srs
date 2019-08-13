@@ -45,7 +45,7 @@ def get_inventory(request):
     template = loader.get_template('inventory.html')
     objects = UmOscReptInvlocV.objects
     context = {
-        'title': 'Inventory and Location Report',
+        'title': 'Inventory & Location Report',
         'depts': names,
         'dates': dates,
     }
@@ -62,6 +62,11 @@ def make_report(request):
     array = total.split('-')
     dept_id = array[0]
     dept_name = array[1]
+
+    # Find dept manager and uniqname
+    dept_info = UmOscDeptProfileV.objects.filter(deptid=dept_id)[0]
+    dept_mgr = dept_info.dept_mgr
+    dept_mgr_uniq = dept_info.dept_mgr_uniqname
    
     bill_period =  request.POST.get('bill_period') #  'May 20, 2018' #
     date = bill_period.replace('.', '')
@@ -112,9 +117,11 @@ def make_report(request):
 
     template = loader.get_template('inventory-report.html')
     context = {
-        'title': 'Inventory and Location Report',
+        'title': 'Inventory & Location Report',
         'dept_id': dept_id,
         'dept_name': dept_name,
+        'dept_mgr': dept_mgr,
+        'dept_mgr_uniq': dept_mgr_uniq,
         'bill_period': bill_period,
         'data': list(data),
         'total_charge': total_charge,

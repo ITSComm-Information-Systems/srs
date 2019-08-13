@@ -2,13 +2,13 @@
 
 {% block content %}
 <h1>Summary of Charges</h1>
-<div class="">
+<div >
 		<strong>Report selection</strong>
         <a class="float-right" href="../soc">Edit your selection</a>
         <a class="float-right" id="edit-selection" href="../soc"><i class="fas fa-edit"></i></a>
 	</div>
 
-	<div class="">
+	<div>
 		<div class="card border-dark">
 			<div class="card-body">
 				<strong>Grouping:&nbsp;&nbsp;</strong>{{ grouping }}
@@ -25,7 +25,7 @@
     CSV File</button>
 <br>
 <br>
-<table class ="table table-sm"  border="1" style="font-size:12px">
+<table class ="table table-sm"  border="1">
     <thead class = "thead-dark">
         <tr>
             <th>Expense Account</th>
@@ -42,9 +42,9 @@
 
     <tbody>
         {% for row in table.0.0 %}
-        <tr class = "table-warning">
-            <td><b style="">{{ row.0 }} ({{ row.1 }})
-                    <input type="checkbox" name="{{row.1}}" id="" data-toggle="toggle">
+        <tr class="table-warning">
+            <td><b>{{ row.0 }} ({{ row.1 }})
+                    <input type="checkbox" name="{{row.1}}" data-toggle="toggle">
                 </b></td>
 
             <td></td>
@@ -53,12 +53,12 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><b style="">${{ row.3 }}</b></td>
+            <td><b>${{ row.3 }}</b></td>
         </tr>
-    <tbody class="hide" id = "{{row.0}}">
+    <tbody class="hide" id="{{row.0}}">
         {% for charge in row.2%}
         <tr class = "table-secondary">
-            <td style="">{{ charge.0 }}
+            <td>{{ charge.0 }}
             <input type="checkbox" name="{{charge.0}}" id="1" data-toggle="toggle2">
                 
             </td>
@@ -67,10 +67,10 @@
             <td></td>
             <td></td>
             <td></td>
-            <td style="">${{ charge.2}}</td>
+            <td>${{ charge.2}}</td>
             <td></td>
         </tr>
-        <div id = "" name = "{{charge.0}}">    
+        <div name = "{{charge.0}}">    
             {% for code in charge.1%}
                 <tr class = "{{charge.0}}" style = "display: none">
                     <td></td>
@@ -89,14 +89,14 @@
     {% endfor %}
     
     <tr>
-        <td><b style="">Total ITCom Charges</td>
+        <td><b>Total ITCom Charges</td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
-        <td><b style="">${{table.0.1}}</td>
+        <td><b>${{table.0.1}}</td>
     </tr>
     </tbody>
 
