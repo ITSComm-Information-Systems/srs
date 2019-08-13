@@ -164,7 +164,7 @@
                 <td>{% for charge in phone %}{% if charge.item_code%}{{charge.item_code}}<br>{% endif%} {% endfor %}</td>
                 <td>{% for charge in phone %}{% if charge.item_description%} {{charge.item_description}}<br>{% endif %}{% endfor %}</td>
                 <td>{% for charge in phone %}{% if charge.quantity%} {{charge.quantity}}{% endif %}<br>{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.unit_price%} {{charge.unit_price}}{% endif %}<br>{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.unit_price%} {{charge.unit_price | currency }}{% endif %}<br>{% endfor %}</td> 
                 <td>{% for charge in phone %}{% if charge.charge_amount%} ${{charge.charge_amount}}{% endif %}<br>{% endfor %}</td>
                 {% comment %} <td>{{item.ncos_desc}} {% if item.ncos %} ({{item.ncos}}) {% endif %}</td>
                 <td>{{item.last_call_date}}</td>
@@ -172,8 +172,8 @@
                 <td>{{item.item_code}}</td>
                 <td>{{item.item_description}}</td>
                 <td>{% if item.quantity %}{{item.quantity}}{% endif %}</td>
-                <td>{% if item.unit_price %}${{item.unit_price}}{% endif %}</td>
-                <td>{% if item.charge_amount %}${{item.charge_amount}}{% endif %}</td> {% endcomment %}
+                <td>{% if item.unit_price %}{{item.unit_price | currency }}{% endif %}</td>
+                <td>{% if item.charge_amount %}{{item.charge_amount | currency }}{% endif %}</td> {% endcomment %}
             </tr>
         {% endfor %}
     </tbody>
