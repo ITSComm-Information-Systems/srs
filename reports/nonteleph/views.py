@@ -117,6 +117,9 @@ def generate_report(request):
                     'project_name': a.voucher_comment,
                     'date': a.invoice_date
                 }
+                # Add N/A
+                if  not user_id['project_name']:
+                    user_id['project_name'] = 'N/A'
                 # Determine charge vs credit
                 if a.unit_price < 0:
                     user_id['type'] = 'Credit'

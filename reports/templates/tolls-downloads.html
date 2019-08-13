@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
 <h1>Toll Statements Report</h1>
-<div >
+<div>
 	<strong>Report selection</strong>
     <a class="float-right" href="../tolls">Edit your selection</a>
     <a class="float-right" id="edit-selection" href="../tolls"><i class="fas fa-edit"></i></a>
@@ -27,33 +26,14 @@
 {% if inactive %}
     <p>No reports created for inactive departments.</p>
 {% elif submit %}
-    <h5>Report Downloads</h5><br>
-    <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/' download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv"><i class="fas fa-file-csv" style="font-size:24px;color:green"></i> CSV Download</a><br><br>
-    <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:24px;color:red"></i> PDF Download</a><br><br>
-    <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:24px;color:red"></i> Condensed PDF Download</a>
-    {% comment %} <table class="table table-hover table-headings">
-        <thead>
-            <tr>
-                    <th>CSV</th>
-                    <th>PDF</th>
-                    <th>Condensed PDF</th>
-            </tr>
-        </thead>
-        <tbody>
-           
-                    <td> 
-                        <a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/' download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv"><i class="fas fa-file-csv" style="font-size:20px;color:green"></i> CSV Download</a></td>
-                    <td> 
-                        <a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> PDF Download</a></td>
-                    <td>
-                        <a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'><i class="fa fa-file-pdf-o" style="font-size:20px;color:red"></i> Condensed PDF Download</a></td>
-
-        </tbody>
-    </table> {% endcomment %}
+    <h5>Report Downloads</h5>
+    <i class="fas fa-file-csv" style="color:#28a745"></i><a href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/' download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv">CSV Download</a><br><br>
+    <i class="fas fa-file-pdf prv-msgs"></i><a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'>PDF Download</a><br><br>
+    <i class="fas fa-file-pdf prv-msgs"></i><a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'>Condensed PDF Download</a>
 {% endif %}
 
 {% if inactive %}
-    <i class="fas fa-exclamation-triangle" style="color:red"></i><span style="color:red">Department is inactive.</span>
+    <i class="fas fa-exclamation-triangle prv-msgs"></i><span class="prv-msgs">Department is inactive.</span>
 {% endif %}
 
 {% endblock %}
