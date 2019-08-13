@@ -33,7 +33,7 @@
         <div class="row align-items-start col-3" id="select_loc">
             <div class="input-group col-auto">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inv_dropdown">
+                    <label class="input-group-text" for="location">
                         Location
                     </label>
                 </div>
@@ -49,7 +49,7 @@
         <div class="row align-items-start col-3" id="select_type">
             <div class="input-group col-auto">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inv_dropdown">User ID Type</label>
+                    <label class="input-group-text" for="type">User ID Type</label>
                 </div>
 
                 <select class="custom-select" name="type" id="type">
@@ -63,7 +63,7 @@
         <div class="row align-items-start col-3" id="select_cf">
             <div class="input-group col-auto">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inv_dropdown">Chartfield</label>
+                    <label class="input-group-text" for="cf">Chartfield</label>
                 </div>
 
                 <select class="custom-select" name="cf" id="cf">
@@ -77,7 +77,7 @@
         <div class="row align-items-start col-3" id="select_date">
             <div class="input-group col-auto">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inv_dropdown">Last Call Date</label>
+                    <label class="input-group-text" for="date">Last Call Date</label>
                 </div>
 
                 <select class="custom-select" name="date" id="date">
@@ -109,11 +109,11 @@
 {% if location_filter or type_filter or cf_filter or date_filter%}
 <h2>Current Filters</h2>
 
-<p><strong>{% if location_filter %}Location filter:</strong> {% endif %} {{ location_filter }}</p>
-<p><strong>{% if type_filter %}User ID Type filter:</strong> {% endif %}{{ type_filter }}</p>
-<p><strong>{% if cf_filter %}Chartfield filter:</strong> {% endif %}{{ cf_filter }}</p>
-<p><strong>{% if date_filter %}Last Call Date filter:</strong> {% endif %}{{ date_filter }}</p>
-<hr class="style1">
+    {% if location_filter %}<p><strong>Location filter:</strong> {{ location_filter }}</p>{% endif %}
+    {% if type_filter %}<p><strong>User ID Type filter:</strong> {{ type_filter }}</p>{% endif %}
+    {% if cf_filter %}<p><strong>Chartfield filter:</strong> {{ cf_filter }}</p>{% endif %}
+    {% if date_filter %}<p><strong>Last Call Date filter:</strong> {{ date_filter }}</p>{% endif %}
+    <hr class="style1">
 {% endif %}
 
 {% if formated_data %}

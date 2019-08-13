@@ -1,26 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Summary of Charges</h1>
-<!-- {% comment %} <div id="main-content" class="container" role="main">
-    <div class="container" role="main">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="message">
-                    <hr class="style1">
-                    <p>
-                        This report is currently under construction.<br>
-                        If you would like to run this report, please visit the Online Service Center and click on Summary of Charges under reports.
-                    </p>
-                    <a href="https://blue.itcom.itd.umich.edu/UofM/WebObjects/OnlineServiceCenter.woa/1/" class="btn btn-outline-primary" role="button">Online Service Center</a>
-                    
-                </div>
-            </div>
-        </div>
-    </div>
-</div> {% endcomment %} -->
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
- <form action="/reports/soc/report" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
+    <h1>{{ title }}</h1>
+    <form action="/reports/soc/report" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
     {% if depts %}
 
     <div class="col-6">

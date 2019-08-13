@@ -6,7 +6,7 @@
         <div class="form-group col-md-6">
             {% if depts %}
             <label for="dept_id">Select a Department ID</label>
-                <select class="form-control" requried type="select" name="dept_id" id="dept_id" value="{{ i }}">
+                <select class="form-control" name="dept_id" id="dept_id" required>
                     {% for dept in depts %}
                     <option value="{{ dept.deptid }}-{{dept.name}}">{{ dept.deptid }} - {{ dept.name }}
                     {% endfor %}
@@ -16,7 +16,7 @@
             <label for="bill_period">
                 Select a Billing Period
             </label>
-            <select class="form-control mt-0" requried type="select" name="bill_period" id="bill_period" value="{{ i }}">
+            <select class="form-control mt-0" type="select" name="bill_period" id="bill_period" required>
                 {% for date in dates %}
                 <option value="{{ date }}">{{ date }}
                 {% endfor %}
