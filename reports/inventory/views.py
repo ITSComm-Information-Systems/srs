@@ -32,7 +32,7 @@ def get_inventory(request):
     for dept in depts:
         departments.append(dept['dept'])
     dates = UmOscBillCycleV.objects.values_list('billing_date', flat = True).order_by('billing_date').distinct().reverse()
-
+    
     names = []
     name_query = list(d.dept_name for d in UmOscDeptProfileV.objects.filter(deptid__in=departments).order_by('deptid'))
     for i in range(0, len(departments)):
@@ -40,14 +40,18 @@ def get_inventory(request):
     		'deptid': departments[i],
     		'name': name_query[i]
     	}
-    	names.append(name)
-
+        names.append(name)
+    
+    number_of_depts = int(len(names))
+    number_of_dates = int(len(dates))
     template = loader.get_template('inventory.html')
     objects = UmOscReptInvlocV.objects
     context = {
         'title': 'Inventory & Location Report',
         'depts': names,
+        'num_depts':number_of_depts,
         'dates': dates,
+        'num_dates': number_of_dates,
     }
     return HttpResponse(template.render(context,request))
     
