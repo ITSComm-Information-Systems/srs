@@ -1,7 +1,7 @@
 {% for field in tab.form %}
     {% if field.field.type == 'Radio' %}
         <fieldset id="{{ field.name }}">
-            <legend>{{ field.label_tag }}</legend>
+            <legend id="legend{{ field.name }}">{{ field.label }}</legend>
             {% for choice in field.field.choices %}
                 <div class="form-check custom-radio">
                         <input type="radio" class="form-check-input" id="{{ field.name }}_{{ choice|first }}"
@@ -24,11 +24,12 @@
     <div class="form-group row col-12" id="oneTimeCharges">
         <!--  -->
         <div class="form-check">
-    <label for="id_{{ field.name }}">{{ field.label_tag }}</label>
+        {{ field.label_tag }}
     <div class="input-group mb3">
         <!-- Select a Department (based off user's department access) -->
             <div class="input-group-prepend">
-                <select class="custom-select" id="id_deptOneTimeCharges" data-target="{{ field.name }}" onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
+                <select class="custom-select" id="{{ field.name }}" data-target="{{ field.name }}" onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
+                    <option value="all">All Depts</option>
                     {% for dept in field.field.dept_list %}
                         <option value="{{dept}}">{{dept}}</option>
                     {% endfor %}                    
@@ -36,7 +37,7 @@
             </div>
 
             <!-- Select a Chartfield (based off user's selection for department that was selected above ^^^ - all options should be from department's shortlist) -->
-            <select name="{{ field.name }}" class="custom-select" id="id_{{ field.name }}"></select>
+            <select name="{{ field.name }}" class="custom-select" id="id_{{ field.name }}">
                 {% for choice in field.field.choices %}
                     <option name="{{ field.name }}" data-dept="{{ choice.2 }}" value="{{ choice.0 }}">{{ choice.1 }}</option>
                 {% endfor %}

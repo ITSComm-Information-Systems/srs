@@ -41,18 +41,18 @@
 		<a href="#main-content" class="sr-only sr-only-focusable">Skip to main content</a>
 	</div>
 	<header role="banner">
-		<nav class="navbar navbar-expand-lg" id="aux-nav">
+		<nav class="navbar navbar-expand-lg" id="aux-nav" aria-label="Auxiliary Navigation">
 			<div class="container">
 				<div class="navbar-brand"><a class="logo" href="/">Online Service Center</a></div>
 				<button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target=".navbars" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<i class="fas fa-bars text-light"></i>
 				</button>
-				<div class="collapse navbar-collapse navbars" aria-label="Auxiliary Navigation" role="navigation">
+				<div class="collapse navbar-collapse navbars" aria-labelledby="aux-nav" role="navigation">
 				<ul class="navbar-nav ml-auto">
 					{% if user.is_authenticated %}
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle {% if title == 'Chartfield Change Request' or title == 'Manage User Access' or title == 'Department Look Up' or title == 'Manage Chartfields' %}active{% endif %}" href="javascript;" id="toolsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							Permissions & Settings
+							Permissions & Billing
 						</a>
 						<div class="dropdown-menu" aria-labelledby="toolsDropdown">
 							{% if perms.oscauth.can_order or perms.oscauth_can_report %}
@@ -103,9 +103,9 @@
 			</div>
 		</div>
 	</nav>
-	<nav class="navbar navbar-expand-lg" id="main-nav">
+	<nav class="navbar navbar-expand-lg" id="main-nav" aria-label="Main Site Navigation">
 		<div class="container">
-			<div class="collapse navbar-collapse navbars" aria-label="Main Site Navigation" role="navigation">
+			<div class="collapse navbar-collapse navbars" aria-labelledby="main-nav" role="navigation">
 				<ul class="navbar-nav /nav-fill w-100">
 					{% if perms.oscauth.can_order %}
 					<li class="nav-item {% if page_name == 'Request Service' %}active{% endif %}">
@@ -132,7 +132,7 @@
 						<a class="nav-link" href="/orders/cart/0"><i class="fas fa-shopping-cart"></i> View Cart</a>
 					</li>
 					<li class="nav-item {% if title == 'Track Orders' %}active{% endif %}">
-						<a class="nav-link" href="/orders/status/0">Track Orders</a>
+						<a class="nav-link" href="/orders/status/0"><i class="fab fa-searchengin"></i> Track Orders</a>
 					</li>
 					{% endif %}
 				</ul>

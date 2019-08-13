@@ -9,12 +9,39 @@
         <form action='/tools/voip/' mthod='GET' submit=' return validate()' name="Select">{% csrf_token %}
             <div class='form-row mt-2'>
                 <div class='input-group col-md-4'>
+                    <div class='input-group-prepend'>
+                        <span class='input-group-text'>Enter a Phone Number</span>
+                    </div>
                     <input type='text' name='number' id='phone' class='form-control'>
                 </div>
                 <input type='submit' value='Search' class='btn btn-primary'>
             </div>
         </form>
     </div>
+
+<!--     {% comment %} <div class="row align-items-start" id="phoneselect">
+     <form action="/tools/voip/" method="GET" submit="return validate()" name="Select">{% csrf_token %}
+    
+        <h2>Phone Number:</h2>
+        <input type="text" style='font-size:20px' name = 'number' id = 'phone' placeholder>
+        <input type="submit" value="Go" class="btn btn-primary"><br>
+        <p></p>
+    </form>
+    </div> {% endcomment %}
+    <form class = "form-row" action="/tools/voip/" method="GET" submit="return validate()" name="Select" id = "phoneselect">{% csrf_token %}
+     <div class = "row align-items-start" id = "select_loc">
+        <div class = "input-group col-md-10">
+            <div class ="input-group-prepend">
+                <label class = "input-group-text" for="inv_dropdown">Enter a Phone Number</label>
+            </div>
+            <input type="text" class = "form-control" style='font-size:20px' name = 'number' id = 'phone'>
+                
+            
+        </div>
+    </div>
+    <input type = "submit" value="Search" class="btn btn-primary"><br>
+    </form>
+    <br> -->
     
     <form action='/tools/voip/confirm/' method="GET" id ="voipLocationForm">
         <ul class="nav justify-content-center nav-pills mt-5" id="voiplocation_nav" role="tablist">

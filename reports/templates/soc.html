@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Summary of Charges</h1>
-{% comment %} <div id="main-content" class="container" role="main">
+<!-- {% comment %} <div id="main-content" class="container" role="main">
     <div class="container" role="main">
         <div class="row">
             <div class="col-lg-12">
@@ -17,158 +17,146 @@
             </div>
         </div>
     </div>
-</div> {% endcomment %}
+</div> {% endcomment %} -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
  <form action="/reports/soc/report" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
     {% if depts %}
 
-    <div style="width: 400px;">
-        <br>
+    <div class="col-6">
         <h2>Select Unit Grouping</h2>
-        <input type="radio" style='font-size:20px' name="unitGroupingGroup" id="deptid" value='1'> Department ID
-        <div id = "department_id">
-        <br>
-        <strong>Select ID(s)</strong>
-        <select class = "custom-select" multiple style='font-size:16px' name="department_id">
-            <option value="%">--Select--</option>
-            {% for dept in depts %}
-            <option value="{{ dept }}">{{ dept }}</option>
-            {% endfor %}
-        </select>
-        </br>
-        <input type="checkbox" style='font-size:20px' name="selectall" id="deptidall" value='2'> Select All
-        Departments (you have access to)
-        <br>
-        <br>
+        <div class="form-group">
+            <input type="radio" name="unitGroupingGroup" id="deptid" value='1'>
+            <label for="deptid"> Department ID</label>
+            <div id = "department_id">
+                <label for="departmentIdSelection">Select ID(s)</label>
+                <select class = "custom-select" multiple name="department_id" id="departmentIdSelection">
+                    <option value="%">--Select--</option>
+                    {% for dept in depts %}
+                    <option value="{{ dept }}">{{ dept }}</option>
+                    {% endfor %}
+                </select>
+                <input type="checkbox" name="selectall" id="deptidall" value='2'>
+                <label for="deptidall">Select All Departments (you have access to)</label>
+            </div>
         </div>
-        <p></p>
-        <p></p>
-
-        <input type="radio" style='font-size:20px' name="unitGroupingGroup" id="deptgroup" value='3'> Department Group
-        <div id = "department_group">
-        <br>
-        <strong>Select a Department Group</strong>
-        <select class = "custom-select" style='font-size:16px' name="department_group" onchange="display_active({{active}})" id = 'department_group'>
-            <option value="%">--Select--</option>
-            {% for group in groups_descr %}
-            <option value="{{ group }}">{{ group }}</option>
-            {% endfor %}
-        </select>
+    
+        <div class="form-group">
+            <input type="radio"  name="unitGroupingGroup" id="deptgroup" value='3'>
+            <label for="deptgroup"> Department Group</label>
+            <div id = "department_group">
+                <label for="department_group">Select a Department Group</label>
+                <select class = "custom-select" name="department_group" onchange="display_active({{active}})" id = 'department_group'>
+                    <option value="%">--Select--</option>
+                    {% for group in groups_descr %}
+                    <option value="{{ group }}">{{ group }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
-        {% comment %} <span id="display">(Fiscal Years Active)</span> {% endcomment %}
-        </br>
-
-        <p></p>
-        <p></p>
-        <input type="radio" style='font-size:20px' name="unitGroupingGroup" id="deptvp" value='4'> Department Group VPArea
-        <div id = "department_vp">
-        <br>
-        <strong>Select a Department VP</strong>
-        <select class = "custom-select" style='font-size:16px' name="department_vp" id = "department_vp">
-            <option value="%">--Select--</option>
-            {% for vp in vps %}
-            <option value="{{ vp }}">{{ vp }}</option>
-            {% endfor %}
-        </select>
+        <div class="form-group">
+            {% comment %} <span id="display">(Fiscal Years Active)</span> {% endcomment %}
+            <input type="radio"  name="unitGroupingGroup" id="deptvp" value='4'>
+            <label for="deptvp"> Department Group VPArea</label>
+            <div id= "department_vp_div">
+                <label for="department_vp">Select a Department VP</label>
+                <select class = "custom-select" name="department_vp" id = "department_vp">
+                    <option value="%">--Select--</option>
+                    {% for vp in vps %}
+                    <option value="{{ vp }}">{{ vp }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
     </div>
 
 
 
-    <div style="width: 400px;">
-        <br>
-
-        <p></p>
+    <div class="col-6">
         <h2>Select Date Range</h2>
-        <input type="radio" style='font-size:20px' name="dateRangeGroup" id="fiscal" value='1'> Fiscal Year
-        <div id = "fiscalyear">
-        <br>
-        <strong>Select a Fiscal Year</strong>
-        <select class = "custom-select" style='font-size:16px' name="FISCALYEAR" id = "fiscalyear">
-            <option value="%">--Select--</option>
-            {% for year in fiscal %}
-            <option value="{{ year }}">{{ year }}</option>
-            {% endfor %}
-        </select>
+        <div class="form-group">
+            <input type="radio" name="dateRangeGroup" id="fiscal" value='1'>
+            <label for="fiscal"> Fiscal Year</label>
+            <div id = "fiscalyear">
+                <strong>Select a Fiscal Year</strong>
+                <select class = "custom-select" name="FISCALYEAR" id = "fiscalyear">
+                    <option value="%">--Select--</option>
+                    {% for year in fiscal %}
+                    <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
-        </br>
-        <p></p>
-        <p></p>
         
-        <input type="radio" style='font-size:20px' name="dateRangeGroup" id="calendar" value='2'> Calender Year
-        <div id = "calendaryear">
-        <br>
-        <strong>Select a Calendar Year</strong>
-        <select class = "custom-select" style='font-size:16px' name="CALENDARYEAR" id = "calendaryear">
-            <option value="%">--Select--</option>
-            {% for year in calendar %}
-            <option value="{{ year }}">{{ year }}</option>
-            {% endfor %}
-        </select>
+        <div class="form-group">
+            <input type="radio" name="dateRangeGroup" id="calendar" value='2'>
+            <label for="calendar">Calender Year</label>
+            <div id = "calendaryear">
+                <strong>Select a Calendar Year</strong>
+                <select class = "custom-select" name="CALENDARYEAR" id = "calendaryear">
+                    <option value="%">--Select--</option>
+                    {% for year in calendar %}
+                    <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
-        </br>
-        <p></p>
-        <p></p>
         
-        <input type="radio" style='font-size:20px' name="dateRangeGroup" id="single" value='3'> Single Month
-        <div id = 'singlemonth'>
-        <br>
-        <strong>Select a Month</strong>
-        <select class = "custom-select" style='font-size:16px' name="SINGLEMONTH">
-            <option value="%">--Select--</option>
-            {% for month in months %}
-            <option value="{{ month }}">{{ month }}</option>
-            {% endfor %}
-        </select>
-        <select class = "custom-select" style='font-size:16px' name="SINGLEYEAR">
-            <option value="%">--Select--</option>
-            {% for year in calendar %}
-            <option value="{{ year }}">{{ year }}</option>
-            {% endfor %}
-        </select>
+        <div class="form-group">
+            <input type="radio" name="dateRangeGroup" id="single" value='3'>
+            <label for="single">Single Month</label>
+            <div id = 'singlemonth'>
+                <strong>Select a Month</strong>
+                <select class = "custom-select" name="SINGLEMONTH">
+                    <option value="%">--Select--</option>
+                    {% for month in months %}
+                    <option value="{{ month }}">{{ month }}</option>
+                    {% endfor %}
+                </select>
+                <select class = "custom-select" name="SINGLEYEAR">
+                    <option value="%">--Select--</option>
+                    {% for year in calendar %}
+                    <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
-        </br>
-        <p></p>
-        <p></p>
-        <input type="radio" style='font-size:20px' name="dateRangeGroup" id="multiple" value='4'> Month-to-month
-        <div id = "multimonth">
-        <br>
-        <strong>Select Billing Range</strong>
-        <select class = "custom-select" style='font-size:16px' name="FIRSTMONTH">
-            <option value="%">--Select--</option>
-            {% for month in months %}
-            <option value="{{ month }}">{{ month }}</option>
-            {% endfor %}
-        </select>
-        <select class = "custom-select" style='font-size:16px' name="FIRSTYEAR">
-            <option value="%">--Select--</option>
-            {% for year in calendar %}
-            <option value="{{ year }}">{{ year }}</option>
-            {% endfor %}
-        </select>
-        <span>to</span>
-        <select class = "custom-select" style='font-size:16px' name="SECONDMONTH">
-            <option value="%">--Select--</option>
-            {% for month in months %}
-            <option value="{{ month }}">{{ month }}</option>
-            {% endfor %}
-        </select>
-        <select class = "custom-select" style='font-size:16px' name="SECONDYEAR">
-            <option value="%">--Select--</option>
-            {% for year in calendar %}
-            <option value="{{ year }}">{{ year }}</option>
-            {% endfor %}
-        </select>
+        <div class="form-group">
+            <input type="radio" name="dateRangeGroup" id="multiple" value='4'>
+            <label for="multiple">Month-to-month</label>
+            <div id = "multimonth">
+                <strong>Select Billing Range</strong>
+                <select class = "custom-select" name="FIRSTMONTH">
+                    <option value="%">--Select--</option>
+                    {% for month in months %}
+                    <option value="{{ month }}">{{ month }}</option>
+                    {% endfor %}
+                </select>
+                <select class = "custom-select" name="FIRSTYEAR">
+                    <option value="%">--Select--</option>
+                    {% for year in calendar %}
+                    <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+                <span>to</span>
+                <select class = "custom-select" name="SECONDMONTH">
+                    <option value="%">--Select--</option>
+                    {% for month in months %}
+                    <option value="{{ month }}">{{ month }}</option>
+                    {% endfor %}
+                </select>
+                <select class = "custom-select" name="SECONDYEAR">
+                    <option value="%">--Select--</option>
+                    {% for year in calendar %}
+                    <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
-        </br>
     </div>
 
     {% endif %}
-    <br>
-    <br>
-    <p><input type='submit' value='Generate Report' class="btn btn-primary"></p>
-    <br>
+    <input type='submit' value='Generate Report' class="btn btn-primary">
 </form>
 {% endblock %}
 
@@ -177,7 +165,7 @@
 $(document).ready(function() {
     $("#department_id").hide();
     $("#department_group").hide();
-    $("#department_vp").hide();
+    $("#department_vp_div").hide();
 
     $("#fiscalyear").hide();
     $("#calendaryear").hide();
@@ -187,19 +175,19 @@ $(document).ready(function() {
     $("#deptid").change(function(){
         $("#department_id").show();
         $("#department_group").hide();
-        $("#department_vp").hide();
+        $("#department_vp_div").hide();
     });
 
     $("#deptgroup").change(function(){
         $("#department_id").hide();
         $("#department_group").show();
-        $("#department_vp").hide();
+        $("#department_vp_div").hide();
     });
 
     $("#deptvp").change(function(){
         $("#department_id").hide();
         $("#department_group").hide();
-        $("#department_vp").show();
+        $("#department_vp_div").show();
     });
 
     $('#fiscal').change(function(){ 

@@ -29,7 +29,7 @@
     {% if cf_info %}
     <div class="col-md-10" id="cf_details">
       <table class="table table-striped table-sm">
-        <caption style="caption-side:top;color:black;font-size:18px">Details for Chartfield <strong class="cf_num">{{ selected_cf.account_number }}</strong>:</caption>
+        <caption style="caption-side:top;color:#000000;font-size:1rem">Details for Chartfield <strong class="cf_num">{{ selected_cf.account_number }}</strong>:</caption>
         <thead>
           <th scope="col">Fund</th>
           <th scope="col">Dept.</th>
@@ -55,14 +55,14 @@
     {% else %}
     <div class="col-md-8" id="no_cfs_alert">
         <div class="alert alert-danger col-md-8" role="alert">
-            <i class="fas fa-exclamation-triangle" style="color:red"></i>
+            <i class="fas fa-exclamation-triangle"></i>
             This department does not have any chartfields currently in use. Please select another department.
         </div>
     </div>
     {% endif %}
     <div class="col-md-8" id="no_cfs_alert" hidden>
         <div class="alert alert-danger col-md-8" role="alert">
-            <i class="fas fa-exclamation-triangle" style="color:red"></i>
+            <i class="fas fa-exclamation-triangle"></i>
             This department does not have any chartfields currently in use. Please select another department.
         </div>
     </div>
