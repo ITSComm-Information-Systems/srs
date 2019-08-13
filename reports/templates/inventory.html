@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load index %}
 {% block content %}
-<h1>Inventory and Location Report</h1>
+<h1>{{ title }}</h1>
 <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
         <div class="form-group col-md-6">
             {% if depts %}
@@ -23,7 +23,9 @@
             </select>
         </div>
         {% endif %}
-        <input type='submit' value='Generate Report' class="btn btn-primary">
+        <div class="form-group col-md-6">
+            <input type='submit' value='Generate Report' class="btn btn-primary">
+        </div>
 </form>
 {% endblock %}
 
