@@ -113,6 +113,7 @@ class Action(Configuration):
         ('D', 'Disconnect'),
         ('E', 'Equipment'),
     )
+    cart_label = models.CharField(max_length=100, blank=True, null=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='A')
     description = models.TextField(blank=True, null=True)
