@@ -1,8 +1,5 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-
     <h1>{{ title }}</h1>
     <form action="/reports/tolls/downloads" method="POST" name="Select">{% csrf_token %}
         <div class="form-group col-4">
