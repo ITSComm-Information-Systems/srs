@@ -22,9 +22,9 @@ $(document).ready(function() {
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
 
-  $("#buildingFields").hide();
+  //$("#buildingFields").hide();
   $("#phLocationFields").hide();
-  $("#buildingTable").hide();
+  //$("#buildingTable").hide();
   $("#Conduit").hide();
   $("#PurchasePhone").hide();
   $("#ModelInfo").hide();
@@ -251,25 +251,7 @@ $(document).ready(function() {
     $('#contact_number_review').hide();
   });
 
-  $("#buildingFields").hide();
-  $("#buildingTable").hide();
 
-  $("#buildingSearch").on("keyup", function() {
-      $("#buildingTable").show();
-      var value = $(this).val().toLowerCase();
-      $("#buildingTable tr").filter(function() {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-      });
-  });
-
-  $('#buildingTable tr').click(function() {
-      var building = $(this).find("td").eq(1).html();   
-      var buildingCode = $(this).find("td").eq(0).html();   
-      $('#id_new_building_name').val(building);
-      $('#id_new_building_code').val(buildingCode);
-      $("#buildingTable").hide();
-      $("#buildingFields").show();
-  });
   function saveReviewData(inp) {
 
     var tab = [];
@@ -308,9 +290,8 @@ $(document).ready(function() {
     }
   
     tabs[currStep] = tab;
-
-  
   }
+
   function validateForm() {
 
     inp = $("#step" + currStep + " :input:visible");
@@ -406,64 +387,4 @@ $(document).ready(function() {
 
   }
 
-  $("#phoneLookup").click(function () {
-    var phone_number = $("#id_phone_number").val();
-    phone_number = phone_number.replace(/\D/g,'');
-
-    $("#phLocationFields").show();
-    $("#phBuildingID").val('');
-    $("#id_building").val('');
-    $("#id_floor").val('');
-    $("#id_room").val('');
-    $("#id_jack").val('');
-
-
-    $.ajax({
-      url: '/orders/ajax/get_phone_location/' + phone_number,
-      //dataType: 'json',
-
-      beforeSend: function(){
-        $("#phLocationFields").hide();
-        $('#phoneLookup').html('Searching...').addClass(' disabled');
-        $("#buildingCode").html('');
-        $("#building").html('');
-        $("#floor").html('');
-        $("#room").html('');
-        $("#jack").html('');
-      },
-
-      success: function (data) {
-        if (data.code !== '') {
-          $("#buildingCode").html(data.code);
-          $("#building").html(data.name);
-          $("#floor").html(data.floor);
-          $("#room").html(data.room);
-          $("#jack").html(data.jack);
-
-          $("#id_buildingCode_review").html(data.code);
-          $("#id_building_review").html(data.name);
-          $("#id_floor_review").html(data.floor);
-          $("#id_room_review").html(data.room);
-          $("#id_jack_review").html(data.jack);
-
-          $("#id_phone_number").addClass('is-valid');
-          $("#id_phone_number").removeClass('invalid');
-          $("#workflowForm").removeClass('was-validated');
-          $("#phLocationFields").show();
-        } else {
-          alert("No phone found.");
-        }
-      },
-
-      error: function(){
-        $("#id_phone_number").addClass('is-invalid');
-        $("#id_phone_number").removeClass('is-valid');
-        $("#workflowForm").addClass('was-validated');
-      },
-
-      complete: function(){
-        $('#phoneLookup').html('Find').removeClass(' disabled');
-      }
-
-    })
-  });
+  
