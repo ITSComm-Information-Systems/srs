@@ -520,6 +520,12 @@ h2.service-menu-header {
 	background-color:#0075bc;
 	color:#ffffff;
 }
+.nav-pills .nav-link.disabled {
+	color:#655a52;
+}
+.nav-pills .nav-link.disabled:hover {
+	cursor:text;
+}
 
 .buttons {
 	margin:auto;
