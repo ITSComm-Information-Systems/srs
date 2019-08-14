@@ -529,15 +529,20 @@ h2.service-menu-header {
 }
 
 .nav-pills .nav-link.active, 
-.nav-pills .show>.nav-link, 
-.nav-link.disabled:active, 
-.nav-link.disabled:focus {
+.nav-pills .show>.nav-link {
 	border-color:#0075bc;
 	background-color:#0075bc;
 	color:#ffffff;
 	cursor:text;
 }
 .nav-pills .nav-link.disabled {
+	color:#655a52;
+}
+
+.nav-link.disabled:active, 
+.nav-link.disabled:focus {
+	border-color:transparent;
+	background-color:transparent;
 	color:#655a52;
 }
 .nav-pills .nav-link.disabled:hover {
