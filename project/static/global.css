@@ -926,3 +926,9 @@ h2.service-menu-header {
 .table-striped tbody tr:nth-of-type(odd) {
 	background-color:#f4f3f2;
 }
+.table-hover tbody tr:hover {
+	background-color:inherit;
+}
+.fas .btn-link:hover {
+	text-decoration:none;
+}
