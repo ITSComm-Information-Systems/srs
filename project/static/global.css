@@ -284,19 +284,6 @@ footer .copyright a:hover {
 	color:#ffcb05;
 	text-decoration:underline;
 }
-
-.dept-dropdown p{
-	display:inline-block;
-}
-.filters{
-	display:inline-block;
-	vertical-align:top;
-}
-.filter-container {
-	display:grid;
-	grid-template-columns:repeat(2, 1fr);
-	grid-column-gap:20px;
-}
 @media (max-width:992px) {
 	footer .links, footer .links.right, footer .copyright {
 		float:none;
@@ -312,6 +299,23 @@ footer .copyright a:hover {
 		margin:0 0 2em 0;
 		white-space:normal;
 	}
+}
+
+.jumbotron {
+	padding:1.25rem;
+}
+
+.dept-dropdown p {
+	display:inline-block;
+}
+.filters {
+	display:inline-block;
+	vertical-align:top;
+}
+.filter-container {
+	display:grid;
+	grid-template-columns:repeat(2, 1fr);
+	grid-column-gap:20px;
 }
 
 /* .card-header .fa-chevron-right {
