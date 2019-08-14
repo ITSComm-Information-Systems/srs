@@ -966,7 +966,7 @@ h3.lead {
 }
 
 .text-muted {
-	color:#555555 !important;
+	color:#655a52 !important;
 }
 .form-control {
 	border:1px solid #cecbc9;
@@ -979,7 +979,7 @@ h3.lead {
 	background-color:#f4f3f2;
 	color:#333333;
 }
-::placeholder {
+input:placeholder {
 	color:#cecbc9;
 }
 
