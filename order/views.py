@@ -110,7 +110,20 @@ def add_to_cart(request):
         print(request.POST)
         i = Item()
         i.created_by_id = request.user.id
-        i.description = request.POST['action']
+
+        label = Action.objects.get(id=request.POST['action_id']).cart_label
+
+        x = label.find('[', 0)
+        y = label.find(']', x)
+
+        while x > 0:
+            tag = label[x+1:y]
+            element = request.POST[tag]
+            label = label.replace('['+tag+']', element)
+            x = label.find('[', x)
+            y = label.find(']', x)
+
+        i.description = label
         occ = request.POST['oneTimeCharges']
         charge = Chartcom.objects.get(id=occ)
         i.chartcom = charge
