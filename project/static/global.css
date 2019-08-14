@@ -450,6 +450,12 @@ span {
 	font-style:italic;
 }
 
+.alert-secondary {
+	border-color:#cecbc9;
+	background-color:#f4f3f2;
+	color:#333333;
+}
+
 .helpful-links {
 	width:inherit;
 /*	margin:0 auto; */
