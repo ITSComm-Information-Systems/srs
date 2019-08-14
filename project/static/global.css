@@ -901,3 +901,13 @@ h2.service-menu-header {
 	font-size:1rem;
 	font-weight:bold;
 }
+
+.text-muted {
+	color:#555555 !important;
+}
+.input-group-text {
+	border:1px solid #cecbc9;
+	background-color:#f4f3f2;
+	color:#333333;
+}
+
