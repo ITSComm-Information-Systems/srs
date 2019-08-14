@@ -451,7 +451,13 @@ span {
 .learn-more-link {
 	margin-bottom:0;
 	font-style:italic;
+	cursor:pointer;
 }
+.card-body .learn-more-link {
+/*	display:none;*/
+}
+
+
 
 .alert-secondary {
 	border-color:#cecbc9;
@@ -857,10 +863,6 @@ h3.lead {
 
 .card-top {
 	padding-top:0;
-}
-
-.card-body .learn-more-link {
-/*	display:none;*/
 }
 
 .floatleft {
