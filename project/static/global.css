@@ -502,6 +502,7 @@ span {
 }
 .btn-outline-primary {
 	border-color:#0075bc;
+	color:#0075bc;
 }
 .btn-outline-primary:not(:disabled):not(.disabled).active, .btn-outline-primary:not(:disabled):not(.disabled):active, .show>.btn-outline-primary.dropdown-toggle, 
 .btn-outline-primary:hover {
@@ -709,7 +710,7 @@ a.popover-icon:hover {
 }
 
 div h2:first-of-type, div h3:first-of-type {
-	margin-top:.25rem;
+	margin-top:0;
 }
 h2.service-menu-header {
 	margin-top:.75rem !important;
@@ -892,20 +893,4 @@ h3.lead {
 .total-charges-inv {
 	font-size:1rem;
 	font-weight:bold;
-}
-
-.fa-searchengin {
-	font-size: 120%;
-}
-
-.card-grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	justify-content:space-around;
-}
-
-.card-grid-4 {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	justify-content:space-around;
 }
