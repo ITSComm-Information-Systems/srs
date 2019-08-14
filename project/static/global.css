@@ -538,16 +538,6 @@ h2.service-menu-header {
 	color:#ffffff;
 	cursor:text;
 }
-.nav-pills .nav-item {
-	font-weight:bold;
-}
-.nav-pills .nav-item:after {
-	width:1em;
-	border:.5em solid #cc0000;
-	background-color:#ffcc00;
-	content:'^';
-	text-align:center;
-}
 .nav-pills a.nav-link.disabled {
 	color:#655a52;
 }
