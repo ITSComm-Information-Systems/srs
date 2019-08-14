@@ -985,7 +985,16 @@ h3.lead {
 	background-color:#f4f3f2;
 	color:#333333;
 }
-input::placeholder {
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+	color:#cecbc9;
+}
+::-moz-placeholder { /* Firefox 19+ */
+	color:#cecbc9;
+}
+:-ms-input-placeholder { /* IE 10+ */
+	color:#cecbc9;
+}
+:-moz-placeholder { /* Firefox 18- */
 	color:#cecbc9;
 }
 
