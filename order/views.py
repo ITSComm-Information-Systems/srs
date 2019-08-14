@@ -5,7 +5,7 @@ from django.views.generic import View
 from order.forms import *
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
-from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceLocV, UmOscChartfieldV
+from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceProfileV, UmOscChartfieldV
 from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from pages.models import Page
@@ -17,17 +17,8 @@ from .models import Product, Action, Service, Step, Element, Item, Constant, Cha
 
 
 def get_phone_location(request, phone_number):
-    #phone_number = request.GET.get('username', None)
-    loc = UmOscServiceLocV.objects.filter(service_number=phone_number).latest('billing_date')
-    print(loc)
-    data = {
-        'code': loc.building_id,
-        'name': loc.building,
-        'floor': loc.floor,
-        'room': loc.room,
-        'jack': loc.jack
-    }
-    return JsonResponse(data)
+    locations = list(UmOscServiceProfileV.objects.filter(service_number=phone_number).exclude(location_id=0).values())
+    return JsonResponse(locations, safe=False)
 
 class ManageChartcom(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
@@ -116,9 +107,23 @@ class Submit(PermissionRequiredMixin, View):
 
 def add_to_cart(request):
     if request.method == "POST":
+        print(request.POST)
         i = Item()
         i.created_by_id = request.user.id
-        i.description = request.POST['action']
+
+        label = Action.objects.get(id=request.POST['action_id']).cart_label
+
+        x = label.find('[', 0)
+        y = label.find(']', x)
+
+        while x > 0:
+            tag = label[x+1:y]
+            element = request.POST[tag]
+            label = label.replace('['+tag+']', element)
+            x = label.find('[', x)
+            y = label.find(']', x)
+
+        i.description = label
         occ = request.POST['oneTimeCharges']
         charge = Chartcom.objects.get(id=occ)
         i.chartcom = charge
@@ -141,6 +146,7 @@ class Workflow(PermissionRequiredMixin, View):
 
         tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
         action = Action.objects.get(id=action_id)
+        js = []
 
         for index, tab in enumerate(tabs, start=1):
             tab.step = 'step' + str(index)
@@ -173,11 +179,16 @@ class Workflow(PermissionRequiredMixin, View):
                 tab.form = f
             else:
                 tab.form = globals()[tab.custom_form]
+                if tab.name == 'PhoneLocation':
+                    js.append('phone_location')
+                elif tab.name == 'LocationNew':
+                    js.append('location')
 
         return render(request, 'order/workflow.html', 
             {'title': action.label,
             'wfid':action_id,
-            'tab_list': tabs})
+            'tab_list': tabs,
+            'js_files': js})
 
 
 class Cart(PermissionRequiredMixin, View):
@@ -311,7 +322,6 @@ class Status(PermissionRequiredMixin, View):
 
         item_list = Item.objects.filter(order__in=order_list)
 
-        print('get items')
         for num, order in enumerate(order_list, start=1):
             if order.order_reference == 'TBD':
                 order.items = item_list.filter(order=order)
@@ -319,7 +329,6 @@ class Status(PermissionRequiredMixin, View):
                 pin = UmOscPreorderApiV.objects.get(pre_order_number=order.order_reference,pre_order_issue=1)
                 order.items = [{'description': pin.comment_text}]
 
-        print('render')
         template = loader.get_template('order/status.html')
         context = {
             'title': 'Track Orders',

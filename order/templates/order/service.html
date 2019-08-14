@@ -1,81 +1,78 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <h1>{{title}}</h1>
-  
-    <div class="container" role="main" id="main-content">
-        <div class="row">
-            <div class="col-xl-3 col-md-3 col-12">
-                <h2 class="service-menu-header">Category</h2>
-                <nav class="navbar navbar-light navbar-expand-md">
-                    <a class="navbar-brand" href="#">
-                        <h2 class="service-menu-link">Category</h2>
-                    </a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#service-menu"
-                        aria-controls="service-menu" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="service-menu">
-                        <ul class="navbar-nav">
-                            {% for service in service_list %}
-                            <li class="nav-item slink" onclick="clickService('{{service.name}}')"><a class="nav-link" href="#">{{ service }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </nav>
-                <div class="alert alert-primary large-order">
-                    <strong>Placing a large order?</strong><br>
-                    For orders with 10 or more items, <strong><a href="/contact">contact us.</a></strong>
-                </div>
-
+<h1>{{title}}</h1>
+<div class="row">
+    <div class="col-xl-3 col-md-3 col-12">
+        <h2 class="service-menu-header">Category</h2>
+        <nav class="navbar navbar-light navbar-expand-md">
+            <a class="navbar-brand" href="#">
+                <h2 class="service-menu-link">Category</h2>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#service-menu"
+                aria-controls="service-menu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="service-menu">
+                <ul class="navbar-nav">
+                    {% for service in service_list %}
+                    <li class="nav-item slink" onclick="clickService('{{service.name}}')"><a class="nav-link"
+                            href="#">{{ service }}</a></li>
+                    {% endfor %}
+                </ul>
             </div>
-            <div class="col-xl-9 col-md-9 col-12 service-cards">
-                {% for service in service_list %}
-                <div class="row service" id="{{service.name}}" name="serviceCards">
-                    <h3 class="lead">{{ service }}</h3>
-                    <div class="col-md-12 card-deck">
-                        {% for action in service.actions %}
-                        <div class="card col-12">
-                            <div class="card-body">
-                                <strong>
-                                    <a href="/orders/wf/{{action.id}}">
-                                        {{action.label}}
-                                    </a>
-                                </strong>
-                                <p class="learn-more-link">
-                                    <a tabindex="0" role="button" data-toggle="popover" data-container="body"
-                                        data-trigger="focus" data-placement="bottom" title="{{action.label}}"
-                                        data-content="{{action.description}}"> Learn more
-                                    </a>
-                                </p>
-                            </div>
-                        </div>
-                        {% endfor %}
+        </nav>
+        <div class="alert alert-primary large-order">
+            <strong>Placing a large order?</strong><br>
+            For orders with 10 or more items, <strong><a href="/contact">contact us.</a></strong>
+        </div>
 
+    </div>
+    <div class="col-xl-6 col-md-9 col-12 service-cards">
+        {% for service in service_list %}
+        <div class="row service" id="{{service.name}}" name="serviceCards">
+            <h3 class="lead">{{ service }}</h3>
+            <div class="col-md-12 card-deck">
+                {% for action in service.actions %}
+                <div class="card col-12">
+                    <div class="card-body">
+                        <strong>
+                            <a href="/orders/wf/{{action.id}}">
+                                {{action.label}}
+                            </a>
+                        </strong>
+                        <p class="learn-more-link">
+                            <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+                                data-trigger="focus" data-placement="bottom" title="{{action.label}}"
+                                data-content="{{action.description}}"> Learn more
+                            </a>
+                        </p>
                     </div>
                 </div>
                 {% endfor %}
 
             </div>
-            <!-- <div class="col-xl-3 col-md-6 col-12">
-                <div class="alert alert-secondary helpful-links" role="alert">
-                    <h3 class="alert-heading">
-                        Helpful ITS Links
-                    </h3>
-                    <p class="mb-2">
-                        <em>
-                            *All links redirect to links outside the OSC
-                        </em>
-                    </p>
-                    {% autoescape off %}
-                    {{ link_list.bodytext }}
-                    {% endautoescape %}
-
-                </div>
-            </div> -->
         </div>
+        {% endfor %}
 
     </div>
+    <div class="col-xl-3 col-md-6 col-12 helpful-links">
+        <div class="alert alert-secondary hlinks" role="alert">
+            <h3 class="alert-heading">
+                Helpful ITS Links
+            </h3>
+            <p class="mb-2">
+                <em>
+                    *All links redirect to links outside the OSC
+                </em>
+            </p>
+            {% autoescape off %}
+            {{ link_list.bodytext }}
+            {% endautoescape %}
+
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 
@@ -90,11 +87,10 @@
 
     function clickService(serviceID) {
         $('.service').hide();
-        $('#'+ serviceID).show();
+        $('#' + serviceID).show();
         $('.slink').removeClass("active");
-        $('#'+ serviceID + "_link").addClass('active');
+        $('#' + serviceID + "_link").addClass('active');
     };
-  
+
 </script>
 {% endblock %}
-

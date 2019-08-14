@@ -5,7 +5,7 @@ from project.pinnmodels import UmOscPreorderApiV
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from django.utils import timezone
-
+from django.db import connections
 
 class Configuration(models.Model):   #Common fields for configuration models
     name = models.CharField(max_length=20)
@@ -113,6 +113,7 @@ class Action(Configuration):
         ('D', 'Disconnect'),
         ('E', 'Equipment'),
     )
+    cart_label = models.CharField(max_length=100, blank=True, null=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='A')
     description = models.TextField(blank=True, null=True)
@@ -204,7 +205,7 @@ class Order(models.Model):
         for element in elements:
             map[element.name] = element.target
 
-        preorder = None
+        preorder_number = None
         status = None
 
         for num, item in enumerate(item_list, start=1):
@@ -215,15 +216,17 @@ class Order(models.Model):
 
             action_id = item.data['action_id']
 
-            api.pre_order_number = preorder
+            api.pre_order_number = preorder_number
             api.work_status_name = status
 
             cons = Constant.objects.filter(action=action_id)
             for con in cons:             #Populate the model with constants
                 setattr(api, con.field, con.value)
-                
+            
+            #detail = ''
             for key, value in item.data.items():
                 if value:           #Populate the model with user supplied values
+                    #detail = detail + key + ':' + value + '\n'
                     if key == 'MRC' or key == 'localCharges' or key == 'LD':
                         value = Chartcom.objects.get(id=value).account_number
                         #print(key, acct)
@@ -237,15 +240,21 @@ class Order(models.Model):
 
             api.save()
 
+            preorder = UmOscPreorderApiV.objects.get(add_info_text_3=self.id)
+
+            with connections['pinnacle'].cursor() as cursor:
+                id = preorder.pre_order_id
+                cursor.callproc('um_note_procedures_k.um_add_wo_tcom_note_p', [id, 'Order Details', item.data['reviewSummary'], ''])
+
             if num == 1:
                 status = 'Received'
-                preorder = UmOscPreorderApiV.objects.get(add_info_text_3=self.id).pre_order_number
+                preorder_number = preorder.pre_order_number
 
         #Trigger completion of entries so Pinnacle rolls up and sends an email
         one = UmOscPreorderApiV.objects.filter(add_info_text_3=self.id, work_status_name=None)
         one.update(work_status_name = status)
 
-        self.order_reference = preorder
+        self.order_reference = preorder.pre_order_number
         self.save()
 
 class Item(models.Model):
