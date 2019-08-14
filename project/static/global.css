@@ -186,6 +186,9 @@ h3, .h3 {
 	color:#555555;
 }
 
+a {
+	display:inline-block;
+}
 a, a:link, a:visited {
 	color:#0075bc;
 }
