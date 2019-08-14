@@ -53,7 +53,7 @@
 						{% if user.is_authenticated %}
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle {% if title == 'Chartfield Change Request' or title == 'Manage User Access' or title == 'Department Look Up' or title == 'Manage Chartfields' %}active{% endif %}" href="javascript;" id="toolsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								Permissions & Billing
+								Permissions &amp; Billing
 							</a>
 							<div class="dropdown-menu" aria-labelledby="toolsDropdown">
 								{% if perms.oscauth.can_order or perms.oscauth_can_report %}
@@ -110,7 +110,7 @@
 				<ul class="navbar-nav /nav-fill w-100">
 					{% if perms.oscauth.can_order %}
 					<li class="nav-item {% if page_name == 'Request Service' %}active{% endif %}">
-						<a class="nav-link" href="/orders/services/"><i class="fas fa-check-circle"></i>Request Service</a>
+						<a class="nav-link" href="/orders/services/"><i class="fas fa-check-circle"></i> Request Service</a>
 					</li>
 					{% endif %}
 					<li class="nav-item dropdown {% if title == 'Metrics' or title == 'Detail of Charges' or title == 'Inventory and Location Report' or title == 'Non-Telephony Detail of Charges' or title == 'Summary of Charges' %}active{% endif %}">
