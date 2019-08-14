@@ -497,6 +497,7 @@ span {
 .btn-primary, .btn-primary:not(:disabled):not(.disabled).active, 
 .btn-primary:not(:disabled):not(.disabled):active, 
 .show>.btn-primary.dropdown-toggle, .nav-link.disabled:active, .nav-link.disabled:focus {
+	border-color:#0075bc;
 	background-color:#0075bc;
 	color:#ffffff;
 }
