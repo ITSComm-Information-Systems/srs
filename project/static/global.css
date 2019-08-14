@@ -587,6 +587,10 @@ h2.service-menu-header {
 }
 .btn-link:hover {
 	color:#cc3300;
+	cursor:pointer;
+}
+.fas.btn-link:hover {
+	text-decoration:none;
 }
 
 .chartfield-text {
