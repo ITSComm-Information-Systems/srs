@@ -508,14 +508,28 @@ h2.service-menu-header {
 	background-color:#f4f3f2;
 }
 
+.nav-pills .nav-link.active, 
+.nav-pills .show>.nav-link, 
+.nav-link.disabled:active, 
+.nav-link.disabled:focus {
+	border-color:#0075bc;
+	background-color:#0075bc;
+	color:#ffffff;
+}
+
 .buttons {
 	margin:auto;
 	padding:10px;
 }
-.nav-pills .nav-link.active, .nav-pills .show>.nav-link, 
-.btn-primary, .btn-primary:not(:disabled):not(.disabled).active, 
+.btn-primary, 
+.btn-primary:not(:disabled):not(.disabled).active, 
 .btn-primary:not(:disabled):not(.disabled):active, 
-.show>.btn-primary.dropdown-toggle, .nav-link.disabled:active, .nav-link.disabled:focus {
+.show>.btn-primary.dropdown-toggle {
+	border-color:#0075bc;
+	background-color:#0075bc;
+	color:#ffffff;
+}
+.btn-primary:hover {
 	border-color:#0075bc;
 	background-color:#0075bc;
 	color:#ffffff;
