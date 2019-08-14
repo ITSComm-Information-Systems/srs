@@ -455,6 +455,9 @@ span {
 		margin:0 auto;
 	}
 }
+.helpful-links .alert {
+	padding-top:.5rem;
+}
 
 .hlinks a{
 	word-wrap:break-word;
