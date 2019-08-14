@@ -36,18 +36,20 @@ def get_inventory(request):
     names = []
     name_query = list(d.dept_name for d in UmOscDeptProfileV.objects.filter(deptid__in=departments).order_by('deptid'))
     for i in range(0, len(departments)):
-    	name = {
-    		'deptid': departments[i],
-    		'name': name_query[i]
-    	}
-    	names.append(name)
+        name = {'deptid': departments[i]
+                ,'name': name_query[i]}
+        names.append(name)
 
+    number_of_depts = int(len(names))
+    number_of_dates = int(len(dates))
     template = loader.get_template('inventory.html')
     objects = UmOscReptInvlocV.objects
     context = {
-        'title': 'Inventory and Location Report',
+        'title': 'Inventory & Location Report',
         'depts': names,
+        'num_depts':number_of_depts,
         'dates': dates,
+        'num_dates': number_of_dates,
     }
     return HttpResponse(template.render(context,request))
     
@@ -62,6 +64,11 @@ def make_report(request):
     array = total.split('-')
     dept_id = array[0]
     dept_name = array[1]
+
+    # Find dept manager and uniqname
+    dept_info = UmOscDeptProfileV.objects.filter(deptid=dept_id)[0]
+    dept_mgr = dept_info.dept_mgr
+    dept_mgr_uniq = dept_info.dept_mgr_uniqname
    
     bill_period =  request.POST.get('bill_period') #  'May 20, 2018' #
     date = bill_period.replace('.', '')
@@ -112,9 +119,11 @@ def make_report(request):
 
     template = loader.get_template('inventory-report.html')
     context = {
-        'title': 'Inventory and Location Report',
+        'title': 'Inventory & Location Report',
         'dept_id': dept_id,
         'dept_name': dept_name,
+        'dept_mgr': dept_mgr,
+        'dept_mgr_uniq': dept_mgr_uniq,
         'bill_period': bill_period,
         'data': list(data),
         'total_charge': total_charge,

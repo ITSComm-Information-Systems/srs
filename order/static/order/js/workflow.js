@@ -11,7 +11,7 @@ $(document).ready(function() {
 
   currStep = 1;
   lastStep = document.getElementsByClassName("tab-pane").length;
-
+  var tabs = new Array(lastStep);
 
   if ( $("h1").html() === 'TestWorkflows' ) {
     for (i = 1; i < lastStep+1; i++) {
@@ -22,9 +22,9 @@ $(document).ready(function() {
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
 
-  $("#buildingFields").hide();
+  //$("#buildingFields").hide();
   $("#phLocationFields").hide();
-  $("#buildingTable").hide();
+  //$("#buildingTable").hide();
   $("#Conduit").hide();
   $("#PurchasePhone").hide();
   $("#ModelInfo").hide();
@@ -251,169 +251,140 @@ $(document).ready(function() {
     $('#contact_number_review').hide();
   });
 
-  $("#buildingFields").hide();
-  $("#buildingTable").hide();
 
-  $("#buildingSearch").on("keyup", function() {
-      $("#buildingTable").show();
-      var value = $(this).val().toLowerCase();
-      $("#buildingTable tr").filter(function() {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-      });
-  });
+  function saveReviewData(inp) {
 
-  $('#buildingTable tr').click(function() {
-      var building = $(this).find("td").eq(1).html();   
-      var buildingCode = $(this).find("td").eq(0).html();   
-      $('#id_new_building_name').val(building);
-      $('#id_new_building_code').val(buildingCode);
-      $("#buildingTable").hide();
-      $("#buildingFields").show();
-  });
+    var tab = [];
+  
+    for (i = 0; i < inp.length; i++) {
+      var obj = inp[i];
+      var type = $(obj).attr('type')
+      var id = $(obj).attr("id");
+      var name = $(obj).attr("name");
+  
+      if(type=="radio") {
+        if (obj.checked == true) {
+          label = $("#legend" + name).text();
+          value = $("label[for='" + id + "']").text();
+          tab.push({'label': label, 'value': value})
+        }
+      } else if (type=="checkbox") {
+        if (obj.checked == true) {
+          label = $("#legend" + name).text();
+          value = $("label[for='" + id + "']").text();
+          tab.push({'label': label, 'value': value})
+        }
+      } else if (type=="text" || type=="number" || obj.tagName=="TEXTAREA") {
+        label = $("label[for='" + id + "']").text();
+        value = $("#" + inp[i].id).val();
+        tab.push({'label': label, 'value': value})
+      } else if (obj.tagName=="SELECT") {
+        if(name) { // Don't process data we are not saving
+        label = $("label[for='" + id + "']").text();
+        value = $( "#" + id + " option:selected" ).text();
+        tab.push({'label': label, 'value': value})
+        }
+      } else {
+        console.log('unknown type:' + type);
+      }
+    }
+  
+    tabs[currStep] = tab;
+  }
 
+  function validateForm() {
+
+    inp = $("#step" + currStep + " :input:visible");
+    valid = true;
+    for (i = 0; i < inp.length; i++) {
+      if (!inp[i].checkValidity()) {
+        inp[i].className += " invalid";
+        valid = false;
+      }
+    }
+    
+    if (valid) {
+      document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
+      $("#workflowForm").removeClass('was-validated');
+      saveReviewData(inp);
+    } else {
+      $("#workflowForm").addClass('was-validated');
+    }
+    return valid; // return the valid status
+  }
+
+
+  function nextPrev(n) {
+
+    if (n == 1 && !validateForm()) return false;
+  
+    currStep = currStep + n;
+  
+    //while ( $('#pills-step'+currStep).hasClass('hidden')) {
+    while ( $('#pills-step'+currStep).is(':hidden')) {
+      currStep = currStep + n;
+    }
+  
+    $('#pills-step'+currStep).removeClass('disabled');
+    $('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
+    if (currStep > lastStep) {
+        $('#workflowForm').submit();
+        return false;
+    }
+  }
+
+  function fillReviewForm() {
+
+    var summary = '';
+    for (tab = 1; tab < lastStep; tab++) {  
+      $('#reviewstep' + tab).text('');
+      if(tabs[tab]) {
+        for (field = 0; field < tabs[tab].length; field++) {
+          txt = '<b>' + tabs[tab][field].label + '</b>  ' + tabs[tab][field].value + '<br>';
+          summary = summary + tabs[tab][field].label + ' - ' + tabs[tab][field].value + '\n';
+          $('#reviewstep' + tab).append(txt);
+        }
+      }
+      summary = summary + '\n';
+    }
+    $('#reviewSummary').val(summary);
+  }
+
+  // Workflow stuff
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+    currStep = $(this)[0].id.substring(10, 12) * 1;
+    if (currStep == lastStep) {
+        $('#nextBtn').html('Add to Cart');
+        fillReviewForm();
+    } else {
+        $('#nextBtn').html('Next');
+    }
+    if (currStep == 1) {
+      $('#prevBtn').hide();
+    } else {
+      $('#prevBtn').show();
+    }
+    //$('#nextBtn').prop('disabled', false);
+  })
 
 });
 
-// Workflow stuff
-$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-  currStep = $(this)[0].id.substring(10, 12) * 1;
-  if (currStep == lastStep) {
-      $('#nextBtn').html('Add to Cart');
-  } else {
-      $('#nextBtn').html('Next');
-  }
-  if (currStep == 1) {
-    $('#prevBtn').hide();
-  } else {
-    $('#prevBtn').show();
-  }
-  //$('#nextBtn').prop('disabled', false);
-})
 
 
-function nextPrev(n) {
-
-  if (n == 1 && !validateForm()) return false;
-
-  currStep = currStep + n;
-
-  //while ( $('#pills-step'+currStep).hasClass('hidden')) {
-  while ( $('#pills-step'+currStep).is(':hidden')) {
-    currStep = currStep + n;
-  }
-
-  $('#pills-step'+currStep).removeClass('disabled');
-  $('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
-  if (currStep > lastStep) {
-      $('#workflowForm').submit();
-      return false;
-  }
-}
 
 
-function validateForm() {
 
-  inp = $("#step" + currStep + " :input:visible");
-  valid = true;
-  for (i = 0; i < inp.length; i++) {
-    id = "#" + $(inp[i]).attr('id') + "_review";
-    selected_text = $( "#" + inp[i].id + " option:selected" ).text()
 
-    if (selected_text) {
-      $(id).html(selected_text);
-      console.log(id + "-" + selected_text + "<");
-    } else {
-      text_box = $("#" + inp[i].id ).val();
-      $(id).html( text_box );
-      console.log(id + ":" + text_box);
-    }
-
-    if (!inp[i].checkValidity()) {
-      inp[i].className += " invalid";
-      valid = false;
-    }
-  }
-
-    $("input[type='radio']:checked").each(function() { // Update review form with radio data
-        var idVal = $(this).attr("id");
-        id = "#id_" + $(this).attr("name") + "_review";
-        $(id).html($("label[for='"+idVal+"']").text());
-    });
-  
-  if (valid) {
-    document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
-    $("#workflowForm").removeClass('was-validated');
-  } else {
-    $("#workflowForm").addClass('was-validated');
-  }
-  return valid; // return the valid status
-}
 
   function filterChartcom(obj) { 
     id = '#id_' + obj.dataset.target;
-    $(id).find('[data-dept]').hide();
-    $(id).find("[data-dept='" + obj.value + "']").show();
+    if (obj.value=='all') {
+      $(id).find('[data-dept]').show();
+    } else {
+      $(id).find('[data-dept]').hide();
+      $(id).find("[data-dept='" + obj.value + "']").show();
+    }
+
   }
 
-  $("#phoneLookup").click(function () {
-    var phone_number = $("#id_phone_number").val();
-    phone_number = phone_number.replace(/\D/g,'');
-
-    $("#phLocationFields").show();
-    $("#phBuildingID").val('');
-    $("#id_building").val('');
-    $("#id_floor").val('');
-    $("#id_room").val('');
-    $("#id_jack").val('');
-
-
-    $.ajax({
-      url: '/orders/ajax/get_phone_location/' + phone_number,
-      //dataType: 'json',
-
-      beforeSend: function(){
-        $("#phLocationFields").hide();
-        $('#phoneLookup').html('Searching...').addClass(' disabled');
-        $("#buildingCode").html('');
-        $("#building").html('');
-        $("#floor").html('');
-        $("#room").html('');
-        $("#jack").html('');
-      },
-
-      success: function (data) {
-        if (data.code !== '') {
-          $("#buildingCode").html(data.code);
-          $("#building").html(data.name);
-          $("#floor").html(data.floor);
-          $("#room").html(data.room);
-          $("#jack").html(data.jack);
-
-          $("#id_buildingCode_review").html(data.code);
-          $("#id_building_review").html(data.name);
-          $("#id_floor_review").html(data.floor);
-          $("#id_room_review").html(data.room);
-          $("#id_jack_review").html(data.jack);
-
-          console.log('good:' + data.code)
-          $("#id_phone_number").addClass('is-valid');
-          $("#id_phone_number").removeClass('invalid');
-          $("#workflowForm").removeClass('was-validated');
-          $("#phLocationFields").show();
-        } else {
-          alert("No phone found.");
-        }
-      },
-
-      error: function(){
-        $("#id_phone_number").addClass('is-invalid');
-        $("#id_phone_number").removeClass('is-valid');
-        $("#workflowForm").addClass('was-validated');
-      },
-
-      complete: function(){
-        $('#phoneLookup').html('Find').removeClass(' disabled');
-      }
-
-    })
-  });
+  
