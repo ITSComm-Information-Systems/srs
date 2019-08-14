@@ -590,6 +590,9 @@ a.nav-link.disabled:focus {
 	background-color:#655a52;
 	color:#ffffff;
 }
+.btn-outline-success {
+	color:#28a745;
+}
 .btn-link:hover {
 	color:#0065a3;
 	cursor:pointer;
