@@ -905,9 +905,24 @@ h2.service-menu-header {
 .text-muted {
 	color:#555555 !important;
 }
+.form-control {
+	border:1px solid #cecbc9;
+}
+.custom-select {
+	border:1px solid #cecbc9;
+}
 .input-group-text {
 	border:1px solid #cecbc9;
 	background-color:#f4f3f2;
 	color:#333333;
 }
 
+.table thead th {
+	border-bottom:2px solid #cecbc9;
+}
+.table td, .table th {
+	border-top:1px solid #cecbc9;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+	background-color:#f4f3f2;
+}
