@@ -535,17 +535,16 @@ h2.service-menu-header {
 	color:#ffffff;
 	cursor:text;
 }
-.nav-pills .nav-link.disabled {
+.nav-pills a.nav-link.disabled {
 	color:#655a52;
 }
-
-.nav-link.disabled:active, 
-.nav-link.disabled:focus {
+a.nav-link.disabled:active, 
+a.nav-link.disabled:focus {
 	border-color:transparent;
 	background-color:transparent;
 	color:#655a52;
 }
-.nav-pills .nav-link.disabled:hover {
+.nav-pills a.nav-link.disabled:hover {
 	cursor:text;
 }
 
