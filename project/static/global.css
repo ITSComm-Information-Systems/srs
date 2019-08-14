@@ -974,6 +974,10 @@ h3.lead {
 	}
 }
 
+.border-secondary {
+	border-color:#cecbc9 !important;
+}
+
 .total-charges-inv {
 	font-size:1rem;
 	font-weight:bold;
