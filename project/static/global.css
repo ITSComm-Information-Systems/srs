@@ -538,10 +538,26 @@ h2.service-menu-header {
 	border-color:#0075bc;
 	color:#0075bc;
 }
-.btn-outline-primary:not(:disabled):not(.disabled).active, .btn-outline-primary:not(:disabled):not(.disabled):active, .show>.btn-outline-primary.dropdown-toggle, 
-.btn-outline-primary:hover {
+.btn-outline-primary:hover, 
+.btn-outline-primary:focus, 
+.btn-outline-primary:not(:disabled):not(.disabled).active, 
+.btn-outline-primary:not(:disabled):not(.disabled):active, 
+.show>.btn-outline-primary.dropdown-toggle {
 	background-color:#0075bc;
 	border-color:#0075bc;
+	color:#ffffff;
+}
+.btn-outline-secondary {
+	margin-left:.2rem;
+	border-color:#655a52;
+	color:#655a52;
+}
+.btn-outline-secondary:hover, 
+.btn-outline-secondary:focus, 
+.btn-outline-secondary:not(:disabled):not(.disabled).active, .btn-outline-secondary:not(:disabled):not(.disabled):active, .show>.btn-outline-secondary.dropdown-toggle {
+	border-color:#655a52;
+	background-color:#655a52;
+	color:#ffffff;
 }
 
 .chartfield-text {
