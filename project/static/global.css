@@ -519,6 +519,7 @@ h2.service-menu-header {
 	border-color:#0075bc;
 	background-color:#0075bc;
 	color:#ffffff;
+	cursor:text;
 }
 .nav-pills .nav-link.disabled {
 	color:#655a52;
