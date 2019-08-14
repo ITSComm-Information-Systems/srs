@@ -186,7 +186,7 @@ a, a:link, a:visited {
 	color:#0075bc;
 }
 a:hover {
-	color:#0075bc;
+	color:#cc3300;
 }
 a:focus {
 	background:#0075bc;
@@ -558,6 +558,9 @@ h2.service-menu-header {
 	border-color:#655a52;
 	background-color:#655a52;
 	color:#ffffff;
+}
+.btn-link:hover {
+	color:#cc3300;
 }
 
 .chartfield-text {
