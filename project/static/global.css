@@ -477,25 +477,35 @@ span {
 	background-color:#e4e1df;
 	padding:10px;
 }
-
 .navbar-light .navbar-nav .nav-item > .nav-link {
 	padding:10px;
 }
-
 .navbar-light .navbar-nav .show > .nav-link,
 .navbar-light .navbar-nav .active > .nav-link,
 .navbar-light .navbar-nav .nav-link.show,
 .navbar-light .navbar-nav .nav-link.active {
 	background-color:#e4e1df;
 }
-
 .navbar-light .navbar-nav .nav-link:focus {
 	background-color:#e4e1df;
 	border-radius:4px;
 }
-
 .navbar-nav .nav-item > .nav-link.active {
 	background-color:#6189b7 !important;
+}
+
+h2.service-menu-header {
+	margin-top:1.25rem !important;
+	font-size:1.75rem;
+}
+#service-menu ul li a {
+	color:#333333;
+}
+#service-menu ul li a:active {
+/*		font-weight:bold;*/
+}
+#service-menu ul li:not(.active) a:hover, #service-menu ul li:not(.active) a:focus {
+	background-color:#f4f3f2;
 }
 
 .buttons {
@@ -750,20 +760,6 @@ h3.lead {
 }
 .cart-chartfield-title small {
 	font-size:100%;
-}
-
-h2.service-menu-header {
-	margin-top:1.25rem !important;
-	font-size:1.75rem;
-}
-#service-menu ul li a {
-	color:#333333;
-}
-#service-menu ul li a:active {
-/*		font-weight:bold;*/
-}
-#service-menu ul li a:hover, #service-menu ul li a:focus {
-	background-color:#f4f3f2;
 }
 
 @media (min-width:768px) {
