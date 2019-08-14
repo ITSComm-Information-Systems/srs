@@ -993,6 +993,9 @@ h3.lead {
 .table td, .table th {
 	border-top:1px solid #cecbc9;
 }
+.table-sm td, .table-sm th {
+	padding:.5rem;
+}
 .table-striped tbody tr:nth-of-type(odd), .table-striped tbody tr:nth-of-type(odd):hover {
 	background-color:#f4f3f2;
 }
