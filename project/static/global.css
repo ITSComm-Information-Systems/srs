@@ -467,10 +467,12 @@ span {
 	background-color:transparent;
 }
 
+.navbar-light .navbar-nav .nav-link {
+	border-radius:4px;
+}
 .navbar-light .navbar-nav .active > .nav-link {
 	background-color:#e4e1df;
 	padding:10px;
-	border-radius:4px;
 }
 
 .navbar-light .navbar-nav .nav-item > .nav-link {
