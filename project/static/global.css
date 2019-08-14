@@ -717,10 +717,6 @@ a.popover-icon:hover {
 div h2:first-of-type, div h3:first-of-type {
 	margin-top:.5rem;
 }
-h2.service-menu-header {
-	margin-top:.75rem !important;
-	font-size:1.75rem;
-}
 h3.lead {
 	margin-left:10px;
 	font-size:1.75rem;
@@ -751,12 +747,18 @@ h3.lead {
 	font-size:100%;
 }
 
-#service-menu ul li a {
-	color:#000000;
+h2.service-menu-header {
+	margin-top:.75rem !important;
+	font-size:1.75rem;
 }
-
+#service-menu ul li a {
+	color:#333333;
+}
 #service-menu ul li a:active {
 /*		font-weight:bold;*/
+}
+#service-menu ul li a:hover, #service-menu ul li a:focus {
+	background-color:#f4f3f2;
 }
 
 @media (min-width:768px) {
