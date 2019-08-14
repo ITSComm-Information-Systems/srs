@@ -732,6 +732,9 @@ a.popover-icon:hover {
 div h2:first-of-type, div h3:first-of-type {
 	margin-top:.5rem;
 }
+h2.lead {
+	font-weight:700;
+}
 h3.lead {
 	margin-left:10px;
 	font-size:1.75rem;
