@@ -979,6 +979,9 @@ h3.lead {
 	background-color:#f4f3f2;
 	color:#333333;
 }
+::placeholder {
+	color:#cecbc9;
+}
 
 .table thead th {
 	border-bottom:2px solid #cecbc9;
