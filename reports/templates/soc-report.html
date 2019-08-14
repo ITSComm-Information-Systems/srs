@@ -12,7 +12,7 @@
 		<div class="card border-dark">
 			<div class="card-body">
 				<strong>Grouping:&nbsp;&nbsp;</strong>{{ grouping }}
-                <strong>&nbsp;&nbsp;&nbsp;&nbsp;Billed Unit(s):&nbsp;&nbsp;</strong>{{unit}}
+                <strong>&nbsp;&nbsp;&nbsp;&nbsp;Billed Unit(s):&nbsp;&nbsp;</strong>{% for item in unit%}{{item}} {% endfor %}
 				<strong>&nbsp;&nbsp;&nbsp;&nbsp;Billing Date Range:&nbsp;&nbsp;</strong>{{ billing_period }}<br>
 		</div>
 	</div>
@@ -25,7 +25,13 @@
     CSV File</button>
 <br>
 <br>
-<table class ="table table-sm"  border="1" style="font-size:12px">
+<button onclick="expandAll()" class = "btn btn-primary">Expand All</button>
+<br>
+<br>
+<button onclick="collapseAll()" class = "btn btn-primary">Collapse All</button>
+<br>
+<br>
+<table class ="table table-sm"   style="font-size:12px">
     <thead class = "thead-dark">
         <tr>
             <th>Expense Account</th>
@@ -44,7 +50,7 @@
         {% for row in table.0.0 %}
         <tr class = "table-warning">
             <td><b style="">{{ row.0 }} ({{ row.1 }})
-                    <input type="checkbox" name="{{row.1}}" id="" data-toggle="toggle">
+                    <input class = 'toggle1'type="checkbox" name="{{row.0}}" id="" data-toggle="toggle">
                 </b></td>
 
             <td></td>
@@ -53,13 +59,13 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><b style="">${{ row.3 }}</b></td>
+            <td><b>${{ row.3 }}</b></td>
         </tr>
-    <tbody class="hide" id = "{{row.0}}">
+    <tbody class = "{{row.0}}" id = "{{row.0}}" style = "display:none">
         {% for charge in row.2%}
         <tr class = "table-secondary">
             <td style="">{{ charge.0 }}
-            <input type="checkbox" name="{{charge.0}}" id="1" data-toggle="toggle2">
+            <input class = 'toggle2' type="checkbox" name="{{charge.2}}" id="1" data-toggle="toggle2">
                 
             </td>
             <td></td>
@@ -67,12 +73,12 @@
             <td></td>
             <td></td>
             <td></td>
-            <td style="">${{ charge.2}}</td>
+            <td>${{ charge.2}}</td>
             <td></td>
         </tr>
-        <div id = "" name = "{{charge.0}}">    
+        <div>    
             {% for code in charge.1%}
-                <tr class = "{{charge.0}}" style = "display: none">
+                <tr class = "{{charge.2}}" style = "display: none">
                     <td></td>
                     <td>{{ code.0 }}</td>
                     <td>{{ code.1 }}</td>
@@ -85,6 +91,7 @@
             {% endfor %}   
         </div>
         {% endfor %}
+
         </tbody>
     {% endfor %}
     
@@ -129,8 +136,21 @@
         $('[data-toggle="toggle"]').parents().next('.hide').toggle();
         $('[data-toggle="toggle2"]').parents().next('.hide').toggle();
 
+        
+
         $('[data-toggle="toggle"]').change(function () {
-            $(this).parents().next('.hide').toggle();
+            var name = this.name;
+            
+            
+            var result_style = document.getElementsByClassName(name);
+            for(var i=0; i<result_style.length; i++) {
+                if (result_style[i].style.display == 'table-row-group') {
+                    result_style[i].style.display = 'none';
+                }
+                else {
+                    result_style[i].style.display = 'table-row-group';
+                }
+            }
         });
 
          
@@ -152,8 +172,12 @@
 
         
     });
+
+    
 </script>
 <script>
+
+
     function exportTableToCSV(filename) {
         var csv = [];
         var rows = document.querySelectorAll("table tr");
@@ -195,6 +219,48 @@
 
         // Click download link
         downloadLink.click();
+    }
+
+    function expandAll() {
+        var toggle = document.getElementsByClassName('toggle1');
+        for(var i = 0; i <toggle.length;i++) {
+            var name = toggle[i].name;
+            toggle[i].checked = true;
+            var result_style = document.getElementsByClassName(name);
+            for(var j=0; j<result_style.length; j++) {
+                result_style[j].style.display = 'table-row-group';
+            }
+        }
+        var toggle = document.getElementsByClassName('toggle2');
+        for(var i = 0; i <toggle.length;i++) {
+            var name = toggle[i].name;
+            toggle[i].checked = true;
+            var result_style = document.getElementsByClassName(name);
+            for(var j=0; j<result_style.length; j++) {
+                result_style[j].style.display = 'table-row';
+            }
+        }
+    }
+
+    function collapseAll() {
+        var toggle = document.getElementsByClassName('toggle1');
+        for(var i = 0; i <toggle.length;i++) {
+            var name = toggle[i].name;
+            toggle[i].checked = false;
+            var result_style = document.getElementsByClassName(name);
+            for(var j=0; j<result_style.length; j++) {
+                result_style[j].style.display = 'none';
+            }
+        }
+        var toggle = document.getElementsByClassName('toggle2');
+        for(var i = 0; i <toggle.length;i++) {
+            var name = toggle[i].name;
+            toggle[i].checked = false;
+            var result_style = document.getElementsByClassName(name);
+            for(var j=0; j<result_style.length; j++) {
+                result_style[j].style.display = 'none';
+            }
+        }
     }
 </script>
 {% endblock %}

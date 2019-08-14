@@ -14,7 +14,7 @@
 			<div class="card-body">
 				<strong>Department:&nbsp;&nbsp;</strong>{{ dept_id }}
                 <strong>&nbsp;&nbsp;&nbsp;&nbsp;Department Name:&nbsp;&nbsp;</strong>{{dept_name}}
-				<strong>&nbsp;&nbsp;&nbsp;&nbsp;Billing Date:&nbsp;&nbsp;</strong>{{ bill_period }}<br>
+				<strong>&nbsp;&nbsp;&nbsp;&nbsp;Billing Date:&nbsp;&nbsp;</strong>{{ bill_period }} <br> 
 		</div>
 	</div>
 </div>
@@ -157,15 +157,15 @@
                 <td style = "vertical-align:middle">{{phone.0.usage}}</td>
                 <td style = "vertical-align:middle">{{phone.0.cd_descr}}</td>
                 <td style = "vertical-align:middle">{{phone.0.first_name}} {{phone.0.last_name}}</td>
-                <td>{% for charge in phone %}{% if charge.jack%}Location: {{charge.building}}<br> Floor: {{charge.floor}} Room: {{charge.room}}<br>Jack: {{charge.jack}}<br>(As of {{charge.location_since_date}})<br>{% endif %}{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.ncos_desc%} {{charge.ncos_desc}} {% if charge.ncos %} ({{charge.ncos}})<br>{% endif %}{% endif %}{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.jack%}Location: {{charge.building}} <br>  Floor: {{charge.floor}} Room: {{charge.room}} <br> Jack: {{charge.jack}} <br> (As of {{charge.location_since_date}}) <br> {% endif %}{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.ncos_desc%} {{charge.ncos_desc}} {% if charge.ncos %} ({{charge.ncos}}) <br> {% endif %}{% endif %}{% endfor %}</td>
                 <td>{{phone.0.last_call_date}}</td>
                 <td>{{phone.0.mrc_account}}</td>
-                <td>{% for charge in phone %}{% if charge.item_code%}{{charge.item_code}}<br>{% endif%} {% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.item_description%} {{charge.item_description}}<br>{% endif %}{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.quantity%} {{charge.quantity}}{% endif %}<br>{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.unit_price%} {{charge.unit_price}}{% endif %}<br>{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.charge_amount%} ${{charge.charge_amount}}{% endif %}<br>{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.item_code != ''%}{{charge.item_code}} <br> {% endif%} {% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.item_description%} {{charge.item_description}} <br> {% endif %}{% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.quantity%} {{charge.quantity}}{% endif %} <br> {% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.unit_price%} {{charge.unit_price}}{% endif %} <br> {% endfor %}</td>
+                <td>{% for charge in phone %}{% if charge.charge_amount%} ${{charge.charge_amount}}{% endif %} <br> {% endfor %}</td>
                 {% comment %} <td>{{item.ncos_desc}} {% if item.ncos %} ({{item.ncos}}) {% endif %}</td>
                 <td>{{item.last_call_date}}</td>
                 <td>{{item.mrc_account}}</td>
@@ -200,7 +200,7 @@
 
 
 
-<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
+<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i> <br> Scroll to top</button>
 
 
 
@@ -234,13 +234,7 @@ function topFunction() {
 
             for (var j = 0; j < cols.length; j++) {
                 string = cols[j].innerHTML;
-                if (string.split("<br>").lengtauto)
-                    string = string.replace("<br>", " ||");
-                if (string.split("<br>").length==4) {
-                    string = string.replace("<br>", " ||");
-                    string = string.replace("<br>", " ||");
-                }
-                string = string.replace("<br>", "");
+                string = string.replace(new RegExp(" <br> ",'g'), " || ");
                 string = string.replace(',', '')
                 row.push(string);
             }

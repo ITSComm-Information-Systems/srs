@@ -190,9 +190,16 @@ def get_rows(unit, grouping, period, drange, request):
     elif (grouping == 'Department Group'):
         return values.filter(dept_grp_descr__exact = unit[0]).order_by('account_desc').values().distinct()
     elif (grouping == 'Department Group VP Area'):
-        return values.filter(dept_grp_vp_descr__exact = unit[0]).order_by('account_desc').values().distinct()
+        return values.filter(dept_grp_vp_area_descr__exact = unit[0]).order_by('account_desc').values().distinct()
 
 def get_table(rows,request):
+    # ordered_rows = rows.ordered_by('account','account_desc','charge_group', 'description','charge_code').values('account','charge_group', 'description','charge_code')
+    # for item in ordered_rows:
+
+
+
+        
+
     accounts = rows.values_list('account','account_desc').distinct()
     whole_table = []
     account_table = []
