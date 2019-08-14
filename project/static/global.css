@@ -920,6 +920,9 @@ h2.service-menu-header {
 .table thead th {
 	border-bottom:2px solid #cecbc9;
 }
+.fas .btn-link:hover {
+	text-decoration:none;
+}
 .table td, .table th {
 	border-top:1px solid #cecbc9;
 }
@@ -929,6 +932,10 @@ h2.service-menu-header {
 .table-hover tbody tr:hover {
 	background-color:inherit;
 }
-.fas .btn-link:hover {
-	text-decoration:none;
+td.action {
+	width:auto;
+	display:table-cell;
 }
+
+
+
