@@ -22,9 +22,9 @@ $(document).ready(function() {
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
 
-  $("#buildingFields").hide();
+  //$("#buildingFields").hide();
   $("#phLocationFields").hide();
-  $("#buildingTable").hide();
+  //$("#buildingTable").hide();
   $("#Conduit").hide();
   $("#PurchasePhone").hide();
   $("#ModelInfo").hide();
@@ -251,25 +251,7 @@ $(document).ready(function() {
     $('#contact_number_review').hide();
   });
 
-  $("#buildingFields").hide();
-  $("#buildingTable").hide();
 
-  $("#buildingSearch").on("keyup", function() {
-      $("#buildingTable").show();
-      var value = $(this).val().toLowerCase();
-      $("#buildingTable tr").filter(function() {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-      });
-  });
-
-  $('#buildingTable tr').click(function() {
-      var building = $(this).find("td").eq(1).html();   
-      var buildingCode = $(this).find("td").eq(0).html();   
-      $('#id_new_building_name').val(building);
-      $('#id_new_building_code').val(buildingCode);
-      $("#buildingTable").hide();
-      $("#buildingFields").show();
-  });
   function saveReviewData(inp) {
 
     var tab = [];
@@ -308,9 +290,8 @@ $(document).ready(function() {
     }
   
     tabs[currStep] = tab;
-
-  
   }
+
   function validateForm() {
 
     inp = $("#step" + currStep + " :input:visible");
