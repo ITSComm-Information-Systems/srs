@@ -194,7 +194,7 @@ a, a:link, a:visited {
 	color:#0075bc;
 }
 a:hover {
-	color:#cc3300;
+	color:#0065a3; /* 0075bc - 5% */
 }
 a:focus {
 	background:#0075bc;
@@ -561,8 +561,8 @@ a.nav-link.disabled:focus {
 	color:#ffffff;
 }
 .btn-primary:hover {
-	border-color:#0075bc;
-	background-color:#0075bc;
+	border-color:#0065a3;
+	background-color:#0065a3;
 	color:#ffffff;
 }
 .btn-outline-primary {
@@ -574,8 +574,8 @@ a.nav-link.disabled:focus {
 .btn-outline-primary:not(:disabled):not(.disabled).active, 
 .btn-outline-primary:not(:disabled):not(.disabled):active, 
 .show>.btn-outline-primary.dropdown-toggle {
-	background-color:#0075bc;
-	border-color:#0075bc;
+	background-color:#0065a3;
+	border-color:#0065a3;
 	color:#ffffff;
 }
 .btn-outline-secondary {
@@ -591,7 +591,7 @@ a.nav-link.disabled:focus {
 	color:#ffffff;
 }
 .btn-link:hover {
-	color:#cc3300;
+	color:#0065a3;
 	cursor:pointer;
 }
 .fas.btn-link:hover {
@@ -733,10 +733,11 @@ input:checked + .slider:before {
 
 .popover-icon {
 	margin-left:0.25rem;
+	color:#0075bc;
 }
 a.popover-icon:hover {
-		cursor:pointer;
-		background-color:#0075bc;
+	cursor:pointer;
+	background-color:#0065a3;
 }
 
 .checkbox-label {
