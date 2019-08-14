@@ -926,7 +926,7 @@ h2.service-menu-header {
 .table td, .table th {
 	border-top:1px solid #cecbc9;
 }
-.table-striped tbody tr:nth-of-type(odd) {
+.table-striped tbody tr:nth-of-type(odd), .table-striped tbody tr:nth-of-type(odd):hover {
 	background-color:#f4f3f2;
 }
 .table-hover tbody tr:hover {
