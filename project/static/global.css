@@ -8,6 +8,7 @@ body {
 	background:#fffefe;
 	font-family:Roboto,sans-serif;
 	color:#333333;
+	overflow-y:scroll;
 }
 @media (max-width:992px) {
 	body {
