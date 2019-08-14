@@ -897,3 +897,15 @@ h3.lead {
 .fa-searchengin {
 	font-size: 120%;
 }
+
+.card-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	justify-content:space-around;
+}
+
+.card-grid-4 {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	justify-content:space-around;
+}

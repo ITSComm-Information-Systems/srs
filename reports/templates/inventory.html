@@ -5,7 +5,7 @@
 <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
         <div class="form-group col-md-6">
             {% if depts %}
-            <label for="dept_id">Select a Department ID</label>
+            <label for="dept_id"><strong>Select a Department ID</strong></label>
                 <select class="form-control" name="dept_id" id="dept_id" size="{{ num_depts }}" required>
                     {% for dept in depts %}
                     <option value="{{ dept.deptid }}-{{dept.name}}">{{ dept.deptid }} - {{ dept.name }}
@@ -14,7 +14,7 @@
         </div>
         <div class="form-group col-md-6">
             <label for="bill_period">
-                Select a Billing Period
+                <strong>Select a Billing Period</strong>
             </label>
             <select class="form-control mt-0" name="bill_period" id="bill_period" size="{{ num_dates }}" required>
                 {% for date in dates %}
