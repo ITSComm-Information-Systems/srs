@@ -979,7 +979,7 @@ h3.lead {
 	background-color:#f4f3f2;
 	color:#333333;
 }
-input:placeholder {
+input::placeholder {
 	color:#cecbc9;
 }
 
