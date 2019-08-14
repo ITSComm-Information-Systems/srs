@@ -997,6 +997,10 @@ h3.lead {
 	background-color:#f4f3f2;
 	color:#333333;
 }
+.input-group>.custom-select:not(:last-child), .input-group>.form-control:not(:last-child) {
+	border-top-right-radius:reset;
+	border-bottom-right-radius:reset;
+}
 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
 	color:#cecbc9;
 }
