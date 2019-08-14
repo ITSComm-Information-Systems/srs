@@ -79,6 +79,8 @@ def generate_report(request):
 	name = UmOscDeptProfileV.objects.filter(deptid=selected_dept)
 	selected_dept = selected_dept + ' - ' + name[0].dept_name
 
+	dept_mgr = name[0].dept_mgr
+
 	# Fix date format
 	date = format_date(bill_date)
 
@@ -280,6 +282,7 @@ def generate_report(request):
 	context= {
 		'title':'Detail of Charges',
 		'dept': selected_dept,
+		'dept_mgr': dept_mgr,
 		'billing_date': bill_date,
 		'charge_types': charge_types,
 		'chartfields': chartcoms
