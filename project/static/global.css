@@ -879,6 +879,11 @@ h3.lead {
 	float:left;
 }
 
+.card-header {
+	font-size:1.15em;
+	font-weight:bold;
+}
+
 .card-width {
 	width:83%;
 }
