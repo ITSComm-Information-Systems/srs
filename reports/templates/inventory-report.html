@@ -11,10 +11,20 @@
 <div class='mb-2'>
     <div class="card border-dark">
         <div class="card-body">
-            <strong>Department ID: </strong>{{ dept_id }}
-            <strong>Department Name: </strong>{{dept_name}}
-            <strong>Department Manager: </strong>{{dept_mgr}} ({{ dept_mgr_uniq }})
-            <strong>Billing Date: </strong>{{ bill_period }}
+            <div class="card-body card-grid-4">
+                <div class="deptid">
+                    <strong>Department: </strong>{{ dept_id }}
+                </div>
+                <div class="deptname">
+                    <strong>Department Name: </strong>{{dept_name}}
+                </div>
+                <div class="dept_manager">
+                    <strong>Department Manager: </strong>{{dept_mgr}} ({{ dept_mgr_uniq }})
+                </div>
+                <div class="billdate">
+                    <strong>Billing Date: </strong>{{ bill_period }}
+                </div>
+            </div>
         </div>
     </div>
 </div>
