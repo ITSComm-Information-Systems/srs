@@ -448,6 +448,9 @@ span {
 		width:100%;
 	}
 }
+.card-deck .card.col-12 {
+	padding:0;
+}
 
 .learn-more-link {
 	margin-bottom:0;
