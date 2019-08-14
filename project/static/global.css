@@ -538,10 +538,10 @@ h2.service-menu-header {
 	color:#ffffff;
 	cursor:text;
 }
-.nav-pills .nav-item a {
+.nav-pills .nav-item {
 	font-weight:bold;
 }
-.nav-pills .nav-item a:after {
+.nav-pills .nav-item:after {
 	width:10px;
 	background-color:#ffcc00;
 	content:'X';
