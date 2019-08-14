@@ -1008,5 +1008,9 @@ td.action {
 	display:table-cell;
 }
 
+#buildingTable tr:hover {
+	cursor:pointer;
+}
+
 
 
