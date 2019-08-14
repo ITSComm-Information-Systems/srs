@@ -181,6 +181,8 @@ class Workflow(PermissionRequiredMixin, View):
                 tab.form = globals()[tab.custom_form]
                 if tab.name == 'PhoneLocation':
                     js.append('phone_location')
+                elif tab.name == 'LocationNew':
+                    js.append('location')
 
         return render(request, 'order/workflow.html', 
             {'title': action.label,
@@ -320,7 +322,6 @@ class Status(PermissionRequiredMixin, View):
 
         item_list = Item.objects.filter(order__in=order_list)
 
-        print('get items')
         for num, order in enumerate(order_list, start=1):
             if order.order_reference == 'TBD':
                 order.items = item_list.filter(order=order)
@@ -328,7 +329,6 @@ class Status(PermissionRequiredMixin, View):
                 pin = UmOscPreorderApiV.objects.get(pre_order_number=order.order_reference,pre_order_issue=1)
                 order.items = [{'description': pin.comment_text}]
 
-        print('render')
         template = loader.get_template('order/status.html')
         context = {
             'title': 'Track Orders',
