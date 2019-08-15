@@ -1,6 +1,22 @@
 {% extends 'base.html'%}
 
 {% block content %}
+<style>
+    .expand-icon input[type="checkbox"],
+    .expand-icon .checked {
+        display: none;
+    }
+
+    .expand-icon input[type="checkbox"]:checked~.checked {
+        display: inline-block;
+    }
+
+    .expand-icon input[type="checkbox"]:checked~.unchecked {
+        display: none;
+    }
+</style>
+
+
 <h1>{{ title }}</h1>
 <div>
     <strong>Report selection</strong>
@@ -38,13 +54,14 @@
     </button>
 </div>
 
-<table class="table table-sm">
+<table class="table table-sm table-bordered">
     <thead class="thead-dark">
         <tr>
             <th>Expense Account</th>
             <th>Item Description</th>
             <th>Charge Codes</th>
             <th>Rate</th>
+            <th>Average Monthly Units Billed</th>
             <th>Billed Units</th>
             <th>Item Total</th>
             <th>Item Group Total</th>
@@ -56,25 +73,37 @@
     <tbody>
         {% for row in table.0.0 %}
         <tr class="table-warning">
-            <td><b>{{ row.0 }} ({{ row.1 }})
+            <td>
+                <label class='expand-icon'>
                     <input class='toggle1' type="checkbox" name="{{row.0}}" data-toggle="toggle">
-                </b></td>
-
+                    <i class="far fa-caret-square-down unchecked"></i>
+                    <i class="far fa-caret-square-up checked"></i>
+                    {{ row.0 }} ({{ row.1 }})
+                </label>
+            </td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
-            <td><b>${{ row.3 }}</b></td>
+            <td></td>
+            <td>${{ row.3 }}</td>
         </tr>
+
     <tbody class="{{row.0}}" id="{{row.0}}" style="display:none">
         {% for charge in row.2%}
         <tr class="table-secondary">
-            <td>{{ charge.0 }}
-                <input class='toggle2' type="checkbox" name="{{charge.2}}" id="1" data-toggle="toggle2">
-
+            <td>
+                <label class='expand-icon'>
+                    &nbsp;&nbsp;&nbsp;
+                    <input class='toggle2' type="checkbox" name="{{charge.2}}" data-toggle="toggle2">
+                    <i class="far fa-caret-square-down unchecked"></i>
+                    <i class="far fa-caret-square-up checked"></i>
+                    {{ charge.0 }}
+                </label>
             </td>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
@@ -83,40 +112,36 @@
             <td>${{ charge.2}}</td>
             <td></td>
         </tr>
-        <div>
-            {% for code in charge.1%}
-            <tr class="{{charge.2}}" style="display: none">
-                <td></td>
-                <td>{{ code.0 }}</td>
-                <td>{{ code.1 }}</td>
-                <td>${{ code.2 }}</td>
-                <td>{{ code.3 }}</td>
-                <td>${{ code.4 }}</td>
-                <td></td>
-                <td></td>
-            </tr>
-            {% endfor %}
-        </div>
+        {% for code in charge.1 %}
+        <tr class="{{charge.2}}" style="display: none">
+            <td></td>
+            <td>{{ code.0 }}</td>
+            <td>{{ code.1 }}</td>
+            <td>${{ code.2 }}</td>
+            <td>{{ avg_monthly_billed }}</td>
+            <td>{{ code.3 }}</td>
+            <td>${{ code.4 }}</td>
+            <td></td>
+            <td></td>
+        </tr>
         {% endfor %}
-
+        {% endfor %}
     </tbody>
     {% endfor %}
 
     <tr>
-        <td><b>Total ITCom Charges</td>
+        <td>Total ITCom Charges</td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
-        <td><b>${{table.0.1}}</td>
+        <td></td>
+        <td>${{table.0.1}}</td>
     </tr>
     </tbody>
-
 </table>
-<p></p>
-<p></p>
 
 {% else %}
 <div class="mt-2">
@@ -135,47 +160,6 @@
         document.getElementById("display").innerHTML = active[index]
 
     }
-    $(document).ready(function () {
-
-        $('[data-toggle="toggle"]').parents().next('.hide').toggle();
-        $('[data-toggle="toggle2"]').parents().next('.hide').toggle();
-
-
-
-        $('[data-toggle="toggle"]').change(function () {
-            var name = this.name;
-
-
-            var result_style = document.getElementsByClassName(name);
-            for (var i = 0; i < result_style.length; i++) {
-                if (result_style[i].style.display == 'table-row-group') {
-                    result_style[i].style.display = 'none';
-                }
-                else {
-                    result_style[i].style.display = 'table-row-group';
-                }
-            }
-        });
-
-
-
-        $('[data-toggle="toggle2"]').change(function () {
-            var name = this.name;
-
-
-            var result_style = document.getElementsByClassName(name);
-            for (var i = 0; i < result_style.length; i++) {
-                if (result_style[i].style.display == 'table-row') {
-                    result_style[i].style.display = 'none';
-                }
-                else {
-                    result_style[i].style.display = 'table-row';
-                }
-            }
-        });
-
-
-    });
 
     function exportTableToCSV(filename) {
         var csv = [];
@@ -261,6 +245,49 @@
             }
         }
     }
+
+    $(document).ready(function () {
+
+        $('[data-toggle="toggle"]').parents().next('.hide').toggle();
+        $('[data-toggle="toggle2"]').parents().next('.hide').toggle();
+
+
+
+        $('[data-toggle="toggle"]').change(function () {
+            var name = this.name;
+
+
+            var result_style = document.getElementsByClassName(name);
+            for (var i = 0; i < result_style.length; i++) {
+                if (result_style[i].style.display == 'table-row-group') {
+                    result_style[i].style.display = 'none';
+                }
+                else {
+                    result_style[i].style.display = 'table-row-group';
+                }
+            }
+        });
+
+
+
+        $('[data-toggle="toggle2"]').change(function () {
+            var name = this.name;
+
+
+            var result_style = document.getElementsByClassName(name);
+            for (var i = 0; i < result_style.length; i++) {
+                if (result_style[i].style.display == 'table-row') {
+                    result_style[i].style.display = 'none';
+                }
+                else {
+                    result_style[i].style.display = 'table-row';
+                }
+            }
+        });
+
+
+    });
 </script>
 <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+
 {% endblock %}
