@@ -68,6 +68,7 @@ def generate(request):
 	dept = UmOscDeptProfileV.objects.filter(deptid=dept_id)
 	dept_name = dept[0].deptid
 	dept_mgr = dept[0].dept_mgr
+	dept_mgr_uniq = dept_info[0].dept_mgr_uniqname
 
 
 	inactive = False
@@ -82,6 +83,7 @@ def generate(request):
 		'dept_id': dept_id,
 		'dept_name': dept_name,
 		'dept_mgr': dept_mgr,
+		'dept_mgr_uniq':dept_mgr_uniq,
 		'inactive': inactive,
 		'bill_period': bill_period,
 		'bill_month': month,

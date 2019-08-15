@@ -80,6 +80,7 @@ def generate_report(request):
 	selected_dept = selected_dept + ' - ' + name[0].dept_name
 
 	dept_mgr = name[0].dept_mgr
+	dept_mgr_uniq = name[0].dept_mgr_uniqname
 
 	# Fix date format
 	date = format_date(bill_date)
@@ -283,6 +284,7 @@ def generate_report(request):
 		'title':'Detail of Charges',
 		'dept': selected_dept,
 		'dept_mgr': dept_mgr,
+		'dept_mgr_uniq': dept_mgr_uniq,
 		'billing_date': bill_date,
 		'charge_types': charge_types,
 		'chartfields': chartcoms

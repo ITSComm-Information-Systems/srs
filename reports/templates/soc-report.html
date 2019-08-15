@@ -12,7 +12,7 @@
     <div class="card border-dark">
         <div class="card-body card-grid">
             <div class="deptid">
-                <strong>Grouping</strong>{{ grouping }}
+                <strong>Grouping: </strong>{{ grouping }}
             </div>
             <div class="deptname">
                 <strong>Unit/Group: </strong>{{ unit }}
@@ -27,16 +27,16 @@
 <hr class="style1">
 
 {% if table %}
-<button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')"class="btn btn-success float-right" style="font-size:16px;font-family:Roboto,sans-serif">Download Table To
-    CSV File</button>
-<br>
-<br>
-<button onclick="expandAll()" class = "btn btn-primary">Expand All</button>
-<br>
-<br>
-<button onclick="collapseAll()" class = "btn btn-primary">Collapse All</button>
-<br>
-<br>
+<div class="soc-buttons">
+    <div class="expand-collapse">
+        <button onclick="expandAll()" class="btn btn-link">Expand All</button>
+        <button onclick="collapseAll()" class="btn btn-link">Collapse All</button>
+    </div>
+    <button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')" class="btn btn-success float-right">Download Table To
+        CSV File
+    </button>
+</div>
+
 <table class ="table table-sm">
     <thead class = "thead-dark">
         <tr>
@@ -55,8 +55,8 @@
     <tbody>
         {% for row in table.0.0 %}
         <tr class = "table-warning">
-            <td><b style="">{{ row.0 }} ({{ row.1 }})
-                    <input class = 'toggle1'type="checkbox" name="{{row.0}}" id="" data-toggle="toggle">
+            <td><b>{{ row.0 }} ({{ row.1 }})
+                    <input class = 'toggle1' type="checkbox" name="{{row.0}}" data-toggle="toggle">
                 </b></td>
 
             <td></td>
@@ -70,7 +70,7 @@
     <tbody class = "{{row.0}}" id = "{{row.0}}" style = "display:none">
         {% for charge in row.2%}
         <tr class = "table-secondary">
-            <td style="">{{ charge.0 }}
+            <td>{{ charge.0 }}
             <input class = 'toggle2' type="checkbox" name="{{charge.2}}" id="1" data-toggle="toggle2">
                 
             </td>
