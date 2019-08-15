@@ -21,7 +21,56 @@ $(document).ready(function() {
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
+  preFields = $('[data-sequence]').hide();
+  $(preFields[0]).show();
+  curr = 0;
+  pointer = 0;
+  vals = []
 
+  var callback = function() {
+    if (preFields.index(this) <= pointer) { // User changed a previous answer.
+      console.log('back');
+      for (i = preFields.index(this)+1; i < preFields.length; i++) {
+        $(preFields[i]).hide();
+        $(preFields[i]).find('input:checked').prop("checked", false);
+        // todo clear value if input
+      }
+    }
+
+    pointer = preFields.index(this);
+    val = $('input:checked', this).val()
+    vals[pointer] = val;
+
+    for (question = 0; question < preFields.length; question++) {
+      curr = preFields[question].dataset.sequence;
+      cond = preFields[question].dataset.condition;
+      if (cond) {
+          arr = cond.split(',')
+          for (i = 0; i < arr.length; i++) {
+            if(!vals.includes(arr[i])) {
+              cond = false;
+              break;
+            }
+          }
+      } else{
+        cond = true; // Pass if no condition
+      }
+
+      if (cond) {
+        if (curr > this.dataset.sequence) {
+          $(preFields[question]).show();
+          break;
+        }
+      }
+    }
+  
+  };
+
+  $(preFields).change(callback);
+  $(preFields).keypress(callback);
+
+
+  /*
   //$("#buildingFields").hide();
   $("#phLocationFields").hide();
   //$("#buildingTable").hide();
@@ -48,7 +97,7 @@ $(document).ready(function() {
     $("#PhoneModelNum").show();
     $("#voipPhoneMac").show();
   });
-
+  */
 
   $("#activePhone_Y").click(function() {
     $('[data-tab="LocationNew"]').hide();
@@ -59,7 +108,7 @@ $(document).ready(function() {
   });
   
 
-
+/*
   //Data
   $("#activePhone").hide();
   $("#jackNumber").hide();
@@ -97,6 +146,7 @@ $(document).ready(function() {
   $("#conduit_N").click(function() {
     $("#linesToInstall").show();
   });
+  */
 
   // Addl info
   $('#contact_id').hide();
@@ -150,7 +200,7 @@ $(document).ready(function() {
   });
 
   
-
+  /*
   // Phone Type Tab
   $("#Jack_Y").click(function() {
     $("#JackNumber").show();
@@ -217,7 +267,7 @@ $(document).ready(function() {
     $("#PhoneSetType_review").hide();
     //$('#pills-step4').hide();  //.addClass(' hidden');
   });
-
+  */
 
   $("#phone_type").click(function() {
     if ($('#phone_type option:selected') > 1) {
@@ -237,18 +287,12 @@ $(document).ready(function() {
     $('#contact_id').show();
     $('#contact_name').show();
     $('#contact_number').show();
-    $('#contact_id_review').show();
-    $('#contact_name_review').show();
-    $('#contact_number_review').show();
   });
 
   $("#contact_yn_True").click(function(event) {
     $('#contact_id').hide();
     $('#contact_name').hide();
     $('#contact_number').hide();
-    $('#contact_id_review').hide();
-    $('#contact_name_review').hide();
-    $('#contact_number_review').hide();
   });
 
 
