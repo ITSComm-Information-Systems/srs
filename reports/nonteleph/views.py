@@ -73,6 +73,9 @@ def generate_report(request):
     name = UmOscDeptProfileV.objects.filter(deptid=selected_dept)
     selected_dept = selected_dept + ' - ' + name[0].dept_name
 
+    dept_mgr = name[0].dept_mgr
+    dept_mgr_uniq = name[0].dept_mgr_uniqname
+
     # Fix date format
     date = format_date(bill_date)
 
@@ -114,7 +117,7 @@ def generate_report(request):
                     'descr': a.item_description,
                     'qty': int(a.quantity),
                     'total_charges': a.charge_amount,
-                    'project_name': a.voucher_comment,
+                    'project_name': a.unique_identifier,
                     'date': a.invoice_date
                 }
                 # Add N/A
@@ -142,7 +145,7 @@ def generate_report(request):
                 for r in charges[prefix]['rows']:
                     unit_price = r['unit_price'].replace('$', '')
                     # Container Services
-                    if prefix == 'Container Services' and r['project_name'] == a.voucher_comment and r['descr'] == a.item_description and unit_price == '{:,.2f}'.format(a.unit_price):
+                    if prefix == 'Container Services' and r['project_name'] == a.unique_identifier and r['descr'] == a.item_description and unit_price == '{:,.2f}'.format(a.unit_price):
                         r['qty'] += int(a.quantity)
                         r['total_charges'] += a.charge_amount
                         breakout = True
@@ -183,6 +186,8 @@ def generate_report(request):
     context= {
         'title':"Non-Telephony Detail of Charges",
         'dept': selected_dept,
+        'dept_mgr': dept_mgr,
+        'dept_mgr_uniq': dept_mgr_uniq,
         'billing_date': bill_date,
         'charge_types': charge_types,
         'chartfields': chartcoms
