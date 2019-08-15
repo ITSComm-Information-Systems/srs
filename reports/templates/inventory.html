@@ -31,4 +31,12 @@
 
 {% block js %}
 <script src="/static/select.js"></script>
+<script>
+    $(document).ready(function() {
+	// Select first options by default
+    $("#dept_id").prop("selectedIndex", 0);
+    $("#bill_period").prop("selectedIndex", 0);
+})
+</script>
+
 {% endblock %}

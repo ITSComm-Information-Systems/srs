@@ -1054,3 +1054,12 @@ td.action {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
 }
+
+.soc-buttons {
+	display: flex;
+	justify-content: space-between;
+}
+
+.expand-collapse button:nth-child(2){
+	margin-left: 2rem;
+}
