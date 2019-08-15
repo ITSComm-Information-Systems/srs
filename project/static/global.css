@@ -751,6 +751,10 @@ a.popover-icon:hover {
 	display:none;
 }
 
+.row.cart-tables {
+	padding-right:15px;
+	padding-left:15px;
+}
 .cart-table {
 	width:100%;
 }
