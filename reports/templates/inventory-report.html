@@ -1,30 +1,11 @@
 {% extends 'base.html' %}
 {% load index %}
 {% block content %}
-<<<<<<< HEAD
-<h1>Inventory and Location Report</h1>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<div class="">
-		<strong>Report selection</strong>
-        <a class="float-right" href="../inventory">Edit your selection</a>
-        <a class="float-right" id="edit-selection" href="../inventory"><i class="fas fa-edit"></i></a>
-	</div>
-
-	<div class="">
-		<div class="card border-dark">
-			<div class="card-body">
-				<strong>Department:&nbsp;&nbsp;</strong>{{ dept_id }}
-                <strong>&nbsp;&nbsp;&nbsp;&nbsp;Department Name:&nbsp;&nbsp;</strong>{{dept_name}}
-				<strong>&nbsp;&nbsp;&nbsp;&nbsp;Billing Date:&nbsp;&nbsp;</strong>{{ bill_period }} <br> 
-		</div>
-	</div>
-=======
 <h1>{{ title }}</h1>
 <div>
     <strong>Report Details</strong>
     <a class="float-right" href="../inventory">Edit your selection</a>
     <a class="float-right" id="edit-selection" href="../inventory"><i class="fas fa-edit"></i></a>
->>>>>>> 860c8f045953b254f21c342ffd7856fe3d42542a
 </div>
 
 <div class='mb-2'>
@@ -231,13 +212,7 @@
 
 
 
-<<<<<<< HEAD
 <button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i> <br> Scroll to top</button>
-=======
-<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to
-    top</button>
-
->>>>>>> 860c8f045953b254f21c342ffd7856fe3d42542a
 
 
 
@@ -270,17 +245,7 @@
 
             for (var j = 0; j < cols.length; j++) {
                 string = cols[j].innerHTML;
-<<<<<<< HEAD
                 string = string.replace(new RegExp(" <br> ",'g'), " || ");
-=======
-                if (string.split("<br>").lengtauto)
-                    string = string.replace("<br>", " ||");
-                if (string.split("<br>").length == 4) {
-                    string = string.replace("<br>", " ||");
-                    string = string.replace("<br>", " ||");
-                }
-                string = string.replace("<br>", "");
->>>>>>> 860c8f045953b254f21c342ffd7856fe3d42542a
                 string = string.replace(',', '')
                 row.push(string);
             }
