@@ -434,6 +434,7 @@ span {
 	display:flex;
 	flex-direction:column;
 	flex-flow:row wrap;
+	margin-bottom:2rem;
 }
 
 .card-deck > .card {
