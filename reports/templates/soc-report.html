@@ -32,13 +32,14 @@
         <button onclick="expandAll()" class="btn btn-link">Expand All</button>
         <button onclick="collapseAll()" class="btn btn-link">Collapse All</button>
     </div>
-    <button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')" class="btn btn-success float-right">Download Table To
+    <button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')"
+        class="btn btn-success float-right">Download Table To
         CSV File
     </button>
 </div>
 
-<table class ="table table-sm">
-    <thead class = "thead-dark">
+<table class="table table-sm">
+    <thead class="thead-dark">
         <tr>
             <th>Expense Account</th>
             <th>Item Description</th>
@@ -54,9 +55,9 @@
 
     <tbody>
         {% for row in table.0.0 %}
-        <tr class = "table-warning">
+        <tr class="table-warning">
             <td><b>{{ row.0 }} ({{ row.1 }})
-                    <input class = 'toggle1' type="checkbox" name="{{row.0}}" data-toggle="toggle">
+                    <input class='toggle1' type="checkbox" name="{{row.0}}" data-toggle="toggle">
                 </b></td>
 
             <td></td>
@@ -67,12 +68,12 @@
             <td></td>
             <td><b>${{ row.3 }}</b></td>
         </tr>
-    <tbody class = "{{row.0}}" id = "{{row.0}}" style = "display:none">
+    <tbody class="{{row.0}}" id="{{row.0}}" style="display:none">
         {% for charge in row.2%}
-        <tr class = "table-secondary">
+        <tr class="table-secondary">
             <td>{{ charge.0 }}
-            <input class = 'toggle2' type="checkbox" name="{{charge.2}}" id="1" data-toggle="toggle2">
-                
+                <input class='toggle2' type="checkbox" name="{{charge.2}}" id="1" data-toggle="toggle2">
+
             </td>
             <td></td>
             <td></td>
@@ -82,23 +83,23 @@
             <td>${{ charge.2}}</td>
             <td></td>
         </tr>
-        <div>    
+        <div>
             {% for code in charge.1%}
-                <tr class = "{{charge.2}}" style = "display: none">
-                    <td></td>
-                    <td>{{ code.0 }}</td>
-                    <td>{{ code.1 }}</td>
-                    <td>${{ code.2 }}</td>
-                    <td>{{ code.3 }}</td>
-                    <td>${{ code.4 }}</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            {% endfor %}   
+            <tr class="{{charge.2}}" style="display: none">
+                <td></td>
+                <td>{{ code.0 }}</td>
+                <td>{{ code.1 }}</td>
+                <td>${{ code.2 }}</td>
+                <td>{{ code.3 }}</td>
+                <td>${{ code.4 }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            {% endfor %}
         </div>
         {% endfor %}
 
-        </tbody>
+    </tbody>
     {% endfor %}
 
     <tr>
@@ -134,22 +135,19 @@
         document.getElementById("display").innerHTML = active[index]
 
     }
-</script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script>
     $(document).ready(function () {
 
         $('[data-toggle="toggle"]').parents().next('.hide').toggle();
         $('[data-toggle="toggle2"]').parents().next('.hide').toggle();
 
-        
+
 
         $('[data-toggle="toggle"]').change(function () {
             var name = this.name;
-            
-            
+
+
             var result_style = document.getElementsByClassName(name);
-            for(var i=0; i<result_style.length; i++) {
+            for (var i = 0; i < result_style.length; i++) {
                 if (result_style[i].style.display == 'table-row-group') {
                     result_style[i].style.display = 'none';
                 }
@@ -178,11 +176,6 @@
 
 
     });
-
-    
-</script>
-<script>
-
 
     function exportTableToCSV(filename) {
         var csv = [];
@@ -229,20 +222,20 @@
 
     function expandAll() {
         var toggle = document.getElementsByClassName('toggle1');
-        for(var i = 0; i <toggle.length;i++) {
+        for (var i = 0; i < toggle.length; i++) {
             var name = toggle[i].name;
             toggle[i].checked = true;
             var result_style = document.getElementsByClassName(name);
-            for(var j=0; j<result_style.length; j++) {
+            for (var j = 0; j < result_style.length; j++) {
                 result_style[j].style.display = 'table-row-group';
             }
         }
         var toggle = document.getElementsByClassName('toggle2');
-        for(var i = 0; i <toggle.length;i++) {
+        for (var i = 0; i < toggle.length; i++) {
             var name = toggle[i].name;
             toggle[i].checked = true;
             var result_style = document.getElementsByClassName(name);
-            for(var j=0; j<result_style.length; j++) {
+            for (var j = 0; j < result_style.length; j++) {
                 result_style[j].style.display = 'table-row';
             }
         }
@@ -250,23 +243,24 @@
 
     function collapseAll() {
         var toggle = document.getElementsByClassName('toggle1');
-        for(var i = 0; i <toggle.length;i++) {
+        for (var i = 0; i < toggle.length; i++) {
             var name = toggle[i].name;
             toggle[i].checked = false;
             var result_style = document.getElementsByClassName(name);
-            for(var j=0; j<result_style.length; j++) {
+            for (var j = 0; j < result_style.length; j++) {
                 result_style[j].style.display = 'none';
             }
         }
         var toggle = document.getElementsByClassName('toggle2');
-        for(var i = 0; i <toggle.length;i++) {
+        for (var i = 0; i < toggle.length; i++) {
             var name = toggle[i].name;
             toggle[i].checked = false;
             var result_style = document.getElementsByClassName(name);
-            for(var j=0; j<result_style.length; j++) {
+            for (var j = 0; j < result_style.length; j++) {
                 result_style[j].style.display = 'none';
             }
         }
     }
 </script>
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
 {% endblock %}
