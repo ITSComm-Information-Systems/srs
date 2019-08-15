@@ -212,9 +212,7 @@
 
 
 
-<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to
-    top</button>
-
+<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i> <br> Scroll to top</button>
 
 
 
@@ -247,13 +245,7 @@
 
             for (var j = 0; j < cols.length; j++) {
                 string = cols[j].innerHTML;
-                if (string.split("<br>").lengtauto)
-                    string = string.replace("<br>", " ||");
-                if (string.split("<br>").length == 4) {
-                    string = string.replace("<br>", " ||");
-                    string = string.replace("<br>", " ||");
-                }
-                string = string.replace("<br>", "");
+                string = string.replace(new RegExp(" <br> ",'g'), " || ");
                 string = string.replace(',', '')
                 row.push(string);
             }

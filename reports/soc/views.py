@@ -21,10 +21,6 @@ from django.db.models import indexes
 from django.db.models import Value
 from django.db.models.functions import Concat
 
-# from .models import AuthUserDept
-# from .models import Role, Group, User
-# from .forms import UserSuForm, AddUserForm
-# from .utils import su_login_callback, custom_login_action, upsert_user
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscDeptUnitsReptV
 from oscauth.forms import *
 import datetime
@@ -37,12 +33,6 @@ def get_soc(request):
     depts = find_depts(request)
     groups = UmOscDeptUnitsReptV.objects.filter(deptid__in=depts).order_by('dept_grp').values_list('dept_grp',flat = True).distinct()
     groups_descr = UmOscDeptUnitsReptV.objects.order_by('dept_grp_descr').values_list('dept_grp_descr',flat = True).distinct()
-    # for i in range(255):
-    #     valid = UmOscDeptUnitsReptV.objects.filter(dept_grp_descr__exact = groups_descr[i]).order_by('fiscal_yr').values_list('fiscal_yr',flat =True).distinct()
-    #     text = valid[0] + '-' + valid[valid.count()-1]
-    #     active[i]= text
-        
-
     
     groups = list(dict.fromkeys(groups))
     fiscal = select_fiscal_year(request)
@@ -50,11 +40,7 @@ def get_soc(request):
     months = select_month(request)
 
     vps = []
-    vps = UmOscDeptUnitsReptV.objects.order_by('dept_grp_vp_area').values_list('dept_grp_vp_area_descr',flat =True).distinct()
-
-        
-        
-    
+    vps = UmOscDeptUnitsReptV.objects.order_by('dept_grp_vp_area').values_list('dept_grp_vp_area_descr',flat =True).distinct() 
 
     context = {
         'title': 'Summary of Charges',
@@ -190,7 +176,7 @@ def get_rows(unit, grouping, period, drange, request):
     elif (grouping == 'Department Group'):
         return values.filter(dept_grp_descr__exact = unit[0]).order_by('account_desc').values().distinct()
     elif (grouping == 'Department Group VP Area'):
-        return values.filter(dept_grp_vp_descr__exact = unit[0]).order_by('account_desc').values().distinct()
+        return values.filter(dept_grp_vp_area_descr__exact = unit[0]).order_by('account_desc').values().distinct()
 
 def get_table(rows,request):
     accounts = rows.values_list('account','account_desc').distinct()
@@ -203,8 +189,6 @@ def get_table(rows,request):
 
     for i in accounts:
         services = accounts.filter(account__exact = i[0]).order_by('charge_group').values_list('description',flat = True)
-        # account_total = 0
-        # # account_table = []
         orders = services.filter(description__in = services).order_by('charge_group').values_list('charge_group', flat = True).distinct()
         total_cost =0.0
         whole_table = []
