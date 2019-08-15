@@ -26,10 +26,7 @@
 
 <div>
     <div class="card border-dark">
-        <div class="card-body card-grid">
-            <div class="deptid">
-                <strong>Grouping: </strong>{{ grouping }}
-            </div>
+        <div class="card-body card-grid-soc">
             <div class="deptname">
                 <strong>Unit/Group: </strong>{{ unit }}
             </div>
@@ -43,7 +40,7 @@
 <hr class="style1">
 
 {% if table %}
-<div class="soc-buttons">
+<div class="soc-buttons mb-4">
     <div class="expand-collapse">
         <button onclick="expandAll()" class="btn btn-link">Expand All</button>
         <button onclick="collapseAll()" class="btn btn-link">Collapse All</button>
@@ -152,7 +149,7 @@
 </div>
 {% endif%}
 
-
+{% block js %}
 <script>
     function display_active(active) {
         var group = document.forms["Select"]["department_group"];
