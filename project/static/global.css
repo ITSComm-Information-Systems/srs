@@ -597,6 +597,9 @@ a.nav-link.disabled:focus {
 .btn-outline-success {
 	color:#28a745;
 }
+.btn-link {
+	color:#0075bc;
+}
 .btn-link:hover {
 	color:#0065a3;
 	cursor:pointer;
@@ -828,6 +831,7 @@ h3.lead {
 .add-chartfield-link {
 	display:flex;
 	justify-content:flex-end;
+	margin-bottom:1rem;
 }
 
 .text-field-short {
