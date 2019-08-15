@@ -14,7 +14,7 @@
                 <label for="deptid"><strong>Department ID</strong></label>
                 <div id="department_id_div">
                     <label for="departmentIdSelection"><strong>Select Depaerment ID(s)</strong></label>
-                    <select class="custom-select" multiple name="department_id" id="departmentIdSelection" size="1">
+                    <select class="custom-select" multiple name="department_id" id="departmentIdSelection">
                         {% for dept in depts %}
                         <option value="{{ dept }}">{{ dept }}</option>
                         {% endfor %}
@@ -30,7 +30,7 @@
                 <div id="department_group_div">
                     <label for="department_group"><strong>Select a Department Group</strong></label>
                     <select class="custom-select" name="department_group" onchange="display_active({{active}})"
-                        id='department_group' size="{{ groups_descr|length }}">
+                        id='department_group' size="1">
                         {% for group in groups_descr %}
                         <option value="{{ group }}">{{ group }}</option>
                         {% endfor %}

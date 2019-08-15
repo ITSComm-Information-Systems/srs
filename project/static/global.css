@@ -1045,5 +1045,12 @@ td.action {
 	cursor:pointer;
 }
 
+.card-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
 
-
+}
+.card-grid-4 {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+}
