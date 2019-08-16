@@ -1,23 +1,9 @@
 {% extends 'base.html'%}
-
+{% load index %}
 {% block content %}
-<style>
-    .expand-icon input[type="checkbox"],
-    .expand-icon .checked {
-        display: none;
-    }
-
-    .expand-icon input[type="checkbox"]:checked~.checked {
-        display: inline-block;
-    }
-
-    .expand-icon input[type="checkbox"]:checked~.unchecked {
-        display: none;
-    }
-</style>
-
 
 <h1>{{ title }}</h1>
+<p>{{ num_months }}</p>
 <div>
     <strong>Report selection</strong>
     <a class="float-right" href="../soc">Edit your selection</a>
@@ -71,7 +57,7 @@
         {% for row in table.0.0 %}
         <tr class="table-warning">
             <td>
-                <label class='expand-icon'>
+                <label class='expand-icon mb-0'>
                     <input class='toggle1' type="checkbox" name="{{row.0}}" data-toggle="toggle">
                     <i class="far fa-caret-square-down unchecked"></i>
                     <i class="far fa-caret-square-up checked"></i>
@@ -92,7 +78,7 @@
         {% for charge in row.2%}
         <tr class="table-secondary">
             <td>
-                <label class='expand-icon'>
+                <label class='expand-icon mb-0'>
                     &nbsp;&nbsp;&nbsp;
                     <input class='toggle2' type="checkbox" name="{{charge.2}}" data-toggle="toggle2">
                     <i class="far fa-caret-square-down unchecked"></i>
@@ -115,7 +101,7 @@
             <td>{{ code.0 }}</td>
             <td>{{ code.1 }}</td>
             <td>${{ code.2 }}</td>
-            <td>{{ avg_monthly_billed }}</td>
+            <td></td>
             <td>{{ code.3 }}</td>
             <td>${{ code.4 }}</td>
             <td></td>
@@ -126,8 +112,8 @@
     </tbody>
     {% endfor %}
 
-    <tr>
-        <td>Total ITCom Charges</td>
+    <tr class='bg-warning'>
+        <td>Total Charges</td>
         <td></td>
         <td></td>
         <td></td>
