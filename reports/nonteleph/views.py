@@ -16,7 +16,7 @@ from django import forms
 
 from ldap3 import Server, Connection, ALL
 
-from oscauth.models import AuthUserDept
+from oscauth.models import AuthUserDept, AuthUserDeptV
 from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscAcctdetailMrcOccV, UmOscRptSubscrib_Api_V
 from oscauth.forms import *
 from django.contrib.auth.decorators import login_required, permission_required
@@ -30,7 +30,7 @@ def get_new(request):
     template = loader.get_template('doc.html')
 
     # Find all departments user has access to
-    user_depts = (d.dept for d in AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept'))
+    user_depts = (d.dept for d in AuthUserDeptV.objects.filter(user=request.user.id,codename='can_report').order_by('dept').exclude(dept='All').distinct('dept'))
     user_depts = list(user_depts)
 
     # Find dept names
@@ -73,6 +73,9 @@ def generate_report(request):
     name = UmOscDeptProfileV.objects.filter(deptid=selected_dept)
     selected_dept = selected_dept + ' - ' + name[0].dept_name
 
+    dept_mgr = name[0].dept_mgr
+    dept_mgr_uniq = name[0].dept_mgr_uniqname
+
     # Fix date format
     date = format_date(bill_date)
 
@@ -110,12 +113,16 @@ def generate_report(request):
 
                 # Create a non-telephony row for the charges table
                 user_id = {
+                    'user_defined_id': a.user_defined_id,
                     'descr': a.item_description,
                     'qty': int(a.quantity),
                     'total_charges': a.charge_amount,
-                    'project_name': a.voucher_comment,
+                    'project_name': a.unique_identifier,
                     'date': a.invoice_date
                 }
+                # Add N/A
+                if  not user_id['project_name']:
+                    user_id['project_name'] = 'N/A'
                 # Determine charge vs credit
                 if a.unit_price < 0:
                     user_id['type'] = 'Credit'
@@ -138,7 +145,7 @@ def generate_report(request):
                 for r in charges[prefix]['rows']:
                     unit_price = r['unit_price'].replace('$', '')
                     # Container Services
-                    if prefix == 'Container Services' and r['project_name'] == a.voucher_comment and r['descr'] == a.item_description and unit_price == '{:,.2f}'.format(a.unit_price):
+                    if prefix == 'Container Services' and r['project_name'] == a.unique_identifier and r['descr'] == a.item_description and unit_price == '{:,.2f}'.format(a.unit_price):
                         r['qty'] += int(a.quantity)
                         r['total_charges'] += a.charge_amount
                         breakout = True
@@ -179,6 +186,8 @@ def generate_report(request):
     context= {
         'title':"Non-Telephony Detail of Charges",
         'dept': selected_dept,
+        'dept_mgr': dept_mgr,
+        'dept_mgr_uniq': dept_mgr_uniq,
         'billing_date': bill_date,
         'charge_types': charge_types,
         'chartfields': chartcoms

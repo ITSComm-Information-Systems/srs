@@ -458,28 +458,28 @@ function tab_func1() {
 function tab_func2() {
 	if (!$('#cfc-2').hasClass('disabled')) {
 		currStep = 2;
+		$('#dept_search').hide();
+		$('#select_dept').hide();
+		$("#cfPrevBtn").removeAttr('disabled');
 	}
-	$('#dept_search').hide();
-	$('#select_dept').hide();
-	$("#cfPrevBtn").removeAttr('disabled');
 }
 
 function tab_func3() {
 	if (!$('#cfc-3').hasClass('disabled')) {
 		currStep = 3;
+		$('#dept_search').hide();
+	  	$('#select_dept').hide();
+	  	$("#cfPrevBtn").removeAttr('disabled');
 	  }
-	  $('#dept_search').hide();
-	  $('#select_dept').hide();
-	  $("#cfPrevBtn").removeAttr('disabled');
 }
 
 function tab_func4() {
 	if (!$('#cfc-4').hasClass('disabled')) {
 		currStep = 4;
+		$('#dept_search').hide();
+		$('#select_dept').hide();
+		$("#cfPrevBtn").removeAttr('disabled');
 	  }
-	  $('#dept_search').hide();
-	  $('#select_dept').hide();
-	  $("#cfPrevBtn").removeAttr('disabled');
 }
 
 
@@ -531,7 +531,7 @@ function change_current_page(selected) {
 		success: function(data) {
 			cf = data;
 			$("#fund").html(cf[0].fund);
-			$("#dept_id").html(cf[0].deptid);
+			$("#deptid").html(cf[0].deptid);
 			$("#program").html(cf[0].program);
 			$("#class_code").html(cf[0].class_code);
 			$("#project_grant").html(cf[0].project_grant);

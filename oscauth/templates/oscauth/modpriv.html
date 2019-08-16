@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
+<h1>{{ title }}</h1>
+
+<h2> {{ subtitle }}</h2>
 
 <form action="/auth/addpriv/" method="POST">{% csrf_token %}
 
@@ -23,8 +26,8 @@
                 <td> {{ result }}</td>
                 <td> {{ row.result }}</td>
                 {% else %}
-                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i> {{ row.col1 }}</td>
-                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i> {{ row.col2 }}</td>
+                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>{{ row.col1 }}</td>
+                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>INACTIVE: {{ row.col2 }}</td>
                 <td> {{ row.role }}</td>
                 <td> {{ row.result }}</td>
                 {% endif %}

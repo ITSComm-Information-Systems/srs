@@ -14,7 +14,8 @@ from django.shortcuts import get_object_or_404, render
 from django.contrib.auth import get_user_model
 from django import forms
 from ldap3 import Server, Connection, ALL
-from oscauth.models import AuthUserDept, Grantor, Role
+from oscauth.models import AuthUserDept, Grantor, Role, AuthUserDeptV
+from django.contrib.auth.decorators import login_required, permission_required
 
 # from .models import AuthUserDept
 # from .models import Role, Group, User
@@ -24,8 +25,9 @@ from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscR
 from oscauth.forms import *
 from datetime import datetime
 
+@permission_required('oscauth.can_report', raise_exception=True)
 def get_inventory(request):
-    depts = AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').values().distinct('dept')
+    depts = AuthUserDeptV.objects.filter(user=request.user.id, codename ='can_report').order_by('dept').exclude(dept='All').values().distinct('dept')
     departments = []
     for dept in depts:
         departments.append(dept['dept'])
@@ -34,22 +36,20 @@ def get_inventory(request):
     names = []
     name_query = list(d.dept_name for d in UmOscDeptProfileV.objects.filter(deptid__in=departments).order_by('deptid'))
     for i in range(0, len(departments)):
-    	name = {
-    		'deptid': departments[i],
-    		'name': name_query[i]
-    	}
-    	names.append(name)
+        name = {'deptid': departments[i]
+                ,'name': name_query[i]}
+        names.append(name)
 
     template = loader.get_template('inventory.html')
     objects = UmOscReptInvlocV.objects
     context = {
-        'title': 'Inventory and Location Report',
+        'title': 'Inventory & Location Report',
         'depts': names,
         'dates': dates,
     }
     return HttpResponse(template.render(context,request))
     
-
+@permission_required('oscauth.can_report', raise_exception=True)
 def make_report(request):
     data = []
     total_charge = 0
@@ -60,6 +60,11 @@ def make_report(request):
     array = total.split('-')
     dept_id = array[0]
     dept_name = array[1]
+
+    # Find dept manager and uniqname
+    dept_info = UmOscDeptProfileV.objects.filter(deptid=dept_id)[0]
+    dept_mgr = dept_info.dept_mgr
+    dept_mgr_uniq = dept_info.dept_mgr_uniqname
    
     bill_period =  request.POST.get('bill_period') #  'May 20, 2018' #
     date = bill_period.replace('.', '')
@@ -110,9 +115,11 @@ def make_report(request):
 
     template = loader.get_template('inventory-report.html')
     context = {
-        'title': 'Inventory and Location Report',
+        'title': 'Inventory & Location Report',
         'dept_id': dept_id,
         'dept_name': dept_name,
+        'dept_mgr': dept_mgr,
+        'dept_mgr_uniq': dept_mgr_uniq,
         'bill_period': bill_period,
         'data': list(data),
         'total_charge': total_charge,

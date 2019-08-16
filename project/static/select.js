@@ -33,6 +33,7 @@ $(document).ready(function() {
 
 	// Set select for tolls- choose dept
 	$("#tolls_deptids").select2({
+		minimumResultsForSearch: '3',
     	matcher: function(params, data) {
         	return matchStart(params, data);
     	}
@@ -46,6 +47,7 @@ $(document).ready(function() {
 
 	// Set select for DOC - departments
 	$('#doc_depts').select2({
+		minimumResultsForSearch: '3',
 		matcher: function(params, data) {
         	return matchStart(params, data);
     	}
@@ -58,6 +60,7 @@ $(document).ready(function() {
 
 	// Set select for Inventory and Location - departments
 	$('#dept_id').select2({
+		minimumResultsForSearch: '3',
 		matcher: function(params, data) {
         	return matchStart(params, data);
     	}

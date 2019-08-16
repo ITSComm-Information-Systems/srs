@@ -39,5 +39,7 @@
 
 {% block js %}
 <script src="/static/order/js/workflow.js"></script>
-<script src="/static/js/building_search.js"></script>
+{% for js_file in js_files %}
+<script src="/static/order/js/{{js_file}}.js"></script>
+{% endfor %}
 {% endblock %}

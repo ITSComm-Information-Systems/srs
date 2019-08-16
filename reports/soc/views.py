@@ -21,25 +21,18 @@ from django.db.models import indexes
 from django.db.models import Value
 from django.db.models.functions import Concat
 
-# from .models import AuthUserDept
-# from .models import Role, Group, User
-# from .forms import UserSuForm, AddUserForm
-# from .utils import su_login_callback, custom_login_action, upsert_user
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscDeptUnitsReptV
 from oscauth.forms import *
 import datetime
+from django.contrib.auth.decorators import login_required, permission_required
 
+
+@permission_required('oscauth.can_report', raise_exception=True)
 def get_soc(request):
     template = loader.get_template('soc.html')
     depts = find_depts(request)
     groups = UmOscDeptUnitsReptV.objects.filter(deptid__in=depts).order_by('dept_grp').values_list('dept_grp',flat = True).distinct()
     groups_descr = UmOscDeptUnitsReptV.objects.order_by('dept_grp_descr').values_list('dept_grp_descr',flat = True).distinct()
-    # for i in range(255):
-    #     valid = UmOscDeptUnitsReptV.objects.filter(dept_grp_descr__exact = groups_descr[i]).order_by('fiscal_yr').values_list('fiscal_yr',flat =True).distinct()
-    #     text = valid[0] + '-' + valid[valid.count()-1]
-    #     active[i]= text
-        
-
     
     groups = list(dict.fromkeys(groups))
     fiscal = select_fiscal_year(request)
@@ -47,29 +40,41 @@ def get_soc(request):
     months = select_month(request)
 
     vps = []
-    vps = UmOscDeptUnitsReptV.objects.order_by('dept_grp_vp_area').values_list('dept_grp_vp_area_descr',flat =True).distinct()
+    vps = UmOscDeptUnitsReptV.objects.order_by('dept_grp_vp_area').values_list('dept_grp_vp_area_descr',flat =True).distinct() 
 
+    context = {
+        'title': 'Summary of Charges',
+        'depts': depts,
+        'groups': groups,
+        'groups_descr':groups_descr,
+        'fiscal':fiscal,
+        'calendar':calendar,
+        'months':months,
+        'vps': vps,
+    }
+    return HttpResponse(template.render(context,request))
 
-    unit = ''
+@permission_required('oscauth.can_report', raise_exception=True)
+def generate(request):
+    depts = find_depts(request)
     grouping = ''
-    
-    text = ''
-    submit = True
-    submitfirst = True
+    unit = ''
 
     display_type = request.POST.get("unitGroupingGroup",None)
+    
     if display_type in ['1']:
         grouping = 'Department ID'
         unit = request.POST.getlist('department_id')
-    elif display_type in ['2']:
-        grouping = 'Department IDs'
-        unit = depts
+        if request.POST.get('selectall',None) in ['2']:
+            grouping = 'Department IDs'
+            unit = depts
     elif display_type in ['3']:
         grouping = 'Department Group'
         unit = [request.POST.get('department_group')]
     elif display_type in ['4']:
         grouping = 'Department Group VP Area'
         unit = [request.POST.get('department_vp')]
+    
 
     billing_period = ''
     dateRange = ''
@@ -98,35 +103,26 @@ def get_soc(request):
     if (table ==[] or list(table)[0][1]==0):
         if (table == []):
             rows = ''
-            submitfirst = False
         else:
             rows = 'There is no data for the current selection'
         table = []
-        submit = False
-        
-        
-    
 
+    template = loader.get_template('soc-report.html')
     context = {
         'title': 'Summary of Charges',
-        'depts': depts,
-        'groups': groups,
-        'groups_descr':groups_descr,
-        'fiscal':fiscal,
-        'calendar':calendar,
-        'months':months,
-        'vps': vps,
+        
         'grouping': grouping,
         'dateRange': dateRange,
         'unit': unit,
         'billing_period': billing_period,
-        'submit': submit,
-        'text': text,
         'rows': rows,
         'table': list(table),
-        'submitfirst': submitfirst,
     }
+
     return HttpResponse(template.render(context,request))
+
+
+
 
 
 def find_depts(request):
@@ -135,7 +131,7 @@ def find_depts(request):
  	query = AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept')
 
  	for dept in query:
- 		if Group.objects.get(name=dept.group).name != 'Orderer':
+ 		if Group.objects.get(name=dept.group).name != 'Reporter':
  			depts.append(dept.dept)
 
  	return depts
@@ -180,7 +176,7 @@ def get_rows(unit, grouping, period, drange, request):
     elif (grouping == 'Department Group'):
         return values.filter(dept_grp_descr__exact = unit[0]).order_by('account_desc').values().distinct()
     elif (grouping == 'Department Group VP Area'):
-        return values.filter(dept_grp_vp_descr__exact = unit[0]).order_by('account_desc').values().distinct()
+        return values.filter(dept_grp_vp_area_descr__exact = unit[0]).order_by('account_desc').values().distinct()
 
 def get_table(rows,request):
     accounts = rows.values_list('account','account_desc').distinct()
@@ -193,8 +189,6 @@ def get_table(rows,request):
 
     for i in accounts:
         services = accounts.filter(account__exact = i[0]).order_by('charge_group').values_list('description',flat = True)
-        # account_total = 0
-        # # account_table = []
         orders = services.filter(description__in = services).order_by('charge_group').values_list('charge_group', flat = True).distinct()
         total_cost =0.0
         whole_table = []
