@@ -13,7 +13,7 @@
             <div class="form-group">
                 <input type="radio" name="unitGroupingGroup" id="deptid" value='1'>
                 <label for="deptid"><strong>Department ID</strong></label>
-                <div id="department_id_div">
+                <div id="department_id_div" class="indented-form-input">
                     <label for="departmentIdSelection"><strong>Select Department ID(s)</strong></label>
                     <select class="custom-select" multiple name="department_id" id="departmentIdSelection">
                         {% for key, value in depts.items %}
@@ -28,7 +28,7 @@
             <div class="form-group">
                 <input type="radio" name="unitGroupingGroup" id="deptgroup" value='3'>
                 <label for="deptgroup"><strong> Department Group</strong></label>
-                <div id="department_group_div">
+                <div id="department_group_div" class="indented-form-input">
                     <label for="department_group"><strong>Select a Department Group</strong></label>
                     <select class="custom-select" name="department_group" onchange="display_active({{active}})"
                         id='department_group' size="1">
@@ -42,7 +42,7 @@
                 {% comment %} <span id="display">(Fiscal Years Active)</span> {% endcomment %}
                 <input type="radio" name="unitGroupingGroup" id="deptvp" value='4'>
                 <label for="deptvp"><strong> Department Group VP Area</strong></label>
-                <div id="department_vp_div">
+                <div id="department_vp_div" class="indented-form-input">
                     <label for="department_vp"><strong>Select a Department VP</strong></label>
                     <select class="custom-select" name="department_vp" id="department_vp" size="1">
                         {% for vp in vps %}
@@ -64,7 +64,7 @@
             <div class="form-group">
                 <input type="radio" name="dateRangeGroup" id="fiscal" value='1'>
                 <label for="fiscal"><strong> Fiscal Year</strong></label>
-                <div id="fiscalyear_div" class="form-group">
+                <div id="fiscalyear_div" class="form-group indented-form-input">
                     <label for="fiscalyear"><strong>Select a Fiscal Year</strong></label>
                     <select class="custom-select" name="FISCALYEAR" id="fiscalyear" size="1">
                         {% for year in fiscal %}
@@ -77,7 +77,7 @@
             <div class="form-group">
                 <input type="radio" name="dateRangeGroup" id="calendar" value='2'>
                 <label for="calendar"><strong>Calender Year</strong></label>
-                <div id="calendaryear_div" class="form-group">
+                <div id="calendaryear_div" class="form-group indented-form-input">
                     <label for="calendaryear"><strong>Select a Calendar Year</strong></label>
                     <select class="custom-select" name="CALENDARYEAR" id="calendaryear" size="1">
                         {% for year in calendar %}
@@ -90,7 +90,7 @@
             <div class="form-group">
                 <input type="radio" name="dateRangeGroup" id="single" value='3'>
                 <label for="single"><strong>Single Month</strong></label>
-                <div id='singlemonth'>
+                <div id='singlemonth' class="indented-form-input">
                     <div class="form-group">
                         <label for="singlemonthselect"><strong>Select a Month</strong></label>
                         <select class="custom-select" name="SINGLEMONTH" id="singlemonthselect" size="1">
@@ -112,7 +112,7 @@
             <div class="form-group">
                 <input type="radio" name="dateRangeGroup" id="multiple" value='4'>
                 <label for="multiple"><strong>Month-to-month</strong></label>
-                <div id="multimonth">
+                <div id="multimonth" class="indented-form-input">
                     <strong>Select Billing Range</strong>
                     <select class="custom-select" name="FIRSTMONTH" size="1">
                         {% for month in months %}
