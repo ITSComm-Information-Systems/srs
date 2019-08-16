@@ -5,7 +5,7 @@ from django.views.generic import View
 from order.forms import *
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
-from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceLocV
+from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceProfileV, UmOscChartfieldV
 from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from pages.models import Page
@@ -17,24 +17,33 @@ from .models import Product, Action, Service, Step, Element, Item, Constant, Cha
 
 
 def get_phone_location(request, phone_number):
-    #phone_number = request.GET.get('username', None)
-    loc = UmOscServiceLocV.objects.filter(service_number=phone_number).latest('billing_date')
-    print(loc)
-    data = {
-        'code': loc.building_id,
-        'name': loc.building,
-        'floor': loc.floor,
-        'room': loc.room,
-        'jack': loc.jack
-    }
-    return JsonResponse(data)
+    locations = list(UmOscServiceProfileV.objects.filter(service_number=phone_number).exclude(location_id=0).values())
+    return JsonResponse(locations, safe=False)
 
 class ManageChartcom(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def post(self, request):
         print(request.POST)
-        return HttpResponseRedirect('/orders/chartcom/' + request.POST['deptid'])
+        action = request.POST.get('action')
+        id = request.POST.get('chartcomId')
+        deptid = request.POST.get('deptid')
+        
+        if action == 'add':
+            print('add ')
+
+        if action == 'edit':
+            chartcom = Chartcom.objects.get(id=id)
+            #descr = request.POST.get('newDescription')
+            chartcom.name = request.POST.get('newDescription')
+            chartcom.save()
+            print('edit',chartcom)
+
+        if action == 'delete':
+            x = Chartcom.objects.get(id=id).delete()
+            print(x)
+
+        return HttpResponseRedirect('/orders/chartcom/' + deptid)
 
     def get(self, request, deptid):
         dept_list = AuthUserDept.get_order_departments(request.user.id)
@@ -51,6 +60,7 @@ class ManageChartcom(PermissionRequiredMixin, View):
             deptid = dept_list[0].dept
 
         chartcoms = Chartcom.objects.filter(dept=deptid)
+        add_chartcoms = UmOscChartfieldV.objects.filter(deptid=deptid)
 
         template = loader.get_template('order/manage_chartfield.html')
         context = {
@@ -58,6 +68,7 @@ class ManageChartcom(PermissionRequiredMixin, View):
             'department': department,
             'dept_list': dept_list,
             'chartcoms': chartcoms,
+            'add_chartcoms': add_chartcoms,
         }
         return HttpResponse(template.render(context, request))
 
@@ -96,26 +107,46 @@ class Submit(PermissionRequiredMixin, View):
 
 def add_to_cart(request):
     if request.method == "POST":
+        print(request.POST)
         i = Item()
         i.created_by_id = request.user.id
-        i.description = request.POST['action']
+
+        label = Action.objects.get(id=request.POST['action_id']).cart_label
+
+        x = label.find('[', 0)
+        y = label.find(']', x)
+
+        while x > 0:
+            tag = label[x+1:y]
+            element = request.POST[tag]
+            label = label.replace('['+tag+']', element)
+            x = label.find('[', x)
+            y = label.find(']', x)
+
+        i.description = label
         occ = request.POST['oneTimeCharges']
         charge = Chartcom.objects.get(id=occ)
         i.chartcom = charge
         i.deptid = charge.dept
         i.data = request.POST
         i.save()
+        return HttpResponseRedirect('/orders/cart/' + charge.dept) 
 
-    return HttpResponseRedirect('/orders/cart/0') 
+def delete_from_cart(request):
+    if request.method == "POST":
+        item = request.POST['itemId']
+        Item.objects.filter(id=item).delete()
+        dept = request.POST['itemIdDept']
+        return HttpResponseRedirect('/orders/cart/' + dept) 
 
 class Workflow(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def get(self, request, action_id):
-    #def get_workflow(request, action_id):
 
         tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
         action = Action.objects.get(id=action_id)
+        js = []
 
         for index, tab in enumerate(tabs, start=1):
             tab.step = 'step' + str(index)
@@ -126,39 +157,42 @@ class Workflow(PermissionRequiredMixin, View):
                 element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
 
                 for element in element_list:
-                    if element.type == 'YN':
-                        field = forms.ChoiceField(label=element.label, widget=forms.RadioSelect, choices=(('Y', 'Yes',), ('N', 'No',)))
-                        #field = forms.ChoiceField(label=element.label, choices=Chartcom.get_user_chartcoms())
-                    elif element.type == 'Radio':
+                    if element.type == 'Radio':
                         field = forms.ChoiceField(label=element.label
                                                 , choices=eval(element.attributes))
-
-
                     elif element.type == 'Chart':
                         field = forms.ChoiceField(label=element.label
                                                 , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user.id))
                                                                                 #AuthUserDept.get_order_departments(request.user.id)
                         field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
-
-
+                    elif element.type == 'NU':
+                        field = forms.ChoiceField(label=element.label
+                                                , widget=forms.NumberInput(attrs={'min': "1"}))
                     elif element.type == 'ST':
                         field = forms.CharField(label=element.label)
-                    elif element.type == 'PH':
-                        field = forms.ChoiceField(label=element.label, widget=PhoneSetType, choices=(('B', 'Basic',), ('A', 'Advanced',),('V', 'VOIP',)))
                     else:
                         field = forms.IntegerField(label=element.label)
 
-                    field.type = element.type                
+                    field.type = element.type
                     f.fields.update({element.name: field})
+
+                    if index == 1:
+                        field.display_seq_no = element.display_seq_no
+                        field.display_condition = element.display_condition
 
                 tab.form = f
             else:
                 tab.form = globals()[tab.custom_form]
+                if tab.name == 'PhoneLocation':
+                    js.append('phone_location')
+                elif tab.name == 'LocationNew':
+                    js.append('location')
 
         return render(request, 'order/workflow.html', 
             {'title': action.label,
             'wfid':action_id,
-            'tab_list': tabs})
+            'tab_list': tabs,
+            'js_files': js})
 
 
 class Cart(PermissionRequiredMixin, View):
@@ -182,31 +216,30 @@ class Cart(PermissionRequiredMixin, View):
             deptid = dept_list[0].dept
 
         status = ['Ready to Order','Saved for Later']
-        item_list = Item.objects.filter(deptid=deptid,order__isnull=True).order_by('chartcom','-create_date')
-        chartcoms = item_list.distinct('chartcom')
-        action_list = Action.objects.all()
+        item_list = Item.objects.filter(deptid=deptid).exclude(order_id__gt=0).order_by('chartcom','-create_date')
+        chartcoms = item_list.distinct('chartcom') #, 'chartcom_id')
+        saved = item_list.distinct('chartcom')
+
+        #print(item_list)
+
+        #item_list = Item.objects.filter(deptid=deptid,order__isnull=True).order_by('chartcom','-create_date')
 
         for acct in chartcoms:
-            acct.items = item_list.filter(chartcom=acct.chartcom) #.order_by('create_date')
+            acct.items = item_list.filter(chartcom=acct.chartcom,order__isnull=True) #.order_by('create_date')
+            acct.table = 'tableReady' + str(acct.chartcom_id)
 
-            for item in acct.items:
-                item.details = item.data.get('action')
-                item.service = action_list.get(id=item.data.get('action_id')).service
         status[0] = chartcoms
         status[0].label = 'Ready to Order'
         status[0].id = 'tableReady'        
 
         item_list = Item.objects.filter(deptid=deptid,order=0).order_by('chartcom','-create_date')
-        saved_later = item_list.distinct('chartcom')
-        action_list = Action.objects.all()
+        #saved_later = item_list.distinct('chartcom')
 
-        for acct in saved_later:
+        for acct in saved:
             acct.items = item_list.filter(chartcom=acct.chartcom) #.order_by('create_date')
+            acct.table = 'tableSaved' + str(acct.chartcom_id)
 
-            for item in acct.items:
-                item.details = item.data.get('action')
-                item.service = action_list.get(id=item.data.get('action_id')).service
-        status[1] = saved_later
+        status[1] = saved
         status[1].label = 'Saved for Later'
         status[1].id = 'tableSaved'
 
@@ -262,6 +295,7 @@ class Services(View):
             'title': 'Request Service',
             'service_list': service_list,
             'link_list': link_list,
+            'page_name': 'Request Service'
         }
         return HttpResponse(template.render(context, request))
 
@@ -292,7 +326,6 @@ class Status(PermissionRequiredMixin, View):
 
         item_list = Item.objects.filter(order__in=order_list)
 
-        print('get items')
         for num, order in enumerate(order_list, start=1):
             if order.order_reference == 'TBD':
                 order.items = item_list.filter(order=order)
@@ -300,7 +333,6 @@ class Status(PermissionRequiredMixin, View):
                 pin = UmOscPreorderApiV.objects.get(pre_order_number=order.order_reference,pre_order_issue=1)
                 order.items = [{'description': pin.comment_text}]
 
-        print('render')
         template = loader.get_template('order/status.html')
         context = {
             'title': 'Track Orders',

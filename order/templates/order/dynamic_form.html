@@ -1,14 +1,17 @@
 {% for field in tab.form %}
     {% if field.field.type == 'Radio' %}
-        <fieldset id="{{ field.name }}">
-            <legend>{{ field.label_tag }}</legend>
+        <fieldset id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" 
+        {% if field.field.display_condition %}
+        data-condition="{{ field.field.display_condition }}"
+        {% endif %}
+        >
+            <legend id="legend{{ field.name }}">{{ field.label }}</legend>
             {% for choice in field.field.choices %}
                 <div class="form-check custom-radio">
-                        <input type="radio" class="form-check-input" id="{{ field.name }}_{{ choice|first }}"
-                        value="{{ choice|first }}" name="{{ field.name }}" required>
+                        <input type="radio" class="form-check-input" id="{{ field.name }}_{{ choice|first }}" value="{{ choice|first }}" name="{{ field.name }}" required>
                         <label class="form-check-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
                     {% if choice == field.field.choices|last %}
-                    <div class="invalid-feedback">Please choose one.</div>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
                     {% endif %}
                 </div>
             {% endfor %}
@@ -17,18 +20,19 @@
     {% elif field.field.type == 'Chart' %}
     {% if tab.name == '0chartfields' %}
     <div id='dummyChartfield'>
-        <label>Chartfield for Tracking Purposes</label>
+        <label>Chartfield for Tracking Purposes  </label>
         <em>There is no charge for this request. However, please select a chartfield for departmental tracking purposes.</em> 
     </div>
     {% endif %}
     <div class="form-group row col-12" id="oneTimeCharges">
         <!--  -->
         <div class="form-check">
-    <label for="id_{{ field.name }}">{{ field.label_tag }}</label>
+        {{ field.label_tag }}
     <div class="input-group mb3">
         <!-- Select a Department (based off user's department access) -->
             <div class="input-group-prepend">
-                <select class="custom-select" id="id_deptOneTimeCharges" data-target="{{ field.name }}" onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
+                <select class="custom-select" id="{{ field.name }}" data-target="{{ field.name }}" onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
+                    <option value="all">All Depts</option>
                     {% for dept in field.field.dept_list %}
                         <option value="{{dept}}">{{dept}}</option>
                     {% endfor %}                    
@@ -46,11 +50,11 @@
     </div>
 
     {% else %}
-    <div class="form-group row col-4" id="{{ field.name }}">
+    <div class="form-group row col-4" id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" data-condition="{{ field.field.display_condition }}">
         <div class = "form-check">
         {{ field.errors }}
         {{ field.label_tag }} {{ field }}
-        <div class="invalid-feedback">Please enter a value.</div>
+        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must enter a value"></i>Please enter a value.</div>
         <div class="valid-feedback">Good.</div>
         </div>
     </div>

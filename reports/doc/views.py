@@ -16,7 +16,7 @@ from django import forms
 
 from ldap3 import Server, Connection, ALL
 
-from oscauth.models import AuthUserDept
+from oscauth.models import AuthUserDept, AuthUserDeptV
 from project.pinnmodels import UmOscBillCycleV, UmOscDtDeptAcctListV, UmOscDeptProfileV, UmOscOtsCallSummaryV, UmOscAcctdetailMrcOccV, UmOscPhoneHistoryV, UmOscServiceLocV, UmOscRatedV, UmOscRptSubscrib_Api_V
 from oscauth.forms import *
 from django.contrib.auth.decorators import login_required, permission_required
@@ -33,7 +33,7 @@ def get_doc(request):
     template = loader.get_template('doc.html')
 
     # Find all departments user has access to
-    user_depts = (d.dept for d in AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept'))
+    user_depts = (d.dept for d in AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept').exclude(dept='All').distinct('dept'))
     user_depts = list(user_depts)
 
     # Find dept names
@@ -78,6 +78,9 @@ def generate_report(request):
 	# Formatting
 	name = UmOscDeptProfileV.objects.filter(deptid=selected_dept)
 	selected_dept = selected_dept + ' - ' + name[0].dept_name
+
+	dept_mgr = name[0].dept_mgr
+	dept_mgr_uniq = name[0].dept_mgr_uniqname
 
 	# Fix date format
 	date = format_date(bill_date)
@@ -280,6 +283,8 @@ def generate_report(request):
 	context= {
 		'title':'Detail of Charges',
 		'dept': selected_dept,
+		'dept_mgr': dept_mgr,
+		'dept_mgr_uniq': dept_mgr_uniq,
 		'billing_date': bill_date,
 		'charge_types': charge_types,
 		'chartfields': chartcoms

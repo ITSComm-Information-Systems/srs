@@ -18,7 +18,7 @@ from django import forms
 from ldap3 import Server, Connection, ALL
 
 from .models import UmTollCallDetail
-from oscauth.models import AuthUserDept, Grantor, Role
+from oscauth.models import AuthUserDept, Grantor, Role, AuthUserDeptV
 
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from django.contrib.auth.decorators import login_required, permission_required
@@ -66,7 +66,9 @@ def generate(request):
 
 
 	dept = UmOscDeptProfileV.objects.filter(deptid=dept_id)
-	dept_name = dept[0]
+	dept_name = dept[0].deptid
+	dept_mgr = dept[0].dept_mgr
+	dept_mgr_uniq = dept_info[0].dept_mgr_uniqname
 
 
 	inactive = False
@@ -77,9 +79,11 @@ def generate(request):
 	year = bill_period.split(' ')[1]
 
 	context = {
-		'title': 'Toll Statements',
+		'title': "Toll Statements Report",
 		'dept_id': dept_id,
 		'dept_name': dept_name,
+		'dept_mgr': dept_mgr,
+		'dept_mgr_uniq':dept_mgr_uniq,
 		'inactive': inactive,
 		'bill_period': bill_period,
 		'bill_month': month,
@@ -118,7 +122,7 @@ def select_billing(request):
 def find_depts(request):
 	depts = []
 		
-	query = AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept')
+	query = AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept').exclude(dept='All').distinct('dept')
 
 	for dept in query:
 		#if Group.objects.get(name=dept.group).name != 'Orderer':

@@ -113,7 +113,8 @@ def mypriv(request):
     rows.append(data)
     template = loader.get_template('oscauth/mypriv.html')
     context = {
-        'title': 'My Privileges: ' + request.user.username,
+        'title': "View My System Priveleges",
+        'subtitle': 'My Privileges: ' + request.user.username,
         'rows': rows
     }
     return HttpResponse(template.render(context, request))
@@ -132,6 +133,7 @@ def deptpriv(request, dept_parm=''):
     dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
     if dept_parm == '':
         context = {
+            'title' : 'Department Look Up',
             'dept_list': dept_list
         }
         return  HttpResponse(template.render(context, request))
@@ -170,6 +172,7 @@ def deptpriv(request, dept_parm=''):
     data = {'col1' : col1, 'col2' : col2, 'roles': roles}
     rows.append(data)
     context = {
+        'title' : 'Department Look Up',
         'dept_list': dept_list,
         'dept_status': dept_status,
         'subtitle1': 'Access For Department: ' + dept_parm + ' - '+ dept_name ,
@@ -186,14 +189,16 @@ def get_uniqname(request, uniqname_parm=''):
         uniqname_parm = request.POST['uniqname_parm']
 
 
+    # Initial page - no uniqname provided yet
     if uniqname_parm == '':
         set_priv = ''
-        return  HttpResponse(template.render({'uniqname_parm': uniqname_parm}, request))
+        return  HttpResponse(template.render({'uniqname_parm': uniqname_parm, 'title':"Manage User Access"}, request))
+    # Load permissions
     else:
         # Check for valid uniqname format
         if len(uniqname_parm) < 3 or len(uniqname_parm) > 8 or uniqname_parm.isalpha is False:
             result = uniqname_parm + ' is not a valid uniqname'
-            return  HttpResponse(template.render({'result': result}, request))
+            return  HttpResponse(template.render({'result': result, 'title':"Manage User Access"}, request))
         else:
             # Get User from MCommunity
             conn = Connection('ldap.umich.edu', auto_bind=True)
@@ -226,42 +231,53 @@ def get_uniqname(request, uniqname_parm=''):
 
                 print(dept_manager)
                 #grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
-                grantor_roles = Grantor.objects.values('grantor_role').distinct()
-                this_grantors_roles = AuthUserDept.objects.filter(user=request.user.id).values("group").distinct()
-# The list of roles should only include those that this particular user can grant
-#                grantable_roles = Grantor.objects.filter(grantor_role__in=this_grantors_roles).values("granted_role_id").distinct()
+#                 grantor_roles = Grantor.objects.values('grantor_role').distinct()
+#                 this_grantors_roles = AuthUserDept.objects.filter(user=request.user.id).values("group").distinct()
+# # The list of roles should only include those that this particular user can grant
+# #                grantable_roles = Grantor.objects.filter(grantor_role__in=this_grantors_roles).values("granted_role_id").distinct()
 
-# The list of depts should be dependent on the role selected
-#   e.g. if proxy is selected, only those depts for which thia grantor has the dept manager role should be displayed
-                grantor_depts = AuthUserDept.objects.filter(user=request.user.id,group__in=grantor_roles).exclude(dept='All').order_by('dept')
+# # The list of depts should be dependent on the role selected
+# #   e.g. if proxy is selected, only those depts for which thia grantor has the dept manager role should be displayed
+#                 grantor_depts = AuthUserDept.objects.filter(user=request.user.id,group__in=grantor_roles).exclude(dept='All').order_by('dept')
 
-                rows = []
-                dept_name = ''
-                dept_status = ''
-                process_access = ''
-                submit_msg = ''
+#                 rows = []
+#                 dept_name = ''
+#                 dept_status = ''
+#                 process_access = ''
+#                 submit_msg = ''
 
-                for role in grantable_roles:
-                    role = role.role
-#                    role = grantable_roles.granted_role_id
-#                    role = Role.objects.get(id=granted_role_id).role
+#                 for role in grantable_roles:
+#                     role = role.role
+# #                    role = grantable_roles.granted_role_id
+# #                    role = Role.objects.get(id=granted_role_id).role
 
-                for dept in grantor_depts:
-                    dept = dept.dept
+#                 for dept in grantor_depts:
+#                     dept = dept.dept
 
-                    if dept_manager.filter(dept=dept).exists():
-                    #if dept in dept_manager:
-                        manager = True
-                    else:
-                        manager = False
+#                     if dept_manager.filter(dept=dept).exists():
+#                     #if dept in dept_manager:
+#                         manager = True
+#                     else:
+#                         manager = False
 
-                    dept_info = UmCurrentDeptManagersV.objects.get(deptid=dept)
-                    dept_name = dept_info.dept_name
-                    dept_status = dept_info.dept_status
-                    data = {'dept_status' : dept_status,'dept' : dept, 'dept_name' : dept_name, 'dept_manager': manager}
-                    rows.append(data)
+#                     dept_info = UmCurrentDeptManagersV.objects.get(deptid=dept)
+#                     dept_name = dept_info.dept_name
+#                     dept_status = dept_info.dept_status
+#                     data = {'dept_status' : dept_status,'dept' : dept, 'dept_name' : dept_name, 'dept_manager': manager}
+#                     rows.append(data)
+
+                # Find user's departments
+                user_depts = AuthUserDept.objects.filter(user=request.user.id)
+
+                # rows = []
+                # row = {
+                #     'deptid':,
+                #     'dept_name':
+                #     'roles':,
+                # }
 
                 context = {
+                    'title':"Manage User Access",
                     'uniqname_parm': uniqname_parm,
                     'osc_user': osc_user,
                     'last_name': last_name,
@@ -279,19 +295,19 @@ def get_uniqname(request, uniqname_parm=''):
                         submit_msg = 'Ready to Process'
                         if request.POST.get('taskrad') == 'add':
 #                            return render(request,'oscauth/addpriv.html', context)
-                            return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not')
+                            return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not') # do I need to pass in the page title here?
                         if request.POST.get('taskrad') == 'remove':
-                            return render(request, 'oscauth/removepriv.html', context)
+                            return render(request, 'oscauth/removepriv.html', context) # do I need to pass in the page title here?
 
                     else:
                         submit_msg = 'Please select a Task, a Role, and at least one Department then click Submit.'
-                        return  HttpResponse(template.render({'submit_msg': submit_msg}, request))
+                        return  HttpResponse(template.render({'submit_msg': submit_msg, 'title':"Manage User Access"}, request)) # do I need to pass in the page title here?
 
                 return render(request, 'oscauth/setpriv.html', context)
 
             else:
                 result = uniqname_parm + ' is not in MCommunity'
-                return  HttpResponse(template.render({'result': result}, request))
+                return  HttpResponse(template.render({'result': result, 'title':"Manage User Access"}, request))
 
 
 def showpriv(request, uniqname_parm):
@@ -394,7 +410,8 @@ def modpriv(request):
             result = 'Deleted Privileges'
 
     context = {
-        'title': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
+        'title': "Manage User Access",
+        'subtitle': 'Adding privileges for: ' + last_name + ', ' + first_name + ' (' + uniqname_parm + ')',
         'uniqname_parm': uniqname_parm,
         'last_name': last_name,
         'first_name': first_name,

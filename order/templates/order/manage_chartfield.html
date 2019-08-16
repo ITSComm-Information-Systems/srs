@@ -3,13 +3,12 @@
 {% block content %}
 
 <!-- Beginning of Content -->
-<div id="main-content" class="container" role="main">
     <div class="row header-info">
         <div class="col-12">
             <div class="row">
                 <div class="col-12">
                     <h1>
-                        Manage Chartfields
+                        {{ title }}
                         <small class="text-muted">
                             for Department: <strong>{{department.id}} - {{department.name}}</strong>
                         </small>
@@ -28,7 +27,8 @@
                                 <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
                                 {% endfor %}
                             </select>
-                            <input type="submit" class="btn btn-outline-secondary dept-dropdown-btn" value="submit">
+                            <input type="submit" class="btn btn-outline-secondary dept-dropdown-btn" value="Go">
+                            <input id="deptSubmit" type="hidden" name="deptSubmit" value="{{department.id}}">
                         </div>
                     </form>
                 </div>
@@ -111,22 +111,20 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="addChartfieldForm" method="GET" action="manage-chartfields.html">
+                        <form id="addChartfieldForm" method="POST" action="/orders/chartcom/">{% csrf_token %}
                             <div class="form-group">
                                 <label for="chartfieldSelectSearch">Select a Chartfield</label>
                                 <!-- Replace this select widget to be searchable select widget with column headings (see Paco's wireframe for example) -->
                                 <select class="form-control" id="chartfieldSelectSearch" name="chartfieldSelection">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                    <option>5</option>
+                                    {% for addcc in add_chartcoms %}
+                                        <option data-shortcode="{{addcc.short_code}}" value="{{addcc.chartfield}}">{{addcc.chartfield}}-{{addcc.program_desc}}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <!-- After user select a chartfield from the select widget above, the chartfield should authomatically populate the following text input (read only so the user can't change the chartfield) -->
                             <div class="form-group">
                                 <label for="chartfieldSelected">Chartfield</label>
-                                <input type="text" class="form-control" id="chartfieldSelected" name="chartfieldCode"
+                                <input type="text" class="form-control" id="chartfieldSelected" name="chartfieldCode" value=" "
                                     readonly>
                             </div>
                             <!-- After user select a chartfield from the select widget above, the shortcode assocaited to chartfield (if any) should authomatically populate the following text input (read only so the user can't change the shortcode) -->
@@ -145,7 +143,9 @@
                                 <input type="text" class="form-control" id="chartfieldDescription"
                                     placeholder="Enter a description or nickname..." name="description">
                             </div>
-
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="deptid" value="{{department.id}}">
+                            <input id="addCCId" type="hidden" name="chartcomId" value="0">
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -173,7 +173,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="editChartfieldForm" method="GET" action="manage-chartfields.html">
+                        <form id="editChartfieldForm" method="POST" action="/orders/chartcom/">{% csrf_token %}
                             <div class="form-group">
                                 <label for="chartfieldComponent">Chartfield Selected</label>
                                 <!-- Replace the value of the input form to be the chartfield that the user selected to edit -->
@@ -196,16 +196,18 @@
                                 <input type="text" class="form-control" id="newChartfieldDescription"
                                     value="Current desciption goes here" name="newDescription">
                             </div>
-
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="deptid" value="{{department.id}}">
+                            <input id="editCCId" type="hidden" name="chartcomId" value="0">
                         </form>
                     </div>
                     <div class="modal-footer">
                         <!-- cancel Form button -->
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <!-- Submit Form button -->
-                        <label for="submitBtn" hidden>Save to List</label>
+                        <label for="submitBtn" hidden>Update</label>
                         <input type="submit" form="editChartfieldForm" id="submitBtn" class="btn btn-primary"
-                            value="Add to List">
+                            value="Update">
                     </div>
                 </div>
             </div>
@@ -225,9 +227,9 @@
                     </div>
                     <div class="modal-body remove-chartfield-form-body">
                         <strong class="remove-text">
-                            Are you sure you want to remove the following shortcode?
+                            Are you sure you want to remove the following chartfield?
                         </strong>
-                        <form id="deleteChartfieldForm" method="GET" action="manage-chartfields.html">
+                        <form id="deleteChartfieldForm" method="POST" action="/orders/chartcom/">{% csrf_token %}
                             <div class="card-body">
                                 <strong class="card-text" >Chartfield:</strong>
                                 <!-- Replace the following text with the value of the chartfield that the user selected to be removed from the shortlist -->
@@ -245,7 +247,9 @@
                                 <!-- Replace the following text with the value of the description of the chartfield that the user selected to be removed from the shortlist -->
                                 <p id="chartComDescr" class="card-text" id="chartcomDescr">Chartcom Description</p>
                             </div>
-
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="deptid" value="{{department.id}}">
+                            <input id="deleteCCId" type="hidden" name="chartcomId" value="0">
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -262,25 +266,51 @@
         <!-- Delete Chartfield Modal #1 -->
 
     </div>
-</div>
 
 {% endblock %}
 
 {% block js %}
 <script>
+
+$(document).ready(function () {
+    dept = $("#deptSubmit").val();
+    $("#deptid").val(dept);
+
+    $('#chartfieldSelectSearch').change(function () {
+        chartfield = $("#chartfieldSelectSearch option:selected").val();
+        shortcode = $("#chartfieldSelectSearch option:selected").data('shortcode');
+        $("#chartfieldSelected").val(chartfield);
+        $("#chartfieldSelectedShortcode").val(shortcode);
+    });
+
+    $('#addChartfieldModal').on('show.bs.modal', function (e) {
+        id = e.relatedTarget.id;
+        row = $("tr[data-cfid='" + id + "']");
+        $("#chartComDescr").text(row.find("th").html());
+        $("#shortCode").text(row.find("td").eq(5).html());
+        $("#chartCom").text(row.data('chartcom'));
+        $("#addCCId").val(id);
+    })
+
     $('#editChartfieldModal1').on('show.bs.modal', function (e) {
         id = e.relatedTarget.id;
         row = $("tr[data-cfid='" + id + "']");
         $("#chartfieldComponent").val(row.data('chartcom'));
         $("#shortCode1").val(row.find("td").eq(5).html());
         $("#newChartfieldDescription").val(row.find("th").html());
+        $("#editCCId").val(id);
     })
+
     $('#deleteChartfieldModal1').on('show.bs.modal', function (e) {
         id = e.relatedTarget.id;
         row = $("tr[data-cfid='" + id + "']");
         $("#chartComDescr").text(row.find("th").html());
         $("#shortCode").text(row.find("td").eq(5).html());
         $("#chartCom").text(row.data('chartcom'));
+        $("#deleteCCId").val(id);
     })
+
+});
+
 </script>
 {% endblock %}

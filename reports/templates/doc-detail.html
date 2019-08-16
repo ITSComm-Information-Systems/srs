@@ -6,7 +6,11 @@
 <div class="container">
 	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
 
-	<h1>{{title}}</h1>
+	<div class='row'>
+		<h1>{{title}}</h1>
+		<i class="fa fa-spinner fa-spin offset-1" id='go-back-loading' style='font:40px;'></i>
+	</div>
+
 	<form action=".." method="POST" id="return">{% csrf_token %}
 		<input type="hidden" name="chartcoms[]" value="{{ return_button.chartcoms }}">
 		<input type="hidden" name="select_dept" value="{{ return_button.select_dept }}">
@@ -35,7 +39,7 @@
 	</form>
 
 	<div class="row">
-		<div class="card border-dark col-md-10"> href='#'
+		<div class="card border-dark col-md-10">
 			<div class="card-body">
 				<div>
 					<strong>Billing ID:&nbsp;&nbsp;</strong>{{ user_id }}<br>
@@ -44,7 +48,7 @@
 					<strong>Username:&nbsp;&nbsp;</strong>{{ username }}
 				</div>
 				<div class="alert alert-light mb-0" role="alert">
-		            Username comes from MCommunity. To edit, visit <a class="alert-link" href="https://mcommunity.umich.edu/">https://mcommunity.umich.edu/</a>.
+		            Username comes from MCommunity. To edit, visit <a class="alert-link" target='_blank' href="https://mcommunity.umich.edu/">https://mcommunity.umich.edu/</a>.
 		        </div>
 			    </div>
 			</div>

@@ -2,28 +2,40 @@ $(document).ready(function() {
 	$("#vlc-1").removeClass('disabled');  // Enable first pill, that is how it all starts.
 
   currStep = 1;
-    lastStep = 3; //document.getElementsByClassName("tab-pane").length;
-    $("#buildingFields").hide();
-    $("#buildingTable").hide();
-    $("#buildingSearch").on("keyup", function() {
-        $("#buildingTable").show();
-        var value = $(this).val().toLowerCase();
-        $("#buildingTable tr").filter(function() {
-          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-      });
-    
-      $('#buildingTable tr').click(function() {
-        var building = $(this).find("td").eq(1).html();   
-        var buildingCode = $(this).find("td").eq(0).html();   
-        $('#buildingName').val(building);
-        $('#buildingID').val(buildingCode);
-        $("#buildingTable").hide();
-        $("#buildingFields").show();
-      });
+  lastStep = 3; //document.getElementsByClassName("tab-pane").length;
+  $("#buildingFields").hide();
+  $("#buildingTable").hide();
 
-    $('#voiplocation_nav li:first-child a').tab('show'); // Select first tab
-    document.getElementById("vl-1").className = "";
+  $("#buildingSearch").on("keyup", function() {
+      $("#buildingTable").show();
+      var value = $(this).val().toLowerCase();
+      $("#buildingTable tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
+  
+    $('#buildingTable tr').click(function() {
+      var building = $(this).find("td").eq(1).html();   
+      var buildingCode = $(this).find("td").eq(0).html(); 
+      var buildingCampus = $(this).find('td').eq(2).html();  
+
+      //$('#new_loc_table').removeAttr('hidden');
+      $('#buildingID').val(buildingCode);
+      $('#buildingName').val(building);
+      $('#campus').val(buildingCampus);
+      $('#buildingSearch').val('');
+      
+      $("#buildingTable").hide();
+      $('#buildingFields').show();
+      $("#roomselect").hide();
+      $("#jackselect").hide();
+      $('#buildingFloor').val('');
+      $('#buildingRoom').val('');
+      $('#buildingJack').val('');
+    });
+
+  $('#voiplocation_nav li:first-child a').tab('show'); // Select first tab
+  document.getElementById("vl-1").className = "";
 
 	$("#vlNextBtn").click(function(event) {
 		nextPrev(1);
@@ -41,8 +53,16 @@ $(document).ready(function() {
 
 
 function nextPrev(n) {
-
-    //if (n == 1 && !validateForm()) return false;
+    var message = validateForm();
+    if (n == 1 && message != 'valid') {
+      if (currStep == 1) {
+        $('#old_error').html(message); 
+      }
+      if (currStep == 2) {
+        $('#new_error').html(message);
+      }
+      return false;
+    }
   
     currStep = currStep + n;
     $('#vlc-'+currStep).removeClass('disabled');
@@ -85,29 +105,35 @@ function nextPrev(n) {
 }
 
 function tab_func1() {
-	currStep = 1;
-	// $('#vlc_desc').show();
- //  	$('#dept_details').show();
-  
-  $('#phoneselect').show();
-  $('#phoneselect').show();
-  document.getElementById("vl-1").className = "";
-  document.getElementById("vl-2").className = "tab-pane fade";
+  if (!$('#vlc-1').hasClass('disabled')) {
+  	currStep = 1;
+  	// $('#vlc_desc').show();
+   //  	$('#dept_details').show();
+    
+    $('#old_error').hide();
+    $('#phoneselect').show();
+    $('#phoneselect').show();
+    document.getElementById("vl-1").className = "";
+    document.getElementById("vl-2").className = "tab-pane fade";
     document.getElementById("vl-3").className = "tab-pane fade";
+  }
 
 }
 
 function tab_func2() {
-	var test = $('#vlc-2');
-	if (!$('#vlc-2').hasClass('disabled')) {
-		currStep = 2;
-		// $('#vlc_desc').hide();
-	 //  	$('#dept_details').hide();
-	}
-  $('#phoneselect').hide();
-  document.getElementById("vl-1").className = "tab-pane fade";
-  document.getElementById("vl-2").className = "";
-  document.getElementById('vl-3').className = "tab-pane fade"
+  if (!$('#vlc-2').hasClass('disabled')) {
+    $('#new_error').hide();
+  	var test = $('#vlc-2');
+  	if (!$('#vlc-2').hasClass('disabled')) {
+  		currStep = 2;
+  		// $('#vlc_desc').hide();
+  	 //  	$('#dept_details').hide();
+  	}
+    $('#phoneselect').hide();
+    document.getElementById("vl-1").className = "tab-pane fade";
+    document.getElementById("vl-2").className = "";
+    document.getElementById('vl-3').className = "tab-pane fade"
+  }
 }
 
 function tab_func3() {
@@ -115,11 +141,44 @@ function tab_func3() {
 		currStep = 3;
 		// $('#vlc_desc').hide();
 	 //  	$('#dept_details').hide();
-	  }
-  $('#phoneselect').hide();
+   $('#phoneselect').hide();
   document.getElementById("vl-1").className = "tab-pane fade";
   document.getElementById("vl-2").className = "tab-pane fade";
   document.getElementById('vl-3').className = ""
+	  }
+}
+
+function validateForm() {
+  if (currStep == 1) {
+    var valid = false;
+    $('#curr_loc_table tr').each(function() {
+      if($(this).find('td:first-child').find(':input').is(':checked')) {
+        valid = true;
+      }
+    })
+    if (valid) {
+      return 'valid';
+    }
+    else {
+      return 'Please select the current phone location.';
+    }
+  }
+  // Make sure floor, room, and jack are supplied
+  if (currStep == 2) {
+    old_strings = ['campus', 'buildingName', 'buildingID', 'buildingFloor', 'buildingRoom', 'buildingJack'];
+
+    for (i = 0; i < old_strings.length; ++i) {
+      if (!$('#' + old_strings[i]).val()) {
+        return 'Please provide the required information.';
+      }
+      else {
+        var new_string = '#new-' + old_strings[i];
+        $(new_string).html($('#' + old_strings[i]).val());
+      }
+    }
+    return 'valid';
+  }
+  return 'valid';
 }
 
 

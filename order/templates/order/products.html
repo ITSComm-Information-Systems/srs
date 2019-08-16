@@ -1,15 +1,25 @@
 {% for list in tab.form.cat %}
+<style>
+  .selected-card {
+			border-color: #28a745;
+			box-shadow: 5px 5px 10px grey;
+		}
+</style>
   <div id="equip{{list.id}}" data-phoneset="{{list.id}}">
 
     <div class="card-columns">
     {% for field in list %}
-
+      <!-- if card is selected, enable the class "selected-card" to the following DIV -->
     <div class="card" style="width: 18rem;">
-        <img class="card-img-top" src="/media/{{field.picture}}" alt="Product Image">
+        <img class="card-img-top" src="/media/{{field.picture}}" alt="Product Image of {{ field }}">
         <div class="card-body">
-          <h5 class="card-title">{{ field }}</h5>
+          <p class="card-title h5">{{ field }}</p>
           <p class="card-text">{{ field.description }}</p>
-          <a href="#" class="btn btn-primary">Select</a><p>${{ field.price }}</p>
+          <!-- if card is selected, enable the class "btn-success" and remove the class "btn-outline-success" to the following link -->
+          <!-- Paco: Dave, do we need the select button to be an "a" tag? 
+            If not, can we make it a button element since it won't actually be a link -->
+          <a href="#" class="btn btn-outline-success">Select <span class="sr-only">{{ field }}</span></a>
+          <p><strong>Price: ${{ field.price }}</strong></p>
         </div>
     </div>
 
