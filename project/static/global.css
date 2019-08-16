@@ -1090,3 +1090,6 @@ td.action {
 .expand-icon input[type="checkbox"]:checked~.unchecked {
     display: none;
 }
+.indented-form-input {
+	margin-left: 3rem;
+}

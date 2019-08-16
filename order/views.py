@@ -173,12 +173,13 @@ class Workflow(PermissionRequiredMixin, View):
                     else:
                         field = forms.IntegerField(label=element.label)
 
+                    field.display_seq_no = element.display_seq_no
+                    field.display_condition = element.display_condition
                     field.type = element.type
                     f.fields.update({element.name: field})
 
-                    if index == 1:
-                        field.display_seq_no = element.display_seq_no
-                        field.display_condition = element.display_condition
+                    #if index == 1:
+
 
                 tab.form = f
             else:

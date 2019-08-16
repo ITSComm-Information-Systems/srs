@@ -82,6 +82,15 @@ class FeatureCategory(models.Model):
         verbose_name_plural = "Feature Categories"
 
 
+class FeatureType(models.Model):
+    name = models.CharField(max_length=20)
+    label = models.CharField(max_length=100)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.label
+
+    
 class Feature(Configuration):
     TYPE_CHOICES = (
         ('STD', 'Standard'),
@@ -92,7 +101,9 @@ class Feature(Configuration):
 
     category = models.ManyToManyField(FeatureCategory)
     type = models.CharField(max_length=3, choices=TYPE_CHOICES)
+    #type_new = models.ForeignKey(FeatureType, on_delete=models.CASCADE)
     description = models.TextField(blank=True)
+    #additional_info = models.TextField(blank=True)
     active = models.BooleanField(default=True)
 
 
