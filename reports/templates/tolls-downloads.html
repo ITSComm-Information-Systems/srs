@@ -11,7 +11,7 @@
 <div>
     <div class="card border-dark">
         <div class="card-body">
-            <div class="card-body card-grid">
+            <div class="card-body card-grid-4">
                 <div class="deptid">
                     <strong>Department: </strong>{{ dept_id }}
                 </div>
@@ -40,15 +40,15 @@
 <div class="col mb-4">
     <i class="fas fa-file-csv" style="color:#28a745"></i><a
         href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/'
-        download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv"> CSV Download</a>
+        download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv">&nbsp;&nbsp;CSV Download</a>
 </div>
 <div class="col mb-4">
-    <i class="fas fa-file-pdf prv-msgs"></i><a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'> PDF
+    <i class="fas fa-file-pdf prv-msgs"></i><a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'>&nbsp;&nbsp;PDF
         Download</a>
 </div>
 <div class="col mb-4">
     <i class="fas fa-file-pdf prv-msgs"></i><a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'>
-        Condensed PDF Download</a>
+        &nbsp;&nbsp;Condensed PDF Download</a>
 </div>
 
 {% endif %}
