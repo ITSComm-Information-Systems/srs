@@ -1,5 +1,31 @@
 $(document).ready(function() {
 
+  // Workflow stuff
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function(event) {
+    console.log('shown');
+    currStep = $(this)[0].id.substring(10, 12) * 1;
+    if (currStep == lastStep) {
+        $('#nextBtn').html('Add to Cart');
+        fillReviewForm();
+    } else {
+        $('#nextBtn').html('Next');
+    }
+    if (currStep == 1) {
+      $('#prevBtn').hide();
+    } else {
+      $('#prevBtn').show();
+    }
+
+    // Progressive Disclosure Fields
+    preFields = $('#step' + currStep).find('[data-sequence]').hide();
+    $(preFields[0]).show();
+    curr = 0;
+    pointer = 0;
+    vals = []
+
+  })
+
+
   var x, i;
   //x = $('input:not(:checkbox)');
   x = $("input:not([type=radio], [type=checkbox])");
@@ -21,11 +47,7 @@ $(document).ready(function() {
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
-  preFields = $('[data-sequence]').hide();
-  $(preFields[0]).show();
-  curr = 0;
-  pointer = 0;
-  vals = []
+
 
   var callback = function() {
     if (preFields.index(this) <= pointer) { // User changed a previous answer.
@@ -69,36 +91,6 @@ $(document).ready(function() {
   $(preFields).change(callback);
   $(preFields).keypress(callback);
 
-
-  /*
-  //$("#buildingFields").hide();
-  $("#phLocationFields").hide();
-  //$("#buildingTable").hide();
-  $("#Conduit").hide();
-  $("#PurchasePhone").hide();
-  $("#ModelInfo").hide();
-  $("#PhoneSetType").hide();
-  $("#JackNumber").hide();
-  $("#PhoneModelNum").hide();
-  $("#voipPhoneMac").hide();
-  
-  
-  $("#ModelInfo_basic").click(function() {
-    $("#PhoneModelNum").show();
-    $("#voipPhoneMac").hide();
-  });
-
-  $("#ModelInfo_advanced").click(function() {
-    $("#PhoneModelNum").show();
-    $("#voipPhoneMac").hide();
-  });
-
-  $("#ModelInfo_voip").click(function() {
-    $("#PhoneModelNum").show();
-    $("#voipPhoneMac").show();
-  });
-  */
-
   $("#activePhone_Y").click(function() {
     $('[data-tab="LocationNew"]').hide();
   });
@@ -108,45 +100,7 @@ $(document).ready(function() {
   });
   
 
-/*
-  //Data
-  $("#activePhone").hide();
-  $("#jackNumber").hide();
-  $("#conduit").hide();
-  $("#linesToInstall").hide();
 
-  $("#jack_Y").click(function() {
-    $("#activePhone").show();
-    $("#conduit").hide();
-  });
-
-  $("#jack_N").click(function() {
-    $("#conduit").show();
-    $("#activePhone").hide();
-    $("#jackNumber").hide();
-  });
-
-  $("#jackNumber").keypress(function() {
-    $("#activePhone").show();
-  });
-
-  $("#activePhone_Y").click(function() {
-    $("#linesToInstall").show();
-  });
-
-  $("#activePhone_N").click(function() {
-    $("#linesToInstall").show();
-    //$('#pills-step2').hide();  //.addClass(' hidden');
-  });
-
-  $("#conduit_Y").click(function() {
-    $("#linesToInstall").show();
-  });
-
-  $("#conduit_N").click(function() {
-    $("#linesToInstall").show();
-  });
-  */
 
   // Addl info
   $('#contact_id').hide();
@@ -200,74 +154,6 @@ $(document).ready(function() {
   });
 
   
-  /*
-  // Phone Type Tab
-  $("#Jack_Y").click(function() {
-    $("#JackNumber").show();
-    $("#JackNumber_review").show();
-    $("#Conduit").hide();
-    $("#Conduit_review").hide();
-  });
-
-  $("#Jack_N").click(function() {
-    $("#JackNumber").hide();
-    $("#JackNumber_review").hide();
-    $("#Conduit").show();
-    $("#Conduit_review").show();
-  });
-
-  $("#JackNumber").keypress(function() {
-    $("#PurchasePhone").show();
-    $("#PurchasePhone_review").show();
-  });
-
-  $("#Conduit_Y").click(function() {
-    $("#PurchasePhone").show();
-    $("#PurchasePhone_review").show();
-  });
-
-  $("#Conduit_N").click(function() {
-    $("#PurchasePhone").show();
-    $("#PurchasePhone_review").show();
-  });
-
-  $("#PurchasePhone_buy").click(function() {
-    $("#PhoneSetType").show();
-    $("#PhoneSetType_review").show();
-    $("#ModelInfo").hide();
-    $("#ModelInfo_review").hide();
-    $("#PhoneModelNum").hide();
-    $("#PhoneModelNum_review").hide();
-    //$('#pills-step3').show();  //removeClass(' hidden');
-  });
-
-  $("#PurchasePhone_nobuy").click(function() {
-    $("#ModelInfo").show();
-    $("#ModelInfo_review").show();
-    $("#PhoneSetType").hide();
-    $("#PhoneSetType_review").hide();
-    //$('#pills-step3').hide();  //addClass(' hidden');
-  });
-
-
-  $("#purchasePhone_buy").click(function() {
-    $("#PhoneSetType").show();
-    $("#PhoneSetType_review").show();
-    $("#ModelInfo").hide();
-    $("#ModelInfo_review").hide();
-    $("#PhoneModelNum").hide();
-    $("#PhoneModelNum_review").hide();
-    //$('#pills-step4').hide();  //.removeClass(' hidden');
-  });
-
-  $("#purchasePhone_nobuy").click(function() {
-    $("#ModelInfo").show();
-    $("#ModelInfo_review").show();
-    $("#PhoneSetType").hide();
-    $("#PhoneSetType_review").hide();
-    //$('#pills-step4').hide();  //.addClass(' hidden');
-  });
-  */
 
   $("#phone_type").click(function() {
     if ($('#phone_type option:selected') > 1) {
@@ -394,24 +280,8 @@ $(document).ready(function() {
     $('#reviewSummary').val(summary);
   }
 
-  // Workflow stuff
-  $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-    currStep = $(this)[0].id.substring(10, 12) * 1;
-    if (currStep == lastStep) {
-        $('#nextBtn').html('Add to Cart');
-        fillReviewForm();
-    } else {
-        $('#nextBtn').html('Next');
-    }
-    if (currStep == 1) {
-      $('#prevBtn').hide();
-    } else {
-      $('#prevBtn').show();
-    }
-    //$('#nextBtn').prop('disabled', false);
-  })
 
-});
+});  // Document Ready
 
 
 
