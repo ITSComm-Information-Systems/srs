@@ -1,9 +1,9 @@
 from django import template
 register = template.Library()
 
-@register.filter
-def divide(a, b)
-	return a/b
+@register.simple_tag
+def divide(a, b):
+	return '{:,.2f}'.format(float(a / b))
 
 @register.filter
 def currency(money):

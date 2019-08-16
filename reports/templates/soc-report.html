@@ -1,9 +1,8 @@
 {% extends 'base.html'%}
-{% load index %}
+{% load tags %}
 {% block content %}
 
 <h1>{{ title }}</h1>
-<p>{{ num_months }}</p>
 <div>
     <strong>Report selection</strong>
     <a class="float-right" href="../soc">Edit your selection</a>
@@ -101,7 +100,7 @@
             <td>{{ code.0 }}</td>
             <td>{{ code.1 }}</td>
             <td>${{ code.2 }}</td>
-            <td></td>
+            <td>{% divide code.3 num_months %}</td>
             <td>{{ code.3 }}</td>
             <td>${{ code.4 }}</td>
             <td></td>
