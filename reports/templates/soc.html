@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load index %}
 {% block content %}
 <h1>{{ title }}</h1>
 <form action="/reports/soc/report" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
@@ -15,8 +16,8 @@
                 <div id="department_id_div">
                     <label for="departmentIdSelection"><strong>Select Department ID(s)</strong></label>
                     <select class="custom-select" multiple name="department_id" id="departmentIdSelection">
-                        {% for dept in depts %}
-                        <option value="{{ dept }}">{{ dept }}</option>
+                        {% for key, value in depts.items %}
+                        <option value="{{ key }}">{{ key }} - {{ value }}</option>
                         {% endfor %}
                     </select>
                     <input type="checkbox" name="selectall" id="deptidall" value='2'>
@@ -51,7 +52,6 @@
                 </div>
             </div>
         </fieldset>
-        <!-- <h2>Select Unit Grouping</h2> -->
     </div>
 
 
