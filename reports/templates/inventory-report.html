@@ -115,9 +115,8 @@
 <hr class="style1">
 {% endif %}
 
-
 {% if location_filter or type_filter or cf_filter or date_filter%}
-<h2>Current Filters</h2>
+<strong class='mt-2 mb-1'>Current Filters:</strong>
 
     {% if location_filter %}<p><strong>Location filter:</strong> {{ location_filter }}</p>{% endif %}
     {% if type_filter %}<p><strong>User ID Type filter:</strong> {{ type_filter }}</p>{% endif %}
@@ -134,7 +133,7 @@
 {% for classification in formated_data %}
 <div class="table-responsive">
     <h3 class="text-dark font-weight-bold">
-        Chartfield: <small class="text-muted">{{classification.0.0.chartfield}}</small>
+        Chartfield: {{classification.0.0.chartfield}}
     </h3>
     <table class="table table-sm mb-5 table-striped" style="font-size:12px">
         <thead class="thead-dark">
