@@ -51,7 +51,7 @@ def get_new(request):
     billing_dates = list((d.billing_date for d in UmOscBillCycleV.objects.all().order_by('billing_date').reverse()))
 
     context = {
-        'title': "Non-Telephony Detail of Charges",
+        'title': "Other Detail of Charges",
         'form_action': '/reports/nonteleph/report/',
         'names': names,
         'dates': billing_dates,
@@ -184,7 +184,7 @@ def generate_report(request):
 
 
     context= {
-        'title':"Non-Telephony Detail of Charges",
+        'title':"Other Detail of Charges",
         'dept': selected_dept,
         'dept_mgr': dept_mgr,
         'dept_mgr_uniq': dept_mgr_uniq,
