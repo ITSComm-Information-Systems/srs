@@ -105,7 +105,8 @@ TEMPLATES = {
                 'project.context_processors.menu',
             ],
             'libraries':{
-                'index': 'reports.inventory.templatetags.index'
+                'index': 'reports.inventory.templatetags.index',
+                'tags': 'reports.soc.templatetags.tags'
             }
         },
 },
