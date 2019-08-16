@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.shortcuts import render
 
-from .models import Service, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory
+from .models import Service, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -63,5 +63,6 @@ admin.site.register(Action, ActionAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Step, StepAdmin)
 admin.site.register(Feature, FeatureAdmin)
+admin.site.register(FeatureType)
 admin.site.register(Restriction, RestrictionAdmin)
 admin.site.register(FeatureCategory, FeatureCategoryAdmin)
