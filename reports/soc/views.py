@@ -15,7 +15,7 @@ from django.contrib.auth import get_user_model
 from django import forms
 
 from ldap3 import Server, Connection, ALL
-from oscauth.models import AuthUserDept, Grantor, Role
+from oscauth.models import AuthUserDeptV, Grantor, Role
 from django.db.models import indexes
 
 from django.db.models import Value
@@ -27,25 +27,27 @@ import datetime
 from django.contrib.auth.decorators import login_required, permission_required
 
 
+# Load selection page
 @permission_required('oscauth.can_report', raise_exception=True)
 def get_soc(request):
     template = loader.get_template('soc.html')
+
+    # Get departments and department groups for dropdown
     depts = find_depts(request)
-    groups = UmOscDeptUnitsReptV.objects.filter(deptid__in=depts).order_by('dept_grp').values_list('dept_grp',flat = True).distinct()
     groups_descr = UmOscDeptUnitsReptV.objects.order_by('dept_grp_descr').values_list('dept_grp_descr',flat = True).distinct()
     
-    groups = list(dict.fromkeys(groups))
+    # Get date information for dropdowns
     fiscal = select_fiscal_year(request)
     calendar = select_calendar_year(request)
     months = select_month(request)
 
+    # Get department group VP areas for dropdown
     vps = []
     vps = UmOscDeptUnitsReptV.objects.order_by('dept_grp_vp_area').values_list('dept_grp_vp_area_descr',flat =True).distinct() 
 
     context = {
         'title': 'Summary of Charges',
-        'depts': depts,
-        'groups': groups,
+        'depts': find_dept_names(depts),
         'groups_descr':groups_descr,
         'fiscal':fiscal,
         'calendar':calendar,
@@ -54,53 +56,69 @@ def get_soc(request):
     }
     return HttpResponse(template.render(context,request))
 
+
+# Generate report
 @permission_required('oscauth.can_report', raise_exception=True)
 def generate(request):
+    # Get selected department(s) from form
+    display_type = request.POST.get("unitGroupingGroup",None)
     depts = find_depts(request)
     grouping = ''
     unit = ''
-
-    display_type = request.POST.get("unitGroupingGroup",None)
-    
+    # If they selected by Department ID
     if display_type in ['1']:
         grouping = 'Department ID'
         unit = request.POST.getlist('department_id')
+        # If they selected all
         if request.POST.get('selectall',None) in ['2']:
             grouping = 'Department IDs'
             unit = depts
+    # If they selected by Department Group
     elif display_type in ['3']:
         grouping = 'Department Group'
         unit = [request.POST.get('department_group')]
+    # If they selected by Department VP Group Area
     elif display_type in ['4']:
         grouping = 'Department Group VP Area'
         unit = [request.POST.get('department_vp')]
     
 
+    # Find billing range
     billing_period = ''
     dateRange = ''
     display_type = request.POST.get("dateRangeGroup",None)
+    # If they selected by fiscal year
     if display_type in ['1']:
         dateRange = 'Fiscal Year'
         billing_period = request.POST.get('FISCALYEAR')
-
+    # If they selected by calendar year
     elif display_type in ['2']:
         dateRange = 'Calendar Year'
         billing_period = request.POST.get('CALENDARYEAR')
+    # If they selected by single month
     elif display_type in ['3']:
         dateRange = 'Single Month'
         billing_period = request.POST.get('SINGLEMONTH')
         billing_period = billing_period + " " + request.POST.get('SINGLEYEAR')
+    # If they selected month-to-month
     elif display_type in ['4']:
         dateRange = 'Month-to-Month'
         billing_period = request.POST.get('FIRSTMONTH')
         billing_period = billing_period + " " + request.POST.get('FIRSTYEAR') + " to"
         billing_period = billing_period + " " + request.POST.get('SECONDMONTH')
         billing_period = billing_period + " " + request.POST.get('SECONDYEAR')
+
+
+    # Get report data
     table = []
     if (unit != '' and billing_period != ''):
+        # Pull Pinnacle data
         rows = get_rows(unit, grouping, billing_period, dateRange, request)
+        # Format data
         table = get_table(rows,request)
-    if (table ==[] or list(table)[0][1]==0):
+
+    # If there is no data available for the selected dept & dates
+    if (table == [] or list(table)[0][1] == 0):
         if (table == []):
             rows = ''
         else:
@@ -109,12 +127,12 @@ def generate(request):
 
     template = loader.get_template('soc-report.html')
     context = {
-        'title': 'Summary of Charges',
-        
+        'title': 'Summary of Charges',   
         'grouping': grouping,
         'dateRange': dateRange,
         'unit': unit,
         'billing_period': billing_period,
+        'num_months': find_num_months(dateRange, billing_period),
         'rows': rows,
         'table': list(table),
     }
@@ -123,60 +141,119 @@ def generate(request):
 
 
 
-
-
+# Returns all departments a user has reporting access to
 def find_depts(request):
- 	depts = []
+    depts = []
+    query = (d.dept for d in AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept').exclude(dept='All').distinct('dept'))
+    depts = list(query)
 
- 	query = AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept')
+    return depts
 
- 	for dept in query:
- 		if Group.objects.get(name=dept.group).name != 'Reporter':
- 			depts.append(dept.dept)
 
- 	return depts
+# Finds a name for each department
+def find_dept_names(depts):
+    full_depts = {}
 
+    for d in depts:
+        name = UmOscDeptProfileV.objects.filter(deptid=d)[0].dept_name
+        full_depts[d] = name
+
+    return full_depts
+
+
+
+# Grabs fiscal year options for dropdown
 def select_fiscal_year(request):
     query = UmOscDeptUnitsReptV.objects.order_by('fiscal_yr').values_list('fiscal_yr',flat =True).distinct()
     return query.reverse()
     
+
+
+# Grabs calendar year options for dropdown
 def select_calendar_year(request):
-    query = UmOscDeptUnitsReptV.objects.order_by('calendar_yr').values_list('calendar_yr',flat =True).distinct()
+    query = UmOscDeptUnitsReptV.objects.order_by('calendar_yr').values_list('calendar_yr',flat=True).distinct()
     return query.reverse()
 
+
+
+# Grabs month options for dropdown
 def select_month(request):
-    query = UmOscDeptUnitsReptV.objects.order_by('month').values_list('month',flat =True).distinct()
-    months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
- 	 		  'August', 'September', 'October', 'November', 'December']
+    query = UmOscDeptUnitsReptV.objects.order_by('month').values_list('month',flat=True).distinct()
     return query
 
-def get_rows(unit, grouping, period, drange, request):
-   
 
+# Calculates the number of months, given the billing period selected
+def find_num_months(date_range, billing_period):
+    if date_range == 'Fiscal Year' or date_range == 'Calendar Year':
+        return 12
+    elif date_range == 'Single Month':
+        return 1
+    else:
+        total_months = 0
+
+        # Parse selected billing period
+        month1 = int(billing_period.split(' ')[0])
+        year1 = int(billing_period.split(' ')[1])
+        month2 = int(billing_period.split(' ')[3])
+        year2 = int(billing_period.split(' ')[4])
+
+        years_between = year2 - year1
+        # If billing period is all within the same year
+        if years_between == 0:
+            total_months += month2 - month1 + 1
+        # If months selected are in consecutive years
+        elif years_between == 1:
+            months_left_in_year = 12 - month1
+            total_months += months_left_in_year + month2 + 1
+        # If more than a year separates the dates
+        else:
+            months_left_in_year = 12 - month1
+            months_between = 12 * (years_between - 1)
+            total_months += months_left_in_year + months_between + month2 + 1
+
+        return total_months
+
+
+
+# Get data from Pinnacle based on selected department(s) and billing period
+def get_rows(unit, grouping, period, drange, request):
+    # unit = departments selected, grouping = how they selected dept, period = billing period, drange = how they selected billing period
+
+    # Filter report data by selected billing period
     if (drange == 'Fiscal Year'):
-        values = UmOscDeptUnitsReptV.objects.filter(fiscal_yr__exact = period)
+        values = UmOscDeptUnitsReptV.objects.filter(fiscal_yr__exact=period)
+
     elif (drange == 'Calendar Year'):
-        values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact = period)
+        values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact=period)
+
     elif (drange == 'Single Month'):
         month = period.split(' ')[0]
         year = period.split(' ')[1]
-        values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact = year).filter(month__exact = month)
+        values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact=year, month__exact=month)
+
     elif (drange == 'Month-to-Month'):
         month1 = period.split(' ')[0]
         year1 = period.split(' ')[1]
         month2 = period.split(' ')[3]
         year2 = period.split(' ')[4]
-        values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(date__range = [year1+''+month1,year2+''+month2]).order_by('account').values('account','date').distinct()
+        values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(date__range = [year1+''+month1,year2+''+month2]) #.order_by('account').values('account','date').distinct()
 
     
+    # Further filter by selected departments
     if (grouping == 'Department ID'):
         return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
+
     elif (grouping == 'Department IDs'):
         return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
+
     elif (grouping == 'Department Group'):
         return values.filter(dept_grp_descr__exact = unit[0]).order_by('account_desc').values().distinct()
+
     elif (grouping == 'Department Group VP Area'):
         return values.filter(dept_grp_vp_area_descr__exact = unit[0]).order_by('account_desc').values().distinct()
+
+
+
 
 def get_table(rows,request):
     accounts = rows.values_list('account','account_desc').distinct()
