@@ -54,7 +54,7 @@ def get_doc(request):
     billing_dates = list((d.billing_date for d in UmOscBillCycleV.objects.all().order_by('billing_date').reverse()))
 
     context = {
-        'title': 'Detail of Charges',
+        'title': 'Telephony Detail of Charges',
         'form_action': '/reports/doc/report/',
         'names': names,
         'dates': billing_dates,
@@ -281,7 +281,7 @@ def generate_report(request):
 
 
 	context= {
-		'title':'Detail of Charges',
+		'title':'Telephony Detail of Charges',
 		'dept': selected_dept,
 		'dept_mgr': dept_mgr,
 		'dept_mgr_uniq': dept_mgr_uniq,
@@ -469,7 +469,7 @@ def show_detail(request):
 
 
 	context = {
-		'title':'Detail of Charges',
+		'title':'Telephony Detail of Charges',
 		'dept': selected_dept,
 		'billing_date': bill_date,
 		'chartcoms': chartcoms,
