@@ -11,15 +11,15 @@ class FeaturesForm(forms.Form):
     
     categories = FeatureCategory.objects.all()
     types = FeatureType.objects.all()
+    features = Feature.objects.all().order_by('display_seq_no')
 
-    for category in categories:
-        features = Feature.objects.filter(category=category).order_by('type', 'display_seq_no')
-        category.types = []
+    for cat in categories:
+        cat.types = []
         for type in types:
-            q = features.filter(type=type)
+            q = features.filter(type=type).filter(category=cat).order_by('display_seq_no')
             if q:
-                category.types.append(type)
-                category.types[-1].features = q
+                cat.types.append(q)
+                cat.types[-1].label = type.label
 
     template = 'order/features.html'
 
