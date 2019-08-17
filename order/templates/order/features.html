@@ -25,24 +25,24 @@
       {% if type.label == 'Standard' %}
       Standard features included with this phone type:
       <ul>
-        {% for feature in type.features %}
+        {% for feature in type %}
         <li>
-          {{feature}}
+          {{ feature.label }}
         </li>
         {% endfor %}
       </ul>
       {% elif type.label == 'Optional' %}
-      {% for feature in type.features %}
+      {% for feature in type %}
       <div class="form-check">
         <input class="form-check-input" type="checkbox" value="{{feature.id}}" name="{{category.name}}{{type.label}}"
           id="cat{{category.id}}feature{{feature.id}}">
         <label class="form-check-label" for="cat{{category.id}}feature{{feature.id}}">
-          {{feature}}
+          {{feature.label}}
         </label>
       </div>
       {% endfor %}
       {% else %}
-      {% for feature in type.features %}
+      {% for feature in type %}
       <div class="form-check">
         <input class="form-check-input" type="radio" value="{{feature.id}}" name="{{category.name}}{{type.label}}"
           id="cat{{category.id}}feature{{feature.id}}" required>
