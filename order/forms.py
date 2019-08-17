@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature, FeatureCategory, Restriction
+from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction
 from project.pinnmodels import UmOSCBuildingV
 
 class FeaturesForm(forms.Form):
@@ -8,26 +8,18 @@ class FeaturesForm(forms.Form):
         queryset=Feature.objects.all(), 
         widget=forms.CheckboxSelectMultiple(),
     )
-    features = Feature.objects.all()
-    list = FeatureCategory.objects.all()
+    
+    categories = FeatureCategory.objects.all()
+    types = FeatureType.objects.all()
 
-    for cat in list:
-        cat.type = ['STD','OPT','SC','VM']
-        cat.type[0] = features.filter(category=cat).filter(type='STD').order_by('display_seq_no')
-        cat.type[0].label = 'Standard'
-        cat.type[1] = features.filter(category=cat).filter(type='OPT').order_by('display_seq_no')
-        cat.type[1].label = 'Optional'
-        cat.type[2] = features.filter(category=cat).filter(type='SPD').order_by('display_seq_no')
-
-        cat.type[2].label = 'Speed Call'
-        last = cat.type[2].count()
-        if last > 0:
-            cat.type[2].last = (cat.type[2][last-1].id)
-
-        cat.type[3] = features.filter(category=cat).filter(type='VM').order_by('display_seq_no')
-        cat.type[3].label = 'Voicemail'
-        last = cat.type[3].count()
-        cat.type[3].last = (cat.type[3][last-1].id)
+    for category in categories:
+        features = Feature.objects.filter(category=category).order_by('type', 'display_seq_no')
+        category.types = []
+        for type in types:
+            q = features.filter(type=type)
+            if q:
+                category.types.append(type)
+                category.types[-1].features = q
 
     template = 'order/features.html'
 
