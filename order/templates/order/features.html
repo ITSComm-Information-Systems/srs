@@ -3,7 +3,7 @@
   <p class="h2"> {{category}}
   </p>
 
-  <div class="features-restriction-msg mb-4">
+  <div class="features-restriction-msg mb-4" id="currentFeatures">
     <em>
       We can't display the current features for this phone. Review the Inventory and Location Report to see your phone's
       current features.
@@ -15,10 +15,11 @@
         Check this box if you want to keep the current features.
       </label>
     </div>
-    <strong>
-      Select the features you want this phone to have.
-    </strong>
   </div>
+
+  <strong>
+      Select the features you want this phone to have.
+  </strong>
 
   <div class="form-row">
     {% for type in category.types %}

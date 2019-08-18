@@ -193,7 +193,7 @@ class Workflow(PermissionRequiredMixin, View):
 
         return render(request, 'order/workflow.html', 
             {'title': action.label,
-            'wfid':action_id,
+            'action':action,
             'tab_list': tabs,
             'js_files': js})
 

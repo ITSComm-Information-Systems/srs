@@ -6,7 +6,8 @@
 
 <form action="/orders/addtocart/" method="post" id="workflowForm" >
   {% csrf_token %}
-  <input type="hidden" id="wfid" name="action_id" value="{{wfid}}">
+  <input type="hidden" id="wfid" name="action_id" value="{{action.id}}">
+  <input type="hidden" id="wftype" name="action_type" value="{{action.type}}">
   <input type="hidden" id="wfname" name="action" value="{{title}}">
 
 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
