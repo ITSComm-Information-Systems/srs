@@ -11,6 +11,12 @@ $(document).ready(function () {
         }
     });
 
+    console.log("val:" + $("#wftype").val());
+    if ($("#wftype").val() == "A") {
+        console.log('add');
+        $("#currentFeatures").hide();
+    }
+
     $("#keepFeatures").click(function() {
         if (this.checked) {
             $(".form-row input:visible").attr("disabled","disabled");
