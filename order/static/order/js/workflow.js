@@ -2,7 +2,6 @@ $(document).ready(function() {
 
   // Workflow stuff
   $('a[data-toggle="tab"]').on('shown.bs.tab', function(event) {
-    console.log('shown');
     currStep = $(this)[0].id.substring(10, 12) * 1;
     if (currStep == lastStep) {
         $('#nextBtn').html('Add to Cart');
@@ -51,7 +50,6 @@ $(document).ready(function() {
 
   var callback = function() {
     if (preFields.index(this) <= pointer) { // User changed a previous answer.
-      console.log('back');
       for (i = preFields.index(this)+1; i < preFields.length; i++) {
         $(preFields[i]).hide();
         $(preFields[i]).find('input:checked').prop("checked", false);
