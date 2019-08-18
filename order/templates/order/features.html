@@ -8,6 +8,13 @@
       We can't display the current features for this phone. Review the Inventory and Location Report to see your phone's
       current features.
     </em>
+    <div class="form-check" id="divKeepFeatures">
+      <input class="form-check-input" type="checkbox" value="keepFeatures" name="keepFeatures"
+      id="keepFeatures">
+      <label class="form-check-label" for="keepFeatures">
+        Check this box if you want to keep the current features.
+      </label>
+    </div>
     <strong>
       Select the features you want this phone to have.
     </strong>
@@ -15,16 +22,18 @@
 
   <div class="form-row">
     {% for type in category.types %}
-    <div class="form-check col">
-      <legend>{{type.label}}   
+    <div class="form-check col feature-types">
+      <legend>{{type.label}}
         <small>
-          <a tabindex="0" role="button" data-toggle="popover" data-container="body"
-              data-trigger="focus" data-placement="bottom" title="{{action.label}}"
-              data-content="{{type.description}}"> Learn more
-          </a>
+            <a class="popover-icon" data-toggle="popover" tabindex="0" role="button"
+            data-container="body" data-trigger="hover" data-placement="right"
+            title="{{type.description}}"
+            data-content="{{type.description}}">
+            <i class="fas fa-question-circle"
+                aria-label="More informaiton about {{feature.label}}"></i>
+            </a>   
         </small>
       </legend>
-
       {% if type.label == 'Standard' %}
       Standard features included with this phone type:
       <ul>
@@ -44,7 +53,7 @@
         </label>
         {% if feature.description %}
         <a class="popover-icon" data-toggle="popover" tabindex="0" role="button"
-        data-container="body" data-trigger="focus" data-placement="right"
+        data-container="body" data-trigger="hover" data-placement="right"
         title="{{feature.label}}"
         data-content="{{feature.description}}">
         <i class="fas fa-question-circle"
