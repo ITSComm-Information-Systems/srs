@@ -10,4 +10,14 @@ $(document).ready(function () {
             $(id).hide();
         }
     });
+
+    $("#keepFeatures").click(function() {
+        if (this.checked) {
+            $(".form-row input:visible").attr("disabled","disabled");
+        } else {
+            $(".form-row input:visible").removeAttr("disabled");
+        }
+    });
+
+
 });
