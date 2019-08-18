@@ -15,12 +15,18 @@ $(document).ready(function() {
       $('#prevBtn').show();
     }
 
-    // Progressive Disclosure Fields
-    preFields = $('#step' + currStep).find('[data-sequence]').hide();
-    $(preFields[0]).show();
-    curr = 0;
-    pointer = 0;
-    vals = []
+    if (currStep > maxStep) {
+      maxStep = currStep;
+      // Progressive Disclosure Fields
+      preFields = $('#step' + currStep).find('[data-sequence]').hide();
+      $(preFields[0]).show();
+      curr = 0;
+      pointer = 0;
+      vals = []
+    }
+
+
+
 
   })
 
@@ -35,10 +41,12 @@ $(document).ready(function() {
   $('#pills-step1').removeClass('disabled');  // Enable first pill, that is how it all starts.
 
   currStep = 1;
+  maxStep = 0;
   lastStep = document.getElementsByClassName("tab-pane").length;
   var tabs = new Array(lastStep);
 
-  if ( $("h1").html() === 'TestWorkflows' ) {
+
+  if ( $("#wfid").val() == 32 ) { // Test Workflow option
     for (i = 1; i < lastStep+1; i++) {
       $('#pills-step'+ i).removeClass('disabled'); 
     }
@@ -171,12 +179,18 @@ $(document).ready(function() {
     $('#contact_id').show();
     $('#contact_name').show();
     $('#contact_number').show();
+    $('#comments').show();
+    $('#file').show();
+    
+    
   });
 
   $("#contact_yn_True").click(function(event) {
     $('#contact_id').hide();
     $('#contact_name').hide();
     $('#contact_number').hide();
+    $('#comments').show();
+    $('#file').show();
   });
 
 
