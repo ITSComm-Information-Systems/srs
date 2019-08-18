@@ -16,9 +16,14 @@
   <div class="form-row">
     {% for type in category.types %}
     <div class="form-check col">
-      <legend>{{type.label}}
+      <legend>{{type.label}}   
         <small>
-          <a href="#">Learn More</a>
+
+            <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+                data-trigger="focus" data-placement="bottom" title="{{action.label}}"
+                data-content="{{type.description}}"> Learn more
+            </a>
+
         </small>
       </legend>
 
@@ -39,6 +44,15 @@
         <label class="form-check-label" for="cat{{category.id}}feature{{feature.id}}">
           {{feature.label}}
         </label>
+        {% if feature.description %}
+        <a class="popover-icon" data-toggle="popover" tabindex="0" role="button"
+        data-container="body" data-trigger="focus" data-placement="right"
+        title="{{feature.label}}"
+        data-content="{{feature.description}}">
+        <i class="fas fa-question-circle"
+            aria-label="More informaiton about {{feature.label}}"></i>
+        </a>
+        {% endif %}
       </div>
       {% endfor %}
       {% else %}

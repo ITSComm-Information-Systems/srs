@@ -20,6 +20,7 @@ class FeaturesForm(forms.Form):
             if q:
                 cat.types.append(q)
                 cat.types[-1].label = type.label
+                cat.types[-1].description = type.description
 
     template = 'order/features.html'
 
