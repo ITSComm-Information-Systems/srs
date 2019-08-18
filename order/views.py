@@ -188,6 +188,8 @@ class Workflow(PermissionRequiredMixin, View):
                     js.append('phone_location')
                 elif tab.name == 'LocationNew':
                     js.append('location')
+                elif tab.name == 'SelectFeatures':
+                    js.append('features')
 
         return render(request, 'order/workflow.html', 
             {'title': action.label,
