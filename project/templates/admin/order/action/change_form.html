@@ -4,7 +4,10 @@
 
 
     <fieldset class="module aligned {{ fieldset.classes }}">
-        <h4>Rendering:</h4>
+        <div>
+            <a href="/orders/wf/{{object_id}}" target="_blank" class="button">Test Workflow</a>
+            <h4>Rendering:</h4>
+        </div>
 
         <table>
         {% for step in step_list %}
