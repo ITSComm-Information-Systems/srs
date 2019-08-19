@@ -2,7 +2,6 @@ $(document).ready(function() {
 
   // Workflow stuff
   $('a[data-toggle="tab"]').on('shown.bs.tab', function(event) {
-    console.log('shown');
     currStep = $(this)[0].id.substring(10, 12) * 1;
     if (currStep == lastStep) {
         $('#nextBtn').html('Add to Cart');
@@ -16,12 +15,18 @@ $(document).ready(function() {
       $('#prevBtn').show();
     }
 
-    // Progressive Disclosure Fields
-    preFields = $('#step' + currStep).find('[data-sequence]').hide();
-    $(preFields[0]).show();
-    curr = 0;
-    pointer = 0;
-    vals = []
+    if (currStep > maxStep) {
+      maxStep = currStep;
+      // Progressive Disclosure Fields
+      preFields = $('#step' + currStep).find('[data-sequence]').hide();
+      $(preFields[0]).show();
+      curr = 0;
+      pointer = 0;
+      vals = []
+    }
+
+
+
 
   })
 
@@ -36,10 +41,12 @@ $(document).ready(function() {
   $('#pills-step1').removeClass('disabled');  // Enable first pill, that is how it all starts.
 
   currStep = 1;
+  maxStep = 0;
   lastStep = document.getElementsByClassName("tab-pane").length;
   var tabs = new Array(lastStep);
 
-  if ( $("h1").html() === 'TestWorkflows' ) {
+
+  if ( $("#wfid").val() == 32 ) { // Test Workflow option
     for (i = 1; i < lastStep+1; i++) {
       $('#pills-step'+ i).removeClass('disabled'); 
     }
@@ -51,7 +58,6 @@ $(document).ready(function() {
 
   var callback = function() {
     if (preFields.index(this) <= pointer) { // User changed a previous answer.
-      console.log('back');
       for (i = preFields.index(this)+1; i < preFields.length; i++) {
         $(preFields[i]).hide();
         $(preFields[i]).find('input:checked').prop("checked", false);
@@ -173,12 +179,18 @@ $(document).ready(function() {
     $('#contact_id').show();
     $('#contact_name').show();
     $('#contact_number').show();
+    $('#comments').show();
+    $('#file').show();
+    
+    
   });
 
   $("#contact_yn_True").click(function(event) {
     $('#contact_id').hide();
     $('#contact_name').hide();
     $('#contact_number').hide();
+    $('#comments').show();
+    $('#file').show();
   });
 
 

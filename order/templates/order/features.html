@@ -1,33 +1,46 @@
-{% for category in tab.form.list %}
+{% for category in tab.form.categories %}
 <div id="cat{{category.id}}" data-phoneset="{{category.name}}">
   <p class="h2"> {{category}}
   </p>
 
-  <div class="features-restriction-msg mb-4">
+  <div class="features-restriction-msg mb-4" id="currentFeatures">
     <em>
       We can't display the current features for this phone. Review the Inventory and Location Report to see your phone's
       current features.
     </em>
-    <strong>
-      Select the features you want this phone to have.
-    </strong>
+    <div class="form-check" id="divKeepFeatures">
+      <input class="form-check-input" type="checkbox" value="keepFeatures" name="keepFeatures"
+      id="keepFeatures">
+      <label class="form-check-label" for="keepFeatures">
+        Check this box if you want to keep the current features.
+      </label>
+    </div>
   </div>
 
+  <strong>
+      Select the features you want this phone to have.
+  </strong>
+
   <div class="form-row">
-    {% for type in category.type %}
-    <div class="form-check col">
+    {% for type in category.types %}
+    <div class="form-check col feature-types">
       <legend>{{type.label}}
         <small>
-          <a href="#">Learn More</a>
+            <a class="popover-icon" data-toggle="popover" tabindex="0" role="button"
+            data-container="body" data-trigger="hover" data-placement="right"
+            title="{{type.description}}"
+            data-content="{{type.description}}">
+            <i class="fas fa-question-circle"
+                aria-label="More informaiton about {{feature.label}}"></i>
+            </a>   
         </small>
       </legend>
-
       {% if type.label == 'Standard' %}
       Standard features included with this phone type:
       <ul>
         {% for feature in type %}
         <li>
-          {{feature}}
+          {{ feature.label }}
         </li>
         {% endfor %}
       </ul>
@@ -37,8 +50,23 @@
         <input class="form-check-input" type="checkbox" value="{{feature.id}}" name="{{category.name}}{{type.label}}"
           id="cat{{category.id}}feature{{feature.id}}">
         <label class="form-check-label" for="cat{{category.id}}feature{{feature.id}}">
-          {{feature}}
+          {{feature.label}}
         </label>
+        {% if feature.description %}
+        <a class="popover-icon" data-toggle="popover" tabindex="0" role="button"
+        data-container="body" data-trigger="hover" data-placement="right"
+        title="{{feature.label}}"
+        data-content="{{feature.description}}">
+        <i class="fas fa-question-circle"
+            aria-label="More informaiton about {{feature.label}}"></i>
+        </a>
+        {% endif %}
+        {% if feature.additional_info %}
+        <input style="display:none" id="addinfo{{category.id}}feature{{feature.id}}" class="col-sm-4" type="text" maxlength="15" id="update" name="update"
+        <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+        data-trigger="focus" data-placement="right" title="{{feature.label}}"
+        data-content="{{feature.additional_info}}"></a>
+        {% endif %}
       </div>
       {% endfor %}
       {% else %}

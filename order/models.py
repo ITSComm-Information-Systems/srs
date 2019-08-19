@@ -100,8 +100,8 @@ class Feature(Configuration):
     )
 
     category = models.ManyToManyField(FeatureCategory)
-    type = models.CharField(max_length=3, choices=TYPE_CHOICES)
-    type_new = models.ForeignKey(FeatureType, on_delete=models.CASCADE)
+    #type = models.CharField(max_length=3, choices=TYPE_CHOICES)
+    type = models.ForeignKey(FeatureType, on_delete=models.CASCADE)
     description = models.TextField(blank=True)
     additional_info = models.TextField(blank=True)
     active = models.BooleanField(default=True)
