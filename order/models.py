@@ -195,6 +195,15 @@ class UserChartcomV(models.Model):
         db_table = 'order_user_chartcom'
 
 
+class LogItem(models.Model):
+    transaction = models.CharField(max_length=20)
+    local_key = models.CharField(max_length=20, blank=True)
+    remote_key = models.CharField(max_length=20, blank=True)
+    create_date = models.DateTimeField('Date Created', auto_now_add=True)
+    level = models.CharField(max_length=20, blank=True)
+    description = models.TextField(blank=True)
+    
+
 class Order(models.Model):
     order_reference = models.CharField(max_length=20)
     create_date = models.DateTimeField('Date Created', auto_now_add=True)
@@ -208,6 +217,19 @@ class Order(models.Model):
         return self.chartcom.dept
 
     def create_preorder(self):
+        api = UmOscPreorderApiV()
+        api.category_code = 2
+        api.wo_type_code = 'WB'
+        api.wo_type_category_id = 0
+        api.action_name = 'Add'
+        api.add_info_text_3 = self.id
+        api.save()
+
+        preorder = UmOscPreorderApiV.objects.get(add_info_text_3=self.id)
+
+        self.order_reference = preorder.pre_order_number
+        self.save()
+
         item_list = Item.objects.filter(order_id=self.id)
 
         elements = Element.objects.exclude(target__isnull=True).exclude(target__exact='')
@@ -216,57 +238,12 @@ class Order(models.Model):
         for element in elements:
             map[element.name] = element.target
 
-        preorder_number = None
-        status = None
-
         for num, item in enumerate(item_list, start=1):
+            item.create_issue(preorder.pre_order_number, map)
 
-            api = UmOscPreorderApiV()
-            api.add_info_text_3 = self.id
-            api.add_info_text_4 = item.id  #This causes an error - PRE_ORDER_ID: 5: Value cannot be changed
+        preorder = UmOscPreorderApiV.objects.filter(add_info_text_3=self.id, work_status_name=None)
+        preorder.update(work_status_name = 'Received')
 
-            action_id = item.data['action_id']
-
-            api.pre_order_number = preorder_number
-            api.work_status_name = status
-
-            cons = Constant.objects.filter(action=action_id)
-            for con in cons:             #Populate the model with constants
-                setattr(api, con.field, con.value)
-            
-            #detail = ''
-            for key, value in item.data.items():
-                if value:           #Populate the model with user supplied values
-                    #detail = detail + key + ':' + value + '\n'
-                    if key == 'MRC' or key == 'localCharges' or key == 'LD':
-                        value = Chartcom.objects.get(id=value).account_number
-                        #print(key, acct)
-
-                    target = map.get(key)
-                    if target != None:
-                        setattr(api, target, value)
-                    
-            api.comment_text = item.description
-            api.default_one_time_expense_acct=self.chartcom.account_number
-
-            api.save()
-
-            preorder = UmOscPreorderApiV.objects.get(add_info_text_3=self.id)
-
-            with connections['pinnacle'].cursor() as cursor:
-                id = preorder.pre_order_id
-                cursor.callproc('um_note_procedures_k.um_add_wo_tcom_note_p', [id, 'Order Details', item.data['reviewSummary'], ''])
-
-            if num == 1:
-                status = 'Received'
-                preorder_number = preorder.pre_order_number
-
-        #Trigger completion of entries so Pinnacle rolls up and sends an email
-        one = UmOscPreorderApiV.objects.filter(add_info_text_3=self.id, work_status_name=None)
-        one.update(work_status_name = status)
-
-        self.order_reference = preorder.pre_order_number
-        self.save()
 
 class Item(models.Model):
     description = models.CharField(max_length=100)
@@ -285,6 +262,55 @@ class Item(models.Model):
         delete_date = self.create_date + timedelta(days=180) 
         days_to_deletion = delete_date - timezone.now()
         return days_to_deletion.days
+
+    def create_issue(self, preorder_number, map):
+        api = UmOscPreorderApiV()
+        api.add_info_text_3 = self.order_id
+        api.add_info_text_4 = self.id
+
+        action_id = self.data['action_id']
+
+        api.pre_order_number = preorder_number
+        #api.work_status_name = status
+
+        cons = Constant.objects.filter(action=action_id)
+        for con in cons:  # Populate the model with constants
+            setattr(api, con.field, con.value)
+
+        #detail = ''
+        for key, value in self.data.items():
+            if value:  # Populate the model with user supplied values
+                #detail = detail + key + ':' + value + '\n'
+                if key == 'MRC' or key == 'localCharges' or key == 'LD':
+                    value = Chartcom.objects.get(id=value).account_number
+                    #print(key, acct)
+
+                target = map.get(key)
+                if target != None:
+                    setattr(api, target, value)
+
+        api.add_info_text_4 = 9857
+        api.comment_text = self.description
+        api.default_one_time_expense_acct = self.chartcom.account_number
+
+        try:
+            print('try save')
+            api.save()
+
+            with connections['pinnacle'].cursor() as cursor:
+                id = UmOscPreorderApiV.objects.get(add_info_text_4=self.id).pre_order_id
+                cursor.callproc('um_note_procedures_k.um_add_wo_tcom_note_p', [id, 'Order Details', self.data['reviewSummary'], ''])
+
+        except Exception as e:
+            print('cept')
+            log = LogItem()
+            log.transaction = 'Create Issue'
+            log.local_key = self.id
+            log.remote_key = preorder_number
+            log.level = 'Error'
+            log.description = e
+            log.save()
+            print(e.with_traceback)
 
     def leppard(self):
         pour=['me']

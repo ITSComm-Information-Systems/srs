@@ -281,6 +281,8 @@ $(document).ready(function() {
     for (tab = 1; tab < lastStep; tab++) {  
       $('#reviewstep' + tab).text('');
       if(tabs[tab]) {
+        //summary = summary + tabs[tab].dataset.label + "\n"
+        console.log(tabs[tab]);
         for (field = 0; field < tabs[tab].length; field++) {
           txt = '<b>' + tabs[tab][field].label + '</b>  ' + tabs[tab][field].value + '<br>';
           summary = summary + tabs[tab][field].label + ' - ' + tabs[tab][field].value + '\n';
@@ -290,6 +292,7 @@ $(document).ready(function() {
       summary = summary + '\n';
     }
     $('#reviewSummary').val(summary);
+    console.log(summary);
   }
 
 
