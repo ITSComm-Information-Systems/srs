@@ -212,9 +212,9 @@ $(document).ready(function() {
         }
       } else if (type=="checkbox") {
         if (obj.checked == true) {
-          label = $("#legend" + name).text();
+          //label = $("#legend" + name).text();
           value = $("label[for='" + id + "']").text();
-          tab.push({'label': label, 'value': value})
+          tab.push({'label': '', 'value': value})
         }
       } else if (type=="text" || type=="number" || obj.tagName=="TEXTAREA") {
         label = $("label[for='" + id + "']").text();
@@ -281,6 +281,8 @@ $(document).ready(function() {
     for (tab = 1; tab < lastStep; tab++) {  
       $('#reviewstep' + tab).text('');
       if(tabs[tab]) {
+         heading = $('#reviewstep' + tab).data('label')
+         summary = summary + heading.toUpperCase() + '\n';
         for (field = 0; field < tabs[tab].length; field++) {
           txt = '<b>' + tabs[tab][field].label + '</b>  ' + tabs[tab][field].value + '<br>';
           summary = summary + tabs[tab][field].label + ' - ' + tabs[tab][field].value + '\n';
@@ -290,6 +292,7 @@ $(document).ready(function() {
       summary = summary + '\n';
     }
     $('#reviewSummary').val(summary);
+    console.log(summary);
   }
 
 
