@@ -49,9 +49,7 @@
       <div class="form-check">
         <input class="form-check-input" type="checkbox" value="{{feature.id}}" name="{{category.name}}{{type.label}}"
           id="cat{{category.id}}feature{{feature.id}}">
-        <label class="form-check-label" for="cat{{category.id}}feature{{feature.id}}">
-          {{feature.label}}
-        </label>
+        <label class="form-check-label" for="cat{{category.id}}feature{{feature.id}}">{{feature.label}}</label>
         {% if feature.description %}
         <a class="popover-icon" data-toggle="popover" tabindex="0" role="button"
         data-container="body" data-trigger="hover" data-placement="right"
