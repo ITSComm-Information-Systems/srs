@@ -9,6 +9,7 @@ from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServic
 from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from pages.models import Page
+from order.models import LogItem
 from django.http import JsonResponse
 
 import threading
@@ -138,6 +139,28 @@ def delete_from_cart(request):
         Item.objects.filter(id=item).delete()
         dept = request.POST['itemIdDept']
         return HttpResponseRedirect('/orders/cart/' + dept) 
+
+class Integration(PermissionRequiredMixin, View):
+    permission_required = 'oscauth.can_order'
+
+    def get(self, request, order_id):
+        order = Order.objects.get(id=order_id)
+        item_list = Item.objects.filter(order=order)
+
+        for item in item_list:
+            item.note = item.data['reviewSummary']
+            error = LogItem.objects.filter(local_key = str(item.id))
+            if error:
+                item.error = error
+                print(str(item.id))
+            else:
+                item.error = 'no errors'
+                print(str(item.id))
+
+        return render(request, 'order/integration.html', 
+            {'order': order,
+            'item_list': item_list,})
+
 
 class Workflow(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'

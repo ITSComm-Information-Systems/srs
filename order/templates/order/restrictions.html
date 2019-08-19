@@ -18,9 +18,7 @@
   <div class="custom-control custom-radio">
     <input class="form-check-input" type="radio" value="{{res.id}}" name="resrescat{{category.id}}" id="cat-{{category.id}}-{{res.id}}"
       required>
-    <label class="form-check-label" for="cat-{{category.id}}-{{res.id}}">
-      {{res}}
-    </label>
+    <label class="form-check-label" for="cat-{{category.id}}-{{res.id}}">{{res}}</label>
     {% if res == category.res.last %}
     <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
         aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
