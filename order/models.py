@@ -267,42 +267,40 @@ class Item(models.Model):
         api = UmOscPreorderApiV()
         api.add_info_text_3 = self.order_id
         api.add_info_text_4 = self.id
-
         action_id = self.data['action_id']
-
         api.pre_order_number = preorder_number
-        #api.work_status_name = status
 
         cons = Constant.objects.filter(action=action_id)
         for con in cons:  # Populate the model with constants
             setattr(api, con.field, con.value)
 
-        #detail = ''
         for key, value in self.data.items():
             if value:  # Populate the model with user supplied values
-                #detail = detail + key + ':' + value + '\n'
                 if key == 'MRC' or key == 'localCharges' or key == 'LD':
                     value = Chartcom.objects.get(id=value).account_number
-                    #print(key, acct)
 
                 target = map.get(key)
                 if target != None:
                     setattr(api, target, value)
 
-        api.add_info_text_4 = 9857
         api.comment_text = self.description
         api.default_one_time_expense_acct = self.chartcom.account_number
 
         try:
-            print('try save')
             api.save()
+            log = LogItem()
+            log.transaction = 'Create Issue'
+            log.local_key = self.id
+            log.remote_key = preorder_number
+            log.level = 'Info'
+            log.description = 'Preorder Created'
+            log.save()
 
             with connections['pinnacle'].cursor() as cursor:
                 id = UmOscPreorderApiV.objects.get(add_info_text_4=self.id).pre_order_id
                 cursor.callproc('um_note_procedures_k.um_add_wo_tcom_note_p', [id, 'Order Details', self.data['reviewSummary'], ''])
 
         except Exception as e:
-            print('cept')
             log = LogItem()
             log.transaction = 'Create Issue'
             log.local_key = self.id
