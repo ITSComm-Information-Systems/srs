@@ -188,10 +188,12 @@ class Workflow(PermissionRequiredMixin, View):
                     js.append('phone_location')
                 elif tab.name == 'LocationNew':
                     js.append('location')
+                elif tab.name == 'SelectFeatures':
+                    js.append('features')
 
         return render(request, 'order/workflow.html', 
             {'title': action.label,
-            'wfid':action_id,
+            'action':action,
             'tab_list': tabs,
             'js_files': js})
 
@@ -331,8 +333,11 @@ class Status(PermissionRequiredMixin, View):
             if order.order_reference == 'TBD':
                 order.items = item_list.filter(order=order)
             else:
-                pin = UmOscPreorderApiV.objects.get(pre_order_number=order.order_reference,pre_order_issue=1)
-                order.items = [{'description': pin.comment_text}]
+                try:
+                    pin = UmOscPreorderApiV.objects.get(pre_order_number=order.order_reference,pre_order_issue=1)
+                    order.items = [{'description': pin.comment_text}]
+                except:
+                    order.items = item_list.filter(order=order)
 
         template = loader.get_template('order/status.html')
         context = {
