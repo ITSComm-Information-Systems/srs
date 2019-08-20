@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container">
+<div class="container">	
+	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
 	<div class='row'>
 		<h1>{{title}}</h1>
-		<i class="fa fa-spinner fa-spin offset-1" id='loading' style='font:40px;'></i>
+		<!-- <i class="fa fa-spinner fa-spin offset-1" id='loading' style='font:40px;'></i> -->
+		<div class="spinner-border text-dark" role="status"> <span class="sr-only">Loading...</span> </div>
 	</div>
 
 	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
@@ -49,12 +51,20 @@
 							{% for key, value in c.type_summary.items %}
 								<tr>
 									<td>{{ key }}</td>
+									{% if '-'|first in value %}
+									<td class='total-col prv-msgs'>{{ value }}</td>
+									{% else %}
 									<td class='total-col'>{{ value }}</td>
+									{% endif %}
 								</tr>
 							{% endfor %}
 							<tr class='table-total bg-warning'>
 								<td><strong>Total</strong></td>
-								<td class='total-col'>{{ c.type_total }}</td>
+								{% if '-'|first in c.type_total %}
+									<td class='total-col prv-msgs'>{{ c.type_total }}</td>
+								{% else %}
+									<td class='total-col'>{{ c.type_total }}</td>
+								{% endif %}
 							</tr>
 						</tbody>
 					</table>
@@ -85,6 +95,7 @@
 									<form method="POST" action='detail/' id="report_details">{% csrf_token %}
 										<input type="hidden" name="selected_dept" value="{{ dept }}">
 										<input type="hidden" name="billing_date" value="{{ billing_date }}">
+										<input type="hidden" name="dept_mgr" value="{{ dept_mgr }} ({{ dept_mgr_uniq }})">
 										<input type="hidden" name="chartcoms" value="{{ chartfields }}">
 										<input type="hidden" name="user_id" value="{{ v.user_defined_id }}">
 										<input type="hidden" name="sub_id:{{ v.user_defined_id}}" value="{{ v.subscriber_id }}">
@@ -92,10 +103,22 @@
 										<input type="hidden" name="charge_type:{{ v.user_defined_id }}" value="{{ key }}">
 
 										<td class="linky-link"><a href='#' onclick="$('#report_details').submit();">{{ v.user_defined_id }}</a></td>
-										<td>{{ v.monthly_charges }}</td>
+										{% if '-'|first in v.monthly_charges %}
+											<td class='prv-msgs'>{{ v.monthly_charges }}</td>
+										{% else %}
+											<td>{{ v.monthly_charges }}</td>
+										{% endif %}
 										<td>{{ v.call_number }}</td>
-										<td>{{ v.call_amount }}</td>
-										<td class='total-col'>{{ v.total_charges }}</td>
+										{% if '-'|first in v.call_amount %}
+											<td class='prv-msgs'>{{ v.call_amount }}</td>
+										{% else %}
+											<td>{{ v.call_amount }}</td>
+										{% endif %}
+										{% if '-'|first in v.total_charges %}
+											<td class='total-col prv-msgs'>{{ v.total_charges }}</td>
+										{% else %}
+											<td class='total-col'>{{ v.total_charges }}</td>
+										{% endif %}
 									</form>
 								</tr>
 								{% endfor %}
@@ -104,7 +127,11 @@
 									<td></td>
 									<td></td>
 									<td></td>
+									{% if '-'|first in value.total %}
+									<td class='total-col prv-msgs'>{{ value.total }}</td>
+									{% else %}
 									<td class='total-col'>{{ value.total }}</td>
+									{% endif %}
 								</tr>
 							</tbody>
 						</table>
@@ -130,9 +157,17 @@
 							<tr>
 								<td>{{ key }}</td>
 								<td>{{ value.desc }}</td>
-								<td>{{ value.unit_amt }}</td>
+								{% if '-'|first in value.unit_amt %}
+									<td class='prv-msgs'>{{ value.unit_amt }}</td>
+								{% else %}
+									<td>{{ value.unit_amt }}</td>
+								{% endif %}
 								<td>{{ value.quantity }}</td>
-								<td class='total-col'>{{ value.total }}</td>
+								{% if '-'|first in value.total %}
+									<td class='total-col prv-msgs'>{{ value.total }}</td>
+								{% else %}
+									<td class='total-col'>{{ value.total }}</td>
+								{% endif %}
 							</tr>
 							{% endfor %}
 							<tr class='table-total bg-warning'>
@@ -140,7 +175,11 @@
 								<td></td>
 								<td></td>
 								<td></td>
-								<td class='total-col'>{{ c.monthly_total }}</td>
+								{% if '-'|first in c.monthly_total %}
+									<td class='total-col prv-msgs'>{{ c.monthly_total }}</td>
+								{% else %}
+									<td class='total-col'>{{ c.monthly_total }}</td>
+								{% endif %}
 							</tr>
 						</tbody>
 					</table>
@@ -166,14 +205,22 @@
 								<td>{{ a.item_code }}</td>
 								<td>{{ a.desc }}</td>
 								<td>{{ a.qty }}</td>
-								<td class='total-col'>{{ a.total }}</td>
+								{% if '-'|first in a.total %}
+									<td class='total-col prv-msgs'>{{ a.total }}</td>
+								{% else %}
+									<td class='total-col'>{{ a.total }}</td>
+								{% endif %}
 							</tr>
 							{% endfor %}
 							<tr class='table-total bg-warning'>
 								<td><strong>Total</strong></td>
 								<td></td>
 								<td></td>
-								<td class='total-col'>{{ c.otc_total }}</td>
+								{% if '-'|first in c.otc_total %}
+									<td class='total-col prv-msgs'>{{ c.otc_total }}</td>
+								{% else %}
+									<td class='total-col'>{{ c.otc_total }}</td>
+								{% endif %}
 							</tr>
 						</tbody>
 					</table>
@@ -199,14 +246,22 @@
 								<td>{{ o.work_order }}</td>
 								<td>{{ o.equip }}</td>
 								<td>{{ o.sol }}</td>
-								<td class='total-col'>{{ o.total_amt }}</td>
+								{% if '-'|first in o.total_amt %}
+									<td class='total-col prv-msgs'>{{ o.total_amt }}</td>
+								{% else %}
+									<td class='total-col'>{{ o.total_amt }}</td>
+								{% endif %}
 							</tr>
 							{% endfor %}
 							<tr class='table-total bg-warning'>
 								<td><strong>Total</strong></td>
 								<td></td>
 								<td></td>
-								<td class='total-col'>{{ c.occ_total }}</td>
+								{% if '-'|first in c.occ_total %}
+									<td class='total-col prv-msgs'>{{ c.occ_total }}</td>
+								{% else %}
+									<td class='total-col'>{{ c.occ_total }}</td>
+								{% endif %}
 							</tr>
 						</tbody>
 					</table>

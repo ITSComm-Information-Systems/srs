@@ -8,7 +8,8 @@
 
 	<div class='row'>
 		<h1>{{title}}</h1>
-		<i class="fa fa-spinner fa-spin offset-1" id='go-back-loading' style='font:40px;'></i>
+		<!-- <i class="fa fa-spinner fa-spin offset-1" id='go-back-loading' style='font:40px;'></i> -->
+		<div class="spinner-border text-dark" role="status"> <span class="sr-only">Loading...</span> </div>
 	</div>
 
 	<form action=".." method="POST" id="return">{% csrf_token %}
@@ -24,6 +25,7 @@
 				<div class="card-body card-bottom">
 					<strong>Department:&nbsp;&nbsp;</strong>{{ dept }}<br>
 					<strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_date }}<br>
+					<strong>Department Manager:&nbsp;&nbsp;</strong>{{ dept_mgr }}<br>
 					<strong class='floatleft'>Chartfields:&nbsp;&nbsp;</strong>
 					<p class='floatleft'>
 					{% for c in chartcoms %}
@@ -80,9 +82,17 @@
 						<tr>
 							<td>{{ m.item_code }}</td>
 							<td>{{ m.desc }}</td>
-							<td>{{ m.unit_price }}</td>
+							{% if '-'|first in m.unit_price %}
+								<td class='prv-msgs'>{{ m.unit_price }}</td>
+							{% else %}
+								<td>{{ m.unit_price }}</td>
+							{% endif %}
 							<td>{{ m.quantity }}</td>
-							<td class='total-col'>{{ m.total_charge }}</td>
+							{% if '-'|first in m.total_charge %}
+								<td class='total-col prv-msgs'>{{ m.total_charge }}</td>
+							{% else %}
+								<td class='total-col'>{{ m.total_charge }}</td>
+							{% endif %}
 						</tr>
 						{% endfor %}
 						<tr class='table-total bg-warning'>
@@ -90,7 +100,11 @@
 							<td></td>
 							<td></td>
 							<td></td>
-							<td class='total-col'>{{ cf.monthly_total }}</td>
+							{% if '-'|first in cf.monthly_total %}
+								<td class='total-col prv-msgs'>{{ cf.monthly_total }}</td>
+							{% else %}
+								<td class='total-col'>{{ cf.monthly_total }}</td>
+							{% endif %}
 						</tr>
 					</tbody>
 				</table>
@@ -119,7 +133,11 @@
 							<td>{{ l.to_num }}</td>
 							<td>{{ l.location }}</td>
 							<td>{{ l.duration }}</td>
-							<td class='total-col'>{{ l.total_charge }}</td>
+							{% if '-'|first in l.total_charge %}
+								<td class='total-col prv-msgs'>{{ l.total_charge }}</td>
+							{% else %}
+								<td class='total-col'>{{ l.total_charge }}</td>
+							{% endif %}
 						</tr>
 						{% endfor %}
 						<tr class='table-total bg-warning'>
@@ -127,7 +145,11 @@
 							<td></td>
 							<td></td>
 							<td></td>
-							<td class='total-col'>{{ cf.local_total }}</td>
+							{% if '-'|first in cf.local_total %}
+								<td class='total-col prv-msgs'>{{ cf.local_total }}</td>
+							{% else %}
+								<td class='total-col'>{{ cf.local_total }}</td>
+							{% endif %}
 						</tr>
 					</tbody>
 				</table>
@@ -155,7 +177,11 @@
 							<td>{{ t.to_num }}</td>
 							<td>{{ t.location }}</td>
 							<td>{{ t.duration }}</td>
-							<td class='total-col'>{{ t.total_charge }}</td>
+							{% if '-'|first in t.total_charge %}
+								<td class='total-col prv-msgs'>{{ t.total_charge }}</td>
+							{% else %}
+								<td class='total-col'>{{ t.total_charge }}</td>
+							{% endif %}
 						</tr>
 						{% endfor %}
 						<tr class='table-total bg-warning'>
@@ -163,7 +189,11 @@
 							<td></td>
 							<td></td>
 							<td></td>
-							<td class='total-col'>{{ cf.toll_total }}</td>
+							{% if '-'|first in cf.toll_total %}
+								<td class='total-col prv-msgs'>{{ cf.toll_total }}</td>
+							{% else %}
+								<td class='total-col'>{{ cf.toll_total }}</td>
+							{% endif %}
 						</tr>
 					</tbody>
 				</table>
@@ -177,7 +207,11 @@
 				<tbody>
 					<tr class='table-total bg-warning'>
 						<td><strong>Total</strong></td>
-						<td class='total-col'>{{ cf.cf_total }}</td>
+						{% if '-'|first in cf.cf_total %}
+							<td class='total-col prv-msgs'>{{ cf.cf_total }}</td>
+						{% else %}
+							<td class='total-col'>{{ cf.cf_total }}</td>
+						{% endif %}
 					</tr>
 				</tbody>
 			</table>
@@ -193,7 +227,11 @@
 				<tbody>
 					<tr class='table-total bg-warning'>
 						<td><strong>Total</strong></td>
-						<td class='total-col'>{{ total }}</td>
+						{% if '-'|first in total %}
+							<td class='total-col prv-msgs'>{{ total }}</td>
+						{% else %}
+							<td class='total-col'>{{ total }}</td>
+						{% endif %}
 					</tr>
 				</tbody>
 			</table>

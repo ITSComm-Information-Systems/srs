@@ -301,6 +301,7 @@ def show_detail(request):
 	# Get information from previous page
 	selected_dept = request.POST.get('selected_dept')
 	bill_date = request.POST.get('billing_date')
+	dept_mgr = request.POST.get('dept_mgr')
 	chartcoms = request.POST.get('chartcoms')
 	user_id = request.POST.get('user_id')
 	chartcom = request.POST.get('chartcom:' + user_id)
@@ -472,6 +473,7 @@ def show_detail(request):
 		'title':'Telephony Detail of Charges',
 		'dept': selected_dept,
 		'billing_date': bill_date,
+		'dept_mgr': dept_mgr,
 		'chartcoms': chartcoms,
 		'user_id': user_id,
 		'sub_id': sub_id,

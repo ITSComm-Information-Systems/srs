@@ -125,6 +125,11 @@ def generate(request):
             rows = 'There is no data for the current selection'
         table = []
 
+    # Format unit if it's a list of departments
+    test = 'False'
+    if grouping == 'Department ID':
+        unit = format_depts(unit)
+
     template = loader.get_template('soc-report.html')
     context = {
         'title': 'Summary of Charges',   
@@ -292,11 +297,26 @@ def get_table(rows,request):
                     item_price =  item_price + float(price[2])
                     total_cost =  total_cost + float(price[2]) 
                 charge_total = charge_total + item_price
-                account_table.append([x[0],x[1],round(rate,2),quantity,round(item_price,2)])
+                account_table.append([x[0],x[1],rate,quantity,item_price,2])
             overall_cost = overall_cost + charge_total
-            whole_table.append([y,account_table, round(charge_total,2)])
-        final_table.append([i[0],i[1],whole_table,round(total_cost,2)])
-    complete_table.append([final_table,round(overall_cost,2)])
+            whole_table.append([y,account_table, charge_total])
+        final_table.append([i[0],i[1],whole_table,total_cost])
+    complete_table.append([final_table,overall_cost])
     return complete_table
+
+# Format departments as list
+def format_depts(depts):
+    depts = str(depts)
+    depts = depts.replace('"','')
+    depts = depts.replace('[','')
+    depts = depts.replace(']','')
+    depts = depts.replace(',','')
+    depts = depts.replace(' ', '')
+    depts = depts.split('\'')
+    format_depts = []
+    for d in depts:
+        if len(d) != 0:
+            format_depts.append(d)
+    return format_depts
 
 
