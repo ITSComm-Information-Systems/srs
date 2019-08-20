@@ -5,7 +5,7 @@
 <form action="/reports/soc/report" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
     {% if depts %}
 
-    <div class="col-6">
+    <div class="col-5">
         <fieldset>
             <legend class="h2">
                 Select Unit Grouping
@@ -15,13 +15,15 @@
                 <label for="deptid"><strong>Department ID</strong></label>
                 <div id="department_id_div" class="indented-form-input">
                     <label for="departmentIdSelection"><strong>Select Department ID(s)</strong></label>
-                    <select class="custom-select" multiple name="department_id" id="departmentIdSelection">
+                    <div class='form-check mt-0 mb-0'>
+                        <input type="checkbox" name="selectall" id="deptidall" value='2'>
+                        <label for="deptidall"><strong>Select All</strong></label>
+                    </div>
+                    <select class="custom-select mt-0" multiple name="department_id" id="departmentIdSelection">
                         {% for key, value in depts.items %}
                         <option value="{{ key }}">{{ key }} - {{ value }}</option>
                         {% endfor %}
                     </select>
-                    <input type="checkbox" name="selectall" id="deptidall" value='2'>
-                    <label for="deptidall">Select All Departments (you have access to)</label>
                 </div>
             </div>
 
@@ -56,7 +58,7 @@
 
 
 
-    <div class="col-6">
+    <div class="col-5">
         <fieldset>
             <legend class="h2">
                 Select a Date Range

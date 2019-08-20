@@ -2,22 +2,25 @@
 {% load tags %}
 {% block content %}
 
+<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
+
 <h1>{{ title }}</h1>
 <div>
     <strong>Report selection</strong>
-    <a class="float-right" href="../soc">Edit your selection</a>
-    <a class="float-right" id="edit-selection" href="../soc"><i class="fas fa-edit"></i></a>
+    <a class='offset-2' href="../soc"><i class="fas fa-edit"></i>Edit your selection</a>
+    <!-- <a class="offset-2" id="edit-selection" href="../soc"><i class="fas fa-edit"></i></a> -->
 </div>
 
-<div>
-    <div class="card border-dark">
-        <div class="card-body card-grid-soc">
-            <div class="deptname">
-                <strong>Unit/Group: </strong>{{ unit }}
-            </div>
-            <div class="billdate">
-                <strong>Billing Date: </strong>{{ billing_period }}
-            </div>
+<div class="row">
+    <div class="card border-dark col-md-5">
+        <div class="card-body card-bottom">
+            <div><strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_period }}</div>
+            <strong class="floatleft">{{ grouping }}:&nbsp;&nbsp;</strong>
+            <p class="floatleft">
+            {% for u in unit %}
+                {{ u }}<br>
+            {% endfor %}
+            </p>
         </div>
     </div>
 </div>
@@ -70,7 +73,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>${{ row.3 }}</td>
+            <td>{{ row.3 | currency }}</td>
         </tr>
 
     <tbody class="{{row.0}}" id="{{row.0}}" style="display:none">
@@ -91,7 +94,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>${{ charge.2}}</td>
+            <td>{{ charge.2 | currency }}</td>
             <td></td>
         </tr>
         {% for code in charge.1 %}
@@ -99,10 +102,10 @@
             <td></td>
             <td>{{ code.0 }}</td>
             <td>{{ code.1 }}</td>
-            <td>${{ code.2 }}</td>
+            <td>{{ code.2 | currency }}</td>
             <td>{% divide code.3 num_months %}</td>
             <td>{{ code.3 }}</td>
-            <td>${{ code.4 }}</td>
+            <td>{{ code.4 | currency }}</td>
             <td></td>
             <td></td>
         </tr>
@@ -112,7 +115,7 @@
     {% endfor %}
 
     <tr class='bg-warning'>
-        <td>Total Charges</td>
+        <td><strong>Total</strong></td>
         <td></td>
         <td></td>
         <td></td>
@@ -120,7 +123,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>${{table.0.1}}</td>
+        <td>{{table.0.1 | currency }}</td>
     </tr>
     </tbody>
 </table>
@@ -271,6 +274,23 @@
 
 
     });
+
+    // When the user scrolls down 20px from the top of the document, show the button
+    window.onscroll = function() {scrollFunction()};
+
+    function scrollFunction() {
+      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        document.getElementById("scrollTop").style.display = "block";
+      } else {
+        document.getElementById("scrollTop").style.display = "none";
+      }
+    }
+
+    // When the user clicks on the button, scroll to the top of the document
+    function topFunction() {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
 </script>
 <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
 
