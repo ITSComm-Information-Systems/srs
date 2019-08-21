@@ -232,15 +232,36 @@
                 <!-- <td>{% for charge in phone %}{% if charge.item_description%}
                     {{charge.item_description}}<br>{% endif %}{% endfor %}</td> -->
                 <td>{% for charge in phone %}{% if charge.quantity%} {{charge.quantity}}{% endif %}<br>{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.unit_price%} {{charge.unit_price | currency }}{% endif %}<br>{% endfor %}</td> 
-                <td>{% for charge in phone %}{% if charge.charge_amount%} {{charge.charge_amount | currency }}{% endif %}<br>{% endfor %}</td>
+                <td>
+                    {% for charge in phone %}
+                        {% if charge.unit_price %}
+                            {% if 0 > charge.unit_price %}
+                                <span class='prv-msgs'>{{charge.unit_price | currency }}</span>
+                            {% else %}
+                                {{ charge.unit_price | currency }}
+                            {% endif %}
+                        {% endif %}<br>
+                    {% endfor %}</td> 
+                <td>{% for charge in phone %}
+                        {% if charge.charge_amount%}
+                            {% if 0 > charge.charge_amount %}
+                                <span class='prv-msgs'>{{charge.charge_amount | currency }}</span>
+                            {% else %}
+                                {{ charge.charge_amount | currency }}
+                            {% endif %}
+                        {% endif %}<br>
+                    {% endfor %}</td>
             </tr>
             {% endfor %}
         </tbody>
         <tr class="bg-warning total-charges-inv">
             <td colspan="2">Total</td>
             <td colspan='7'></td>
-            <td colspan="3" class="total-col">{{cost_table|index:forloop.counter0 | currency }}</td>
+            {% if 0 > cost_table|index:forloop.counter0 %}
+                <td colspan="3" class="total-col prv-msgs">{{cost_table|index:forloop.counter0 | currency }}</td>
+            {% else %}
+                <td colspan="3" class="total-col">{{cost_table|index:forloop.counter0 | currency }}</td>
+            {% endif %}
         </tr>
     </table>
 </div>

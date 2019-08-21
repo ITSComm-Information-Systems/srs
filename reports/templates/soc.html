@@ -21,7 +21,7 @@
                     </div>
                     <select class="custom-select mt-0" multiple name="department_id" id="departmentIdSelection">
                         {% for key, value in depts.items %}
-                        <option value="{{ key }}">{{ key }} - {{ value }}</option>
+                        <option value="{{ key }} - {{ value }}">{{ key }} - {{ value }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -58,7 +58,7 @@
 
 
 
-    <div class="col-5">
+    <div class="col-12">
         <fieldset>
             <legend class="h2">
                 Select a Date Range
@@ -66,7 +66,7 @@
             <div class="form-group">
                 <input type="radio" name="dateRangeGroup" id="fiscal" value='1'>
                 <label for="fiscal"><strong> Fiscal Year</strong></label>
-                <div id="fiscalyear_div" class="form-group indented-form-input">
+                <div id="fiscalyear_div" class="form-group indented-form-input col-5">
                     <label for="fiscalyear"><strong>Select a Fiscal Year</strong></label>
                     <select class="custom-select" name="FISCALYEAR" id="fiscalyear" size="1">
                         {% for year in fiscal %}
@@ -79,7 +79,7 @@
             <div class="form-group">
                 <input type="radio" name="dateRangeGroup" id="calendar" value='2'>
                 <label for="calendar"><strong>Calender Year</strong></label>
-                <div id="calendaryear_div" class="form-group indented-form-input">
+                <div id="calendaryear_div" class="form-group indented-form-input col-5">
                     <label for="calendaryear"><strong>Select a Calendar Year</strong></label>
                     <select class="custom-select" name="CALENDARYEAR" id="calendaryear" size="1">
                         {% for year in calendar %}
@@ -92,31 +92,39 @@
             <div class="form-group">
                 <input type="radio" name="dateRangeGroup" id="single" value='3'>
                 <label for="single"><strong>Single Month</strong></label>
-                <div id='singlemonth' class="indented-form-input">
+                <div id='singlemonth' class="indented-form-input col-5">
                     <div class="form-group">
-                        <label for="singlemonthselect"><strong>Select a Month</strong></label>
+                        <label for='singlemonthselect'><strong>Select a Month & Year</strong></label>
+                        <select class='custom-select' name='singlemonthselect' size='1'>
+                            {% for year in calendar %}
+                                {% for month in months %}
+                                    <option value='{{ month }} {{ year }}'>{{ month }} {{ year }}</option>
+                                {% endfor %}
+                            {% endfor %}
+                        </select>
+                        <!-- <label for="singlemonthselect"><strong>Select a Month</strong></label>
                         <select class="custom-select" name="SINGLEMONTH" id="singlemonthselect" size="1">
                             {% for month in months %}
                             <option value="{{ month }}">{{ month }}</option>
                             {% endfor %}
-                        </select>
+                        </select> -->
                     </div>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="singlemonthyear"><strong>Select a Year</strong></label>
                         <select class="custom-select" name="SINGLEYEAR" id="singlemonthyear" size="1">
                             {% for year in calendar %}
                             <option value="{{ year }}">{{ year }}</option>
                             {% endfor %}
                         </select>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="form-group">
                 <input type="radio" name="dateRangeGroup" id="multiple" value='4'>
                 <label for="multiple"><strong>Month-to-month</strong></label>
                 <div id="multimonth" class="indented-form-input">
-                    <strong>Select Billing Range</strong>
-                    <select class="custom-select" name="FIRSTMONTH" size="1">
+                    <label for='multimonth1'><strong>Select Month & Year Range</strong></label>
+                    <!-- <select class="custom-select" name="FIRSTMONTH" size="1">
                         {% for month in months %}
                         <option value="{{ month }}">{{ month }}</option>
                         {% endfor %}
@@ -136,7 +144,28 @@
                         {% for year in calendar %}
                         <option value="{{ year }}">{{ year }}</option>
                         {% endfor %}
-                    </select>
+                    </select> -->
+                    <div class='form-row col-md-12'>
+                        <div class='form-group col-md-3'>
+                            <select class='custom-select' name='multimonth1' size='1'>
+                                {% for year in calendar %}
+                                    {% for month in months %}
+                                        <option value='{{ month }} {{ year }}'>{{ month }} {{ year }}</option>
+                                    {% endfor %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <span>&nbsp;<strong>to</strong>&nbsp;</span>
+                        <div class='form-group col-md-3'>
+                            <select class='custom-select' name='multimonth2' size='1'>
+                                {% for year in calendar %}
+                                    {% for month in months %}
+                                        <option value='{{ month }} {{ year }}'>{{ month }} {{ year }}</option>
+                                    {% endfor %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
         </fieldset>
