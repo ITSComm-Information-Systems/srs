@@ -14,7 +14,7 @@
 <div class="row">
     <div class="card border-dark col-md-5">
         <div class="card-body card-bottom">
-            <div><strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_period }}</div>
+            <div><strong>Billing Period:&nbsp;&nbsp;</strong>{{ billing_period }}</div>
             <strong class="floatleft">{{ grouping }}:&nbsp;&nbsp;</strong>
             <p class="floatleft">
             {% for u in unit %}
@@ -34,8 +34,7 @@
         <button onclick="collapseAll()" class="btn btn-link">Collapse All</button>
     </div>
     <button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')"
-        class="btn btn-success float-right">Download Table To
-        CSV File
+        class="btn btn-success float-right">CSV Download
     </button>
 </div>
 
@@ -73,7 +72,11 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>{{ row.3 | currency }}</td>
+            {% if row.3 < 0 %}
+                <td class='prv-msgs'>{{ row.3 | currency }}</td>
+            {% else %}
+                <td>{{ row.3 | currency }}</td>
+            {% endif %}
         </tr>
 
     <tbody class="{{row.0}}" id="{{row.0}}" style="display:none">
@@ -94,7 +97,11 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>{{ charge.2 | currency }}</td>
+            {% if 0 > charge.2 %}
+                <td class='prv-msgs'>{{ charge.2 | currency }}</td>
+            {% else %}
+                <td>{{ charge.2 | currency }}</td>
+            {% endif %}
             <td></td>
         </tr>
         {% for code in charge.1 %}
@@ -102,10 +109,18 @@
             <td></td>
             <td>{{ code.0 }}</td>
             <td>{{ code.1 }}</td>
-            <td>{{ code.2 | currency }}</td>
+            {% if 0 > code.2 %}
+                <td class='prv-msgs'>{{ code.2 | currency }}</td>
+            {% else %}
+                <td>{{ code.2 | currency }}</td>
+            {% endif %}
             <td>{% divide code.3 num_months %}</td>
             <td>{{ code.3 }}</td>
-            <td>{{ code.4 | currency }}</td>
+            {% if 0 > code.4 %}
+                <td class='prv-msgs'>{{ code.4 | currency }}</td>
+            {% else %}
+                <td>{{ code.4 | currency }}</td>
+            {% endif %}
             <td></td>
             <td></td>
         </tr>
@@ -123,7 +138,11 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>{{table.0.1 | currency }}</td>
+        {% if 0 > table.0.1 %}
+            <td class='prv-msgs'>{{table.0.1 | currency }}</td>
+        {% else %}
+            <td>{{ table.0.1 | currency }}</td>
+        {% endif %}
     </tr>
     </tbody>
 </table>
