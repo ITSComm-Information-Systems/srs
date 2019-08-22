@@ -37,7 +37,7 @@
     <input type="text" name="dept_id" id="dept_id" value="{{dept_id}}-{{dept_name}}" readonly hidden>
     <input type="text" name="bill_period" id="bill_period" value="{{bill_period}}" readonly hidden>
 
-    <strong class='mt-2 mb-1'>Filter by:</strong>
+    <strong class='mt-2 mb-2'>Filter By:</strong>
 
     <div class="form-row">
         <div class="row align-items-start col-3" id="select_loc">
@@ -104,30 +104,71 @@
         {% endif %}
         <input type='submit' value='Apply Filters' class="btn btn-primary mb-1 float-right">
 
-        {% if location_filter or type_filter or cf_filter or date_filter%}
-        <div class="row align-items-start col-10"></div>
-        <pre>            </pre>
-        <input type='submit' value='Remove Filters' class="btn btn-danger mb-1">
-        {% endif %}
-
     </div>
+
+    <hr class="style1">
+    {% endif %}
+
+    {% if location_filter or type_filter or cf_filter or date_filter%}
+        <div class='form-row mb-0'>
+            <div class='form-group col-md-10'>
+                <strong class='mt-2 mb-1'>Current Filters:</strong>
+
+                <div class='indented-form-input'>
+                    <p>
+                        {% if location_filter %}<strong>Location:</strong> {{ location_filter }}<br>{% endif %}
+                        {% if type_filter %}<strong>User ID Type:</strong> {{ type_filter }}<br>{% endif %}
+                        {% if cf_filter %}<strong>Chartfield:</strong> {{ cf_filter }}<br>{% endif %}
+                        {% if date_filter %}<strong>Last Call Date:</strong> {{ date_filter }}<br>{% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class='form-group col-md-2'>
+                {% if location_filter or type_filter or cf_filter or date_filter%}
+                    <!-- <div class="row align-items-start col-10"></div>
+                    <pre>            </pre> -->
+                    <input type='submit' value='Remove Filters' class="btn btn-danger float-right">
+                {% endif %}
+            </div>
+        </div>
+
+        <hr class="style1">
+    {% endif %}
 </form>
+{% comment %}
 <hr class="style1">
 {% endif %}
 
 {% if location_filter or type_filter or cf_filter or date_filter%}
-<strong class='mt-2 mb-1'>Current Filters:</strong>
+    <div class='form-row mb-0'>
+        <div class='form-group col-md-10'>
+            <strong class='mt-2 mb-1'>Current Filters:</strong>
 
-    {% if location_filter %}<p><strong>Location filter:</strong> {{ location_filter }}</p>{% endif %}
-    {% if type_filter %}<p><strong>User ID Type filter:</strong> {{ type_filter }}</p>{% endif %}
-    {% if cf_filter %}<p><strong>Chartfield filter:</strong> {{ cf_filter }}</p>{% endif %}
-    {% if date_filter %}<p><strong>Last Call Date filter:</strong> {{ date_filter }}</p>{% endif %}
+            <div class='indented-form-input'>
+                <p>
+                    {% if location_filter %}<strong>Location:</strong> {{ location_filter }}<br>{% endif %}
+                    {% if type_filter %}<strong>User ID Type:</strong> {{ type_filter }}<br>{% endif %}
+                    {% if cf_filter %}<strong>Chartfield:</strong> {{ cf_filter }}<br>{% endif %}
+                    {% if date_filter %}<strong>Last Call Date:</strong> {{ date_filter }}<br>{% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class='form-group col-md-2'>
+            {% if location_filter or type_filter or cf_filter or date_filter%}
+                <input type='submit' value='Remove Filters' class="btn btn-danger float-right">
+            {% endif %}
+        </div>
+    </div>
+
     <hr class="style1">
 {% endif %}
+{% endcomment %}
 
 {% if formated_data %}
 <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right">
-    CSV Download
+    Download as CSV
 </button>
 
 {% for classification in formated_data %}
@@ -138,18 +179,18 @@
     <table class="table table-sm mb-5 table-striped" style="font-size:12px">
         <thead class="thead-dark">
             <tr>
-                <th>User Id</th>
+                <th>User ID</th>
                 <th>Usage</th>
                 <th>User ID Type</th>
-                <th>User ID Name</th>
+                <th>User Name</th>
                 <th>Location</th>
-                <th>Calling Range/Restrictions</th>
-                <th>Last Outbound Call</th>
+                <th>Calling Range</th>
+                <th>Last Outbound Call Date</th>
                 <th>Account</th>
                 <th>Charge Code</th>
-                <th>Charge Description</th>
+                <!-- <th>Charge Description</th> -->
                 <th>Quantity</th>
-                <th>Rate</th>
+                <th>Unit Rate</th>
                 <th>Amount</th>
             </tr>
 
@@ -161,35 +202,66 @@
                 <td style="vertical-align:middle">{{phone.0.usage}}</td>
                 <td style="vertical-align:middle">{{phone.0.cd_descr}}</td>
                 <td style="vertical-align:middle">{{phone.0.first_name}} {{phone.0.last_name}}</td>
-                <td>{% for charge in phone %}{% if charge.jack%}Location: {{charge.building}}<br> Floor:
-                    {{charge.floor}} Room: {{charge.room}}<br>Jack: {{charge.jack}}<br>(As of
-                    {{charge.location_since_date}})<br>{% endif %}{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.ncos_desc%} {{charge.ncos_desc}} {% if charge.ncos %}
-                    ({{charge.ncos}})<br>{% endif %}{% endif %}{% endfor %}</td>
+                <td>{% for charge in phone %}
+                        {% if charge.jack%}
+                            Location: {{charge.building}}<br> 
+                            Floor: {{charge.floor}}
+                            Room: {{charge.room}}<br>
+                            Jack: {{charge.jack}}<br>
+                            (As of {{charge.location_since_date}})<br>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{% for charge in phone %}
+                        {% if charge.ncos_desc%}
+                            {{charge.ncos_desc}} 
+                            {% if charge.ncos %}
+                                ({{charge.ncos}})<br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
                 <td>{{phone.0.last_call_date}}</td>
                 <td>{{phone.0.mrc_account}}</td>
-                <td>{% for charge in phone %}{% if charge.item_code%}{{charge.item_code}}<br>{% endif%} {% endfor %}
+                <td>{% for charge in phone %}
+                        {% if charge.item_code%}
+                            {{charge.item_code}}<br>
+                        {% endif%}
+                    {% endfor %}
                 </td>
-                <td>{% for charge in phone %}{% if charge.item_description%}
-                    {{charge.item_description}}<br>{% endif %}{% endfor %}</td>
+                <!-- <td>{% for charge in phone %}{% if charge.item_description%}
+                    {{charge.item_description}}<br>{% endif %}{% endfor %}</td> -->
                 <td>{% for charge in phone %}{% if charge.quantity%} {{charge.quantity}}{% endif %}<br>{% endfor %}</td>
-                <td>{% for charge in phone %}{% if charge.unit_price%} {{charge.unit_price | currency }}{% endif %}<br>{% endfor %}</td> 
-                <td>{% for charge in phone %}{% if charge.charge_amount%} ${{charge.charge_amount}}{% endif %}<br>{% endfor %}</td>
-                {% comment %} <td>{{item.ncos_desc}} {% if item.ncos %} ({{item.ncos}}) {% endif %}</td>
-                <td>{{item.last_call_date}}</td>
-                <td>{{item.mrc_account}}</td>
-                <td>{{item.item_code}}</td>
-                <td>{{item.item_description}}</td>
-                <td>{% if item.quantity %}{{item.quantity}}{% endif %}</td>
-                <td>{% if item.unit_price %}{{item.unit_price | currency }}{% endif %}</td>
-                <td>{% if item.charge_amount %}{{item.charge_amount | currency }}{% endif %}</td> {% endcomment %}
+                <td>
+                    {% for charge in phone %}
+                        {% if charge.unit_price %}
+                            {% if 0 > charge.unit_price %}
+                                <span class='prv-msgs'>{{charge.unit_price | currency }}</span>
+                            {% else %}
+                                {{ charge.unit_price | currency }}
+                            {% endif %}
+                        {% endif %}<br>
+                    {% endfor %}</td> 
+                <td>{% for charge in phone %}
+                        {% if charge.charge_amount%}
+                            {% if 0 > charge.charge_amount %}
+                                <span class='prv-msgs'>{{charge.charge_amount | currency }}</span>
+                            {% else %}
+                                {{ charge.charge_amount | currency }}
+                            {% endif %}
+                        {% endif %}<br>
+                    {% endfor %}</td>
             </tr>
             {% endfor %}
         </tbody>
         <tr class="bg-warning total-charges-inv">
-            <td colspan="2">Total Charges:</td>
-            <td colspan='8'></td>
-            <td colspan="3" class="total-col">${{cost_table|index:forloop.counter0}}</td>
+            <td colspan="2">Total</td>
+            <td colspan='7'></td>
+            {% if 0 > cost_table|index:forloop.counter0 %}
+                <td colspan="3" class="total-col prv-msgs">{{cost_table|index:forloop.counter0 | currency }}</td>
+            {% else %}
+                <td colspan="3" class="total-col">{{cost_table|index:forloop.counter0 | currency }}</td>
+            {% endif %}
         </tr>
     </table>
 </div>
