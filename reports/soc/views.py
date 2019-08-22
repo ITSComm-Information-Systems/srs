@@ -26,6 +26,8 @@ from oscauth.forms import *
 import datetime
 from django.contrib.auth.decorators import login_required, permission_required
 
+from pages.models import Page
+
 
 # Load selection page
 @permission_required('oscauth.can_report', raise_exception=True)
@@ -41,6 +43,9 @@ def get_soc(request):
     calendar = select_calendar_year(request)
     months = select_month(request)
 
+    # Get instructions
+    instructions = Page.objects.get(permalink='/soc')
+
     # Get department group VP areas for dropdown
     vps = []
     vps = UmOscDeptUnitsReptV.objects.order_by('dept_grp_vp_area').values_list('dept_grp_vp_area_descr',flat =True).distinct() 
@@ -49,6 +54,7 @@ def get_soc(request):
         'title': 'Summary of Charges',
         'depts': find_dept_names(depts),
         'groups_descr':groups_descr,
+        'instructions': instructions,
         'fiscal':fiscal,
         'calendar':calendar,
         'months':months,

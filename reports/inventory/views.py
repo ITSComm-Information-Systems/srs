@@ -21,6 +21,8 @@ from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscR
 from oscauth.forms import *
 from datetime import datetime
 
+from pages.models import Page
+
 
 # Load selection page
 @permission_required('oscauth.can_report', raise_exception=True)
@@ -42,9 +44,13 @@ def get_inventory(request):
                 ,'name': name_query[i]}
         names.append(name)
 
+    # Get instructions
+    instructions = Page.objects.get(permalink='/ial')
+
     template = loader.get_template('inventory.html')
     context = {
         'title': 'Inventory & Location Report',
+        'instructions': instructions,
         'depts': names,
         'dates': dates,
     }
