@@ -27,6 +27,8 @@ from django.http import JsonResponse
 from datetime import datetime
 from django.shortcuts import redirect
 
+from pages.models import Page
+
 # Load intial Detail of Charge page
 @permission_required('oscauth.can_report', raise_exception=True)
 def get_doc(request):
@@ -53,10 +55,14 @@ def get_doc(request):
     # Find all available billing dates
     billing_dates = list((d.billing_date for d in UmOscBillCycleV.objects.all().order_by('billing_date').reverse()))
 
+    # Get instructions
+    instructions = Page.objects.get(permalink='/doc')
+
     context = {
         'title': 'Telephony Detail of Charges',
         'form_action': '/reports/doc/report/',
         'names': names,
+        'instructions': instructions,
         'dates': billing_dates,
         'initial_date':billing_dates[0],
         'dept_cfs': dept_cfs

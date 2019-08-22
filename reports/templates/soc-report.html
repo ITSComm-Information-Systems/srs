@@ -2,6 +2,12 @@
 {% load tags %}
 {% block content %}
 
+<style>
+    .center-title {
+        text-align:center;
+    }
+</style>
+
 <button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
 
 <h1>{{ title }}</h1>
@@ -38,18 +44,18 @@
     </button>
 </div>
 
-<table class="table table-sm table-bordered">
+<table class="table table-sm table-bordered" id='soc-table'>
     <thead class="thead-dark">
         <tr>
-            <th>Expense Account</th>
-            <th>Item Description</th>
-            <th>Charge Codes</th>
-            <th>Rate</th>
-            <th>Average Monthly Units Billed</th>
-            <th>Billed Units</th>
-            <th>Item Total</th>
-            <th>Item Group Total</th>
-            <th>Account Total</th>
+            <th class='center-title'>Expense Account</th>
+            <th class='center-title'>Item Description</th>
+            <th class='center-title'>Charge Codes</th>
+            <th class='center-title'>Rate</th>
+            <th class='center-title'>Average Monthly Units Billed</th>
+            <th class='center-title'>Billed Units</th>
+            <th class='center-title'>Item Total</th>
+            <th class='center-title'>Item Group Total</th>
+            <th class='center-title'>Account Total</th>
 
         </tr>
     </thead>
@@ -62,7 +68,7 @@
                     <input class='toggle1' type="checkbox" name="{{row.0}}" data-toggle="toggle">
                     <i class="far fa-caret-square-down unchecked"></i>
                     <i class="far fa-caret-square-up checked"></i>
-                    {{ row.0 }} ({{ row.1 }})
+                    <span id='test'>{{ row.0 }} ({{ row.1 }})</span>
                 </label>
             </td>
             <td></td>
@@ -139,9 +145,9 @@
         <td></td>
         <td></td>
         {% if 0 > table.0.1 %}
-            <td class='prv-msgs'>{{table.0.1 | currency }}</td>
+            <td class='prv-msgs'><strong>{{table.0.1 | currency }}</strong></td>
         {% else %}
-            <td>{{ table.0.1 | currency }}</td>
+            <td><strong>{{ table.0.1 | currency }}</strong></td>
         {% endif %}
     </tr>
     </tbody>
@@ -167,6 +173,51 @@
 
     }
 
+    // function exportTableToCSV(filename) {
+    //     var csv = [];
+    //     // Get all rows
+    //     var rows = document.querySelectorAll("table tr");
+
+    //     //Loop through all rows
+    //     for (var i = 0; i < rows.length; i++) {
+    //         var row = [];
+    //         var cols = rows[i].querySelectorAll("td, th");
+
+    //         // Loop through all columns
+    //         for (var j = 0; j < cols.length; j++) {
+    //             // if (j == 0) {
+    //             //     var test = cols[j].text();
+    //             //     alert(test);
+    //             // }
+    //             row.push(cols[j].innerText);
+    //         }
+
+    //         csv.push(row.join(","));
+    //     }
+
+    //     // var table = document.getElementById('soc-table');
+    //     // for (var i = 0; row; row = table.rows[i]; ++i) {
+    //     //     row = [];
+    //     //     for (var j = 0; col; col = table.cells[j]; ++j) {
+    //     //         alert(j.text());
+    //     //     }
+    //     // }
+
+    //     // // Loop through rows
+    //     // $('#soc-table tr').each(function(){
+    //     //     row = [];
+    //     //     // Loop through columns
+    //     //     $(this).find('td').each(function(){
+    //     //         //do your stuff, you can use $(this) to get current cell
+    //     //         row.push($(this).text());
+    //     //     })
+    //     //     csv.push(row.join(','));
+    //     // })
+
+    //     // Download CSV file
+    //     downloadCSV(csv.join("\n"), filename);
+    // }
+
     function exportTableToCSV(filename) {
         var csv = [];
         var rows = document.querySelectorAll("table tr");
@@ -183,6 +234,7 @@
         // Download CSV file
         downloadCSV(csv.join("\n"), filename);
     }
+
 
     function downloadCSV(csv, filename) {
         var csvFile;
