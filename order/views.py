@@ -205,6 +205,10 @@ class Workflow(PermissionRequiredMixin, View):
 
 
                 tab.form = f
+            elif tab.custom_form == 'StaticForm':
+                tab.bodytext = Page.objects.get(permalink='/prepPhone').bodytext
+                tab.form = forms.Form()
+                tab.form.template = 'order/static.html'
             else:
                 tab.form = globals()[tab.custom_form]
                 if tab.name == 'PhoneLocation':

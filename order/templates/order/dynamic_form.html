@@ -17,6 +17,10 @@
             {% endfor %}
             <br>
         </fieldset>
+    {% elif field.field.type == 'Label' %}
+    <div id="{{ field.name }}">
+        <label>{{ field.label }}</label>
+    </div>
     {% elif field.field.type == 'Chart' %}
     {% if tab.name == '0chartfields' %}
     <div id='dummyChartfield'>
