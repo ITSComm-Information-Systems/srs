@@ -1,43 +1,56 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>{{title}}</h1>
-    <form action="{{ form_action }}" method="POST" name="Select">{% csrf_token %}
-        <div class="form-group col-md-4">
-            <label for="doc_depts"><strong>Select Department</strong></label>
-            <select class="form-control" name="select_dept" id="doc_depts" size='1' required>
-                {% for dept in names %}
-                <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group col-md-4">
-            <label for="doc_bill_date"><strong>Select Billing Date</strong></label>
-        	<select class="form-control" required name="billing_date" id="doc_bill_date" size='1' required>
-                {% for d in dates %}
-                <option value="{{ d }}">{{ d }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group col-md-4">
-            <label for="doc_chartcom"><strong>Select Chartfield(s)</strong></label>
-            <div class="alert mt-0 mb-0">To select multiple, on Mac press and hold
-               “Command” and select. On PC,
-               press and hold “Ctrl” and select.</div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="select-all">
-                <label class="form-check-label" for="select-all">
-                    <strong>Select All</strong>
-                </label>
+<h1>{{title}}</h1>
+<div class='row'>
+    <div class='col-8'>
+        <form action="{{ form_action }}" method="POST" name="Select">{% csrf_token %}
+            <div class="form-group col-8">
+                <label for="doc_depts"><strong>Select Department</strong></label>
+                <select class="form-control" name="select_dept" id="doc_depts" size='1' required>
+                    {% for dept in names %}
+                    <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <select multiple="multiple" class="form-control" required name="chartcoms[]" id="doc_chartcom">
-                {% for cf in dept_cfs %}
-                <option value="{{ cf }}">{{ cf }}</option>
-                {% endfor %}
-            </select>
+            <div class="form-group col-8">
+                <label for="doc_bill_date"><strong>Select Billing Date</strong></label>
+            	<select class="form-control" required name="billing_date" id="doc_bill_date" size='1' required>
+                    {% for d in dates %}
+                    <option value="{{ d }}">{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group col-8">
+                <label for="doc_chartcom"><strong>Select Chartfield(s)</strong></label>
+                <div class="alert mt-0 mb-0">To select multiple, on Mac press and hold
+                   “Command” and select. On PC,
+                   press and hold “Ctrl” and select.</div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="select-all">
+                    <label class="form-check-label" for="select-all">
+                        <strong>Select All</strong>
+                    </label>
+                </div>
+                <select multiple="multiple" class="form-control" required name="chartcoms[]" id="doc_chartcom">
+                    {% for cf in dept_cfs %}
+                    <option value="{{ cf }}">{{ cf }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <strong id="error_message" class="hidden">Please select a chartfield.</strong>
+            <input id="generate" type='submit' value='Generate Report' class="btn btn-primary mt-2" disabled>
+        </form>
+    </div>
+    
+    <div class="col-4 float-right">
+        <div class="alert alert-secondary hlinks" role="alert">
+            {% autoescape off %}
+            {{ instructions.bodytext }}
+            {% endautoescape %}
+
         </div>
-        <strong id="error_message" class="hidden">Please select a chartfield.</strong>
-        <input id="generate" type='submit' value='Generate Report' class="btn btn-primary mt-2" disabled>
-    </form>
+    </div>
+</div>
 
 {% endblock %}
 
