@@ -24,6 +24,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from datetime import datetime
 from django.shortcuts import redirect
 
+from pages.models import Page
+
 # Load intial Detail of Charge page
 @permission_required('oscauth.can_report', raise_exception=True)
 def get_new(request):
@@ -50,11 +52,15 @@ def get_new(request):
     # Find all available billing dates
     billing_dates = list((d.billing_date for d in UmOscBillCycleV.objects.all().order_by('billing_date').reverse()))
 
+    # Get instructions
+    instructions = Page.objects.get(permalink='/nonteleph')
+
     context = {
         'title': "Other Detail of Charges",
         'form_action': '/reports/nonteleph/report/',
         'names': names,
         'dates': billing_dates,
+        'instructions': instructions,
         'initial_date':billing_dates[0],
         'dept_cfs': dept_cfs
     }

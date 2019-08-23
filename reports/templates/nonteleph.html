@@ -75,8 +75,7 @@
 
 									<td>{{ v.qty }}</td>
 
-									<!-- {% if v.type == 'Credit' %} -->
-									{% if v.total_charges|slice:"1" == "a" %}
+									{% if v.type == 'Credit' %}
 										<td class='total-col prv-msgs'>{{ v.total_charges }}</td>
 									{% else %}
 										<td class='total-col'>{{ v.total_charges }}</td>
