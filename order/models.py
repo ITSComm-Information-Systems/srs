@@ -30,6 +30,7 @@ class Step(Configuration):
         ('ChartfieldForm', 'Chartfield'),
         ('RestrictionsForm', 'Restrictions'),
         ('FeaturesForm', 'Features'),
+        ('StaticForm', 'Static Page'),
 
     )
 
@@ -43,6 +44,7 @@ class Element(Configuration):
         ('ST', 'String'),
         ('NU', 'Number'),
         ('Chart', 'Chartcom'),
+        ('Label', 'Label'),
     )
     label = models.TextField()
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
