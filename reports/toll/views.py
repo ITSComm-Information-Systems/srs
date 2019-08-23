@@ -30,6 +30,8 @@ import os
 from os import listdir
 from project import settings
 
+from pages.models import Page
+
 # Generate report
 @permission_required('oscauth.can_report', raise_exception=True)
 def select(request):
@@ -39,14 +41,14 @@ def select(request):
 	depts = find_depts(request)
 	dept_names = []
 
-	# query = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('deptid')
-	# for q in query:
-	# 	dept_names.append(q.dept_name)
+	# Get instructions
+	instructions = Page.objects.get(permalink='/toll')
 
 	context = {
 		'title': 'Toll Statements',
 		'periods': dropdown,
 		'depts': depts,	
+		'instructions': instructions,
 		'dept_names': dept_names,
 	}
 
@@ -66,7 +68,7 @@ def generate(request):
 
 
 	dept = UmOscDeptProfileV.objects.filter(deptid=dept_id)
-	dept_name = dept[0].deptid
+	dept_name = dept[0].dept_name
 	dept_mgr = dept[0].dept_mgr
 	dept_mgr_uniq = dept[0].dept_mgr_uniqname
 

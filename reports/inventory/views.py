@@ -17,22 +17,26 @@ from ldap3 import Server, Connection, ALL
 from oscauth.models import AuthUserDept, Grantor, Role, AuthUserDeptV
 from django.contrib.auth.decorators import login_required, permission_required
 
-# from .models import AuthUserDept
-# from .models import Role, Group, User
-# from .forms import UserSuForm, AddUserForm
-# from .utils import su_login_callback, custom_login_action, upsert_user
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscReptInvlocV, UmOscBillCycleV
 from oscauth.forms import *
 from datetime import datetime
 
+from pages.models import Page
+
+
+# Load selection page
 @permission_required('oscauth.can_report', raise_exception=True)
 def get_inventory(request):
+    # Find all departments user has reporting access to
     depts = AuthUserDeptV.objects.filter(user=request.user.id, codename ='can_report').order_by('dept').exclude(dept='All').values().distinct('dept')
     departments = []
     for dept in depts:
         departments.append(dept['dept'])
+
+    # Find available billing dates
     dates = UmOscBillCycleV.objects.values_list('billing_date', flat = True).order_by('billing_date').distinct().reverse()
 
+    # Add department names to department IDs
     names = []
     name_query = list(d.dept_name for d in UmOscDeptProfileV.objects.filter(deptid__in=departments).order_by('deptid'))
     for i in range(0, len(departments)):
@@ -40,23 +44,30 @@ def get_inventory(request):
                 ,'name': name_query[i]}
         names.append(name)
 
+    # Get instructions
+    instructions = Page.objects.get(permalink='/ial')
+
     template = loader.get_template('inventory.html')
-    objects = UmOscReptInvlocV.objects
     context = {
         'title': 'Inventory & Location Report',
+        'instructions': instructions,
         'depts': names,
         'dates': dates,
     }
     return HttpResponse(template.render(context,request))
     
+
+# Build report
 @permission_required('oscauth.can_report', raise_exception=True)
 def make_report(request):
+    # Initialize variables
     data = []
     total_charge = 0
     formated_data = []
     cost_table = []
     
-    total =  request.POST.get('dept_id') # 456000 #
+    # Get user-selected department ID and name
+    total =  request.POST.get('dept_id')
     array = total.split('-')
     dept_id = array[0]
     dept_name = array[1]
@@ -65,8 +76,9 @@ def make_report(request):
     dept_info = UmOscDeptProfileV.objects.filter(deptid=dept_id)[0]
     dept_mgr = dept_info.dept_mgr
     dept_mgr_uniq = dept_info.dept_mgr_uniqname
-   
-    bill_period =  request.POST.get('bill_period') #  'May 20, 2018' #
+      
+    # Get user-selected billing period & format appropriately
+    bill_period =  request.POST.get('bill_period') 
     date = bill_period.replace('.', '')
     date = date.replace(',', '')
     date = date.split(' ')
@@ -74,13 +86,16 @@ def make_report(request):
     date = date[0] + ' ' + date[1] + ' ' + date[2]
     date = datetime.strptime(date, '%b %d %Y')
     date = str(date.year) + '-' + str(date.month) + '-' + str(date.day)
-    
+
+    # Find data to populate the month filter
     months_list = UmOscBillCycleV.objects.values_list('billing_date', flat = True).order_by('billing_date').distinct().reverse()
     curr_period = months_list[0]
     filter_months = (months_list[5], months_list[11])
 
+    # Pull data using selected department ID and billing date
     data = UmOscReptInvlocV.objects.filter(billing_date__exact = date, org__exact = dept_id).order_by('fund','org', 'program', 'subclass', 'project_grant', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
     
+    # Find data to populate filter
     buildings = data.exclude(building = None).order_by('building').values_list('building', flat = True).distinct()
     user_types = data.exclude(cd_descr = None).order_by('cd_descr').values_list("cd_descr", flat= True).distinct()
     chartfields = data.exclude(chartfield = None).order_by('chartfield').values_list('chartfield',flat = True).distinct()
@@ -90,15 +105,19 @@ def make_report(request):
     type_filter = ''
     cf_filter = ''
     date_filter = ''
+    # If they filter by location
     if request.POST.get('location')!= '' and request.POST.get('location')!= None:
         location_filter = request.POST.get('location')
         data = data.filter(building__exact = location_filter).order_by('fund','org', 'program', 'subclass', 'project_grant', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+    # If they filter by User ID type
     if request.POST.get('type')!= ''and  request.POST.get('type')!= None:
         type_filter = request.POST.get('type')
         data = data.filter(cd_descr__exact = type_filter).order_by('fund','org', 'program', 'subclass', 'project_grant', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+    # If they filter by chartfield
     if request.POST.get('cf')!= '' and  request.POST.get('cf')!= None:
         cf_filter = request.POST.get('cf')
         data = data.filter(chartfield__exact = cf_filter).order_by('fund','org', 'program', 'subclass', 'project_grant', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+    # If they filter by date
     if request.POST.get('date')!= '' and  request.POST.get('date')!= None:
         date_filter = request.POST.get('date')
         if date_filter == '6-12':
@@ -108,6 +127,7 @@ def make_report(request):
             date_filter = "Greater than 12 months"
             data = data.filter(last_call_date__lte = months_list[11]).order_by('fund','org', 'program', 'subclass', 'project_grant', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
       
+    # Format the report data
     if list(data) != []:
         formated_data, cost_table = format_data(data,request)
     first = datetime.strptime(date,'%Y-%m-%d').date() == curr_period

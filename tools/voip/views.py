@@ -27,6 +27,8 @@ def get_voip(request):
     submit = False
     template = loader.get_template('voip.html')
     phone_number = request.GET.get('number', None)
+    if phone_number:
+        phone_number = phone_number.replace('-','')
     current = UmOscLocationsInUseV.objects.filter(service_number__exact = phone_number).order_by('room').values().distinct()
     building_list = UmOscAvailableLocsV.objects.values_list('building_id', 'building_name', 'campus_desc').distinct()
     selected = ''
