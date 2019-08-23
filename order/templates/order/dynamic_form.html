@@ -18,7 +18,11 @@
             <br>
         </fieldset>
     {% elif field.field.type == 'Label' %}
-    <div id="{{ field.name }}">
+    <div id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" 
+    {% if field.field.display_condition %}
+    data-condition="{{ field.field.display_condition }}"
+    {% endif %}
+    >
         <label>{{ field.label }}</label>
     </div>
     {% elif field.field.type == 'Chart' %}
