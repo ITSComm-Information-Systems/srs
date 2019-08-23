@@ -2,22 +2,31 @@
 {% load tags %}
 {% block content %}
 
+<style>
+    .center-title {
+        text-align:center;
+    }
+</style>
+
+<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
+
 <h1>{{ title }}</h1>
 <div>
     <strong>Report selection</strong>
-    <a class="float-right" href="../soc">Edit your selection</a>
-    <a class="float-right" id="edit-selection" href="../soc"><i class="fas fa-edit"></i></a>
+    <a class='offset-2' href="../soc"><i class="fas fa-edit"></i>Edit your selection</a>
+    <!-- <a class="offset-2" id="edit-selection" href="../soc"><i class="fas fa-edit"></i></a> -->
 </div>
 
-<div>
-    <div class="card border-dark">
-        <div class="card-body card-grid-soc">
-            <div class="deptname">
-                <strong>Unit/Group: </strong>{{ unit }}
-            </div>
-            <div class="billdate">
-                <strong>Billing Date: </strong>{{ billing_period }}
-            </div>
+<div class="row">
+    <div class="card border-dark col-md-5">
+        <div class="card-body card-bottom">
+            <div><strong>Billing Period:&nbsp;&nbsp;</strong>{{ billing_period }}</div>
+            <strong class="floatleft">{{ grouping }}:&nbsp;&nbsp;</strong>
+            <p class="floatleft">
+            {% for u in unit %}
+                {{ u }}<br>
+            {% endfor %}
+            </p>
         </div>
     </div>
 </div>
@@ -31,23 +40,22 @@
         <button onclick="collapseAll()" class="btn btn-link">Collapse All</button>
     </div>
     <button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')"
-        class="btn btn-success float-right">Download Table To
-        CSV File
+        class="btn btn-success float-right">CSV Download
     </button>
 </div>
 
-<table class="table table-sm table-bordered">
+<table class="table table-sm table-bordered" id='soc-table'>
     <thead class="thead-dark">
         <tr>
-            <th>Expense Account</th>
-            <th>Item Description</th>
-            <th>Charge Codes</th>
-            <th>Rate</th>
-            <th>Average Monthly Units Billed</th>
-            <th>Billed Units</th>
-            <th>Item Total</th>
-            <th>Item Group Total</th>
-            <th>Account Total</th>
+            <th class='center-title'>Expense Account</th>
+            <th class='center-title'>Item Description</th>
+            <th class='center-title'>Charge Codes</th>
+            <th class='center-title'>Rate</th>
+            <th class='center-title'>Average Monthly Units Billed</th>
+            <th class='center-title'>Billed Units</th>
+            <th class='center-title'>Item Total</th>
+            <th class='center-title'>Item Group Total</th>
+            <th class='center-title'>Account Total</th>
 
         </tr>
     </thead>
@@ -60,7 +68,7 @@
                     <input class='toggle1' type="checkbox" name="{{row.0}}" data-toggle="toggle">
                     <i class="far fa-caret-square-down unchecked"></i>
                     <i class="far fa-caret-square-up checked"></i>
-                    {{ row.0 }} ({{ row.1 }})
+                    <span id='test'>{{ row.0 }} ({{ row.1 }})</span>
                 </label>
             </td>
             <td></td>
@@ -70,7 +78,11 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>${{ row.3 }}</td>
+            {% if row.3 < 0 %}
+                <td class='prv-msgs'>{{ row.3 | currency }}</td>
+            {% else %}
+                <td>{{ row.3 | currency }}</td>
+            {% endif %}
         </tr>
 
     <tbody class="{{row.0}}" id="{{row.0}}" style="display:none">
@@ -91,7 +103,11 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>${{ charge.2}}</td>
+            {% if 0 > charge.2 %}
+                <td class='prv-msgs'>{{ charge.2 | currency }}</td>
+            {% else %}
+                <td>{{ charge.2 | currency }}</td>
+            {% endif %}
             <td></td>
         </tr>
         {% for code in charge.1 %}
@@ -99,10 +115,18 @@
             <td></td>
             <td>{{ code.0 }}</td>
             <td>{{ code.1 }}</td>
-            <td>${{ code.2 }}</td>
+            {% if 0 > code.2 %}
+                <td class='prv-msgs'>{{ code.2 | currency }}</td>
+            {% else %}
+                <td>{{ code.2 | currency }}</td>
+            {% endif %}
             <td>{% divide code.3 num_months %}</td>
             <td>{{ code.3 }}</td>
-            <td>${{ code.4 }}</td>
+            {% if 0 > code.4 %}
+                <td class='prv-msgs'>{{ code.4 | currency }}</td>
+            {% else %}
+                <td>{{ code.4 | currency }}</td>
+            {% endif %}
             <td></td>
             <td></td>
         </tr>
@@ -112,7 +136,7 @@
     {% endfor %}
 
     <tr class='bg-warning'>
-        <td>Total Charges</td>
+        <td><strong>Total</strong></td>
         <td></td>
         <td></td>
         <td></td>
@@ -120,7 +144,11 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>${{table.0.1}}</td>
+        {% if 0 > table.0.1 %}
+            <td class='prv-msgs'><strong>{{table.0.1 | currency }}</strong></td>
+        {% else %}
+            <td><strong>{{ table.0.1 | currency }}</strong></td>
+        {% endif %}
     </tr>
     </tbody>
 </table>
@@ -145,6 +173,51 @@
 
     }
 
+    // function exportTableToCSV(filename) {
+    //     var csv = [];
+    //     // Get all rows
+    //     var rows = document.querySelectorAll("table tr");
+
+    //     //Loop through all rows
+    //     for (var i = 0; i < rows.length; i++) {
+    //         var row = [];
+    //         var cols = rows[i].querySelectorAll("td, th");
+
+    //         // Loop through all columns
+    //         for (var j = 0; j < cols.length; j++) {
+    //             // if (j == 0) {
+    //             //     var test = cols[j].text();
+    //             //     alert(test);
+    //             // }
+    //             row.push(cols[j].innerText);
+    //         }
+
+    //         csv.push(row.join(","));
+    //     }
+
+    //     // var table = document.getElementById('soc-table');
+    //     // for (var i = 0; row; row = table.rows[i]; ++i) {
+    //     //     row = [];
+    //     //     for (var j = 0; col; col = table.cells[j]; ++j) {
+    //     //         alert(j.text());
+    //     //     }
+    //     // }
+
+    //     // // Loop through rows
+    //     // $('#soc-table tr').each(function(){
+    //     //     row = [];
+    //     //     // Loop through columns
+    //     //     $(this).find('td').each(function(){
+    //     //         //do your stuff, you can use $(this) to get current cell
+    //     //         row.push($(this).text());
+    //     //     })
+    //     //     csv.push(row.join(','));
+    //     // })
+
+    //     // Download CSV file
+    //     downloadCSV(csv.join("\n"), filename);
+    // }
+
     function exportTableToCSV(filename) {
         var csv = [];
         var rows = document.querySelectorAll("table tr");
@@ -161,6 +234,7 @@
         // Download CSV file
         downloadCSV(csv.join("\n"), filename);
     }
+
 
     function downloadCSV(csv, filename) {
         var csvFile;
@@ -271,6 +345,23 @@
 
 
     });
+
+    // When the user scrolls down 20px from the top of the document, show the button
+    window.onscroll = function() {scrollFunction()};
+
+    function scrollFunction() {
+      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        document.getElementById("scrollTop").style.display = "block";
+      } else {
+        document.getElementById("scrollTop").style.display = "none";
+      }
+    }
+
+    // When the user clicks on the button, scroll to the top of the document
+    function topFunction() {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
 </script>
 <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
 

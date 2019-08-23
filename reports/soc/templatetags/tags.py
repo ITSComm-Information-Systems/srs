@@ -7,4 +7,11 @@ def divide(a, b):
 
 @register.filter
 def currency(money):
-	return '${:,.2f}'.format(money)
+	credit = False
+	if money < 0:
+		credit = True
+		money = abs(money)
+	if credit:
+		return '-${:,.2f}'.format(money)
+	else:
+		return '${:,.2f}'.format(money)

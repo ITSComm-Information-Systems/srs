@@ -26,6 +26,8 @@ from oscauth.forms import *
 import datetime
 from django.contrib.auth.decorators import login_required, permission_required
 
+from pages.models import Page
+
 
 # Load selection page
 @permission_required('oscauth.can_report', raise_exception=True)
@@ -41,6 +43,9 @@ def get_soc(request):
     calendar = select_calendar_year(request)
     months = select_month(request)
 
+    # Get instructions
+    instructions = Page.objects.get(permalink='/soc')
+
     # Get department group VP areas for dropdown
     vps = []
     vps = UmOscDeptUnitsReptV.objects.order_by('dept_grp_vp_area').values_list('dept_grp_vp_area_descr',flat =True).distinct() 
@@ -49,6 +54,7 @@ def get_soc(request):
         'title': 'Summary of Charges',
         'depts': find_dept_names(depts),
         'groups_descr':groups_descr,
+        'instructions': instructions,
         'fiscal':fiscal,
         'calendar':calendar,
         'months':months,
@@ -68,19 +74,18 @@ def generate(request):
     # If they selected by Department ID
     if display_type in ['1']:
         grouping = 'Department ID'
-        unit = request.POST.getlist('department_id')
-        # If they selected all
-        if request.POST.get('selectall',None) in ['2']:
-            grouping = 'Department IDs'
-            unit = depts
+        format_unit = request.POST.getlist('department_id')
+        unit = remove_names(format_unit)
     # If they selected by Department Group
     elif display_type in ['3']:
         grouping = 'Department Group'
         unit = [request.POST.get('department_group')]
+        format_unit = unit
     # If they selected by Department VP Group Area
     elif display_type in ['4']:
         grouping = 'Department Group VP Area'
         unit = [request.POST.get('department_vp')]
+        format_unit = unit
     
 
     # Find billing range
@@ -91,22 +96,31 @@ def generate(request):
     if display_type in ['1']:
         dateRange = 'Fiscal Year'
         billing_period = request.POST.get('FISCALYEAR')
+        format_billing_period = 'Fiscal Year ' + billing_period
     # If they selected by calendar year
     elif display_type in ['2']:
         dateRange = 'Calendar Year'
         billing_period = request.POST.get('CALENDARYEAR')
+        format_billing_period = 'Calendar Year ' + billing_period
     # If they selected by single month
     elif display_type in ['3']:
         dateRange = 'Single Month'
-        billing_period = request.POST.get('SINGLEMONTH')
-        billing_period = billing_period + " " + request.POST.get('SINGLEYEAR')
+        billing_period = request.POST.get('singlemonthselect')
+        format_billing_period = billing_period
+        month = words_to_num(billing_period.split(' ')[0])
+        year = billing_period.split(' ')[1]
+        billing_period = str(month) + ' ' + year
     # If they selected month-to-month
     elif display_type in ['4']:
         dateRange = 'Month-to-Month'
-        billing_period = request.POST.get('FIRSTMONTH')
-        billing_period = billing_period + " " + request.POST.get('FIRSTYEAR') + " to"
-        billing_period = billing_period + " " + request.POST.get('SECONDMONTH')
-        billing_period = billing_period + " " + request.POST.get('SECONDYEAR')
+        billing_period1 = request.POST.get('multimonth1')
+        billing_period2 = request.POST.get('multimonth2')
+        month1 = words_to_num(billing_period1.split(' ')[0])
+        month2 = words_to_num(billing_period2.split(' ')[0])
+        year1 = billing_period1.split(' ')[1]
+        year2 = billing_period2.split(' ')[1]
+        billing_period = str(month1) + ' ' + year1 + ' to ' + str(month2) + ' ' + year2
+        format_billing_period = billing_period1 + ' - ' + billing_period2
 
 
     # Get report data
@@ -130,8 +144,8 @@ def generate(request):
         'title': 'Summary of Charges',   
         'grouping': grouping,
         'dateRange': dateRange,
-        'unit': unit,
-        'billing_period': billing_period,
+        'unit': format_unit,
+        'billing_period': format_billing_period,
         'num_months': find_num_months(dateRange, billing_period),
         'rows': rows,
         'table': list(table),
@@ -179,7 +193,11 @@ def select_calendar_year(request):
 # Grabs month options for dropdown
 def select_month(request):
     query = UmOscDeptUnitsReptV.objects.order_by('month').values_list('month',flat=True).distinct()
-    return query
+    month_names = []
+    query = query.reverse()
+    for q in query:
+        month_names.append(num_to_words(int(q)))
+    return month_names
 
 
 # Calculates the number of months, given the billing period selected
@@ -292,11 +310,38 @@ def get_table(rows,request):
                     item_price =  item_price + float(price[2])
                     total_cost =  total_cost + float(price[2]) 
                 charge_total = charge_total + item_price
-                account_table.append([x[0],x[1],round(rate,2),quantity,round(item_price,2)])
+                account_table.append([x[0],x[1],rate,quantity,item_price,2])
             overall_cost = overall_cost + charge_total
-            whole_table.append([y,account_table, round(charge_total,2)])
-        final_table.append([i[0],i[1],whole_table,round(total_cost,2)])
-    complete_table.append([final_table,round(overall_cost,2)])
+            whole_table.append([y,account_table, charge_total])
+        final_table.append([i[0],i[1],whole_table,total_cost])
+    complete_table.append([final_table,overall_cost])
     return complete_table
+
+
+# Month conversion
+def num_to_words(month):
+    months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    return months[month - 1]
+
+
+# Month conversion
+def words_to_num(month):
+    months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+    for m in range(0, len(months)):
+        if months[m] == month:
+            if m + 1 < 10:
+                return '0' + str(m + 1)
+            else:
+                return m + 1
+
+# Gives selected departments without their names
+def remove_names(unit):
+    just_ids = []
+
+    for u in unit:
+        just_ids.append(u.split(' ')[0])
+
+    return just_ids
 
 
