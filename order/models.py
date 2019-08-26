@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from django.utils import timezone
 from django.db import connections
+import json
+import cx_Oracle
 
 class Configuration(models.Model):   #Common fields for configuration models
     name = models.CharField(max_length=20)
@@ -219,32 +221,63 @@ class Order(models.Model):
         return self.chartcom.dept
 
     def create_preorder(self):
-        api = UmOscPreorderApiV()
-        api.category_code = 2
-        api.wo_type_code = 'WB'
-        api.wo_type_category_id = 0
-        api.action_name = 'Add'
-        api.add_info_text_3 = self.id
-        api.save()
-
-        preorder = UmOscPreorderApiV.objects.get(add_info_text_3=self.id)
-
-        self.order_reference = preorder.pre_order_number
-        self.save()
+        data =  {  
+                    "department_number": self.chartcom.dept,
+                    "default_one_time_expense_acct": self.chartcom.account_number,
+                    "submitter": self.created_by.username,
+                }
 
         item_list = Item.objects.filter(order_id=self.id)
-
         elements = Element.objects.exclude(target__isnull=True).exclude(target__exact='')
         map = {}
 
         for element in elements:
             map[element.name] = element.target
 
-        for num, item in enumerate(item_list, start=1):
-            item.create_issue(preorder.pre_order_number, map)
+        equipment_only = True
 
-        preorder = UmOscPreorderApiV.objects.filter(add_info_text_3=self.id, work_status_name=None)
-        preorder.update(work_status_name = 'Received')
+        for num, item in enumerate(item_list, start=1):
+            issue = {}
+            if num == 1:
+                #data['priority_name'] = 'High'
+                #data['due_date'] = '01/20/2019'
+                data['issues'] = []
+
+            action_id = item.data['action_id']
+            action = Action.objects.get(id=action_id)
+            if action.type != 'E':
+                equipment_only = False
+
+            cons = Constant.objects.filter(action=action_id)
+            for con in cons:  # Populate issue with constants
+                issue[con.field] = con.value
+
+            for key, value in item.data.items():
+                if value:  # Populate issue with user supplied values
+                    if key == 'MRC' or key == 'localCharges' or key == 'LD':
+                        value = Chartcom.objects.get(id=value).account_number
+
+                    target = map.get(key)
+                    if target != None:
+                        issue[target] = value
+
+            issue['add_info_text_3'] = self.id
+
+            issue['note'] = item.data['reviewSummary']
+            issue['comment_text'] = item.description
+            data['issues'].append(issue)
+
+        if equipment_only:
+            data['equipment_only'] = 'Y'
+
+        json_data = json.dumps({"Order": data})
+
+        with connections['pinnacle'].cursor() as cursor:
+            ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
+            print(ponum)
+
+        self.order_reference = ponum
+        self.save()
 
 
 class Item(models.Model):
@@ -264,53 +297,6 @@ class Item(models.Model):
         delete_date = self.create_date + timedelta(days=180) 
         days_to_deletion = delete_date - timezone.now()
         return days_to_deletion.days
-
-    def create_issue(self, preorder_number, map):
-        api = UmOscPreorderApiV()
-        api.add_info_text_3 = self.order_id
-        api.add_info_text_4 = self.id
-        action_id = self.data['action_id']
-        api.pre_order_number = preorder_number
-
-        cons = Constant.objects.filter(action=action_id)
-        for con in cons:  # Populate the model with constants
-            setattr(api, con.field, con.value)
-
-        for key, value in self.data.items():
-            if value:  # Populate the model with user supplied values
-                if key == 'MRC' or key == 'localCharges' or key == 'LD':
-                    value = Chartcom.objects.get(id=value).account_number
-
-                target = map.get(key)
-                if target != None:
-                    setattr(api, target, value)
-
-        api.comment_text = self.description
-        api.default_one_time_expense_acct = self.chartcom.account_number
-
-        try:
-            api.save()
-            log = LogItem()
-            log.transaction = 'Create Issue'
-            log.local_key = self.id
-            log.remote_key = preorder_number
-            log.level = 'Info'
-            log.description = 'Preorder Created'
-            log.save()
-
-            with connections['pinnacle'].cursor() as cursor:
-                id = UmOscPreorderApiV.objects.get(add_info_text_4=self.id).pre_order_id
-                cursor.callproc('um_note_procedures_k.um_add_wo_tcom_note_p', [id, 'Order Details', self.data['reviewSummary'], ''])
-
-        except Exception as e:
-            log = LogItem()
-            log.transaction = 'Create Issue'
-            log.local_key = self.id
-            log.remote_key = preorder_number
-            log.level = 'Error'
-            log.description = e
-            log.save()
-            print(e.with_traceback)
 
     def leppard(self):
         pour=['me']
