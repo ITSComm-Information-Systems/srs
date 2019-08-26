@@ -6,7 +6,7 @@
         <form action="{{ form_action }}" method="POST" name="Select">{% csrf_token %}
             <div class="form-group col-8">
                 <label for="doc_depts"><strong>Select Department</strong></label>
-                <select class="form-control" name="select_dept" id="doc_depts" size='1' required>
+                <select class="form-control" name="select_dept" id="doc_depts" size='{{ names|length }}' required>
                     {% for dept in names %}
                     <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.name }}</option>
                     {% endfor %}
@@ -14,7 +14,7 @@
             </div>
             <div class="form-group col-8">
                 <label for="doc_bill_date"><strong>Select Billing Date</strong></label>
-            	<select class="form-control" required name="billing_date" id="doc_bill_date" size='1' required>
+            	<select class="form-control" name="billing_date" id="doc_bill_date" size='{{ dates|length }}' required>
                     {% for d in dates %}
                     <option value="{{ d }}">{{ d }}</option>
                     {% endfor %}

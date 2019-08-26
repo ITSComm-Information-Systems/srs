@@ -168,7 +168,7 @@
 
 {% if formated_data %}
 <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right">
-    Download as CSV
+    CSV Download
 </button>
 
 {% for classification in formated_data %}
@@ -178,7 +178,7 @@
     </h3>
     <table class="table table-sm mb-5 table-striped" style="font-size:12px">
         <thead class="thead-dark">
-            <tr>
+            <tr name='{{ classification.0.0.chartfield }}'>
                 <th>User ID</th>
                 <th>Usage</th>
                 <th>User ID Type</th>
@@ -255,12 +255,21 @@
             {% endfor %}
         </tbody>
         <tr class="bg-warning total-charges-inv">
-            <td colspan="2">Total</td>
-            <td colspan='7'></td>
+            <td colspan="1">Total</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
             {% if 0 > cost_table|index:forloop.counter0 %}
-                <td colspan="3" class="total-col prv-msgs">{{cost_table|index:forloop.counter0 | currency }}</td>
+                <td colspan="1" class="total-col prv-msgs">{{cost_table|index:forloop.counter0 | currency }}</td>
             {% else %}
-                <td colspan="3" class="total-col">{{cost_table|index:forloop.counter0 | currency }}</td>
+                <td colspan="1" class="total-col">{{cost_table|index:forloop.counter0 | currency }}</td>
             {% endif %}
         </tr>
     </table>
@@ -311,14 +320,27 @@
     function exportTableToCSV(filename) {
         var csv = [];
         var rows = document.querySelectorAll("table tr");
+
         for (var i = 0; i < rows.length; i++) {
             var row = [], cols = rows[i].querySelectorAll("td, th");
+            var name = rows[i].getAttribute('name');
 
-            for (var j = 0; j < cols.length; j++) {
-                string = cols[j].innerHTML;
-                string = string.replace(new RegExp(" <br> ",'g'), " || ");
-                string = string.replace(',', '')
-                row.push(string);
+            for (var j = 0; j < cols.length; ++j) {
+                var text = cols[j].innerText;
+
+                // New chartfield
+                if (text == 'User ID') {
+                    if (i != 0) {
+                        row.push('\n'); // does this work on mac?
+                        csv.push(row);
+                        row = [];
+                    }
+                    row.push(name);
+                    csv.push(row);
+                    row = [];
+                }
+                text = '"' + text + '"';
+                row.push(text);
             }
 
             csv.push(row.join(","));
