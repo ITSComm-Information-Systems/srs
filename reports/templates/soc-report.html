@@ -68,7 +68,7 @@
                     <input class='toggle1' type="checkbox" name="{{row.0}}" data-toggle="toggle">
                     <i class="far fa-caret-square-down unchecked"></i>
                     <i class="far fa-caret-square-up checked"></i>
-                    <span id='test'>{{ row.0 }} ({{ row.1 }})</span>
+                    {{ row.0 }} ({{ row.1 }})
                 </label>
             </td>
             <td></td>
@@ -89,8 +89,8 @@
         {% for charge in row.2%}
         <tr class="table-secondary">
             <td>
-                <label class='expand-icon mb-0'>
-                    &nbsp;&nbsp;&nbsp;
+                <label class='expand-icon mb-0 offset-1'>
+                    <!-- &nbsp;&nbsp;&nbsp; -->
                     <input class='toggle2' type="checkbox" name="{{charge.2}}" data-toggle="toggle2">
                     <i class="far fa-caret-square-down unchecked"></i>
                     <i class="far fa-caret-square-up checked"></i>
@@ -173,51 +173,6 @@
 
     }
 
-    // function exportTableToCSV(filename) {
-    //     var csv = [];
-    //     // Get all rows
-    //     var rows = document.querySelectorAll("table tr");
-
-    //     //Loop through all rows
-    //     for (var i = 0; i < rows.length; i++) {
-    //         var row = [];
-    //         var cols = rows[i].querySelectorAll("td, th");
-
-    //         // Loop through all columns
-    //         for (var j = 0; j < cols.length; j++) {
-    //             // if (j == 0) {
-    //             //     var test = cols[j].text();
-    //             //     alert(test);
-    //             // }
-    //             row.push(cols[j].innerText);
-    //         }
-
-    //         csv.push(row.join(","));
-    //     }
-
-    //     // var table = document.getElementById('soc-table');
-    //     // for (var i = 0; row; row = table.rows[i]; ++i) {
-    //     //     row = [];
-    //     //     for (var j = 0; col; col = table.cells[j]; ++j) {
-    //     //         alert(j.text());
-    //     //     }
-    //     // }
-
-    //     // // Loop through rows
-    //     // $('#soc-table tr').each(function(){
-    //     //     row = [];
-    //     //     // Loop through columns
-    //     //     $(this).find('td').each(function(){
-    //     //         //do your stuff, you can use $(this) to get current cell
-    //     //         row.push($(this).text());
-    //     //     })
-    //     //     csv.push(row.join(','));
-    //     // })
-
-    //     // Download CSV file
-    //     downloadCSV(csv.join("\n"), filename);
-    // }
-
     function exportTableToCSV(filename) {
         var csv = [];
         var rows = document.querySelectorAll("table tr");
@@ -225,8 +180,11 @@
         for (var i = 0; i < rows.length; i++) {
             var row = [], cols = rows[i].querySelectorAll("td, th");
 
-            for (var j = 0; j < cols.length; j++)
-                row.push(cols[j].innerText);
+            for (var j = 0; j < cols.length; j++) {
+                var text = '"' + cols[j].innerText + '"';
+                //alert(text);
+                row.push(text);
+            }
 
             csv.push(row.join(","));
         }
