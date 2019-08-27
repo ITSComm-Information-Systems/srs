@@ -143,6 +143,12 @@ def delete_from_cart(request):
 class Integration(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
+    def post(self, request, order_id):
+        print(request.POST)
+        order = Order.objects.get(id=order_id)
+        order.create_preorder()
+        return HttpResponseRedirect('/orders/integration/' + str(order_id)) 
+
     def get(self, request, order_id):
         order = Order.objects.get(id=order_id)
         item_list = Item.objects.filter(order=order)

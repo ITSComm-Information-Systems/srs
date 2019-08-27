@@ -42,6 +42,12 @@ ul, #myUL {
 
 
 <h1>Order #{{order.id}}</h1>
+
+    <form action="/orders/integration/{{order.id}}" method="POST">{% csrf_token %}
+      <input type="hidden" value="{{order.id}}">
+      <input type="submit" value="reSubmit">Note that this runs in background, allow up to 20 seconds to complete and whatnot.
+    </form>
+
 <ul>
     <li>{{ order.service }}</li>
     <li>Ref#: {{ order.order_reference }}</li>
