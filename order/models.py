@@ -206,6 +206,14 @@ class LogItem(models.Model):
     create_date = models.DateTimeField('Date Created', auto_now_add=True)
     level = models.CharField(max_length=20, blank=True)
     description = models.TextField(blank=True)
+
+    def add_log_entry(self, local_key, descr):
+        self.transaction = 'Create Issue'
+        self.local_key = local_key
+        self.remote_key = 23432
+        self.level = 'Info'
+        self.description = descr
+        self.save()
     
 
 class Order(models.Model):
@@ -272,9 +280,14 @@ class Order(models.Model):
 
         json_data = json.dumps({"Order": data})
 
+        LogItem().add_log_entry(item.id, json_data)
+        #log.add_log_entry(json_data)
+
         with connections['pinnacle'].cursor() as cursor:
             ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
             print(ponum)
+
+        LogItem().add_log_entry(item.id, ponum)
 
         self.order_reference = ponum
         self.save()
