@@ -26,10 +26,10 @@ $(document).ready(function () {
     });
 
     if ($("#wftype").val() == "A") {
-        $("#currentFeatures").hide();
+        $(".keep-features").hide();
     }
 
-    $("#keepFeatures").click(function() {
+    $(".keep-check").click(function() {
         if (this.checked) {
             $(".form-row input:visible").attr("disabled","disabled");
         } else {
