@@ -60,10 +60,13 @@
         </a>
         {% endif %}
         {% if feature.additional_info %}
-        <input style="display:none" id="addinfo{{category.id}}feature{{feature.id}}" class="col-sm-4" type="text" maxlength="15" id="update" name="update"
+        <div class="form-check check-addl" style="display:none">
+        <input id="addinfo{{category.id}}feature{{feature.id}}" class="col-sm-4" type="text" maxlength="15" id="update" name="update"
         <a tabindex="0" role="button" data-toggle="popover" data-container="body"
         data-trigger="focus" data-placement="right" title="{{feature.label}}"
-        data-content="{{feature.additional_info}}"></a>
+        data-content="{{feature.additional_info}}" required></a>
+        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must enter a value"></i>Please enter a value.</div>
+        </div>
         {% endif %}
       </div>
       {% endfor %}
@@ -73,10 +76,20 @@
         <input class="form-check-input" type="radio" value="{{feature.id}}" name="{{category.name}}{{type.label}}"
           id="cat{{category.id}}feature{{feature.id}}" required>
         <label class="form-check-label" for="cat{{category.id}}feature{{feature.id}}">{{feature}}</label>
+        {% if feature.additional_info %}
+        <div class="form-check radio-addl" style="display:none">
+        <input id="addinfo{{category.id}}feature{{feature.id}}" class="col-sm-4" type="text" maxlength="15" id="update" name="update"
+        <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+        data-trigger="focus" data-placement="right" title="{{feature.label}}"
+        data-content="{{feature.additional_info}}" required></a>
+        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must enter a value"></i>Please enter a value.</div>
+        </div>
+        {% endif %}
         {% if feature.id == type.last %}
         <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
             aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
         {% endif %}
+
       </div>
       {% endfor %}
       {% endif %}
