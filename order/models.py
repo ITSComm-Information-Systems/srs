@@ -33,6 +33,7 @@ class Step(Configuration):
         ('RestrictionsForm', 'Restrictions'),
         ('FeaturesForm', 'Features'),
         ('StaticForm', 'Static Page'),
+        ('AuthCodeForm', 'Auth Codes'),
 
     )
 

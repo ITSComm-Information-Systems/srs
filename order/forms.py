@@ -63,6 +63,16 @@ class ReviewForm(forms.Form):
     template = 'order/review.html'
 
 
+class AuthCodeForm(forms.Form):
+    TYPE_CHOICES = (
+    ('Individual', 'Individual'),
+    ('Workgroup', 'Workgroup')
+    )
+    type = forms.ChoiceField(choices = TYPE_CHOICES, required=True)
+    name = forms.CharField(label='summary', max_length=100)
+    template = 'order/auth_code.html'
+
+
 class NewLocationForm(forms.Form):
     building_list = UmOSCBuildingV.objects.all()
     new_building_code = forms.CharField(label='Building Code', max_length=100)
