@@ -97,6 +97,7 @@ $(document).ready(function() {
   $(preFields).change(callback);
   $(preFields).keypress(callback);
 
+
   // Hide phone location if no active phone line
   if ($("#activePhone").length) {
     $('[data-tab="PhoneLocation"]').hide();
@@ -295,15 +296,10 @@ $(document).ready(function() {
       summary = summary + '\n';
     }
     $('#reviewSummary').val(summary);
-    console.log(summary);
   }
 
 
 });  // Document Ready
-
-
-
-
 
 
 

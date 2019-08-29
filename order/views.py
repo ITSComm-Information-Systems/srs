@@ -223,6 +223,8 @@ class Workflow(PermissionRequiredMixin, View):
                     js.append('location')
                 elif tab.name == 'SelectFeatures':
                     js.append('features')
+                elif tab.name == 'AuthCodes':
+                    js.append('auth_codes')
 
         return render(request, 'order/workflow.html', 
             {'title': action.label,
