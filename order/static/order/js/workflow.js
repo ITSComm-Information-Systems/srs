@@ -97,16 +97,20 @@ $(document).ready(function() {
   $(preFields).change(callback);
   $(preFields).keypress(callback);
 
-  $("#activePhone_Y").click(function() {
-    $('[data-tab="LocationNew"]').hide();
+
+  // Hide phone location if no active phone line
+  if ($("#activePhone").length) {
+    $('[data-tab="PhoneLocation"]').hide();
+  }
+  
+  $("#activePhone_yesactivephone").click(function() {
+    $('[data-tab="PhoneLocation"]').show();
   });
 
-  $("#activePhone_N").click(function() {
-    $('[data-tab="LocationNew"]').show();
+  $("#activePhone_noactivephone").click(function() {
+    $('[data-tab="PhoneLocation"]').hide();
   });
   
-
-
 
   // Addl info
   $('#contact_id').hide();
@@ -292,15 +296,10 @@ $(document).ready(function() {
       summary = summary + '\n';
     }
     $('#reviewSummary').val(summary);
-    console.log(summary);
   }
 
 
 });  // Document Ready
-
-
-
-
 
 
 
