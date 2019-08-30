@@ -227,6 +227,8 @@ class Workflow(PermissionRequiredMixin, View):
                     js.append('auth_codes')
                 elif tab.name == 'Equipment':
                     js.append('equipment')
+                elif tab.name == 'QuantityModel':
+                    js.append('Product')
 
         return render(request, 'order/workflow.html', 
             {'title': action.label,
