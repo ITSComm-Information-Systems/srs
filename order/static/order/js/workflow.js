@@ -230,8 +230,15 @@ $(document).ready(function() {
         value = $( "#" + id + " option:selected" ).text();
         tab.push({'label': label, 'value': value})
         }
+      } else if (type=="button") {
+        if($("#" + id).hasClass('selected')) { 
+          label = $("label[for='" + id + "']").text();
+          value = $("#" + inp[i].id).val();
+          tab.push({'label': label, 'value': value})
+        }
       } else {
         console.log('unknown type:' + type);
+        console.log(inp[i]);
       }
     }
   

@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction
+from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory
 from project.pinnmodels import UmOSCBuildingV
 
 class FeaturesForm(forms.Form):
@@ -89,6 +89,12 @@ class EquipmentForm(forms.Form):
     cat[0].id = 'basic'
     cat[1] = Product.objects.all().filter(category=2).order_by('display_seq_no') 
     cat[1].id = 'voip'
+    template = 'order/equipment.html'
+
+
+class ProductForm(forms.Form):
+    category_list = ProductCategory.objects.all().order_by('display_seq_no') 
+    product_list = Product.objects.all().order_by('category','display_seq_no') 
     template = 'order/products.html'
 
 

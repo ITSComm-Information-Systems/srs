@@ -1,0 +1,26 @@
+{% for list in tab.form.cat %}
+<style>
+  .selected-card {
+			border-color: #28a745;
+			box-shadow: 5px 5px 10px grey;
+		}
+</style>
+  <div id="equip{{list.id}}" data-phoneset="{{list.id}}">
+
+    <div class="card-columns">
+    {% for field in list %}
+      <div class="card product-card" style="width: 18rem;">
+          <img class="card-img-top" src="/media/{{field.picture}}" alt="Product Image of {{ field }}">
+          <div class="card-body">
+            <p class="card-title h5">{{ field }}"</p>
+            <p class="card-text">{{ field.description }}</p>
+            <button id="product{{field.id}}" name="product" type="button" class="btn btn-outline-success select-button" value="{{ field }}" onclick="selectProductCard(this)">Select</button>
+  <!----          <label for="product{{field.id}}">Product</label>  --->
+            <p><strong>Price: ${{ field.price }}</strong></p>
+          </div>
+      </div>
+    {% endfor %}
+    </div>
+
+  </div>
+{% endfor %}

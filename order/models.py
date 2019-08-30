@@ -34,6 +34,7 @@ class Step(Configuration):
         ('FeaturesForm', 'Features'),
         ('StaticForm', 'Static Page'),
         ('AuthCodeForm', 'Auth Codes'),
+        ('ProductForm', 'Quantity Model'),
 
     )
 
