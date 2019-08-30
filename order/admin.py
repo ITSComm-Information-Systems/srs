@@ -55,8 +55,12 @@ class FeatureCategoryAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
 
+class ProductCategoryAdmin(admin.ModelAdmin):
+    list_display = ['display_seq_no','label','name']
+    ordering = ('display_seq_no',)
+
 admin.site.register(Constant)
-admin.site.register(ProductCategory)
+admin.site.register(ProductCategory, ProductCategoryAdmin)
 admin.site.register(Element, ElementAdmin)
 admin.site.register(Service, ServiceAdmin)
 admin.site.register(Action, ActionAdmin)
