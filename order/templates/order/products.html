@@ -9,20 +9,16 @@
 
     <div class="card-columns">
     {% for field in list %}
-      <!-- if card is selected, enable the class "selected-card" to the following DIV -->
-    <div class="card" style="width: 18rem;">
-        <img class="card-img-top" src="/media/{{field.picture}}" alt="Product Image of {{ field }}">
-        <div class="card-body">
-          <p class="card-title h5">{{ field }}</p>
-          <p class="card-text">{{ field.description }}</p>
-          <!-- if card is selected, enable the class "btn-success" and remove the class "btn-outline-success" to the following link -->
-          <!-- Paco: Dave, do we need the select button to be an "a" tag? 
-            If not, can we make it a button element since it won't actually be a link -->
-          <a href="#" class="btn btn-outline-success">Select <span class="sr-only">{{ field }}</span></a>
-          <p><strong>Price: ${{ field.price }}</strong></p>
-        </div>
-    </div>
-
+      <div class="card product-card" style="width: 18rem;">
+          <img class="card-img-top" src="/media/{{field.picture}}" alt="Product Image of {{ field }}">
+          <div class="card-body">
+            <p class="card-title h5">{{ field }}"</p>
+            <p class="card-text">{{ field.description }}</p>
+            <button id="product{{field.id}}" name="product" type="button" class="btn btn-outline-success select-button" value="{{ field }}" onclick="selectProductCard(this)">Select</button>
+  <!----          <label for="product{{field.id}}">Product</label>  --->
+            <p><strong>Price: ${{ field.price }}</strong></p>
+          </div>
+      </div>
     {% endfor %}
     </div>
 
