@@ -61,17 +61,29 @@ function selectCard(card) {
         $("#newLocationFields").show();
     } else {
         $("#newLocationFields").hide();
+        div = $(card).parent();
+        $("#newBuildingName").val(div.find('#name').html());
+        $("#newBuildingCode").val(div.find('#code').html());
+        $("#newBuildingFloor").val(div.find('#floor').html());
+        $("#newBuildingRoom").val(div.find('#room').html());
+        $("#newBuildingJack").val(div.find('#jack').html());
+    
+        loc = div.find('#name').html() + "<br>" 
+        + "Building ID: " + div.find('#code').html() + "<br>" 
+        + "Floor: " + div.find('#floor').html() + "<br>" 
+        + "Room: " + div.find('#room').html() + "<br>" 
+        + "Jack: " + div.find('#jack').html() + "<br>";
+        $(card).val(loc);
     }
 
-    div = $(card).parent();
-    $("#newBuildingName").val(div.find('#name').html());
-    $("#newBuildingCode").val(div.find('#code').html());
-    $("#newBuildingFloor").val(div.find('#floor').html());
-    $("#newBuildingRoom").val(div.find('#room').html());
-    $("#newBuildingJack").val(div.find('#jack').html());
+
 
     $(card).addClass('btn-outline-success')
     $('.location-card').removeClass('selected-card').val('Select')
     $(card).closest('.location-card').addClass('selected-card').val('Selected')
+
+    $("button").removeClass('selected');
+    $(card).addClass('selected');
+
 
 }
