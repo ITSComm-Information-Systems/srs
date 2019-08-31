@@ -32,10 +32,18 @@
         <em>There is no charge for this request. However, please select a chartfield for departmental tracking purposes.</em> 
     </div>
     {% endif %}
-    <div class="form-group row col-12" id="oneTimeCharges">
+
+
+
+    <div class="form-group row col-12" id="div{{field.name}}">
         <!--  -->
         <div class="form-check">
         {{ field.label_tag }}
+        {% if tab.name == '4Chartfields' and field.name == 'oneTimeCharges' or tab.name == '2Chartfields' and field.name == 'oneTimeCharges' %}
+        <label for="useSameCode">     Use this chartcom for all charges</label>
+        <input class="col-3" id="useSameCode" type="checkbox" value="YES" onClick="useSameShortCode(this)">
+
+        {% endif %}
     <div class="input-group mb3">
         <!-- Select a Department (based off user's department access) -->
             <div class="input-group-prepend">
@@ -53,6 +61,7 @@
                     <option name="{{ field.name }}" data-dept="{{ choice.2 }}" value="{{ choice.0 }}">{{ choice.1 }}</option>
                 {% endfor %}
             </select>
+
         </div>
     </div>
     </div>
