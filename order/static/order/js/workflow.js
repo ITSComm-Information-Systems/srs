@@ -309,6 +309,18 @@ $(document).ready(function() {
 });  // Document Ready
 
 
+function useSameShortCode(obj) {
+  if (obj.checked) {
+
+    $('#divlocalCharges').hide();
+    $('#divLD').hide();
+    $('#divMRC').hide();
+  } else {
+    $('#divMRC').show();
+    $('#divlocalCharges').show();
+    $('#divLD').show();
+  }
+}
 
 
   function filterChartcom(obj) { 
