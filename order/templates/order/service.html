@@ -45,6 +45,9 @@
         {% endfor %}  
     </div>
 
+    {% autoescape off %}
+    {{ link_list.bodytext }}
+    {% endautoescape %}
 
     <div class="col-xl-3 col-md-6 col-12 helpful-links">
         <div class="alert alert-secondary hlinks" role="alert">
@@ -53,7 +56,7 @@
             </h3>
             <p class="mb-2">
                 <em>
-                    *All links redirect to links outside the OSC
+                    *All links redirect to links outside the SRS
                 </em>
             </p>
             {% autoescape off %}
