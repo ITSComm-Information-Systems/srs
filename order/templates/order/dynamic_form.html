@@ -1,3 +1,13 @@
+{% if tab.name == '4Chartfields' or tab.name == '2Chartfields' %}
+<div class="form-check">
+        <input class="form-check-input keep-check" type="checkbox" value="keepFeatures" name="keepFeatures"
+        id="useSameCode" onClick="useSameShortCode(this)">
+        <label class="form-check-label" for="useSameCode">
+          Check this box if you want to use the same chartcom for all charges.
+        </label>
+</div>
+<br>
+{% endif %}
 {% for field in tab.form %}
     {% if field.field.type == 'Radio' %}
         <fieldset id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" 
@@ -39,11 +49,6 @@
         <!--  -->
         <div class="form-check">
         {{ field.label_tag }}
-        {% if tab.name == '4Chartfields' and field.name == 'oneTimeCharges' or tab.name == '2Chartfields' and field.name == 'oneTimeCharges' %}
-        <label for="useSameCode">     Use this chartcom for all charges</label>
-        <input class="col-3" id="useSameCode" type="checkbox" value="YES" onClick="useSameShortCode(this)">
-
-        {% endif %}
     <div class="input-group mb3">
         <!-- Select a Department (based off user's department access) -->
             <div class="input-group-prepend">
