@@ -163,7 +163,16 @@ $(document).ready(function() {
 
   });
 
-  
+    
+  $("#id_oneTimeCharges").change(function() {
+
+    if ( $('#useSameCode').prop('checked') ) {
+      occ = $('#id_oneTimeCharges option:selected').val();
+      $("#id_MRC").val(occ);
+      $("#id_localCharges").val(occ);
+      $("#id_LD").val(occ);
+    }
+  });
 
   $("#phone_type").click(function() {
     if ($('#phone_type option:selected') > 1) {
@@ -309,6 +318,32 @@ $(document).ready(function() {
 });  // Document Ready
 
 
+function useSameShortCode(obj) {
+  if (obj.checked) {
+    console.log("checked");
+    $('#divlocalCharges').attr("disabled","disabled");
+    $('#divLD').attr("disabled","disabled");
+    $('#MRC').attr("disabled","disabled");
+    $('#id_MRC').attr("disabled","disabled");
+    $('#localCharges').attr("disabled","disabled");
+    $('#id_localCharges').attr("disabled","disabled");
+    $('#LD').attr("disabled","disabled");
+    $('#id_LD').attr("disabled","disabled");
+    occ = $('#id_oneTimeCharges option:selected').val();
+    $("#id_MRC").val(occ);
+    $("#id_localCharges").val(occ);
+    $("#id_LD").val(occ);
+  } else {
+    $('#divlocalCharges').removeAttr("disabled");
+    $('#divLD').removeAttr("disabled");
+    $('#MRC').removeAttr("disabled");
+    $('#id_MRC').removeAttr("disabled");
+    $('#localCharges').removeAttr("disabled");
+    $('#id_localCharges').removeAttr("disabled");
+    $('#LD').removeAttr("disabled");
+    $('#id_LD').removeAttr("disabled");
+  }
+}
 
 
   function filterChartcom(obj) { 
