@@ -1,3 +1,13 @@
+{% if tab.name == '4Chartfields' or tab.name == '2Chartfields' %}
+<div class="form-check">
+        <input class="form-check-input keep-check" type="checkbox" value="keepFeatures" name="keepFeatures"
+        id="useSameCode" onClick="useSameShortCode(this)">
+        <label class="form-check-label" for="useSameCode">
+          Check this box if you want to use the same chartcom for all charges.
+        </label>
+</div>
+<br>
+{% endif %}
 {% for field in tab.form %}
     {% if field.field.type == 'Radio' %}
         <fieldset id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" 
@@ -32,7 +42,10 @@
         <em>There is no charge for this request. However, please select a chartfield for departmental tracking purposes.</em> 
     </div>
     {% endif %}
-    <div class="form-group row col-12" id="oneTimeCharges">
+
+
+
+    <div class="form-group row col-12" id="div{{field.name}}">
         <!--  -->
         <div class="form-check">
         {{ field.label_tag }}
@@ -53,6 +66,7 @@
                     <option name="{{ field.name }}" data-dept="{{ choice.2 }}" value="{{ choice.0 }}">{{ choice.1 }}</option>
                 {% endfor %}
             </select>
+
         </div>
     </div>
     </div>
