@@ -4,7 +4,7 @@
 <form action="/auth/get_dept/" method="POST">{% csrf_token %}
     <div class="form-group col-md-6">    
         <label for="deptf">Select a Department ID</label>
-        <select type="select" name="dept_parm" id="deptf" value="{{ dept.deptid }}">
+        <select type="select" name="dept_parm" id="deptf" value="{{ dept.deptid }}" class="form-control text-field-short">
             <option></option>
             {% for dept in dept_list %}
             <option value={{ dept.deptid }}>{{ dept.deptid }}</option>
