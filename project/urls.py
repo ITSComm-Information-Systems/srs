@@ -20,6 +20,7 @@ urlpatterns = [
     path('chartchange/update-table/', views.get_users),
     path('chartchange/submit/', views.submit),
     path('chartchange/', views.chartchange),
+    path('', views.homepage),
     path('', include('pages.urls')),
     path('tools/',include('tools.urls'))
 ]
