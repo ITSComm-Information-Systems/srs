@@ -13,6 +13,7 @@ $(document).ready(function() {
 
 	$("#deptf").select2({
 		placeholder: "Select a department",
+		display:"inline",
 		// width: "100%",
   		matcher: function(params, data) {
         	return matchStart(params, data);
