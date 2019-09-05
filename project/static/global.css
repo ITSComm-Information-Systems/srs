@@ -1096,3 +1096,12 @@ td.action {
 .center-title {
     text-align:center;
 }
+
+.save-changes {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.save-changes > .btn-outline-primary {
+	margin-right:2rem;
+}

@@ -1,40 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- <style>
-    * {
-      box-sizing: border-box;
-    }
-    
-    /* Create four columns that floats next to each other */
-    .column {
-      float: left;
-      width: 20%;
-      padding: 10px;
-    }
-    
-
-    .left, .right {
-    width: 50%;
-    }
-
-    .middle {
-    width: 20%;
-    }
-
-    .deptid {
-    column-width:500px;
-    width:500px;
-    }
-
-    /* Clear floats after the columns */
-    .row:after {
-      content: "";
-      display: table;
-      clear: both;
-    }
-</style> -->
-
 <style>
     tr.no-top-border td {
         border-top: none;
@@ -45,7 +11,7 @@
     }
 </style>
     
-<div class='main-content'>
+
 <h1>{{ title }}</h1>
 <form action="/auth/get_uniqname/" method="POST">{% csrf_token %}
 
@@ -133,8 +99,8 @@
         </tbody>
     </table>
 
-    <div class='float-right'>
-        <button type='button' class='btn btn-primary'>Clear Changes</button>
+    <div class='save-changes'>
+        <button type='button' class='btn btn-outline-primary'>Clear Changes</button>
         <button type='button' class='btn btn-primary'>Save Changes</button>
     </div>
 
@@ -199,7 +165,7 @@
 
     {% endif %}
 </form>
-</div>
+
 
 {% endblock %}
 
