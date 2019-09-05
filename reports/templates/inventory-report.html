@@ -178,7 +178,7 @@
     </h3>
     <table class="table table-sm mb-5 table-striped" style="font-size:12px">
         <thead class="thead-dark">
-            <tr name='{{ classification.0.0.chartfield }}'>
+            <tr data-name="{{ classification.0.0.chartfield }}">
                 <th>User ID</th>
                 <th>Usage</th>
                 <th>User ID Type</th>
@@ -323,7 +323,7 @@
 
         for (var i = 0; i < rows.length; i++) {
             var row = [], cols = rows[i].querySelectorAll("td, th");
-            var name = rows[i].getAttribute('name');
+            var name = rows[i].getAttribute('data-name');
 
             for (var j = 0; j < cols.length; ++j) {
                 var text = cols[j].innerText;

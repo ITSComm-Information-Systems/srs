@@ -23,9 +23,13 @@
                             </label>
                         </div>
                         <select class="custom-select order-status-dropdown" id="selectDept">
+                            <option id="alldepts" name="dept" data-filter="dept" value="all_departments">
+                                All Departments
+                            </option>
                             {% for dept in dept_list %}
                             <option id="mydept{{dept.dept}}" name="dept" data-filter="dept" value="{{dept.dept}}">
-                                {{dept.dept}} - {{dept.name}}</option>
+                                {{dept.dept}} - {{dept.name}}
+                            </option>
                             {% endfor %}
                         </select>
                     </div>
