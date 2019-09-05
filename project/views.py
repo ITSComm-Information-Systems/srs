@@ -23,6 +23,8 @@ from oscauth.models import AuthUserDept, AuthUserDeptV
 from datetime import datetime, date
 from django.contrib.auth.decorators import login_required, permission_required
 
+from pages.models import Page
+
 import json
 from django.http import JsonResponse
 
@@ -31,6 +33,20 @@ from django.db.models import indexes, Max
 from django.db import connections
 from django import db
 import cx_Oracle
+
+
+    
+def homepage(request):
+
+	notices = Page.objects.get(permalink='/notices')
+
+	template = loader.get_template('home.html')
+
+	context = {
+		'title': 'Welcome to the Service Request System',
+		'notices': notices,
+	}
+	return HttpResponse(template.render(context, request))
 
 
 @permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)

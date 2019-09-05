@@ -262,10 +262,13 @@ class Order(models.Model):
             for con in cons:  # Populate issue with constants
                 issue[con.field] = con.value
 
+            note = item.data['reviewSummary'] + 'CHARTCOM \nOCC:' + item.chartcom.account_number + '\n'
+
             for key, value in item.data.items():
                 if value:  # Populate issue with user supplied values
                     if key == 'MRC' or key == 'localCharges' or key == 'LD':
                         value = Chartcom.objects.get(id=value).account_number
+                        note = note + key+ ':' + value + '\n'
 
                     target = map.get(key)
                     if target != None:
@@ -273,7 +276,7 @@ class Order(models.Model):
 
             issue['add_info_text_3'] = self.id
 
-            issue['note'] = item.data['reviewSummary']
+            issue['note'] = note #item.data['reviewSummary']
             issue['comment_text'] = item.description
             data['issues'].append(issue)
 
