@@ -1093,3 +1093,6 @@ td.action {
 .indented-form-input {
 	margin-left: 3rem;
 }
+.center-title {
+    text-align:center;
+}

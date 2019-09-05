@@ -43,8 +43,7 @@
                     <label for="deptgroup"><strong> Department Group</strong></label>
                     <div id="department_group_div" class="indented-form-input">
                         <label for="department_group"><strong>Select a Department Grouping</strong><span class='required-field prv-msgs' hidden>*</span></label>
-                        <select class="custom-select" name="department_group" id='deptGroupSelection' onchange="display_active({{active}})"
-                            id='department_group' size="1">
+                        <select class="custom-select" name="department_group" onchange="display_active({{active}})" id='department_group' size="1">
                             {% for group in groups_descr %}
                             <option value="{{ group }}">{{ group }}</option>
                             {% endfor %}
@@ -286,7 +285,7 @@
             })
         }
         else if ($('#deptgroup').is(':checked')) {
-            $('#deptGroupSelection option').each(function() {
+            $('#deptartment_group option').each(function() {
                 if ($(this).is(':selected')) {
                     to_return = true;
                 }
