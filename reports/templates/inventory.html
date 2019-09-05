@@ -8,7 +8,7 @@
                 <div class="form-group col-8">
                     {% if depts %}
                     <label for="dept_id"><strong>Select a Department ID</strong></label>
-                        <select class="form-control" name="dept_id" id="dept_id" size="1" required>
+                        <select class="form-control" name="dept_id" id="dept_id" size="{{ depts|length }}" required>
                             {% for dept in depts %}
                             <option value="{{ dept.deptid }}-{{dept.name}}">{{ dept.deptid }} - {{ dept.name }}</option>
                             {% endfor %}
@@ -18,7 +18,7 @@
                     <label for="bill_period">
                         <strong>Select a Billing Period</strong>
                     </label>
-                    <select class="form-control mt-0" name="bill_period" id="bill_period" size="1" required>
+                    <select class="form-control mt-0" name="bill_period" id="bill_period" size="{{ dates|length }}" required>
                         {% for date in dates %}
                         <option value="{{ date }}">{{ date }}</option>
                         {% endfor %}
@@ -47,9 +47,11 @@
 <script>
     $(document).ready(function() {
 	    // Select first options by default
-        $("#dept_id").prop("selectedIndex", 0);
-        $("#bill_period").prop("selectedIndex", 0);
-})
+        // $("#dept_id").prop("selectedIndex", 0);
+        // $("#bill_period").prop("selectedIndex", 0);
+
+        $('#dept_id option:eq(0)').prop('selected', true);
+    })
 </script>
 
 {% endblock %}
