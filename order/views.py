@@ -319,7 +319,7 @@ class Review(PermissionRequiredMixin, View):
         return HttpResponse(template.render(context, request))
 
 
-class Services(View):
+class Services(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
     
     def get(self, request):
