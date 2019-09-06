@@ -4,6 +4,7 @@ import json
 import logging
 import requests
 from requests.auth import HTTPBasicAuth
+from oscauth.utils import upsert_user
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
@@ -88,9 +89,11 @@ class OIDCAuthenticationBackend(ModelBackend):
 
     def create_user(self, claims):
         """Return object for a newly created user account."""
-        email = claims.get('email')
-        username = self.get_username(claims)
-        return self.UserModel.objects.create_user(username, email)
+        user = upsert_user(claims['sub'])
+        #email = claims.get('email')
+        #username = self.get_username(claims)
+        #return self.UserModel.objects.create_user(claims['sub'], email, first_name='Dave', last_name='Jamison')
+        return user
 
     def get_username(self, claims):
         """Generate username based on claims."""
