@@ -86,13 +86,15 @@
 								{% if user.is_superuser %}
 									<a class="dropdown-item" href="/admin/">Admin</a>
 								{% endif %}
-
-								{% if not request.session.exit_users_pk %}
-									<a class="dropdown-item" href="/auth/su_login/">Impersonate</a>
-								{% endif %}
-								{% if request.session.exit_users_pk %}
-									<a class="dropdown-item" href="/auth/su/">Exit Impersonate</a>
-								{% endif %}								
+								
+								{% if perms.oscauth.can_impersonate %}
+									{% if not request.session.exit_users_pk %}
+										<a class="dropdown-item" href="/auth/su_login/">Impersonate</a>
+									{% endif %}
+									{% if request.session.exit_users_pk %}
+										<a class="dropdown-item" href="/auth/su/">Exit Impersonate</a>
+									{% endif %}
+								{% endif %}				
 								<a class="dropdown-item" href="/auth/mypriv/">View System Privileges</a>
 								<a class="dropdown-item"  href="/auth/logout/">Logout</a>
 							</div>
