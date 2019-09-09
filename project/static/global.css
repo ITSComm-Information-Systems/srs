@@ -760,9 +760,14 @@ input:checked + .slider:before {
 	margin-left:0.25rem;
 	color:#0075bc;
 }
+a.popover-icon:focus {
+	background-color:transparent;
+	color:#0075bc;
+}
 a.popover-icon:hover {
+	background-color:transparent;
+	color:#0075bc;
 	cursor:pointer;
-	background-color:#0065a3;
 }
 
 .checkbox-label {
@@ -1009,10 +1014,15 @@ h3.alert-heading {
 	color:#655a52 !important;
 }
 .form-control {
+    margin:0.2rem;
 	border:1px solid #cecbc9;
 }
 .custom-select {
 	border:1px solid #cecbc9;
+}
+.custom-select.order-status-dropdown {
+    border-top-right-radius:.25rem;
+    border-bottom-right-radius:.25rem;
 }
 .input-group-text {
 	border:1px solid #cecbc9;
@@ -1063,6 +1073,9 @@ td.action {
 .row.cart-tables {
 /*	padding-right:15px;
 	padding-left:15px;*/
+}
+.cart-tables th {
+    background-color:#e4e1df;
 }
 .cart-table h4 {
 	padding:.75rem;
