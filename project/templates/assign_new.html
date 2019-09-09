@@ -17,13 +17,13 @@
 				<div class="input-group ol-md-6" id="dept_search">
 			      <input type="text" id="dept_text_search" name="select_dept" class="form-control" placeholder="Enter department" aria-label="Enter department" aria-describedby="basic-addon2">
 			      <div class="input-group-append">
-			        <button class="btn" type="Submit">Submit</button>
+			        <button class="btn btn-primary" type="Submit">Submit</button>
 			      </div>
 			    </div>
 				{% else %}
 	            <div class="input-group">
 	                <div class="input-group-prepend">
-	                    <label class="input-group-text" for="dept_dropdown">
+	                    <label class="input-group-text" for="select_dept_3">
 	                        Select New Department
 	                    </label>
 	                </div>
@@ -40,7 +40,7 @@
 	        <form id="cf_dropdown_3" method="POST" name="cf_dropdown">{% csrf_token %}
 	            <div class="input-group">
 	                <div class="input-group-prepend">
-	                    <label class="input-group-text" for="cf_dropdown">
+	                    <label class="input-group-text" for="select_cf_3">
 	                        Select New Chartfield
 	                    </label>
 	                </div>
@@ -61,15 +61,15 @@
 		</div>
 
 		<div class="form-check form-check-inline">
-	    	<input class="form-check-input" type="checkbox" value="" id="local" disabled>
-	    	<label class="form-check-label" for="local">
+	    	<input class="form-check-input" type="checkbox" value="" id="toll" disabled>
+	    	<label class="form-check-label" for="toll">
 		    	<strong>Toll</strong>
 		  	</label>
 		</div>
 
 		<div class="form-check form-check-inline">
-	    	<input class="form-check-input" type="checkbox" value="" id="toll" disabled>
-	    	<label class="form-check-label" for="toll">
+	    	<input class="form-check-input" type="checkbox" value="" id="local" disabled>
+	    	<label class="form-check-label" for="local">
 		    	<strong>Local</strong>
 		  	</label>
 		</div>
