@@ -820,7 +820,7 @@ h2.lead {
 	font-weight:700;
 }
 h3.lead {
-	margin-left:10px;
+	margin:1.25rem 0 .5em 10px;
 	font-size:1.75rem;
 	font-weight:700;
 }
