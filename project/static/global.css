@@ -635,7 +635,7 @@ a.nav-link.disabled:focus {
 }
 
 .header-info {
-	margin-bottom:10px;
+	margin-bottom:2rem;
 }
 
 @media (max-width:991px) {
