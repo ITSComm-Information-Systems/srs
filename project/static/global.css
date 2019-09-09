@@ -442,6 +442,7 @@ span {
 	flex:initial;
 	width:46%;
 	margin:10px;
+	border:1px solid #cecbc9;
 	vertical-align:middle;
 }
 @media (max-width:575px) {
