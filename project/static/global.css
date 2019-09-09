@@ -381,10 +381,11 @@ span {
 }
 .action a {
 	display:inline;
+	padding-right:1rem;
 }
 .action a:nth-child(even) {
-	padding-left:1rem;
-	padding-right:1rem;
+/*	padding-left:1rem;
+	padding-right:1rem;*/
 }
 .action .delete {
 	color:#dc3545;
@@ -412,6 +413,9 @@ span {
 	background-color:transparent;
 	background:transparent;
 	color:#0075bc;
+}
+.action .ready-link {
+    white-space:nowrap;
 }
 
 @media (min-width:992px) {
@@ -1052,6 +1056,24 @@ h3.lead {
 td.action {
 	width:auto;
 	display:table-cell;
+}
+
+.cart-table + .table-responsive-md > .table {
+}
+.cart-table + .table-responsive-md > .table thead th:nth-child(1) { /* date created */
+	width:10%;
+	white-space:nowrap;
+}
+.cart-table + .table-responsive-md > .table thead th:nth-child(2) { /* created by */
+	width:10%;
+	white-space:nowrap;
+}
+.cart-table + .table-responsive-md > .table thead th:nth-child(3) { /* details */
+	width:60%;
+	min-width:320px;
+}
+.cart-table + .table-responsive-md > .table thead th:nth-child(4) { /* action */
+	width:20%;
 }
 
 #buildingTable tr:hover {
