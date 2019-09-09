@@ -556,7 +556,7 @@ a.nav-link.disabled:focus {
 .nav-pills a.nav-link.disabled:hover {
 	cursor:text;
 }
-.nav-pills a.nav-link:hover {
+.nav-pills a.nav-link:not(.active):hover {
     background-color:#0075bc;
     color:#ffffff;
 }
