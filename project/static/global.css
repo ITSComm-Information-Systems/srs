@@ -1074,6 +1074,9 @@ td.action {
 /*	padding-right:15px;
 	padding-left:15px;*/
 }
+.cart-tables th {
+    background-color:#e4e1df;
+}
 .cart-table h4 {
 	padding:.75rem;
 }
