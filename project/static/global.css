@@ -1031,14 +1031,14 @@ h3.lead {
 }
 
 .table thead th {
-	border-bottom:3px solid #cecbc9;
+	border-top:1px solid #cecbc9;
 }
 .fas .btn-link:hover {
 	text-decoration:none;
 	cursor:pointer;
 }
 .table td, .table th {
-	border-top:1px solid #cecbc9;
+	border-bottom:1px solid #cecbc9;
 }
 .table-sm td, .table-sm th {
 	padding:.5rem;
