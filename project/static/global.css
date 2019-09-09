@@ -542,7 +542,7 @@ h2.service-menu-header {
 	border-color:#e4e1df;
 	background-color:#e4e1df;
 	color:#555555;
-	cursor:text;
+	cursor:default;
 }
 .nav-pills a.nav-link.disabled {
 	color:#655a52;
@@ -554,7 +554,7 @@ a.nav-link.disabled:focus {
 	color:#655a52;
 }
 .nav-pills a.nav-link.disabled:hover {
-	cursor:text;
+	cursor:default;
 }
 .nav-pills a.nav-link:not(.active):hover {
     background-color:#0075bc;
