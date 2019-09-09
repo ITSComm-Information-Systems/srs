@@ -12,16 +12,16 @@
 <table class="table table-hover table-striped table-sm">
     <thead>
         <tr>
-                <th>Department</th>
-                <th>Role</th>
-                <th>Result</th>
+                <th scope="col">Department</th>
+                <th scope="col">Role</th>
+                <th scope="col">Result</th>
         </tr>
     </thead>
     <tbody>
         {% for dept in dept_checked %}
         <tr>
                 {% if row.dept_status != 'I' %}
-                <td> {{ dept }}</td>
+                <td scope="col"> {{ dept }}</td>
                 <td> {{ role_checked }}</td>
                 <td> {{ result }}</td>
                 <td> {{ row.result }}</td>

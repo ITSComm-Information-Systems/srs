@@ -12,11 +12,11 @@
       <div class="card product-card" style="width: 18rem;">
           <img class="card-img-top" src="/media/{{field.picture}}" alt="Product Image of {{ field }}">
           <div class="card-body">
-            <p class="card-title h5">{{ field }}"</p>
+            <p class="card-title h5" id="card-title-of-{{ field }}">{{ field }}"</p>
             <p class="card-text">{{ field.description }}</p>
-            <button id="product{{field.id}}" name="product" type="button" class="btn btn-outline-success select-button" value="{{ field }}" onclick="selectProductCard(this)">Select</button>
-  <!----          <label for="product{{field.id}}">Product</label>  --->
-            <p><strong>Price: ${{ field.price }}</strong></p>
+            <p class="card-text"><strong>Price: ${{ field.price }}</strong></p>
+            <button id="product{{field.id}}" name="product" type="button" class="btn btn-outline-success select-button" value="{{ field }}" onclick="selectProductCard(this)" aria-describedby="card-title-of-{{ field }}">Select <span class="sr-only"> {{ field }}</span></button>
+            
           </div>
       </div>
     {% endfor %}

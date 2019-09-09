@@ -55,15 +55,15 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td style='text-align:center;'>
+                <td scope="col" style='text-align:center;'>
                     <label for='proxy-check'><strong>Select All</strong></label><br>
                     <input type='checkbox' id='proxy-check'>
                 </td>
-                <td style='text-align:center;'>
+                <td scope="col" style='text-align:center;'>
                     <label for='orderer-check'><strong>Select All</strong></label><br>
                     <input type='checkbox' id='orderer-check'>
                 </td>
-                <td style='text-align:center;'>
+                <td scope="col" style='text-align:center;'>
                     <label for='reporter-check'><strong>Select All</strong></label><br>
                     <input type='checkbox' id='reporter-check'>
                 </td>
@@ -72,23 +72,23 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td style='text-align:center;'><strong>Edit Role(s)</strong></td>
+                <td scope="col" style='text-align:center;'><strong>Edit Role(s)</strong></td>
                 <td></td>
                 <td></td>
             </tr>
             <tr class='no-top-border'>
-                <th>Department ID</th>
-                <th>Department Name</th>
-                <th>Current User Role(s)&nbsp;<i class="fas fa-question-circle btn-link" aria-label="More Information icon" data-toggle="modal" data-target="#statusIndicatorModal"></i></th>
-                <th style='text-align:center;'>Proxy</th>
-                <th style='text-align:center;'>Orderer</th>
-                <th style='text-align:center;'>Reporter</th>
+                <th scope="col">Department ID</th>
+                <th scope="col">Department Name</th>
+                <th scope="col">Current User Role(s)&nbsp;<i class="fas fa-question-circle btn-link" aria-label="More Information icon" data-toggle="modal" data-target="#statusIndicatorModal"></i></th>
+                <th style='text-align:center;' scope="col">Proxy</th>
+                <th style='text-align:center;' scope="col">Orderer</th>
+                <th style='text-align:center;' scope="col">Reporter</th>
             </tr>
         </thead>
         <tbody>
             {% for row in rows %}
                 <tr>
-                    <td>{{ row.dept }}</td>
+                    <td scope="col">{{ row.dept }}</td>
                     <td>{{ row.dept_name }}</td>
                     <td></td>
                     <td style='text-align:center;'><input type='checkbox'></td>
