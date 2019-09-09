@@ -21,7 +21,7 @@
         {% for dept in dept_checked %}
         <tr>
                 {% if row.dept_status != 'I' %}
-                <td scope="col"> {{ dept }}</td>
+                <td scope="row"> {{ dept }}</td>
                 <td> {{ role_checked }}</td>
                 <td> {{ result }}</td>
                 <td> {{ row.result }}</td>
