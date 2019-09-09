@@ -760,9 +760,14 @@ input:checked + .slider:before {
 	margin-left:0.25rem;
 	color:#0075bc;
 }
+a.popover-icon:focus {
+	background-color:transparent;
+	color:#0075bc;
+}
 a.popover-icon:hover {
+	background-color:transparent;
+	color:#0075bc;
 	cursor:pointer;
-	background-color:#0065a3;
 }
 
 .checkbox-label {
