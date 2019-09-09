@@ -18,7 +18,7 @@
                     <form action="/orders/chartcom/" id="cart-department-dropdown" method="POST">{% csrf_token %}
                         <div class="input-group dept-dropdown">
                             <div class="input-group-prepend">
-                                <label class="input-group-text" for="department-dropdown">
+                                <label class="input-group-text" for="deptid">
                                     Switch Department
                                 </label>
                             </div>
@@ -83,11 +83,11 @@
                                     <td class="action">
                                         <a id="{{chartcom.id}}" class="edit" href="#" data-toggle="modal"
                                             data-target="#editChartfieldModal1">
-                                            Edit
+                                            Edit <span class="sr-only">{{chartcom.name}}</span>
                                         </a>
                                         <a id="{{chartcom.id}}" class="delete" href="#" role="button"
                                             data-toggle="modal" data-target="#deleteChartfieldModal1">
-                                            Remove
+                                            Remove <span class="sr-only">{{chartcom.name}}</span>
                                         </a>
                                     </td>
                                 </tr>
@@ -124,7 +124,7 @@
                             <!-- After user select a chartfield from the select widget above, the chartfield should authomatically populate the following text input (read only so the user can't change the chartfield) -->
                             <div class="form-group">
                                 <label for="chartfieldSelected">Chartfield</label>
-                                <input type="text" class="form-control" id="chartfieldSelected" name="chartfieldCode" value=" "
+                                <input type="text" class="form-control" id="chartfieldSelected" name="chartfieldCode"
                                     readonly>
                             </div>
                             <!-- After user select a chartfield from the select widget above, the shortcode assocaited to chartfield (if any) should authomatically populate the following text input (read only so the user can't change the shortcode) -->
@@ -178,14 +178,14 @@
                                 <label for="chartfieldComponent">Chartfield Selected</label>
                                 <!-- Replace the value of the input form to be the chartfield that the user selected to edit -->
                                 <input type="text" class="form-control" id="chartfieldComponent" name="chartfieldVal"
-                                    value="Chartfield code goes here" readonly>
+                                     readonly>
                             </div>
 
                             <div class="form-group">
-                                <label for="shortcode">Shortcode</label>
+                                <label for="shortCode1">Shortcode</label>
                                 <!-- Replace the value of the input form below to be the shortcode (if any) of the chartfield that the user selected to edit -->
                                 <input type="text" class="form-control" id="shortCode1" name="shortcodeVal"
-                                    value="Shortcode goes here (if there is one)" readonly>
+                                     readonly>
                             </div>
 
                             <div class="form-group">
@@ -193,8 +193,7 @@
                                     Enter a New Associated Name
                                 </label>
                                 <!-- Replace the value of the input form below to be the description of the chartfield that the user selected to edit -->
-                                <input type="text" class="form-control" id="newChartfieldDescription"
-                                    value="Current desciption goes here" name="newDescription">
+                                <input type="text" class="form-control" id="newChartfieldDescription" name="newDescription">
                             </div>
                             <input type="hidden" name="action" value="edit">
                             <input type="hidden" name="deptid" value="{{department.id}}">
@@ -233,19 +232,19 @@
                             <div class="card-body">
                                 <strong class="card-text" >Chartfield:</strong>
                                 <!-- Replace the following text with the value of the chartfield that the user selected to be removed from the shortlist -->
-                                <p id="chartCom" class="card-text">Enter chartfield value here</p>
+                                <p id="chartCom" class="card-text"></p>
                                 <br>
                                 <strong class="card-text" >
                                     Shortcode:
                                 </strong>
                                 <!-- Replace the following text with the value of the shortcode of the chartfield that the user selected to be removed from the shortlist -->
-                                <p id="shortCode" class="card-text">Shortcode (if any) goes here</p>
+                                <p id="shortCode" class="card-text"></p>
                                 <br>
                                 <strong class="card-text" >
                                     Associated Name
                                 </strong>
                                 <!-- Replace the following text with the value of the description of the chartfield that the user selected to be removed from the shortlist -->
-                                <p id="chartComDescr" class="card-text" id="chartcomDescr">Chartcom Description</p>
+                                <p id="chartComDescr" class="card-text" id="chartcomDescr"></p>
                             </div>
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="deptid" value="{{department.id}}">
