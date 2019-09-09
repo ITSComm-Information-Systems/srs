@@ -831,6 +831,9 @@ h3.lead {
 	font-size:1.75rem;
 	font-weight:700;
 }
+h3.alert-heading {
+    margin-top:.5rem;
+}
 
 .wismo-order-details {
 	width:40%;
