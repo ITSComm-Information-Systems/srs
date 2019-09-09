@@ -8,16 +8,16 @@
 <table class="table table-hover table-striped table-sm">
     <thead>
         <tr>
-                <th>Department ID</th>
-                <th>Department Name</th>
-                <th>Role</th>
+                <th scope="col">Department ID</th>
+                <th scope="col">Department Name</th>
+                <th scope="col">Role</th>
         </tr>
     </thead>
     <tbody>
         {% for row in rows %}
         <tr>
                 {% if row.dept_status != 'I' %}
-                <td> {{ row.col1 }}</td>
+                <td scope="col"> {{ row.col1 }}</td>
                 <td> {{ row.col2 }}</td>
                 <td> {{ row.roles }}</td>
                 {% else %}
