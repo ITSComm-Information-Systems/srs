@@ -21,6 +21,11 @@ body {
 	z-index:9999;
 }
 
+.container {
+    padding-right:20px;
+    padding-left:20px;
+}
+
 .navbar {
 	padding:0;
 }
@@ -35,8 +40,6 @@ body {
 
 .container {
 	max-width:1280px;
-	padding-right:20px !important;
-	padding-left:20px !important;
 }
 
 #aux-nav {
@@ -169,7 +172,7 @@ body {
 }
 
 #main-content.container .container {
-	padding:0 !important;
+/*	padding:0 !important;*/
 }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
@@ -203,7 +206,7 @@ a:focus {
 
 footer {
 	margin:2em 0 0 0;
-	padding:20px;
+	padding:20px 0 20px 0;
 	background:#333333;
 	color:#ffffff;
 	overflow:hidden;
@@ -766,14 +769,6 @@ a.popover-icon:hover {
 	display:none;
 }
 
-.row.cart-tables {
-	padding-right:20px;
-	padding-left:20px;
-}
-.cart-table {
-	width:100%;
-}
-
 .italic-msg {
 	margin-top:1rem;
 }
@@ -1015,6 +1010,10 @@ h3.alert-heading {
 .custom-select {
 	border:1px solid #cecbc9;
 }
+.custom-select.order-status-dropdown {
+    border-top-right-radius:.25rem;
+    border-bottom-right-radius:.25rem;
+}
 .input-group-text {
 	border:1px solid #cecbc9;
 	background-color:#f4f3f2;
@@ -1048,7 +1047,7 @@ h3.alert-heading {
 	border-bottom:1px solid #cecbc9 !important;
 }
 .table-sm td, .table-sm th {
-	padding:.5rem;
+	padding:.75rem;
 }
 .table-striped tbody tr:nth-of-type(odd), .table-striped tbody tr:nth-of-type(odd):hover {
 	background-color:#f4f3f2;
@@ -1061,6 +1060,13 @@ td.action {
 	display:table-cell;
 }
 
+.row.cart-tables {
+/*	padding-right:15px;
+	padding-left:15px;*/
+}
+.cart-table h4 {
+	padding:.75rem;
+}
 .cart-table + .table-responsive-md > .table {
 }
 .cart-table + .table-responsive-md > .table thead th:nth-child(1) { /* date created */
