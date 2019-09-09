@@ -626,7 +626,7 @@ a.nav-link.disabled:focus {
 }
 @media (min-width:960px) {
 	.large-order {
-		width:75%;
+/*		width:75%;*/
 	}
 }
 
