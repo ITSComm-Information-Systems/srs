@@ -195,7 +195,7 @@ def get_uniqname(request, uniqname_parm=''):
         return  HttpResponse(template.render({'uniqname_parm': uniqname_parm, 'title':"Manage User Access"}, request))
     # Load permissions
     else:
-        # Check for valid uniqname format
+        # Account for incorrectly formatted uniqnames
         if len(uniqname_parm) < 3 or len(uniqname_parm) > 8 or uniqname_parm.isalpha is False:
             result = uniqname_parm + ' is not a valid uniqname'
             return  HttpResponse(template.render({'result': result, 'title':"Manage User Access"}, request))
@@ -204,6 +204,7 @@ def get_uniqname(request, uniqname_parm=''):
             conn = Connection('ldap.umich.edu', auto_bind=True)
             conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname_parm + ')', attributes=["uid","mail","user","givenName","sn"])
             
+            # User exists in MCommunity
             if conn.entries:
                 mc_user = conn.entries[0]
                 result = ''
@@ -217,64 +218,107 @@ def get_uniqname(request, uniqname_parm=''):
                     osc_user.exists = True
 
                 osc_user.username = mc_user.uid
-#                osc_user.last_name = mc_user.sn
-#                osc_user.first_name = mc_user.givenName
                 last_name = mc_user.sn
                 first_name = mc_user.givenName
 
                 if(request.user.has_perm('oscauth.can_administer_access_all')):
                     grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
                     dept_manager = AuthUserDept.objects.filter(user=request.user.id,group=3)
+                    disable_proxy = False
                 else:
                     grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).exclude(role='Proxy').order_by('role')
                     dept_manager = []
+                    disable_proxy = True
 
                 print(dept_manager)
                 #grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
-#                 grantor_roles = Grantor.objects.values('grantor_role').distinct()
+                grantor_roles = Grantor.objects.values('grantor_role').distinct()
 #                 this_grantors_roles = AuthUserDept.objects.filter(user=request.user.id).values("group").distinct()
 # # The list of roles should only include those that this particular user can grant
 # #                grantable_roles = Grantor.objects.filter(grantor_role__in=this_grantors_roles).values("granted_role_id").distinct()
 
 # # The list of depts should be dependent on the role selected
 # #   e.g. if proxy is selected, only those depts for which thia grantor has the dept manager role should be displayed
-#                 grantor_depts = AuthUserDept.objects.filter(user=request.user.id,group__in=grantor_roles).exclude(dept='All').order_by('dept')
+                grantor_depts = AuthUserDept.objects.filter(user=request.user.id,group__in=grantor_roles).exclude(dept='All').order_by('dept')
 
-#                 rows = []
-#                 dept_name = ''
-#                 dept_status = ''
-#                 process_access = ''
-#                 submit_msg = ''
+                rows = []
+                dept_name = ''
+                dept_status = ''
+                process_access = ''
+                submit_msg = ''
 
-#                 for role in grantable_roles:
-#                     role = role.role
-# #                    role = grantable_roles.granted_role_id
-# #                    role = Role.objects.get(id=granted_role_id).role
+                for role in grantable_roles:
+                    role = role.role
+#                    role = grantable_roles.granted_role_id
+#                    role = Role.objects.get(id=granted_role_id).role
 
-#                 for dept in grantor_depts:
-#                     dept = dept.dept
+                for query_dept in grantor_depts:
+                    dept = query_dept.dept
 
-#                     if dept_manager.filter(dept=dept).exists():
-#                     #if dept in dept_manager:
-#                         manager = True
-#                     else:
-#                         manager = False
+                    if dept_manager.filter(dept=dept).exists():
+                    #if dept in dept_manager:
+                        manager = True
+                    else:
+                        manager = False
 
-#                     dept_info = UmCurrentDeptManagersV.objects.get(deptid=dept)
-#                     dept_name = dept_info.dept_name
-#                     dept_status = dept_info.dept_status
-#                     data = {'dept_status' : dept_status,'dept' : dept, 'dept_name' : dept_name, 'dept_manager': manager}
-#                     rows.append(data)
+                    dept_info = UmCurrentDeptManagersV.objects.get(deptid=dept)
+                    dept_name = dept_info.dept_name
+                    dept_status = dept_info.dept_status
 
-                # Find user's departments
-                user_depts = AuthUserDept.objects.filter(user=request.user.id)
+                    # Determine selected user's roles for system user's departments
+                    roles = {
+                        'proxy': False,
+                        'orderer': False,
+                        'reporter': False
+                    }
+                    user_roles = []
+                    if osc_user:
+                        roles_list = AuthUserDept.objects.filter(user=osc_user[0], dept=dept)
+                        user_roles = []
+                        for role in roles_list:
+                            # one_role = Role.objects.filter(group=role)[0].role
+                            # user_roles.append(one_role)
+                            user_roles.append(role.group.role.role)
 
-                # rows = []
-                # row = {
-                #     'deptid':,
-                #     'dept_name':
-                #     'roles':,
-                # }
+                        # Create for checkboxes
+                        proxy = False
+                        orderer = False
+                        reporter = False
+                        if 'Proxy' in user_roles:
+                            proxy = True
+                        if 'Orderer' in user_roles:
+                            orderer = True
+                        if 'Reporter' in user_roles:
+                            reporter = True
+                        roles = {
+                            'proxy': proxy,
+                            'orderer': orderer,
+                            'reporter': reporter
+                        }
+
+                    # Get the requestor's role for that department
+                    role = query_dept.group.role.role
+
+                    disable_proxy = False
+                    disable_others = False
+                    if role != "Department Manager":
+                        disable_proxy = True
+                    if role != "Proxy" and role != 'Department Manager':
+                        disable_others = True
+
+                    data = {
+                        'dept_status' : dept_status,
+                        'dept' : dept, 
+                        'dept_name' : dept_name, 
+                        'dept_manager': manager,
+                        'disable_proxy': disable_proxy,
+                        'disable_others': disable_others,
+                        'my_role': role,
+                        'current_roles': roles,
+                        'roles_list': ", ".join(user_roles)
+                    }
+                    rows.append(data)
+
 
                 context = {
                     'title':"Manage User Access",
@@ -288,6 +332,7 @@ def get_uniqname(request, uniqname_parm=''):
                     'rows': rows,
                     'result': result,
                     'submit_msg': submit_msg,
+                    'disable_proxy': disable_proxy
                 }
 
                 if request.method=='POST' and request.POST.get('process_access'):
@@ -305,6 +350,7 @@ def get_uniqname(request, uniqname_parm=''):
 
                 return render(request, 'oscauth/setpriv.html', context)
 
+            # If user does not exist in MCommunity
             else:
                 result = uniqname_parm + ' is not in MCommunity'
                 return  HttpResponse(template.render({'result': result, 'title':"Manage User Access"}, request))

@@ -20,7 +20,7 @@
       required>
     <label class="form-check-label" for="cat-{{category.id}}-{{res.id}}">{{res}}</label>
     {% if res == category.res.last %}
-    <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+    <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle"
         aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
     {% endif %}
   </div>

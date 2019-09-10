@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <div class="tab-content col-6" id="v-pills-tabContent">
+    <div class="tab-content col-xl-6 col-md-9 col-12" id="v-pills-tabContent">
         {% for service in service_list %}
         <div class="tab-pane fade" id="{{ service.name }}" role="tabpanel" aria-labelledby="v-pills-profile-tab">
             <div class="row service" id="{{service.name}}" name="serviceCards">
@@ -33,7 +33,7 @@
                             <p class="learn-more-link">
                                 <a tabindex="0" role="button" data-toggle="popover" data-container="body"
                                     data-trigger="focus" data-placement="bottom" title="{{action.label}}"
-                                    data-content="{{action.description}}"> Learn more
+                                    data-content="{{action.description}}"> Learn more <span class="sr-only"> about {{ action.label }}</span>
                                 </a>
                             </p>
                         </div>
@@ -45,16 +45,11 @@
         {% endfor %}  
     </div>
 
-    <div class="col-xl-3 col-md-6 col-12 helpful-links">
+    <div class="col-xl-3 col-md-6 col-7 helpful-links">
         <div class="alert alert-secondary hlinks" role="alert">
             <h3 class="alert-heading">
                 Helpful ITS Links
             </h3>
-            <p class="mb-2">
-                <em>
-                    *All links redirect to links outside the SRS
-                </em>
-            </p>
             {% autoescape off %}
             {{ link_list.bodytext }}
             {% endautoescape %}

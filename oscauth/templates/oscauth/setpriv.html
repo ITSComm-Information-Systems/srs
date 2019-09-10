@@ -1,40 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- <style>
-    * {
-      box-sizing: border-box;
-    }
-    
-    /* Create four columns that floats next to each other */
-    .column {
-      float: left;
-      width: 20%;
-      padding: 10px;
-    }
-    
-
-    .left, .right {
-    width: 50%;
-    }
-
-    .middle {
-    width: 20%;
-    }
-
-    .deptid {
-    column-width:500px;
-    width:500px;
-    }
-
-    /* Clear floats after the columns */
-    .row:after {
-      content: "";
-      display: table;
-      clear: both;
-    }
-</style> -->
-
 <style>
     tr.no-top-border td {
         border-top: none;
@@ -45,7 +11,7 @@
     }
 </style>
     
-<div class='main-content'>
+
 <h1>{{ title }}</h1>
 <form action="/auth/get_uniqname/" method="POST">{% csrf_token %}
 
@@ -55,18 +21,20 @@
             <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short col-4" placeholder='Uniqname'>
             <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
         </div>
-        {% if uniqname_parm is None or result != '' %}
-        <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i><strong class="prv-msgs">&nbsp;{{ result }}</strong>
+        {% if uniqname_parm == '' %}
         {% else %}
-
-            {% if osc_user.exists %}
-            <div class='mt-5'>
-                <h2 class='d-inline'>Assign Access Roles for: </h2><h3 class='d-inline'>{{ first_name }} {{ last_name }} ({{ uniqname_parm }})</h3>
-                <p class='prv-msgs mt-2'>Inactive departments are shown with <strong>red text and the following icon:&nbsp;</strong><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></p>
-            </div>
+            {% if result is not None and result != '' %}
+            <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i><strong class="prv-msgs">&nbsp;{{ result }}</strong>
             {% else %}
-                <strong>{{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
-                 - User not found, add a role to create them.
+                {% if osc_user.exists %}
+                <div class='mt-5'>
+                    <h2 class='d-inline'>Assign Access Roles for: </h2><h3 class='d-inline'>{{ first_name }} {{ last_name }} ({{ uniqname_parm }})</h3>
+                    <p class='prv-msgs mt-2'>Inactive departments are shown with <strong>red text and the following icon:&nbsp;</strong><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></p>
+                </div>
+                {% else %}
+                    <strong>{{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
+                     - User not found, add a role to create them.
+                {% endif %}
             {% endif %}
         {% endif %}
         <br>
@@ -87,15 +55,15 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td style='text-align:center;'>
+                <td scope="col" style='text-align:center;' id='proxy-all'>
                     <label for='proxy-check'><strong>Select All</strong></label><br>
                     <input type='checkbox' id='proxy-check'>
                 </td>
-                <td style='text-align:center;'>
+                <td scope="col" style='text-align:center;' id='orderer-all'>
                     <label for='orderer-check'><strong>Select All</strong></label><br>
                     <input type='checkbox' id='orderer-check'>
                 </td>
-                <td style='text-align:center;'>
+                <td scope="col" style='text-align:center;' id='reporter-all'>
                     <label for='reporter-check'><strong>Select All</strong></label><br>
                     <input type='checkbox' id='reporter-check'>
                 </td>
@@ -104,35 +72,73 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td style='text-align:center;'><strong>Edit Role(s)</strong></td>
+                <td scope="col" style='text-align:center;'><strong>Edit Role(s)</strong></td>
                 <td></td>
                 <td></td>
             </tr>
             <tr class='no-top-border'>
-                <th>Department ID</th>
-                <th>Department Name</th>
-                <th>Current User Role(s)&nbsp;<i class="fas fa-question-circle btn-link" aria-label="More Information icon" data-toggle="modal" data-target="#statusIndicatorModal"></i></th>
-                <th style='text-align:center;'>Proxy</th>
-                <th style='text-align:center;'>Orderer</th>
-                <th style='text-align:center;'>Reporter</th>
+                <th scope="col">Department ID</th>
+                <th scope="col">Department Name</th>
+                <th scope="col">Current User Role(s)&nbsp;<i class="fas fa-question-circle btn-link" aria-label="More Information icon" data-toggle="modal" data-target="#statusIndicatorModal"></i></th>
+                <th style='text-align:center;' scope="col">Proxy</th>
+                <th style='text-align:center;' scope="col">Orderer</th>
+                <th style='text-align:center;' scope="col">Reporter</th>
             </tr>
         </thead>
         <tbody>
             {% for row in rows %}
                 <tr>
-                    <td>{{ row.dept }}</td>
+                    <td scope="row">{{ row.dept }}</td>
                     <td>{{ row.dept_name }}</td>
-                    <td></td>
-                    <td style='text-align:center;'><input type='checkbox'></td>
-                    <td style='text-align:center;'><input type='checkbox'></td>
-                    <td style='text-align:center;'><input type='checkbox'></td>
+                    <td>{{ row.roles_list }}</td>
+                    {% if row.disable_proxy %}
+                        {% if row.current_roles.proxy %}
+                            <td style='text-align:center;'><input class='proxy' type='checkbox' checked disabled></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='proxy'type='checkbox' disabled></td>
+                        {% endif %}
+                    {% else %}
+                        {% if row.current_roles.proxy %}
+                            <td style='text-align:center;'><input class='proxy' type='checkbox' checked></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='proxy' type='checkbox'</td>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if disable_others %}
+                        {% if row.current_roles.orderer %}
+                            <td style='text-align:center;'><input class='orderer' type='checkbox' checked disabled></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='orderer' type='checkbox' disabled></td>
+                        {% endif %}
+                    {% else %}
+                        {% if row.current_roles.orderer %}
+                            <td style='text-align:center;'><input class='orderer' type='checkbox' checked></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='orderer' type='checkbox'></td>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if row.disable_others %}
+                        {% if row.current_roles.reporter %}
+                            <td style='text-align:center;'><input class='reporter' type='checkbox' checked disabled></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='reporter' type='checkbox' disabled></td>
+                        {% endif %}
+                    {% else %}
+                        {% if row.current_roles.reporter %}
+                            <td style='text-align:center;'><input class='reporter' type='checkbox' checked></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='reporter' type='checkbox'></td>
+                        {% endif %}
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <div class='float-right'>
-        <button type='button' class='btn btn-primary'>Clear Changes</button>
+    <div class='save-changes'>
+        <button type='button' class='btn btn-outline-primary'>Clear Changes</button>
         <button type='button' class='btn btn-primary'>Save Changes</button>
     </div>
 
@@ -197,7 +203,7 @@
 
     {% endif %}
 </form>
-</div>
+
 
 {% endblock %}
 
@@ -230,6 +236,51 @@ $(document).ready(function() {
     $("#Reporter").click(function(event) {
         $('[data-manager="False"]').show();
     });
+
+    // Select all functionality - proxy
+    $('#proxy-all').on('click', function() {
+        var checked = false;
+        if ($(this).is(':checked')) {
+            checked = true;
+        }
+        $('#manage-access-table tbody tr').each(function() {
+            var inner_checked = $(this).find('.proxy').is(':checked');
+
+            if (checked != inner_checked) {
+                $(this).find('.proxy').click();
+            }
+        })
+    })
+
+    // Select all functionality - orderer
+    $('#orderer-all').on('click', function() {
+        var checked = false;
+        if ($(this).is(':checked')) {
+            checked = true;
+        }
+        $('#manage-access-table tbody tr').each(function() {
+            var inner_checked = $(this).find('.orderer').is(':checked');
+
+            if (checked != inner_checked) {
+                $(this).find('.orderer').click();
+            }
+        })
+    })
+
+    // Select all functionality - reporter
+    $('#reporter-all').on('click', function() {
+        var checked = false;
+        if ($(this).is(':checked')) {
+            checked = true;
+        }
+        $('#manage-access-table tbody tr').each(function() {
+            var inner_checked = $(this).find('.reporter').is(':checked');
+
+            if (checked != inner_checked) {
+                $(this).find('.reporter').click();
+            }
+        })
+    })
 
 });
 
