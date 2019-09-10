@@ -436,40 +436,44 @@ def modpriv(request):
     modifications = {}
 
     for dept in dept_list:
+        modifications[dept] = {
+            'added': [],
+            'deleted': []
+        }
         # Add/delete proxy status
         proxy_actions = request.POST.get(dept + 'proxy')
-        if proxy_actions != '':
-            proxy_actions.split('/')
-        for act in proxy_actions:
-            if act.startswith('add'):
-                add_priv(osc_user, 'Proxy', dept)
+        if proxy_actions == 'add':
+            result = add_priv(osc_user, 'Proxy', dept)
+            if result == 'change':
                 modifications[dept]['added'].append('Proxy')
-            elif act.startswith('delete'):
-                delete_priv(osc_user, 'Proxy', dept)
+
+        elif proxy_actions == 'delete':
+            result = delete_priv(osc_user, 'Proxy', dept)
+            if result == 'change':
                 modifications[dept]['deleted'].append('Proxy')
 
         # Add/delete orderer status
         orderer_actions = request.POST.get(dept + 'orderer')
-        if orderer_actions != '':
-            orderer_actions.split('/')
-        for act in orderer_actions:
-            if act.startswith('add'):
-                add_priv(osc_user, 'Orderer', dept)
+        if orderer_actions == 'add':
+            result = add_priv(osc_user, 'Orderer', dept)
+            if result == 'change':
                 modifications[dept]['added'].append('Orderer')
-            elif act.startswith('delete'):
-                delete_priv(osc_user, 'Orderer', dept)
+
+        elif orderer_actions == 'delete':
+            result = delete_priv(osc_user, 'Orderer', dept)
+            if result == 'change':
                 modifications[dept]['deleted'].append('Orderer')
 
         # Add/delete reporter status
         reporter_actions = request.POST.get(dept + 'reporter')
-        if reporter_actions != '':
-            reporter_actions.split('/')
-        for act in reporter_actions:
-            if act.startswith('add'):
-                add_priv(osc_user, 'Reporter', dept)
+        if reporter_actions == 'add':
+            result = add_priv(osc_user, 'Reporter', dept)
+            if result == 'change':
                 modifications[dept]['added'].append('Reporter')
-            elif act.startswith('delete'):
-                delete_priv(osc_user, 'Reporter', dept)
+
+        elif reporter_actions == 'delete':
+            result = delete_priv(osc_user, 'Reporter', dept)
+            if result == 'change':
                 modifications[dept]['deleted'].append('Reporter')
 
     context = {
@@ -479,9 +483,6 @@ def modpriv(request):
         'last_name': last_name,
         'first_name': first_name,
         'modifications': modifications
-        # 'role_checked': role_checked,
-        # 'dept_checked': dept_checked,
-        # 'result': result
     }
 
     return render(request,'oscauth/modpriv.html', context)
@@ -581,17 +582,20 @@ def add_priv(osc_user, role, dept):
 
     try:
         new_auth.save()
-        result = 'Privilege Added'
+        result = 'change'
     except IntegrityError: 
-        result = 'Privilege already exists'
+        result = 'no change'
 
     return result
 
 def delete_priv(osc_user, role, dept):
     role = Role.objects.get(role=role).group
     aud = AuthUserDept.objects.filter(user=osc_user,group=role,dept=dept)
-    aud.delete()
-    result = 'Deleted Privileges'
+
+    result = 'no change'
+    if aud.exists():
+        aud.delete()
+        result = 'change'
 
     return result
 
