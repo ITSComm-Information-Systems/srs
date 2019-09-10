@@ -50,7 +50,7 @@
 							{% for key, value in c.type_summary.items %}
 								<tr>
 									<td>{{ key }}</td>
-									{% if '-'|first in value %}
+									{% if '-'|first in 'value' %}
 									<td class='total-col prv-msgs'>{{ value }}</td>
 									{% else %}
 									<td class='total-col'>{{ value }}</td>
@@ -60,9 +60,9 @@
 							<tr class='table-total bg-warning'>
 								<td><strong>Total</strong></td>
 								{% if '-'|first in c.type_total %}
-									<td class='total-col prv-msgs'>{{ c.type_total }}</td>
+									<td class='total-col prv-msgs'><strong>{{ c.type_total }}</strong></td>
 								{% else %}
-									<td class='total-col'>{{ c.type_total }}</td>
+									<td class='total-col'><strong>{{ c.type_total }}</strong></td>
 								{% endif %}
 							</tr>
 						</tbody>
@@ -127,9 +127,9 @@
 									<td></td>
 									<td></td>
 									{% if '-'|first in value.total %}
-									<td class='total-col prv-msgs'>{{ value.total }}</td>
+									<td class='total-col prv-msgs'><strong>{{ value.total }}</strong></td>
 									{% else %}
-									<td class='total-col'>{{ value.total }}</td>
+									<td class='total-col'><strong>{{ value.total }}</strong></td>
 									{% endif %}
 								</tr>
 							</tbody>
@@ -175,9 +175,9 @@
 								<td></td>
 								<td></td>
 								{% if '-'|first in c.monthly_total %}
-									<td class='total-col prv-msgs'>{{ c.monthly_total }}</td>
+									<td class='total-col prv-msgs'><strong>{{ c.monthly_total }}</strong></td>
 								{% else %}
-									<td class='total-col'>{{ c.monthly_total }}</td>
+									<td class='total-col'><strong>{{ c.monthly_total }}</strong></td>
 								{% endif %}
 							</tr>
 						</tbody>
@@ -216,9 +216,9 @@
 								<td></td>
 								<td></td>
 								{% if '-'|first in c.otc_total %}
-									<td class='total-col prv-msgs'>{{ c.otc_total }}</td>
+									<td class='total-col prv-msgs'><strong>{{ c.otc_total }}</strong></td>
 								{% else %}
-									<td class='total-col'>{{ c.otc_total }}</td>
+									<td class='total-col'><strong>{{ c.otc_total }}</strong></td>
 								{% endif %}
 							</tr>
 						</tbody>
@@ -257,9 +257,9 @@
 								<td></td>
 								<td></td>
 								{% if '-'|first in c.occ_total %}
-									<td class='total-col prv-msgs'>{{ c.occ_total }}</td>
+									<td class='total-col prv-msgs'><strong>{{ c.occ_total }}</strong></td>
 								{% else %}
-									<td class='total-col'>{{ c.occ_total }}</td>
+									<td class='total-col'><strong>{{ c.occ_total }}</strong></td>
 								{% endif %}
 							</tr>
 						</tbody>
@@ -287,7 +287,7 @@
 							{% endfor %}
 							<tr class="table-total bg-warning">
 								<td><strong>Total</strong></td>
-								<td class='total-col'>{{ c.credit_total }}</td>
+								<td class='total-col'><strong>{{ c.credit_total }}</strong></td>
 							</tr>
 						</tbody>
 					</table>

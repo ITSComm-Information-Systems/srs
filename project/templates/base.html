@@ -86,13 +86,15 @@
 								{% if user.is_superuser %}
 									<a class="dropdown-item" href="/admin/">Admin</a>
 								{% endif %}
-
-								{% if not request.session.exit_users_pk %}
-									<a class="dropdown-item" href="/auth/su_login/">Impersonate</a>
-								{% endif %}
-								{% if request.session.exit_users_pk %}
-									<a class="dropdown-item" href="/auth/su/">Exit Impersonate</a>
-								{% endif %}								
+								
+								{% if perms.oscauth.can_impersonate %}
+									{% if not request.session.exit_users_pk %}
+										<a class="dropdown-item" href="/auth/su_login/">Impersonate</a>
+									{% endif %}
+									{% if request.session.exit_users_pk %}
+										<a class="dropdown-item" href="/auth/su/">Exit Impersonate</a>
+									{% endif %}
+								{% endif %}				
 								<a class="dropdown-item" href="/auth/mypriv/">View System Privileges</a>
 								<a class="dropdown-item"  href="/auth/logout/">Logout</a>
 							</div>
@@ -118,7 +120,7 @@
 					<li class="nav-item dropdown {% if title == 'Metrics' or title == 'Detail of Charges' or title == 'Inventory and Location Report' or title == 'Non-Telephony Detail of Charges' or title == 'Summary of Charges' %}active{% endif %}">
 						{% if perms.oscauth.can_report %}
 						<a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								<i class="fas fa-chart-line" aria-label="Run Reports Icon"></i>
+								<i class="fas fa-chart-line"></i>
 							Run Reports
 						</a>
 						<div class="dropdown-menu" aria-labelledby="reportsDropdown">
