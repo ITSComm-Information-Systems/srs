@@ -4,7 +4,9 @@
 
 <h2> {{ subtitle }}</h2>
 
-<form action="/auth/addpriv/" method="POST">{% csrf_token %}
+<p>{{ modifications }}</p>
+
+<!-- <form action="/auth/addpriv/" method="POST">{% csrf_token %}
 
 <p>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></p>
 <br>
@@ -36,6 +38,6 @@
     </tbody>
 </table>
 
-</form>
+</form> -->
 
 {% endblock %}

@@ -89,49 +89,53 @@
             {% for row in rows %}
                 <tr>
                     <td scope="row">{{ row.dept }}</td>
+                    <input hidden name='dept_list' value='{{ row.dept }}'>
                     <td>{{ row.dept_name }}</td>
                     <td>{{ row.roles_list }}</td>
                     {% if row.disable_proxy %}
                         {% if row.current_roles.proxy %}
-                            <td style='text-align:center;'><input class='proxy' type='checkbox' checked disabled></td>
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox' checked disabled></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='proxy'type='checkbox' disabled></td>
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox' disabled></td>
                         {% endif %}
                     {% else %}
                         {% if row.current_roles.proxy %}
-                            <td style='text-align:center;'><input class='proxy' type='checkbox' checked></td>
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox' checked></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='proxy' type='checkbox'</td>
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox'></td>
                         {% endif %}
                     {% endif %}
+                    <input hidden name="{{ row.dept }}proxy" value="">
 
                     {% if disable_others %}
                         {% if row.current_roles.orderer %}
-                            <td style='text-align:center;'><input class='orderer' type='checkbox' checked disabled></td>
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox' checked disabled></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='orderer' type='checkbox' disabled></td>
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox' disabled></td>
                         {% endif %}
                     {% else %}
                         {% if row.current_roles.orderer %}
-                            <td style='text-align:center;'><input class='orderer' type='checkbox' checked></td>
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox' checked></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='orderer' type='checkbox'></td>
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox'></td>
                         {% endif %}
                     {% endif %}
+                    <input hidden name="{{ row.dept }}orderer" value="">
                     
                     {% if row.disable_others %}
                         {% if row.current_roles.reporter %}
-                            <td style='text-align:center;'><input class='reporter' type='checkbox' checked disabled></td>
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox' checked disabled></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='reporter' type='checkbox' disabled></td>
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox' disabled></td>
                         {% endif %}
                     {% else %}
                         {% if row.current_roles.reporter %}
-                            <td style='text-align:center;'><input class='reporter' type='checkbox' checked></td>
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox' checked></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='reporter' type='checkbox'></td>
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox'></td>
                         {% endif %}
                     {% endif %}
+                    <input hidden name="{{ row.dept }}reporter" value="">
                 </tr>
             {% endfor %}
         </tbody>
@@ -139,7 +143,7 @@
 
     <div class='save-changes'>
         <button type='button' class='btn btn-outline-primary'>Clear Changes</button>
-        <button type='button' class='btn btn-primary'>Save Changes</button>
+        <button type='Submit' class='btn btn-primary'>Save Changes</button>
     </div>
 
     <!-- <h6>Please select a Task, a Role, and at least one Department then click Submit.</h6>
@@ -240,7 +244,7 @@ $(document).ready(function() {
     // Select all functionality - proxy
     $('#proxy-all').on('click', function() {
         var checked = false;
-        if ($(this).is(':checked')) {
+        if ($('#proxy-check').is(':checked')) {
             checked = true;
         }
         $('#manage-access-table tbody tr').each(function() {
@@ -255,7 +259,7 @@ $(document).ready(function() {
     // Select all functionality - orderer
     $('#orderer-all').on('click', function() {
         var checked = false;
-        if ($(this).is(':checked')) {
+        if ($('#orderer-check').is(':checked')) {
             checked = true;
         }
         $('#manage-access-table tbody tr').each(function() {
@@ -270,7 +274,7 @@ $(document).ready(function() {
     // Select all functionality - reporter
     $('#reporter-all').on('click', function() {
         var checked = false;
-        if ($(this).is(':checked')) {
+        if ($('#reporter-check').is(':checked')) {
             checked = true;
         }
         $('#manage-access-table tbody tr').each(function() {
@@ -280,6 +284,54 @@ $(document).ready(function() {
                 $(this).find('.reporter').click();
             }
         })
+    })
+
+    // Proxy status changed
+    $('.proxy').on('change', function() {
+        // Get dept ID
+        var dept_id = $(this).attr('id');
+        
+        // Add or delete
+        var method = "delete"
+        if ($(this).is(':checked')) {
+            method = "add";
+        }
+
+        // Set value
+        $('#' + dept_id + 'proxy').val() = $('#' + dept_id + 'proxy').val() + method + 'proxy/';
+    })
+
+    // Orderer status changed
+    $('.orderer').on('change', function() {
+        // Get dept ID
+        var dept_id = $(this).attr('id');
+        
+        // Add or delete
+        var method = "delete"
+        if ($(this).is(':checked')) {
+            method = "add";
+        }
+
+        // Set value
+        var str = '#' + dept_id + 'orderer';
+        alert($(str));
+        $(str).val() = $(str).val() + method + 'orderer/';
+        alert($(str).val());
+    })
+
+    // Reporter status changed
+    $('.reporter').on('change', function() {
+        // Get dept ID
+        var dept_id = $(this).attr('id');
+
+        // Add or delete
+        var method = "delete"
+        if ($(this).is(':checked')) {
+            method = "add";
+        }
+
+        // Set value
+        $('#' + dept_id + 'reporter').val() = $('#' + dept_id + 'proxy').val() + method + 'reporter/';
     })
 
 });
