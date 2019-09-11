@@ -126,6 +126,13 @@ $(document).ready(function() {
     $('[data-tab="PhoneLocation"]').hide();
   });
   
+  $("#ExistingPhone_nophone").click(function() {
+    $('[data-tab="PhoneLocation"]').hide();
+  });
+
+  $("#ExistingPhone_yesphone").click(function() {
+    $('[data-tab="PhoneLocation"]').show();
+  });
 
   // Addl info
   $('#contact_id').hide();
