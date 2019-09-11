@@ -87,7 +87,7 @@ class EquipmentForm(forms.Form):
     cat = ['Basic','VOIP']
     cat[0] = Product.objects.all().filter(category=1).order_by('display_seq_no')
     cat[0].id = 'basic'
-    cat[1] = Product.objects.all().filter(category=2).order_by('display_seq_no') 
+    cat[1] = Product.objects.all().filter(category__in=[2, 4]).order_by('display_seq_no') # Voip and Conference
     cat[1].id = 'voip'
     template = 'order/equipment.html'
 
