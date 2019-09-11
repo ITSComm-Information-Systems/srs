@@ -13,7 +13,7 @@
     
 
 <h1>{{ title }}</h1>
-<form action="/auth/get_uniqname/" method="POST">{% csrf_token %}
+<form action="/auth/get_uniqname/" id='first-form' method="POST">{% csrf_token %}
 
     <div>
         <div class="form-group">
@@ -40,6 +40,12 @@
         <br>
         <strong>{{ submit_msg }}</strong>
     </div>
+</form>
+
+<form hidden id='clear-form' action='/auth/get_uniqname/' method='POST'>{% csrf_token %}
+    <input type="hidden" id="uniqname" name="uniqname_parm" value="{{uniqname_parm}}">
+    <input type="hidden" id="last_name" name="last_name" value="{{last_name}}">
+    <input type="hidden" id="first_name" name="first_name" value="{{first_name}}">
 </form>
 
 <form action="/auth/modpriv/" method="POST">{% csrf_token %}
@@ -89,117 +95,62 @@
             {% for row in rows %}
                 <tr>
                     <td scope="row">{{ row.dept }}</td>
+                    <input hidden name='dept_list' value='{{ row.dept }}'>
                     <td>{{ row.dept_name }}</td>
                     <td>{{ row.roles_list }}</td>
                     {% if row.disable_proxy %}
                         {% if row.current_roles.proxy %}
-                            <td style='text-align:center;'><input class='proxy' type='checkbox' checked disabled></td>
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox' checked disabled></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='proxy'type='checkbox' disabled></td>
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox' disabled></td>
                         {% endif %}
                     {% else %}
                         {% if row.current_roles.proxy %}
-                            <td style='text-align:center;'><input class='proxy' type='checkbox' checked></td>
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox' checked></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='proxy' type='checkbox'</td>
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox'></td>
                         {% endif %}
                     {% endif %}
+                    <input hidden name="{{ row.dept }}proxy" id="{{ row.dept }}proxy" value="">
 
                     {% if disable_others %}
                         {% if row.current_roles.orderer %}
-                            <td style='text-align:center;'><input class='orderer' type='checkbox' checked disabled></td>
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox' checked disabled></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='orderer' type='checkbox' disabled></td>
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox' disabled></td>
                         {% endif %}
                     {% else %}
                         {% if row.current_roles.orderer %}
-                            <td style='text-align:center;'><input class='orderer' type='checkbox' checked></td>
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox' checked></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='orderer' type='checkbox'></td>
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox'></td>
                         {% endif %}
                     {% endif %}
+                    <input hidden name="{{ row.dept }}orderer" id="{{ row.dept }}orderer" value="">
                     
                     {% if row.disable_others %}
                         {% if row.current_roles.reporter %}
-                            <td style='text-align:center;'><input class='reporter' type='checkbox' checked disabled></td>
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox' checked disabled></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='reporter' type='checkbox' disabled></td>
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox' disabled></td>
                         {% endif %}
                     {% else %}
                         {% if row.current_roles.reporter %}
-                            <td style='text-align:center;'><input class='reporter' type='checkbox' checked></td>
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox' checked></td>
                         {% else %}
-                            <td style='text-align:center;'><input class='reporter' type='checkbox'></td>
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox'></td>
                         {% endif %}
                     {% endif %}
+                    <input hidden name="{{ row.dept }}reporter" id="{{ row.dept }}reporter" value="">
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 
     <div class='save-changes'>
-        <button type='button' class='btn btn-outline-primary'>Clear Changes</button>
-        <button type='button' class='btn btn-primary'>Save Changes</button>
+        <button type='button' class='btn btn-outline-primary' onclick="$('#clear-form').submit();">Clear Changes</button>
+        <button type='Submit' class='btn btn-primary'>Save Changes</button>
     </div>
-
-    <!-- <h6>Please select a Task, a Role, and at least one Department then click Submit.</h6>
-
-    <h7>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></h7>
-
-    <div class="row access-action-row">
-        <div class="column">
-            <h2>Select Task</h2>
-            <div class="form-check">
-                <input id="roleAdd" type='radio' name="taskrad" value='add' class="form-check-input">
-                <label for="roleAdd" class="form-check-label">Add Access</label><br>
-                <input id="roleDelete" type='radio' name="taskrad" value='remove' class="form-check-input">
-                <label for="roleDelete" class="form-check-label">Remove Access</label>
-            </div>
-        </div>
-        <div class="column" id="addRole">
-            <h2>Select Role</h2>
-            <div class="form-check">
-                {% for role in grantable_roles %}
-                <input type='radio' name="roleAdd" value={{ role.role }} id={{ role.role }} class="form-check-input">
-                <label for={{ role.role }} class="form-check-label">{{ role.role }}</label>
-                <br>
-            {% endfor %}
-            </div>
-        </div>
-        <div class="column" id="deleteRole">
-            <h2>Select Role</h2>
-            <div class="form-check">
-                {% for role in grantable_roles %}
-                <input type='checkbox' name="roleDelete" value="{{ role.role }}"" id="{{ role.role }}"" class="form-check-input">
-                <label for="{{ role.role }}" class="form-check-label">{{ role.role }}</label>
-                <br>
-                {% endfor %}
-            </div>
-            
-        </div>
-        <div class="column deptid">
-            <h2>Select Department</h2>
-            <div class="form-check">
-                <input type="checkbox" onclick="toggle(this);" id="selectAllDepts" class="form-check-input">
-                <label for="selectAllDepts" class="form-check-label">Select All Departments</label><br>
-                {% for row in rows %}
-                    <div data-manager="{{ row.dept_manager }}">
-                    {% if row.dept_status != 'I' %}
-                    <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
-                    <label for="dept.{{ row.dept }}" class="form-check-label">{{ row.dept }} - {{ row.dept_name }}</label>
-                    {% else %}
-                    <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
-                    <label for="dept.{{ row.dept }}" class="form-check-label prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>INACTIVE:  {{ row.dept }} - {{ row.dept_name }}</label>
-                    {% endif %}
-                    <br>
-                    </div>
-                {% endfor %} 
-            </div>
-        </div>
-        <div class="column">
-            <input type='submit' name='process_access' value='Submit' class="btn btn-primary">
-        </div>
-    </div> -->
 
     {% endif %}
 </form>
@@ -240,7 +191,7 @@ $(document).ready(function() {
     // Select all functionality - proxy
     $('#proxy-all').on('click', function() {
         var checked = false;
-        if ($(this).is(':checked')) {
+        if ($('#proxy-check').is(':checked')) {
             checked = true;
         }
         $('#manage-access-table tbody tr').each(function() {
@@ -255,7 +206,7 @@ $(document).ready(function() {
     // Select all functionality - orderer
     $('#orderer-all').on('click', function() {
         var checked = false;
-        if ($(this).is(':checked')) {
+        if ($('#orderer-check').is(':checked')) {
             checked = true;
         }
         $('#manage-access-table tbody tr').each(function() {
@@ -270,7 +221,7 @@ $(document).ready(function() {
     // Select all functionality - reporter
     $('#reporter-all').on('click', function() {
         var checked = false;
-        if ($(this).is(':checked')) {
+        if ($('#reporter-check').is(':checked')) {
             checked = true;
         }
         $('#manage-access-table tbody tr').each(function() {
@@ -280,6 +231,51 @@ $(document).ready(function() {
                 $(this).find('.reporter').click();
             }
         })
+    })
+
+    // Proxy status changed
+    $('.proxy').on('change', function() {
+        // Get dept ID
+        var dept_id = $(this).attr('id');
+        
+        // Add or delete
+        var method = "delete"
+        if ($(this).is(':checked')) {
+            method = "add";
+        }
+
+        // Set value
+        $('#' + dept_id + 'proxy').val(method);
+    })
+
+    // Orderer status changed
+    $('.orderer').on('change', function() {
+        // Get dept ID
+        var dept_id = $(this).attr('id');
+        
+        // Add or delete
+        var method = "delete"
+        if ($(this).is(':checked')) {
+            method = "add";
+        }
+
+        // Set value
+        $('#' + dept_id + 'orderer').val(method);
+    })
+
+    // Reporter status changed
+    $('.reporter').on('change', function() {
+        // Get dept ID
+        var dept_id = $(this).attr('id');
+
+        // Add or delete
+        var method = "delete"
+        if ($(this).is(':checked')) {
+            method = "add";
+        }
+
+        // Set value
+        $('#' + dept_id + 'reporter').val(method);
     })
 
 });

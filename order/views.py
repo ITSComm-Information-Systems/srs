@@ -11,6 +11,9 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from pages.models import Page
 from order.models import LogItem
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.db import connections
+import cx_Oracle
 
 import threading
 
@@ -105,10 +108,22 @@ class Submit(PermissionRequiredMixin, View):
 
         return HttpResponseRedirect('/submitted') 
 
+@csrf_exempt
+def send_email(request):
+    if request.method == "POST":
+        print(request.POST)
+        subject = request.POST['emailSubject']
+        body = request.POST['emailBody']
+
+        with connections['pinnacle'].cursor() as cursor:
+            cursor.callproc('um_osc_util_k.um_send_email_p', ['itcom.csr@umich.edu', subject, body])
+
+        return HttpResponseRedirect('/emailsent') 
+
 
 def add_to_cart(request):
     if request.method == "POST":
-        print(request.POST)
+
         i = Item()
         i.created_by_id = request.user.id
 
@@ -225,6 +240,8 @@ class Workflow(PermissionRequiredMixin, View):
                     js.append('features')
                 elif tab.name == 'AuthCodes':
                     js.append('auth_codes')
+                elif tab.name == 'CMC':
+                    js.append('cmc_codes')
                 elif tab.name == 'Equipment':
                     js.append('equipment')
                 elif tab.name == 'QuantityModel':

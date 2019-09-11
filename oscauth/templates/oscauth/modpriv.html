@@ -4,38 +4,49 @@
 
 <h2> {{ subtitle }}</h2>
 
-<form action="/auth/addpriv/" method="POST">{% csrf_token %}
+<p>{{ modifications }}</p>
 
-<p>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></p>
-<br>
+<p>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i
+            class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></p>
+
+<a href="#" class="btn btn-primary">Back to Manage User Access</a>
 
 <table class="table table-hover table-striped table-sm">
     <thead>
         <tr>
-                <th scope="col">Department</th>
-                <th scope="col">Role</th>
-                <th scope="col">Result</th>
+            <th scope="col">Department ID</th>
+            <th scope="col">Department Name</th>
+            <th scope="col">Role(s) Added</th>
+            <th scope="col">Role(s) Removed</th>
         </tr>
     </thead>
     <tbody>
-        {% for dept in dept_checked %}
+        <!-- {% for dept in dept_checked %} -->
+        <!-- Paco: If it is NOT AN INACTIVE department, do this -->
         <tr>
-                {% if row.dept_status != 'I' %}
-                <td scope="row"> {{ dept }}</td>
-                <td> {{ role_checked }}</td>
-                <td> {{ result }}</td>
-                <td> {{ row.result }}</td>
-                {% else %}
-                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>{{ row.col1 }}</td>
-                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>INACTIVE: {{ row.col2 }}</td>
-                <td> {{ row.role }}</td>
-                <td> {{ row.result }}</td>
-                {% endif %}
+            <!-- {% if row.dept_status != 'I' %} -->
+            <th scope="row">000000</th>
+            <td>Fake Department</td>
+            <td>Orderer</td>
+            <td>Reporter</td>
+            <!-- {% else %} -->
+            <!-- {% endif %} -->
         </tr>
-        {% endfor %}
+        <!-- Paco: If it is an INACTIVE department, do this -->
+        <tr>
+            <th scope="row" class="prv-msgs">
+                000000
+            </th>
+            <td class="prv-msgs"><i class="fas fa-exclamation-triangle"
+                    aria-label="Icon for inactive department"></i>INACTIVE department name</td>
+            <td>Reporter</td>
+            <td></td>
+        </tr>
+        <!-- {% endfor %} -->
     </tbody>
 </table>
 
-</form>
+<!-- <form action="/auth/addpriv/" method="POST">{% csrf_token %}
+</form> -->
 
 {% endblock %}

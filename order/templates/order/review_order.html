@@ -44,7 +44,7 @@
                                     <input type="radio" name="processingTime[{{order.num}}]"
                                         id="standardProcessing{{order.num}}" value="standardProcessing" checked
                                         aria-label="Radio button for following text input" form="order-processing-form"
-                                        onclick="hideDateDivs()">
+                                        onclick="hideDateDivs({{ order.num }})">
                                     <label for="standardProcessing{{order.num}}">Standard Processing Time
                                         (varies on request type)</label>
                                     <a class="popover-icon" data-toggle="popover" tabindex="0" role="button"
@@ -60,7 +60,7 @@
                                     <input type="radio" name="processingTime[{{order.num}}]"
                                         id="specificDay{{order.num}}" value="specificDay"
                                         aria-label="Radio button for following text input"
-                                        onclick="showSpecificDayDiv()">
+                                        onclick="showSpecificDayDiv({{ order.num }})">
                                     <label for="specificDay{{order.num}}" class="form-check-label">Do on
                                         specific day</label>
                                     <a class="popover-icon" data-toggle="popover" tabindex="0" role="button"
@@ -71,7 +71,7 @@
                                             aria-label="More informaiton about Standard Processing Time option"></i>
                                     </a>
                                     <!-- this div should remain hidden unless the user selected the radio button "specific day" -->
-                                    <div id="specificDayDivForm">
+                                    <div id="specificDayDivForm{{ order.num }}" style="display: none">
                                         <label for="specificDayInput">
                                             Please select a date for this order to be processed on
                                         </label>
@@ -82,7 +82,7 @@
                                 <div class="form-group">
                                     <input type="radio" name="processingTime[{{order.num}}]" value="expediteOrder"
                                         id="expedite{{order.num}}" aria-label="Radio button for following text input"
-                                        onclick="showExpediteOrderDiv()">
+                                        onclick="showExpediteOrderDiv({{ order.num }})">
                                     <label for="expedite{{order.num}}" class="form-check-label">
                                         Expedite Order ($$)
                                     </label>
@@ -94,7 +94,7 @@
                                             aria-label="More informaiton about Expedited Processing Time option"></i>
                                     </a>
                                     <!-- this div should remain hidden unless the user selected the radio button "expedite order" -->
-                                    <div id="expediteDivForm">
+                                    <div id="expediteDivForm{{ order.num }}" style="display: none">
                                         <label for="expediteDayInput">
                                             Please select a date for this order to be processed on
                                         </label>
@@ -134,26 +134,27 @@
     });
 
     // Paco's JS for toggling input fields to enter a date if expediting order or want order completed on certain date
-    function showSpecificDayDiv() {
-        if (document.getElementById("expediteDivForm").style.display === "block") {
-            document.getElementById("expediteDivForm").style.display = "none"
+    function showSpecificDayDiv(order) {
+        if (document.getElementById("expediteDivForm" + order).style.display === "block") {
+            document.getElementById("expediteDivForm" + order).style.display = "none"
         }
-        document.getElementById("specificDayDivForm").style.display = "block";
+        document.getElementById("specificDayDivForm" + order).style.display = "block";
     }
 
-    function showExpediteOrderDiv() {
-        if (document.getElementById("specificDayDivForm").style.display === 'block') {
-            document.getElementById("specificDayDivForm").style.display = 'none'
+    function showExpediteOrderDiv(order) {
+        console.log(order)
+        if (document.getElementById("specificDayDivForm" + order).style.display === 'block') {
+            document.getElementById("specificDayDivForm" + order).style.display = 'none'
         }
-        document.getElementById("expediteDivForm").style.display = 'block'
+        document.getElementById("expediteDivForm" + order).style.display = 'block'
     }
 
-    function hideDateDivs() {
-        if (document.getElementById("specificDayDivForm").style.display === 'block') {
-            document.getElementById("specificDayDivForm").style.display = 'none'
+    function hideDateDivs(order) {
+        if (document.getElementById("specificDayDivForm" + order).style.display === 'block') {
+            document.getElementById("specificDayDivForm" + order).style.display = 'none'
         }
-        if (document.getElementById("expediteDivForm").style.display === "block") {
-            document.getElementById("expediteDivForm").style.display = "none"
+        if (document.getElementById("expediteDivForm" + order).style.display === "block") {
+            document.getElementById("expediteDivForm" + order).style.display = "none"
         }
     }
 </script>
