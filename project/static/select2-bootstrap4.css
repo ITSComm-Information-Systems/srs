@@ -10,7 +10,7 @@
  */
 
 .select2-container--bootstrap4 {
-  display: block;
+  display: inline-block;
 }
 .select2-container--bootstrap4 .select2-selection {
   background-color: #fff;
