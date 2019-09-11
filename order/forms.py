@@ -72,6 +72,10 @@ class AuthCodeForm(forms.Form):
     name = forms.CharField(label='summary', max_length=100)
     template = 'order/auth_code.html'
 
+class CMCCodeForm(forms.Form):
+    code = forms.CharField(label='CMC Code', max_length=100)
+    template = 'order/cmc_code.html'
+
 
 class NewLocationForm(forms.Form):
     building_list = UmOSCBuildingV.objects.all()
