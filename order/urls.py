@@ -10,6 +10,7 @@ urlpatterns = [
 
     path('deletefromcart/', views.delete_from_cart),
     path('addtocart/', views.add_to_cart),
+    path('sendemail/', views.send_email),
     path('submit/', views.Submit.as_view()), 
     path('review/', views.Review.as_view()),
     path('services/', Services.as_view()),

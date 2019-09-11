@@ -98,6 +98,21 @@ $(document).ready(function() {
   $(preFields).keypress(callback);
 
 
+  (function ($) {
+	  $.each(['show', 'hide'], function (i, ev) {
+	    var el = $.fn[ev];
+	    $.fn[ev] = function () {
+	      this.trigger(ev);
+	      return el.apply(this, arguments);
+	    };
+	  });
+  })(jQuery);
+  
+  $('.dynlabel').on('show', function() {
+    console.log('#foo is now visible');
+    $(this).keypress();
+  });
+
   // Hide phone location if no active phone line
   if ($("#activePhone").length) {
     $('[data-tab="PhoneLocation"]').hide();
@@ -111,6 +126,13 @@ $(document).ready(function() {
     $('[data-tab="PhoneLocation"]').hide();
   });
   
+  $("#ExistingPhone_nophone").click(function() {
+    $('[data-tab="PhoneLocation"]').hide();
+  });
+
+  $("#ExistingPhone_yesphone").click(function() {
+    $('[data-tab="PhoneLocation"]').show();
+  });
 
   // Addl info
   $('#contact_id').hide();

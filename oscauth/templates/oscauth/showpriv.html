@@ -17,11 +17,11 @@
         {% for row in rows %}
         <tr>
                 {% if row.dept_status != 'I' %}
-                <td scope="row"> {{ row.col1 }}</td>
+                <th scope="row"> {{ row.col1 }}</th>
                 <td> {{ row.col2 }}</td>
                 <td> {{ row.roles }}</td>
                 {% else %}
-                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>{{ row.col1 }}</td>
+                <th class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>{{ row.col1 }}</th>
                 <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>INACTIVE: {{ row.col2 }}</td>
                 <td class="prv-msgs"> {{ row.roles }}</td>
                 {% endif %}

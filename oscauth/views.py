@@ -335,18 +335,18 @@ def get_uniqname(request, uniqname_parm=''):
                     'disable_proxy': disable_proxy
                 }
 
-                if request.method=='POST' and request.POST.get('process_access'):
-                    if request.POST.get('rolerad') and request.POST.get('deptck'):
-                        submit_msg = 'Ready to Process'
-                        if request.POST.get('taskrad') == 'add':
-#                            return render(request,'oscauth/addpriv.html', context)
-                            return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not') # do I need to pass in the page title here?
-                        if request.POST.get('taskrad') == 'remove':
-                            return render(request, 'oscauth/removepriv.html', context) # do I need to pass in the page title here?
+#                 if request.method=='POST' and request.POST.get('process_access'):
+#                     if request.POST.get('rolerad') and request.POST.get('deptck'):
+#                         submit_msg = 'Ready to Process'
+#                         if request.POST.get('taskrad') == 'add':
+# #                            return render(request,'oscauth/addpriv.html', context)
+#                             return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not') # do I need to pass in the page title here?
+#                         if request.POST.get('taskrad') == 'remove':
+#                             return render(request, 'oscauth/removepriv.html', context) # do I need to pass in the page title here?
 
-                    else:
-                        submit_msg = 'Please select a Task, a Role, and at least one Department then click Submit.'
-                        return  HttpResponse(template.render({'submit_msg': submit_msg, 'title':"Manage User Access"}, request)) # do I need to pass in the page title here?
+#                     else:
+#                         submit_msg = 'Please select a Task, a Role, and at least one Department then click Submit.'
+#                         return  HttpResponse(template.render({'submit_msg': submit_msg, 'title':"Manage User Access"}, request)) # do I need to pass in the page title here?
 
                 return render(request, 'oscauth/setpriv.html', context)
 
@@ -418,12 +418,14 @@ def showpriv(request, uniqname_parm):
 def modpriv(request):
 
     if request.method == 'POST':
-            uniqname_parm = request.POST['uniqname_parm']
-            last_name = request.POST['last_name']
-            first_name = request.POST['first_name']
-            action_checked = request.POST['taskrad']
-            dept_checked = request.POST.getlist('deptck')
+        uniqname_parm = request.POST['uniqname_parm']
+        last_name = request.POST['last_name']
+        first_name = request.POST['first_name']
 
+        # action_checked = request.POST['taskrad']
+        dept_list = request.POST.getlist('dept_list')
+
+    # Add user if needed
     try:
         osc_user = User.objects.get(username=uniqname_parm)
         result = 'User already exists'
@@ -431,29 +433,48 @@ def modpriv(request):
         osc_user = upsert_user(uniqname_parm) 
         result = 'Added user'
 
-    if action_checked == 'add':
-        add_checked = request.POST['roleAdd']
-        role_checked = add_checked
-        for dept in dept_checked:
-            new_auth = AuthUserDept()
-            new_auth.user = osc_user
-            new_auth.group = Role.objects.get(role=add_checked).group
-            new_auth.dept = dept
+    modifications = {}
 
-            try:
-                new_auth.save()
-                result = 'Privilege Added'
-            except IntegrityError: 
-                result = 'Privilege already exists'
-            
-    else:
-        del_checked = request.POST.getlist('roleDelete')
-        role_checked = del_checked
-        for del_role in del_checked:
-            role = Role.objects.get(role=del_role).group
-            aud = AuthUserDept.objects.filter(user=osc_user,group=role,dept__in=dept_checked)
-            aud.delete()
-            result = 'Deleted Privileges'
+    for dept in dept_list:
+        modifications[dept] = {
+            'added': [],
+            'deleted': []
+        }
+        # Add/delete proxy status
+        proxy_actions = request.POST.get(dept + 'proxy')
+        if proxy_actions == 'add':
+            result = add_priv(osc_user, 'Proxy', dept)
+            if result == 'change':
+                modifications[dept]['added'].append('Proxy')
+
+        elif proxy_actions == 'delete':
+            result = delete_priv(osc_user, 'Proxy', dept)
+            if result == 'change':
+                modifications[dept]['deleted'].append('Proxy')
+
+        # Add/delete orderer status
+        orderer_actions = request.POST.get(dept + 'orderer')
+        if orderer_actions == 'add':
+            result = add_priv(osc_user, 'Orderer', dept)
+            if result == 'change':
+                modifications[dept]['added'].append('Orderer')
+
+        elif orderer_actions == 'delete':
+            result = delete_priv(osc_user, 'Orderer', dept)
+            if result == 'change':
+                modifications[dept]['deleted'].append('Orderer')
+
+        # Add/delete reporter status
+        reporter_actions = request.POST.get(dept + 'reporter')
+        if reporter_actions == 'add':
+            result = add_priv(osc_user, 'Reporter', dept)
+            if result == 'change':
+                modifications[dept]['added'].append('Reporter')
+
+        elif reporter_actions == 'delete':
+            result = delete_priv(osc_user, 'Reporter', dept)
+            if result == 'change':
+                modifications[dept]['deleted'].append('Reporter')
 
     context = {
         'title': "Manage User Access",
@@ -461,9 +482,7 @@ def modpriv(request):
         'uniqname_parm': uniqname_parm,
         'last_name': last_name,
         'first_name': first_name,
-        'role_checked': role_checked,
-        'dept_checked': dept_checked,
-        'result': result
+        'modifications': modifications
     }
 
     return render(request,'oscauth/modpriv.html', context)
@@ -554,4 +573,29 @@ def chart_change(request):
     template = loader.get_template('oscauth/chartchange.html');
 
     return HttpResponse(template.render({'title':'Chartfield Change Request'}, request))
+
+def add_priv(osc_user, role, dept):
+    new_auth = AuthUserDept()
+    new_auth.user = osc_user
+    new_auth.group = Role.objects.get(role=role).group
+    new_auth.dept = dept
+
+    try:
+        new_auth.save()
+        result = 'change'
+    except IntegrityError: 
+        result = 'no change'
+
+    return result
+
+def delete_priv(osc_user, role, dept):
+    role = Role.objects.get(role=role).group
+    aud = AuthUserDept.objects.filter(user=osc_user,group=role,dept=dept)
+
+    result = 'no change'
+    if aud.exists():
+        aud.delete()
+        result = 'change'
+
+    return result
 

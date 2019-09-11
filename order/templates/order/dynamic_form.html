@@ -28,7 +28,7 @@
             <br>
         </fieldset>
     {% elif field.field.type == 'Label' %}
-    <div id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" 
+    <div id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" class='dynlabel'
     {% if field.field.display_condition %}
     data-condition="{{ field.field.display_condition }}"
     {% endif %}
