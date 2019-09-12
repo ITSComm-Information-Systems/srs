@@ -630,6 +630,7 @@ a.nav-link.disabled:focus {
 .btn-outline-success:hover, 
 .btn-outline-success:focus, 
 .btn-outline-success:active, 
+.btn-outline-success:not(:disabled):not(.disabled):active, 
 .btn-outline-success.selected {
     border-color:#218739;
     background-color:#218739;
