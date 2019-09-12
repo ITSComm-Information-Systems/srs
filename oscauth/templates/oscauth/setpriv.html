@@ -85,7 +85,7 @@
             <tr class='no-top-border'>
                 <th scope="col">Department ID</th>
                 <th scope="col">Department Name</th>
-                <th scope="col">Current User Role(s)&nbsp;<i class="fas fa-question-circle btn-link" aria-label="More Information icon" data-toggle="modal" data-target="#statusIndicatorModal"></i></th>
+                <th scope="col">Current User Role(s)&nbsp;<i class="fas fa-question-circle btn-link" aria-label="More Information icon" data-toggle="modal" data-target="#userRoleExplanation"></i></th>
                 <th style='text-align:center;' scope="col">Proxy</th>
                 <th style='text-align:center;' scope="col">Orderer</th>
                 <th style='text-align:center;' scope="col">Reporter</th>
@@ -154,6 +154,51 @@
 
     {% endif %}
 </form>
+<!-- Add Chartfield Modal -->
+<div class="modal fade" id="userRoleExplanation" tabindex="-1" role="dialog"
+aria-labelledby="userRoles" aria-hidden="true">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="userRoles">User Roles</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="">
+                <p>
+                    <strong>Department Manager:</strong>
+                    Something about that role
+                </p>
+            </div>
+            <div>
+                <p>
+                    <strong>Proxy:</strong>
+                    Something about that role
+                </p>
+            </div>
+            <div>
+                <p>
+                    <strong>Orderer:</strong>
+                    Something about that role
+                </p>
+            </div>
+            <div>
+                <p>
+                    <strong>Reporter:</strong>
+                    Something about that role
+                </p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <!-- Close button -->
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+</div>
+<!-- End of Add Cahrtfield Modal -->
 
 
 {% endblock %}
