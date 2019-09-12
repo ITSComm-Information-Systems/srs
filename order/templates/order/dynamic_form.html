@@ -72,7 +72,7 @@
     </div>
 
     {% else %}
-    <div class="form-group row col-4" id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" data-condition="{{ field.field.display_condition }}">
+    <div class="form-group row col-md-4" id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" data-condition="{{ field.field.display_condition }}">
         <div class = "form-check">
         {{ field.errors }}
         {{ field.label_tag }} {{ field }}
