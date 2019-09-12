@@ -114,7 +114,7 @@ def mypriv(request):
     rows.append(data)
     template = loader.get_template('oscauth/mypriv.html')
     context = {
-        'title': "View My System Priveleges",
+        'title': "View My System Privileges",
         'subtitle': 'My Privileges: ' + request.user.username,
         'rows': rows
     }
