@@ -29,6 +29,12 @@ body {
 .navbar {
 	padding:0;
 }
+@media (max-width:991.98px) {
+    .navbar-expand-lg>.container, .navbar-expand-lg>.container-fluid {
+        padding-right:20px;
+        padding-left:20px;
+    }
+}
 .navbar a:link, .navbar a:visited {
 	color:#ffffff;
 }
