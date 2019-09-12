@@ -14,6 +14,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 import cx_Oracle
+import json
 
 import threading
 
@@ -168,6 +169,12 @@ class Integration(PermissionRequiredMixin, View):
         order = Order.objects.get(id=order_id)
         item_list = Item.objects.filter(order=order)
 
+        order_list = LogItem.objects.filter(local_key = str(order.id))
+
+        for order in order_list:
+            parsed = json.loads(order.description)
+            order.sent = json.dumps(parsed, indent=4)
+
         for item in item_list:
             item.note = item.data['reviewSummary']
             error = LogItem.objects.filter(local_key = str(item.id))
@@ -180,6 +187,7 @@ class Integration(PermissionRequiredMixin, View):
 
         return render(request, 'order/integration.html', 
             {'order': order,
+            'order_list': order_list,
             'item_list': item_list,})
 
 

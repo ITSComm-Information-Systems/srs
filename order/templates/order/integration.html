@@ -59,6 +59,19 @@ ul, #myUL {
 </ul>
 
 <ul>
+{% for order in order_list %}
+  <li><span class="caret">Sent JSON @ {{ order.create_date }}</span>
+    <ul class="nested">
+
+            <pre id="{{order.id}}">{{order.sent}}</pre>
+
+
+    </ul>
+  </li>
+{% endfor %}
+</ul>
+
+<ul>
 {% for item in item_list %}
     <li>{{ item.id }} - {{ item.description }}
         <ul>
@@ -100,4 +113,7 @@ for (i = 0; i < toggler.length; i++) {
     this.classList.toggle("caret-down");
   });
 }
+
+
+                        
 </script>
