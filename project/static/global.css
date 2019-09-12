@@ -1060,11 +1060,11 @@ h3.alert-heading {
 .table-sm td, .table-sm th {
 	padding:.75rem;
 }
-.table-striped tbody tr:nth-of-type(even), .table-striped tbody tr:nth-of-type(even):hover {
-	background-color:#f4f3f2;
-}
-.table-striped tbody tr:nth-of-type(odd), .table-striped tbody tr:nth-of-type(odd):hover {
+.table-striped tbody tr:nth-of-type(odd), .table-striped tbody tr:nth-of-type(even) {
 	background-color:transparent;
+}
+.table-striped tbody tr:nth-of-type(odd):hover, .table-striped tbody tr:nth-of-type(even):hover {
+	background-color:#f4f3f2;
 }
 .table-hover tbody tr:hover {
 	background-color:inherit;
