@@ -166,14 +166,16 @@ class Integration(PermissionRequiredMixin, View):
         return HttpResponseRedirect('/orders/integration/' + str(order_id)) 
 
     def get(self, request, order_id):
+        print(order_id)
         order = Order.objects.get(id=order_id)
+        print(order.id)
         item_list = Item.objects.filter(order=order)
 
         order_list = LogItem.objects.filter(local_key = str(order.id))
 
-        for order in order_list:
-            parsed = json.loads(order.description)
-            order.sent = json.dumps(parsed, indent=4)
+        for ord in order_list:
+            parsed = json.loads(ord.description)
+            ord.sent = json.dumps(parsed, indent=4)
 
         for item in item_list:
             item.note = item.data['reviewSummary']
