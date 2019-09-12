@@ -1,86 +1,95 @@
 {% if tab.name == '4Chartfields' or tab.name == '2Chartfields' %}
 <div class="form-check">
-        <input class="form-check-input keep-check" type="checkbox" value="keepFeatures" name="keepFeatures"
-        id="useSameCode" onClick="useSameShortCode(this)">
-        <label class="form-check-label" for="useSameCode">
-          Check this box if you want to use the same chartcom for all charges.
-        </label>
+    <input class="form-check-input keep-check" type="checkbox" value="keepFeatures" name="keepFeatures" id="useSameCode"
+        onClick="useSameShortCode(this)">
+    <label class="form-check-label" for="useSameCode">
+        Check this box if you want to use the same chartfield for all charges.
+    </label>
 </div>
 <br>
 {% endif %}
 {% for field in tab.form %}
-    {% if field.field.type == 'Radio' %}
-        <fieldset id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" 
-        {% if field.field.display_condition %}
-        data-condition="{{ field.field.display_condition }}"
+{% if field.field.type == 'Radio' %}
+<fieldset id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" {% if field.field.display_condition %}
+    data-condition="{{ field.field.display_condition }}" {% endif %}>
+    <legend id="legend{{ field.name }}">
+        <strong>{{ field.label }}</strong>
+    </legend>
+    {% for choice in field.field.choices %}
+    <div class="form-check custom-radio">
+        <input type="radio" class="form-check-input" id="{{ field.name }}_{{ choice|first }}" value="{{ choice|first }}"
+            name="{{ field.name }}" required>
+        <label class="form-check-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
+        {% if choice == field.field.choices|last %}
+        <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
         {% endif %}
-        >
-            <legend id="legend{{ field.name }}">{{ field.label }}</legend>
-            {% for choice in field.field.choices %}
-                <div class="form-check custom-radio">
-                        <input type="radio" class="form-check-input" id="{{ field.name }}_{{ choice|first }}" value="{{ choice|first }}" name="{{ field.name }}" required>
-                        <label class="form-check-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
-                    {% if choice == field.field.choices|last %}
-                    <div class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-            <br>
-        </fieldset>
-    {% elif field.field.type == 'Label' %}
-    <div id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" class='dynlabel'
-    {% if field.field.display_condition %}
-    data-condition="{{ field.field.display_condition }}"
-    {% endif %}
-    >
-        <label>{{ field.label }}</label>
     </div>
-    {% elif field.field.type == 'Chart' %}
-    {% if tab.name == '0chartfields' %}
-    <div id='dummyChartfield'>
-        <label>Chartfield for Tracking Purposes  </label>
-        <em>There is no charge for this request. However, please select a chartfield for departmental tracking purposes.</em> 
-    </div>
-    {% endif %}
+    {% endfor %}
+    <br>
+</fieldset>
+{% elif field.field.type == 'Label' %}
+<div id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" class='dynlabel'
+    {% if field.field.display_condition %} data-condition="{{ field.field.display_condition }}" {% endif %}>
+    <label>{{ field.label }}</label>
+</div>
+{% elif field.field.type == 'Chart' %}
+{% if tab.name == '0chartfields' %}
+<div id='dummyChartfield'>
+    <label>Chartfield for Tracking Purposes </label>
+    <em>There is no charge for this request. However, please select a chartfield for departmental tracking
+        purposes.</em>
+</div>
+{% endif %}
 
 
-
-    <div class="form-group row col-12" id="div{{field.name}}">
-        <!--  -->
-        <div class="form-check">
-        {{ field.label_tag }}
-    <div class="input-group mb3">
-        <!-- Select a Department (based off user's department access) -->
-            <div class="input-group-prepend">
-                <select class="custom-select" id="{{ field.name }}" data-target="{{ field.name }}" onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
-                    <option value="all">All Depts</option>
-                    {% for dept in field.field.dept_list %}
-                        <option value="{{dept}}">{{dept}}</option>
-                    {% endfor %}                    
-                </select>
-            </div>
-
-            <!-- Select a Chartfield (based off user's selection for department that was selected above ^^^ - all options should be from department's shortlist) -->
-            <select name="{{ field.name }}" class="custom-select" id="id_{{ field.name }}">
-                {% for choice in field.field.choices %}
-                    <option name="{{ field.name }}" data-dept="{{ choice.2 }}" value="{{ choice.0 }}">{{ choice.1 }}</option>
+<fieldset class="form-group row col-lg-6 col-md-8 col-sm-10 col-12" id="div{{field.name}}">
+    <legend id="legend_{{field.name}}">
+        <strong>
+            {{ field.label_tag }}
+        </strong>
+    </legend>
+    <div class="input-group mb-3">
+        <span class="sr-only">
+            <label for="{{ field.name }}" id="label_dp_{{ field.name }}">Select a Department</label>
+        </span>
+        <div class="input-group-prepend">
+            <select class="custom-select" id="{{ field.name }}" data-target="{{ field.name }}"
+                onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;"
+                aria-labelledby="legend_{{field.name}} label_dp_{{ field.name }}">
+                <option value="all">All Depts</option>
+                {% for dept in field.field.dept_list %}
+                <option value="{{dept}}">{{dept}}</option>
                 {% endfor %}
             </select>
-
         </div>
-    </div>
+
+        <span class="sr-only">
+            <label for="id_{{ field.name }}" id="label_{{ field.name }}">Select a Chartfield</label>
+        </span>
+
+        <select name="{{ field.name }}" class="custom-select" id="id_{{ field.name }}"
+            aria-labelledby="legend_{{field.name}} label_{{ field.name }}">
+            {% for choice in field.field.choices %}
+            <option data-dept="{{ choice.2 }}" value="{{ choice.0 }}">{{ choice.1 }}
+            </option>
+            {% endfor %}
+        </select>
     </div>
 
-    {% else %}
-    <div class="form-group row col-md-4" id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" data-condition="{{ field.field.display_condition }}">
-        <div class = "form-check">
+</fieldset>
+
+{% else %}
+<div class="form-group row col-md-4" id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}"
+    data-condition="{{ field.field.display_condition }}">
+    <div class="form-check">
         {{ field.errors }}
         {{ field.label_tag }} {{ field }}
-        <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signfying that user must enter a value"></i>Please enter a value.</div>
+        <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signfying that user must enter a value"></i>Please enter a value.</div>
         <div role=”alert” class="valid-feedback">Good.</div>
-        </div>
     </div>
-    {% endif %}
+</div>
+{% endif %}
 
 {% endfor %}
- 
