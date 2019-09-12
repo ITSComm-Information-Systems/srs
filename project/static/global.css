@@ -850,6 +850,7 @@ h3.lead {
 }
 h3.alert-heading {
     margin-top:.75rem;
+    color:#555555;
 }
 
 .wismo-order-details {
