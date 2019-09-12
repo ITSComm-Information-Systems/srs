@@ -1048,6 +1048,7 @@ h3.alert-heading {
 
 .table thead th {
 	border-top:1px solid #cecbc9;
+	background-color:#e4e1df;
 }
 .fas .btn-link:hover {
 	text-decoration:none;
