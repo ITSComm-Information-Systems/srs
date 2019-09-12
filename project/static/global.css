@@ -624,8 +624,16 @@ a.nav-link.disabled:focus {
 	color:#ffffff;
 }
 .btn-outline-success {
-	color:#28a745;
+	color:#218739;
 }
+.btn-outline-success:hover, 
+.btn-outline-success:focus, 
+.btn-outline-success:active, 
+.btn-outline-success.selected {
+    border-color:#218739;
+    background-color:#218739;
+    color:#ffffff;
+} 
 .btn-link {
 	color:#0075bc;
 }
