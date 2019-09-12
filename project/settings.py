@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'oscauth',
     'project',
+    'django.forms', # try to override widgets
     'django.contrib.admin',
     'django.contrib.auth',
     'mozilla_django_oidc',  # Load after auth
@@ -49,6 +50,8 @@ INSTALLED_APPS = [
     'reports',
     'tools',
 ]
+
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'  # Override widgets
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
