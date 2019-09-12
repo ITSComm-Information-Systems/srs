@@ -1026,7 +1026,7 @@ h3.alert-heading {
 	color:#655a52 !important;
 }
 .form-control {
-    margin:0.2rem;
+/*    margin:0.2rem;*/
 	border:1px solid #cecbc9;
 }
 .custom-select {
