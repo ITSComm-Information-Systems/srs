@@ -562,6 +562,7 @@ h2.service-menu-header {
 .nav-pills a.nav-link.disabled {
 	color:#655a52;
 }
+a.nav-link.disabled:hover, 
 a.nav-link.disabled:active, 
 a.nav-link.disabled:focus {
 	border-color:transparent;
