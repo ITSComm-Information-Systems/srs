@@ -29,6 +29,12 @@ body {
 .navbar {
 	padding:0;
 }
+@media (max-width:991.98px) {
+    .navbar-expand-lg>.container, .navbar-expand-lg>.container-fluid {
+        padding-right:20px;
+        padding-left:20px;
+    }
+}
 .navbar a:link, .navbar a:visited {
 	color:#ffffff;
 }
@@ -36,6 +42,9 @@ body {
 	.navbar .navbar-brand {
 		display:none;
 	}
+}
+.navbar .dropdown-item {
+    white-space:normal;
 }
 
 .container {
@@ -188,6 +197,9 @@ h2, .h2 {
 }
 h3, .h3 {
 	color:#555555;
+}
+.float-right .h4.alert-heading {
+    margin-top:0;
 }
 
 a {
@@ -547,21 +559,23 @@ h2.service-menu-header {
 	color:#555555;
 	cursor:default;
 }
+/*.nav-pills a.nav-link:not(.active):hover*/
+.nav-pills a.nav-link:hover {
+    background-color:#0075bc;
+    color:#ffffff;
+}
 .nav-pills a.nav-link.disabled {
 	color:#655a52;
 }
+a.nav-link.disabled:hover, 
 a.nav-link.disabled:active, 
 a.nav-link.disabled:focus {
-	border-color:transparent;
-	background-color:transparent;
-	color:#655a52;
+	border-color:transparent !important;
+	background-color:transparent !important;
+	color:#655a52 !important;
 }
 .nav-pills a.nav-link.disabled:hover {
 	cursor:default;
-}
-.nav-pills a.nav-link:not(.active):hover {
-    background-color:#0075bc;
-    color:#ffffff;
 }
 
 .buttons {
@@ -610,8 +624,18 @@ a.nav-link.disabled:focus {
 	color:#ffffff;
 }
 .btn-outline-success {
-	color:#28a745;
+    border-color:#218739;
+	color:#218739;
 }
+.btn-outline-success:hover, 
+.btn-outline-success:focus, 
+.btn-outline-success:active, 
+.btn-outline-success:not(:disabled):not(.disabled):active, 
+.btn-outline-success.selected {
+    border-color:#218739;
+    background-color:#218739;
+    color:#ffffff;
+} 
 .btn-link {
 	color:#0075bc;
 }
@@ -837,6 +861,7 @@ h3.lead {
 }
 h3.alert-heading {
     margin-top:.75rem;
+    color:#555555;
 }
 
 .wismo-order-details {
@@ -1014,7 +1039,7 @@ h3.alert-heading {
 	color:#655a52 !important;
 }
 .form-control {
-    margin:0.2rem;
+/*    margin:0.2rem;*/
 	border:1px solid #cecbc9;
 }
 .custom-select {
@@ -1048,6 +1073,7 @@ h3.alert-heading {
 
 .table thead th {
 	border-top:1px solid #cecbc9;
+	background-color:#e4e1df;
 }
 .fas .btn-link:hover {
 	text-decoration:none;
@@ -1059,7 +1085,10 @@ h3.alert-heading {
 .table-sm td, .table-sm th {
 	padding:.75rem;
 }
-.table-striped tbody tr:nth-of-type(odd), .table-striped tbody tr:nth-of-type(odd):hover {
+.table-striped tbody tr:nth-of-type(odd), .table-striped tbody tr:nth-of-type(even) {
+	background-color:transparent;
+}
+.table-striped tbody tr:nth-of-type(odd):hover, .table-striped tbody tr:nth-of-type(even):hover {
 	background-color:#f4f3f2;
 }
 .table-hover tbody tr:hover {
@@ -1144,4 +1173,8 @@ td.action {
 
 .save-changes > .btn-outline-primary {
 	margin-right:2rem;
+}
+
+.user-access-btn {
+		color: #fff !important;
 }
