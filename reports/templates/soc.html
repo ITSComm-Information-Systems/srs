@@ -23,14 +23,14 @@
                     <label for="deptid"><strong>Department ID</strong></label>
                     <div id="department_id_div" class="indented-form-input">
                         <label for="departmentIdSelection"><strong>Select Department ID(s)</strong></label>
-                        <div class="alert mt-0 mb-0">To select multiple, on Mac press and hold
+                        <div class="alert mt-0 mb-0" id="chartfieldInstructions">To select multiple, on Mac press and hold
                            “Command” and select. On PC,
                            press and hold “Ctrl” and select.</div>
                         <div class='form-check mt-0 mb-0'>
                             <input type="checkbox" name="selectall" id="deptidall" value='2'>
                             <label for="deptidall"><strong>Select All</strong></label>
                         </div>
-                        <select class="custom-select mt-0" multiple name="department_id" id="departmentIdSelection">
+                        <select class="custom-select mt-0" multiple aria-describedby="chartfieldInstructions" name="department_id" id="departmentIdSelection">
                             {% for key, value in depts.items %}
                             <option value="{{ key }} - {{ value }}">{{ key }} - {{ value }}</option>
                             {% endfor %}
@@ -150,7 +150,7 @@
         </div>
 
         {% endif %}
-        <p id='error' class='prv-msgs'></p>
+        <p id='error' role="alert" class='prv-msgs'></p>
         <input type='submit' value='Generate Report' class="btn btn-primary" id='generate' disabled>
     </form>
     </div>

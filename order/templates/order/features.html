@@ -1,6 +1,6 @@
 {% for category in tab.form.categories %}
 <div id="cat{{category.id}}" data-phoneset="{{category.name}}">
-  <p class="h2"> {{category}}
+  <p class="h2">Features for {{category}}
   </p>
 
   <div class="features-restriction-msg mb-4" id="currentFeatures">
@@ -24,7 +24,8 @@
   <div class="form-row">
     {% for type in category.types %}
     <div class="form-check col feature-types">
-      <legend>{{type.label}}
+      <legend>
+        <strong>{{type.label}}</strong>
         <small>
             <a class="popover-icon" data-toggle="popover" tabindex="0" role="button"
             data-container="body" data-trigger="hover" data-placement="right"
