@@ -73,7 +73,7 @@
                                             <td>{{ item.created_by }}</td>
                                             <td>{{ item.description }}</td>
                                             <td class="action">
-                                                <a class="delete" href="#" data-toggle="modal" data-target="#deleteCartItem" data-item="{{item.id}}" role="button">Delete <span class="sr-only">item that was created on {{ item.create_date|date:"m/d/y" }} by {{ item.created_by }}. Item description: {{ item.description }}. Item Id: {{item.id}}. Item chartfield: {{item.chartcom}}</span> </a>
+                                                <a class="delete" href="#" data-toggle="modal" data-target="#deleteCartItem" data-item="{{item.id}}" role="button">Delete <span class="sr-only">item that was created on {{ item.create_date|date:"m/d/y" }} by {{ item.created_by }}. Item description: {{ item.description }}. Item Id: {{item.id}}. Item chartfield: {{item.chartcom}}</span></a>
                                                 {% if section == status|first %}
                                                 <a class="ready-link" onclick="moveRow(this)" href="#">Save for
                                                     Later <span class="sr-only">item that was created on {{ item.create_date|date:"m/d/y" }} by {{ item.created_by }}. Item description: {{ item.description }}. Item Id: {{item.id}}. Item chartfield: {{item.chartcom}}</span></a>
