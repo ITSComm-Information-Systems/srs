@@ -1145,3 +1145,7 @@ td.action {
 .save-changes > .btn-outline-primary {
 	margin-right:2rem;
 }
+
+.user-access-btn {
+		color: #fff !important;
+}
