@@ -624,6 +624,7 @@ a.nav-link.disabled:focus {
 	color:#ffffff;
 }
 .btn-outline-success {
+    border-color:#218739;
 	color:#218739;
 }
 .btn-outline-success:hover, 
