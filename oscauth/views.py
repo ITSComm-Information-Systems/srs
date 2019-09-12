@@ -1,5 +1,6 @@
 import warnings
 
+from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.template import loader
 from django.db import models
@@ -490,7 +491,8 @@ def modpriv(request):
 
 @csrf_protect
 @require_http_methods(['POST'])
-@user_passes_test(su_login_callback)
+#@user_passes_test(su_login_callback)
+@permission_required('oscauth.can_impersonate')
 def login_as_user(request, user_id):
     userobj = authenticate(request=request, su=True, user_id=user_id)
     if not userobj:
@@ -537,7 +539,8 @@ def add_custom_permissions(user_id):
 
 @csrf_protect
 @require_http_methods(['POST', 'GET'])
-@user_passes_test(su_login_callback)
+#@user_passes_test(su_login_callback)
+@permission_required('oscauth.can_impersonate')
 def su_login(request, form_class=UserSuForm, template_name='oscauth/su_login.html'):
     form = form_class(request.POST or None)
     user_list = User.objects.order_by('username')
