@@ -559,23 +559,23 @@ h2.service-menu-header {
 	color:#555555;
 	cursor:default;
 }
+/*.nav-pills a.nav-link:not(.active):hover*/
+.nav-pills a.nav-link:hover {
+    background-color:#0075bc;
+    color:#ffffff;
+}
 .nav-pills a.nav-link.disabled {
 	color:#655a52;
 }
 a.nav-link.disabled:hover, 
 a.nav-link.disabled:active, 
 a.nav-link.disabled:focus {
-	border-color:transparent;
-	background-color:transparent;
-	color:#655a52;
+	border-color:transparent !important;
+	background-color:transparent !important;
+	color:#655a52 !important;
 }
 .nav-pills a.nav-link.disabled:hover {
 	cursor:default;
-}
-/*.nav-pills a.nav-link:not(.active):hover*/
-.nav-pills a.nav-link:hover {
-    background-color:#0075bc;
-    color:#ffffff;
 }
 
 .buttons {
