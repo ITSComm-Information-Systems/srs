@@ -211,7 +211,7 @@ class LogItem(models.Model):
     description = models.TextField(blank=True)
 
     def add_log_entry(self, transaction, local_key, descr):
-        self.transaction = 'Create Issue'
+        self.transaction = transaction
         self.local_key = local_key
         self.remote_key = 23432
         self.level = 'Info'
@@ -292,14 +292,20 @@ class Order(models.Model):
         LogItem().add_log_entry('JSON', self.id, json_data)
         #log.add_log_entry(json_data)
 
-        with connections['pinnacle'].cursor() as cursor:
-            ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
-            print(ponum)
+        try: 
+            with connections['pinnacle'].cursor() as cursor:
+                ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
+            self.order_reference = ponum
+            self.save()
 
-        LogItem().add_log_entry('Send Data', item.id, ponum)
+        except Exception as e:
+            print(e)
+            LogItem().add_log_entry('Error', self.id, e)
+            pass
 
-        self.order_reference = ponum
-        self.save()
+        #LogItem().add_log_entry('Send Data', item.id, ponum)
+
+
 
 
 class Item(models.Model):

@@ -174,8 +174,10 @@ class Integration(PermissionRequiredMixin, View):
         order_list = LogItem.objects.filter(local_key = str(order.id))
 
         for ord in order_list:
-            parsed = json.loads(ord.description)
-            ord.sent = json.dumps(parsed, indent=4)
+            if ord.transaction == 'JSON':
+                parsed = json.loads(ord.description)
+                ord.sent = json.dumps(parsed, indent=4)
+
 
         for item in item_list:
             item.note = item.data['reviewSummary']
