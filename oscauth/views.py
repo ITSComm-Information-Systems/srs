@@ -335,19 +335,6 @@ def get_uniqname(request, uniqname_parm=''):
                     'disable_proxy': disable_proxy
                 }
 
-#                 if request.method=='POST' and request.POST.get('process_access'):
-#                     if request.POST.get('rolerad') and request.POST.get('deptck'):
-#                         submit_msg = 'Ready to Process'
-#                         if request.POST.get('taskrad') == 'add':
-# #                            return render(request,'oscauth/addpriv.html', context)
-#                             return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not') # do I need to pass in the page title here?
-#                         if request.POST.get('taskrad') == 'remove':
-#                             return render(request, 'oscauth/removepriv.html', context) # do I need to pass in the page title here?
-
-#                     else:
-#                         submit_msg = 'Please select a Task, a Role, and at least one Department then click Submit.'
-#                         return  HttpResponse(template.render({'submit_msg': submit_msg, 'title':"Manage User Access"}, request)) # do I need to pass in the page title here?
-
                 return render(request, 'oscauth/setpriv.html', context)
 
             # If user does not exist in MCommunity
@@ -475,6 +462,14 @@ def modpriv(request):
             result = delete_priv(osc_user, 'Reporter', dept)
             if result == 'change':
                 modifications[dept]['deleted'].append('Reporter')
+
+        # Format lists in modifications
+        for value in modifications.values():
+        #     # for v in value:
+        #     #     v = "test"
+        #     #     #v = ", ".join(v)
+            value['added'] = ", ".join(value['added'])
+            value['deleted'] = ", ".join(value['deleted'])
 
     context = {
         'title': "Manage User Access",
