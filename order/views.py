@@ -90,6 +90,12 @@ class Submit(PermissionRequiredMixin, View):
 
             order_items = request.POST.getlist('orderItems[' + order +']')
             priority = request.POST['processingTime[' + order +']']
+
+            if priority == 'expediteOrder':
+                due_date = request.POST['expediteDayInput[' + order +']']
+            else:
+                due_date = request.POST['specificDayInput[' + order +']']
+
             firstitem = Item.objects.get(id=order_items[0])
             action = firstitem.data['action_id']
             service = Action.objects.get(id=action).service
@@ -101,6 +107,9 @@ class Submit(PermissionRequiredMixin, View):
             order.chartcom = firstitem.chartcom
             order.service = service
             order.status = 'Submitted'
+            if priority == 'expediteOrder':
+                order.priority = 'High'
+            order.due_date = due_date
             order.save()
 
             Item.objects.filter(id__in=order_items).update(order=order) #associate Items with order
@@ -160,15 +169,12 @@ class Integration(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def post(self, request, order_id):
-        print(request.POST)
         order = Order.objects.get(id=order_id)
         order.create_preorder()
         return HttpResponseRedirect('/orders/integration/' + str(order_id)) 
 
     def get(self, request, order_id):
-        print(order_id)
         order = Order.objects.get(id=order_id)
-        print(order.id)
         item_list = Item.objects.filter(order=order)
 
         order_list = LogItem.objects.filter(local_key = str(order.id))
@@ -184,10 +190,8 @@ class Integration(PermissionRequiredMixin, View):
             error = LogItem.objects.filter(local_key = str(item.id))
             if error:
                 item.error = error
-                print(str(item.id))
             else:
                 item.error = 'no errors'
-                print(str(item.id))
 
         return render(request, 'order/integration.html', 
             {'order': order,

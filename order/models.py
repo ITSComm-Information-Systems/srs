@@ -220,12 +220,20 @@ class LogItem(models.Model):
     
 
 class Order(models.Model):
+    PRIORITY_CHOICES = (
+        ('High', 'Expedited'),
+        ('Medium', 'Standard'),
+        ('Low', 'Low'),
+    )
+
     order_reference = models.CharField(max_length=20)
     create_date = models.DateTimeField('Date Created', auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
     status = models.CharField(max_length=20)
+    priority = models.CharField(max_length=20, default='Medium', choices=PRIORITY_CHOICES)
+    due_date = models.DateTimeField(blank=True, null=True)
 
     @property
     def dept(self):
@@ -250,8 +258,8 @@ class Order(models.Model):
         for num, item in enumerate(item_list, start=1):
             issue = {}
             if num == 1:
-                #data['priority_name'] = 'High'
-                #data['due_date'] = '01/20/2019'
+                data['priority_code'] = self.priority
+                data['due_date'] = self.due_date
                 data['issues'] = []
 
             action_id = item.data['action_id']
@@ -306,7 +314,13 @@ class Order(models.Model):
         #LogItem().add_log_entry('Send Data', item.id, ponum)
 
 
+class PinnPreOrder(UmOscPreorderApiV):
 
+    def add_attachments(self):
+        print('add')
+
+    class Meta:
+        managed=False
 
 class Item(models.Model):
     description = models.CharField(max_length=100)
