@@ -59,6 +59,19 @@ ul, #myUL {
 </ul>
 
 <ul>
+{% for order in order_list %}
+  <li><span class="caret">{{order.transaction}} @ {{ order.create_date }}</span>
+    <ul class="nested">
+
+            <pre id="{{order.id}}">{{order.sent}}</pre>
+            <pre>{{order.description}}</pre>
+
+    </ul>
+  </li>
+{% endfor %}
+</ul>
+
+<ul>
 {% for item in item_list %}
     <li>{{ item.id }} - {{ item.description }}
         <ul>
@@ -67,13 +80,6 @@ ul, #myUL {
                         <code>{{ item.data }}</code>
                 </ul>
             </li>
-            {% for error in item.error %}
-            <li><span class="caret">{{error.create_date}}</span>
-                <ul class="nested">
-                  <code>{{ error.description }}</code>
-                </ul>
-            </li>
-            {% endfor %}
             <li><span class="caret">note</span>
                 <ul class="nested">
                     <pre>{{ item.note }}</pre>
@@ -100,4 +106,7 @@ for (i = 0; i < toggler.length; i++) {
     this.classList.toggle("caret-down");
   });
 }
+
+
+                        
 </script>
