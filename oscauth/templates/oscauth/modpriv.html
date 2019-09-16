@@ -4,12 +4,10 @@
 
 <h2> {{ subtitle }}</h2>
 
-<p>{{ modifications }}</p>
-
 <p>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i
             class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></p>
 
-<a href="#" class="btn btn-primary user-access-btn">Back to Manage User Access</a>
+<a href="/auth/get_uniqname/" class="btn btn-primary user-access-btn">Back to Manage User Access</a>
 
 <h3>Results</h3>
 
@@ -23,17 +21,31 @@
         </tr>
     </thead>
     <tbody>
+        {% for key, value in modifications.items %}
+            {% if value.added or value.deleted %}
+        <tr>
+            <td>{{ key }}</td>
+            <td>Name</td>
+            <td>{{ value.added }}</td>
+            <td>{{ value.deleted }}</td>
+        </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+<!--     <tbody>
         <!-- {% for dept in dept_checked %} -->
+        {% for key, value in modifications.items %}
         <!-- Paco: If it is NOT AN INACTIVE department, do this -->
         <tr>
             <!-- {% if row.dept_status != 'I' %} -->
-            <th scope="row">000000</th>
+            <th scope="row">key</th>
             <td>Fake Department</td>
-            <td>Orderer</td>
-            <td>Reporter</td>
+            <td>{{ value.added }}</td>
+            <td>{{ value.deleted }}</td>
             <!-- {% else %} -->
             <!-- {% endif %} -->
         </tr>
+        {% endfor %}
         <!-- Paco: If it is an INACTIVE department, do this -->
         <tr>
             <th scope="row" class="prv-msgs">
@@ -45,7 +57,7 @@
             <td></td>
         </tr>
         <!-- {% endfor %} -->
-    </tbody>
+    </tbody> -->
 </table>
 
 <!-- <form action="/auth/addpriv/" method="POST">{% csrf_token %}
