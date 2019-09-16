@@ -100,7 +100,7 @@
                             <!-- First table row -->
                             <tr data-dept="{{order.dept}}" data-order="{{order.id}}">
                                 <th scope="row">{{order.order_reference}}
-                                {% if user.is_superuser %}
+                                {% if request.session.exit_users_pk or perms.oscauth.can_impersonate %}
                                     <a href="/orders/integration/{{order.id}}"><i class="fas fa-info-circle"></i></a></th>
                                 {% endif %}
                                 <td>{{ order.create_date|date:"m/d/y" }}</td>
