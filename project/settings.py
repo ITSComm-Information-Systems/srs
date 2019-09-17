@@ -125,6 +125,14 @@ DATABASES = {
         'USER': os.getenv('DATABASE_USER','postgres'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD','w94zLR2dkkfo'),
         'HOST': os.getenv('DATABASE_SERVICE_NAME','pgoscdev.cvwq7quwqs3k.us-east-2.rds.amazonaws.com'),
+        'TEST':
+        {
+        'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
+        'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
+        'USER': os.getenv('DATABASE_USER','postgres'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD','w94zLR2dkkfo'),
+        'HOST': os.getenv('DATABASE_SERVICE_NAME','pgoscdev.cvwq7quwqs3k.us-east-2.rds.amazonaws.com'),
+        },
     },
     'pinnacle': {
         'NAME': os.getenv('ORACLE_DATABASE','pinntst.dsc.umich.edu:1521/pinndev.world'),
