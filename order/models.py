@@ -343,3 +343,7 @@ class Item(models.Model):
     def leppard(self):
         pour=['me']
         pour.append('sugar')
+
+class Attachment(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    file = models.FileField(upload_to='attachments',blank=True, null=True)
