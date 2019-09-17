@@ -277,8 +277,6 @@ def get_uniqname(request, uniqname_parm=''):
                         roles_list = AuthUserDept.objects.filter(user=osc_user[0], dept=dept)
                         user_roles = []
                         for role in roles_list:
-                            # one_role = Role.objects.filter(group=role)[0].role
-                            # user_roles.append(one_role)
                             user_roles.append(role.group.role.role)
 
                         # Create for checkboxes
@@ -311,6 +309,7 @@ def get_uniqname(request, uniqname_parm=''):
                         'dept_status' : dept_status,
                         'dept' : dept, 
                         'dept_name' : dept_name, 
+                        'dept_status': dept_status,
                         'dept_manager': manager,
                         'disable_proxy': disable_proxy,
                         'disable_others': disable_others,
@@ -413,6 +412,9 @@ def modpriv(request):
         # action_checked = request.POST['taskrad']
         dept_list = request.POST.getlist('dept_list')
 
+        # Get department info
+        dept_info = UmCurrentDeptManagersV.objects.filter(deptid__in = dept_list)
+
     # Add user if needed
     try:
         osc_user = User.objects.get(username=uniqname_parm)
@@ -426,7 +428,9 @@ def modpriv(request):
     for dept in dept_list:
         modifications[dept] = {
             'added': [],
-            'deleted': []
+            'deleted': [],
+            'inactive': False,
+            'name': ''
         }
         # Add/delete proxy status
         proxy_actions = request.POST.get(dept + 'proxy')
@@ -464,13 +468,12 @@ def modpriv(request):
             if result == 'change':
                 modifications[dept]['deleted'].append('Reporter')
 
-        # Format lists in modifications
-        for value in modifications.values():
-        #     # for v in value:
-        #     #     v = "test"
-        #     #     #v = ", ".join(v)
-            value['added'] = ", ".join(value['added'])
-            value['deleted'] = ", ".join(value['deleted'])
+    # Department inactive vs. active and name
+    for info in dept_info:
+        if info.dept_status == 'I':
+            modifications[info.deptid]['inactive'] = True
+        modifications[info.deptid]['name'] = info.dept_name
+
 
     context = {
         'title': "Manage User Access",
