@@ -96,7 +96,11 @@
                 <tr>
                     <td scope="row">{{ row.dept }}</td>
                     <input hidden name='dept_list' value='{{ row.dept }}'>
-                    <td>{{ row.dept_name }}</td>
+                    {% if row.dept_status == 'I' %}
+                        <td class='prv-msgs'><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>{{ row.dept_name }}</td>
+                    {% else %}
+                        <td>{{ row.dept_name }}</td>
+                    {% endif %}
                     <td>{{ row.roles_list }}</td>
                     {% if row.disable_proxy %}
                         {% if row.current_roles.proxy %}
