@@ -7,18 +7,18 @@
         <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
                 <div class="form-group col-8">
                     {% if depts %}
-                    <label for="dept_id"><strong>Select a Department ID</strong></label>
-                        <select class="form-control" name="dept_id" id="dept_id" size="{{ depts|length }}" required>
+                    <label id="dept_id_label" for="dept_id"><strong>Select a Department ID</strong></label>
+                        <select class="form-control" name="dept_id" id="dept_id" size="{{ depts|length }}" aria-labelledby="dept_id_label" required>
                             {% for dept in depts %}
                             <option value="{{ dept.deptid }}-{{dept.name}}">{{ dept.deptid }} - {{ dept.name }}</option>
                             {% endfor %}
                         </select>
                 </div>
                 <div class="form-group col-8">
-                    <label for="bill_period">
+                    <label for="bill_period" id="billing_label">
                         <strong>Select a Billing Period</strong>
                     </label>
-                    <select class="form-control mt-0" name="bill_period" id="bill_period" size="{{ dates|length }}" required>
+                    <select class="form-control mt-0" name="bill_period" id="bill_period" size="{{ dates|length }}"  aria-labelledby="billing_label" required>
                         {% for date in dates %}
                         <option value="{{ date }}">{{ date }}</option>
                         {% endfor %}
