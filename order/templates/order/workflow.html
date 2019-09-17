@@ -4,7 +4,7 @@
 
 <h1>{{title}} <span class="sr-only">Insert the tab name of where the user is currently at so the screen reader will read it out to the user</span></h1>
 
-<form action="/orders/addtocart/" method="post" id="workflowForm" >
+<form action="/orders/addtocart/" method="post" id="workflowForm" enctype="multipart/form-data">
   {% csrf_token %}
   <input type="hidden" id="wfid" name="action_id" value="{{action.id}}">
   <input type="hidden" id="wftype" name="action_type" value="{{action.type}}">

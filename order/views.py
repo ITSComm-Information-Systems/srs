@@ -9,16 +9,16 @@ from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServic
 from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from pages.models import Page
-from order.models import LogItem
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 import cx_Oracle
 import json
+from django.core.files.storage import FileSystemStorage
 
 import threading
 
-from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order
+from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment
 
 
 def get_phone_location(request, phone_number):
@@ -90,10 +90,12 @@ class Submit(PermissionRequiredMixin, View):
 
             order_items = request.POST.getlist('orderItems[' + order +']')
             priority = request.POST['processingTime[' + order +']']
+            due_date = None
 
             if priority == 'expediteOrder':
                 due_date = request.POST['expediteDayInput[' + order +']']
-            else:
+
+            if priority == 'specificDay':
                 due_date = request.POST['specificDayInput[' + order +']']
 
             firstitem = Item.objects.get(id=order_items[0])
@@ -134,6 +136,7 @@ def send_email(request):
 def add_to_cart(request):
     if request.method == "POST":
 
+        #print(request.POST)
         i = Item()
         i.created_by_id = request.user.id
 
@@ -156,6 +159,17 @@ def add_to_cart(request):
         i.deptid = charge.dept
         i.data = request.POST
         i.save()
+
+
+        for file in request.FILES.getlist('file'):
+            fs = FileSystemStorage()
+            filename = fs.save('attachments/' + file.name, file)  
+
+            attach = Attachment()
+            attach.item = i
+            attach.file = filename
+            attach.save()
+
         return HttpResponseRedirect('/orders/cart/' + charge.dept) 
 
 def delete_from_cart(request):
