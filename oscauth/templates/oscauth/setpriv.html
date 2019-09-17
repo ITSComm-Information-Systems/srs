@@ -171,29 +171,11 @@ aria-labelledby="userRoles" aria-hidden="true">
         </div>
         <div class="modal-body">
             <div class="">
-                <p>
-                    <strong>Department Manager:</strong>
-                    Something about that role
-                </p>
+                {% autoescape off %}
+                    {{ information.bodytext }}
+                {% endautoescape %}
             </div>
-            <div>
-                <p>
-                    <strong>Proxy:</strong>
-                    Something about that role
-                </p>
-            </div>
-            <div>
-                <p>
-                    <strong>Orderer:</strong>
-                    Something about that role
-                </p>
-            </div>
-            <div>
-                <p>
-                    <strong>Reporter:</strong>
-                    Something about that role
-                </p>
-            </div>
+
         </div>
         <div class="modal-footer">
             <!-- Close button -->
