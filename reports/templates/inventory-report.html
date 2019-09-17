@@ -37,99 +37,149 @@
     <input type="text" name="dept_id" id="dept_id" value="{{dept_id}}-{{dept_name}}" readonly hidden>
     <input type="text" name="bill_period" id="bill_period" value="{{bill_period}}" readonly hidden>
 
-    <strong class='mt-2 mb-2'>Filter By:</strong>
-
-    <div class="form-row">
-        <div class="row align-items-start col-3" id="select_loc">
-            <div class="input-group col-auto">
-                <div class="input-group-prepend">
-                    <label class="input-group-text" for="location">
-                        Location
-                    </label>
-                </div>
-                <select class="custom-select" name="location"
-                    id="location">
-                    <option value=''>--Select--
-                        {% for building in buildings %}
-                    <option value="{{ building }}">{{ building }}{% endfor %}
-                </select>
-            </div>
-        </div>
-
-        <div class="row align-items-start col-3" id="select_type">
-            <div class="input-group col-auto">
-                <div class="input-group-prepend">
-                    <label class="input-group-text" for="type">User ID Type</label>
-                </div>
-
-                <select class="custom-select" name="type" id="type">
-                    <option value=''>--Select--
-                        {% for type in user_types %}
-                    <option value="{{ type }}">{{ type }}{% endfor %}
-                </select>
-            </div>
-        </div>
-
-        <div class="row align-items-start col-3" id="select_cf">
-            <div class="input-group col-auto">
-                <div class="input-group-prepend">
-                    <label class="input-group-text" for="cf">Chartfield</label>
-                </div>
-
-                <select class="custom-select" name="cf" id="cf">
-                    <option value=''>--Select--
-                        {% for chartfield in chartfields %}
-                    <option value="{{ chartfield }}">{{ chartfield }}{% endfor %}
-                </select>
-            </div>
-        </div>
-        {% if first %}
-        <div class="row align-items-start col-3" id="select_date">
-            <div class="input-group col-auto">
-                <div class="input-group-prepend">
-                    <label class="input-group-text" for="date">Last Call Date</label>
-                </div>
-
-                <select class="custom-select" name="date" id="date">
-                    <option value=''>--Select--
-                    <option value="6-12">Greater than 6 months and less than 12 months
-                    <option value="12+">Greater than 12 months
-                </select>
-            </div>
-        </div>
-        {% endif %}
-
-        {% if first is False%}
-        <div class="row align-items-start col-3"></div>
-        {% endif %}
-        <input type='submit' value='Apply Filters' class="btn btn-primary mb-1 float-right">
-
+    <div class="mt-2 mb-2">
+        <strong>Filter By:</strong>
     </div>
+
+    
+        {% if first %}
+        <div class="form-row">
+            <div class="col-3" id="select_loc">
+                <div class="input-group col-auto">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="location">
+                            Location
+                        </label>
+                    </div>
+                    <select class="custom-select" name="location"
+                        id="location">
+                        <option value=''>--Select--
+                            {% for building in buildings %}
+                        <option value="{{ building }}">{{ building }}{% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-3" id="select_type">
+                <div class="input-group col-auto">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="type">User ID Type</label>
+                    </div>
+
+                    <select class="custom-select" name="type" id="type">
+                        <option value=''>--Select--
+                            {% for type in user_types %}
+                        <option value="{{ type }}">{{ type }}{% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-3" id="select_cf">
+                <div class="input-group col-auto">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="cf">Chartfield</label>
+                    </div>
+
+                    <select class="custom-select" name="cf" id="cf">
+                        <option value=''>--Select--
+                            {% for chartfield in chartfields %}
+                        <option value="{{ chartfield }}">{{ chartfield }}{% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="col-3" id="select_date">
+                <div class="input-group col-auto">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="date">Last Call Date</label>
+                    </div>
+
+                    <select class="custom-select" name="date" id="date">
+                        <option value=''>--Select--
+                        <option value="6-12">Greater than 6 months and less than 12 months
+                        <option value="12+">Greater than 12 months
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="inv-filter-btns mt-2">
+            <input type='submit' value='Apply Filters' class="btn btn-primary">
+            {% if location_filter or type_filter or cf_filter or date_filter%}
+            <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs">
+            {% endif %}
+        </div>
+
+        {% else %}
+        <div class="form-row">
+            <div class="col-3" id="select_loc">
+                <div class="input-group col-auto">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="location">
+                            Location
+                        </label>
+                    </div>
+                    <select class="custom-select" name="location"
+                        id="location">
+                        <option value=''>--Select--
+                            {% for building in buildings %}
+                        <option value="{{ building }}">{{ building }}{% endfor %}
+                    </select>
+                </div>
+            </div>
+    
+            <div class="col-3" id="select_type">
+                <div class="input-group col-auto">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="type">User ID Type</label>
+                    </div>
+    
+                    <select class="custom-select" name="type" id="type">
+                        <option value=''>--Select--
+                            {% for type in user_types %}
+                        <option value="{{ type }}">{{ type }}{% endfor %}
+                    </select>
+                </div>
+            </div>
+    
+            <div class="col-3" id="select_cf">
+                <div class="input-group col-auto">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="cf">Chartfield</label>
+                    </div>
+    
+                    <select class="custom-select" name="cf" id="cf">
+                        <option value=''>--Select--
+                            {% for chartfield in chartfields %}
+                        <option value="{{ chartfield }}">{{ chartfield }}{% endfor %}
+                    </select>
+                </div>
+            </div> 
+
+            <div class="col-3">
+                <input type='submit' value='Apply Filters' class="btn btn-primary">
+                {% if location_filter or type_filter or cf_filter or date_filter%}
+                <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs">
+                {% endif %}
+            </div>
+        </div>
+
+        {% endif %}
 
     <hr class="style1">
     {% endif %}
 
     {% if location_filter or type_filter or cf_filter or date_filter%}
-        <div class='form-row mb-0'>
-            <div class='form-group col-md-10'>
-                <strong class='mt-2 mb-1'>Current Filters:</strong>
-
-                <div class='indented-form-input'>
-                    <p>
-                        {% if location_filter %}<strong>Location:</strong> {{ location_filter }}<br>{% endif %}
-                        {% if type_filter %}<strong>User ID Type:</strong> {{ type_filter }}<br>{% endif %}
-                        {% if cf_filter %}<strong>Chartfield:</strong> {{ cf_filter }}<br>{% endif %}
-                        {% if date_filter %}<strong>Last Call Date:</strong> {{ date_filter }}<br>{% endif %}
-                    </p>
+        <div class='form-row'>
+            <div>
+                <div class="mt-2 mb-2">
+                    <strong>Current Filters:</strong>
                 </div>
-            </div>
-
-            <div class='form-group col-md-2'>
-                {% if location_filter or type_filter or cf_filter or date_filter%}
-                    <!-- <div class="row align-items-start col-10"></div>
-                    <pre>            </pre> -->
-                    <input type='submit' value='Remove Filters' class="btn btn-danger float-right">
-                {% endif %}
+                <div class='indented-form-input'>
+                    {% if location_filter %}<strong>Location:</strong> {{ location_filter }}<br>{% endif %}
+                    {% if type_filter %}<strong>User ID Type:</strong> {{ type_filter }}<br>{% endif %}
+                    {% if cf_filter %}<strong>Chartfield:</strong> {{ cf_filter }}<br>{% endif %}
+                    {% if date_filter %}<strong>Last Call Date:</strong> {{ date_filter }}<br>{% endif %}
+                </div>
             </div>
         </div>
 
@@ -179,7 +229,7 @@
     <table class="table table-sm mb-5 table-striped" style="font-size:12px">
         <thead class="thead-dark">
             <tr data-name="{{ classification.0.0.chartfield }}">
-                <th>User ID</th>
+                <th class="user_id_report_col">User ID</th>
                 <th>Usage</th>
                 <th>User ID Type</th>
                 <th>User Name</th>
@@ -187,7 +237,7 @@
                 <th>Calling Range</th>
                 <th>Last Outbound Call Date</th>
                 <th>Account</th>
-                <th>Charge Code</th>
+                <th class="charge_cd_report_col">Charge Code</th>
                 <!-- <th>Charge Description</th> -->
                 <th>Quantity</th>
                 <th>Unit Rate</th>
