@@ -25,6 +25,7 @@ from .utils import su_login_callback, custom_login_action, upsert_user
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from oscauth.forms import *
 from oscauth.utils import upsert_user
+from pages.models import Page
 #from oscauth.models import AuthUserDept, Grantor, Role
 
 
@@ -319,6 +320,9 @@ def get_uniqname(request, uniqname_parm=''):
                     }
                     rows.append(data)
 
+                # Get permission information
+                information = Page.objects.get(permalink='/manageacces')
+
 
                 context = {
                     'title':"Manage User Access",
@@ -332,6 +336,7 @@ def get_uniqname(request, uniqname_parm=''):
                     'rows': rows,
                     'result': result,
                     'submit_msg': submit_msg,
+                    'information': information,
                     'disable_proxy': disable_proxy
                 }
 

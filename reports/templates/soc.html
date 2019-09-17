@@ -43,7 +43,7 @@
                     <label for="deptgroup"><strong> Department Group</strong></label>
                     <div id="department_group_div" class="indented-form-input">
                         <label for="department_group"><strong>Select a Department Grouping</strong></label>
-                        <select class="custom-select" name="department_group" onchange="display_active({{active}})" id='department_group' size="1">
+                        <select class="custom-select" name="department_group" id='department_group' size="1">
                             {% for group in groups_descr %}
                             <option value="{{ group }}">{{ group }}</option>
                             {% endfor %}
@@ -105,10 +105,13 @@
                         <div class="form-group">
                             <label for='singlemonthselect'><strong>Select a Month & Year</strong></label>
                             <select class='custom-select' name='singlemonthselect' id='singlemonthselect' size='1'>
-                                {% for year in calendar %}
+                                <!-- {% for year in calendar %}
                                     {% for month in months %}
                                         <option value='{{ month }} {{ year }}'>{{ month }} {{ year }}</option>
                                     {% endfor %}
+                                {% endfor %} -->
+                                {% for date in dates %}
+                                    <option value='{{ date }}'>{{ date }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -126,20 +129,26 @@
                         <div class='form-row col-md-12'>
                             <div class='form-group col-5'>
                                 <select class='custom-select' name='multimonth1' id='multimonth1' size='1'>
-                                    {% for year in calendar %}
+                                    <!-- {% for year in calendar %}
                                         {% for month in months %}
                                             <option value='{{ month }} {{ year }}'>{{ month }} {{ year }}</option>
                                         {% endfor %}
+                                    {% endfor %} -->
+                                    {% for date in dates %}
+                                        <option value='{{ date }}'>{{ date }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <span>&nbsp;<strong>to</strong>&nbsp;</span>
                             <div class='form-group col-5'>
                                 <select class='custom-select' name='multimonth2' id='multimonth2' size='1'>
-                                    {% for year in calendar %}
+                                    <!-- {% for year in calendar %}
                                         {% for month in months %}
                                             <option value='{{ month }} {{ year }}'>{{ month }} {{ year }}</option>
                                         {% endfor %}
+                                    {% endfor %} -->
+                                    {% for date in dates %}
+                                        <option value='{{ date }}'>{{ date }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -286,7 +295,7 @@
             })
         }
         else if ($('#deptgroup').is(':checked')) {
-            $('#deptartment_group option').each(function() {
+            $('#department_group option').each(function() {
                 if ($(this).is(':selected')) {
                     to_return = true;
                 }
