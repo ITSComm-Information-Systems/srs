@@ -117,8 +117,9 @@
 						<a class="nav-link" href="/orders/services/"><i class="fas fa-check-circle"></i> Request Service</a>
 					</li>
 					{% endif %}
+					{% if perms.oscauth.can_report %}
 					<li class="nav-item dropdown {% if title == 'Metrics' or title == 'Detail of Charges' or title == 'Inventory and Location Report' or title == 'Non-Telephony Detail of Charges' or title == 'Summary of Charges' %}active{% endif %}">
-						{% if perms.oscauth.can_report %}
+						
 						<a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								<i class="fas fa-chart-line"></i>
 							Run Reports
