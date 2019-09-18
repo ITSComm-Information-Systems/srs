@@ -1083,7 +1083,7 @@ h3.alert-heading {
 	border-bottom:1px solid #cecbc9 !important;
 }
 .table-sm td, .table-sm th {
-	padding:.75rem;
+	padding:.75rem .3rem;
 }
 .table-striped tbody tr:nth-of-type(odd), .table-striped tbody tr:nth-of-type(even) {
 	background-color:transparent;
@@ -1189,4 +1189,16 @@ label {
 
 .custom-h2 {
 	font-size: 1.5rem;
+}
+.user_id_report_col {
+	width:11%;
+}
+.charge_cd_report_col {
+	width:8%;
+}
+
+.inv-filter-btns {
+	display: flex;
+	justify-content: flex-end;
+	
 }

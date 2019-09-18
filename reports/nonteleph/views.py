@@ -56,7 +56,7 @@ def get_new(request):
     instructions = Page.objects.get(permalink='/nonteleph')
 
     context = {
-        'title': "Other Detail of Charges",
+        'title': "Non-Telephony Detail of Charges",
         'form_action': '/reports/nonteleph/report/',
         'names': names,
         'dates': billing_dates,
@@ -190,7 +190,7 @@ def generate_report(request):
 
 
     context= {
-        'title':"Other Detail of Charges",
+        'title':"Non-Telephony Detail of Charges",
         'dept': selected_dept,
         'dept_mgr': dept_mgr,
         'dept_mgr_uniq': dept_mgr_uniq,

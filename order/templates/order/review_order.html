@@ -75,7 +75,7 @@
                                         <label for="specificDayInput">
                                             Please select a date for this order to be processed on
                                         </label>
-                                        <input type="date" id="specificDayInput" class="form-control-sm">
+                                        <input name="specificDayInput[{{order.num}}]" type="date" id="specificDayInput" class="form-control-sm">
                                     </div>
                                 </div>
 
@@ -98,7 +98,7 @@
                                         <label for="expediteDayInput">
                                             Please select a date for this order to be processed on
                                         </label>
-                                        <input type="date" id="expediteDayInput" class="form-control-sm">
+                                        <input type="date" id="expediteDayInput" class="form-control-sm" name="expediteDayInput[{{order.num}}]">
                                     </div>
                                 </div>
                                 <input type="submit" id="submit-order" class="btn btn-primary hidden">

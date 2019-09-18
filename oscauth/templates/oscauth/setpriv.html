@@ -96,7 +96,11 @@
                 <tr>
                     <td scope="row">{{ row.dept }}</td>
                     <input hidden name='dept_list' value='{{ row.dept }}'>
-                    <td>{{ row.dept_name }}</td>
+                    {% if row.dept_status == 'I' %}
+                        <td class='prv-msgs'><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>{{ row.dept_name }}</td>
+                    {% else %}
+                        <td>{{ row.dept_name }}</td>
+                    {% endif %}
                     <td>{{ row.roles_list }}</td>
                     {% if row.disable_proxy %}
                         {% if row.current_roles.proxy %}
@@ -148,7 +152,7 @@
     </table>
 
     <div class='save-changes'>
-        <button type='button' class='btn btn-outline-primary' onclick="$('#clear-form').submit();">Clear Changes</button>
+        <button type='button' class='btn btn-link' onclick="$('#clear-form').submit();">Clear Changes</button>
         <button type='Submit' class='btn btn-primary'>Save Changes</button>
     </div>
 
@@ -167,29 +171,11 @@ aria-labelledby="userRoles" aria-hidden="true">
         </div>
         <div class="modal-body">
             <div class="">
-                <p>
-                    <strong>Department Manager:</strong>
-                    Something about that role
-                </p>
+                {% autoescape off %}
+                    {{ information.bodytext }}
+                {% endautoescape %}
             </div>
-            <div>
-                <p>
-                    <strong>Proxy:</strong>
-                    Something about that role
-                </p>
-            </div>
-            <div>
-                <p>
-                    <strong>Orderer:</strong>
-                    Something about that role
-                </p>
-            </div>
-            <div>
-                <p>
-                    <strong>Reporter:</strong>
-                    Something about that role
-                </p>
-            </div>
+
         </div>
         <div class="modal-footer">
             <!-- Close button -->

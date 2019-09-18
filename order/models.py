@@ -211,7 +211,7 @@ class LogItem(models.Model):
     description = models.TextField(blank=True)
 
     def add_log_entry(self, transaction, local_key, descr):
-        self.transaction = 'Create Issue'
+        self.transaction = transaction
         self.local_key = local_key
         self.remote_key = 23432
         self.level = 'Info'
@@ -220,12 +220,20 @@ class LogItem(models.Model):
     
 
 class Order(models.Model):
+    PRIORITY_CHOICES = (
+        ('High', 'Expedited'),
+        ('Medium', 'Standard'),
+        ('Low', 'Low'),
+    )
+
     order_reference = models.CharField(max_length=20)
     create_date = models.DateTimeField('Date Created', auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
     status = models.CharField(max_length=20)
+    priority = models.CharField(max_length=20, default='Medium', choices=PRIORITY_CHOICES)
+    due_date = models.DateTimeField(blank=True, null=True)
 
     @property
     def dept(self):
@@ -250,8 +258,8 @@ class Order(models.Model):
         for num, item in enumerate(item_list, start=1):
             issue = {}
             if num == 1:
-                #data['priority_name'] = 'High'
-                #data['due_date'] = '01/20/2019'
+                data['priority_code'] = self.priority
+                data['due_date'] = self.due_date
                 data['issues'] = []
 
             action_id = item.data['action_id']
@@ -292,15 +300,27 @@ class Order(models.Model):
         LogItem().add_log_entry('JSON', self.id, json_data)
         #log.add_log_entry(json_data)
 
-        with connections['pinnacle'].cursor() as cursor:
-            ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
-            print(ponum)
+        try: 
+            with connections['pinnacle'].cursor() as cursor:
+                ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
+            self.order_reference = ponum
+            self.save()
 
-        LogItem().add_log_entry('Send Data', item.id, ponum)
+        except Exception as e:
+            print(e)
+            LogItem().add_log_entry('Error', self.id, e)
+            pass
 
-        self.order_reference = ponum
-        self.save()
+        #LogItem().add_log_entry('Send Data', item.id, ponum)
 
+
+class PinnPreOrder(UmOscPreorderApiV):
+
+    def add_attachments(self):
+        print('add')
+
+    class Meta:
+        managed=False
 
 class Item(models.Model):
     description = models.CharField(max_length=100)
@@ -323,3 +343,7 @@ class Item(models.Model):
     def leppard(self):
         pour=['me']
         pour.append('sugar')
+
+class Attachment(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    file = models.FileField(upload_to='attachments',blank=True, null=True)
