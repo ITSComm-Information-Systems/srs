@@ -6,10 +6,10 @@
         <form action="/reports/tolls/downloads" method="POST" name="Select">{% csrf_token %}
             <div class="form-group col-8">
                 {% if depts %}
-                <label for="tolls_deptids">
+                <label for="tolls_deptids" id="tollDeptLabel">
                     <strong>Select a Department ID</strong>
                 </label>
-                <select class="form-control mt-0" name="dept_id" id="tolls_deptids" required size="{{ depts|length}}">
+                <select class="form-control mt-0" name="dept_id" id="tolls_deptids" required size="{{ depts|length}}" aria-labelledby="tollDeptLabel">
                     {% for dept in depts %}
                     <option value="{{ dept.id }}">{{ dept.id }} - {{ dept.name }}</option>
                     {% endfor %}
@@ -17,10 +17,10 @@
                 {% endif %}
             </div>
             <div class="form-group col-8">
-                <label for="tolls_billing">
+                <label for="tolls_billing" id="tollBillingLabel">
                     <strong>Select a Billing Period</strong>
                 </label>
-                <select class="form-control mt-0" name="bill_period" id="tolls_billing" required size="{{ periods|length}}">
+                <select class="form-control mt-0" name="bill_period" id="tolls_billing" required size="{{ periods|length}}" aria-labelledby="tollBillingLabel">
                     {% for i in periods %}
                     <option value="{{ i }}">{{ i }}</option>
                     {% endfor %}
