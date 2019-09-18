@@ -43,6 +43,15 @@ def get_soc(request):
     calendar = select_calendar_year(request)
     months = select_month(request)
 
+    dates = []
+    today = datetime.date.today()
+    for year in calendar:
+        for month in months:
+            if (month > today.month and int(year) == today.year) or int(year) > today.year:
+                pass
+            else:
+                dates.append(num_to_words(month) + ' ' + year)
+
     # Get instructions
     instructions = Page.objects.get(permalink='/soc')
 
@@ -58,6 +67,7 @@ def get_soc(request):
         'fiscal':fiscal,
         'calendar':calendar,
         'months':months,
+        'dates': dates,
         'vps': vps,
     }
     return HttpResponse(template.render(context,request))
@@ -196,7 +206,7 @@ def select_month(request):
     month_names = []
     query = query.reverse()
     for q in query:
-        month_names.append(num_to_words(int(q)))
+        month_names.append(int(q))
     return month_names
 
 

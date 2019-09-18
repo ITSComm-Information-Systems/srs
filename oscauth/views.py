@@ -25,6 +25,7 @@ from .utils import su_login_callback, custom_login_action, upsert_user
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from oscauth.forms import *
 from oscauth.utils import upsert_user
+from pages.models import Page
 #from oscauth.models import AuthUserDept, Grantor, Role
 
 
@@ -277,8 +278,6 @@ def get_uniqname(request, uniqname_parm=''):
                         roles_list = AuthUserDept.objects.filter(user=osc_user[0], dept=dept)
                         user_roles = []
                         for role in roles_list:
-                            # one_role = Role.objects.filter(group=role)[0].role
-                            # user_roles.append(one_role)
                             user_roles.append(role.group.role.role)
 
                         # Create for checkboxes
@@ -311,6 +310,7 @@ def get_uniqname(request, uniqname_parm=''):
                         'dept_status' : dept_status,
                         'dept' : dept, 
                         'dept_name' : dept_name, 
+                        'dept_status': dept_status,
                         'dept_manager': manager,
                         'disable_proxy': disable_proxy,
                         'disable_others': disable_others,
@@ -319,6 +319,9 @@ def get_uniqname(request, uniqname_parm=''):
                         'roles_list': ", ".join(user_roles)
                     }
                     rows.append(data)
+
+                # Get permission information
+                information = Page.objects.get(permalink='/manageacces')
 
 
                 context = {
@@ -333,21 +336,9 @@ def get_uniqname(request, uniqname_parm=''):
                     'rows': rows,
                     'result': result,
                     'submit_msg': submit_msg,
+                    'information': information,
                     'disable_proxy': disable_proxy
                 }
-
-#                 if request.method=='POST' and request.POST.get('process_access'):
-#                     if request.POST.get('rolerad') and request.POST.get('deptck'):
-#                         submit_msg = 'Ready to Process'
-#                         if request.POST.get('taskrad') == 'add':
-# #                            return render(request,'oscauth/addpriv.html', context)
-#                             return HttpResponseRedirect('/auth/addpriv/' + uniqname_parm, context, 'not') # do I need to pass in the page title here?
-#                         if request.POST.get('taskrad') == 'remove':
-#                             return render(request, 'oscauth/removepriv.html', context) # do I need to pass in the page title here?
-
-#                     else:
-#                         submit_msg = 'Please select a Task, a Role, and at least one Department then click Submit.'
-#                         return  HttpResponse(template.render({'submit_msg': submit_msg, 'title':"Manage User Access"}, request)) # do I need to pass in the page title here?
 
                 return render(request, 'oscauth/setpriv.html', context)
 
@@ -426,6 +417,9 @@ def modpriv(request):
         # action_checked = request.POST['taskrad']
         dept_list = request.POST.getlist('dept_list')
 
+        # Get department info
+        dept_info = UmCurrentDeptManagersV.objects.filter(deptid__in = dept_list)
+
     # Add user if needed
     try:
         osc_user = User.objects.get(username=uniqname_parm)
@@ -439,7 +433,9 @@ def modpriv(request):
     for dept in dept_list:
         modifications[dept] = {
             'added': [],
-            'deleted': []
+            'deleted': [],
+            'inactive': False,
+            'name': ''
         }
         # Add/delete proxy status
         proxy_actions = request.POST.get(dept + 'proxy')
@@ -476,6 +472,13 @@ def modpriv(request):
             result = delete_priv(osc_user, 'Reporter', dept)
             if result == 'change':
                 modifications[dept]['deleted'].append('Reporter')
+
+    # Department inactive vs. active and name
+    for info in dept_info:
+        if info.dept_status == 'I':
+            modifications[info.deptid]['inactive'] = True
+        modifications[info.deptid]['name'] = info.dept_name
+
 
     context = {
         'title': "Manage User Access",

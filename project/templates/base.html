@@ -117,18 +117,19 @@
 						<a class="nav-link" href="/orders/services/"><i class="fas fa-check-circle"></i> Request Service</a>
 					</li>
 					{% endif %}
+					{% if perms.oscauth.can_report %}
 					<li class="nav-item dropdown {% if title == 'Metrics' or title == 'Detail of Charges' or title == 'Inventory and Location Report' or title == 'Non-Telephony Detail of Charges' or title == 'Summary of Charges' %}active{% endif %}">
-						{% if perms.oscauth.can_report %}
+						
 						<a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								<i class="fas fa-chart-line"></i>
 							Run Reports
 						</a>
 						<div class="dropdown-menu" aria-labelledby="reportsDropdown">
-							<a class="dropdown-item" href="/reports/metrics/">Departmental Telephone Service Metrics</a>
-							<a class="dropdown-item" href="/reports/doc/">Telephony Detail of Charges</a>
+							<a class="dropdown-item" href="https://tableau.dsc.umich.edu/t/UM/views/telecom_dashboard_db_conn_month_actives/DepartmentalTelephoneServiceMetrics?:embed=y&:showShareOptions=true&:display_count=no&:showVizHome=no">Departmental Telephone Service Metrics</a>
 							<a class="dropdown-item" href="/reports/inventory/">Inventory and Location Report</a>
-							<a class="dropdown-item" href="/reports/nonteleph/">Other Detail of Charges</a>
+							<a class="dropdown-item" href="/reports/nonteleph/">Non-Telephony Detail of Charges</a>
 							<a class="dropdown-item" href="/reports/soc">Summary of Charges</a>
+							<a class="dropdown-item" href="/reports/doc/">Telephony Detail of Charges</a>
 							<a class="dropdown-item" href="/reports/tolls/">Toll Statements</a>
 						</div>
 						{% endif %}

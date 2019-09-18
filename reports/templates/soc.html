@@ -15,14 +15,14 @@
 
         <div class='col-8'>
             <fieldset>
-                <legend class="h2">
+                <legend class="h2" id="form-instruction">
                     Select Unit Grouping
                 </legend>
                 <div class="form-group">
-                    <input type="radio" name="unitGroupingGroup" id="deptid" value='1'>
-                    <label for="deptid"><strong>Department ID</strong></label>
+                    <input type="radio" name="unitGroupingGroup" id="deptid" aria-labelledby="dept_id_label" value='1' aria-describedby="form-instruction dept_id_label">
+                    <label for="deptid" id="dept_id_label"><strong>Department ID</strong></label>
                     <div id="department_id_div" class="indented-form-input">
-                        <label for="departmentIdSelection"><strong>Select Department ID(s)</strong></label>
+                        <label for="departmentIdSelection" id="deptIDSelectLabel"><strong>Select Department ID(s)</strong></label>
                         <div class="alert mt-0 mb-0" id="chartfieldInstructions">To select multiple, on Mac press and hold
                            “Command” and select. On PC,
                            press and hold “Ctrl” and select.</div>
@@ -30,7 +30,7 @@
                             <input type="checkbox" name="selectall" id="deptidall" value='2'>
                             <label for="deptidall"><strong>Select All</strong></label>
                         </div>
-                        <select class="custom-select mt-0" multiple aria-describedby="chartfieldInstructions" name="department_id" id="departmentIdSelection">
+                        <select class="custom-select mt-0" multiple aria-describedby="form-instruction dept_id_label deptIDSelectLabel chartfieldInstructions" aria-labelledby="deptIDSelectLabel" name="department_id" id="departmentIdSelection">
                             {% for key, value in depts.items %}
                             <option value="{{ key }} - {{ value }}">{{ key }} - {{ value }}</option>
                             {% endfor %}
@@ -39,11 +39,11 @@
                 </div>
 
                 <div class="form-group">
-                    <input type="radio" name="unitGroupingGroup" id="deptgroup" value='3'>
-                    <label for="deptgroup"><strong> Department Group</strong></label>
+                    <input type="radio" name="unitGroupingGroup" id="deptgroup" value='3' aria-labelledby="deptGroupLabel" aria-describedby="form-instruction deptGroupLabel">
+                    <label for="deptgroup" id="deptGroupLabel"><strong> Department Group</strong></label>
                     <div id="department_group_div" class="indented-form-input">
-                        <label for="department_group"><strong>Select a Department Grouping</strong></label>
-                        <select class="custom-select" name="department_group" onchange="display_active({{active}})" id='department_group' size="1">
+                        <label for="department_group" id="departmentGroupLabel"><strong>Select a Department Grouping</strong></label>
+                        <select class="custom-select" name="department_group" id='department_group' size="1" aria-labelledby="departmentGroupLabel" aria-describedby="form-instruction deptGroupLabel departmentGroupLabel">
                             {% for group in groups_descr %}
                             <option value="{{ group }}">{{ group }}</option>
                             {% endfor %}
@@ -51,11 +51,11 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <input type="radio" name="unitGroupingGroup" id="deptvp" value='4'>
-                    <label for="deptvp"><strong> Department Group VP Area</strong></label>
+                    <input type="radio" name="unitGroupingGroup" id="deptvp" value='4' aria-labelledby="dptVpRadioLabel" aria-describedby="form-instruction dptVpRadioLabel">
+                    <label for="deptvp" id="dptVpRadioLabel"><strong> Department Group VP Area</strong></label>
                     <div id="department_vp_div" class="indented-form-input">
-                        <label for="department_vp"><strong>Select a Department Grouping</strong></label>
-                        <select class="custom-select" name="department_vp" id="department_vp" size="1">
+                        <label for="department_vp" id="detpVPSelectLabel"><strong>Select a Department Grouping</strong></label>
+                        <select class="custom-select" name="department_vp" id="department_vp" size="1" aria-labelledby="detpVPSelectLabel" aria-describedby="form-instruction dptVpRadioLabel detpVPSelectLabel">
                             {% for vp in vps %}
                             <option value="{{ vp }}">{{ vp }}</option>
                             {% endfor %}
@@ -69,15 +69,15 @@
 
         <div class="col-8">
             <fieldset>
-                <legend class="h2">
+                <legend class="h2" id="form-instruction-2">
                     Select a Date Range
                 </legend>
                 <div class="form-group">
-                    <input type="radio" name="dateRangeGroup" id="fiscal" value='1'>
-                    <label for="fiscal"><strong> Fiscal Year</strong></label>
+                    <input type="radio" name="dateRangeGroup" id="fiscal" value='1' aria-describedby="form-instruction-2 fiscalRadioLabel" aria-labelledby="fiscalRadioLabel">
+                    <label for="fiscal" id="fiscalRadioLabel"><strong> Fiscal Year</strong></label>
                     <div id="fiscalyear_div" class="form-group indented-form-input">
-                        <label for="fiscalyear"><strong>Select a Fiscal Year</strong></label>
-                        <select class="custom-select" name="FISCALYEAR" id="fiscalyear" size="1">
+                        <label for="fiscalyear" id="fiscalSelectLabel"><strong>Select a Fiscal Year</strong></label>
+                        <select class="custom-select" name="FISCALYEAR" id="fiscalyear" size="1" aria-describedby="form-instruction-2 fiscalRadioLabel fiscalSelectLabel" aria-labelledby="fiscalSelectLabel">
                             {% for year in fiscal %}
                             <option value="{{ year }}">{{ year }}</option>
                             {% endfor %}
@@ -86,11 +86,11 @@
                 </div>
 
                 <div class="form-group">
-                    <input type="radio" name="dateRangeGroup" id="calendar" value='2'>
-                    <label for="calendar"><strong>Calender Year</strong></label>
+                    <input type="radio" name="dateRangeGroup" id="calendar" value='2' aria-describedby="form-instruction-2 calyearRadioLabel" aria-labelledby="calyearRadioLabel">
+                    <label for="calendar" id="calyearRadioLabel"><strong>Calender Year</strong></label>
                     <div id="calendaryear_div" class="form-group indented-form-input">
-                        <label for="calendaryear"><strong>Select a Calendar Year</strong></label>
-                        <select class="custom-select" name="CALENDARYEAR" id="calendaryear" size="1">
+                        <label for="calendaryear" id="calyearSelectLabel"><strong>Select a Calendar Year</strong></label>
+                        <select class="custom-select" name="CALENDARYEAR" id="calendaryear" size="1" aria-describedby="form-instruction-2 calyearRadioLabel calyearSelectLabel" aria-labelledby="calyearSelectLabel">
                             {% for year in calendar %}
                             <option value="{{ year }}">{{ year }}</option>
                             {% endfor %}
@@ -99,16 +99,14 @@
                 </div>
 
                 <div class="form-group">
-                    <input type="radio" name="dateRangeGroup" id="single" value='3'>
-                    <label for="single"><strong>Single Month</strong></label>
+                    <input type="radio" name="dateRangeGroup" id="single" value='3' aria-describedby="form-instruction-2 singleMonthRadioLabel" aria-labelledby="singleMonthRadioLabel">
+                    <label for="single" id="singleMonthRadioLabel"><strong>Single Month</strong></label>
                     <div id='singlemonth' class="indented-form-input">
                         <div class="form-group">
-                            <label for='singlemonthselect'><strong>Select a Month & Year</strong></label>
-                            <select class='custom-select' name='singlemonthselect' id='singlemonthselect' size='1'>
-                                {% for year in calendar %}
-                                    {% for month in months %}
-                                        <option value='{{ month }} {{ year }}'>{{ month }} {{ year }}</option>
-                                    {% endfor %}
+                            <label for='singlemonthselect' id="singleMonthSelectLabel"><strong>Select a Month & Year</strong></label>
+                            <select class='custom-select' name='singlemonthselect' id='singlemonthselect' size='1' aria-describedby="form-instruction-2 singleMonthRadioLabel singleMonthSelectLabel" aria-labelledby="singleMonthSelectLabel">
+                                {% for date in dates %}
+                                    <option value='{{ date }}'>{{ date }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -119,27 +117,26 @@
         <div class='col-12'>
             <fieldset>
                 <div class="form-group">
-                    <input type="radio" name="dateRangeGroup" id="multiple" value='4'>
-                    <label for="multiple"><strong>Month-to-month</strong></label>
+                    <input type="radio" name="dateRangeGroup" id="multiple" value='4' aria-describedby="form-instruction-2 m2mRadiolabel" aria-labelledby="m2mRadiolabel">
+                    <label for="multiple" id="m2mRadiolabel"><strong>Month-to-month</strong></label>
                     <div id="multimonth" class="indented-form-input">
-                        <label for='multimonth1'><strong>Select Month & Year Range</strong></label>
+                        <label for='multimonth1' id="m2mSelectlabel"><strong>Select Month & Year Range</strong></label>
                         <div class='form-row col-md-12'>
                             <div class='form-group col-5'>
-                                <select class='custom-select' name='multimonth1' id='multimonth1' size='1'>
-                                    {% for year in calendar %}
-                                        {% for month in months %}
-                                            <option value='{{ month }} {{ year }}'>{{ month }} {{ year }}</option>
-                                        {% endfor %}
+                                <select class='custom-select' name='multimonth1' id='multimonth1' size='1' aria-describedby="form-instruction-2 m2mRadiolabel m2mSelectlabel" aria-labelledby="m2mSelectlabel">
+                                    {% for date in dates %}
+                                        <option value='{{ date }}'>{{ date }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <span>&nbsp;<strong>to</strong>&nbsp;</span>
                             <div class='form-group col-5'>
-                                <select class='custom-select' name='multimonth2' id='multimonth2' size='1'>
-                                    {% for year in calendar %}
-                                        {% for month in months %}
-                                            <option value='{{ month }} {{ year }}'>{{ month }} {{ year }}</option>
-                                        {% endfor %}
+                                <span class='sr-only'>
+                                    <label for="multimonth2" id="m2m2Selectlabel">Select the second month and year to set the range</label>
+                                </span>
+                                <select class='custom-select' name='multimonth2' id='multimonth2' size='1' aria-describedby="form-instruction-2 m2mRadiolabel m2mSelectlabel m2m2Selectlabel" aria-labelledby="m2m2Selectlabel">
+                                    {% for date in dates %}
+                                        <option value='{{ date }}'>{{ date }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -286,7 +283,7 @@
             })
         }
         else if ($('#deptgroup').is(':checked')) {
-            $('#deptartment_group option').each(function() {
+            $('#department_group option').each(function() {
                 if ($(this).is(':selected')) {
                     to_return = true;
                 }

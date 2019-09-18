@@ -4,16 +4,20 @@
 	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
 	<div class='row'>
 		<h1>{{title}}</h1>
+		<!-- <div class="d-flex align-items-center">
+			<strong>Loading...</strong>
+			<div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+		  </div> -->
 		<!-- <i class="fa fa-spinner fa-spin offset-1" id='loading' style='font:40px;'></i> -->
 		<!-- <i class="fas fa-spinner fa-spin offset-1 mt-4" id='loading'></i>
 		<div class="spinner-border text-dark" role="status"> <span class="sr-only">Loading...</span> </div> -->
 	</div>
 
 	<strong class="d-inline">Report Selection</strong>
-	<a class="d-inline offset-md-2" href='..'><i class="fas fa-edit"></i>Edit Your Selection</a>
+	<a class="d-inline offset-md-3" href='..'><i class="fas fa-edit"></i>Edit Your Selection</a>
 
 		<div class="row">
-			<div class="card border-dark col-md-5">
+			<div class="card border-dark col-md-6">
 				<div class="card-body card-bottom">
 					<div id="selected_dept"><strong>Department:&nbsp;&nbsp;</strong>{{ dept }}</div>
 					<div id="billing_date"><strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_date }}</div>

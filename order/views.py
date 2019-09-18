@@ -9,16 +9,16 @@ from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServic
 from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from pages.models import Page
-from order.models import LogItem
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 import cx_Oracle
 import json
+from django.core.files.storage import FileSystemStorage
 
 import threading
 
-from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order
+from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment
 
 
 def get_phone_location(request, phone_number):
@@ -90,6 +90,14 @@ class Submit(PermissionRequiredMixin, View):
 
             order_items = request.POST.getlist('orderItems[' + order +']')
             priority = request.POST['processingTime[' + order +']']
+            due_date = None
+
+            if priority == 'expediteOrder':
+                due_date = request.POST['expediteDayInput[' + order +']']
+
+            if priority == 'specificDay':
+                due_date = request.POST['specificDayInput[' + order +']']
+
             firstitem = Item.objects.get(id=order_items[0])
             action = firstitem.data['action_id']
             service = Action.objects.get(id=action).service
@@ -101,6 +109,9 @@ class Submit(PermissionRequiredMixin, View):
             order.chartcom = firstitem.chartcom
             order.service = service
             order.status = 'Submitted'
+            if priority == 'expediteOrder':
+                order.priority = 'High'
+            order.due_date = due_date
             order.save()
 
             Item.objects.filter(id__in=order_items).update(order=order) #associate Items with order
@@ -125,6 +136,7 @@ def send_email(request):
 def add_to_cart(request):
     if request.method == "POST":
 
+        #print(request.POST)
         i = Item()
         i.created_by_id = request.user.id
 
@@ -147,6 +159,17 @@ def add_to_cart(request):
         i.deptid = charge.dept
         i.data = request.POST
         i.save()
+
+
+        for file in request.FILES.getlist('file'):
+            fs = FileSystemStorage()
+            filename = fs.save('attachments/' + file.name, file)  
+
+            attach = Attachment()
+            attach.item = i
+            attach.file = filename
+            attach.save()
+
         return HttpResponseRedirect('/orders/cart/' + charge.dept) 
 
 def delete_from_cart(request):
@@ -160,32 +183,29 @@ class Integration(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def post(self, request, order_id):
-        print(request.POST)
         order = Order.objects.get(id=order_id)
         order.create_preorder()
         return HttpResponseRedirect('/orders/integration/' + str(order_id)) 
 
     def get(self, request, order_id):
-        print(order_id)
         order = Order.objects.get(id=order_id)
-        print(order.id)
         item_list = Item.objects.filter(order=order)
 
         order_list = LogItem.objects.filter(local_key = str(order.id))
 
         for ord in order_list:
-            parsed = json.loads(ord.description)
-            ord.sent = json.dumps(parsed, indent=4)
+            if ord.transaction == 'JSON':
+                parsed = json.loads(ord.description)
+                ord.sent = json.dumps(parsed, indent=4)
+
 
         for item in item_list:
             item.note = item.data['reviewSummary']
             error = LogItem.objects.filter(local_key = str(item.id))
             if error:
                 item.error = error
-                print(str(item.id))
             else:
                 item.error = 'no errors'
-                print(str(item.id))
 
         return render(request, 'order/integration.html', 
             {'order': order,
