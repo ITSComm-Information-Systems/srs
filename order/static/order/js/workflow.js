@@ -109,7 +109,6 @@ $(document).ready(function() {
   })(jQuery);
   
   $('.dynlabel').on('show', function() {
-    console.log('#foo is now visible');
     $(this).keypress();
   });
 
@@ -186,15 +185,7 @@ $(document).ready(function() {
   });
 
     
-  $("#id_oneTimeCharges").change(function() {
 
-    if ( $('#useSameCode').prop('checked') ) {
-      occ = $('#id_oneTimeCharges option:selected').val();
-      $("#id_MRC").val(occ);
-      $("#id_localCharges").val(occ);
-      $("#id_LD").val(occ);
-    }
-  });
 
   $("#phone_type").click(function() {
     if ($('#phone_type option:selected') > 1) {
@@ -269,7 +260,6 @@ $(document).ready(function() {
         }
       } else {
         console.log('unknown type:' + type);
-        console.log(inp[i]);
       }
     }
   
@@ -341,32 +331,31 @@ $(document).ready(function() {
 
 
 function useSameShortCode(obj) {
-  if (obj.checked) {
-    console.log("checked");
-    $('#divlocalCharges').attr("disabled","disabled");
-    $('#divLD').attr("disabled","disabled");
-    $('#MRC').attr("disabled","disabled");
-    $('#id_MRC').attr("disabled","disabled");
-    $('#localCharges').attr("disabled","disabled");
-    $('#id_localCharges').attr("disabled","disabled");
-    $('#LD').attr("disabled","disabled");
-    $('#id_LD').attr("disabled","disabled");
-    occ = $('#id_oneTimeCharges option:selected').val();
-    $("#id_MRC").val(occ);
-    $("#id_localCharges").val(occ);
-    $("#id_LD").val(occ);
+  if (obj.checked) {    
+    $('.ccsel').not('#id_oneTimeCharges').attr("disabled","disabled");
+    $('.dccsel').not('#oneTimeCharges').attr("disabled","disabled");
+
+    occ = $('[name="oneTimeCharges"]:visible option:selected').val();
+    //occ = $(occ1).filter(":visible").filter('option:selected').val();
+    //occ = $(occ )
+    //occ = $('#id_oneTimeCharges option:selected').val();
+    console.log('occ');
+    $('.ccsel').val(occ);
+    //$("#id_MRC").val(occ);
+    //$("#id_localCharges").val(occ);
+    //$("#id_LD").val(occ);
   } else {
-    $('#divlocalCharges').removeAttr("disabled");
-    $('#divLD').removeAttr("disabled");
-    $('#MRC').removeAttr("disabled");
-    $('#id_MRC').removeAttr("disabled");
-    $('#localCharges').removeAttr("disabled");
-    $('#id_localCharges').removeAttr("disabled");
-    $('#LD').removeAttr("disabled");
-    $('#id_LD').removeAttr("disabled");
+    $('.ccsel').not('#id_oneTimeCharges').removeAttr("disabled","disabled");
+    $('.dccsel').not('#oneTimeCharges').removeAttr("disabled","disabled");
   }
 }
 
+function chartcomChange(obj) {
+  if ( $('#useSameCode' + obj.dataset.tabid).prop('checked') ) {
+    occ = $('[name="oneTimeCharges"][data-tabid=' + obj.dataset.tabid + '] option:selected').val();
+    $(".ccsel").val(occ);
+  }
+}
 
   function filterChartcom(obj) { 
     id = '#id_' + obj.dataset.target;
