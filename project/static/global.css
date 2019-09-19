@@ -198,8 +198,12 @@ h2, .h2 {
 h3, .h3 {
 	color:#555555;
 }
-.alert-secondary .h4.alert-heading {
-    margin-top:.25em;
+
+.alert {
+    padding:1.25rem;
+}
+.alert .h4.alert-heading {
+    margin-top:0;
 }
 
 .border-dark {
