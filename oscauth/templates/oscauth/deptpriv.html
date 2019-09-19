@@ -8,13 +8,12 @@
             <strong>Select a Department ID</strong>
         </label>
         <br>
-        <select type='select' name="dept_parm" id="deptf" size="1" class="form-control text-field-short col-4">
+        <select type='select' name="dept_parm" id="deptf" size="1" class="form-control text-field-short col-4" onchange="this.form.submit()">
             <option></option>
             {% for dept in dept_list %}
-            <option value={{ dept.deptid }}>{{ dept.deptid }}</option>
+            <option value={{ dept.deptid }} >{{ dept.deptid }}</option>
             {% endfor %}
         </select>
-        <input id="search-btn" type='submit' value='Search' style="display: inline" class="btn btn-primary">
     </div>
 </form>
 

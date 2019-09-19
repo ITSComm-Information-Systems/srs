@@ -3,9 +3,9 @@
 {% block content %}
 <h1>{{ title }}</h1>
 <div class='row'>
-    <div class='col-8'>
+    <div class='col-lg-8 col-md-12'>
         <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
-                <div class="form-group col-8">
+                <div class="form-group">
                     {% if depts %}
                     <label id="dept_id_label" for="dept_id"><strong>Select a Department ID</strong></label>
                         <select class="form-control" name="dept_id" id="dept_id" size="{{ depts|length }}" aria-labelledby="dept_id_label" required>
@@ -14,7 +14,7 @@
                             {% endfor %}
                         </select>
                 </div>
-                <div class="form-group col-8">
+                <div class="form-group">
                     <label for="bill_period" id="billing_label">
                         <strong>Select a Billing Period</strong>
                     </label>
@@ -25,13 +25,13 @@
                     </select>
                 </div>
                 {% endif %}
-                <div class="form-group col-md-6">
+                <div class="form-group">
                     <input type='submit' value='Generate Report' class="btn btn-primary">
                 </div>
         </form>
     </div>
 
-    <div class="col-4 float-right">
+    <div class="col-lg-4 col-md-12">
         <div class="alert alert-secondary hlinks" role="alert">
             <p class="h4 alert-heading">About this Report</p>
             {% autoescape off %}
