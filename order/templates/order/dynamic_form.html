@@ -1,8 +1,8 @@
 {% if tab.name == '4Chartfields' or tab.name == '2Chartfields' %}
 <div class="form-check">
-    <input class="form-check-input keep-check" type="checkbox" value="keepFeatures" name="keepFeatures" id="useSameCode"
+    <input class="form-check-input keep-check usesamecode" type="checkbox" value="keepFeatures" name="keepFeatures" id="useSameCode{{tab.id}}"
         onClick="useSameShortCode(this)">
-    <label class="form-check-label" for="useSameCode">
+    <label class="form-check-label" for="useSameCode{{tab.id}}">
         Check this box if you want to use the same chartfield for all charges.
     </label>
 </div>
@@ -54,7 +54,7 @@
             <label for="{{ field.name }}" id="label_dp_{{ field.name }}">Select a Department</label>
         </span>
         <div class="input-group-prepend">
-            <select class="custom-select" id="{{ field.name }}" data-target="{{ field.name }}"
+            <select class="custom-select dccsel" id="{{ field.name }}" data-target="{{ field.name }}"
                 onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;"
                 aria-labelledby="legend_{{field.name}} label_dp_{{ field.name }}">
                 <option value="all">All Depts</option>
@@ -68,8 +68,8 @@
             <label for="id_{{ field.name }}" id="label_{{ field.name }}">Select a Chartfield</label>
         </span>
 
-        <select name="{{ field.name }}" class="custom-select" id="id_{{ field.name }}"
-            aria-labelledby="legend_{{field.name}} label_{{ field.name }}">
+        <select name="{{ field.name }}" data-tabid="{{tab.id}}" class="custom-select ccsel" id="id_{{ field.name }}"
+            aria-labelledby="legend_{{field.name}} label_{{ field.name }}" onchange="chartcomChange(this)">
             {% for choice in field.field.choices %}
             <option data-dept="{{ choice.2 }}" value="{{ choice.0 }}">{{ choice.1 }}
             </option>

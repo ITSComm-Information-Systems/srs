@@ -58,6 +58,13 @@ class AddlInfoForm(forms.Form):
     template = 'order/dynamic_form.html'
 
 
+class ContactCenterForm(forms.Form):
+    phone_number = forms.CharField(label='summary', max_length=12)
+    description = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100'}) )
+
+    template = 'order/contact_center.html'
+
+
 class ReviewForm(forms.Form):
     summary = forms.CharField(label='summary', max_length=6)
     template = 'order/review.html'
