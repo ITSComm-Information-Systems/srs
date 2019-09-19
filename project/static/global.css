@@ -1132,6 +1132,9 @@ td.action {
 .cart-table + .table-responsive-md > .table thead th:nth-child(4) { /* action */
 	width:20%;
 }
+.table tbody+tbody {
+    border-top:0;
+}
 
 #buildingTable tr:hover {
 	cursor:pointer;
