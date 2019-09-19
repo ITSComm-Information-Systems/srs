@@ -553,6 +553,7 @@ h2.service-menu-header {
 }
 
 .nav-pills .nav-link.active, 
+.nav-pills .nav-link.active:hover, .nav-pills .nav-link.active:focus, 
 .nav-pills .show>.nav-link {
 	border-color:#e4e1df;
 	background-color:#e4e1df;
