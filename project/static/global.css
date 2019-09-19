@@ -198,8 +198,16 @@ h2, .h2 {
 h3, .h3 {
 	color:#555555;
 }
-.float-right .h4.alert-heading {
+
+.alert {
+    padding:1.25rem;
+}
+.alert .h4.alert-heading {
     margin-top:0;
+}
+
+.border-dark {
+    border-color:#cecbc9 !important;
 }
 
 a {
@@ -553,6 +561,7 @@ h2.service-menu-header {
 }
 
 .nav-pills .nav-link.active, 
+.nav-pills .nav-link.active:hover, .nav-pills .nav-link.active:focus, 
 .nav-pills .show>.nav-link {
 	border-color:#e4e1df;
 	background-color:#e4e1df;
@@ -802,12 +811,12 @@ a.popover-icon:hover {
 	margin-top:1rem;
 }
 .italic-msg em {
-	color:#ff0000;
+	color:#cc0000;
 }
 
 .tracking-msg {
 	display:block;
-	color:#ff0000;
+	color:#cc0000;
 }
 
 .cart-button {
@@ -879,7 +888,7 @@ h3.alert-heading {
 }
 
 .fa-exclamation-triangle, .prv-msgs, .required{
-	color:#ff0000;
+	color:#cc0000;
 }
 
 .cart-chartfield-title {
@@ -982,7 +991,7 @@ h3.alert-heading {
 
 .select-loc-directions {
 	display:block;
-	color:#ff0000
+	color:#cc0000
 }
 
 .location-card .card-text {
@@ -1049,6 +1058,10 @@ h3.alert-heading {
     border-top-right-radius:.25rem;
     border-bottom-right-radius:.25rem;
 }
+.input-group>.custom-select.order-status-dropdown {
+    border-top-right-radius:.25rem;
+    border-bottom-right-radius:.25rem;
+}
 .input-group-text {
 	border:1px solid #cecbc9;
 	background-color:#f4f3f2;
@@ -1080,10 +1093,11 @@ h3.alert-heading {
 	cursor:pointer;
 }
 .table td, .table th {
+	padding:.5rem 1rem;
 	border-bottom:1px solid #cecbc9 !important;
 }
 .table-sm td, .table-sm th {
-	padding:.75rem .3rem;
+	padding:.5rem 1rem;
 }
 .table-striped tbody tr:nth-of-type(odd), .table-striped tbody tr:nth-of-type(even) {
 	background-color:transparent;
@@ -1117,6 +1131,9 @@ td.action {
 }
 .cart-table + .table-responsive-md > .table thead th:nth-child(4) { /* action */
 	width:20%;
+}
+.table tbody+tbody {
+    border-top:0;
 }
 
 #buildingTable tr:hover {
@@ -1183,10 +1200,6 @@ legend {
 	font-size: 1rem;
 }
 
-label {
-	font-weight: bolder;
-}
-
 .custom-h2 {
 	font-size: 1.5rem;
 }
@@ -1201,4 +1214,8 @@ label {
 	display: flex;
 	justify-content: flex-end;
 	
+}
+
+#invLocTable.table-sm td, #invLocTable.table-sm th {
+    padding: 0.75rem 0.3rem;
 }
