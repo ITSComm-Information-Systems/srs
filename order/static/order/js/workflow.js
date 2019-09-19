@@ -238,6 +238,12 @@ $(document).ready(function() {
       var id = $(obj).attr("id");
       var name = $(obj).attr("name");
   
+      var label = obj.dataset.label;
+
+      if(label=='skip') {
+        continue;
+      }
+
       if(type=="radio") {
         if (obj.checked == true) {
           label = $("#legend" + name).text();
