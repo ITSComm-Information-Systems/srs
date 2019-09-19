@@ -3,7 +3,7 @@
 {% block content %}
 <h1>{{ title }}</h1>
 <div class='row'>
-    <div>
+    <div class='col-8'>
         <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
                 <div class="form-group col-8">
                     {% if depts %}
