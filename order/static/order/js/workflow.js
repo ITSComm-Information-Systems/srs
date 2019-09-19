@@ -242,7 +242,7 @@ $(document).ready(function() {
           value = $("label[for='" + id + "']").text();
           tab.push({'label': '', 'value': value})
         }
-      } else if (type=="text" || type=="number" || obj.tagName=="TEXTAREA") {
+      } else if (type=="text" || type=="number" || type=="tel" ||obj.tagName=="TEXTAREA") {
         label = $("label[for='" + id + "']").text();
         value = $("#" + inp[i].id).val();
         tab.push({'label': label, 'value': value})
