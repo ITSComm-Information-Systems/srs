@@ -1049,6 +1049,10 @@ h3.alert-heading {
     border-top-right-radius:.25rem;
     border-bottom-right-radius:.25rem;
 }
+.input-group>.custom-select.order-status-dropdown {
+    border-top-right-radius:.25rem;
+    border-bottom-right-radius:.25rem;
+}
 .input-group-text {
 	border:1px solid #cecbc9;
 	background-color:#f4f3f2;
