@@ -803,12 +803,12 @@ a.popover-icon:hover {
 	margin-top:1rem;
 }
 .italic-msg em {
-	color:#ff0000;
+	color:#cc0000;
 }
 
 .tracking-msg {
 	display:block;
-	color:#ff0000;
+	color:#cc0000;
 }
 
 .cart-button {
@@ -880,7 +880,7 @@ h3.alert-heading {
 }
 
 .fa-exclamation-triangle, .prv-msgs, .required{
-	color:#ff0000;
+	color:#cc0000;
 }
 
 .cart-chartfield-title {
@@ -983,7 +983,7 @@ h3.alert-heading {
 
 .select-loc-directions {
 	display:block;
-	color:#ff0000
+	color:#cc0000
 }
 
 .location-card .card-text {
