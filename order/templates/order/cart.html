@@ -1,117 +1,127 @@
 {% extends 'base.html' %}
 {% block content %}
-<!-- Beginning of Content -->
 
-    <div class="row header-info">
-        <div class="col-12">
-            <div class="row">
-                <div class="col-12">
-                    <h1>
-                        {{ title }}
-                        <small class="text-muted">
-                            for Department: <strong>{{department.id}} - {{department.name}}</strong>
-                        </small>
-                    </h1>
-                </div>
-            </div>
-            <div class='row'>
-                <div class="col-xl-8 col-12 dept-select">
-                    <form action="/orders/cart/" id="cart-department-dropdown" method="POST">{% csrf_token %}
-                        <div class="input-group dept-dropdown">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="department-dropdown">
-                                    Switch Department
-                                </label>
-                            </div>
-                            <select name="deptid" class="custom-select order-status-dropdown" onchange="this.form.submit()" id="department-dropdown">
-                                {% for dept in dept_list %}
-                                <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
-                                {% endfor %}
-                            </select>
-                            <noscript><input type="submit" class="btn btn-outline-secondary" value="Go"></noscript>
+<!-- Beginning of Content -->
+<div class="row header-info">
+    <div class="col-12">
+        <div class="row">
+            <h1>
+                {{ title }}
+                <small class="text-muted">
+                    for Department: <strong>{{department.id}} - {{department.name}}</strong>
+                </small>
+            </h1>
+        </div>
+        <div class='row'>
+            <div class="col-xl-8 col-12 dept-select">
+                <form action="/orders/cart/" id="cart-department-dropdown" method="POST" class="cart-form">
+                    {% csrf_token %}
+                    <div class="input-group dept-dropdown">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="department-dropdown">
+                                Switch Department
+                            </label>
                         </div>
-                    </form>
-                </div>
+                        <select name="deptid" class="custom-select order-status-dropdown" onchange="this.form.submit()"
+                            id="department-dropdown">
+                            {% for dept in dept_list %}
+                            <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
+                            {% endfor %}
+                        </select>
+                        <noscript><input type="submit" class="btn btn-outline-secondary" value="Go"></noscript>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
-    <section class="row" role="contentinfo">
-        <div class="container">
-            <div class="row cart-tables">
-                <div class="col-12">
-                    <form action="/orders/review/" id="cart-orders" method="POST" class="cart-table">{% csrf_token %}
-                        {% for section in status %}
-                        <div class="ready-to-order">
-                            <h2>{{section.label}}</h2>
-                            {% for chartcom in section %}
-                            <div class="cart-table">
-                                <h4 class="cart-chartfield-title">
-                                    Billed to:
-                                    <!-- Insert Chartfield Nickname here -->
-                                    <small>{{chartcom.chartcom}} ({{chartcom.chartcom.account_number}}) </small>
-                                </h4>
-                            </div>
-                            <div class="table-responsive-md">
-                                <table class="table table-hover table-striped table-sm" id="{{chartcom.table}}">
-                                    <thead>
-                                        <tr class="col-headings">
-                                            <th scope="col">Date Created</th>
-                                            <th scope="col">Created By</th>
-                                            <th scope="col">Details</th>
-                                            <th scope="col">Action</th>
-                                        </tr>
-                                    </thead>
+<section role="contentinfo">
+    <div class="row cart-tables">
+        <div class="col-12">
+            <form action="/orders/review/" id="cart-orders" method="POST" class="cart-table">{% csrf_token %}
+                {% for section in status %}
+                <div class="ready-to-order">
+                    <h2>{{section.label}}</h2>
+                    {% for chartcom in section %}
+                    <div class="cart-table">
+                        <h4 class="cart-chartfield-title">
+                            Billed to:
+                            <!-- Insert Chartfield Nickname here -->
+                            <small>{{chartcom.chartcom}} ({{chartcom.chartcom.account_number}}) </small>
+                        </h4>
+                    </div>
+                    <div class="table-responsive-md">
+                        <table class="table table-hover table-striped table-sm" id="{{chartcom.table}}">
+                            <thead>
+                                <tr class="col-headings">
+                                    <th scope="col">Date Created</th>
+                                    <th scope="col">Created By</th>
+                                    <th scope="col">Details</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
 
-                                    <!-- Beginning of table body -->
-                                    <tbody>
+                            <!-- Beginning of table body -->
+                            <tbody>
 
 
-                                        {% for item in chartcom.items %}
-                                        <tr data-item="{{item.id}}" data-chartcom="{{item.chartcom}}" data-chartcomid="{{item.chartcom.id}}">
-                                            <th scope="row">{{ item.create_date|date:"m/d/y" }}</th>
-                                            <td>{{ item.created_by }}</td>
-                                            <td>{{ item.description }}</td>
-                                            <td class="action">
-                                                <a class="delete" href="#" data-toggle="modal" data-target="#deleteCartItem" data-item="{{item.id}}" role="button">Delete<span class="sr-only"> item that was created on {{ item.create_date|date:"m/d/y" }} by {{ item.created_by }}. Item description: {{ item.description }}. Item Id: {{item.id}}. Item chartfield: {{item.chartcom}}</span></a>
-                                                {% if section == status|first %}
-                                                <a class="ready-link" onclick="moveRow(this)" href="#">Save for
-                                                    Later<span class="sr-only"> item that was created on {{ item.create_date|date:"m/d/y" }} by {{ item.created_by }}. Item description: {{ item.description }}. Item Id: {{item.id}}. Item chartfield: {{item.chartcom}}</span></a>
-                                                {% else %}
-                                                <a class="saved-for-later" onclick="moveRow(this)" href="#">Move to
-                                                    Cart<span class="sr-only"> item that was created on {{ item.create_date|date:"m/d/y" }} by {{ item.created_by }}. Item description: {{ item.description }}. Item Id: {{item.id}}. Item chartfield: {{item.chartcom}}</span></a>
-                                                {% endif %}
-                                                {% if item.days_to_deletion < 30 %}
-                                                <a tabindex="0" role="button" data-toggle="popover"
-                                                    data-container="body" data-trigger="focus" data-placement="right"
-                                                    data-content="This item will be erased in {{ item.days_to_deletion }} days">
-                                                    <i class="fas fa-exclamation-circle"></i></a>
-                                                {% endif %}
-                                            </td>
-                                            <input type="hidden" id="custId" name="includeInOrder" value="{{item.id}}">
-                                        </tr>
+                                {% for item in chartcom.items %}
+                                <tr data-item="{{item.id}}" data-chartcom="{{item.chartcom}}"
+                                    data-chartcomid="{{item.chartcom.id}}">
+                                    <th scope="row">{{ item.create_date|date:"m/d/y" }}</th>
+                                    <td>{{ item.created_by }}</td>
+                                    <td>{{ item.description }}</td>
+                                    <td class="action">
+                                        <a class="delete" href="#" data-toggle="modal" data-target="#deleteCartItem"
+                                            data-item="{{item.id}}" role="button">Delete<span class="sr-only"> item that
+                                                was created on {{ item.create_date|date:"m/d/y" }} by
+                                                {{ item.created_by }}. Item description: {{ item.description }}. Item
+                                                Id: {{item.id}}. Item chartfield: {{item.chartcom}}</span></a>
+                                        {% if section == status|first %}
+                                        <a class="ready-link" onclick="moveRow(this)" href="#">Save for
+                                            Later<span class="sr-only"> item that was created on
+                                                {{ item.create_date|date:"m/d/y" }} by {{ item.created_by }}. Item
+                                                description: {{ item.description }}. Item Id: {{item.id}}. Item
+                                                chartfield: {{item.chartcom}}</span></a>
+                                        {% else %}
+                                        <a class="saved-for-later" onclick="moveRow(this)" href="#">Move to
+                                            Cart<span class="sr-only"> item that was created on
+                                                {{ item.create_date|date:"m/d/y" }} by {{ item.created_by }}. Item
+                                                description: {{ item.description }}. Item Id: {{item.id}}. Item
+                                                chartfield: {{item.chartcom}}</span></a>
+                                        {% endif %}
+                                        {% if item.days_to_deletion < 30 %}
+                                        <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+                                            data-trigger="focus" data-placement="right"
+                                            data-content="This item will be erased in {{ item.days_to_deletion }} days">
+                                            <i class="fas fa-exclamation-circle"></i></a>
+                                        {% endif %}
+                                    </td>
+                                    <input type="hidden" id="custId" name="includeInOrder" value="{{item.id}}">
+                                </tr>
 
-                                        {% endfor %}
-                                        <tr></tr>
-                                    </tbody>
-                                    <!-- End of table body -->
-                                </table>
-                            </div>
-                            {% endfor %}
-                            {% if section == status|first %}
-                            <div class="col-sm-12 cart-button">
-                                <input id="deptSubmit" type="hidden" name="deptSubmit" value="{{department.id}}">
-                                <input type="submit" class="hidden" value="Review Order" id="cartReviewbtn">
-                                <label for="cartReviewbtn" class="btn btn-primary">Proceed to Checkout</label>
-                            </div>
-                    </form>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
+                                {% endfor %}
+                                <tr></tr>
+                            </tbody>
+                            <!-- End of table body -->
+                        </table>
+                    </div>
+                    {% endfor %}
+                    {% if section == status|first %}
+                    <div class="col-sm-12 cart-button">
+                        <input id="deptSubmit" type="hidden" name="deptSubmit" value="{{department.id}}">
+                        <input type="submit" class="hidden" value="Review Order" id="cartReviewbtn">
+                        <label for="cartReviewbtn" class="btn btn-primary">Proceed to Checkout</label>
+                    </div>
+            </form>
+            {% endif %}
         </div>
-        <!-- Delete Cart Item Modal -->
-        <div class="modal fade" id="deleteCartItem" tabindex="-1" role="dialog" aria-labelledby="deleteCartItem"
+        {% endfor %}
+    </div>
+    </div>
+    <!-- Delete Cart Item Modal -->
+    <div class="modal fade" id="deleteCartItem" tabindex="-1" role="dialog" aria-labelledby="deleteCartItem"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -128,31 +138,31 @@
                     <form id="deleteCartItemForm" method="POST" action="/orders/deletefromcart/">{% csrf_token %}
                         <input id="itemId" type="hidden" name="itemId" value="0">
                         <input id="itemIdDept" type="hidden" name="itemIdDept" value="{{department.id}}">
-                        
-                        <div class="card-body">
-                                <strong class="card-text">
-                                    Date Submitted:
-                                </strong>
-                                <p id="dateSubmitted" class="card-text">mm/dd/yyyy</p>
-                                <br>
-                                <strong class="card-text">
-                                    Submitted by:
-                                </strong>
-                                <!-- Replace the following text with the value of the uniqname of the order's submitter that the user selected to be removed from the shortlist -->
-                                <p id="uniqname" class="card-text">uniqname here</p>
-                                <br>
 
-                                <strong class="card-text">
-                                    Cart Item Details:
-                                </strong>
-                                <!-- Replace the following text with the value of the description of the order that the user selected to be removed from the shortlist -->
-                                <p id="itemDetails" class="card-text">Detailed information goes here</p>
-                                <br>
-                                <strong class="card-text">
-                                    Chartfield:
-                                </strong>
-                                <!-- Replace the following text with the value of the chartfield of the order that the user selected to be removed from the shortlist -->
-                                <p id="chartCom" class="card-text">Chartfield here</p>
+                        <div class="card-body">
+                            <strong class="card-text">
+                                Date Submitted:
+                            </strong>
+                            <p id="dateSubmitted" class="card-text">mm/dd/yyyy</p>
+                            <br>
+                            <strong class="card-text">
+                                Submitted by:
+                            </strong>
+                            <!-- Replace the following text with the value of the uniqname of the order's submitter that the user selected to be removed from the shortlist -->
+                            <p id="uniqname" class="card-text">uniqname here</p>
+                            <br>
+
+                            <strong class="card-text">
+                                Cart Item Details:
+                            </strong>
+                            <!-- Replace the following text with the value of the description of the order that the user selected to be removed from the shortlist -->
+                            <p id="itemDetails" class="card-text">Detailed information goes here</p>
+                            <br>
+                            <strong class="card-text">
+                                Chartfield:
+                            </strong>
+                            <!-- Replace the following text with the value of the chartfield of the order that the user selected to be removed from the shortlist -->
+                            <p id="chartCom" class="card-text">Chartfield here</p>
                         </div>
 
                     </form>
@@ -167,9 +177,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    <!-- End of Cancel Order Modal -->
-    </section>
+        <!-- End of Cancel Order Modal -->
+</section>
 
 <!-- End of Content -->
 {% endblock %}
@@ -197,7 +206,7 @@
         $("#uniqname").text(row.find("td").eq(0).html());
         $("#itemDetails").html(row.find("td").eq(1).html());
         $("#chartCom").text(row.data('chartcom'));
-        $("#itemId").val(item);        
+        $("#itemId").val(item);
     })
 
     function moveRow(row) {
