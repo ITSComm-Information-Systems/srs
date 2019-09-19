@@ -1212,3 +1212,11 @@ legend {
 	justify-content: flex-end;
 	
 }
+
+#invLocTable.table-sm td, #invLocTable.table-sm th {
+    padding: 0.75rem 0.3rem;
+}
+
+label {
+	font-weight: bolder;
+}
