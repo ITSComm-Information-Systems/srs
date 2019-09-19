@@ -1084,10 +1084,11 @@ h3.alert-heading {
 	cursor:pointer;
 }
 .table td, .table th {
+	padding:.5rem 1rem;
 	border-bottom:1px solid #cecbc9 !important;
 }
 .table-sm td, .table-sm th {
-	padding:.75rem .3rem;
+	padding:.5rem 1rem;
 }
 .table-striped tbody tr:nth-of-type(odd), .table-striped tbody tr:nth-of-type(even) {
 	background-color:transparent;
