@@ -11,7 +11,7 @@
         <select type='select' name="dept_parm" id="deptf" size="1" class="form-control text-field-short col-4" onchange="this.form.submit()">
             <option></option>
             {% for dept in dept_list %}
-            <option value={{ dept.deptid }} >{{ dept.deptid }}</option>
+            <option value={{ dept.deptid }} >{{ dept.deptid }} - {{ dept.dept_name }}</option>
             {% endfor %}
         </select>
     </div>
