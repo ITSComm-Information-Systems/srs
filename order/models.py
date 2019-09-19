@@ -259,7 +259,7 @@ class Order(models.Model):
         for num, item in enumerate(item_list, start=1):
             issue = {}
             if num == 1:
-                data['priority_code'] = self.priority
+                data['priority_name'] = self.priority
                 data['due_date'] = self.due_date
                 data['issues'] = []
 
