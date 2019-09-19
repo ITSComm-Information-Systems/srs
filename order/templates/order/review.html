@@ -1,3 +1,9 @@
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+  Please review your order and make changes or select Add to Cart.
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
 {% for tab in tab_list %}
 {% if tab.name != 'Review' %}
 <div data-tab="{{ tab.name }}" class="card border-secondary mb-3">
