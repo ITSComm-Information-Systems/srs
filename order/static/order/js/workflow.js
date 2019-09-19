@@ -116,13 +116,20 @@ $(document).ready(function() {
   if ($("#activePhone").length) {
     $('[data-tab="PhoneLocation"]').hide();
   }
-  
+
+  $("#jack_nojack").click(function() {
+    $('[data-tab="PhoneLocation"]').hide();
+    $('[data-tab="LocationNew"]').show();
+  });
+
   $("#activePhone_yesactivephone").click(function() {
     $('[data-tab="PhoneLocation"]').show();
+    $('[data-tab="LocationNew"]').hide();
   });
 
   $("#activePhone_noactivephone").click(function() {
     $('[data-tab="PhoneLocation"]').hide();
+    $('[data-tab="LocationNew"]').show();
   });
   
   $("#ExistingPhone_nophone").click(function() {
@@ -131,6 +138,7 @@ $(document).ready(function() {
 
   $("#ExistingPhone_yesphone").click(function() {
     $('[data-tab="PhoneLocation"]').show();
+    $('[data-tab="LocationNew"]').hide();
   });
 
   // Addl info
