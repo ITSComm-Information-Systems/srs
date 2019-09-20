@@ -1047,6 +1047,10 @@ h3.alert-heading {
 .text-muted {
 	color:#655a52 !important;
 }
+.form-row {
+    margin-right:auto;
+    margin-left:auto;
+}
 .form-control {
 /*    margin:0.2rem;*/
 	border:1px solid #cecbc9;
