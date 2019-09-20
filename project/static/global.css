@@ -1047,9 +1047,16 @@ h3.alert-heading {
 .text-muted {
 	color:#655a52 !important;
 }
+.form-row {
+    margin-right:auto;
+    margin-left:auto;
+}
 .form-control {
 /*    margin:0.2rem;*/
 	border:1px solid #cecbc9;
+}
+.input-group {
+    margin:0.2rem;
 }
 .custom-select {
 	border:1px solid #cecbc9;
@@ -1087,6 +1094,11 @@ h3.alert-heading {
 .table thead th {
 	border-top:1px solid #cecbc9;
 	background-color:#e4e1df;
+}
+.table .thead-dark th {
+    background-color:#333333;
+    border-color:#333333;
+    color:#ffffff;
 }
 .fas .btn-link:hover {
 	text-decoration:none;
@@ -1132,6 +1144,11 @@ td.action {
 .cart-table + .table-responsive-md > .table thead th:nth-child(4) { /* action */
 	width:20%;
 }
+
+.table th.charge_cd_report_col {
+    white-space:nowrap;
+}
+
 .table tbody+tbody {
     border-top:0;
 }
@@ -1218,4 +1235,8 @@ legend {
 
 #invLocTable.table-sm td, #invLocTable.table-sm th {
     padding: 0.75rem 0.3rem;
+}
+
+.cart-form {
+	width:100%;
 }
