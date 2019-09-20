@@ -1135,6 +1135,11 @@ td.action {
 .cart-table + .table-responsive-md > .table thead th:nth-child(4) { /* action */
 	width:20%;
 }
+
+.table th.charge_cd_report_col {
+    white-space:nowrap;
+}
+
 .table tbody+tbody {
     border-top:0;
 }
