@@ -1095,6 +1095,11 @@ h3.alert-heading {
 	border-top:1px solid #cecbc9;
 	background-color:#e4e1df;
 }
+.table .thead-dark th {
+    background-color:#333333;
+    border-color:#333333;
+    color:#ffffff;
+}
 .fas .btn-link:hover {
 	text-decoration:none;
 	cursor:pointer;
