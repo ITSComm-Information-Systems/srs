@@ -8,7 +8,7 @@
     <a class="float-right" id="edit-selection" href="../inventory"><i class="fas fa-edit"></i></a>
 </div>
 
-<div class='mb-2'>
+<div class='mb-4'>
     <div class="card border-dark">
         <div class="card-body">
             <div class="card-grid-4">
@@ -28,8 +28,6 @@
         </div>
     </div>
 </div>
-
-<hr class="style1">
 
 
 {% if formated_data or location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%}
@@ -110,6 +108,7 @@
         </div>
 
         {% else %}
+    <hr class="style1">
         <div class="form-row">
             <div class="col-3" id="select_loc">
                 <div class="input-group col-auto">
@@ -163,9 +162,10 @@
             </div>
         </div>
 
+    <hr class="style1">
+
         {% endif %}
 
-    <hr class="style1">
     {% endif %}
 
     {% if location_filter or type_filter or cf_filter or date_filter%}
