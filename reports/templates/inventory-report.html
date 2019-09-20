@@ -8,7 +8,7 @@
     <a class="float-right" id="edit-selection" href="../inventory"><i class="fas fa-edit"></i></a>
 </div>
 
-<div class='mb-2'>
+<div class="mt-2 mb-4">
     <div class="card border-dark">
         <div class="card-body">
             <div class="card-grid-4">
@@ -28,8 +28,6 @@
         </div>
     </div>
 </div>
-
-<hr class="style1">
 
 
 {% if formated_data or location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%}
@@ -163,15 +161,16 @@
             </div>
         </div>
 
+
         {% endif %}
 
-    <hr class="style1">
     {% endif %}
 
     {% if location_filter or type_filter or cf_filter or date_filter%}
+    <hr class="style1 2">
         <div class='form-row'>
             <div>
-                <div class="mt-2 mb-2">
+                <div class="mb-2">
                     <strong>Current Filters:</strong>
                 </div>
                 <div class='indented-form-input'>
@@ -183,11 +182,11 @@
             </div>
         </div>
 
-        <hr class="style1">
+        <hr class="style1 3">
     {% endif %}
 </form>
 {% comment %}
-<hr class="style1">
+<hr class="style1 4">
 {% endif %}
 
 {% if location_filter or type_filter or cf_filter or date_filter%}
@@ -212,7 +211,7 @@
         </div>
     </div>
 
-    <hr class="style1">
+    <hr class="style1 5">
 {% endif %}
 {% endcomment %}
 
@@ -226,7 +225,7 @@
     <h3 class="text-dark font-weight-bold">
         Chartfield: {{classification.0.0.chartfield}}
     </h3>
-    <table class="table table-sm mb-5 table-striped" style="font-size:12px" id="invLocTable">
+    <table class="table table-sm mb-5 table-striped" id="invLocTable">
         <thead class="thead-dark">
             <tr data-name="{{ classification.0.0.chartfield }}">
                 <th class="user_id_report_col">User ID</th>
@@ -325,11 +324,8 @@
     </table>
 </div>
 
-
-
 {% endfor %}
 {% else %}
-<hr class="style1">
 <div class="mt-2">
     <div class="alert alert-danger col-md-8" role="alert">
         <i class="fas fa-exclamation-triangle prv-msgs"></i>
@@ -340,11 +336,7 @@
 </div>
 {% endif%}
 
-
-
 <button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i> <br> Scroll to top</button>
-
-
 
 <script>
     // When the user scrolls down 20px from the top of the document, show the button
