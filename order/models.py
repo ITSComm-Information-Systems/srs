@@ -37,6 +37,7 @@ class Step(Configuration):
         ('CMCCodeForm', 'CMC Codes'),
         ('ProductForm', 'Quantity Model'),
         ('ContactCenterForm', 'Contact Center'),
+        ('BillingForm', 'Billing'),
 
     )
 
@@ -119,6 +120,10 @@ class Restriction(Configuration):
     category = models.ManyToManyField(FeatureCategory)
 
 
+class ChargeType(Configuration):
+    pass
+
+
 class Action(Configuration):
     ROUTE_CHOICES = (
         ('P', 'Preorder'),
@@ -138,12 +143,14 @@ class Action(Configuration):
     description = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=True)    
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    charge_types = models.ManyToManyField(ChargeType)
     steps = models.ManyToManyField(Step)
     route = models.CharField(max_length=1, choices=ROUTE_CHOICES, default='P')
     destination = models.CharField(max_length=40, blank=True)
 
     def __str__(self):
         return self.label 
+
 
 
 class Constant(models.Model):

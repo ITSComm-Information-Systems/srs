@@ -18,7 +18,7 @@ from django.core.files.storage import FileSystemStorage
 
 import threading
 
-from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment
+from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment, ChargeType
 
 
 def get_phone_location(request, phone_number):
@@ -252,10 +252,15 @@ class Workflow(PermissionRequiredMixin, View):
                     field.type = element.type
                     f.fields.update({element.name: field})
 
-                    #if index == 1:
-
-
                 tab.form = f
+            elif tab.custom_form == 'BillingForm':
+                f = forms.Form()
+                f.template = 'order/billing.html'
+                f.charge_types = ChargeType.objects.filter(action__id=action_id).order_by('display_seq_no')
+                f.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
+                f.chartcom_list = Chartcom.get_user_chartcoms(request.user.id)
+                tab.form = f
+
             elif tab.custom_form == 'StaticForm':
                 tab.bodytext = Page.objects.get(permalink='/' + tab.name).bodytext
                 tab.form = forms.Form()
