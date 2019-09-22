@@ -18,7 +18,7 @@ from django.core.files.storage import FileSystemStorage
 
 import threading
 
-from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment
+from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment, ChargeType, UserChartcomV
 
 
 def get_phone_location(request, phone_number):
@@ -136,7 +136,7 @@ def send_email(request):
 def add_to_cart(request):
     if request.method == "POST":
 
-        #print(request.POST)
+        print(request.POST)
         i = Item()
         i.created_by_id = request.user.id
 
@@ -156,6 +156,7 @@ def add_to_cart(request):
         occ = request.POST['oneTimeCharges']
         charge = Chartcom.objects.get(id=occ)
         i.chartcom = charge
+        #i.chartcom_id = request.POST['oneTimeCharges']
         i.deptid = charge.dept
         i.data = request.POST
         i.save()
@@ -252,10 +253,16 @@ class Workflow(PermissionRequiredMixin, View):
                     field.type = element.type
                     f.fields.update({element.name: field})
 
-                    #if index == 1:
-
-
                 tab.form = f
+            elif tab.custom_form == 'BillingForm':
+                f = forms.Form()
+                f.template = 'order/billing.html'
+                f.charge_types = ChargeType.objects.filter(action__id=action_id).order_by('display_seq_no')
+                f.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
+                #f.chartcom_list = Chartcom.get_user_chartcoms(request.user.id)
+                f.chartcom_list = UserChartcomV.objects.filter(user=request.user).order_by('name')
+                tab.form = f
+
             elif tab.custom_form == 'StaticForm':
                 tab.bodytext = Page.objects.get(permalink='/' + tab.name).bodytext
                 tab.form = forms.Form()

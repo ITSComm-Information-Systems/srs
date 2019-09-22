@@ -141,6 +141,16 @@ $(document).ready(function() {
     $('[data-tab="LocationNew"]').hide();
   });
 
+
+  var x = document.getElementsByClassName("ccsel");
+  var i;
+  for (i = 0; i < x.length; i++) {
+    chartcomChange(x[i]);
+    //x[i].style.backgroundColor = "red";
+  }
+  
+
+
   // Addl info
   $('#contact_id').hide();
   $('#contact_name').hide();
@@ -238,6 +248,12 @@ $(document).ready(function() {
       var id = $(obj).attr("id");
       var name = $(obj).attr("name");
   
+      var label = obj.dataset.label;
+
+      if(!name) {  // Don't display data not being saved
+        continue;
+      }
+
       if(type=="radio") {
         if (obj.checked == true) {
           label = $("#legend" + name).text();
@@ -250,10 +266,6 @@ $(document).ready(function() {
           value = $("label[for='" + id + "']").text();
           tab.push({'label': '', 'value': value})
         }
-      } else if (type=="text" || type=="number" || type=="tel" ||obj.tagName=="TEXTAREA") {
-        label = $("label[for='" + id + "']").text();
-        value = $("#" + inp[i].id).val();
-        tab.push({'label': label, 'value': value})
       } else if (obj.tagName=="SELECT") {
         if(name) { // Don't process data we are not saving
         label = $("label[for='" + id + "']").text();
@@ -267,7 +279,11 @@ $(document).ready(function() {
           tab.push({'label': label, 'value': value})
         }
       } else {
-        console.log('unknown type:' + type);
+        if (!label) {
+          label = $("label[for='" + id + "']").text();
+        }
+        value = $("#" + inp[i].id).val();
+        tab.push({'label': label, 'value': value})
       }
     }
   
@@ -331,7 +347,7 @@ $(document).ready(function() {
       }
       summary = summary + '\n';
     }
-    $('#reviewSummary').val(summary);
+    $('#reviewSummary').val(summary); 
   }
 
 
@@ -340,28 +356,36 @@ $(document).ready(function() {
 
 function useSameShortCode(obj) {
   if (obj.checked) {    
-    $('.ccsel').not('#id_oneTimeCharges').attr("disabled","disabled");
-    $('.dccsel').not('#oneTimeCharges').attr("disabled","disabled");
-
-    occ = $('[name="oneTimeCharges"]:visible option:selected').val();
-    //occ = $(occ1).filter(":visible").filter('option:selected').val();
-    //occ = $(occ )
-    //occ = $('#id_oneTimeCharges option:selected').val();
-    console.log('occ');
+    $('.ccsel').not('#name_oneTimeCharges').attr("disabled","disabled");
+    $('.dccsel').not('#dept_oneTimeCharges').attr("disabled","disabled");
+    occ = $('#name_oneTimeCharges option:selected').val();
     $('.ccsel').val(occ);
-    //$("#id_MRC").val(occ);
-    //$("#id_localCharges").val(occ);
-    //$("#id_LD").val(occ);
+    occ = $('#oneTimeCharges').val();
+    $(".ccval").val(occ);  // Set all chartcom values same as OCC
   } else {
-    $('.ccsel').not('#id_oneTimeCharges').removeAttr("disabled","disabled");
-    $('.dccsel').not('#oneTimeCharges').removeAttr("disabled","disabled");
+    $('.ccsel').removeAttr("disabled","disabled");
+    $('.dccsel').removeAttr("disabled","disabled");
   }
 }
 
 function chartcomChange(obj) {
+
+  id = "#" + obj.id.substring(5,99);
+  val = $('#' + obj.id + ' option:selected').data('chartcom');
+
+  $(id).val(val);
+
+  if (obj.id == 'name_oneTimeCharges') {
+    val = $('#' + obj.id + ' option:selected').data('chartcom-id');
+    console.log(val);
+    $('#occ_key').val(val);
+  }
+
   if ( $('#useSameCode' + obj.dataset.tabid).prop('checked') ) {
-    occ = $('[name="oneTimeCharges"][data-tabid=' + obj.dataset.tabid + '] option:selected').val();
-    $(".ccsel").val(occ);
+    occ = $('#name_oneTimeCharges option:selected').val();
+    $(".ccsel").val(occ);  // Set all chartcom names same as OCC
+    occ = $('#oneTimeCharges').val();
+    $(".ccval").val(occ);  // Set all chartcom values same as OCC
   }
 }
 

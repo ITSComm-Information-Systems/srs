@@ -31,6 +31,14 @@ $(document).ready(function() {
     	$('input.select2-search__field').prop('placeholder', 'Search...');
 	});
 
+	$("#dept_id").one('select2:open', function(e) {
+    	$('input.select2-search__field').prop('placeholder', 'Search...');
+	});
+
+	$("#doc_depts").one('select2:open', function(e) {
+    	$('input.select2-search__field').prop('placeholder', 'Search...');
+	});
+
 
 	// Set select for tolls- choose dept
 	$("#tolls_deptids").select2({
