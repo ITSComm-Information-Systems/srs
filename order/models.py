@@ -37,6 +37,7 @@ class Step(Configuration):
         ('CMCCodeForm', 'CMC Codes'),
         ('ProductForm', 'Quantity Model'),
         ('ContactCenterForm', 'Contact Center'),
+        ('BillingForm', 'Billing'),
 
     )
 
@@ -119,6 +120,10 @@ class Restriction(Configuration):
     category = models.ManyToManyField(FeatureCategory)
 
 
+class ChargeType(Configuration):
+    pass
+
+
 class Action(Configuration):
     ROUTE_CHOICES = (
         ('P', 'Preorder'),
@@ -138,12 +143,14 @@ class Action(Configuration):
     description = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=True)    
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    charge_types = models.ManyToManyField(ChargeType)
     steps = models.ManyToManyField(Step)
     route = models.CharField(max_length=1, choices=ROUTE_CHOICES, default='P')
     destination = models.CharField(max_length=40, blank=True)
 
     def __str__(self):
         return self.label 
+
 
 
 class Constant(models.Model):
@@ -176,12 +183,12 @@ class Chartcom(models.Model):
 
     def get_user_chartcoms(self):
         chartcom_list = UserChartcomV.objects.filter(user=self).order_by('name')
-        user_chartcoms = []
+        #user_chartcoms = []
         
-        for chartcom in chartcom_list:
-            user_chartcoms.append((chartcom.chartcom_id, chartcom.name, chartcom.dept))
+        #for chartcom in chartcom_list:
+        #    user_chartcoms.append((chartcom.chartcom_id, chartcom.name, chartcom.dept, chartcom.account_number))
 
-        return user_chartcoms
+        return chartcom_list
 
     def get_user_chartcom_depts(self):
         dept_list = UserChartcomV.objects.filter(user=self).order_by('dept').distinct('dept')
@@ -192,11 +199,13 @@ class Chartcom(models.Model):
 
         return user_chartcom_depts
 
+
 class UserChartcomV(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     chartcom = models.ForeignKey(Chartcom, on_delete=models.PROTECT)
     name = models.CharField(max_length=20, blank=True, primary_key=True)
     dept = models.CharField(max_length=30)
+    account_number = models.CharField(max_length=30)
 
     class Meta:
         managed = False
@@ -259,7 +268,7 @@ class Order(models.Model):
         for num, item in enumerate(item_list, start=1):
             issue = {}
             if num == 1:
-                data['priority_code'] = self.priority
+                data['priority_name'] = self.priority
                 data['due_date'] = self.due_date
                 data['issues'] = []
 
