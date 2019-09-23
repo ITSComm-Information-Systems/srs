@@ -13,7 +13,11 @@
 <fieldset id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" {% if field.field.display_condition %}
     data-condition="{{ field.field.display_condition }}" {% endif %}>
     <legend id="legend{{ field.name }}">
+        {% if field.label == "Is there conduit?" %}
+        <strong>{{ field.label }} </strong><i class="fas fa-question-circle btn-link" aria-label="More Information icon" data-toggle="modal" data-target="#datatarget"></i>
+        {% else %}
         <strong>{{ field.label }}</strong>
+        {% endif %}
     </legend>
     {% for choice in field.field.choices %}
     <div class="form-check custom-radio">
@@ -24,6 +28,9 @@
         <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
                 aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
         {% endif %}
+        {% if field.label == "Is there conduit?" and choice != field.field.choices|first %}
+                   (<a href='#blank' data-toggle="modal" data-target="#datatarget2">Order a conduit</a>)
+       {% endif %}
     </div>
     {% endfor %}
     <br>
@@ -93,3 +100,59 @@
 {% endif %}
 
 {% endfor %}
+
+<!-- Add Checking for Conduit Modal -->
+<div class="modal fade" id="datatarget" tabindex="-1" role="dialog"
+aria-labelledby="userRoles" aria-hidden="true">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="userRoles">Checking for Conduit</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="">
+                {% autoescape off %}
+                    {{ conduit_check.bodytext }}
+                {% endautoescape %}
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <!-- Close button -->
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+</div>
+<!-- End of Add Checking for Conduit Modal -->
+
+<!-- Add Checking for Conduit Modal -->
+<div class="modal fade" id="datatarget2" tabindex="-1" role="dialog"
+aria-labelledby="userRoles" aria-hidden="true">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="userRoles">Order Conduit</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="">
+                {% autoescape off %}
+                    {{ conduit_order.bodytext }}
+                {% endautoescape %}
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <!-- Close button -->
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+</div>
+<!-- End of Add Checking for Conduit Modal -->
