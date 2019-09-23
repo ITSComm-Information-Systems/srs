@@ -93,7 +93,7 @@ def generate_report(request):
     charge_types = []
     for cf in chartcoms:
         # Create tables for each user defined ID type
-        all_data = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf).order_by('voucher_comment', 'item_description', 'invoice_date')
+        all_data = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf).order_by('voucher_comment', 'item_description', 'invoice_date', 'user_defined_id')
         prefixes = {}
         charges = {}
         total = 0
