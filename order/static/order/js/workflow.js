@@ -401,7 +401,8 @@ function chartcomChange(obj) {
 }
 
   function filterChartcom(obj) { 
-    id = '#id_' + obj.dataset.target;
+    id = '#name_' + obj.dataset.target;
+    console.log(id);
     if (obj.value=='all') {
       $(id).find('[data-dept]').show();
     } else {
