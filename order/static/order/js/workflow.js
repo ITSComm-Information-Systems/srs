@@ -290,11 +290,17 @@ $(document).ready(function() {
           tab.push({'label': label, 'value': value})
         }
       } else {
+
+        name = $("#" + inp[i].id).attr('name')
+        //console.log('name:' + name);
         if (!label) {
           label = $("label[for='" + id + "']").text();
         }
         value = $("#" + inp[i].id).val();
-        tab.push({'label': label, 'value': value})
+        if(name != 'product' || value != 0) { // don't show 0 product
+          tab.push({'label': label, 'value': value})
+        }
+
       }
     }
   
@@ -360,6 +366,37 @@ $(document).ready(function() {
     }
     $('#reviewSummary').val(summary); 
   }
+
+
+
+
+  $('[data-tab="SubscriberID"]').on('shown.bs.tab', function(event) {
+
+    max = $("#id_cancelAuth").val();
+    $("#subscriberId").show();
+    count = $("[id^=authdiv]").length;
+
+    console.log(max + '-' + count);
+
+    $("#subscriberId").removeAttr('data-sequence');
+    $("#subscriberId").removeAttr('data-condition');
+    var rec = $("#subscriberId").clone();
+
+    for (i = 1; i < (max-count); i++) {
+
+        num = i.toString();
+
+        var rec = $("#subscriberId").clone();
+
+        rec.attr("id", "authdiv" + num);
+    
+        $("#step2").append(rec);
+
+    }
+})
+
+
+
 
 
 });  // Document Ready
