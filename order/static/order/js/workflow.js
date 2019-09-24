@@ -258,13 +258,24 @@ $(document).ready(function() {
         if (obj.checked == true) {
           label = $("#legend" + name).text();
           value = $("label[for='" + id + "']").text();
+          if (obj.id == 'cat3feature31' ) {
+            label = "Speed Call:";
+          }
+          if (obj.id == 'cat3feature47' ) {
+            label = "Voicemail";
+          }   
           tab.push({'label': label, 'value': value})
         }
       } else if (type=="checkbox") {
         if (obj.checked == true) {
+
           //label = $("#legend" + name).text();
+          label = ''
           value = $("label[for='" + id + "']").text();
-          tab.push({'label': '', 'value': value})
+          if (obj.id == 'cat3feature48' ) {
+            label = "Optional:";
+          }
+          tab.push({'label': label, 'value': value})
         }
       } else if (obj.tagName=="SELECT") {
         if(name) { // Don't process data we are not saving
