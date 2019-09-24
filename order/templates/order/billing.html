@@ -49,7 +49,7 @@
         <select data-label="{{ field.label }}" data-tabid="{{tab.id}}" class="custom-select ccsel" id="name_{{ field.name }}"
             aria-labelledby="legend_{{field.name}} label_{{ field.name }}" onchange="chartcomChange(this)" onload="chartcomChange(this)">
             {% for chartcom in tab.form.chartcom_list %}
-            <option data-dept="{{ chartcom.id }}" data-chartcom="{{ chartcom.account_number }}" data-chartcom-id="{{ chartcom.chartcom_id }}"">{{ chartcom.name }}</option>
+            <option data-dept="{{ chartcom.dept }}" data-chartcom="{{ chartcom.account_number }}" data-chartcom-id="{{ chartcom.chartcom_id }}"">{{ chartcom.name }}</option>
             {% endfor %}
         </select>
 
