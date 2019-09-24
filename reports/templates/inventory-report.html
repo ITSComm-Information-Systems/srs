@@ -182,7 +182,7 @@
             </div>
         </div>
 
-        <hr class="style1 3">
+        <!-- <hr class="style1 3"> -->
     {% endif %}
 </form>
 {% comment %}
@@ -216,8 +216,11 @@
 {% endcomment %}
 
 {% if formated_data %}
+<!-- {% if not location_filter or type_filter or  cf_filter or  date_filter %} -->
+<hr class="style1 2">
+<!-- {% endif %} -->
 <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right">
-    CSV Download
+    Download CSV
 </button>
 
 {% for classification in formated_data %}
