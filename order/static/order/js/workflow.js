@@ -263,10 +263,10 @@ $(document).ready(function() {
         if (obj.checked == true) {
           label = $("#legend" + name).text();
           value = $("label[for='" + id + "']").text();
-          if (obj.id == 'cat3feature31' ) {
+          if (obj.id == 'cat3feature31' || obj.id == 'cat2feature31' ) {
             label = "Speed Call:";
           }
-          if (obj.id == 'cat3feature47' ) {
+          if (obj.id == 'cat3feature47' || obj.id == 'cat2feature47' || obj.id == 'cat1feature47' ) {
             label = "Voicemail";
           }   
           tab.push({'label': label, 'value': value})
@@ -277,7 +277,7 @@ $(document).ready(function() {
           //label = $("#legend" + name).text();
           label = ''
           value = $("label[for='" + id + "']").text();
-          if (obj.id == 'cat3feature48' ) {
+          if (obj.id == 'cat1feature48' || obj.id == 'cat2feature48' || obj.id == 'cat3feature48'  ) {
             label = "Optional:";
           }
           tab.push({'label': label, 'value': value})
