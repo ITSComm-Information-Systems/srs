@@ -301,6 +301,9 @@ $(document).ready(function() {
         if (!label) {
           label = $("label[for='" + id + "']").text();
         }
+        if (name=="subscriberId") {
+          label = "Subscriber ID";
+        }
         value = $("#" + inp[i].id).val();
         if(name != 'product' || value != 0) { // don't show 0 product
           tab.push({'label': label, 'value': value})
