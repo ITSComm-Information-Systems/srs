@@ -117,6 +117,11 @@ $(document).ready(function() {
     $('[data-tab="PhoneLocation"]').hide();
   }
 
+  $("#AdminUnique").click(function() {
+    $('#PhoneNumber').show();
+    $('#GroupEmailAdd').show();
+  });
+
   $("#jack_nojack").click(function() {
     $('[data-tab="PhoneLocation"]').hide();
     $('[data-tab="LocationNew"]').show();
@@ -258,13 +263,24 @@ $(document).ready(function() {
         if (obj.checked == true) {
           label = $("#legend" + name).text();
           value = $("label[for='" + id + "']").text();
+          if (obj.id == 'cat3feature31' ) {
+            label = "Speed Call:";
+          }
+          if (obj.id == 'cat3feature47' ) {
+            label = "Voicemail";
+          }   
           tab.push({'label': label, 'value': value})
         }
       } else if (type=="checkbox") {
         if (obj.checked == true) {
+
           //label = $("#legend" + name).text();
+          label = ''
           value = $("label[for='" + id + "']").text();
-          tab.push({'label': '', 'value': value})
+          if (obj.id == 'cat3feature48' ) {
+            label = "Optional:";
+          }
+          tab.push({'label': label, 'value': value})
         }
       } else if (obj.tagName=="SELECT") {
         if(name) { // Don't process data we are not saving
@@ -279,11 +295,17 @@ $(document).ready(function() {
           tab.push({'label': label, 'value': value})
         }
       } else {
+
+        name = $("#" + inp[i].id).attr('name')
+        //console.log('name:' + name);
         if (!label) {
           label = $("label[for='" + id + "']").text();
         }
         value = $("#" + inp[i].id).val();
-        tab.push({'label': label, 'value': value})
+        if(name != 'product' || value != 0) { // don't show 0 product
+          tab.push({'label': label, 'value': value})
+        }
+
       }
     }
   
@@ -351,6 +373,37 @@ $(document).ready(function() {
   }
 
 
+
+
+  $('[data-tab="SubscriberID"]').on('shown.bs.tab', function(event) {
+
+    max = $("#id_cancelAuth").val();
+    $("#subscriberId").show();
+    count = $("[id^=authdiv]").length;
+
+    console.log(max + '-' + count);
+
+    $("#subscriberId").removeAttr('data-sequence');
+    $("#subscriberId").removeAttr('data-condition');
+    var rec = $("#subscriberId").clone();
+
+    for (i = 1; i < (max-count); i++) {
+
+        num = i.toString();
+
+        var rec = $("#subscriberId").clone();
+
+        rec.attr("id", "authdiv" + num);
+    
+        $("#step2").append(rec);
+
+    }
+})
+
+
+
+
+
 });  // Document Ready
 
 
@@ -390,7 +443,8 @@ function chartcomChange(obj) {
 }
 
   function filterChartcom(obj) { 
-    id = '#id_' + obj.dataset.target;
+    id = '#name_' + obj.dataset.target;
+    console.log(id);
     if (obj.value=='all') {
       $(id).find('[data-dept]').show();
     } else {

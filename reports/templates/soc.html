@@ -122,12 +122,17 @@
                     <input type="radio" name="dateRangeGroup" id="multiple" value='4' aria-describedby="form-instruction-2 m2mRadiolabel" aria-labelledby="m2mRadiolabel">
                     <label for="multiple" id="m2mRadiolabel"><strong>Month-to-month</strong></label>
                     <div id="multimonth" class="indented-form-input">
-                        <label for='multimonth1' id="m2mSelectlabel">Select Month & Year Range</label>
+                        <label id="labelLegend">Select Month & Year Range</label>
                         <div class='form-row col-md-12'>
                             <div class='form-group col-5'>
-                                <select class='custom-select' name='multimonth1' id='multimonth1' size='1' aria-describedby="form-instruction-2 m2mRadiolabel m2mSelectlabel" aria-labelledby="m2mSelectlabel">
+                                <span class='sr-only'>
+                                    <label for="multimonth1" id="m2m1Selectlabel">Select the first month and year to set the range</label>
+                                </span>
+                                <select class='custom-select' name='multimonth1' id='multimonth1' size='1'
+                                    aria-describedby="form-instruction-2 m2mRadiolabel labelLegend m2m1Selectlabel"
+                                    aria-labelledby="m2m1Selectlabel">
                                     {% for date in dates %}
-                                        <option value='{{ date }}'>{{ date }}</option>
+                                    <option value='{{ date }}'>{{ date }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -136,9 +141,11 @@
                                 <span class='sr-only'>
                                     <label for="multimonth2" id="m2m2Selectlabel">Select the second month and year to set the range</label>
                                 </span>
-                                <select class='custom-select' name='multimonth2' id='multimonth2' size='1' aria-describedby="form-instruction-2 m2mRadiolabel m2mSelectlabel m2m2Selectlabel" aria-labelledby="m2m2Selectlabel">
+                                <select class='custom-select' name='multimonth2' id='multimonth2' size='1'
+                                    aria-describedby="form-instruction-2 m2mRadiolabel labelLegend m2m2Selectlabel"
+                                    aria-labelledby="m2m2Selectlabel">
                                     {% for date in dates %}
-                                        <option value='{{ date }}'>{{ date }}</option>
+                                    <option value='{{ date }}'>{{ date }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -155,7 +162,7 @@
     </div>
 
     <div class="col-4 float-right">
-        <div class="alert alert-secondary hlinks" role="alert">
+        <div class="alert alert-secondary hlinks">
             <p class="h4 alert-heading">About this Report</p>
             {% autoescape off %}
             {{ instructions.bodytext }}

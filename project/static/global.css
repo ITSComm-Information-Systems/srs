@@ -1240,3 +1240,7 @@ legend {
 .cart-form {
 	width:100%;
 }
+
+#invLocTable {
+	font-size: 13px;
+}
