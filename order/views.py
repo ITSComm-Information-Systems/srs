@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceProfileV, UmOscChartfieldV
 from oscauth.models import AuthUserDept
+from pages.models import Page
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from pages.models import Page
 from django.http import JsonResponse
@@ -291,11 +292,17 @@ class Workflow(PermissionRequiredMixin, View):
                 elif tab.name == 'QuantityModel':
                     js.append('product')
 
+        # Configurable conduit information
+        conduit_check = Page.objects.get(permalink='/checkcond')
+        conduit_order = Page.objects.get(permalink='/ordercond')
+
         return render(request, 'order/workflow.html', 
             {'title': action.label,
             'action':action,
             'tab_list': tabs,
-            'js_files': js})
+            'js_files': js,
+            'conduit_check': conduit_check,
+            'conduit_order': conduit_order})
 
 
 class Cart(PermissionRequiredMixin, View):

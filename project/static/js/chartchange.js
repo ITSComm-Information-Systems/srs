@@ -589,7 +589,7 @@ function validate(cf_change_table) {
 		var col5 = row.find('td:nth-child(6)').text(); // Local
 
 		if (col1.startsWith('PH')) {
-			if (col3 == '' || col4 == '' || col5 == '') {
+			if (col3 == '' && col4 == '' && col5 == '') {
 				get_out = true;
 			}
 		}
@@ -607,6 +607,7 @@ function validate(cf_change_table) {
 function load_4(cf_change_table, review_table) {
 	review_table.clear();
 
+	var current_cf = $('.current').text();
 	cf_change_table.rows().every(function(index, element) {
 		var row = $(this.node());
 		var user_id = row.find('td:nth-child(2)').text()
@@ -622,6 +623,16 @@ function load_4(cf_change_table, review_table) {
 			toll,
 			local
 		]).draw();
+
+		if (mrc == '') {
+			mrc = current_cf;
+		}
+		if (toll == '') {
+			toll = current_cf;
+		}
+		if (local == '') {
+			local = current_cf;
+		}
 
 		var input = document.createElement("input");
         input.type = "hidden";

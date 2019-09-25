@@ -95,7 +95,7 @@
 								</tr>
 								{% for v in value.rows %}
 								<tr>
-									<form method="POST" action='detail/' id="report_details">{% csrf_token %}
+									<form method="POST" action='detail/' id="report_details{{v.user_defined_id}}">{% csrf_token %}
 										<input type="hidden" name="selected_dept" value="{{ dept }}">
 										<input type="hidden" name="billing_date" value="{{ billing_date }}">
 										<input type="hidden" name="dept_mgr" value="{{ dept_mgr }} ({{ dept_mgr_uniq }})">
@@ -105,7 +105,7 @@
 										<input type="hidden" name="chartcom:{{ v.user_defined_id }}" value="{{ c.account_number }}">
 										<input type="hidden" name="charge_type:{{ v.user_defined_id }}" value="{{ key }}">
 
-										<td class="linky-link"><a href='#' onclick="$('#report_details').submit();">{{ v.user_defined_id }}</a></td>
+										<td class="linky-link"><a href='#' onclick="$('#report_details{{v.user_defined_id}}').submit();">{{ v.user_defined_id }}</a></td>
 										{% if '-'|first in v.monthly_charges %}
 											<td class='prv-msgs'>{{ v.monthly_charges }}</td>
 										{% else %}

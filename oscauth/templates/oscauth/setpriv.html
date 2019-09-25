@@ -18,7 +18,8 @@
     <div>
         <div class="form-group">
             <label for="uniqname-field">Enter a Uniqname</label><br>
-            <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short col-4" placeholder='Uniqname'>
+            <small class="text-muted form-text mb-1" id="manageAccInstrcutions">Enter the uniqname of the person that you want to give/edit access</small>
+            <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short col-4" placeholder='Uniqname' aria-describedby="manageAccInstrcutions">
             <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
         </div>
         {% if uniqname_parm == '' %}
