@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from django.utils import timezone
 from django.db import connections
-import json
+import json, io, os
 import cx_Oracle
 
 class Configuration(models.Model):   #Common fields for configuration models
@@ -201,8 +201,8 @@ class Chartcom(models.Model):
 
 
 class UserChartcomV(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    chartcom = models.ForeignKey(Chartcom, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    chartcom = models.ForeignKey(Chartcom, on_delete=models.DO_NOTHING)
     name = models.CharField(max_length=20, blank=True, primary_key=True)
     dept = models.CharField(max_length=30)
     account_number = models.CharField(max_length=30)
@@ -249,7 +249,41 @@ class Order(models.Model):
     def dept(self):
         return self.chartcom.dept
 
+
+    def add_attachments(self):
+
+        item_list = Item.objects.filter(order=self)
+
+        for num, item in enumerate(item_list, start=2):
+            attachment_list = Attachment.objects.filter(item_id=item.id)
+
+            if len(attachment_list) > 0:
+                pre_order_id = UmOscPreorderApiV.objects.get(add_info_text_3=self.id, pre_order_issue = num).pre_order_id # TODO replace issue id with key -- add_info_text_4=item.id
+
+                with connections['pinnacle'].cursor() as cursor:
+                    cursor.callproc('um_note_procedures_k.um_create_note_p', ['Work Order', None, pre_order_id, 'files', 'attachments', None, self.created_by.username] )
+
+                with connections['pinnacle'].cursor() as cursor:
+                    noteid = cursor.callfunc('um_note_procedures_k.um_get_note_id_f', cx_Oracle.STRING , ['Work Order', pre_order_id,'files'] )
+                    id = int(noteid)
+
+                for attachment in attachment_list:
+                    filename = attachment.file.name[12:99]
+                    loc = '/Users/djamison/oscmedia/attachments/ex_QDC8LZD.jpg'
+
+                    fileData = attachment.file.read()
+
+                    conn = connections['pinnacle'].connection
+                    lob = conn.createlob(cx_Oracle.CLOB)
+                    lob.write(fileData)
+                        #lob = connections['pinnacle'].createlob()
+
+                    with connections['pinnacle'].cursor() as cursor:
+                        noteid = cursor.callproc('um_note_procedures_k.um_make_note_an_attachment_p',  ['Note', id,'files', filename, lob] )
+
+
     def create_preorder(self):
+
         data =  {  
                     "department_number": self.chartcom.dept,
                     "default_one_time_expense_acct": self.chartcom.account_number,
@@ -315,13 +349,13 @@ class Order(models.Model):
                 ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
             self.order_reference = ponum
             self.save()
+            
+            #self.add_attachments()
 
         except Exception as e:
             print(e)
             LogItem().add_log_entry('Error', self.id, e)
             pass
-
-        #LogItem().add_log_entry('Send Data', item.id, ponum)
 
 
 class PinnPreOrder(UmOscPreorderApiV):
