@@ -117,6 +117,11 @@ $(document).ready(function() {
     $('[data-tab="PhoneLocation"]').hide();
   }
 
+  $("#AdminUnique").click(function() {
+    $('#PhoneNumber').show();
+    $('#GroupEmailAdd').show();
+  });
+
   $("#jack_nojack").click(function() {
     $('[data-tab="PhoneLocation"]').hide();
     $('[data-tab="LocationNew"]').show();
