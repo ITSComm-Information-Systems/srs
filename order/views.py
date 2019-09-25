@@ -35,14 +35,21 @@ class ManageChartcom(PermissionRequiredMixin, View):
         deptid = request.POST.get('deptid')
         
         if action == 'add':
-            print('add ')
+            cc = UmOscChartfieldV.objects.get(chartfield=request.POST.get('chartfieldSelection'))
+            chartcom = Chartcom()
+            chartcom.fund = cc.fund
+            chartcom.dept = cc.deptid
+            chartcom.program = cc.program
+            chartcom.class_code = cc.class_code
+            chartcom.project_grant = cc.project_grant
+            chartcom.name = request.POST.get('description')
+            chartcom.save()
 
         if action == 'edit':
             chartcom = Chartcom.objects.get(id=id)
             #descr = request.POST.get('newDescription')
             chartcom.name = request.POST.get('newDescription')
             chartcom.save()
-            print('edit',chartcom)
 
         if action == 'delete':
             x = Chartcom.objects.get(id=id).delete()
