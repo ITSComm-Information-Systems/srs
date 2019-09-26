@@ -25,9 +25,9 @@
                 Switch Department
             </label>
         </div>
-        <select name="deptids" class="custom-select" id="chart_deptids" value="{{ dept }}">
+        <select name="deptids" class="custom-select" id="chart_deptids">
             {% for dept in deptids %}
-            <option name="dept" value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.name }}</option>
+            <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.name }}</option>
             {% endfor %}
         </select>
       </div>
@@ -39,16 +39,16 @@
   <form method="POST">
     <ul class="nav justify-content-center nav-pills" id="chartchange_nav" role="tablist">
       <li class="nav-item">
-        <a class="nav-link disabled" onclick="tab_func1()" data-toggle="tab" id="cfc-1" href="#cf-1" role="tab" name="Select Current Chartfield" aria-selected="false">Select Current Chartfield</a>
+        <a class="nav-link disabled" onclick="tab_func1()" data-toggle="tab" id="cfc-1" href="#cf-1" role="tab" aria-selected="false">Select Current Chartfield</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link disabled" onclick="tab_func2()" data-toggle="tab" id="cfc-2" href="#cf-2" role="tab" name="Select User IDs" aria-selected="false">Select User IDs</a>
+        <a class="nav-link disabled" onclick="tab_func2()" data-toggle="tab" id="cfc-2" href="#cf-2" role="tab" aria-selected="false">Select User IDs</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link disabled" onclick="tab_func3()" data-toggle="tab" id="cfc-3" href="#cf-3" role="tab" name="Select New Chartfield" aria-selected="false">Select New Chartfield</a>
+        <a class="nav-link disabled" onclick="tab_func3()" data-toggle="tab" id="cfc-3" href="#cf-3" role="tab" aria-selected="false">Select New Chartfield</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link disabled" onclick="tab_func4()" data-toggle="tab" id="cfc-4" href="#cf-4" role="tab" name="Review & Submit" aria-selected="false">Review & Submit</a>
+        <a class="nav-link disabled" onclick="tab_func4()" data-toggle="tab" id="cfc-4" href="#cf-4" role="tab" aria-selected="false">Review & Submit</a>
       </li>
     </ul>
 
