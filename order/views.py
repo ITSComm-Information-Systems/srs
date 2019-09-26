@@ -24,6 +24,9 @@ from .models import Product, Action, Service, Step, Element, Item, Constant, Cha
 
 def get_phone_location(request, phone_number):
     locations = list(UmOscServiceProfileV.objects.filter(service_number=phone_number).exclude(location_id=0).values())
+    if not locations:
+        phone_number = phone_number.replace("-",'');
+        locations = list(UmOscServiceProfileV.objects.filter(service_number=phone_number).exclude(location_id=0).values())
     return JsonResponse(locations, safe=False)
 
 class ManageChartcom(PermissionRequiredMixin, View):
