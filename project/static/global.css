@@ -1244,3 +1244,7 @@ legend {
 #invLocTable {
 	font-size: 12px;
 }
+
+pre {
+	width: inherit !important;
+}
