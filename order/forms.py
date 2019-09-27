@@ -70,6 +70,17 @@ class ReviewForm(forms.Form):
     template = 'order/review.html'
 
 
+class AuthCodeCancelForm(forms.Form):
+    TYPE_CHOICES = (
+    ('Cancel', 'Cancel'),
+    ('Change', 'Change')
+    )
+    action = forms.ChoiceField(choices = TYPE_CHOICES, required=True)
+    subscriber_id = forms.CharField(label='summary', max_length=100)
+    name = forms.CharField(label='name', max_length=100)
+    template = 'order/auth_code_cancel.html'
+
+
 class AuthCodeForm(forms.Form):
     TYPE_CHOICES = (
     ('Individual', 'Individual'),
