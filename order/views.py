@@ -312,6 +312,8 @@ class Workflow(PermissionRequiredMixin, View):
                     js.append('features')
                 elif tab.name == 'AuthCodes':
                     js.append('auth_codes')
+                elif tab.name == 'AuthCodeCancel':
+                    js.append('auth_code_cancel')
                 elif tab.name == 'CMC':
                     js.append('cmc_codes')
                 elif tab.name == 'Equipment':
