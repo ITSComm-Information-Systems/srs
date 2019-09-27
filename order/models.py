@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from django.utils import timezone
 from django.db import connections
+from django.template.loader import render_to_string
 import json, io, os
 import cx_Oracle
 
@@ -34,6 +35,7 @@ class Step(Configuration):
         ('FeaturesForm', 'Features'),
         ('StaticForm', 'Static Page'),
         ('AuthCodeForm', 'Auth Codes'),
+        ('AuthCodeCancelForm', 'Auth Codes'),
         ('CMCCodeForm', 'CMC Codes'),
         ('ProductForm', 'Quantity Model'),
         ('ContactCenterForm', 'Contact Center'),
@@ -284,11 +286,18 @@ class Order(models.Model):
 
     def create_preorder(self):
 
+        #self.add_attachments()
+        #return
+
         data =  {  
                     "department_number": self.chartcom.dept,
                     "default_one_time_expense_acct": self.chartcom.account_number,
                     "submitter": self.created_by.username,
+                    "add_info_text_3": self.id,
                 }
+
+        if self.due_date:
+            data['due_date'] = self.due_date
 
         item_list = Item.objects.filter(order_id=self.id)
         elements = Element.objects.exclude(target__isnull=True).exclude(target__exact='')
@@ -298,61 +307,70 @@ class Order(models.Model):
             map[element.name] = element.target
 
         equipment_only = True
+        wiring_only = True
+        create_bill_only = True   #set to true when it hits a category 0 type is not equipment or wiring  
 
         for num, item in enumerate(item_list, start=1):
             issue = {}
             if num == 1:
                 data['priority_name'] = self.priority
-                data['due_date'] = self.due_date
                 data['issues'] = []
 
             action_id = item.data['action_id']
             action = Action.objects.get(id=action_id)
-            if action.type != 'E':
-                equipment_only = False
 
             cons = Constant.objects.filter(action=action_id)
             for con in cons:  # Populate issue with constants
                 issue[con.field] = con.value
 
-            note = item.data['reviewSummary'] + 'CHARTCOM \nOCC:' + item.chartcom.account_number + '\n'
+            if action.type != 'E':
+                equipment_only = False
+
+            if action_id != 41:
+                wiring_only = False
+
+            if issue['wo_type_category_id'] == '0':
+                if not equipment_only or not wiring_only:
+                    create_bill_only = False
 
             for key, value in item.data.items():
                 if value:  # Populate issue with user supplied values
                     if key == 'MRC' or key == 'localCharges' or key == 'LD':
                         value = Chartcom.objects.get(id=value).account_number
-                        note = note + key+ ':' + value + '\n'
 
                     target = map.get(key)
                     if target != None:
                         issue[target] = value
 
-            issue['add_info_text_3'] = self.id
-
-            item.data['reviewSummary'] = note
-            item.save()
-
-            issue['note'] = note #item.data['reviewSummary']
+            issue['add_info_text_4'] = item.id
+            issue['note'] = item.format_note()
             issue['comment_text'] = item.description
             data['issues'].append(issue)
 
         if equipment_only:
             data['equipment_only'] = 'Y'
+    
+        if wiring_only:
+            data['wiring_only'] = 'Y'
+    
+        if create_bill_only:
+            data['create_bill_only'] = 'Y'
 
         json_data = json.dumps({"Order": data})
 
         LogItem().add_log_entry('JSON', self.id, json_data)
-        #log.add_log_entry(json_data)
 
         try: 
             with connections['pinnacle'].cursor() as cursor:
                 ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
+
             self.order_reference = ponum
             self.save()
             
             #self.add_attachments()
 
-        except Exception as e:
+        except cx_Oracle.DatabaseError as e:
+        #except Exception as e:
             print(e)
             LogItem().add_log_entry('Error', self.id, e)
             pass
@@ -383,6 +401,17 @@ class Item(models.Model):
         delete_date = self.create_date + timedelta(days=180) 
         days_to_deletion = delete_date - timezone.now()
         return days_to_deletion.days
+
+    def format_note(self):
+        text = self.data['reviewSummary']
+
+        if isinstance(text, str):  #TODO Legacy orders
+            note = text  
+        else:
+            note = render_to_string('order/pinnacle_note.html', {'text': text, 'title': self.description})
+
+        return note
+        
 
     def leppard(self):
         pour=['me']
