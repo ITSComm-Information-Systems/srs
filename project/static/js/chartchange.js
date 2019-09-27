@@ -69,7 +69,7 @@ $(document).ready(function() {
               	var type = row['user_defined_id'];
               	type = type.split('-');
               	type = type[0];
-              	if (type == 'PH') {
+              	if (type == 'PH' | type == 'RA') {
               		if (data == 'Y') {
               			return '<i class="fa fa-check-circle" style="color:green;" aria-hidden="true"></i>';
               		}
@@ -180,7 +180,8 @@ $(document).ready(function() {
 	 	cf_change_table.rows().every(function(index, element) {
 			var row = $(this.node());
 			var col0 = row.find('td:first-child input[type="checkbox"]');
-			var starts_with = row.find('td:nth-child(2)').text().startsWith('PH');
+			var starts_with = row.find('td:nth-child(2)').text().startsWith('PH') |
+							  row.find('td:nth-child(2)').text().startsWith('RA');
 			 
 			insideChecked = false;
 			if (col0.is(':checked')) {
@@ -266,7 +267,8 @@ $(document).ready(function() {
 	$('#cf_change_table').on('change', 'tr', function() {
 		var box = $(this).find('td:first-child input[type="checkbox"]');
 		var checked = box.is(':checked');
-		var starts_with = $(this).find('td:nth-child(2)').text().startsWith('PH');
+		var starts_with = $(this).find('td:nth-child(2)').text().startsWith('PH') |
+						  $(this).find('td:nth-child(2)').text().startsWith('RA');
 		maintain_checks(checked, starts_with);
 	})
 
@@ -285,7 +287,7 @@ $(document).ready(function() {
 			 
 			if (col0.is(':checked')) {
 			    // If PH
-			    if (col1.startsWith("PH")) {
+			    if (col1.startsWith("PH") | col1.startsWith("RA")) {
 			    	// Set MRC
 			    	if ($('#mrc').is(':checked')) {
 			    		col3.html(selected);
@@ -560,7 +562,7 @@ function load_3(table, cf_change_table) {
 		var col0 = row.find('td:first-child input[type="checkbox"]'); // checkbox
 		var col1 = row.find('td:nth-child(2)').text();
 		var charges = '';
-		if (!col1.startsWith('PH')) {
+		if (!(col1.startsWith('PH') | col1.startsWith('RA'))) {
 			charges = 'N/A';
 		}
 
@@ -588,7 +590,7 @@ function validate(cf_change_table) {
 		var col4 = row.find('td:nth-child(5)').text(); // Toll
 		var col5 = row.find('td:nth-child(6)').text(); // Local
 
-		if (col1.startsWith('PH')) {
+		if (col1.startsWith('PH') | col1.startsWith('RA')) {
 			if (col3 == '' && col4 == '' && col5 == '') {
 				get_out = true;
 			}
