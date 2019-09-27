@@ -1,0 +1,4 @@
+{% for tab in text.tabs %}{% for title, content in tab.items %}
+{{title}}{% for key, value in content.items %}
+{{key}}: {{value}}{% endfor %}
+{% endfor %}{% endfor %}

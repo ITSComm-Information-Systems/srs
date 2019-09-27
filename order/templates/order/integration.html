@@ -83,6 +83,9 @@ ul, #myUL {
             <li><span class="caret">note</span>
                 <ul class="nested">
                     <pre>{{ item.note }}</pre>
+                    {% with text=item.note %}
+                    <pre>{% include 'order/pinnacle_note.html' %}</pre>
+                    {% endwith %}
                 </ul>
             </li>
         </ul>

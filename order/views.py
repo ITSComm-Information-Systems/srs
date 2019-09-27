@@ -160,13 +160,38 @@ def add_to_cart(request):
             x = label.find('[', x)
             y = label.find(']', x)
 
+        summary = request.POST['reviewSummary']
+
+        data = {}
+        title = ''
+        data['tabs'] = []
+
+        for line in summary.split('^'):
+
+            if line[0:1] == '~':
+                if title:
+                    tab = {title: tabdata}
+                    data['tabs'].append(tab)
+                    
+                tabdata = {}
+                title = line[1:99]
+            else:
+                fields = line.split('\t')
+                if len(fields) > 1:
+                    tabdata[fields[0]] = fields[1]
+            
+        postdata = request.POST.dict()
+        
+        postdata['reviewSummary'] = data
+        postdata['csrfmiddlewaretoken'] = ''
+
         i.description = label
         occ = request.POST['oneTimeCharges']
         charge = Chartcom.objects.get(id=occ)
         i.chartcom = charge
         #i.chartcom_id = request.POST['oneTimeCharges']
         i.deptid = charge.dept
-        i.data = request.POST
+        i.data = postdata
         i.save()
 
 
@@ -209,6 +234,8 @@ class Integration(PermissionRequiredMixin, View):
 
 
         for item in item_list:
+            #item.note = item.data['reviewSummary']
+            #item.note = item.format_note()
             item.note = item.data['reviewSummary']
             error = LogItem.objects.filter(local_key = str(item.id))
             if error:
