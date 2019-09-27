@@ -5,7 +5,11 @@ $(document).ready(function() {
 
     $("#phoneLookup").click(function () {
         var phone_number = $("#id_phone_number").val();
-        phone_number = phone_number.replace(/\D/g,'');
+        //phone_number = phone_number.replace(/\D/g,'');
+        phone_number=  phone_number.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
+        phone_number = phone_number.replace(/\s+/g, '');
+        console.log("phone_number")
+        console.log(phone_number)
     
         $("#phLocationFields").show();
         $("#phBuildingID").val('');
