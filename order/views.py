@@ -25,9 +25,25 @@ from .models import Product, Action, Service, Step, Element, Item, Constant, Cha
 def get_phone_location(request, phone_number):
     locations = list(UmOscServiceProfileV.objects.filter(service_number=phone_number).exclude(location_id=0).values())
     if not locations:
-        phone_number = phone_number.replace("-",'');
+        phone_number = phone_number.replace("-",'')
         locations = list(UmOscServiceProfileV.objects.filter(service_number=phone_number).exclude(location_id=0).values())
     return JsonResponse(locations, safe=False)
+
+
+def get_order_detail(request, order_id):
+
+    order = Order.objects.get(id=order_id)
+    item_list = Item.objects.filter(order=order)
+
+    template = loader.get_template('order/order_detail.html')
+    context = {
+        'title': 'Order Summary',
+        'order': order,
+        'item_list': item_list
+    }
+    return HttpResponse(template.render(context, request))
+
+
 
 class ManageChartcom(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'

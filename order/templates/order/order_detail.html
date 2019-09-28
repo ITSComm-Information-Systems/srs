@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Order Summary</h1>
+    <div class="summary-info mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-1">
+                    <strong>Reference Number: </strong>
+                    <p class="d-inline" id="orderNum">{{ order.order_reference }}</p>
+                </div>
+                <div class='mb-1'>
+                    <strong>Department: </strong>
+                    <p class="d-inline" id="department">{{ order.chartcom.dept }}</p>
+                </div>
+
+                <div class='mb-1'>
+                    <strong>Submitted by: </strong>
+                    <p class="d-inline" id="submitter">{{ order.created_by.username }}</p>
+                </div>
+
+                <div class='mb-1'>
+                    <strong>Date Submitted: </strong>
+                    <p class="d-inline" id="dateCreated">{{ order.create_date }}</p>
+                </div>
+                <div class='mb-0'>
+                    <strong>Status: </strong>
+                    <p class="d-inline" id="orderStatus">{{ order.status }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Items Submitted</h2>
+    <div class="accordion" id="accordionExample">
+
+
+
+        {% for item in item_list %}
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h2 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne"
+                        aria-expanded="true" aria-controls="collapseOne">
+                        {{ item.description }}
+                    </button>
+                </h2>
+            </div>
+
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                data-parent="#accordionExample">
+                <div class="card-body">
+                    {% for tab in item.data.reviewSummary.tabs %}
+                    {% for title, content in tab.items %}
+                    <div class="tabInformation">
+                        <p class="h4" id="tabTitle">{{ title }}</p>
+                        {% for key, value in content.items %}
+                        <div class="mb-1 indented-form-input">
+                            <strong class="question">{{key}}</strong>
+                            <p class="d-inline" id="questionAnswer">{{value}}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $('.collapse').collapse();
+    </script>
+{% endblock js %}
