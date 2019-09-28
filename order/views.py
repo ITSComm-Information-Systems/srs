@@ -198,6 +198,9 @@ def add_to_cart(request):
                 fields = line.split('\t')
                 if len(fields) > 1:
                     tabdata[fields[0]] = fields[1]
+        
+        tab = {title: tabdata}
+        data['tabs'].append(tab)
             
         postdata = request.POST.dict()
         
@@ -253,9 +256,7 @@ class Integration(PermissionRequiredMixin, View):
 
 
         for item in item_list:
-            #item.note = item.data['reviewSummary']
-            #item.note = item.format_note()
-            item.note = item.data['reviewSummary']
+            item.note = item.format_note()
             error = LogItem.objects.filter(local_key = str(item.id))
             if error:
                 item.error = error
