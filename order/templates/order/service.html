@@ -66,6 +66,14 @@
         $('[data-toggle="popover"]').popover();
         $('#phoneData-tab').addClass(' active');
         $('#phoneData').addClass(' active show');
+
+
+    $('.nav-link').on('show.bs.tab', function(event) {
+        id = '#' + event.target.id.slice(0,-4);
+        $('.tab-pane').attr('tabindex', '0');        
+        $(id).attr('tabindex', '-1');
+    })
+
     });
 </script>
 {% endblock %}
