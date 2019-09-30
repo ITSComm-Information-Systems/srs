@@ -66,6 +66,10 @@
         $('[data-toggle="popover"]').popover();
         $('#phoneData-tab').addClass(' active');
         $('#phoneData').addClass(' active show');
+
+        $('#v-pills-tab a').on('click', function() {
+            $(this).addClass('tabindex=-1');
+        })
     });
 </script>
 {% endblock %}
