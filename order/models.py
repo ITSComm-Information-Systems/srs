@@ -408,7 +408,7 @@ class Item(models.Model):
         if isinstance(text, str):  #TODO Legacy orders
             note = text  
         else:
-            note = render_to_string('order/pinnacle_note.html', {'text': text, 'title': self.description})
+            note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
 
         return note
         
