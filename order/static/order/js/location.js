@@ -20,4 +20,15 @@ $(document).ready(function() {
         $("#buildingFields").show();
     });
 
+    $('#buildingTable tr').on("keyup",function(e) {
+        if((e.keyCode === 13)){
+            var building = $(this).find("td").eq(1).html();   
+            var buildingCode = $(this).find("td").eq(0).html();   
+            $('#id_new_building_name').val(building);
+            $('#id_new_building_code').val(buildingCode);
+            $("#buildingTable").hide();
+            $("#buildingFields").show();
+        }
+    });
+
 });

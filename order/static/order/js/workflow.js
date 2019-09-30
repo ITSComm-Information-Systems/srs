@@ -264,7 +264,7 @@ $(document).ready(function() {
           label = $("#legend" + name).text();
           value = $("label[for='" + id + "']").text();
           if (obj.id == 'cat3feature31' || obj.id == 'cat2feature31' ) {
-            label = "Speed Call:";
+            label = "Speed Call";
           }
           if (obj.id == 'cat3feature47' || obj.id == 'cat2feature47' || obj.id == 'cat1feature47' ) {
             label = "Voicemail";
@@ -278,7 +278,7 @@ $(document).ready(function() {
           label = ''
           value = $("label[for='" + id + "']").text();
           if (obj.id == 'cat1feature48' || obj.id == 'cat2feature48' || obj.id == 'cat3feature48'  ) {
-            label = "Optional:";
+            label = "Optional";
           }
           tab.push({'label': label, 'value': value})
         }
@@ -363,14 +363,14 @@ $(document).ready(function() {
       $('#reviewstep' + tab).text('');
       if(tabs[tab]) {
          heading = $('#reviewstep' + tab).data('label')
-         summary = summary + heading.toUpperCase() + '\n';
+         summary = summary + '~' + heading + '^';
         for (field = 0; field < tabs[tab].length; field++) {
           txt = '<b>' + tabs[tab][field].label + '</b>  ' + tabs[tab][field].value + '<br>';
-          summary = summary + tabs[tab][field].label + ' - ' + tabs[tab][field].value + '\n';
+          summary = summary + tabs[tab][field].label.trim() + '\t' + tabs[tab][field].value.trim() + '^';
           $('#reviewstep' + tab).append(txt);
         }
       }
-      summary = summary + '\n';
+      //summary = summary + '\n';
     }
     $('#reviewSummary').val(summary); 
   }
