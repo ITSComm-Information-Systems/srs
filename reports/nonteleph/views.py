@@ -31,22 +31,23 @@ from pages.models import Page
 def get_new(request):
     template = loader.get_template('doc.html')
 
-    # Find all departments user has access to
-    user_depts = (d.dept for d in AuthUserDeptV.objects.filter(user=request.user.id,codename='can_report').order_by('dept').exclude(dept='All').distinct('dept'))
-    user_depts = list(user_depts)
+    # # Find all departments user has access to
+    # user_depts = (d.dept for d in AuthUserDeptV.objects.filter(user=request.user.id,codename='can_report').order_by('dept').exclude(dept='All').distinct('dept'))
+    # user_depts = list(user_depts)
 
-    # Find dept names
-    names = []
-    name_query = list(d.dept_name for d in UmOscDeptProfileV.objects.filter(deptid__in=user_depts).order_by('deptid'))
-    for i in range(0, len(user_depts)):
-    	name = {
-    		'deptid': user_depts[i],
-    		'name': name_query[i]
-    	}
-    	names.append(name)
+    # # Find dept names
+    # names = []
+    # name_query = list(d.dept_name for d in UmOscDeptProfileV.objects.filter(deptid__in=user_depts).order_by('deptid'))
+    # for i in range(0, len(user_depts)):
+    # 	name = {
+    # 		'deptid': user_depts[i],
+    # 		'name': name_query[i]
+    # 	}
+    # 	names.append(name)
+    names = AuthUserDept.get_report_departments(request)
 
     # Find associated chartfields
-    selected_dept = user_depts[0]
+    selected_dept = names[0].deptid
     dept_cfs = list((d.account_number for d in UmOscDtDeptAcctListV.objects.filter(deptid=selected_dept).order_by('account_number').distinct()))
 
     # Find all available billing dates

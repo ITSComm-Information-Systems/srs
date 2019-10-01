@@ -28,21 +28,10 @@ from pages.models import Page
 @permission_required('oscauth.can_report', raise_exception=True)
 def get_inventory(request):
     # Find all departments user has reporting access to
-    depts = AuthUserDeptV.objects.filter(user=request.user.id, codename ='can_report').order_by('dept').exclude(dept='All').values().distinct('dept')
-    departments = []
-    for dept in depts:
-        departments.append(dept['dept'])
+    names = AuthUserDept.get_report_departments(request)
 
     # Find available billing dates
     dates = UmOscBillCycleV.objects.values_list('billing_date', flat = True).order_by('billing_date').distinct().reverse()
-
-    # Add department names to department IDs
-    names = []
-    name_query = list(d.dept_name for d in UmOscDeptProfileV.objects.filter(deptid__in=departments).order_by('deptid'))
-    for i in range(0, len(departments)):
-        name = {'deptid': departments[i]
-                ,'name': name_query[i]}
-        names.append(name)
 
     # Get instructions
     instructions = Page.objects.get(permalink='/ial')
@@ -196,3 +185,19 @@ def format_data(data,request):
         cost_table.append(chartfield_cost)
     
     return whole_table, cost_table
+
+def get_depts(request):
+    if request.user.has_perm('can_order_all'):
+        query = UmOscDeptProfileV.objects.all().order_by('deptid')
+        return list(query)
+    else:
+        query = AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept')
+        full_depts = []
+        for d in query:
+            name = UmOscDeptProfileV.objects.filter(deptid=d.dept)[0].dept_name
+            dept ={
+                'deptid': d.dept,
+                'dept_name': name
+            }
+            full_depts.append(dept)
+        return full_depts
