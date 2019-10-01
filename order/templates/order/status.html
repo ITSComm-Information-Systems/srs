@@ -107,8 +107,8 @@
                             <td>{{ order.created_by }}</td>
                             <td>
                                 {% for item in order.items %}
-                                <pre
-                                    style='font-family: Roboto; font-size: 1rem; margin-bottom: 0rem;'>{{ item.description }}</pre>
+                                <p
+                                    style='font-family: Roboto; font-size: 1rem; margin-bottom: 0rem;'>{{ item.description }}</p>
                                 {% endfor %}
                                 <a href="/orders/detail/{{ order.id }}">Order details</a>
                             </td>
