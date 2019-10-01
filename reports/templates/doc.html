@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>{{title}}</h1>
-<div class='row'>
-    <div class='col-8'>
+<div class="row">
+    <div class="col-lg-8 col-md-12">
         <form action="{{ form_action }}" method="POST" name="Select">{% csrf_token %}
-            <div class="form-group col-8">
+            <div class="form-group">
                 <label for="doc_depts" id="depts"><strong>Select Department</strong></label>
                 <select class="form-control" name="select_dept" id="doc_depts" aria-labelledby="depts" size='{{ names|length }}' required>
                     {% for dept in names %}
@@ -12,7 +12,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="form-group col-8">
+            <div class="form-group">
                 <label for="doc_bill_date" id="billingDate"><strong>Select Billing Date</strong></label>
             	<select class="form-control" name="billing_date" id="doc_bill_date" size='{{ dates|length }}' aria-labelledby="billingDate" required>
                     {% for d in dates %}
@@ -20,7 +20,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="form-group col-8">
+            <div class="form-group">
                 <label for="doc_chartcom" id="docChartfield"><strong>Select Chartfield(s)</strong></label>
                 <div class="mt-0 mb-1">
                     <small class="text-muted form-text" id="chartfieldInstructions">
@@ -44,7 +44,7 @@
         </form>
     </div>
     
-    <div class="col-4 float-right">
+    <div class="col-lg-4 col-md-12">
         <div class="alert alert-secondary hlinks">
             <p class="h4 alert-heading">About this Report</p>
             {% autoescape off %}
