@@ -40,9 +40,9 @@
     <div class="row cart-table">
         <div class="col-12">
             <!-- Beginning of Filter/Search -->
-            <div class="filter-container">
+            <!-- <div class="filter-container"> -->
                 <!-- Beginning of Search Bar -->
-                <div class="input-group mb-3 search-bar">
+                <!-- <div class="input-group mb-3 search-bar">
                     <div class="input-group-prepend">
                         <span class="input-group-text">
                             <i class="fas fa-search" aria-label="Search Icon"></i>
@@ -51,11 +51,11 @@
                     <input id="orderSearch" type="text" class="form-control"
                         placeholder="Search by pre-order or uniqname…" aria-label="Search by pre-order or uniqname…"
                         aria-describedby="basic-addon2">
-                </div>
+                </div> -->
                 <!-- End of Search -->
 
                 <!-- Beginning of Order Status Filter Dropdown -->
-                <div class="input-group mb-3 order-status">
+                <!-- <div class="input-group mb-3 order-status">
                     <div class="input-group-prepend">
                         <label class="input-group-text">
                             Filter By Order Status
@@ -68,9 +68,9 @@
                         <option value="Billed">Billed</option>
                         <option value="Cancelled">Cancelled</option>
                     </select>
-                </div>
+                </div> -->
                 <!-- End of Order Status Filter Dropdown -->
-            </div>
+            <!-- </div> -->
             <!-- End of Filter/Search -->
 
             <!-- Beginning of table -->
@@ -112,7 +112,7 @@
                                 {% endfor %}
                                 <a href="/orders/detail/{{ order.id }}">Order details</a>
                             </td>
-                            <td>{{ order.chartcom }}</td>
+                            <td>{{ order.chartcom.name }} ({{order.chartcom.account_number}})</td>
                             <td>{{order.status}}</td>
                             <td class="action">
                                 <!-- <a class="delete" href="#">Cancel</a> -->
