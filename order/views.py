@@ -158,7 +158,8 @@ def send_email(request):
 
         with connections['pinnacle'].cursor() as cursor:
             cursor.callproc('um_osc_util_k.um_send_email_p', ['itcom.csr@umich.edu', subject, body])
-
+        if body == "Cancel Order":
+            return HttpResponseRedirect('/cancelorder') 
         return HttpResponseRedirect('/emailsent') 
 
 

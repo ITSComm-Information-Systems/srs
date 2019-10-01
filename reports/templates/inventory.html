@@ -10,7 +10,7 @@
                     <label id="dept_id_label" for="dept_id"><strong>Select a Department ID</strong></label>
                         <select class="form-control" name="dept_id" id="dept_id" size="{{ depts|length }}" aria-labelledby="dept_id_label" required>
                             {% for dept in depts %}
-                            <option value="{{ dept.deptid }}-{{dept.name}}">{{ dept.deptid }} - {{ dept.name }}</option>
+                            <option value="{{ dept.deptid }}-{{dept.dept_name}}">{{ dept.deptid }} - {{ dept.dept_name }}</option>
                             {% endfor %}
                         </select>
                 </div>
