@@ -67,7 +67,7 @@ class AuthUserDept(models.Model):
 
     def get_report_departments(request):
         if request.user.has_perm('can_order_all'):
-            query = UmOscDeptProfileV.objects.all().order_by('deptid').values_list()
+            query = UmOscDeptProfileV.objects.all().order_by('deptid')
             return query
         else:
             query = AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept')
