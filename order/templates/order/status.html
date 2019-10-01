@@ -21,9 +21,9 @@
                         </label>
                     </div>
                     <select class="custom-select order-status-dropdown" id="selectDept">
-                        <option id="alldepts" name="dept" data-filter="dept" value="all_departments">
+<!--                         <option id="alldepts" name="dept" data-filter="dept" value="all_departments">
                             All Departments
-                        </option>
+                        </option> -->
                         {% for dept in dept_list %}
                         <option id="mydept{{dept.dept}}" name="dept" data-filter="dept" value="{{dept.dept}}">
                             {{dept.dept}} - {{dept.name}}
@@ -234,6 +234,9 @@
     $(document).ready(function () {
         $('[data-toggle="popover"]').popover();
 
+        $('[data-dept]').hide();
+        $("[data-dept='" + $('#selectDept').val() + "']").show();
+
         dept = $("#selectDept option:selected").text();
         $('#deptHeading').text(dept);
 
@@ -261,7 +264,7 @@
             console.log(status);
         });
 
-        $('#selectDept').change(function () {
+        $('#selectDept').on('change', function () {
             if (this.value == 'Select a department') {
                 $('[data-dept]').show();
             } else {
