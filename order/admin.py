@@ -42,6 +42,17 @@ class StepAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
 
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        element_list = Element.objects.all().filter(step_id = object_id).order_by('display_seq_no')
+            
+        extra_context = {
+            'element_list': element_list,
+        }
+        return super().change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
+
+
 class FeatureAdmin(admin.ModelAdmin):
     list_filter = ('category',)
     list_display = ['display_seq_no','label']
