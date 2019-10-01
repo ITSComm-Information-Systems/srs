@@ -365,7 +365,7 @@ $(document).ready(function() {
          heading = $('#reviewstep' + tab).data('label')
          summary = summary + '~' + heading + '^';
         for (field = 0; field < tabs[tab].length; field++) {
-          txt = '<b>' + tabs[tab][field].label + '</b>  ' + tabs[tab][field].value + '<br>';
+          txt = '<b>' + tabs[tab][field].label.trim() + '</b>  ' + tabs[tab][field].value.trim() + '<br>';
           summary = summary + tabs[tab][field].label.trim() + '\t' + tabs[tab][field].value.trim() + '^';
           $('#reviewstep' + tab).append(txt);
         }

@@ -1,3 +1,5 @@
+var locations = [];
+
 $(document).ready(function() {
 
     $("#newLocationFields").hide();    
@@ -27,7 +29,7 @@ $(document).ready(function() {
           },
     
           success: function (data) {
-
+            locations = data;
             for (loc = 0; loc < data.length; loc++) {
                 var newCard = $("#mainCard").clone();
                 $(newCard).attr('id',loc);
@@ -37,6 +39,7 @@ $(document).ready(function() {
                 $(newCard).find("#floor").text(data[loc]['floor_name']);
                 $(newCard).find("#room").text(data[loc]['room_name']);
                 $(newCard).find("#jack").text(data[loc]['jack_name']);
+                $(newCard).find(".card-body").data('location', loc);
                 $("#cardDeck").prepend(newCard);
                 $("#foundPhone").text(phone_number);
                 $("#phLocationFields").show();
@@ -61,6 +64,7 @@ $(document).ready(function() {
 
 
 function selectCard(card) {
+    //console.log(locations);
     if (card.id == 'updateLocation') {
         $("#newLocationFields").show();
     } else {
@@ -72,12 +76,22 @@ function selectCard(card) {
         $("#newBuildingRoom").val(div.find('#room').html());
         $("#newBuildingJack").val(div.find('#jack').html());
     
-        loc = div.find('#name').html() + "<br>" 
-        + "Building ID: " + div.find('#code').html() + "<br>" 
-        + "Floor: " + div.find('#floor').html() + "<br>" 
-        + "Room: " + div.find('#room').html() + "<br>" 
-        + "Jack: " + div.find('#jack').html() + "<br>";
+        loc = div.find('#name').html() + "\n" 
+        + "Building ID: " + div.find('#code').html() + "\n" 
+        + "Floor: " + div.find('#floor').html() + "\n" 
+        + "Room: " + div.find('#room').html() + "\n" 
+        + "Jack: " + div.find('#jack').html() + "\n";
         $(card).val(loc);
+
+        //sel = $(div).data('location');
+        selectedLocation = locations[$(div).data('location')];
+
+        $("#subscriber_id").val(selectedLocation.subscriber_id);
+        $("#service_number").val(selectedLocation.service_number);
+        $("#location_id").val(selectedLocation.location_id);
+        $("#service_type").val(selectedLocation.service_type);
+
+
     }
 
 
