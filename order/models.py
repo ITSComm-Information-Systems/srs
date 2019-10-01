@@ -370,7 +370,7 @@ class Order(models.Model):
             self.order_reference = ponum
             self.save()
             
-            #self.add_attachments()
+            self.add_attachments()
 
         except cx_Oracle.DatabaseError as e:
         #except Exception as e:
