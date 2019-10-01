@@ -411,7 +411,7 @@ span {
 	padding-right:1rem;*/
 }
 .action .delete {
-	color:#dc3545;
+	color:#d32f2f;
 	font-weight:400;
 	border-color:transparent;
 	background-color:transparent;
@@ -422,7 +422,7 @@ span {
 	background:transparent;
 }
 .action .cancel {
-	color:#dc3545;
+	color:#d32f2f;
 	font-weight:400;
 	border-color:transparent;
 	background-color:transparent;
@@ -455,7 +455,7 @@ span {
 	margin:0 auto;
 }
 .review-order-link a {
-	color:#fff;
+	color:#ffffff;
 }
 .card-deck {
 	display:flex;
