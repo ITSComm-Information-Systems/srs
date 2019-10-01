@@ -40,11 +40,12 @@ class Step(Configuration):
         ('ProductForm', 'Quantity Model'),
         ('ContactCenterForm', 'Contact Center'),
         ('BillingForm', 'Billing'),
+        ('DynamicForm', 'Dynamic'),
 
     )
 
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
-
+    progressive_disclosure = models.BooleanField(default=False)
 
 class Element(Configuration):
     ELEMENT_CHOICES = (
