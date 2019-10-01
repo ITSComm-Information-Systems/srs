@@ -33,8 +33,11 @@
                             <label for="deptidall"><strong>Select All</strong></label>
                         </div>
                         <select class="custom-select mt-0" multiple aria-describedby="form-instruction dept_id_label deptIDSelectLabel chartfieldInstructions" aria-labelledby="deptIDSelectLabel" name="department_id" id="departmentIdSelection">
-                            {% for key, value in depts.items %}
+                            <!-- {% for key, value in depts.items %}
                             <option value="{{ key }} - {{ value }}">{{ key }} - {{ value }}</option>
+                            {% endfor %} -->
+                            {% for d in depts %}
+                            <option value="{{ d.deptid }} - {{ d.dept_name }}">{{ d.deptid }} - {{ d.dept_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
