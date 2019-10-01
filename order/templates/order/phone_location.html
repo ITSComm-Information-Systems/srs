@@ -15,10 +15,14 @@
             </div>
         </div>
     </div>
+    <input type="hidden" id="subscriber_id" name="subscriber_id" value="">
+    <input type="hidden" id="service_number" name="service_number" value="">
+    <input type="hidden" id="location_id" name="location_id" value="">
+    <input type="hidden" id="service_type" name="service_type" value="">
     <br>
     <div class="container" id="phLocationFields">
         <div class="col-12 mb-3">
-            <strong>Select the Current Service Location for Phone number:</strong> <em id="foundPhone">123-123-1234</em>
+            <strong>Select the Current Service Location for:</strong> <em id="foundPhone">123-123-1234</em>
             <em class="prv-msgs select-loc-directions">You can only select one location</em>
         </div>
         <div class="col-12">
@@ -27,7 +31,7 @@
                 <div id="mainCard" class="col-sm-12 col-md-6 col-lg-4" style="display: none;">
                     <!-- Beginning of service location cards: Please pass in the appropriate parameters for the location that are shown in the card -->
                     <div class="card location-card">
-                        <div class="card-body">
+                        <div class="card-body" data-location="">
                             <strong class="card-text">
                                 Building Name:
                             </strong>
