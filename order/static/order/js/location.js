@@ -2,8 +2,10 @@ $(document).ready(function() {
 
     $("#buildingFields").hide();
     $("#buildingTable").hide();
+    $("#NewLocationDiv").hide();
 
     $("#buildingSearch").on("keyup", function() {
+        $("#NewLocationDiv").show();
         $("#buildingTable").show();
         var value = $(this).val().toLowerCase();
         $("#buildingTable tr").filter(function() {
@@ -18,7 +20,15 @@ $(document).ready(function() {
         $('#id_new_building_code').val(buildingCode);
         $("#buildingTable").hide();
         $("#buildingFields").show();
+        $("#NewLocationDiv").hide();
     });
+
+     $('#NewLocationDiv button').click(function() {
+        $("#buildingTable").hide();
+        $("#buildingFields").show();
+        $("#NewLocationDiv").hide();
+    });
+    
 
     $('#buildingTable tr').on("keyup",function(e) {
         if((e.keyCode === 13)){
@@ -28,6 +38,7 @@ $(document).ready(function() {
             $('#id_new_building_code').val(buildingCode);
             $("#buildingTable").hide();
             $("#buildingFields").show();
+            $("#NewLocationDiv").hide();
         }
     });
 
