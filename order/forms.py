@@ -49,10 +49,10 @@ class AddlInfoForm(forms.Form):
 
     contact_yn = forms.ChoiceField(choices = TRUE_FALSE_CHOICES, label="Are you the on site contact?", required=True)
     contact_yn.type = 'Radio'
-    contact_id = forms.CharField(label='Uniqname', max_length=8)
-    contact_name = forms.CharField(label='Name', max_length=40)
-    contact_number = forms.CharField(label='Best number to contact.', max_length=10)
-    comments = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100'}) )
+    contact_id = forms.CharField(label='Uniqname of the on site contact person', max_length=8)
+    contact_name = forms.CharField(label='Name of the on site contact person', max_length=40)
+    contact_number = forms.CharField(label='Best number to contact', max_length=10)
+    comments = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100', 'class':'form-control'}) )
     file = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
     template = 'order/dynamic_form.html'
