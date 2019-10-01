@@ -1078,6 +1078,9 @@ h3.alert-heading {
 	border-top-right-radius:reset;
 	border-bottom-right-radius:reset;
 }
+.select2-container {
+    width:100% !important;
+}
 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
 	color:#cecbc9;
 }
