@@ -9,8 +9,6 @@ body {
 	font-family:Roboto,sans-serif;
 	color:#333333;
 	overflow-y:scroll;
-}
-@media (max-width:992px) {
 	body {
 		font-size:1.15em;
 	}
@@ -52,7 +50,7 @@ body {
 }
 
 #aux-nav {
-	background:var(--dark-blue);
+	background:#00274c;
 	color:#ffffff;
 }
 #aux-nav .navbar-brand {
@@ -121,7 +119,7 @@ body {
 }
 
 #main-nav {
-	background:var(--med-blue);
+	background:#40658f;
 	color:#ffffff;
 }
 #main-nav .nav-item {
@@ -190,10 +188,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 h1, .h1 {
 	margin:.75em 0 .5em 0;
-	color:var(--dark-blue);
+	color:#00274c;
 }
 h2, .h2 {
-	color:var(--med-blue);
+	color:#40658f;
 }
 h3, .h3 {
 	color:#555555;
@@ -411,7 +409,7 @@ span {
 	padding-right:1rem;*/
 }
 .action .delete {
-	color:#dc3545;
+	color:#d32f2f;
 	font-weight:400;
 	border-color:transparent;
 	background-color:transparent;
@@ -422,7 +420,7 @@ span {
 	background:transparent;
 }
 .action .cancel {
-	color:#dc3545;
+	color:#d32f2f;
 	font-weight:400;
 	border-color:transparent;
 	background-color:transparent;
@@ -455,7 +453,7 @@ span {
 	margin:0 auto;
 }
 .review-order-link a {
-	color:#fff;
+	color:#ffffff;
 }
 .card-deck {
 	display:flex;
@@ -1077,6 +1075,9 @@ h3.alert-heading {
 .input-group>.custom-select:not(:last-child), .input-group>.form-control:not(:last-child) {
 	border-top-right-radius:reset;
 	border-bottom-right-radius:reset;
+}
+.select2-container {
+    width:100% !important;
 }
 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
 	color:#cecbc9;

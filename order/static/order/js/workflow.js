@@ -280,7 +280,8 @@ $(document).ready(function() {
           if (obj.id == 'cat1feature48' || obj.id == 'cat2feature48' || obj.id == 'cat3feature48'  ) {
             label = "Optional";
           }
-          tab.push({'label': label, 'value': value})
+          if(id != "useSameCode56")
+            tab.push({'label': label, 'value': value})
         }
       } else if (obj.tagName=="SELECT") {
         if(name) { // Don't process data we are not saving
@@ -365,7 +366,7 @@ $(document).ready(function() {
          heading = $('#reviewstep' + tab).data('label')
          summary = summary + '~' + heading + '^';
         for (field = 0; field < tabs[tab].length; field++) {
-          txt = '<b>' + tabs[tab][field].label + '</b>  ' + tabs[tab][field].value + '<br>';
+          txt = '<b>' + tabs[tab][field].label.trim() + '</b>  ' + tabs[tab][field].value.trim() + '<br>';
           summary = summary + tabs[tab][field].label.trim() + '\t' + tabs[tab][field].value.trim() + '^';
           $('#reviewstep' + tab).append(txt);
         }

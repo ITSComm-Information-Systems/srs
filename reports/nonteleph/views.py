@@ -44,6 +44,7 @@ def get_new(request):
     		'name': name_query[i]
     	}
     	names.append(name)
+    # names = AuthUserDept.get_report_departments(request)
 
     # Find associated chartfields
     selected_dept = user_depts[0]

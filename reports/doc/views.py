@@ -35,7 +35,7 @@ def get_doc(request):
     template = loader.get_template('doc.html')
 
     # Find all departments user has access to
-    user_depts = (d.dept for d in AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept').exclude(dept='All').distinct('dept'))
+    user_depts = (d.dept for d in AuthUserDeptV.objects.filter(user=request.user.id,codename='can_report').order_by('dept').exclude(dept='All').distinct('dept'))
     user_depts = list(user_depts)
 
     # Find dept names
@@ -47,6 +47,8 @@ def get_doc(request):
     		'name': name_query[i]
     	}
     	names.append(name)
+
+    # names = AuthUserDept.get_report_departments(request)
 
     # Find associated chartfields
     selected_dept = user_depts[0]

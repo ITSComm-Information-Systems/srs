@@ -309,7 +309,7 @@ class Order(models.Model):
 
         equipment_only = True
         wiring_only = True
-        create_bill_only = True   #set to true when it hits a category 0 type is not equipment or wiring  
+        create_bill_only = False   #set to true when it hits a category 0 type is not equipment or wiring  
 
         for num, item in enumerate(item_list, start=1):
             issue = {}
@@ -325,14 +325,16 @@ class Order(models.Model):
                 issue[con.field] = con.value
 
             if action.type != 'E':
+                print(action.type)
                 equipment_only = False
 
-            if action_id != 41:
+            if action_id != '41':
+                print(action_id)
                 wiring_only = False
 
             if issue['wo_type_category_id'] == '0':
-                if not equipment_only or not wiring_only:
-                    create_bill_only = False
+                if action_id != '37' and action_id != '41':
+                    create_bill_only = True
 
             for key, value in item.data.items():
                 if value:  # Populate issue with user supplied values
@@ -368,7 +370,7 @@ class Order(models.Model):
             self.order_reference = ponum
             self.save()
             
-            #self.add_attachments()
+            self.add_attachments()
 
         except cx_Oracle.DatabaseError as e:
         #except Exception as e:

@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User, Group
-from project.pinnmodels import UmCurrentDeptManagersV
+from project.pinnmodels import UmCurrentDeptManagersV, UmOscDeptProfileV
 
 
 class Role(models.Model):  
@@ -65,7 +65,21 @@ class AuthUserDept(models.Model):
     def get_order_departments(self):
         return AuthUserDeptV.objects.filter(user_id=self,codename='can_order')
 
-    # def get_report_departments(self):
+    def get_report_departments(request):
+        if request.user.has_perm('can_order_all'):
+            query = UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').order_by('deptid')
+            return query
+        else:
+            query = AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept')
+            full_depts = []
+            for d in query:
+                name = UmOscDeptProfileV.objects.filter(deptid=d.dept)[0].dept_name
+                dept ={
+                    'deptid': d.dept,
+                    'dept_name': name
+                }
+                full_depts.append(dept)
+            return full_depts
     #     if self.has_perm('can_order_all'):
     #         return UmCurrentDeptManagersV.objects.order_by('deptid').values_list('deptid', flat=True)
     #     else:

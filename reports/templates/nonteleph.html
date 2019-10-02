@@ -6,7 +6,8 @@
 		<a class="d-inline offset-md-3" href='..'><i class="fas fa-edit"></i>Edit Your Selection</a>
 
 		<div class="row">
-			<div class="card border-dark col-md-6">
+		    <div class="col-12">
+			<div class="card border-dark col-md-6 mt-1">
 				<div class="card-body card-bottom">
 					<div id="selected_dept"><strong>Department: </strong>{{ dept }}</div>
 					<div id="billing_date"><strong>Billing Date: </strong>{{ billing_date }}</div>
@@ -19,12 +20,14 @@
 					</p>
 				</div>
 			</div>
+			</div>
 		</div>
 
 
 		{% for c in charge_types %}
 		{% if c.data %}
 		<div class="row mt-5">
+		    <div class="col-12">
 			<div class="card border-dark card-width">
 				<div class="card-header">
 					<strong>Chartfield:</strong>&nbsp;{{ c.account_number }}
@@ -102,9 +105,11 @@
 					{% endfor %}
 				</div>
 			</div>
+			</div>
 		</div>
 		{% else %}
 		<div class="row mt-5">
+		    <div class="col-12">
 			<div class="card border-dark card-width">
 				<div class="card-header">
 					<strong>Chartfield:&nbsp;</strong>{{ c.account_number }}
@@ -118,6 +123,7 @@
 				    </div>
 				</div>
 			</div>
+		</div>
 		</div>
 		{% endif %}
 		{% endfor %}

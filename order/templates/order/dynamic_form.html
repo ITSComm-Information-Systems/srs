@@ -13,7 +13,7 @@
 <fieldset id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}" {% if field.field.display_condition %}
     data-condition="{{ field.field.display_condition }}" {% endif %}>
     <legend id="legend{{ field.name }}">
-        {% if field.label == "Is there conduit?" %}
+        {% if field.label == "Is there conduit at the location?" %}
         <strong>{{ field.label }} </strong><i class="fas fa-question-circle btn-link" aria-label="More Information icon" data-toggle="modal" data-target="#datatarget"></i>
         {% else %}
         <strong>{{ field.label }}</strong>
@@ -28,7 +28,7 @@
         <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
                 aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
         {% endif %}
-        {% if field.label == "Is there conduit?" and choice != field.field.choices|first %}
+        {% if field.label == "Is there conduit at the location?" and choice != field.field.choices|first %}
                    (<a href='#blank' data-toggle="modal" data-target="#datatarget2">Order a conduit</a>)
        {% endif %}
     </div>

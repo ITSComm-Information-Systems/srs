@@ -31,23 +31,22 @@
     </div>
 
     <h2>Items Submitted</h2>
-    <div class="accordion" id="accordionExample">
-
-
+    <div class="accordion" id="ordersAccordian">
 
         {% for item in item_list %}
+        <!-- {{ forloop.counter }} -->
         <div class="card">
-            <div class="card-header" id="headingOne">
+            <div class="card-header" id="heading-{{ forloop.counter }}">
                 <h2 class="mb-0">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne"
-                        aria-expanded="true" aria-controls="collapseOne">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ forloop.counter }}"
+                        aria-expanded="true" aria-controls="collapse-{{ forloop.counter }}">
                         {{ item.description }}
                     </button>
                 </h2>
             </div>
 
-            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
-                data-parent="#accordionExample">
+            <div id="collapse-{{ forloop.counter }}" class="collapse show" aria-labelledby="heading-{{ forloop.counter }}"
+                data-parent="#ordersAccordian">
                 <div class="card-body">
                     {% for tab in item.data.reviewSummary.tabs %}
                     {% for title, content in tab.items %}
