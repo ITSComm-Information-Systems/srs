@@ -15,9 +15,10 @@ $(document).ready(function () {
     $("input:radio").click(function() {
         id = "#addinfo" + this.id.substring(3,30);
         div = $(id).parent();
-        console.log(div);
+        type = $(this).data('type');
         if (this.checked) {
-            $(".radio-addl").hide();
+            //$(".radio-addl").hide();
+            $("[data-addl='" + type + "']").hide();
             $(div).show()
             $(id).select()
         } else {
