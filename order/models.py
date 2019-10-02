@@ -282,7 +282,7 @@ class Order(models.Model):
                         #lob = connections['pinnacle'].createlob()
 
                     with connections['pinnacle'].cursor() as cursor:
-                        noteid = cursor.callproc('um_note_procedures_k.um_make_note_an_attachment_p',  ['Note', id,'files', filename, lob] )
+                        noteid = cursor.callproc('pinn_custom.um_note_procedures_k.um_make_note_an_attachment_p',  ['Note', id,'files', filename, lob] )
 
 
     def create_preorder(self):
