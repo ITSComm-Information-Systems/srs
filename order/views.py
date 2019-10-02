@@ -153,8 +153,8 @@ class Submit(PermissionRequiredMixin, View):
 def send_email(request):
     if request.method == "POST":
         print(request.POST)
-        subject = request.POST['emailSubject']
-        body = request.POST['emailBody']
+        subject = request.POST['emailSubject'] + ' - from ' + request.user.username
+        body = request.POST['emailBody'] 
 
         with connections['pinnacle'].cursor() as cursor:
             cursor.callproc('um_osc_util_k.um_send_email_p', ['itcom.csr@umich.edu', subject, body])
