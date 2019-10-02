@@ -15,7 +15,7 @@ from django.contrib.auth import get_user_model
 from django import forms
 
 from ldap3 import Server, Connection, ALL
-from oscauth.models import AuthUserDeptV, Grantor, Role
+from oscauth.models import AuthUserDept, Grantor, Role
 from django.db.models import indexes
 
 from django.db.models import Value
@@ -35,7 +35,7 @@ def get_soc(request):
     template = loader.get_template('soc.html')
 
     # Get departments and department groups for dropdown
-    depts = find_depts(request)
+    depts = AuthUserDept.get_report_departments(request)
     groups_descr = UmOscDeptUnitsReptV.objects.order_by('dept_grp_descr').values_list('dept_grp_descr',flat = True).distinct()
     
     # Get date information for dropdowns
@@ -162,39 +162,6 @@ def generate(request):
     }
 
     return HttpResponse(template.render(context,request))
-
-
-
-# Returns all departments a user has reporting access to
-def find_depts(request):
-    # depts = []
-    # query = AuthUserDept.get_report_departments(request.user)#(d.dept for d in AuthUserDept.get_report_departments(request.user))#.objects.filter(user=request.user.id, codename='can_report').order_by('dept').exclude(dept='All').distinct('dept'))
-    # depts = list(query)
-
-    # return depts
-    if request.user.has_perm('can_order_all'):
-        query = UmOscDeptProfileV.objects.all().order_by('deptid')
-        return list(query)
-    else:
-        query = AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept')
-        query = find_dept_names(query)
-        return query
-
-
-# Finds a name for each department
-def find_dept_names(depts):
-    full_depts = []
-
-    for d in depts:
-        name = UmOscDeptProfileV.objects.filter(deptid=d.dept)[0].dept_name
-        dept ={
-            'deptid': d.dept,
-            'dept_name': name
-        }
-        full_depts.append(dept)
-
-    return full_depts
-
 
 
 # Grabs fiscal year options for dropdown

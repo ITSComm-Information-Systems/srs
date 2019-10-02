@@ -3,6 +3,7 @@ from django.template import loader
 from django.shortcuts import render
 from django.views.generic import View
 from order.forms import *
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceProfileV, UmOscChartfieldV
@@ -21,7 +22,7 @@ import threading
 
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment, ChargeType, UserChartcomV
 
-
+@permission_required('oscauth.can_order')
 def get_phone_location(request, phone_number):
     locations = list(UmOscServiceProfileV.objects.filter(service_number=phone_number).exclude(location_id=0).values())
     if not locations:
@@ -30,6 +31,7 @@ def get_phone_location(request, phone_number):
     return JsonResponse(locations, safe=False)
 
 
+@permission_required('oscauth.can_order')
 def get_order_detail(request, order_id):
 
     order = Order.objects.get(id=order_id)
@@ -156,10 +158,12 @@ def send_email(request):
 
         with connections['pinnacle'].cursor() as cursor:
             cursor.callproc('um_osc_util_k.um_send_email_p', ['itcom.csr@umich.edu', subject, body])
-
+        if body == "Cancel Order":
+            return HttpResponseRedirect('/cancelorder') 
         return HttpResponseRedirect('/emailsent') 
 
 
+@permission_required('oscauth.can_order')
 def add_to_cart(request):
     if request.method == "POST":
 
@@ -228,6 +232,7 @@ def add_to_cart(request):
 
         return HttpResponseRedirect('/orders/cart/' + charge.dept) 
 
+@permission_required('oscauth.can_order')
 def delete_from_cart(request):
     if request.method == "POST":
         item = request.POST['itemId']
