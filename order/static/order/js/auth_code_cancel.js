@@ -3,8 +3,9 @@ $(document).ready(function() {
     $('[data-tab="AuthCodeCancel"]').on('shown.bs.tab', function(event) {
 
         max = $("#id_CodeCount").val();
+        num = $(".form-row").length;
 
-        for (i = 1; i < max; i++) {
+        for (i = num; i < max; i++) {
 
             num = i.toString();
 
@@ -18,9 +19,9 @@ $(document).ready(function() {
             rec.find("#change").attr("name", "type" + num).attr("id", "change" + num);
             rec.find("label[for='change']").attr("for", "change" + num);
         
-            rec.find("#auth").attr("name", "auth" + num).attr("id","auth" + num);
+            rec.find("#sub").attr("name", "sub" + num).attr("id","sub" + num);
 
-            rec.find("#authName").attr("name", "auth" + num).attr("id","auth" + num);
+            rec.find("#group").attr("name", "group" + num).attr("id","group" + num);
 
             $("#mainBody").append(rec);
 
