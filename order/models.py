@@ -264,10 +264,10 @@ class Order(models.Model):
                 pre_order_id = UmOscPreorderApiV.objects.get(add_info_text_3=self.id, pre_order_issue = num).pre_order_id # TODO replace issue id with key -- add_info_text_4=item.id
 
                 with connections['pinnacle'].cursor() as cursor:
-                    cursor.callproc('um_note_procedures_k.um_create_note_p', ['Work Order', None, pre_order_id, 'files', 'attachments', None, self.created_by.username] )
+                    cursor.callproc('pinn_custom.um_note_procedures_k.um_create_note_p', ['Work Order', None, pre_order_id, 'files', 'attachments', None, self.created_by.username] )
 
                 with connections['pinnacle'].cursor() as cursor:
-                    noteid = cursor.callfunc('um_note_procedures_k.um_get_note_id_f', cx_Oracle.STRING , ['Work Order', pre_order_id,'files'] )
+                    noteid = cursor.callfunc('pinn_custom.um_note_procedures_k.um_get_note_id_f', cx_Oracle.STRING , ['Work Order', pre_order_id,'files'] )
                     id = int(noteid)
 
                 for attachment in attachment_list:
