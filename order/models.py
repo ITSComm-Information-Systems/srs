@@ -261,7 +261,7 @@ class Order(models.Model):
             attachment_list = Attachment.objects.filter(item_id=item.id)
 
             if len(attachment_list) > 0:
-                pre_order_id = UmOscPreorderApiV.objects.get(add_info_text_3=self.id, add_info_text_4=item.id).pre_order_id # TODO replace issue id with key -- add_info_text_4=item.id
+                pre_order_id = UmOscPreorderApiV.objects.get(add_info_text_3=self.id, add_info_text_4=item.id).pre_order_id
 
                 #with connections['pinnacle'].cursor() as cursor:
                 #    cursor.callproc('pinn_custom.um_note_procedures_k.um_create_note_p', ['Work Order', None, pre_order_id, 'files', 'attachments', None, self.created_by.username] )
@@ -272,25 +272,17 @@ class Order(models.Model):
 
                 for attachment in attachment_list:
                     filename = attachment.file.name[12:99]
-                    #loc = '/Users/djamison/oscmedia/attachments/ex_QDC8LZD.jpg'
-                    source = attachment.file.open(mode='rb')
-                    fileData = source.read()
-                    #fileData = attachment.file.read()
-                    #print(fileData)
+                    fileData = attachment.file.read()
 
                     conn = connections['pinnacle'].connection
-                    lob = conn.createlob(cx_Oracle.CLOB)  #blob causes invalid parameters
+                    lob = conn.createlob(cx_Oracle.BLOB)  
                     lob.write(fileData)
-                        #lob = connections['pinnacle'].createlob()
 
                     with connections['pinnacle'].cursor() as cursor:
-                        noteid = cursor.callproc('pinn_custom.um_note_procedures_k.um_make_note_an_attachment_p',  ['Note', id,'files', filename, lob] )
+                        noteid = cursor.callproc('pinn_custom.um_note_procedures_k.um_make_blob_an_attachment_p',  ['Note', id,'files', filename, lob] )
 
 
     def create_preorder(self):
-
-        #self.add_attachments()
-        #return
 
         data =  {  
                     "department_number": self.chartcom.dept,
@@ -360,6 +352,8 @@ class Order(models.Model):
     
         if create_bill_only:
             data['create_bill_only'] = 'Y'
+        else:
+            data['create_bill_only'] = 'N'
 
         json_data = json.dumps({"Order": data})
 
