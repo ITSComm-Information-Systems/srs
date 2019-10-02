@@ -289,8 +289,8 @@ class Order(models.Model):
 
     def create_preorder(self):
 
-        self.add_attachments()
-        return
+        #self.add_attachments()
+        #return
 
         data =  {  
                     "department_number": self.chartcom.dept,
