@@ -2,15 +2,13 @@
 <div id="rescat{{category.id}}" data-phoneset="{{category.name}}">
   <p class="h2 custom-h2">Calling Restrictions for {{category}}
   </p>
-  <div class="features-restriction-msg mb-4">
+  <div class="features-restriction-msg mb-2">
     <em>
       We can't display the current calling restrictions for this phone. Review the Inventory and Location Report to see
       your phone's current calling restrictions.
     </em>
-    <strong>
+    <strong class="mt-2">
       Select the calling restrictions you want this phone to have.
-      <small>
-        <!-- <a href="#">Learn More</a> -->
         <a class="popover-icon" data-toggle="popover" tabindex="0" role="button"
           data-container="body" data-trigger="hover" data-placement="right"
           title=""
@@ -18,7 +16,6 @@
           <i class="fas fa-question-circle"
               aria-label="More informaiton about calling restrictions"></i>
           </a>   
-      </small>
     </strong>
   </div>
   {% for res in category.res %}
