@@ -588,17 +588,17 @@ class UmOscAvailableLocsV(models.Model):
           ordering = ('service_number',)
           db_table = 'PINN_CUSTOM\".\"um_osc_available_locs_v'
 
-class UmOscLocationsInUseV(models.Model):
-     campus_code = models.CharField(max_length=4)
+class UmOscLocationsInUseV(models.Model): 
+     campuscd = models.CharField(max_length=4)
      campus_desc = models.CharField(max_length=30)
      service_type = models.CharField(max_length=20)
-     service_number = models.CharField(max_length=60)
-     service_subscrib_id = models.IntegerField(9, null=False)
+     service_number = models.CharField(max_length=60)   
+     #service_subscrib_id = models.IntegerField(9, null=False)  
      status = models.CharField(max_length=15)
      service_id = models.IntegerField(9, null=False)
      location_id = models.IntegerField(9, null=False)
      path_id = models.IntegerField(9, null=False)
-     building_id = models.CharField(max_length=10, primary_key=True)
+     building_id = models.CharField(max_length=10, primary_key=True)  # DEBUG
      building_name = models.CharField(max_length=25)
      floor = models.CharField(max_length=18)
      floor_desc = models.CharField(max_length=50)
