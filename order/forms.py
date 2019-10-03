@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory
+from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 
 class FeaturesForm(forms.Form):
@@ -37,6 +38,8 @@ class RestrictionsForm(forms.Form):
         cat.res = res.filter(category=cat).order_by('display_seq_no')
         last = cat.res.count()
         cat.last = cat.res[last-1].id
+
+    information = Page.objects.get(permalink='/restriction')
 
     template = 'order/restrictions.html'
 
