@@ -111,7 +111,7 @@ def confirm(request):
     new_location = UmOscAvailableLocsV.objects.filter(building_name__exact = new_name, building_id__exact = new_code, floor__exact = new_floor, room__exact = new_room, jack__exact = new_jack).values_list().distinct()
 
     p = UmOscVoipLocChangeInput(uniqname = unique_name, service_id = selected[0]['service_id'], service_number = phone_number, # service_subscrib_id = selected[0]['service_subscrib_id'],
-        old_campuscd = selected[0]['campus_code'], old_campus_desc = selected[0]['campus_desc'], old_location_id = selected[0]['location_id'], 
+        old_campuscd = selected[0]['campuscd'], old_campus_desc = selected[0]['campus_desc'], old_location_id = selected[0]['location_id'], 
         old_path_id = selected[0]['path_id'], old_building_id = selected[0]['building_id'], old_building_name = selected[0]['building_name'], old_floor = selected[0]['floor'],
         old_floor_desc = None, old_room = selected[0]['room'], old_room_desc = None,
         old_jack = current_jack, service_id_at_new_loc = None, service_nbr_at_new_loc = None,
