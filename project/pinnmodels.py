@@ -615,7 +615,7 @@ class UmOscVoipLocChangeInput(models.Model):
      uniqname = models.CharField(max_length=8) 
      service_id = models.IntegerField(9, null=False)
      service_number= models.CharField(max_length=60)
-     service_subscrib_id = models.IntegerField(9, null=False)
+     #service_subscrib_id = models.IntegerField(9, null=False)
      old_campuscd = models.CharField(max_length=4)
      old_campus_desc = models.CharField(max_length=30)
      old_location_id = models.IntegerField(9, null=False)
