@@ -61,7 +61,7 @@ def get_soc(request):
 
     context = {
         'title': 'Summary of Charges',
-        'depts': depts, #find_dept_names(depts),
+        'depts': depts,
         'groups_descr':groups_descr,
         'instructions': instructions,
         'fiscal':fiscal,
@@ -78,7 +78,6 @@ def get_soc(request):
 def generate(request):
     # Get selected department(s) from form
     display_type = request.POST.get("unitGroupingGroup",None)
-    depts = find_depts(request)
     grouping = ''
     unit = ''
     # If they selected by Department ID
