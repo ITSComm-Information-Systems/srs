@@ -72,14 +72,32 @@
                             <!-- end of table headers -->
                             <tbody>
                                 {% for chartcom in chartcoms %}
-                                <tr data-cfid="{{chartcom.id}}" data-chartcom="{{chartcom.account_number}}">
+                                <tr data-cfid="{{chartcom.id}}" data-chartcom="{{chartcom.account_number}}" id = "{{chartcom.id}}" >
                                     <th scope="row">{{chartcom.name}}</th>
                                     <td>{{chartcom.fund}}</td>
                                     <td>{{chartcom.dept}}</td>
                                     <td>{{chartcom.program}}</td>
                                     <td>{{chartcom.class_code}}</td>
-                                    <td>{{chartcom.project_grant}}</td>
-                                    <td>{{chartcom.shortcode}}</td>
+                                    <td>{{chartcom.project_grant}}</td> 
+                                    <script>
+                                       var key = "{{chartcom.fund}}"+"-"+"{{chartcom.dept}}"+"-"+"{{chartcom.program}}"+"-" +"{{chartcom.class_code}}"
+                                       if("{{chartcom.project_grant}}" != ""){
+                                            key = key + "-"+"{{chartcom.project_grant}}";
+                                       }
+                                       var s_d = "{{short_code_list}}";
+                                       s_d = s_d.replace(/&quot;/g,"'"); 
+                                       var value;
+                                       if(s_d.substring(s_d.indexOf(key)+ key.length + 4,s_d.indexOf(key) + key.length +5 ) == "'")
+                                            value = "";
+                                        else
+                                            value = s_d.substring(s_d.indexOf(key)+ key.length + 4,s_d.indexOf(key) + key.length +10 );
+                                       var x = document.createElement("TD");
+                                       x.innerHTML = value;
+                                       document.getElementById("{{chartcom.id}}").appendChild(x);
+
+                                    </script>
+                                    
+
                                     <td class="action">
                                         <a id="{{chartcom.id}}" class="edit" href="#" data-toggle="modal"
                                             data-target="#editChartfieldModal1">
@@ -118,6 +136,8 @@
                                 <select class="form-control" id="chartfieldSelectSearch" name="chartfieldSelection">
                                     {% for addcc in add_chartcoms %}
                                         <option data-shortcode="{{addcc.short_code}}" value="{{addcc.chartfield}}">{{addcc.chartfield}}</option>
+                                        
+
                                     {% endfor %}
                                 </select>
                             </div>
@@ -134,6 +154,12 @@
                                 </label>
                                 <input type="text" class="form-control" id="chartfieldSelectedShortcode"
                                     name="shortcode" readonly>
+                                <script>
+                                        console.log("Shortcode populated");
+                                        var value = document.getElementById("chartfieldSelectedShortcode").value;
+                                        console.log(value);
+
+                                </script>
                             </div>
                             <!-- user enters description/nickname in following text input field -->
                             <div class="form-group">
@@ -289,6 +315,8 @@ $(document).ready(function () {
         $("#shortCode").text(row.find("td").eq(5).html());
         $("#chartCom").text(row.data('chartcom'));
         $("#addCCId").val(id);
+        console.log("shortcode")
+        console.log(row.find("td").eq(5).html())
     })
 
     $('#editChartfieldModal1').on('show.bs.modal', function (e) {
@@ -306,6 +334,10 @@ $(document).ready(function () {
         $("#chartComDescr").text(row.find("th").html());
         $("#shortCode").text(row.find("td").eq(5).html());
         $("#chartCom").text(row.data('chartcom'));
+        console.log("Chart")
+        console.log($("#chartCom").text(row.data('chartcom')).html())
+        console.log("shortcode")
+        console.log($("#shortCode").val())
         $("#deleteCCId").val(id);
     })
 
