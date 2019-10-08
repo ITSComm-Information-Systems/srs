@@ -64,6 +64,7 @@ class ManageChartcom(PermissionRequiredMixin, View):
             chartcom.program = cc.program
             chartcom.class_code = cc.class_code
             chartcom.project_grant = cc.project_grant
+            chartcom.short_code = cc.short_code
             chartcom.name = request.POST.get('description')
             chartcom.save()
 
@@ -96,6 +97,10 @@ class ManageChartcom(PermissionRequiredMixin, View):
         chartcoms = Chartcom.objects.filter(dept=deptid)
         add_chartcoms = UmOscChartfieldV.objects.filter(deptid=deptid)
 
+        short_code_list = {}
+        for ctc in add_chartcoms:
+            short_code_list[str(ctc.chartfield)] = ctc.short_code
+
         template = loader.get_template('order/manage_chartfield.html')
         context = {
             'title': 'Manage Chartfields',
@@ -103,6 +108,7 @@ class ManageChartcom(PermissionRequiredMixin, View):
             'dept_list': dept_list,
             'chartcoms': chartcoms,
             'add_chartcoms': add_chartcoms,
+            'short_code_list':json.dumps(short_code_list),
         }
         return HttpResponse(template.render(context, request))
 
