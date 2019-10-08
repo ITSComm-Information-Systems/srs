@@ -29,12 +29,11 @@
     </legend>
     <div class="input-group mb-4">
         <span class="sr-only">
-            <label for="dept_{{ field.name }}" id="label_dp_{{ field.name }}">Select a Department</label>
+            <label for="dept_{{ field.name }}">Select a Department</label>
         </span>
         <div class="input-group-prepend">
             <select class="custom-select dccsel" id="dept_{{ field.name }}" data-target="{{ field.name }}"
-                onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;"
-                aria-labelledby="legend_{{field.name}} label_dp_{{ field.name }}">
+                onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
                 <option value="all">All Depts</option>
                 {% for dept in tab.form.dept_list %}
                 <option value="{{dept}}">{{dept}}</option>
@@ -43,11 +42,10 @@
         </div> 
 
         <span class="sr-only">
-            <label for="id_{{ field.name }}" id="label_{{ field.name }}">Select a Chartfield</label>
+            <label for="name_{{ field.name }}">Select a Chartfield</label>
         </span>
 
-        <select data-label="{{ field.label }}" data-tabid="{{tab.id}}" class="custom-select ccsel" id="name_{{ field.name }}"
-            aria-labelledby="legend_{{field.name}} label_{{ field.name }}" onchange="chartcomChange(this)" onload="chartcomChange(this)">
+        <select data-label="{{ field.label }}" data-tabid="{{tab.id}}" class="custom-select ccsel" id="name_{{ field.name }}" onchange="chartcomChange(this)" onload="chartcomChange(this)">
             {% for chartcom in tab.form.chartcom_list %}
             <option data-dept="{{ chartcom.dept }}" data-chartcom="{{ chartcom.account_number }}" data-chartcom-id="{{ chartcom.chartcom_id }}"">{{ chartcom.name }}</option>
             {% endfor %}
