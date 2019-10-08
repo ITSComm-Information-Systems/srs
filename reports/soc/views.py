@@ -83,8 +83,11 @@ def generate(request):
     # If they selected by Department ID
     if display_type in ['1']:
         grouping = 'Department ID'
-        format_unit = request.POST.getlist('department_id')
-        unit = remove_names(format_unit)
+        if request.POST.get('deptall') == 'All':
+            unit = 'All'
+        else:
+            format_unit = request.POST.getlist('department_id')
+            unit = remove_names(format_unit)
     # If they selected by Department Group
     elif display_type in ['3']:
         grouping = 'Department Group'
@@ -246,7 +249,10 @@ def get_rows(unit, grouping, period, drange, request):
     
     # Further filter by selected departments
     if (grouping == 'Department ID'):
-        return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
+        if unit == "All":
+            return values.order_by('account_desc').values().distinct()
+        else:
+            return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
 
     elif (grouping == 'Department IDs'):
         return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
