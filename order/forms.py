@@ -56,8 +56,7 @@ class AddlInfoForm(forms.Form):
     contact_name = forms.CharField(label='Name of the on site contact person', max_length=40)
     contact_number = forms.CharField(label='Best number to contact', max_length=10)
     comments = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100', 'class':'form-control'}) )
-    file = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
-
+    file = forms.FileField(label="Please attach any drawings, spreadsheets or floor plans with jack locations as needed", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
     template = 'order/dynamic_form.html'
 
 
