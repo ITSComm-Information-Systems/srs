@@ -1,54 +1,55 @@
 {% for category in tab.form.list %}
 <div id="rescat{{category.id}}" data-phoneset="{{category.name}}">
-  <p class="h2 custom-h2">Calling Restrictions for {{category}}
-  </p>
-  <div class="features-restriction-msg mb-2">
-    <em>
-      We can't display the current calling restrictions for this phone. Review the Inventory and Location Report to see
-      your phone's current calling restrictions.
-    </em>
-    <strong class="mt-2">
-      Select the calling restrictions you want this phone to have.
+  <fieldset>
+    <legend class="h2 custom-h2">Calling Restrictions for {{category}}</legend>
+    <div class="features-restriction-msg mb-2">
+      <em>
+        We can't display the current calling restrictions for this phone. Review the Inventory and Location Report to
+        see
+        your phone's current calling restrictions.
+      </em>
+      <strong class="mt-2">
+        Select the calling restrictions you want this phone to have.
         <a href='#' data-toggle="modal" tabindex="0" role="button" data-target="#restrictionsModal">
-          <i class="fas fa-question-circle"
-              aria-label="More informaiton about calling restrictions"></i>
-          </a>   
-    </strong>
-  </div>
-  {% for res in category.res %}
-  <div class="custom-control custom-radio">
-    <input class="form-check-input" type="radio" value="{{res.id}}" name="resrescat{{category.id}}" id="cat-{{category.id}}-{{res.id}}"
-      required>
-    <label class="form-check-label" for="cat-{{category.id}}-{{res.id}}">{{res}}</label>
-    {% if res == category.res.last %}
-    <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle"
-        aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
-    {% endif %}
-  </div>
-  {% endfor %}
+          <i class="fas fa-question-circle" aria-label="More informaiton about calling restrictions"></i>
+        </a>
+      </strong>
+    </div>
+    {% for res in category.res %}
+    <div class="custom-control custom-radio">
+      <input class="form-check-input" type="radio" value="{{res.id}}" name="resrescat{{category.id}}"
+        id="cat-{{category.id}}-{{res.id}}" required>
+      <label class="form-check-label" for="cat-{{category.id}}-{{res.id}}">{{res}}</label>
+      {% if res == category.res.last %}
+      <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+          aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </fieldset>
 </div>
 {% endfor %}
 
 <!-- Restrictions Modal -->
 <div class="modal fade" id="restrictionsModal" tabindex="-1" role="dialog" aria-labelledby="callingRestrictions"
-aria-hidden="true">
-<div class="modal-dialog" role="document">
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
     <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="callingRestrictions">Calling Restrictions</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-              {{ information.bodytext }}
-            </div>
-            <div class="modal-footer">
-                <!-- Close Button -->
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      <div class="modal-header">
+        <h5 class="modal-title" id="callingRestrictions">Calling Restrictions</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {{ information.bodytext }}
+      </div>
+      <div class="modal-footer">
+        <!-- Close Button -->
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 
-            </div>
+      </div>
     </div>
-</div>
+  </div>
 </div>
 <!-- End of Restrictions Modal -->
