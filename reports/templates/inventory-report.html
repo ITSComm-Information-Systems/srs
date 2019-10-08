@@ -29,7 +29,7 @@
     </div>
 </div>
 
-
+{% comment %}
 {% if formated_data or location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%}
 <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
     <input type="text" name="dept_id" id="dept_id" value="{{dept_id}}-{{dept_name}}" readonly hidden>
@@ -185,41 +185,15 @@
         <!-- <hr class="style1 3"> -->
     {% endif %}
 </form>
-{% comment %}
-<hr class="style1 4">
-{% endif %}
 
-{% if location_filter or type_filter or cf_filter or date_filter%}
-    <div class='form-row mb-0'>
-        <div class='form-group col-md-10'>
-            <strong class='mt-2 mb-1'>Current Filters:</strong>
 
-            <div class='indented-form-input'>
-                <p>
-                    {% if location_filter %}<strong>Location:</strong> {{ location_filter }}<br>{% endif %}
-                    {% if type_filter %}<strong>User ID Type:</strong> {{ type_filter }}<br>{% endif %}
-                    {% if cf_filter %}<strong>Chartfield:</strong> {{ cf_filter }}<br>{% endif %}
-                    {% if date_filter %}<strong>Last Call Date:</strong> {{ date_filter }}<br>{% endif %}
-                </p>
-            </div>
-        </div>
-
-        <div class='form-group col-md-2'>
-            {% if location_filter or type_filter or cf_filter or date_filter%}
-                <input type='submit' value='Remove Filters' class="btn btn-danger float-right">
-            {% endif %}
-        </div>
-    </div>
-
-    <hr class="style1 5">
-{% endif %}
 {% endcomment %}
 
 {% if formated_data %}
 <!-- {% if not location_filter or type_filter or  cf_filter or  date_filter %} -->
-<hr class="style1 2">
+<!-- <hr class="style1 2"> -->
 <!-- {% endif %} -->
-<button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right">
+<button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right" aria-label="Downdload Report as CSV File">
     Download CSV
 </button>
 
