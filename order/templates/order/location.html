@@ -15,17 +15,17 @@
 
   <table id="buildingTable" class="table table-hover" aria-live=”polite”>
     {% for building in tab.form.building_list %}
-    <tr tabindex="0"  id="{{ building.building_code }}">
+    <tr tabindex="0"  id="{{ building.building_code }}" role="button" aria-label="Select location building {{ building.building_name }} with buidling code of {{ building.building_code }}">
       <td >{{ building.building_code }}</td>
       <td name="buildingName">{{ building.building_name }}</td>
     </tr>
     {% endfor %}
-    <tr id="buildingNA">
+    <tr id="buildingNA" role="button" aria-label="Building location not listed">
       <td>Not Listed</td>
       <td name="buildingName"></td>
     </tr>
   </table>
-  <div id="NewLocationDiv">
+  <div id="NewLocationDiv" role="button" aria-label="Add a new location that is not currently listed">
     <b>Can't find the building you're looking for?   </b>
     <button id = "NewLocationButton" type="button" class="btn btn-warning">Add New Location</button>
   </div>
