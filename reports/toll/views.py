@@ -124,17 +124,18 @@ def select_billing(request):
 def find_depts(request):
 	depts = []
 		
-	query = AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept').exclude(dept='All').distinct('dept')
+	# query = AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept').exclude(dept='All').distinct('dept')
 
-	for dept in query:
-		#if Group.objects.get(name=dept.group).name != 'Orderer':
-		name = UmOscDeptProfileV.objects.filter(deptid=dept.dept)[0].dept_name
-		#depts.append(dept.dept)
-		depart = {
-			'id': dept.dept,
-			'name': name
-		}
-		depts.append(depart)
+	# for dept in query:
+	# 	#if Group.objects.get(name=dept.group).name != 'Orderer':
+	# 	name = UmOscDeptProfileV.objects.filter(deptid=dept.dept)[0].dept_name
+	# 	#depts.append(dept.dept)
+	# 	depart = {
+	# 		'id': dept.dept,
+	# 		'name': name
+	# 	}
+	# 	depts.append(depart)
+	depts = AuthUserDept.get_report_departments(request)
 	return depts
 
 # Generate report data

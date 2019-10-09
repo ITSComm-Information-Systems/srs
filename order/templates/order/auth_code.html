@@ -1,5 +1,6 @@
 <div id="mainBody">
-    <div class="form-row" id="authdiv">
+    <div class="form-row mb-4" id="authdiv">
+        <legend><strong>Assign Authcode to Individual or Group</strong></legend>
         <div class="form-check">
             <input class="form-check-input col-2" type="radio" value="Individual" name="type" id="individual" required>
             <label class="form-check-label col-2" for="individual">Individual</label>
@@ -8,7 +9,10 @@
             <input class="form-check-input wg-rad col-2" type="radio" value="Workgroup" name="type" id="workgroup" required>
             <label class="form-check-label wg-rad col-2" for="workgroup">Workgroup</label>
         </div>
-        <input class="col-2" id="auth" type="text" name="name" placeholder="Name of Group/Individual" required>
+        <div class="form-check">
+            <label for="auth">Enter the Name of the Group/Individual</label>
+            <input class="col-12" id="auth" type="text" name="name" placeholder="Name of Group/Individual" required>
+        </div>
     </div>
 </div>
 

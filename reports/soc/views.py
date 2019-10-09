@@ -83,8 +83,12 @@ def generate(request):
     # If they selected by Department ID
     if display_type in ['1']:
         grouping = 'Department ID'
-        format_unit = request.POST.getlist('department_id')
-        unit = remove_names(format_unit)
+        if request.POST.get('deptall') == 'All':
+            unit = 'All'
+            format_unit = ['All']
+        else:
+            format_unit = request.POST.getlist('department_id')
+            unit = remove_names(format_unit)
     # If they selected by Department Group
     elif display_type in ['3']:
         grouping = 'Department Group'
@@ -226,27 +230,111 @@ def get_rows(unit, grouping, period, drange, request):
 
     # Filter report data by selected billing period
     if (drange == 'Fiscal Year'):
-        values = UmOscDeptUnitsReptV.objects.filter(fiscal_yr__exact=period)
+        variable_column = 'fiscal_yr'
+        search_type = 'exact'
+        search_string = period
+        # values = UmOscDeptUnitsReptV.objects.filter(fiscal_yr__exact=period)
 
     elif (drange == 'Calendar Year'):
-        values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact=period)
+        variable_column = 'calendar_yr'
+        search_type = 'exact'
+        search_string = period
+        #values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact=period)
 
     elif (drange == 'Single Month'):
         month = period.split(' ')[0]
         year = period.split(' ')[1]
-        values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact=year, month__exact=month)
+
+        variable_column = 'calendar_yr'
+        search_type = 'exact'
+        search_string = year
+
+        variable_column2 = 'month'
+        search_type2 = 'exact'
+        search_string2 = month
+
+        date_filter2 = variable_column2 + '__' + search_type2
+
+        #values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact=year, month__exact=month)
 
     elif (drange == 'Month-to-Month'):
         month1 = period.split(' ')[0]
         year1 = period.split(' ')[1]
         month2 = period.split(' ')[3]
         year2 = period.split(' ')[4]
-        values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(date__range = [year1+''+month1,year2+''+month2]) #.order_by('account').values('account','date').distinct()
+
+        variable_column = 'date'
+        search_type = 'range'
+        search_string = [year1+''+month1,year2+''+month2]
+
+       # values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(date__range = [year1+''+month1,year2+''+month2]) #.order_by('account').values('account','date').distinct()
+
+
+    # # CREATE DEPT FILTER
+    # if (grouping == 'Department ID'):
+    #     if unit == "All":
+    #         if not request.user.has_perm("can_order_all"):
+    #             depts = [d['deptid'] for d in AuthUserDept.get_report_departments(request)]
+    #             dept_column = 'deptid'
+    #             dept_search_type = 'in'
+    #             dept_search_string = depts
+    #     else:
+    #         dept_column = 'deptid'
+    #         dept_search_type = 'in'
+    #         dept_search_string = unit
+
+    # elif (grouping == 'Department IDs'):
+    #     dept_column = 'deptid'
+    #     dept_search_type = 'in'
+    #     dept_search_string = unit
+
+    # elif (grouping == 'Department Group'):
+    #     dept_column = 'dept_dep_descr'
+    #     dept_search_type = 'exact'
+    #     dept_search_string = unit[0]
+
+    # elif (grouping == 'Department Group VP Area'):
+    #     dept_column = 'dept_grp_vp_area_descr'
+    #     dept_search_type = 'exact'
+    #     dept_search_string = unit[0]
+
+
+    # Use custom filter
+    date_filter = variable_column + '__' + search_type
+
+    # if unit == 'All' and request.user.has_perm("can_order_all"):
+    if drange == 'Single Month':
+        values = UmOscDeptUnitsReptV.objects.filter(**{ date_filter: search_string }, **{ date_filter2: search_string2 }).order_by('account', 
+                                                    'charge_group', 'charge_code')
+    elif drange == 'Month-to-Month':
+        values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(**{ date_filter: search_string }).order_by('account', 
+                                                        'charge_group', 'charge_code')
+    else:
+        values = UmOscDeptUnitsReptV.objects.filter(**{ date_filter: search_string }).order_by('account', 'charge_group', 'charge_code')
+
+    # else:
+    #     dept_filter = dept_column + '__' + dept_search_type
+    #     if drange == 'Single Month':
+    #         values = UmOscDeptUnitsReptV.objects.filter(**{ dept_filter: dept_search_string }, **{ date_filter: search_string }, 
+    #                                                     **{ date_filter2: search_string2 }).order_by('account', 'charge_group', 'charge_code')
+    #     elif drange == 'Month-to-Month':
+    #         values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(**{ dept_filter: dept_search_string }, 
+    #                                                         **{ date_filter: search_string }).order_by('account', 'charge_group', 'charge_code')
+    #     else:
+    #         values = UmOscDeptUnitsReptV.objects.filter(**{ dept_filter: dept_search_string }, **{ date_filter: search_string }).order_by('account', 
+    #                                                     'charge_group', 'charge_code') 
 
     
     # Further filter by selected departments
     if (grouping == 'Department ID'):
-        return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
+        if unit == "All":
+            if request.user.has_perm("can_order_all"):
+                return values.order_by('account_desc').values().distinct()
+            else:
+                depts = [d['deptid'] for d in AuthUserDept.get_report_departments(request)]
+                return values.filter(deptid__in = depts).order_by('account_desc').values().distinct()
+        else:
+            return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
 
     elif (grouping == 'Department IDs'):
         return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
