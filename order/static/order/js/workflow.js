@@ -321,7 +321,10 @@ $(document).ready(function() {
     inp = $("#step" + currStep + " :input:visible");
     valid = true;
     for (i = 0; i < inp.length; i++) {
-      if (!inp[i].checkValidity()) {
+      if (inp[i].checkValidity()) {
+        $(inp[i]).attr("aria-invalid", "false");
+      } else {
+        $(inp[i]).attr("aria-invalid", "true");
         inp[i].className += " invalid";
         valid = false;
       }
