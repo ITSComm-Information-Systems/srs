@@ -11,7 +11,7 @@
                 </label>
                 <select class="form-control mt-0" name="dept_id" id="tolls_deptids" required size="{{ depts|length}}" aria-labelledby="tollDeptLabel">
                     {% for dept in depts %}
-                    <option value="{{ dept.id }}">{{ dept.id }} - {{ dept.name }}</option>
+                    <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.dept_name }}</option>
                     {% endfor %}
                 </select>
                 {% endif %}

@@ -7,6 +7,8 @@
     <form action="/reports/soc/report" method="POST" onsubmit="return validate()" name="Select">{% csrf_token %}
         {% if depts %}
 
+        <input id='deptall' name='deptall' value="Some" hidden>
+
         <div class='col-5'>
             <fieldset>
                 
@@ -33,9 +35,6 @@
                             <label for="deptidall"><strong>Select All</strong></label>
                         </div>
                         <select class="custom-select mt-0" multiple aria-describedby="form-instruction dept_id_label deptIDSelectLabel chartfieldInstructions" aria-labelledby="deptIDSelectLabel" name="department_id" id="departmentIdSelection">
-                            <!-- {% for key, value in depts.items %}
-                            <option value="{{ key }} - {{ value }}">{{ key }} - {{ value }}</option>
-                            {% endfor %} -->
                             {% for d in depts %}
                             <option value="{{ d.deptid }} - {{ d.dept_name }}">{{ d.deptid }} - {{ d.dept_name }}</option>
                             {% endfor %}
@@ -132,7 +131,7 @@
                                     <label for="multimonth1" id="m2m1Selectlabel">Select the first month and year to set the range</label>
                                 </span>
                                 <select class='custom-select' name='multimonth1' id='multimonth1' size='1'
-                                    aria-describedby="form-instruction-2 m2mRadiolabel labelLegend m2m1Selectlabel"
+                                    aria-describedby="labelLegend"
                                     aria-labelledby="m2m1Selectlabel">
                                     {% for date in dates %}
                                     <option value='{{ date }}'>{{ date }}</option>
@@ -145,7 +144,7 @@
                                     <label for="multimonth2" id="m2m2Selectlabel">Select the second month and year to set the range</label>
                                 </span>
                                 <select class='custom-select' name='multimonth2' id='multimonth2' size='1'
-                                    aria-describedby="form-instruction-2 m2mRadiolabel labelLegend m2m2Selectlabel"
+                                    aria-describedby="labelLegend"
                                     aria-labelledby="m2m2Selectlabel">
                                     {% for date in dates %}
                                     <option value='{{ date }}'>{{ date }}</option>
@@ -256,9 +255,11 @@
         // Select all
         $('#deptidall').on('change', function() {        
             if ($('#deptidall').is(':checked')) {
+                $('#deptall').val("All");
                 $('#departmentIdSelection option').prop('selected', 'selected');
             }
             else {
+                $('#deptall').val("Some");
                 $('#departmentIdSelection option').prop('selected', '');
             }
             enable();
@@ -266,6 +267,9 @@
 
         // Make sure the date range makes sense
         $('#generate').on('click', function(e) {
+            if ($('#deptall').val() == 'All') {
+                $('#departmentIdSelection option').prop('selected', '');
+            }
             if (!validate_date()) {
                 e.preventDefault();
                 $('#error').text('Please select a valid date range.');

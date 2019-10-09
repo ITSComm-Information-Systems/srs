@@ -17,7 +17,9 @@ $(document).ready(function() {
         
             rec.find("#individual").attr("name", "type" + num).attr("id", "individual" + num);
             rec.find("label[for='individual']").attr("for", "individual" + num);
-        
+
+            rec.find("label[for='auth']").attr("for", "auth" + num);
+            console.log(rec.find("label[for='auth']").attr.val)
             rec.find("#auth").attr("name", "auth" + num).attr("id","auth" + num);
         
             $("#mainBody").append(rec);
