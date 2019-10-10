@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 
 from project.pinnmodels import UmCurrentDeptManagersV
 
-from project import widgets
+# from project import widgets
 
 class AddUserForm(forms.Form):
     uniqname = forms.CharField(label='Uniqname', max_length=8)
