@@ -3,11 +3,13 @@
   <fieldset>
     <legend class="h2 custom-h2">Calling Restrictions for {{category}}</legend>
     <div class="features-restriction-msg mb-2">
+      {% if title == "Move a Phone Line" or title == "Change Calling Range/Restrictions" or title == "Change a Phone Set" %}
       <em>
         We can't display the current calling restrictions for this phone. Review the Inventory and Location Report to
         see
         your phone's current calling restrictions.
       </em>
+      {% endif %}
       <strong class="mt-2">
         Select the calling restrictions you want this phone to have.
         <a href='#' data-toggle="modal" tabindex="0" role="button" data-target="#restrictionsModal">

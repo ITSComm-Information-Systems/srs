@@ -4,10 +4,12 @@
   </p>
 
   <div class="features-restriction-msg mb-4" id="currentFeatures">
+    {% if title == "Move a Phone Line" or title == "Change Phone Features" or title == "Change a Phone Set" %}
     <em>
       We can't display the current features for this phone. Review the Inventory and Location Report to see your phone's
       current features.
     </em>
+    {% endif %}
     <div class="form-check keep-features mt-4" id="divKeepFeatures">
       <input class="form-check-input keep-check" type="checkbox" value="keepFeatures" name="keepFeatures"
         id="keepFeatures{{category.id}}">
