@@ -33,8 +33,10 @@
         <hr>
         <h4>Constants</h4>
         <table>
-            {% for con in consts %}
             <tr>
+                <td><a style = "float:left; margin-left: 106px;" id="add_constant_id" class="related-widget-wrapper-link add-related"  href="/admin/order/constant/add/?_to_field=id&amp;_popup=1&amp;action={{object_id}}" title="Add Constant"><img src="/static/admin/img/icon-addlink.svg" alt="Add"></a></td>
+            </tr>
+            {% for con in consts %}
             <td><a href="/admin/order/constant/{{ con.id }}/change/">{{ con.field }}</a></td><td>{{ con.value }}</td> 
             </tr>
             {% endfor %}
