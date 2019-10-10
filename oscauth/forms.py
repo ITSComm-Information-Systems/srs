@@ -20,7 +20,7 @@ class UserSuForm(forms.Form):
 
     user = forms.ModelChoiceField(
         label=_('Users'), queryset=get_user_model()._default_manager.order_by(
-            username_field), required=True, widget=widgets.Select2Widget)  # pylint: disable=W0212
+            username_field), required=True)  # pylint: disable=W0212
 
     use_ajax_select = False
 

@@ -10,14 +10,14 @@
   <p hidden id="dept_mgr">{{ dept_info.dept_mgr }}</p>
 
   <form  id="choose_dept" method="POST">{% csrf_token %}
-    {% if user.is_superuser %}
+<!--     {% if user.is_superuser %}
     <div class="input-group mb-3 mb-4 col-md-5" id="dept_search">
       <input type="text" name="select_dept" class="form-control" placeholder="Enter department" aria-label="Enter department" aria-describedby="basic-addon2">
       <div class="input-group-append">
         <button class="btn btn-primary" type="Submit">Submit</button>
       </div>
     </div>
-    {% else %}
+    {% else %} -->
     <div class="row align-items-start mb-4" id="select_dept">
       <div class="input-group col-md-5">
         <div class="input-group-prepend">
@@ -32,7 +32,7 @@
         </select>
       </div>
     </div>
-    {% endif %}
+<!--     {% endif %} -->
 
   </form> 
 
