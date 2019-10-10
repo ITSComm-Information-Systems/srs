@@ -152,6 +152,8 @@ def generate(request):
             rows = 'There is no data for the current selection'
         table = []
 
+    print(len(table))
+
     template = loader.get_template('soc-report.html')
     context = {
         'title': 'Summary of Charges',   
@@ -228,34 +230,35 @@ def find_num_months(date_range, billing_period):
 def get_rows(unit, grouping, period, drange, request):
     # unit = departments selected, grouping = how they selected dept, period = billing period, drange = how they selected billing period
 
+    print('base')
+    base_sql = '''select a.account, a.account_desc, a.charge_group, a.charge_code, a.description
+            , round( nvl(avg(a.unit_rate),   sum(a.amount) /  sum( nvl(a.quantity,1) )  ),2)   as unit_rate
+            , sum( nvl(a.quantity,1) ) as quantity
+            , sum(a.amount) as amount
+            from pinn_custom.UM_OSC_DEPT_UNITS_REPT_V a where '''
+
+
+    end_sql = ''' group by a.account, a.account_desc, a.charge_group, a.charge_code,  a.description
+                order by account_desc, charge_group, description '''
+
+    parms = []
+
     # Filter report data by selected billing period
     if (drange == 'Fiscal Year'):
-        variable_column = 'fiscal_yr'
-        search_type = 'exact'
-        search_string = period
-        # values = UmOscDeptUnitsReptV.objects.filter(fiscal_yr__exact=period)
+        date_sql =  ' a.fiscal_yr = %s '
+        parms.append(period)
 
     elif (drange == 'Calendar Year'):
-        variable_column = 'calendar_yr'
-        search_type = 'exact'
-        search_string = period
-        #values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact=period)
+        date_sql =  ' a.calendar_yr = %s '
+        parms.append(period)
 
     elif (drange == 'Single Month'):
         month = period.split(' ')[0]
         year = period.split(' ')[1]
 
-        variable_column = 'calendar_yr'
-        search_type = 'exact'
-        search_string = year
-
-        variable_column2 = 'month'
-        search_type2 = 'exact'
-        search_string2 = month
-
-        date_filter2 = variable_column2 + '__' + search_type2
-
-        #values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact=year, month__exact=month)
+        date_sql =  ' a.calendar_yr = %s and a.month = %s '
+        parms.append(year)
+        parms.append(words_to_num(month))
 
     elif (drange == 'Month-to-Month'):
         month1 = period.split(' ')[0]
@@ -263,99 +266,119 @@ def get_rows(unit, grouping, period, drange, request):
         month2 = period.split(' ')[3]
         year2 = period.split(' ')[4]
 
-        variable_column = 'date'
-        search_type = 'range'
-        search_string = [year1+''+month1,year2+''+month2]
-
-       # values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(date__range = [year1+''+month1,year2+''+month2]) #.order_by('account').values('account','date').distinct()
+        date_sql =  ' a.calendar_yr || a.month = %s between %s and %s '
+        parms.append(year1 + words_to_num(month1))
+        parms.append(year2 + words_to_num(month2))
 
 
-    # # CREATE DEPT FILTER
-    # if (grouping == 'Department ID'):
-    #     if unit == "All":
-    #         if not request.user.has_perm("can_order_all"):
-    #             depts = [d['deptid'] for d in AuthUserDept.get_report_departments(request)]
-    #             dept_column = 'deptid'
-    #             dept_search_type = 'in'
-    #             dept_search_string = depts
-    #     else:
-    #         dept_column = 'deptid'
-    #         dept_search_type = 'in'
-    #         dept_search_string = unit
-
-    # elif (grouping == 'Department IDs'):
-    #     dept_column = 'deptid'
-    #     dept_search_type = 'in'
-    #     dept_search_string = unit
-
-    # elif (grouping == 'Department Group'):
-    #     dept_column = 'dept_dep_descr'
-    #     dept_search_type = 'exact'
-    #     dept_search_string = unit[0]
-
-    # elif (grouping == 'Department Group VP Area'):
-    #     dept_column = 'dept_grp_vp_area_descr'
-    #     dept_search_type = 'exact'
-    #     dept_search_string = unit[0]
-
-
-    # Use custom filter
-    date_filter = variable_column + '__' + search_type
-
-    # if unit == 'All' and request.user.has_perm("can_order_all"):
-    if drange == 'Single Month':
-        values = UmOscDeptUnitsReptV.objects.filter(**{ date_filter: search_string }, **{ date_filter2: search_string2 }).order_by('account', 
-                                                    'charge_group', 'charge_code')
-    elif drange == 'Month-to-Month':
-        values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(**{ date_filter: search_string }).order_by('account', 
-                                                        'charge_group', 'charge_code')
-    else:
-        values = UmOscDeptUnitsReptV.objects.filter(**{ date_filter: search_string }).order_by('account', 'charge_group', 'charge_code')
-
-    # else:
-    #     dept_filter = dept_column + '__' + dept_search_type
-    #     if drange == 'Single Month':
-    #         values = UmOscDeptUnitsReptV.objects.filter(**{ dept_filter: dept_search_string }, **{ date_filter: search_string }, 
-    #                                                     **{ date_filter2: search_string2 }).order_by('account', 'charge_group', 'charge_code')
-    #     elif drange == 'Month-to-Month':
-    #         values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(**{ dept_filter: dept_search_string }, 
-    #                                                         **{ date_filter: search_string }).order_by('account', 'charge_group', 'charge_code')
-    #     else:
-    #         values = UmOscDeptUnitsReptV.objects.filter(**{ dept_filter: dept_search_string }, **{ date_filter: search_string }).order_by('account', 
-    #                                                     'charge_group', 'charge_code') 
-
-    
-    # Further filter by selected departments
-    if (grouping == 'Department ID'):
+    if (grouping == 'Department ID'): #TODO
         if unit == "All":
             if request.user.has_perm("can_order_all"):
-                return values.order_by('account_desc').values().distinct()
+                pass
+                #dept_list = values.order_by('account_desc').values().distinct()
             else:
                 depts = [d['deptid'] for d in AuthUserDept.get_report_departments(request)]
-                return values.filter(deptid__in = depts).order_by('account_desc').values().distinct()
+                #return values.filter(deptid__in = depts).order_by('account_desc').values().distinct()
         else:
-            return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
+            pass
+            #return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
 
-    elif (grouping == 'Department IDs'):
-        return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
+    elif (grouping == 'Department IDs'): #TODO
+        pass
+        #return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
 
     elif (grouping == 'Department Group'):
-        return values.filter(dept_grp_descr__exact = unit[0]).order_by('account_desc').values().distinct()
+        dept_sql = ' and a.dept_grp_descr = %s '
+        parms.append(unit[0])
 
     elif (grouping == 'Department Group VP Area'):
-        return values.filter(dept_grp_vp_area_descr__exact = unit[0]).order_by('account_desc').values().distinct()
+        dept_sql = ' and a.dept_grp_vp_area_descr = %s '
+        parms.append(unit[0])
 
 
+
+    #dept_sql = ' and a.dept_grp_descr = %s '
+    #parms.append('Alumni Association')
+    #dept_sql = ''
+
+
+    vals = UmOscDeptUnitsReptV.objects.raw(base_sql + date_sql + dept_sql + end_sql , parms)
+
+    for val in vals:
+        print(val.account, val.charge_group, val.amount)
+
+    print('endloop')
+    
+    return vals
 
 
 def get_table(rows,request):
-    accounts = rows.values_list('account','account_desc').distinct()
+    #accounts = rows.values_list('account','account_desc').distinct()
+    #accounts = ['611450']
     whole_table = []
     account_table = []
     final_table = []
     throwaway = []
     overall_cost = 0
     complete_table = []
+
+    print(type(rows))
+    idx_acct = 0
+    account = ''
+    charge_group = ''
+    total = 0
+    charge_code = ''
+    description = ''
+    rate = 0
+    quantity = 0
+    item_price = 0
+    total_cost = 0
+    charge_total = 0
+
+    print('new loop')
+
+    for row in rows:
+
+        if row.charge_code != charge_code:
+            print(charge_code)
+            if charge_code != '':
+                print('append account')
+                account_table.append([description,charge_code,rate,quantity,item_price,2])
+                #account_table.append([x[0],x[1],rate,quantity,item_price,2])
+            description = row.description
+            charge_code = row.charge_code
+
+        if row.charge_group != charge_group:
+            if charge_group != '':
+                whole_table.append([charge_group, account_table, charge_total])
+                #whole_table.append([y,account_table, charge_total])
+            charge_group = row.charge_group
+            account_table = []
+
+        if row.account != account:
+            if account != '':
+                #final_table.append([i[0],i[1],whole_table,total_cost])
+                final_table.append([account,account_desc,whole_table,total_cost])
+
+            account = row.account
+            account_desc = row.account_desc
+            whole_table = []
+            print(row)
+
+    #whole_table.append([charge_group, account_table, charge_total])
+    #final_table.append([account,account_desc,whole_table,total_cost])
+    overall_cost = 1
+    complete_table.append([final_table,overall_cost])
+
+    print(len(account_table))
+    #print(len(overall_cost))
+    print(len(whole_table))
+    print(len(final_table))
+    print(len(complete_table))
+
+    return complete_table
+
+    print('original loop')
 
     for i in accounts:
         services = accounts.filter(account__exact = i[0]).order_by('charge_group').values_list('description',flat = True)
@@ -390,6 +413,13 @@ def get_table(rows,request):
             whole_table.append([y,account_table, charge_total])
         final_table.append([i[0],i[1],whole_table,total_cost])
     complete_table.append([final_table,overall_cost])
+
+    print(len(account_table))
+    #print(len(overall_cost))
+    print(len(whole_table))
+    print(len(final_table))
+    print(len(complete_table))
+
     return complete_table
 
 
