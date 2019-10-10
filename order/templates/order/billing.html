@@ -14,7 +14,7 @@
 
 {% if field.label == 'Billing' %}
 <div id='dummyChartfield'>
-    <label>Chartfield for Tracking Purposes </label>
+    <label>Chartfield for Tracking Purposes</label>
     <em>There is no charge for this request. However, please select a chartfield for departmental tracking
         purposes.</em>
 </div>
@@ -47,7 +47,7 @@
 
         <select data-label="{{ field.label }}" data-tabid="{{tab.id}}" class="custom-select ccsel" id="name_{{ field.name }}" onchange="chartcomChange(this)" onload="chartcomChange(this)">
             {% for chartcom in tab.form.chartcom_list %}
-            <option data-dept="{{ chartcom.dept }}" data-chartcom="{{ chartcom.account_number }}" data-chartcom-id="{{ chartcom.chartcom_id }}"">{{ chartcom.name }}</option>
+            <option data-dept="{{ chartcom.dept }}" data-chartcom="{{ chartcom.account_number }}" data-chartcom-id="{{ chartcom.chartcom_id }}">{{ chartcom.name }}</option>
             {% endfor %}
         </select>
 
