@@ -1,25 +1,21 @@
 <div class="container mt-4" id="assign_row">	
-	<p class="mt-4 cf_info inline">You have chosen to change the following User IDs from Chartfield:&nbsp;</p><strong class="cf_num inline">{{ selected_cf.account_number }}</strong>
+	<p class="mt-4 cf_info inline">You have chosen to change the following User IDs from Chartfield:&nbsp;</p><strong class="current cf_num inline">{{ selected_cf.account_number }}</strong>
 		{% if nickname %}
 			<strong class="inline">({{ nickname }})</strong>
 		{% endif %}
-		<strong class="cf_nickname inline"></strong>
+		<strong class="cf_nickname inline"></strong>.
 	</p>
+
+	<hr class="style1">
+
+	<p>Please select a new department and chartfield.</p>
 
 	<div class="row mt-4 col-md-12">
 		<div class="col-md-5">
 	        <form action="" id="dept_dropdown_3" method="POST" name="dept_dropdown">{% csrf_token %}
-	        	{% if user.is_superuser %}
-				<div class="input-group ol-md-6" id="dept_search">
-			      <input type="text" id="dept_text_search" name="select_dept" class="form-control" placeholder="Enter department" aria-label="Enter department" aria-describedby="basic-addon2">
-			      <div class="input-group-append">
-			        <button class="btn" type="Submit">Submit</button>
-			      </div>
-			    </div>
-				{% else %}
 	            <div class="input-group">
 	                <div class="input-group-prepend">
-	                    <label class="input-group-text" for="dept_dropdown">
+	                    <label class="input-group-text" for="select_dept_3">
 	                        Select New Department
 	                    </label>
 	                </div>
@@ -29,14 +25,13 @@
 	                    {% endfor %}
 	                </select>
 	            </div>
-	            {% endif %}
 	        </form>
 	    </div>
 	    <div class="col-md-4">
 	        <form id="cf_dropdown_3" method="POST" name="cf_dropdown">{% csrf_token %}
 	            <div class="input-group">
 	                <div class="input-group-prepend">
-	                    <label class="input-group-text" for="cf_dropdown">
+	                    <label class="input-group-text" for="select_cf_3">
 	                        Select New Chartfield
 	                    </label>
 	                </div>
@@ -57,27 +52,27 @@
 		</div>
 
 		<div class="form-check form-check-inline">
-	    	<input class="form-check-input" type="checkbox" value="" id="local" disabled>
-	    	<label class="form-check-label" for="local">
+	    	<input class="form-check-input" type="checkbox" value="" id="toll" disabled>
+	    	<label class="form-check-label" for="toll">
 		    	<strong>Toll</strong>
 		  	</label>
 		</div>
 
 		<div class="form-check form-check-inline">
-	    	<input class="form-check-input" type="checkbox" value="" id="toll" disabled>
-	    	<label class="form-check-label" for="toll">
+	    	<input class="form-check-input" type="checkbox" value="" id="local" disabled>
+	    	<label class="form-check-label" for="local">
 		    	<strong>Local</strong>
 		  	</label>
 		</div>
 
-		<button type="button" id="apply" value='Apply' class="btn btn-primary">Apply</button>
+		<button type="button" id="apply" value='Apply' class="btn btn-success">Apply</button>
 	</div>
 </div>
 
 <div class="row mt-4">
 	<div class="form-check form-check-inline" id="select_button">
     	<input class="form-check-input" type="checkbox" value="" id="select_all_an">
-    	<label class="form-check-label" for="select_all">
+    	<label class="form-check-label" for="select_all_an">
 	    	<strong>Select All</strong>
 	  	</label>
 	</div>

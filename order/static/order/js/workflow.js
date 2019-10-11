@@ -1,5 +1,36 @@
 $(document).ready(function() {
 
+  // Workflow stuff
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function(event) {
+    currStep = $(this)[0].id.substring(10, 12) * 1;
+    if (currStep == lastStep) {
+        $('#nextBtn').html('Add to Cart');
+        fillReviewForm();
+    } else {
+        $('#nextBtn').html('Next');
+    }
+    if (currStep == 1) {
+      $('#prevBtn').hide();
+    } else {
+      $('#prevBtn').show();
+    }
+
+    if (currStep > maxStep) {
+      maxStep = currStep;
+      // Progressive Disclosure Fields
+      preFields = $('#step' + currStep).find('[data-sequence]').hide();
+      $(preFields[0]).show();
+      curr = 0;
+      pointer = 0;
+      vals = []
+    }
+
+
+
+
+  })
+
+
   var x, i;
   //x = $('input:not(:checkbox)');
   x = $("input:not([type=radio], [type=checkbox])");
@@ -10,10 +41,12 @@ $(document).ready(function() {
   $('#pills-step1').removeClass('disabled');  // Enable first pill, that is how it all starts.
 
   currStep = 1;
+  maxStep = 0;
   lastStep = document.getElementsByClassName("tab-pane").length;
+  var tabs = new Array(lastStep);
 
 
-  if ( $("h1").html() === 'TestWorkflows' ) {
+  if ( $("#wfid").val() == 32 ) { // Test Workflow option
     for (i = 1; i < lastStep+1; i++) {
       $('#pills-step'+ i).removeClass('disabled'); 
     }
@@ -22,81 +55,106 @@ $(document).ready(function() {
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
 
-  $("#buildingFields").hide();
-  $("#phLocationFields").hide();
-  $("#buildingTable").hide();
-  $("#Conduit").hide();
-  $("#PurchasePhone").hide();
-  $("#ModelInfo").hide();
-  $("#PhoneSetType").hide();
-  $("#JackNumber").hide();
-  $("#PhoneModelNum").hide();
-  $("#voipPhoneMac").hide();
+
+  var callback = function() {
+    if (preFields.index(this) <= pointer) { // User changed a previous answer.
+      for (i = preFields.index(this)+1; i < preFields.length; i++) {
+        $(preFields[i]).hide();
+        $(preFields[i]).find('input:checked').prop("checked", false);
+        // todo clear value if input
+      }
+    }
+
+    pointer = preFields.index(this);
+    val = $('input:checked', this).val()
+    vals[pointer] = val;
+
+    for (question = 0; question < preFields.length; question++) {
+      curr = preFields[question].dataset.sequence;
+      cond = preFields[question].dataset.condition;
+      if (cond) {
+          arr = cond.split(',')
+          for (i = 0; i < arr.length; i++) {
+            if(!vals.includes(arr[i])) {
+              cond = false;
+              break;
+            }
+          }
+      } else{
+        cond = true; // Pass if no condition
+      }
+
+      if (cond) {
+        if (curr > this.dataset.sequence) {
+          $(preFields[question]).show();
+          break;
+        }
+      }
+    }
   
+  };
+
+  $(preFields).change(callback);
+  $(preFields).keypress(callback);
+
+
+  (function ($) {
+	  $.each(['show', 'hide'], function (i, ev) {
+	    var el = $.fn[ev];
+	    $.fn[ev] = function () {
+	      this.trigger(ev);
+	      return el.apply(this, arguments);
+	    };
+	  });
+  })(jQuery);
   
-  $("#ModelInfo_basic").click(function() {
-    $("#PhoneModelNum").show();
-    $("#voipPhoneMac").hide();
+  $('.dynlabel').on('show', function() {
+    $(this).keypress();
   });
 
-  $("#ModelInfo_advanced").click(function() {
-    $("#PhoneModelNum").show();
-    $("#voipPhoneMac").hide();
+  // Hide phone location if no active phone line
+  if ($("#activePhone").length) {
+    $('[data-tab="PhoneLocation"]').hide();
+  }
+
+  $("#AdminUnique").click(function() {
+    $('#PhoneNumber').show();
+    $('#GroupEmailAdd').show();
   });
 
-  $("#ModelInfo_voip").click(function() {
-    $("#PhoneModelNum").show();
-    $("#voipPhoneMac").show();
+  $("#jack_nojack").click(function() {
+    $('[data-tab="PhoneLocation"]').hide();
+    $('[data-tab="LocationNew"]').show();
   });
 
-
-  $("#activePhone_Y").click(function() {
+  $("#activePhone_yesactivephone").click(function() {
+    $('[data-tab="PhoneLocation"]').show();
     $('[data-tab="LocationNew"]').hide();
   });
 
-  $("#activePhone_N").click(function() {
+  $("#activePhone_noactivephone").click(function() {
+    $('[data-tab="PhoneLocation"]').hide();
     $('[data-tab="LocationNew"]').show();
   });
   
-
-
-  //Data
-  $("#activePhone").hide();
-  $("#jackNumber").hide();
-  $("#conduit").hide();
-  $("#linesToInstall").hide();
-
-  $("#jack_Y").click(function() {
-    $("#activePhone").show();
-    $("#conduit").hide();
+  $("#ExistingPhone_nophone").click(function() {
+    $('[data-tab="PhoneLocation"]').hide();
   });
 
-  $("#jack_N").click(function() {
-    $("#conduit").show();
-    $("#activePhone").hide();
-    $("#jackNumber").hide();
+  $("#ExistingPhone_yesphone").click(function() {
+    $('[data-tab="PhoneLocation"]').show();
+    $('[data-tab="LocationNew"]').hide();
   });
 
-  $("#jackNumber").keypress(function() {
-    $("#activePhone").show();
-  });
 
-  $("#activePhone_Y").click(function() {
-    $("#linesToInstall").show();
-  });
+  var x = document.getElementsByClassName("ccsel");
+  var i;
+  for (i = 0; i < x.length; i++) {
+    chartcomChange(x[i]);
+    //x[i].style.backgroundColor = "red";
+  }
+  
 
-  $("#activePhone_N").click(function() {
-    $("#linesToInstall").show();
-    //$('#pills-step2').hide();  //.addClass(' hidden');
-  });
-
-  $("#conduit_Y").click(function() {
-    $("#linesToInstall").show();
-  });
-
-  $("#conduit_N").click(function() {
-    $("#linesToInstall").show();
-  });
 
   // Addl info
   $('#contact_id').hide();
@@ -149,74 +207,7 @@ $(document).ready(function() {
 
   });
 
-  
-
-  // Phone Type Tab
-  $("#Jack_Y").click(function() {
-    $("#JackNumber").show();
-    $("#JackNumber_review").show();
-    $("#Conduit").hide();
-    $("#Conduit_review").hide();
-  });
-
-  $("#Jack_N").click(function() {
-    $("#JackNumber").hide();
-    $("#JackNumber_review").hide();
-    $("#Conduit").show();
-    $("#Conduit_review").show();
-  });
-
-  $("#JackNumber").keypress(function() {
-    $("#PurchasePhone").show();
-    $("#PurchasePhone_review").show();
-  });
-
-  $("#Conduit_Y").click(function() {
-    $("#PurchasePhone").show();
-    $("#PurchasePhone_review").show();
-  });
-
-  $("#Conduit_N").click(function() {
-    $("#PurchasePhone").show();
-    $("#PurchasePhone_review").show();
-  });
-
-  $("#PurchasePhone_buy").click(function() {
-    $("#PhoneSetType").show();
-    $("#PhoneSetType_review").show();
-    $("#ModelInfo").hide();
-    $("#ModelInfo_review").hide();
-    $("#PhoneModelNum").hide();
-    $("#PhoneModelNum_review").hide();
-    //$('#pills-step3').show();  //removeClass(' hidden');
-  });
-
-  $("#PurchasePhone_nobuy").click(function() {
-    $("#ModelInfo").show();
-    $("#ModelInfo_review").show();
-    $("#PhoneSetType").hide();
-    $("#PhoneSetType_review").hide();
-    //$('#pills-step3').hide();  //addClass(' hidden');
-  });
-
-
-  $("#purchasePhone_buy").click(function() {
-    $("#PhoneSetType").show();
-    $("#PhoneSetType_review").show();
-    $("#ModelInfo").hide();
-    $("#ModelInfo_review").hide();
-    $("#PhoneModelNum").hide();
-    $("#PhoneModelNum_review").hide();
-    //$('#pills-step4').hide();  //.removeClass(' hidden');
-  });
-
-  $("#purchasePhone_nobuy").click(function() {
-    $("#ModelInfo").show();
-    $("#ModelInfo_review").show();
-    $("#PhoneSetType").hide();
-    $("#PhoneSetType_review").hide();
-    //$('#pills-step4').hide();  //.addClass(' hidden');
-  });
+    
 
 
   $("#phone_type").click(function() {
@@ -237,156 +228,237 @@ $(document).ready(function() {
     $('#contact_id').show();
     $('#contact_name').show();
     $('#contact_number').show();
-    $('#contact_id_review').show();
-    $('#contact_name_review').show();
-    $('#contact_number_review').show();
+    $('#comments').show();
+    $('#file').show();
+    
+    
   });
 
   $("#contact_yn_True").click(function(event) {
     $('#contact_id').hide();
     $('#contact_name').hide();
     $('#contact_number').hide();
-    $('#contact_id_review').hide();
-    $('#contact_name_review').hide();
-    $('#contact_number_review').hide();
+    $('#comments').show();
+    $('#file').show();
   });
 
 
-});
+  function saveReviewData(inp) {
 
-// Workflow stuff
-$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-  currStep = $(this)[0].id.substring(10, 12) * 1;
-  if (currStep == lastStep) {
-      $('#nextBtn').html('Add to Cart');
-  } else {
-      $('#nextBtn').html('Next');
+    var tab = [];
+  
+    for (i = 0; i < inp.length; i++) {
+      var obj = inp[i];
+      var type = $(obj).attr('type')
+      var id = $(obj).attr("id");
+      var name = $(obj).attr("name");
+  
+      var label = obj.dataset.label;
+
+      if(!name) {  // Don't display data not being saved
+        continue;
+      }
+
+      if(type=="radio") {
+        if (obj.checked == true) {
+          label = $("#legend" + name).text();
+          value = $("label[for='" + id + "']").text();
+          if (obj.id == 'cat3feature31' || obj.id == 'cat2feature31' ) {
+            label = "Speed Call";
+          }
+          if (obj.id == 'cat3feature47' || obj.id == 'cat2feature47' || obj.id == 'cat1feature47' ) {
+            label = "Voicemail";
+          }   
+          tab.push({'label': label, 'value': value})
+        }
+      } else if (type=="checkbox") {
+        if (obj.checked == true) {
+
+          //label = $("#legend" + name).text();
+          label = ''
+          value = $("label[for='" + id + "']").text();
+          if (obj.id == 'cat1feature48' || obj.id == 'cat2feature48' || obj.id == 'cat3feature48'  ) {
+            label = "Optional";
+          }
+          if(id != "useSameCode56")
+            tab.push({'label': label, 'value': value})
+        }
+      } else if (obj.tagName=="SELECT") {
+        if(name) { // Don't process data we are not saving
+        label = $("label[for='" + id + "']").text();
+        value = $( "#" + id + " option:selected" ).text();
+        tab.push({'label': label, 'value': value})
+        }
+      } else if (type=="button") {
+        if($("#" + id).hasClass('selected')) { 
+          label = $("label[for='" + id + "']").text();
+          value = $("#" + inp[i].id).val();
+          tab.push({'label': label, 'value': value})
+        }
+      } else {
+
+        name = $("#" + inp[i].id).attr('name')
+        //console.log('name:' + name);
+        if (!label) {
+          label = $("label[for='" + id + "']").text();
+        }
+        if (name=="subscriberId") {
+          label = "Subscriber ID";
+        }
+        value = $("#" + inp[i].id).val();
+        if(name != 'product' || value != 0) { // don't show 0 product
+          tab.push({'label': label, 'value': value})
+        }
+
+      }
+    }
+  
+    tabs[currStep] = tab;
   }
-  $('#nextBtn').prop('disabled', false);
+
+  function validateForm() {
+
+    inp = $("#step" + currStep + " :input:visible");
+    valid = true;
+    for (i = 0; i < inp.length; i++) {
+      if (inp[i].checkValidity()) {
+        $(inp[i]).attr("aria-invalid", "false");
+      } else {
+        $(inp[i]).attr("aria-invalid", "true");
+        inp[i].className += " invalid";
+        valid = false;
+      }
+    }
+    
+    if (valid) {
+      document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
+      $("#workflowForm").removeClass('was-validated');
+      saveReviewData(inp);
+    } else {
+      $("#workflowForm").addClass('was-validated');
+    }
+    return valid; // return the valid status
+  }
+
+
+  function nextPrev(n) {
+
+    if (n == 1 && !validateForm()) return false;
+  
+    currStep = currStep + n;
+  
+    //while ( $('#pills-step'+currStep).hasClass('hidden')) {
+    while ( $('#pills-step'+currStep).is(':hidden')) {
+      currStep = currStep + n;
+    }
+  
+    $('#pills-step'+currStep).removeClass('disabled');
+    $('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
+    if (currStep > lastStep) {
+        $('#workflowForm').submit();
+        return false;
+    }
+  }
+
+  function fillReviewForm() {
+
+    var summary = '';
+    for (tab = 1; tab < lastStep; tab++) {  
+      $('#reviewstep' + tab).text('');
+      if(tabs[tab]) {
+         heading = $('#reviewstep' + tab).data('label')
+         summary = summary + '~' + heading + '^';
+        for (field = 0; field < tabs[tab].length; field++) {
+          txt = '<b>' + tabs[tab][field].label.trim() + '</b>  ' + tabs[tab][field].value.trim() + '<br>';
+          summary = summary + tabs[tab][field].label.trim() + '\t' + tabs[tab][field].value.trim() + '^';
+          $('#reviewstep' + tab).append(txt);
+        }
+      }
+      //summary = summary + '\n';
+    }
+    $('#reviewSummary').val(summary); 
+  }
+
+
+
+
+  $('[data-tab="SubscriberID"]').on('shown.bs.tab', function(event) {
+
+    max = $("#id_cancelAuth").val();
+    $("#subscriberId").show();
+    count = $("[id^=authdiv]").length;
+
+    console.log(max + '-' + count);
+
+    $("#subscriberId").removeAttr('data-sequence');
+    $("#subscriberId").removeAttr('data-condition');
+    var rec = $("#subscriberId").clone();
+
+    for (i = 1; i < (max-count); i++) {
+
+        num = i.toString();
+
+        var rec = $("#subscriberId").clone();
+
+        rec.attr("id", "authdiv" + num);
+    
+        $("#step2").append(rec);
+
+    }
 })
 
 
-function nextPrev(n) {
 
-  if (n == 1 && !validateForm()) return false;
 
-  currStep = currStep + n;
 
-  //while ( $('#pills-step'+currStep).hasClass('hidden')) {
-  while ( $('#pills-step'+currStep).is(':hidden')) {
-    currStep = currStep + n;
-  }
+});  // Document Ready
 
-  $('#pills-step'+currStep).removeClass('disabled');
-  $('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
-  if (currStep > lastStep) {
-      $('#workflowForm').submit();
-      return false;
+
+function useSameShortCode(obj) {
+  if (obj.checked) {    
+    $('.ccsel').not('#name_oneTimeCharges').attr("disabled","disabled");
+    $('.dccsel').not('#dept_oneTimeCharges').attr("disabled","disabled");
+    occ = $('#name_oneTimeCharges option:selected').val();
+    $('.ccsel').val(occ);
+    occ = $('#oneTimeCharges').val();
+    $(".ccval").val(occ);  // Set all chartcom values same as OCC
+  } else {
+    $('.ccsel').removeAttr("disabled","disabled");
+    $('.dccsel').removeAttr("disabled","disabled");
   }
 }
 
+function chartcomChange(obj) {
 
-function validateForm() {
+  id = "#" + obj.id.substring(5,99);
+  val = $('#' + obj.id + ' option:selected').data('chartcom');
 
-  inp = $("#step" + currStep + " :input:visible");
-  valid = true;
-  for (i = 0; i < inp.length; i++) {
-    id = "#" + $(inp[i]).attr('id') + "_review";
-    selected_text = $( "#" + inp[i].id + " option:selected" ).text()
+  $(id).val(val);
 
-    if (selected_text) {
-      $(id).html(selected_text);
-    } else {
-      text_box = $("#" + inp[i].id ).val();
-      $(id).html( text_box );
-    }
-
-    if (!inp[i].checkValidity()) {
-      inp[i].className += " invalid";
-      valid = false;
-    }
+  if (obj.id == 'name_oneTimeCharges') {
+    val = $('#' + obj.id + ' option:selected').data('chartcom-id');
+    console.log(val);
+    $('#occ_key').val(val);
   }
 
-    $("input[type='radio']:checked").each(function() { // Update review form with radio data
-        var idVal = $(this).attr("id");
-        id = "#id_" + $(this).attr("name") + "_review";
-        $(id).html($("label[for='"+idVal+"']").text());
-    });
-  
-  if (valid) {
-    document.getElementsByClassName("tab-pane")[currStep-1].className += " finish";
-    $("#workflowForm").removeClass('was-validated');
-  } else {
-    $("#workflowForm").addClass('was-validated');
+  if ( $('#useSameCode' + obj.dataset.tabid).prop('checked') ) {
+    occ = $('#name_oneTimeCharges option:selected').val();
+    $(".ccsel").val(occ);  // Set all chartcom names same as OCC
+    occ = $('#oneTimeCharges').val();
+    $(".ccval").val(occ);  // Set all chartcom values same as OCC
   }
-  return valid; // return the valid status
 }
 
   function filterChartcom(obj) { 
-    id = '#id_' + obj.dataset.target;
-    $(id).find('[data-dept]').hide();
-    $(id).find("[data-dept='" + obj.value + "']").show();
+    id = '#name_' + obj.dataset.target;
+    console.log(id);
+    if (obj.value=='all') {
+      $(id).find('[data-dept]').show();
+    } else {
+      $(id).find('[data-dept]').hide();
+      $(id).find("[data-dept='" + obj.value + "']").show();
+    }
+
   }
 
-  $("#phoneLookup").click(function () {
-    var phone_number = $("#id_phone_number").val();
-    phone_number = phone_number.replace(/\D/g,'');
-
-    $("#phLocationFields").show();
-    $("#phBuildingID").val('');
-    $("#id_building").val('');
-    $("#id_floor").val('');
-    $("#id_room").val('');
-    $("#id_jack").val('');
-
-
-    $.ajax({
-      url: '/orders/ajax/get_phone_location/' + phone_number,
-      //dataType: 'json',
-
-      beforeSend: function(){
-        $("#phLocationFields").hide();
-        $('#phoneLookup').html('Searching...').addClass(' disabled');
-        $("#buildingCode").html('');
-        $("#building").html('');
-        $("#floor").html('');
-        $("#room").html('');
-        $("#jack").html('');
-      },
-
-      success: function (data) {
-        if (data.code !== '') {
-          $("#buildingCode").html(data.code);
-          $("#building").html(data.name);
-          $("#floor").html(data.floor);
-          $("#room").html(data.room);
-          $("#jack").html(data.jack);
-
-          $("#id_buildingCode_review").html(data.code);
-          $("#id_building_review").html(data.name);
-          $("#id_floor_review").html(data.floor);
-          $("#id_room_review").html(data.room);
-          $("#id_jack_review").html(data.jack);
-
-          console.log('good:' + data.code)
-          $("#id_phone_number").addClass('is-valid');
-          $("#id_phone_number").removeClass('invalid');
-          $("#workflowForm").removeClass('was-validated');
-          $("#phLocationFields").show();
-        } else {
-          alert("No phone found.");
-        }
-      },
-
-      error: function(){
-        $("#id_phone_number").addClass('is-invalid');
-        $("#id_phone_number").removeClass('is-valid');
-        $("#workflowForm").addClass('was-validated');
-      },
-
-      complete: function(){
-        $('#phoneLookup').html('Find').removeClass(' disabled');
-      }
-
-    })
-  });
+  

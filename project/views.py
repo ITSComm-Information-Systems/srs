@@ -19,9 +19,11 @@ from ldap3 import Server, Connection, ALL
 
 from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput
 from order.models import Chartcom
-from oscauth.models import AuthUserDept
+from oscauth.models import AuthUserDept, AuthUserDeptV
 from datetime import datetime, date
 from django.contrib.auth.decorators import login_required, permission_required
+
+from pages.models import Page
 
 import json
 from django.http import JsonResponse
@@ -31,6 +33,20 @@ from django.db.models import indexes, Max
 from django.db import connections
 from django import db
 import cx_Oracle
+
+
+    
+def homepage(request):
+
+	notices = Page.objects.get(permalink='/notices')
+
+	template = loader.get_template('home.html')
+
+	context = {
+		'title': 'Welcome to the Service Request System',
+		'notices': notices,
+	}
+	return HttpResponse(template.render(context, request))
 
 
 @permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
@@ -44,7 +60,7 @@ def chartchange(request):
 	else:
 		# Find all departments user has access to
 		user_depts = []
-		dept_query = AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept')
+		dept_query = AuthUserDeptV.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept')
 		for d in dept_query:
 			find_dept_info = UmOscDeptProfileV.objects.filter(deptid=d.dept)
 			dept = {
@@ -98,6 +114,7 @@ def chartchange(request):
 
 	
 	context = {
+		'title': 'Chartfield Change Request',
 		'deptids': user_depts,
 		'dept_info': dept_info,
 		'selected_cf': selected_cf,
@@ -229,7 +246,7 @@ def submit(request):
 
 
 		context = {
-			'title': '',
+			'title': 'Chartfield Change',
 		}
 
 	return HttpResponse(template.render(context, request))

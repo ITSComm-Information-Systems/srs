@@ -1,54 +1,59 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<!-- <style>
-.select2-dropdown--below {
-    top: -1.9rem;
-}
-</style> -->
-
-<div class="container">
-    <form action="/reports/doc/report/" method="POST" name="Select">{% csrf_token %}
-        <div class="form-group">
-            <h5>Select Department<span class="prv-msgs">*</span></h5>
-            <p class="mb-0"><span class="prv-msgs">*</span> Required fields</p>
-            <div class="row">
-                <select class="form-control col-md-4 mt-0" style='font-size:16px' type="select" name="select_dept" id="doc_depts" value="{{ dept }}">
+<h1>{{title}}</h1>
+<div class="row">
+    <div class="col-lg-8 col-md-12">
+        <form action="{{ form_action }}" method="POST" name="Select">{% csrf_token %}
+            <div class="form-group">
+                <label for="doc_depts" id="depts"><strong>Select Department</strong></label>
+                <select class="form-control" name="select_dept" id="doc_depts" aria-labelledby="depts" size='{{ names|length }}' required>
                     {% for dept in names %}
-                    <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.name }}</option>
+                    <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.dept_name }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <h5 class='mb-0'>Select Billing Date<span class="prv-msgs">*</span></h5>
-            <div class="row">
-            	<select class="form-control col-md-4 mt-0" style='font-size:16px' requried type="select" name="billing_date" id="doc_bill_date" value="{{ d }}">
+            <div class="form-group">
+                <label for="doc_bill_date" id="billingDate"><strong>Select Billing Date</strong></label>
+            	<select class="form-control" name="billing_date" id="doc_bill_date" size='{{ dates|length }}' aria-labelledby="billingDate" required>
                     {% for d in dates %}
                     <option value="{{ d }}">{{ d }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <h5 class="mb-0">Select Chartfield(s)</h5>
-            <div class="alert mt-0 mb-0">To select multiple, on Mac press and hold
-               “Command” and select. On PC,
-               press and hold “Ctrl” and select.</div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="select-all">
-                <label class="form-check-label" for="select-all">
-                    <strong>Select All</strong>
-                </label>
+            <div class="form-group">
+                <label for="doc_chartcom" id="docChartfield"><strong>Select Chartfield(s)</strong></label>
+                <div class="mt-0 mb-1">
+                    <em class="prv-msgs">Please do not select more than 10 Chartfields at a time</em>
+                    <small class="text-muted form-text" id="chartfieldInstructions">
+                        To select multiple, on Mac press and hold “Command” and select. On PC, press and hold “Ctrl” and select.
+                    </small>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="select-all">
+                    <label class="form-check-label" for="select-all">
+                        <strong>Select All</strong>
+                    </label>
+                </div>
+                <select multiple="multiple" class="form-control" required aria-describedby="chartfieldInstructions" aria-labelledby="docChartfield" name="chartcoms[]" id="doc_chartcom">
+                    {% for cf in dept_cfs %}
+                    <option value="{{ cf }}">{{ cf }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="row">
-	            <select multiple="multiple" class="form-control col-md-4" style='font-size:16px;float:left;' requried type="select" name="chartcoms[]" id="doc_chartcom" value="{{ cf }}">
-	                {% for cf in dept_cfs %}
-	                <option value="{{ cf }}">{{ cf }}</option>
-	                {% endfor %}
-	            </select>
-	            <p id='chartfield_list' style="float:left;"></p>
-	        </div>
+            <strong id="error_message" role="alert" class="hidden">Please select a chartfield.</strong>
+            <input id="generate" type='submit' value='Generate Report' class="btn btn-primary mt-2" disabled>
+        </form>
+    </div>
+    
+    <div class="col-lg-4 col-md-12">
+        <div class="alert alert-secondary hlinks">
+            <p class="h4 alert-heading">About this Report</p>
+            {% autoescape off %}
+            {{ instructions.bodytext }}
+            {% endautoescape %}
+
         </div>
-        <strong id="error_message" class="hidden">Please select a chartfield.</strong>
-        <p><input id="generate" type='submit' value='Generate Report' class="btn btn-primary mt-2"></p>
-    </form>
+    </div>
 </div>
 
 {% endblock %}
@@ -56,26 +61,6 @@
 {% block js %}
 
 <script src="/../static/doc.js"></script> 
-<script type="text/javascript" src="/static/select.js"></script>
+<script src="/static/select.js"></script>
 
-
-{% comment %}
-<div id="main-content" class="container" role="main">
-    <div class="container" role="main">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="message">
-                    <hr class="style1">
-                    <p>
-                        This report is currently under construction.<br>
-                        If you would like to run this report, please visit the Online Service Center and click on Detail of Charges under reports.
-                    </p>
-                    <a href="https://blue.itcom.itd.umich.edu/UofM/WebObjects/OnlineServiceCenter.woa/1/" class="btn btn-outline-primary" role="button">Online Service Center</a>
-                    
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endcomment %}
 {% endblock %}

@@ -1,0 +1,30 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+{% block after_field_sets %}
+
+
+    <fieldset class="module aligned {{ fieldset.classes }}">
+        <div>
+            <h4>Rendering:</h4>
+        </div>
+
+        <table>
+            {% for element in element_list %}
+            <tr>
+                <td></td>
+                <td><a class="related-widget-wrapper-link change-related" id="change_id_service" data-href-template="/admin/order/service/__fk__/change/?_to_field=id&amp;_popup=1" title="Change selected service" href="/admin/order/element/{{ element.id }}/change/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-changelink.svg" alt="Change"></a></td>
+                <td> {{ element.display_seq_no }} </td>
+                <td> {{ element.name }} </td>
+                <td> {{ element.type }} </td>
+                <td> {{ element.label }} </td>
+                <td> {{ element.attributes }} </td>
+                <td> {{ element.display_condition }} </td>
+                <td> {{ element.target }} </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    </fieldset>
+    
+
+{% endblock %}

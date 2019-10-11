@@ -1,38 +1,46 @@
 {% extends 'base.html' %}
 {% block content %}
+<h1>{{ title }}</h1>
 
-<form action="/auth/addpriv/" method="POST">{% csrf_token %}
+<h2> {{ subtitle }}</h2>
 
-<p>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></p>
-<br>
+<p>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i
+            class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></p>
 
-<table class="table table-hover table-striped table-sm">
+<a href="/auth/get_uniqname/" class="btn btn-primary user-access-btn">Back to Manage User Access</a>
+
+<h3>Results</h3>
+
+<table class="table table-hover table-striped table-sm mt-4">
     <thead>
         <tr>
-                <th>Department</th>
-                <th>Role</th>
-                <th>Result</th>
+            <th scope="col">Department ID</th>
+            <th scope="col">Department Name</th>
+            <th scope="col">Role(s) Added</th>
+            <th scope="col">Role(s) Removed</th>
         </tr>
     </thead>
     <tbody>
-        {% for dept in dept_checked %}
-        <tr>
-                {% if row.dept_status != 'I' %}
-                <td> {{ dept }}</td>
-                <td> {{ role_checked }}</td>
-                <td> {{ result }}</td>
-                <td> {{ row.result }}</td>
+        {% for key, value in modifications.items %}
+            {% if value.added or value.deleted %}
+                {% if value.inactive %}
+                    <tr>
+                        <td class='prv-msgs'>{{ key }}</td>
+                        <td class="prv-msgs"><i class="fas fa-exclamation-triangle"
+                            aria-label="Icon for inactive department"></i>{{ value.name }}</td>
+                        <td>{{ value.added|join:", " }}</td>
+                        <td>{{ value.deleted|join:", " }}</td>
+                    </tr>
                 {% else %}
-                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i> {{ row.col1 }}</td>
-                <td class="prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i> {{ row.col2 }}</td>
-                <td> {{ row.role }}</td>
-                <td> {{ row.result }}</td>
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td>{{ value.name }}</td>
+                        <td>{{ value.added|join:", " }}</td>
+                        <td>{{ value.deleted|join:", " }}</td>
+                    </tr>
                 {% endif %}
-        </tr>
+            {% endif %}
         {% endfor %}
     </tbody>
 </table>
-
-</form>
-
 {% endblock %}

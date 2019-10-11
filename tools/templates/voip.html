@@ -1,10 +1,25 @@
 {% extends 'base.html' %}
 {% block content %}
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div class = "container">
+    <h1>{{ title }}</h1>
 
-    <div class="row align-items-start" id="phoneselect">
+    <div id='phoneselect'>
+        <h6 class='d-inline'>Enter VoIP Service Number</h6><p class='d-inline'>&nbsp;(e.g. 7347632000 or 734-763-2000)</p>
+        <form action='/tools/voip/' mthod='GET' submit=' return validate()' name="Select">{% csrf_token %}
+            <div class='form-row mt-2'>
+                <div class='input-group col-md-4'>
+                    <div class='input-group-prepend'>
+                        <span class='input-group-text'>Enter a Phone Number</span>
+                    </div>
+                    <input type='text' name='number' id='phone' class='form-control'>
+                </div>
+                <input type='submit' value='Search' class='btn btn-primary'>
+            </div>
+        </form>
+    </div>
+
+<!--     {% comment %} <div class="row align-items-start" id="phoneselect">
      <form action="/tools/voip/" method="GET" submit="return validate()" name="Select">{% csrf_token %}
     
         <h2>Phone Number:</h2>
@@ -12,19 +27,32 @@
         <input type="submit" value="Go" class="btn btn-primary"><br>
         <p></p>
     </form>
+    </div> {% endcomment %}
+    <form class = "form-row" action="/tools/voip/" method="GET" submit="return validate()" name="Select" id = "phoneselect">{% csrf_token %}
+     <div class = "row align-items-start" id = "select_loc">
+        <div class = "input-group col-md-10">
+            <div class ="input-group-prepend">
+                <label class = "input-group-text" for="inv_dropdown">Enter a Phone Number</label>
+            </div>
+            <input type="text" class = "form-control" style='font-size:20px' name = 'number' id = 'phone'>
+                
+            
+        </div>
     </div>
+    <input type = "submit" value="Search" class="btn btn-primary"><br>
+    </form>
+    <br> -->
     
-    
-    <form action='/tools/voip/confirm/' method="GET" id = "voipLocationForm">
-        <ul class="nav justify-content-center nav-pills" id="voiplocation_nav" role="tablist">
+    <form action='/tools/voip/confirm/' method="GET" id ="voipLocationForm">
+        <ul class="nav justify-content-center nav-pills mt-5" id="voiplocation_nav" role="tablist">
             <li class="nav-item">
-                <a class="nav-link disabled" onclick="tab_func1()" data-toggle="tab" id="vlc-1" href="#vl-1" role="tab" name="Select Phone Number" aria-selected="false">Select Phone Number</a>
+                <a class="nav-link disabled" onclick="tab_func1()" data-toggle="tab" id="vlc-1" href="#vl-1" role="tab" name="Select Phone Number" aria-selected="false">Current Location</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link disabled" onclick="tab_func2()" data-toggle="tab" id="vlc-2" href="#vl-2" role="tab" name="Select New Location" aria-selected="false">Select New Location</a>
+                <a class="nav-link disabled" onclick="tab_func2()" data-toggle="tab" id="vlc-2" href="#vl-2" role="tab" name="Select New Location" aria-selected="false">New Location</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link disabled" onclick="tab_func3()" data-toggle="tab" id="vlc-3" href="vl-3" role="tab" name="Confirm Change" aria-selected="false">Confirm Change</a>
+                <a class="nav-link disabled" onclick="tab_func3()" data-toggle="tab" id="vlc-3" href="vl-3" role="tab" name="Confirm Change" aria-selected="false">Review & Submit</a>
             </li>
         </ul>
 
@@ -59,7 +87,7 @@
                         This tool is currently under construction.<br>
                         If you would like to use this tool, click the button below.
                     </p>
-                    <a href="https://itscommweb.itd.umich.edu/LocationChange/" class="btn btn-outline-primary" role="button">VOIP Location Change</a>
+                    <a href="https://itscommweb.itd.umich.edu/LocationChange/" class="btn btn-outline-primary" role="button">VoIP Location Change</a>
                     
                 </div>
             </div>

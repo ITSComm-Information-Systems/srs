@@ -8,5 +8,6 @@ urlpatterns = [
     path('doc/', include('reports.doc.urls')),
     path('soc/', include('reports.soc.urls')),
     path('metrics/', include('reports.metrics.urls')),
+    path('nonteleph/', include('reports.nonteleph.urls'))
 
 ]

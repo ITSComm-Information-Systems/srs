@@ -1,47 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<style>
-	.table-total {
-		background-color:#F0AD4E;
-	}
-
-	.total-col {
-		text-align:right;
-	}
-
-	.submit-link {
-		text-align:left;
-		float:left;
-	    background:none!important;
-	    border:none; 
-	    padding:0!important;
-	    text-decoration:underline;
-	    cursor:pointer;
-	}
-
-	#edit-selection {
-		text-decoration:underline;
-	}
-
-</style>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-<div class="container">
+<div class="container">	
 	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
-		<strong class="d-inline">Your selection</strong>
-		<div class="d-inline offset-md-2">
-			<button class="btn btn-link d-inline" onclick="location.href='..'"><i class="fas fa-edit"></i>Edit Your Selection</button>
-		</div>
+	<div class='row'>
+		<h1>{{title}}</h1>
+		<!-- <div class="d-flex align-items-center">
+			<strong>Loading...</strong>
+			<div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+		  </div> -->
+		<!-- <i class="fa fa-spinner fa-spin offset-1" id='loading' style='font:40px;'></i> -->
+		<!-- <i class="fas fa-spinner fa-spin offset-1 mt-4" id='loading'></i>
+		<div class="spinner-border text-dark" role="status"> <span class="sr-only">Loading...</span> </div> -->
+	</div>
+
+	<strong class="d-inline">Report Selection</strong>
+	<a class="d-inline offset-md-3" href='..'><i class="fas fa-edit"></i>Edit Your Selection</a>
 
 		<div class="row">
-			<div class="card border-dark col-md-5">
-				<div class="card-body" style="padding-bottom:0;">
-					<div id="selected_dept"><strong>Department:&nbsp;&nbsp;</strong>{{ dept }}<br></div>
-					<div id="billing_date"><strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_date }}<br></div>
-					<strong style="float:left;">Chartfields:&nbsp;&nbsp;</strong>
-					<p id="chartcoms" style="float:left;">
+			<div class="card border-dark col-md-6">
+				<div class="card-body card-bottom">
+					<div id="selected_dept"><strong>Department:&nbsp;&nbsp;</strong>{{ dept }}</div>
+					<div id="billing_date"><strong>Billing Date:&nbsp;&nbsp;</strong>{{ billing_date }}</div>
+					<div id="department_manager"><strong>Department Manager: </strong>{{ dept_mgr }} ({{ dept_mgr_uniq }})</div>
+					<strong class="floatleft">Chartfields:&nbsp;&nbsp;</strong>
+					<p id="chartcoms" class="floatleft">
 					{% for c in charge_types %}
 						{{ c.account_number }}<br>
 					{% endfor %}
@@ -54,16 +36,16 @@
 		{% for c in charge_types %}
 		{% if c.data %}
 		<div class="row mt-5">
-			<div class="card border-dark" style="width:83%;">
+			<div class="card border-dark card-width">
 				<div class="card-header">
 					<strong>Chartfield:</strong>&nbsp;{{ c.account_number }}
 				</div>
 				<div class="card-body">
 					{% if c.type_summary %}
 					<strong>Summary</strong>
-					<table class="table table-sm">
+					<table class="doc table table-sm table-striped mt-2">
 						<thead>
-							<tr class="table-secondary">
+							<tr class="thead-dark">
 								<th scope="col">Type of Service</th>
 								<th scope="col" class='total-col'>Total Charge</th>
 							</tr>
@@ -72,197 +54,254 @@
 							{% for key, value in c.type_summary.items %}
 								<tr>
 									<td>{{ key }}</td>
+									{% if '-'|first in 'value' %}
+									<td class='total-col prv-msgs'>{{ value }}</td>
+									{% else %}
 									<td class='total-col'>{{ value }}</td>
+									{% endif %}
 								</tr>
 							{% endfor %}
-							<tr class='table-total'>
+							<tr class='table-total bg-warning'>
 								<td><strong>Total</strong></td>
-								<td class='total-col'>{{ c.type_total }}</td>
+								{% if '-'|first in c.type_total %}
+									<td class='total-col prv-msgs'><strong>{{ c.type_total }}</strong></td>
+								{% else %}
+									<td class='total-col'><strong>{{ c.type_total }}</strong></td>
+								{% endif %}
 							</tr>
 						</tbody>
 					</table>
 					{% endif %}
 
 					{% for key, value in c.charge_tables.items %}
-					<div class="mt-5">
-						<strong>{{ key }} Charges</strong>
-						<table class="table table-sm" id='charge_table'>
+						<div class='mt-5'></div>
+						<strong>{{ key }}</strong>
+						<table class="doc table table-sm table-striped mt-2" id='charge_table'>
 							<thead>
-								<tr class="table-secondary">
-									<th scope='col' style='text-align:left;'>Billing ID</th>
+								<tr class="thead-dark">
+									<th scope='col' class="first-col">Billing ID</th>
 									<th scope="col">Monthly Charges</th>
 									<th scope="col" colspan='2'>Call Usage</th>
-									<th scope="col" style='text-align:right;'>Total Charge</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr class="table-warning">
-									<td style='text-align:left;'></td>
-									<td>Amount</td>
-									<td>Number</td>
-									<td>Amount</td>
-									<td style='text-align:right;'>Amount</td>
-								</tr>
-								{% for v in value.rows %}
-								<tr>
-									<form method="POST" action='detail/' id="report_details">{% csrf_token %}
-										<input type="hidden" name="selected_dept" value="{{ dept }}">
-										<input type="hidden" name="billing_date" value="{{ billing_date }}">
-										<input type="hidden" name="chartcoms" value="{{ chartfields }}">
-
-										<td><input class="btn btn-link submit-link" style="text-align:left;" type="submit" name="user_id" value="{{ v.user_defined_id }}"></td>
-										<input type="hidden" name="sub_id:{{ v.user_defined_id}}" value="{{ v.subscriber_id }}">
-										<input type="hidden" name="chartcom:{{ v.user_defined_id }}" value="{{ c.account_number }}">
-										<input type="hidden" name="charge_type:{{ v.user_defined_id }}" value="{{ key }}">
-										<td>{{ v.monthly_charges }}</td>
-										<td>{{ v.call_number }}</td>
-										<td>{{ v.call_amount }}</td>
-										<td style='text-align:right;'>{{ v.total_charges }}</td>
-									</form>
-								</tr>
-								{% endfor %}
-								<tr class='table-total'>
-									<td style='text-align:left;'><strong>Total</strong></td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td style='text-align:right;'>{{ value.total }}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					{% endfor %}
-
-					{% if c.monthly_data %}
-					<div class="mt-5">
-						<strong>Monthly Service Charges</strong>
-						<table class="table table-sm">
-							<thead>
-								<tr class="table-secondary">
-									<th scope="col">Item Code</th>
-									<th scope="col">Description</th>
-									<th scope="col">Unit Amount</th>
-									<th scope="col">Quantity</th>
 									<th scope="col" class='total-col'>Total Charge</th>
 								</tr>
 							</thead>
 							<tbody>
-								{% for key, value in c.monthly_data.items %}
+								<tr class="table-warning">
+									<td class='first-col'></td>
+									<td>Amount</td>
+									<td>Number</td>
+									<td>Amount</td>
+									<td class='total-col'>Amount</td>
+								</tr>
+								{% for v in value.rows %}
 								<tr>
-									<td>{{ key }}</td>
-									<td>{{ value.desc }}</td>
-									<td>{{ value.unit_amt }}</td>
-									<td>{{ value.quantity }}</td>
-									<td class='total-col'>{{ value.total }}</td>
+									<form method="POST" action='detail/' id="report_details{{v.user_defined_id}}">{% csrf_token %}
+										<input type="hidden" name="selected_dept" value="{{ dept }}">
+										<input type="hidden" name="billing_date" value="{{ billing_date }}">
+										<input type="hidden" name="dept_mgr" value="{{ dept_mgr }} ({{ dept_mgr_uniq }})">
+										<input type="hidden" name="chartcoms" value="{{ chartfields }}">
+										<input type="hidden" name="user_id" value="{{ v.user_defined_id }}">
+										<input type="hidden" name="sub_id:{{ v.user_defined_id}}" value="{{ v.subscriber_id }}">
+										<input type="hidden" name="chartcom:{{ v.user_defined_id }}" value="{{ c.account_number }}">
+										<input type="hidden" name="charge_type:{{ v.user_defined_id }}" value="{{ key }}">
+
+										<td class="linky-link"><a href='#' onclick="$('#report_details{{v.user_defined_id}}').submit();">{{ v.user_defined_id }}</a></td>
+										{% if '-'|first in v.monthly_charges %}
+											<td class='prv-msgs'>{{ v.monthly_charges }}</td>
+										{% else %}
+											<td>{{ v.monthly_charges }}</td>
+										{% endif %}
+										<td>{{ v.call_number }}</td>
+										{% if '-'|first in v.call_amount %}
+											<td class='prv-msgs'>{{ v.call_amount }}</td>
+										{% else %}
+											<td>{{ v.call_amount }}</td>
+										{% endif %}
+										{% if '-'|first in v.total_charges %}
+											<td class='total-col prv-msgs'>{{ v.total_charges }}</td>
+										{% else %}
+											<td class='total-col'>{{ v.total_charges }}</td>
+										{% endif %}
+									</form>
 								</tr>
 								{% endfor %}
-								<tr class='table-total'>
-									<td><strong>Total</strong></td>
+								<tr class='table-total bg-warning'>
+									<td class='first-col'><strong>Total</strong></td>
 									<td></td>
 									<td></td>
 									<td></td>
-									<td class='total-col'>{{ c.monthly_total }}</td>
+									{% if '-'|first in value.total %}
+									<td class='total-col prv-msgs'><strong>{{ value.total }}</strong></td>
+									{% else %}
+									<td class='total-col'><strong>{{ value.total }}</strong></td>
+									{% endif %}
 								</tr>
 							</tbody>
 						</table>
-					</div>
+					{% endfor %}
+
+					{% if c.monthly_data %}
+						{% if c.charge_tables %}
+						<div class="mt-5"></div>
+						{% endif %}
+					<strong>Monthly Service Charges</strong>
+					<table class="doc table table-sm table-striped mt-2">
+						<thead>
+							<tr class="thead-dark">
+								<th scope="col">Item Code</th>
+								<th scope="col">Description</th>
+								<th scope="col">Unit Amount</th>
+								<th scope="col">Quantity</th>
+								<th scope="col" class='total-col'>Total Charge</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for key, value in c.monthly_data.items %}
+							<tr>
+								<td>{{ key }}</td>
+								<td>{{ value.desc }}</td>
+								{% if '-'|first in value.unit_amt %}
+									<td class='prv-msgs'>{{ value.unit_amt }}</td>
+								{% else %}
+									<td>{{ value.unit_amt }}</td>
+								{% endif %}
+								<td>{{ value.quantity }}</td>
+								{% if '-'|first in value.total %}
+									<td class='total-col prv-msgs'>{{ value.total }}</td>
+								{% else %}
+									<td class='total-col'>{{ value.total }}</td>
+								{% endif %}
+							</tr>
+							{% endfor %}
+							<tr class='table-total bg-warning'>
+								<td><strong>Total</strong></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								{% if '-'|first in c.monthly_total %}
+									<td class='total-col prv-msgs'><strong>{{ c.monthly_total }}</strong></td>
+								{% else %}
+									<td class='total-col'><strong>{{ c.monthly_total }}</strong></td>
+								{% endif %}
+							</tr>
+						</tbody>
+					</table>
 					{% endif %}
 
 					{% if c.otc %}
-					<div class="mt-5">
-						<strong>One Time Charges</strong>
-						<table class="table table-sm">
-							<thead>
-								<tr class="table-secondary">
-									<th scope="col">Item Code</th>
-									<th scope="col">Description</th>
-									<th scope="col">Quantity</th>
-									<th scope="col" style="text-align:right;">Total Amount</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for a in c.otc %}
-								<tr>
-									<td>{{ a.item_code }}</td>
-									<td>{{ a.desc }}</td>
-									<td>{{ a.qty }}</td>
-									<td style="text-align:right;">{{ a.total }}</td>
-								</tr>
-								{% endfor %}
-								<tr style="background-color:#F0AD4E;">
-									<td><strong>Total</strong></td>
-									<td></td>
-									<td></td>
-									<td style="text-align:right;">{{ c.otc_total }}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
+						{% if c.charge_tables or c.monthly_data %}
+						<div class="mt-5"></div>
+						{% endif %}
+					<strong>One Time Charges</strong>
+					<table class="doc table table-sm table-striped mt-2">
+						<thead>
+							<tr class="thead-dark">
+								<th scope="col">Item Code</th>
+								<th scope="col">Description</th>
+								<th scope="col">Quantity</th>
+								<th scope="col" class='total-col'>Total Amount</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for a in c.otc %}
+							<tr>
+								<td>{{ a.item_code }}</td>
+								<td>{{ a.desc }}</td>
+								<td>{{ a.qty }}</td>
+								{% if '-'|first in a.total %}
+									<td class='total-col prv-msgs'>{{ a.total }}</td>
+								{% else %}
+									<td class='total-col'>{{ a.total }}</td>
+								{% endif %}
+							</tr>
+							{% endfor %}
+							<tr class='table-total bg-warning'>
+								<td><strong>Total</strong></td>
+								<td></td>
+								<td></td>
+								{% if '-'|first in c.otc_total %}
+									<td class='total-col prv-msgs'><strong>{{ c.otc_total }}</strong></td>
+								{% else %}
+									<td class='total-col'><strong>{{ c.otc_total }}</strong></td>
+								{% endif %}
+							</tr>
+						</tbody>
+					</table>
 					{% endif %}
 
 					{% if c.occ %}
-					<div class="mt-5">
-						<strong>Work Order Charges</strong>
-						<table class="table table-sm">
-							<thead>
-								<tr class="table-secondary">
-									<th scope="col">Work Order</th>
-									<th scope="col">Service Order/Equipment</th>
-									<th scope="col">Labor</th>
-									<th scope="col" style="text-align:right">Total Charge</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for o in c.occ %}
-								<tr>						
-									<td>{{ o.work_order }}</td>
-									<td>{{ o.equip }}</td>
-									<td>{{ o.sol }}</td>
-									<td style="text-align:right">{{ o.total_amt }}</td>
-								</tr>
-								{% endfor %}
-								<tr style="background-color:#F0AD4E;">
-									<td><strong>Total</strong></td>
-									<td></td>
-									<td></td>
-									<td style="text-align:right">{{ c.occ_total }}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
+						{% if c.charge_tables or c.monthly_data or c.otc %}
+						<div class="mt-5"></div>
+						{% endif %}
+					<strong>Work Order Charges</strong>
+					<table class="doc table table-sm table-striped mt-2">
+						<thead>
+							<tr class="thead-dark">
+								<th scope="col">Work Order</th>
+								<th scope="col">Service Order/Equipment</th>
+								<th scope="col">Labor</th>
+								<th scope="col" class='total-col'>Total Charge</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for o in c.occ %}
+							<tr>						
+								<td>{{ o.work_order }}</td>
+								<td>{{ o.equip }}</td>
+								<td>{{ o.sol }}</td>
+								{% if '-'|first in o.total_amt %}
+									<td class='total-col prv-msgs'>{{ o.total_amt }}</td>
+								{% else %}
+									<td class='total-col'>{{ o.total_amt }}</td>
+								{% endif %}
+							</tr>
+							{% endfor %}
+							<tr class='table-total bg-warning'>
+								<td><strong>Total</strong></td>
+								<td></td>
+								<td></td>
+								{% if '-'|first in c.occ_total %}
+									<td class='total-col prv-msgs'><strong>{{ c.occ_total }}</strong></td>
+								{% else %}
+									<td class='total-col'><strong>{{ c.occ_total }}</strong></td>
+								{% endif %}
+							</tr>
+						</tbody>
+					</table>
 					{% endif %}
 
 					{% if c.credits %}
-					<div class="mt-5">
-						<strong>Credits Summary</strong>
-						<table class="table table-sm">
-							<thead>
-								<tr class="table-secondary">
-									<th scope="col">Item Code</th>
-									<th scope="col" style="text-align:right;">Credit</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for cr in c.credits %}
-								<tr>
-									<td>{{ cr.item_code }}</td>
-									<td style="text-align:right;"> {{ cr.credit }}</td>
-								</tr>
-								{% endfor %}
-								<tr style="background-color:#F0AD4E;">
-									<td><strong>Total</strong></td>
-									<td style="text-align:right;">{{ c.credit_total }}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
+						{% if c.charge_tables or c.monthly_data or c.otc or c.occ %}
+						<div class="mt-5"></div>
+						{% endif %}
+					<strong>Credits Summary</strong>
+					<table class="doc table table-sm table-striped mt-2">
+						<thead>
+							<tr class="thead-dark">
+								<th scope="col">Item Code</th>
+								<th scope="col" class='total-col'>Credit</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for cr in c.credits %}
+							<tr>
+								<td>{{ cr.item_code }}</td>
+								<td class='total-col'> {{ cr.credit }}</td>
+							</tr>
+							{% endfor %}
+							<tr class="table-total bg-warning">
+								<td><strong>Total</strong></td>
+								<td class='total-col'><strong>{{ c.credit_total }}</strong></td>
+							</tr>
+						</tbody>
+					</table>
 				    {% endif %}
 				</div>
 			</div>
 		</div>
 		{% else %}
 		<div class="row mt-5">
-			<div class="card border-dark" style="width:83%;">
+			<div class="card border-dark card-width">
 				<div class="card-header">
 					<strong>Chartfield:&nbsp;</strong>{{ c.account_number }}
 				</div>

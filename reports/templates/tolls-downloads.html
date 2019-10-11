@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>{{ title }}</h1>
+<div>
+    <strong>Report selection</strong>
+    <a class="float-right" href="../tolls">Edit your selection</a>
+    <a class="float-right" id="edit-selection" href="../tolls"><i class="fas fa-edit"></i></a>
+</div>
+
+<div>
+    <div class="card border-dark">
+        <div class="card-body">
+            <div class="card-grid-4">
+                <div class="deptid">
+                    <strong>Department: </strong>{{ dept_id }}
+                </div>
+                <div class="deptname">
+                    <strong>Department Name: </strong>{{dept_name}}
+                </div>
+                <div class="dept_manager">
+                    <strong>Department Manager: </strong>{{dept_mgr}} ({{ dept_mgr_uniq }})
+                </div>
+                <div class="billdate">
+                    <strong>Billing Date: </strong>{{ bill_period }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if inactive %}
+<span class="prv-msgs">{{dept_name}} ({{dept_id}})</span><i class="fas fa-exclamation-triangle"></i>
+{% endif %}
+
+{% if inactive %}
+<p><strong>No reports created for inactive departments.</strong></p>
+{% elif submit %}
+<h2>Reports Available for Download</h2>
+<div class="col mb-4">
+    <i class="fas fa-file-csv" style="color:#28a745"></i><a
+        href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/'
+        download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv">&nbsp;&nbsp;CSV Download</a>
+</div>
+<div class="col mb-4">
+    <i class="fas fa-file-pdf prv-msgs"></i><a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'>&nbsp;&nbsp;PDF
+        Download</a>
+</div>
+<div class="col mb-4">
+    <i class="fas fa-file-pdf prv-msgs"></i><a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'>
+        &nbsp;&nbsp;Condensed PDF Download</a>
+</div>
+
+{% endif %}
+
+{% if inactive %}
+<i class="fas fa-exclamation-triangle prv-msgs"></i><span class="prv-msgs">Department is inactive.</span>
+{% endif %}
+
+{% endblock %}

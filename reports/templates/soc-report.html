@@ -1,0 +1,318 @@
+{% extends 'base.html'%}
+{% load tags %}
+{% block content %}
+
+<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
+
+<h1>{{ title }}</h1>
+<div>
+    <strong>Report selection</strong>
+    <a class='offset-3' href="../soc"><i class="fas fa-edit"></i>Edit your selection</a>
+    <!-- <a class="offset-2" id="edit-selection" href="../soc"><i class="fas fa-edit"></i></a> -->
+</div>
+
+<div class="row">
+    <div class="card border-dark col-md-6">
+        <div class="card-body card-bottom">
+            <div><strong>Billing Period:&nbsp;&nbsp;</strong>{{ billing_period }}</div>
+            <strong class="floatleft">{{ grouping }}:&nbsp;&nbsp;</strong>
+            <p class="floatleft">
+            {% for u in unit %}
+                {{ u }}<br>
+            {% endfor %}
+            </p>
+        </div>
+    </div>
+</div>
+
+{% if table %}
+<div class="soc-buttons mt-4 mb-4">
+    <div class="expand-collapse">
+        <button onclick="expandAll()" class="btn btn-link">Expand All</button>
+        <button onclick="collapseAll()" class="btn btn-link">Collapse All</button>
+    </div>
+    <button onclick="exportTableToCSV('{% for name in unit%}{{name}}_{% endfor %}{{billing_period}}.csv')"
+        class="btn btn-success float-right">CSV Download
+    </button>
+</div>
+
+<table class="table table-sm table-bordered" id='soc-table'>
+    <thead class="thead-dark">
+        <tr>
+            <th class='center-title'>Expense Account</th>
+            <th class='center-title'>Item Description</th>
+            <th class='center-title'>Charge Codes</th>
+            <th class='center-title'>Rate</th>
+            <th class='center-title'>Average Monthly Units Billed</th>
+            <th class='center-title'>Billed Units</th>
+            <th class='center-title'>Item Total</th>
+            <th class='center-title'>Item Group Total</th>
+            <th class='center-title'>Account Total</th>
+
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for row in table.0.0 %}
+        <tr class="table-warning">
+            <td>
+                <label class='expand-icon mb-0'>
+                    <input class='toggle1' type="checkbox" name="{{row.0}}" data-toggle="toggle">
+                    <i class="far fa-caret-square-down unchecked"></i>
+                    <i class="far fa-caret-square-up checked"></i>
+                    {{ row.0 }} ({{ row.1 }})
+                </label>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% if row.3 < 0 %}
+                <td class='prv-msgs'>{{ row.3 | currency }}</td>
+            {% else %}
+                <td>{{ row.3 | currency }}</td>
+            {% endif %}
+        </tr>
+
+    <tbody class="{{row.0}}" id="{{row.0}}" style="display:none">
+        {% for charge in row.2%}
+        <tr class="table-secondary">
+            <td>
+                <label class='expand-icon mb-0 offset-1'>
+                    <!-- &nbsp;&nbsp;&nbsp; -->
+                    <input class='toggle2' type="checkbox" name="{{charge.2}}" data-toggle="toggle2">
+                    <i class="far fa-caret-square-down unchecked"></i>
+                    <i class="far fa-caret-square-up checked"></i>
+                    {{ charge.0 }}
+                </label>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% if 0 > charge.2 %}
+                <td class='prv-msgs'>{{ charge.2 | currency }}</td>
+            {% else %}
+                <td>{{ charge.2 | currency }}</td>
+            {% endif %}
+            <td></td>
+        </tr>
+        {% for code in charge.1 %}
+        <tr class="{{charge.2}}" style="display: none">
+            <td></td>
+            <td>{{ code.0 }}</td>
+            <td>{{ code.1 }}</td>
+            {% if 0 > code.2 %}
+                <td class='prv-msgs'>{{ code.2 | currency }}</td>
+            {% else %}
+                <td>{{ code.2 | currency }}</td>
+            {% endif %}
+            <td>{% divide code.3 num_months %}</td>
+            <td>{{ code.3 }}</td>
+            {% if 0 > code.4 %}
+                <td class='prv-msgs'>{{ code.4 | currency }}</td>
+            {% else %}
+                <td>{{ code.4 | currency }}</td>
+            {% endif %}
+            <td></td>
+            <td></td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </tbody>
+    {% endfor %}
+
+    <tr class='bg-warning'>
+        <td><strong>Total</strong></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        {% if 0 > table.0.1 %}
+            <td class='prv-msgs'><strong>{{table.0.1 | currency }}</strong></td>
+        {% else %}
+            <td><strong>{{ table.0.1 | currency }}</strong></td>
+        {% endif %}
+    </tr>
+    </tbody>
+</table>
+
+{% else %}
+<div class="mt-2">
+    <div class="alert alert-danger col-md-8" role="alert">
+        <i class="fas fa-exclamation-triangle prv-msgs"></i>
+        No charges for current selection
+    </div>
+</div>
+{% endif%}
+
+{% endblock %}
+
+{% block js %}
+<script>
+    function display_active(active) {
+        var group = document.forms["Select"]["department_group"];
+        var index = group.selectedIndex - 1;
+        document.getElementById("display").innerHTML = active[index]
+
+    }
+
+    function exportTableToCSV(filename) {
+        var csv = [];
+        var rows = document.querySelectorAll("table tr");
+
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll("td, th");
+
+            for (var j = 0; j < cols.length; j++) {
+                var text = '"' + cols[j].innerText + '"';
+                //alert(text);
+                row.push(text);
+            }
+
+            csv.push(row.join(","));
+        }
+
+        // Download CSV file
+        downloadCSV(csv.join("\n"), filename);
+    }
+
+
+    function downloadCSV(csv, filename) {
+        var csvFile;
+        var downloadLink;
+
+        // CSV file
+        csvFile = new Blob([csv], { type: "text/csv" });
+
+        // Download link
+        downloadLink = document.createElement("a");
+
+        // File name
+        downloadLink.download = filename;
+
+        // Create a link to the file
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+
+        // Hide download link
+        downloadLink.style.display = "none";
+
+        // Add the link to DOM
+        document.body.appendChild(downloadLink);
+
+        // Click download link
+        downloadLink.click();
+    }
+
+    function expandAll() {
+        var toggle = document.getElementsByClassName('toggle1');
+        for (var i = 0; i < toggle.length; i++) {
+            var name = toggle[i].name;
+            toggle[i].checked = true;
+            var result_style = document.getElementsByClassName(name);
+            for (var j = 0; j < result_style.length; j++) {
+                result_style[j].style.display = 'table-row-group';
+            }
+        }
+        var toggle = document.getElementsByClassName('toggle2');
+        for (var i = 0; i < toggle.length; i++) {
+            var name = toggle[i].name;
+            toggle[i].checked = true;
+            var result_style = document.getElementsByClassName(name);
+            for (var j = 0; j < result_style.length; j++) {
+                result_style[j].style.display = 'table-row';
+            }
+        }
+    }
+
+    function collapseAll() {
+        var toggle = document.getElementsByClassName('toggle1');
+        for (var i = 0; i < toggle.length; i++) {
+            var name = toggle[i].name;
+            toggle[i].checked = false;
+            var result_style = document.getElementsByClassName(name);
+            for (var j = 0; j < result_style.length; j++) {
+                result_style[j].style.display = 'none';
+            }
+        }
+        var toggle = document.getElementsByClassName('toggle2');
+        for (var i = 0; i < toggle.length; i++) {
+            var name = toggle[i].name;
+            toggle[i].checked = false;
+            var result_style = document.getElementsByClassName(name);
+            for (var j = 0; j < result_style.length; j++) {
+                result_style[j].style.display = 'none';
+            }
+        }
+    }
+
+    $(document).ready(function () {
+
+        $('[data-toggle="toggle"]').parents().next('.hide').toggle();
+        $('[data-toggle="toggle2"]').parents().next('.hide').toggle();
+
+
+
+        $('[data-toggle="toggle"]').change(function () {
+            var name = this.name;
+
+
+            var result_style = document.getElementsByClassName(name);
+            for (var i = 0; i < result_style.length; i++) {
+                if (result_style[i].style.display == 'table-row-group') {
+                    result_style[i].style.display = 'none';
+                }
+                else {
+                    result_style[i].style.display = 'table-row-group';
+                }
+            }
+        });
+
+
+
+        $('[data-toggle="toggle2"]').change(function () {
+            var name = this.name;
+
+
+            var result_style = document.getElementsByClassName(name);
+            for (var i = 0; i < result_style.length; i++) {
+                if (result_style[i].style.display == 'table-row') {
+                    result_style[i].style.display = 'none';
+                }
+                else {
+                    result_style[i].style.display = 'table-row';
+                }
+            }
+        });
+
+
+    });
+
+    // When the user scrolls down 20px from the top of the document, show the button
+    window.onscroll = function() {scrollFunction()};
+
+    function scrollFunction() {
+      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        document.getElementById("scrollTop").style.display = "block";
+      } else {
+        document.getElementById("scrollTop").style.display = "none";
+      }
+    }
+
+    // When the user clicks on the button, scroll to the top of the document
+    function topFunction() {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
+</script>
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+
+{% endblock %}

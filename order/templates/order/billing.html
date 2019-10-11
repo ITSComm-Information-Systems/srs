@@ -1,0 +1,59 @@
+{% if tab.form.charge_types.count > 1 %}
+<div class="form-check">
+    <input data-label="Use the same chartfield for all charges" class="form-check-input keep-check usesamecode" type="checkbox" value="keepFeatures" name="keepFeatures" id="useSameCode{{tab.id}}"
+        onClick="useSameShortCode(this)">
+    <label class="form-check-label" for="useSameCode{{tab.id}}">
+        Check this box if you want to use the same chartfield for all charges.
+    </label>
+</div>
+<br>
+{% endif %}
+
+
+{% for field in tab.form.charge_types %}
+
+{% if field.label == 'Chartfield for Tracking Purposes' %}
+<div id='dummyChartfield'>
+    <em>There is no charge for this request. However, please select a chartfield for departmental tracking purposes.</em>
+</div>
+{% endif %}
+
+
+<fieldset class="form-group row col-md-8 col-12" id="div{{field.name}}">
+    <legend id="legend_{{field.name}}">
+        <strong>
+            {{ field.label }}
+        </strong>
+    </legend>
+    <div class="input-group mb-4">
+        <span class="sr-only">
+            <label for="dept_{{ field.name }}">Select a Department</label>
+        </span>
+        <div class="input-group-prepend">
+            <select class="custom-select dccsel" id="dept_{{ field.name }}" data-target="{{ field.name }}"
+                onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
+                <option value="all">All Depts</option>
+                {% for dept in tab.form.dept_list %}
+                <option value="{{dept}}">{{dept}}</option>
+                {% endfor %}
+            </select>
+        </div> 
+
+        <span class="sr-only">
+            <label for="name_{{ field.name }}">Select a Chartfield</label>
+        </span>
+
+        <select data-label="{{ field.label }}" data-tabid="{{tab.id}}" class="custom-select ccsel" id="name_{{ field.name }}" onchange="chartcomChange(this)" onload="chartcomChange(this)">
+            {% for chartcom in tab.form.chartcom_list %}
+            <option data-dept="{{ chartcom.dept }}" data-chartcom="{{ chartcom.account_number }}" data-chartcom-id="{{ chartcom.chartcom_id }}">{{ chartcom.name }}</option>
+            {% endfor %}
+        </select>
+
+    <input data-label="{{ field.label }}" class='col-8 ccval' name="cc_{{ field.name }}" id="{{ field.name }}" value="{{ chartcom }}" readonly>
+
+</div>
+
+</fieldset>
+{% endfor %}
+
+<input type="hidden" name="oneTimeCharges" id="occ_key" value="11">

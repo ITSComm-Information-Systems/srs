@@ -13,7 +13,8 @@ $(document).ready(function() {
 
 	$("#deptf").select2({
 		placeholder: "Select a department",
-		width: "100%",
+		display:"inline",
+		// width: "100%",
   		matcher: function(params, data) {
         	return matchStart(params, data);
     	}
@@ -30,11 +31,18 @@ $(document).ready(function() {
     	$('input.select2-search__field').prop('placeholder', 'Search...');
 	});
 
+	$("#dept_id").one('select2:open', function(e) {
+    	$('input.select2-search__field').prop('placeholder', 'Search...');
+	});
+
+	$("#doc_depts").one('select2:open', function(e) {
+    	$('input.select2-search__field').prop('placeholder', 'Search...');
+	});
+
 
 	// Set select for tolls- choose dept
 	$("#tolls_deptids").select2({
-    	placeholder: "Select a department",
-    	width: "100%",
+		minimumResultsForSearch: '3',
     	matcher: function(params, data) {
         	return matchStart(params, data);
     	}
@@ -42,14 +50,13 @@ $(document).ready(function() {
 
 	// tolls - choose billing period
 	$("#tolls_billing").select2({
-    	minimumResultsForSearch: Infinity,
-    	placeholder: "Select a billing period"
+    	minimumResultsForSearch: Infinity
 	});
 
 
 	// Set select for DOC - departments
 	$('#doc_depts').select2({
-		// width: '33%',
+		minimumResultsForSearch: '3',
 		matcher: function(params, data) {
         	return matchStart(params, data);
     	}
@@ -57,8 +64,20 @@ $(document).ready(function() {
 
 	// Set select for DOC - date
 	$('#doc_bill_date').select2({
-		minimumResultsForSearch: Infinity,
-		width: '33%'
+		minimumResultsForSearch: Infinity
+	})
+
+	// Set select for Inventory and Location - departments
+	$('#dept_id').select2({
+		minimumResultsForSearch: '3',
+		matcher: function(params, data) {
+        	return matchStart(params, data);
+    	}
+	})
+
+	// Set select for Inventory and Location - bill period
+	$('#bill_period').select2({
+		minimumResultsForSearch: Infinity
 	})
 
 });

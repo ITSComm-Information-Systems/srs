@@ -69,7 +69,7 @@ $(document).ready(function() {
               	var type = row['user_defined_id'];
               	type = type.split('-');
               	type = type[0];
-              	if (type == 'PH') {
+              	if (type == 'PH' | type == 'RA') {
               		if (data == 'Y') {
               			return '<i class="fa fa-check-circle" style="color:green;" aria-hidden="true"></i>';
               		}
@@ -122,7 +122,7 @@ $(document).ready(function() {
 	 	}
 
 	 	table.rows().every(function(index, element) {
-	 		record_count += 1;
+	 		record_count = record_count + 1;
 			var row = $(this.node());
 			var col0 = row.find('td:first-child input[type="checkbox"]');
 			 
@@ -180,7 +180,8 @@ $(document).ready(function() {
 	 	cf_change_table.rows().every(function(index, element) {
 			var row = $(this.node());
 			var col0 = row.find('td:first-child input[type="checkbox"]');
-			var starts_with = row.find('td:nth-child(2)').text().startsWith('PH');
+			var starts_with = row.find('td:nth-child(2)').text().startsWith('PH') |
+							  row.find('td:nth-child(2)').text().startsWith('RA');
 			 
 			insideChecked = false;
 			if (col0.is(':checked')) {
@@ -245,10 +246,11 @@ $(document).ready(function() {
 	$('#cf_users_table').on('change', 'tr', function() {
 		var box = $(this).find('td:first-child input[type="checkbox"]');
 		var checked = box.is(':checked');
-		if (checked) {
+		var select_all_checked = $('#select_all').is(':checked');
+		if (checked && !select_all_checked) {
 			record_count += 1;
 		}
-		else {
+		else if (!checked) {
 			record_count -= 1;
 		}
 		$('#record-count').html(record_count + ' Records Selected');
@@ -265,7 +267,8 @@ $(document).ready(function() {
 	$('#cf_change_table').on('change', 'tr', function() {
 		var box = $(this).find('td:first-child input[type="checkbox"]');
 		var checked = box.is(':checked');
-		var starts_with = $(this).find('td:nth-child(2)').text().startsWith('PH');
+		var starts_with = $(this).find('td:nth-child(2)').text().startsWith('PH') |
+						  $(this).find('td:nth-child(2)').text().startsWith('RA');
 		maintain_checks(checked, starts_with);
 	})
 
@@ -284,7 +287,7 @@ $(document).ready(function() {
 			 
 			if (col0.is(':checked')) {
 			    // If PH
-			    if (col1.startsWith("PH")) {
+			    if (col1.startsWith("PH") | col1.startsWith("RA")) {
 			    	// Set MRC
 			    	if ($('#mrc').is(':checked')) {
 			    		col3.html(selected);
@@ -344,12 +347,22 @@ $(document).ready(function() {
 			// Reset chartfield options when department changes
 			success: function(data) {
 				$('#cf_dropdown').empty();
-				for (i = 0; i < data.length - 1; ++i) {
-					var drp = document.getElementById('cf_dropdown');
-					var option = document.createElement("OPTION");
-					option.value = data[i].account_number;
-					option.text = data[i].account_number;
-					drp.add(option);
+				if (data.length < 2) {
+					$('#cf_dropdown_group').hide();
+					$('#cf_details').hide();
+					$('#no_cfs_alert').removeAttr('hidden');
+				}
+				else {
+					$('#cf_dropdown_group').show();
+					$('#cf_details').show();
+					$('#no_cfs_alert').attr('hidden', 'hidden');
+					for (i = 0; i < data.length - 1; ++i) {
+						var drp = document.getElementById('cf_dropdown');
+						var option = document.createElement("OPTION");
+						option.value = data[i].account_number;
+						option.text = data[i].account_number;
+						drp.add(option);
+					}
 				}
 				$('#dept_title').html('Department: ' + selected + ' - ' + data[data.length - 1].name);
 				change_current_page(data[0].account_number);
@@ -409,10 +422,12 @@ function nextPrev(n, table, cf_change_table, review_table) {
   if (n == 1 && currStep == 2) {
   	$('#dept_search').hide();
   	$('#select_dept').hide();
+  	$("#cfPrevBtn").removeAttr('disabled');
   }
   if (n == -1 && currStep == 1) {
   	$('#dept_search').show();
   	$('#select_dept').show();
+  	$("#cfPrevBtn").attr('disabled', 'disabled');
   }
 
   // Load third page correctly
@@ -439,30 +454,34 @@ function tab_func1() {
 	currStep = 1;
  	$('#dept_search').show();
   	$('#select_dept').show();
+  	$("#cfPrevBtn").attr('disabled', 'disabled');
 }
 
 function tab_func2() {
 	if (!$('#cfc-2').hasClass('disabled')) {
 		currStep = 2;
+		$('#dept_search').hide();
+		$('#select_dept').hide();
+		$("#cfPrevBtn").removeAttr('disabled');
 	}
-	$('#dept_search').hide();
-	$('#select_dept').hide();
 }
 
 function tab_func3() {
 	if (!$('#cfc-3').hasClass('disabled')) {
 		currStep = 3;
+		$('#dept_search').hide();
+	  	$('#select_dept').hide();
+	  	$("#cfPrevBtn").removeAttr('disabled');
 	  }
-	  $('#dept_search').hide();
-	  $('#select_dept').hide();
 }
 
 function tab_func4() {
 	if (!$('#cfc-4').hasClass('disabled')) {
 		currStep = 4;
+		$('#dept_search').hide();
+		$('#select_dept').hide();
+		$("#cfPrevBtn").removeAttr('disabled');
 	  }
-	  $('#dept_search').hide();
-	  $('#select_dept').hide();
 }
 
 
@@ -514,7 +533,7 @@ function change_current_page(selected) {
 		success: function(data) {
 			cf = data;
 			$("#fund").html(cf[0].fund);
-			$("#dept_id").html(cf[0].deptid);
+			$("#deptid").html(cf[0].deptid);
 			$("#program").html(cf[0].program);
 			$("#class_code").html(cf[0].class_code);
 			$("#project_grant").html(cf[0].project_grant);
@@ -543,7 +562,7 @@ function load_3(table, cf_change_table) {
 		var col0 = row.find('td:first-child input[type="checkbox"]'); // checkbox
 		var col1 = row.find('td:nth-child(2)').text();
 		var charges = '';
-		if (!col1.startsWith('PH')) {
+		if (!(col1.startsWith('PH') | col1.startsWith('RA'))) {
 			charges = 'N/A';
 		}
 
@@ -571,8 +590,8 @@ function validate(cf_change_table) {
 		var col4 = row.find('td:nth-child(5)').text(); // Toll
 		var col5 = row.find('td:nth-child(6)').text(); // Local
 
-		if (col1.startsWith('PH')) {
-			if (col3 == '' || col4 == '' || col5 == '') {
+		if (col1.startsWith('PH') | col1.startsWith('RA')) {
+			if (col3 == '' && col4 == '' && col5 == '') {
 				get_out = true;
 			}
 		}
@@ -590,6 +609,7 @@ function validate(cf_change_table) {
 function load_4(cf_change_table, review_table) {
 	review_table.clear();
 
+	var current_cf = $('.current').text();
 	cf_change_table.rows().every(function(index, element) {
 		var row = $(this.node());
 		var user_id = row.find('td:nth-child(2)').text()
@@ -605,6 +625,16 @@ function load_4(cf_change_table, review_table) {
 			toll,
 			local
 		]).draw();
+
+		if (mrc == '') {
+			mrc = current_cf;
+		}
+		if (toll == '') {
+			toll = current_cf;
+		}
+		if (local == '') {
+			local = current_cf;
+		}
 
 		var input = document.createElement("input");
         input.type = "hidden";

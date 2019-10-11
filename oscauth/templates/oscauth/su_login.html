@@ -3,9 +3,10 @@
 
 {% block content %}
 
+<h1>{{title}}</h1>
 <form action="." method="POST">{% csrf_token %}
  
-    {{ form }}
+    {{ form.as_p }}
     <div class="submit-row">
       <input type="submit" name="submit" class="btn btn-primary" value="{% trans "Change Login" %}"/>
     </div>
