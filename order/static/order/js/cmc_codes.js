@@ -8,17 +8,17 @@ $(document).ready(function() {
 
             num = i.toString();
 
-            var rec = $("#authdiv").clone();
+            var rec = $("#cmcdiv").clone();
 
-            rec.attr("id", "authdiv" + num);
+            rec.attr("id", "cmcdiv" + num);
 
             //rec.find("#workgroup").attr("name", "type" + num).attr("id", "workgroup" + num);
             //rec.find("label[for='workgroup']").attr("for", "workgroup" + num);
         
             //rec.find("#individual").attr("name", "type" + num).attr("id", "individual" + num);
             //rec.find("label[for='individual']").attr("for", "individual" + num);
-        
-            rec.find("#auth").attr("name", "auth" + num).attr("id","auth" + num);
+            rec.find("label[for='cmc']").attr("for", "cmc" + num);
+            rec.find("#cmc").attr("name", "auth" + num).attr("id","cmc" + num);
         
             $("#mainBody").append(rec);
 
