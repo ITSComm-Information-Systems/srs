@@ -152,8 +152,6 @@ def generate(request):
             rows = 'There is no data for the current selection'
         table = []
 
-    print(len(table))
-
     template = loader.get_template('soc-report.html')
     context = {
         'title': 'Summary of Charges',   
@@ -269,27 +267,15 @@ def get_rows(unit, grouping, period, drange, request):
         parms.append(year1 + month1)
         parms.append(year2 + month2)
 
-
-    print(grouping)
-    print(unit)
-    if (grouping == 'Department ID'): #TODO
+    if (grouping == 'Department ID'): 
         if unit == "All":
             if request.user.has_perm("can_order_all"):
                 dept_sql = ''
             else:
                 depts = [d['deptid'] for d in AuthUserDept.get_report_departments(request)]
-                dept_sql = ' and a.deptid in (%s) '
-                parms.append(depts)
-                #return values.filter(deptid__in = depts).order_by('account_desc').values().distinct()
+                dept_sql = " and a.deptid in ('" + "','".join(depts) + "') " #TODO could not get this to work as a parm or a tuple
         else:
-            pass
-            #return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
-
-    elif (grouping == 'Department IDs'): #TODO
-        dept_sql = ' and a.deptid in (%s) '
-        parms.append(unit)
-        print(unit)
-        #return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
+            dept_sql = " and a.deptid in ('" + "','".join(unit) + "') " #TODO could not get this to work as a parm or a tuple
 
     elif (grouping == 'Department Group'):
         dept_sql = ' and a.dept_grp_descr = %s '
