@@ -230,7 +230,6 @@ def find_num_months(date_range, billing_period):
 def get_rows(unit, grouping, period, drange, request):
     # unit = departments selected, grouping = how they selected dept, period = billing period, drange = how they selected billing period
 
-    print('base')
     base_sql = '''select a.account, a.account_desc, a.charge_group, a.charge_code, a.description
             , round( nvl(avg(a.unit_rate),   sum(a.amount) /  sum( nvl(a.quantity,1) )  ),2)   as unit_rate
             , sum( nvl(a.quantity,1) ) as quantity
@@ -258,7 +257,7 @@ def get_rows(unit, grouping, period, drange, request):
 
         date_sql =  ' a.calendar_yr = %s and a.month = %s '
         parms.append(year)
-        parms.append(words_to_num(month))
+        parms.append(month)
 
     elif (drange == 'Month-to-Month'):
         month1 = period.split(' ')[0]
@@ -267,24 +266,29 @@ def get_rows(unit, grouping, period, drange, request):
         year2 = period.split(' ')[4]
 
         date_sql =  ' a.calendar_yr || a.month = %s between %s and %s '
-        parms.append(year1 + words_to_num(month1))
-        parms.append(year2 + words_to_num(month2))
+        parms.append(year1 + month1)
+        parms.append(year2 + month2)
 
 
+    print(grouping)
+    print(unit)
     if (grouping == 'Department ID'): #TODO
         if unit == "All":
             if request.user.has_perm("can_order_all"):
-                pass
-                #dept_list = values.order_by('account_desc').values().distinct()
+                dept_sql = ''
             else:
                 depts = [d['deptid'] for d in AuthUserDept.get_report_departments(request)]
+                dept_sql = ' and a.deptid in (%s) '
+                parms.append(depts)
                 #return values.filter(deptid__in = depts).order_by('account_desc').values().distinct()
         else:
             pass
             #return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
 
     elif (grouping == 'Department IDs'): #TODO
-        pass
+        dept_sql = ' and a.deptid in (%s) '
+        parms.append(unit)
+        print(unit)
         #return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
 
     elif (grouping == 'Department Group'):
@@ -295,130 +299,51 @@ def get_rows(unit, grouping, period, drange, request):
         dept_sql = ' and a.dept_grp_vp_area_descr = %s '
         parms.append(unit[0])
 
-
-
-    #dept_sql = ' and a.dept_grp_descr = %s '
-    #parms.append('Alumni Association')
-    #dept_sql = ''
-
-
     vals = UmOscDeptUnitsReptV.objects.raw(base_sql + date_sql + dept_sql + end_sql , parms)
-
-    for val in vals:
-        print(val.account, val.charge_group, val.amount)
-
-    print('endloop')
     
     return vals
 
 
 def get_table(rows,request):
-    #accounts = rows.values_list('account','account_desc').distinct()
-    #accounts = ['611450']
+
     whole_table = []
     account_table = []
     final_table = []
-    throwaway = []
-    overall_cost = 0
     complete_table = []
 
-    print(type(rows))
-    idx_acct = 0
     account = ''
+    account_desc = ''
     charge_group = ''
-    total = 0
-    charge_code = ''
-    description = ''
-    rate = 0
-    quantity = 0
-    item_price = 0
-    total_cost = 0
     charge_total = 0
-
-    print('new loop')
+    total_cost = 0
+    overall_cost = 0
 
     for row in rows:
-
-        if row.charge_code != charge_code:
-            print(charge_code)
-            if charge_code != '':
-                print('append account')
-                account_table.append([description,charge_code,rate,quantity,item_price,2])
-                #account_table.append([x[0],x[1],rate,quantity,item_price,2])
-            description = row.description
-            charge_code = row.charge_code
 
         if row.charge_group != charge_group:
             if charge_group != '':
                 whole_table.append([charge_group, account_table, charge_total])
-                #whole_table.append([y,account_table, charge_total])
             charge_group = row.charge_group
+            charge_total = 0
             account_table = []
 
         if row.account != account:
             if account != '':
-                #final_table.append([i[0],i[1],whole_table,total_cost])
                 final_table.append([account,account_desc,whole_table,total_cost])
 
             account = row.account
             account_desc = row.account_desc
+            total_cost = 0
             whole_table = []
-            print(row)
 
-    #whole_table.append([charge_group, account_table, charge_total])
-    #final_table.append([account,account_desc,whole_table,total_cost])
-    overall_cost = 1
+        account_table.append([row.description,row.charge_code,row.unit_rate,row.quantity,row.amount,2])
+        charge_total = charge_total + row.amount
+        total_cost = total_cost + row.amount
+        overall_cost = overall_cost + row.amount
+
+    whole_table.append([charge_group, account_table, charge_total])
+    final_table.append([account,account_desc,whole_table,total_cost])
     complete_table.append([final_table,overall_cost])
-
-    print(len(account_table))
-    #print(len(overall_cost))
-    print(len(whole_table))
-    print(len(final_table))
-    print(len(complete_table))
-
-    return complete_table
-
-    print('original loop')
-
-    for i in accounts:
-        services = accounts.filter(account__exact = i[0]).order_by('charge_group').values_list('description',flat = True)
-        orders = services.filter(description__in = services).order_by('charge_group').values_list('charge_group', flat = True).distinct()
-        total_cost =0.0
-        whole_table = []
-        for y in orders:
-            charge_together = orders.filter(charge_group__exact = y).order_by('description').values_list('description','charge_code')
-            charge_total = 0.0
-            account_table = []
-            
-            for x in charge_together:
-                samecode = charge_together.filter(charge_code__exact = x[1] or None).order_by('charge_code').values_list('unit_rate','quantity','amount','dept_descr','month').distinct()
-                item_price = 0.0
-                rate = 0.0
-                quantity = 0
-                
-                for price in samecode:
-                    if (price[0]==''):
-                        rate = 0
-                    else:
-                        rate = float(price[0])
-                    if (price[1]=='' or price[1] == None):
-                        quantity= quantity +1
-                    else:
-                        quantity = quantity + int(price[1])
-                    item_price =  item_price + float(price[2])
-                    total_cost =  total_cost + float(price[2]) 
-                charge_total = charge_total + item_price
-                account_table.append([x[0],x[1],rate,quantity,item_price,2])
-            overall_cost = overall_cost + charge_total
-            whole_table.append([y,account_table, charge_total])
-        final_table.append([i[0],i[1],whole_table,total_cost])
-    complete_table.append([final_table,overall_cost])
-
-    print(len(account_table))
-    #print(len(overall_cost))
-    print(len(whole_table))
-    print(len(final_table))
-    print(len(complete_table))
 
     return complete_table
 
