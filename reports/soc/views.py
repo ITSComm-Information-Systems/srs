@@ -228,34 +228,34 @@ def find_num_months(date_range, billing_period):
 def get_rows(unit, grouping, period, drange, request):
     # unit = departments selected, grouping = how they selected dept, period = billing period, drange = how they selected billing period
 
+    base_sql = '''select a.account, a.account_desc, a.charge_group, a.charge_code, a.description
+            , round( nvl(avg(a.unit_rate),   sum(a.amount) /  sum( nvl(a.quantity,1) )  ),2)   as unit_rate
+            , sum( nvl(a.quantity,1) ) as quantity
+            , sum(a.amount) as amount
+            from pinn_custom.UM_OSC_DEPT_UNITS_REPT_V a where '''
+
+
+    end_sql = ''' group by a.account, a.account_desc, a.charge_group, a.charge_code,  a.description
+                order by account_desc, charge_group, description '''
+
+    parms = []
+
     # Filter report data by selected billing period
     if (drange == 'Fiscal Year'):
-        variable_column = 'fiscal_yr'
-        search_type = 'exact'
-        search_string = period
-        # values = UmOscDeptUnitsReptV.objects.filter(fiscal_yr__exact=period)
+        date_sql =  ' a.fiscal_yr = %s '
+        parms.append(period)
 
     elif (drange == 'Calendar Year'):
-        variable_column = 'calendar_yr'
-        search_type = 'exact'
-        search_string = period
-        #values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact=period)
+        date_sql =  ' a.calendar_yr = %s '
+        parms.append(period)
 
     elif (drange == 'Single Month'):
         month = period.split(' ')[0]
         year = period.split(' ')[1]
 
-        variable_column = 'calendar_yr'
-        search_type = 'exact'
-        search_string = year
-
-        variable_column2 = 'month'
-        search_type2 = 'exact'
-        search_string2 = month
-
-        date_filter2 = variable_column2 + '__' + search_type2
-
-        #values = UmOscDeptUnitsReptV.objects.filter(calendar_yr__exact=year, month__exact=month)
+        date_sql =  ' a.calendar_yr = %s and a.month = %s '
+        parms.append(year)
+        parms.append(month)
 
     elif (drange == 'Month-to-Month'):
         month1 = period.split(' ')[0]
@@ -263,133 +263,74 @@ def get_rows(unit, grouping, period, drange, request):
         month2 = period.split(' ')[3]
         year2 = period.split(' ')[4]
 
-        variable_column = 'date'
-        search_type = 'range'
-        search_string = [year1+''+month1,year2+''+month2]
+        date_sql =  ' a.calendar_yr || a.month = %s between %s and %s '
+        parms.append(year1 + month1)
+        parms.append(year2 + month2)
 
-       # values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(date__range = [year1+''+month1,year2+''+month2]) #.order_by('account').values('account','date').distinct()
-
-
-    # # CREATE DEPT FILTER
-    # if (grouping == 'Department ID'):
-    #     if unit == "All":
-    #         if not request.user.has_perm("can_order_all"):
-    #             depts = [d['deptid'] for d in AuthUserDept.get_report_departments(request)]
-    #             dept_column = 'deptid'
-    #             dept_search_type = 'in'
-    #             dept_search_string = depts
-    #     else:
-    #         dept_column = 'deptid'
-    #         dept_search_type = 'in'
-    #         dept_search_string = unit
-
-    # elif (grouping == 'Department IDs'):
-    #     dept_column = 'deptid'
-    #     dept_search_type = 'in'
-    #     dept_search_string = unit
-
-    # elif (grouping == 'Department Group'):
-    #     dept_column = 'dept_dep_descr'
-    #     dept_search_type = 'exact'
-    #     dept_search_string = unit[0]
-
-    # elif (grouping == 'Department Group VP Area'):
-    #     dept_column = 'dept_grp_vp_area_descr'
-    #     dept_search_type = 'exact'
-    #     dept_search_string = unit[0]
-
-
-    # Use custom filter
-    date_filter = variable_column + '__' + search_type
-
-    # if unit == 'All' and request.user.has_perm("can_order_all"):
-    if drange == 'Single Month':
-        values = UmOscDeptUnitsReptV.objects.filter(**{ date_filter: search_string }, **{ date_filter2: search_string2 }).order_by('account', 
-                                                    'charge_group', 'charge_code')
-    elif drange == 'Month-to-Month':
-        values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(**{ date_filter: search_string }).order_by('account', 
-                                                        'charge_group', 'charge_code')
-    else:
-        values = UmOscDeptUnitsReptV.objects.filter(**{ date_filter: search_string }).order_by('account', 'charge_group', 'charge_code')
-
-    # else:
-    #     dept_filter = dept_column + '__' + dept_search_type
-    #     if drange == 'Single Month':
-    #         values = UmOscDeptUnitsReptV.objects.filter(**{ dept_filter: dept_search_string }, **{ date_filter: search_string }, 
-    #                                                     **{ date_filter2: search_string2 }).order_by('account', 'charge_group', 'charge_code')
-    #     elif drange == 'Month-to-Month':
-    #         values = UmOscDeptUnitsReptV.objects.annotate(date = Concat('calendar_yr',Value(''), 'month')).filter(**{ dept_filter: dept_search_string }, 
-    #                                                         **{ date_filter: search_string }).order_by('account', 'charge_group', 'charge_code')
-    #     else:
-    #         values = UmOscDeptUnitsReptV.objects.filter(**{ dept_filter: dept_search_string }, **{ date_filter: search_string }).order_by('account', 
-    #                                                     'charge_group', 'charge_code') 
-
-    
-    # Further filter by selected departments
-    if (grouping == 'Department ID'):
+    if (grouping == 'Department ID'): 
         if unit == "All":
             if request.user.has_perm("can_order_all"):
-                return values.order_by('account_desc').values().distinct()
+                dept_sql = ''
             else:
                 depts = [d['deptid'] for d in AuthUserDept.get_report_departments(request)]
-                return values.filter(deptid__in = depts).order_by('account_desc').values().distinct()
+                dept_sql = " and a.deptid in ('" + "','".join(depts) + "') " #TODO could not get this to work as a parm or a tuple
         else:
-            return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
-
-    elif (grouping == 'Department IDs'):
-        return values.filter(deptid__in = unit).order_by('account_desc').values().distinct()
+            dept_sql = " and a.deptid in ('" + "','".join(unit) + "') " #TODO could not get this to work as a parm or a tuple
 
     elif (grouping == 'Department Group'):
-        return values.filter(dept_grp_descr__exact = unit[0]).order_by('account_desc').values().distinct()
+        dept_sql = ' and a.dept_grp_descr = %s '
+        parms.append(unit[0])
 
     elif (grouping == 'Department Group VP Area'):
-        return values.filter(dept_grp_vp_area_descr__exact = unit[0]).order_by('account_desc').values().distinct()
+        dept_sql = ' and a.dept_grp_vp_area_descr = %s '
+        parms.append(unit[0])
 
-
+    vals = UmOscDeptUnitsReptV.objects.raw(base_sql + date_sql + dept_sql + end_sql , parms)
+    
+    return vals
 
 
 def get_table(rows,request):
-    accounts = rows.values_list('account','account_desc').distinct()
+
     whole_table = []
     account_table = []
     final_table = []
-    throwaway = []
-    overall_cost = 0
     complete_table = []
 
-    for i in accounts:
-        services = accounts.filter(account__exact = i[0]).order_by('charge_group').values_list('description',flat = True)
-        orders = services.filter(description__in = services).order_by('charge_group').values_list('charge_group', flat = True).distinct()
-        total_cost =0.0
-        whole_table = []
-        for y in orders:
-            charge_together = orders.filter(charge_group__exact = y).order_by('description').values_list('description','charge_code')
-            charge_total = 0.0
+    account = ''
+    account_desc = ''
+    charge_group = ''
+    charge_total = 0
+    total_cost = 0
+    overall_cost = 0
+
+    for row in rows:
+
+        if row.charge_group != charge_group:
+            if charge_group != '':
+                whole_table.append([charge_group, account_table, charge_total])
+            charge_group = row.charge_group
+            charge_total = 0
             account_table = []
-            
-            for x in charge_together:
-                samecode = charge_together.filter(charge_code__exact = x[1] or None).order_by('charge_code').values_list('unit_rate','quantity','amount','dept_descr','month').distinct()
-                item_price = 0.0
-                rate = 0.0
-                quantity = 0
-                
-                for price in samecode:
-                    if (price[0]==''):
-                        rate = 0
-                    else:
-                        rate = float(price[0])
-                    if (price[1]=='' or price[1] == None):
-                        quantity= quantity +1
-                    else:
-                        quantity = quantity + int(price[1])
-                    item_price =  item_price + float(price[2])
-                    total_cost =  total_cost + float(price[2]) 
-                charge_total = charge_total + item_price
-                account_table.append([x[0],x[1],rate,quantity,item_price,2])
-            overall_cost = overall_cost + charge_total
-            whole_table.append([y,account_table, charge_total])
-        final_table.append([i[0],i[1],whole_table,total_cost])
+
+        if row.account != account:
+            if account != '':
+                final_table.append([account,account_desc,whole_table,total_cost])
+
+            account = row.account
+            account_desc = row.account_desc
+            total_cost = 0
+            whole_table = []
+
+        account_table.append([row.description,row.charge_code,row.unit_rate,row.quantity,row.amount,2])
+        charge_total = charge_total + row.amount
+        total_cost = total_cost + row.amount
+        overall_cost = overall_cost + row.amount
+
+    whole_table.append([charge_group, account_table, charge_total])
+    final_table.append([account,account_desc,whole_table,total_cost])
     complete_table.append([final_table,overall_cost])
+
     return complete_table
 
 
