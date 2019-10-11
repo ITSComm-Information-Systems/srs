@@ -27,18 +27,20 @@ def get_voip(request):
     submit = False
     template = loader.get_template('voip.html')
     phone_number = request.GET.get('number', None)
-    current = UmOscLocationsInUseV.objects.filter(service_number__exact = phone_number).order_by('room').values_list().distinct()
-    building_list = UmOscAvailableLocsV.objects.values_list('building_id', 'building_name').distinct()
+    if phone_number:
+        phone_number = phone_number.replace('-','')
+    current = UmOscLocationsInUseV.objects.filter(service_number__exact = phone_number).order_by('room').values().distinct()
+    building_list = UmOscAvailableLocsV.objects.values_list('building_id', 'building_name', 'campus_desc').distinct()
     selected = ''
     choice = ''
     if phone_number!= None:
         submit = True
     if request.is_ajax():
         choice = request.GET.get('jacks',None)
-        selected = UmOscLocationsInUseV.objects.filter(service_number__exact = phone_number, jack__exact = choice).order_by('room').values_list().distinct()
+        selected = UmOscLocationsInUseV.objects.filter(service_number__exact = phone_number, jack__exact = choice).order_by('room').values().distinct()
         
     context = {
-        'title': 'VOIP Location Change',
+        'title': 'VoIP Location Change',
         'phone_number': phone_number,
         'current': list(current),
         'building_list': list(building_list),
@@ -97,19 +99,19 @@ def confirm(request):
     template = loader.get_template('confirm.html')
     unique_name = request.user.username
 
-    phone_number = request.GET.get('holder',None)
+    phone_number = request.GET.get('phone-num',None)
     current_jack = request.GET.get('jacks',None)
     selected = UmOscLocationsInUseV.objects.filter(service_number__exact = phone_number, jack__exact = current_jack).order_by('room').values().distinct()
     
     new_name = request.GET.get('buildingName',None)
-    new_code = request.GET.get('buildingCode',None)
+    new_code = request.GET.get('buildingID',None)
     new_floor = request.GET.get('buildingFloor',None)
     new_room = request.GET.get('buildingRoom', None)
     new_jack = request.GET.get('buildingJack',None)
     new_location = UmOscAvailableLocsV.objects.filter(building_name__exact = new_name, building_id__exact = new_code, floor__exact = new_floor, room__exact = new_room, jack__exact = new_jack).values_list().distinct()
 
-    p = UmOscVoipLocChangeInput(uniqname = 'dyangz', service_id = selected[0]['service_id'], service_number = phone_number, # service_subscrib_id = selected[0]['service_subscrib_id'],
-        old_campuscd = selected[0]['campus_code'], old_campus_desc = selected[0]['campus_desc'], old_location_id = selected[0]['location_id'], 
+    p = UmOscVoipLocChangeInput(uniqname = unique_name, service_id = selected[0]['service_id'], service_number = phone_number, # service_subscrib_id = selected[0]['service_subscrib_id'],
+        old_campuscd = selected[0]['campuscd'], old_campus_desc = selected[0]['campus_desc'], old_location_id = selected[0]['location_id'], 
         old_path_id = selected[0]['path_id'], old_building_id = selected[0]['building_id'], old_building_name = selected[0]['building_name'], old_floor = selected[0]['floor'],
         old_floor_desc = None, old_room = selected[0]['room'], old_room_desc = None,
         old_jack = current_jack, service_id_at_new_loc = None, service_nbr_at_new_loc = None,
@@ -121,7 +123,7 @@ def confirm(request):
     p.save()
 
     curr = connections['pinnacle'].cursor()
-    p_uniqname = 'dyangz'
+    p_uniqname = unique_name
     p_datetime_added = date.today()
     curr.callproc('UM_VOIP_PROCEDURES_K.UM_MOVE_VOIP_SERVICE_P',[p_uniqname,p_datetime_added])
     curr.close()
@@ -130,7 +132,7 @@ def confirm(request):
     # query the table and recieve the message to display to the user
 
     context = {
-        'title': 'Voip Location Change Status',
+        'title': 'VoIP Location Change Status',
         'phone_number': phone_number,
         'old_jack': current_jack,
         'selected': selected,

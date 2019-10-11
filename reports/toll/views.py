@@ -18,9 +18,10 @@ from django import forms
 from ldap3 import Server, Connection, ALL
 
 from .models import UmTollCallDetail
-from oscauth.models import AuthUserDept, Grantor, Role
+from oscauth.models import AuthUserDept, Grantor, Role, AuthUserDeptV
 
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
+from django.contrib.auth.decorators import login_required, permission_required
 
 from datetime import datetime
 from django.utils.dateparse import parse_date
@@ -29,36 +30,48 @@ import os
 from os import listdir
 from project import settings
 
+from pages.models import Page
+
 # Generate report
-def generate(request):
+@permission_required('oscauth.can_report', raise_exception=True)
+def select(request):
 	template = loader.get_template('tolls.html')
 
 	dropdown = select_billing(request)
 	depts = find_depts(request)
 	dept_names = []
 
+	# Get instructions
+	instructions = Page.objects.get(permalink='/toll')
 
+	context = {
+		'title': 'Toll Statements',
+		'periods': dropdown,
+		'depts': depts,	
+		'instructions': instructions,
+		'dept_names': dept_names,
+	}
+
+	return HttpResponse(template.render(context, request))
+
+
+@permission_required('oscauth.can_report', raise_exception=True)
+def generate(request):
+	template = loader.get_template('tolls-downloads.html')
 	# Set default billing period/dept ID
 	bill_period = ''
 	dept_id = ''
-	submit = False
-	if request.POST.get('bill_period') is None:
-		bill_period = dropdown[0]
-	else:
-		bill_period = request.POST.get('bill_period')
-		submit = True
-	if request.POST.get('dept_id') is None:
-		dept_id = depts[0]
-	else:
-		dept_id = request.POST.get('dept_id')
+	submit = True
+	
+	bill_period = request.POST.get('bill_period')
+	dept_id = request.POST.get('dept_id').split('-')[0]
 
 
 	dept = UmOscDeptProfileV.objects.filter(deptid=dept_id)
-	dept_name = dept[0]
+	dept_name = dept[0].dept_name
+	dept_mgr = dept[0].dept_mgr
+	dept_mgr_uniq = dept[0].dept_mgr_uniqname
 
-	query = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('deptid')
-	for q in query:
-		dept_names.append(q.dept_name)
 
 	inactive = False
 	if dept[0].dept_eff_status == 'I':
@@ -68,31 +81,32 @@ def generate(request):
 	year = bill_period.split(' ')[1]
 
 	context = {
-		'periods': dropdown,
-		'depts': depts,
+		'title': "Toll Statements Report",
 		'dept_id': dept_id,
 		'dept_name': dept_name,
-		'dept_names': dept_names,
+		'dept_mgr': dept_mgr,
+		'dept_mgr_uniq':dept_mgr_uniq,
 		'inactive': inactive,
 		'bill_period': bill_period,
 		'bill_month': month,
 		'bill_year': year,
-		'submit': submit
+		'submit': submit,
 	}
 
 	return HttpResponse(template.render(context, request))
+	
+
 
 # Select billing period and department ID
+@permission_required('oscauth.can_report', raise_exception=True)
 def select_billing(request):
- 	template = loader.get_template('tolls.html')
-
  	billing_options = []
 
  	# # We should be able to do this without hardcoding...
  	months = ['null', 'January', 'February', 'March', 'April', 'May', 'June', 'July',
  	 		  'August', 'September', 'October', 'November', 'December']
 
- 	og_format = os.listdir(settings.MEDIA_ROOT + '/toll/')
+ 	og_format = os.listdir(settings.MEDIA_ROOT + '/toll')
  	og_format.sort()
  	for date in og_format:
  		pieces = date.split('_')
@@ -102,20 +116,27 @@ def select_billing(request):
  		text = month + ' ' + str(year)
  		billing_options.append(text)
  	billing_options.reverse()
+
  	return billing_options
 
 
  # List all departments
 def find_depts(request):
- 	depts = []
+	depts = []
+		
+	# query = AuthUserDeptV.objects.filter(user=request.user.id, codename='can_report').order_by('dept').exclude(dept='All').distinct('dept')
 
- 	query = AuthUserDept.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept')
-
- 	for dept in query:
- 		if Group.objects.get(name=dept.group).name != 'Orderer':
- 			depts.append(dept.dept)
-
- 	return depts
+	# for dept in query:
+	# 	#if Group.objects.get(name=dept.group).name != 'Orderer':
+	# 	name = UmOscDeptProfileV.objects.filter(deptid=dept.dept)[0].dept_name
+	# 	#depts.append(dept.dept)
+	# 	depart = {
+	# 		'id': dept.dept,
+	# 		'name': name
+	# 	}
+	# 	depts.append(depart)
+	depts = AuthUserDept.get_report_departments(request)
+	return depts
 
 # Generate report data
 def generate_path(request, bill_date, deptid):
@@ -130,6 +151,8 @@ def generate_path(request, bill_date, deptid):
 
 	return string_date + '/' + string_date + '_' + deptid + '_Toll_Statement'
 
+
+@permission_required('oscauth.can_report', raise_exception=True)
 def download_PDF(request, bill_date, deptid):
 	path = generate_path(request, bill_date, deptid) + '.pdf'
 	file_path = os.path.join(settings.MEDIA_ROOT + '/toll/', path)
@@ -143,6 +166,8 @@ def download_PDF(request, bill_date, deptid):
 	else:
 		return HttpResponse(file_path)
 
+
+@permission_required('oscauth.can_report', raise_exception=True)
 def download_cond_PDF(request, bill_date, deptid):
 	path = generate_path(request, bill_date, deptid) + '_brief.pdf'
 	file_path = os.path.join(settings.MEDIA_ROOT + '/toll/',path)
@@ -155,6 +180,8 @@ def download_cond_PDF(request, bill_date, deptid):
 	else:
 		return HttpResponse(file_path)
 
+
+@permission_required('oscauth.can_report', raise_exception=True)
 def download_CSV(request, bill_date, deptid):
 	path = generate_path(request, bill_date, deptid) + '.csv'
 

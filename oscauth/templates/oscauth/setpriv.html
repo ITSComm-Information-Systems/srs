@@ -2,58 +2,40 @@
 {% block content %}
 
 <style>
-    * {
-      box-sizing: border-box;
-    }
-    
-    /* Create four columns that floats next to each other */
-    .column {
-      float: left;
-      width: 20%;
-      padding: 10px;
-    }
-    
-
-    .left, .right {
-    width: 50%;
+    tr.no-top-border td {
+        border-top: none;
     }
 
-    .middle {
-    width: 20%;
-    }
-
-    .deptid {
-    column-width:500px;
-    width:500px;
-    }
-
-    /* Clear floats after the columns */
-    .row:after {
-      content: "";
-      display: table;
-      clear: both;
+    tr.no-top-border th {
+        border-top: none;
     }
 </style>
     
 
-<form action="/auth/get_uniqname/" method="POST">{% csrf_token %}
-    <h1>Manage Access</h1>
+<h1>{{ title }}</h1>
+<form action="/auth/get_uniqname/" id='first-form' method="POST">{% csrf_token %}
 
-    <h2>Select Person</h2>
     <div>
-        <label for="uniqname-field">Enter a Uniqname</label>
-        <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short">
-        <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
-        {% if uniqname_parm is None or result != '' %}
-        <strong class="prv-msgs">{{ result }}</strong>
+        <div class="form-group">
+            <label for="uniqname-field">Enter a Uniqname</label><br>
+            <small class="text-muted form-text mb-1" id="manageAccInstrcutions">Enter the uniqname of the person that you want to give/edit access</small>
+            <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short col-4" placeholder='Uniqname' aria-describedby="manageAccInstrcutions">
+            <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
+        </div>
+        {% if uniqname_parm == '' %}
         {% else %}
-
-            {% if osc_user.exists %}
-            <strong>  {{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
-            <input type='button' value='Show Current Access' class="btn btn-outline-primary" onclick="window.location.href='/auth/showpriv/' + '{{uniqname_parm}}' + '/'" parameter=uniqname_parm>
+            {% if result is not None and result != '' %}
+            <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i><strong class="prv-msgs">&nbsp;{{ result }}</strong>
             {% else %}
-                <strong>{{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
-                 - User not found, add a role to create them.
+                {% if osc_user.exists %}
+                <div class='mt-5'>
+                    <h2 class='d-inline'>Assign Access Roles for: </h2><h3 class='d-inline'>{{ first_name }} {{ last_name }} ({{ uniqname_parm }})</h3>
+                    <p class='prv-msgs mt-2'>Inactive departments are shown with <strong>red text and the following icon:&nbsp;</strong><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></p>
+                </div>
+                {% else %}
+                    <strong>{{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
+                     - User not found, add a role to create them.
+                {% endif %}
             {% endif %}
         {% endif %}
         <br>
@@ -61,72 +43,150 @@
     </div>
 </form>
 
+<form hidden id='clear-form' action='/auth/get_uniqname/' method='POST'>{% csrf_token %}
+    <input type="hidden" id="uniqname" name="uniqname_parm" value="{{uniqname_parm}}">
+    <input type="hidden" id="last_name" name="last_name" value="{{last_name}}">
+    <input type="hidden" id="first_name" name="first_name" value="{{first_name}}">
+</form>
+
 <form action="/auth/modpriv/" method="POST">{% csrf_token %}
     <input type="hidden" id="uniqname" name="uniqname_parm" value="{{uniqname_parm}}">
     <input type="hidden" id="last_name" name="last_name" value="{{last_name}}">
     <input type="hidden" id="first_name" name="first_name" value="{{first_name}}">
 
-{% if last_name %}
+    {% if last_name %}
 
-<h6>Please select a Task, a Role, and at least one Department then click Submit.</h6>
-
-<h7>Inactive departments are shown with a <strong class="prv-msgs">red text and the following icon: <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></strong></h7>
-
-<div class="row access-action-row">
-    <div class="column">
-        <h2>Select Task</h2>
-        <div class="form-check">
-            <input id="roleAdd" type='radio' name="taskrad" value='add' class="form-check-input">
-            <label for="roleAdd" class="form-check-label">Add Access</label><br>
-            <input id="roleDelete" type='radio' name="taskrad" value='remove' class="form-check-input">
-            <label for="roleDelete" class="form-check-label">Remove Access</label>
-        </div>
-    </div>
-    <div class="column" id="addRole">
-        <h2>Select Role</h2>
-        <div class="form-check">
-            {% for role in grantable_roles %}
-            <input type='radio' name="rolerad" value={{ role.role }} id={{ role.role }} class="form-check-input">
-            <label for={{ role.role }} class="form-check-label">{{ role.role }}</label>
-            <br>
-        {% endfor %}
-        </div>
-    </div>
-    <div class="column" id="deleteRole">
-        <h2>Select Role</h2>
-        <div class="form-check">
-            {% for role in grantable_roles %}
-            <input type='checkbox' name="rolerad" value={{ role.role }} id={{ role.role }} class="form-check-input">
-            <label for={{ role.role }} class="form-check-label">{{ role.role }}</label>
-            <br>
-            {% endfor %}
-        </div>
-        
-    </div>
-    <div class="column deptid">
-        <h2>Select Department</h2>
-        <div class="form-check">
-            <input type="checkbox" onclick="toggle(this);" id="selectAllDepts" class="form-check-input">
-            <label for="selectAllDepts" class="form-check-label">Select All Departments</label><br>
+    <table class='table table-sm table-striped' id='manage-access-table'>
+        <thead>
+            <tr class='no-top-border'>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td scope="col" style='text-align:center;' id='proxy-all'>
+                    <label for='proxy-check'><strong>Select All</strong></label><br>
+                    <input type='checkbox' id='proxy-check'>
+                </td>
+                <td scope="col" style='text-align:center;' id='orderer-all'>
+                    <label for='orderer-check'><strong>Select All</strong></label><br>
+                    <input type='checkbox' id='orderer-check'>
+                </td>
+                <td scope="col" style='text-align:center;' id='reporter-all'>
+                    <label for='reporter-check'><strong>Select All</strong></label><br>
+                    <input type='checkbox' id='reporter-check'>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td scope="col" style='text-align:center;'><strong>Edit Role(s)</strong></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr class='no-top-border'>
+                <th scope="col">Department ID</th>
+                <th scope="col">Department Name</th>
+                <th scope="col">Current User Role(s)&nbsp;<i class="fas fa-question-circle btn-link" aria-label="More Information icon" data-toggle="modal" data-target="#userRoleExplanation"></i></th>
+                <th style='text-align:center;' scope="col">Proxy</th>
+                <th style='text-align:center;' scope="col">Orderer</th>
+                <th style='text-align:center;' scope="col">Reporter</th>
+            </tr>
+        </thead>
+        <tbody>
             {% for row in rows %}
-                {% if row.dept_status != 'I' %}
-                <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
-                <label for="dept.{{ row.dept }}" class="form-check-label">{{ row.dept }} - {{ row.dept_name }}</label>
-                {% else %}
-                <input type='checkbox' name="deptck" value={{ row.dept }} id="dept.{{ row.dept }}" class="form-check-input">
-                <label for="dept.{{ row.dept }}" class="form-check-label prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>  {{ row.dept }} - {{ row.dept_name }}</label>
-                {% endif %}
-                <br>
-            {% endfor %} 
-        </div>
+                <tr>
+                    <td scope="row">{{ row.dept }}</td>
+                    <input hidden name='dept_list' value='{{ row.dept }}'>
+                    {% if row.dept_status == 'I' %}
+                        <td class='prv-msgs'><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>{{ row.dept_name }}</td>
+                    {% else %}
+                        <td>{{ row.dept_name }}</td>
+                    {% endif %}
+                    <td>{{ row.roles_list }}</td>
+                    {% if row.disable_proxy %}
+                        {% if row.current_roles.proxy %}
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox' checked disabled></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox' disabled></td>
+                        {% endif %}
+                    {% else %}
+                        {% if row.current_roles.proxy %}
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox' checked></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='proxy' id="{{ row.dept }}" type='checkbox'></td>
+                        {% endif %}
+                    {% endif %}
+                    <input hidden name="{{ row.dept }}proxy" id="{{ row.dept }}proxy" value="">
+
+                    {% if disable_others %}
+                        {% if row.current_roles.orderer %}
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox' checked disabled></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox' disabled></td>
+                        {% endif %}
+                    {% else %}
+                        {% if row.current_roles.orderer %}
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox' checked></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='orderer' id="{{ row.dept }}" type='checkbox'></td>
+                        {% endif %}
+                    {% endif %}
+                    <input hidden name="{{ row.dept }}orderer" id="{{ row.dept }}orderer" value="">
+                    
+                    {% if row.disable_others %}
+                        {% if row.current_roles.reporter %}
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox' checked disabled></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox' disabled></td>
+                        {% endif %}
+                    {% else %}
+                        {% if row.current_roles.reporter %}
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox' checked></td>
+                        {% else %}
+                            <td style='text-align:center;'><input class='reporter' id="{{ row.dept }}" type='checkbox'></td>
+                        {% endif %}
+                    {% endif %}
+                    <input hidden name="{{ row.dept }}reporter" id="{{ row.dept }}reporter" value="">
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class='save-changes'>
+        <button type='button' class='btn btn-link' onclick="$('#clear-form').submit();">Clear Changes</button>
+        <button type='Submit' class='btn btn-primary'>Save Changes</button>
     </div>
-    <div class="column">
-        <input type='submit' name='process_access' value='Submit' class="btn btn-primary">
+
+    {% endif %}
+</form>
+<!-- Add Chartfield Modal -->
+<div class="modal fade" id="userRoleExplanation" tabindex="-1" role="dialog"
+aria-labelledby="userRoles" aria-hidden="true">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="userRoles">User Roles</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="">
+                {% autoescape off %}
+                    {{ information.bodytext }}
+                {% endautoescape %}
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <!-- Close button -->
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
     </div>
 </div>
+</div>
+<!-- End of Add Cahrtfield Modal -->
 
-{% endif %}
-</form>
 
 {% endblock %}
 
@@ -147,6 +207,108 @@ $(document).ready(function() {
         $('#addRole').hide();
     });
 
+    $("#Proxy").click(function(event) {
+        $('[data-manager="False"]').hide();
+        toggle('False');
+    });
+
+    $("#Orderer").click(function(event) {
+        $('[data-manager="False"]').show();
+    });
+
+    $("#Reporter").click(function(event) {
+        $('[data-manager="False"]').show();
+    });
+
+    // Select all functionality - proxy
+    $('#proxy-all').on('click', function() {
+        var checked = false;
+        if ($('#proxy-check').is(':checked')) {
+            checked = true;
+        }
+        $('#manage-access-table tbody tr').each(function() {
+            var inner_checked = $(this).find('.proxy').is(':checked');
+
+            if (checked != inner_checked) {
+                $(this).find('.proxy').click();
+            }
+        })
+    })
+
+    // Select all functionality - orderer
+    $('#orderer-all').on('click', function() {
+        var checked = false;
+        if ($('#orderer-check').is(':checked')) {
+            checked = true;
+        }
+        $('#manage-access-table tbody tr').each(function() {
+            var inner_checked = $(this).find('.orderer').is(':checked');
+
+            if (checked != inner_checked) {
+                $(this).find('.orderer').click();
+            }
+        })
+    })
+
+    // Select all functionality - reporter
+    $('#reporter-all').on('click', function() {
+        var checked = false;
+        if ($('#reporter-check').is(':checked')) {
+            checked = true;
+        }
+        $('#manage-access-table tbody tr').each(function() {
+            var inner_checked = $(this).find('.reporter').is(':checked');
+
+            if (checked != inner_checked) {
+                $(this).find('.reporter').click();
+            }
+        })
+    })
+
+    // Proxy status changed
+    $('.proxy').on('change', function() {
+        // Get dept ID
+        var dept_id = $(this).attr('id');
+        
+        // Add or delete
+        var method = "delete"
+        if ($(this).is(':checked')) {
+            method = "add";
+        }
+
+        // Set value
+        $('#' + dept_id + 'proxy').val(method);
+    })
+
+    // Orderer status changed
+    $('.orderer').on('change', function() {
+        // Get dept ID
+        var dept_id = $(this).attr('id');
+        
+        // Add or delete
+        var method = "delete"
+        if ($(this).is(':checked')) {
+            method = "add";
+        }
+
+        // Set value
+        $('#' + dept_id + 'orderer').val(method);
+    })
+
+    // Reporter status changed
+    $('.reporter').on('change', function() {
+        // Get dept ID
+        var dept_id = $(this).attr('id');
+
+        // Add or delete
+        var method = "delete"
+        if ($(this).is(':checked')) {
+            method = "add";
+        }
+
+        // Set value
+        $('#' + dept_id + 'reporter').val(method);
+    })
 
 });
 

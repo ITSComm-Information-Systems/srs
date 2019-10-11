@@ -508,13 +508,13 @@ class UmOscDeptUnitsReptV(models.Model):
      month = models.CharField(max_length=2)
      deptid = models.CharField(max_length=6) 
      dept_descr = models.CharField(max_length=30)
-     dept_grp = models.CharField(primary_key= True,max_length=20) 
+     dept_grp = models.CharField(max_length=20) 
      dept_grp_descr = models.CharField(max_length=30)
      dept_grp_vp_area = models.CharField(max_length=20) 
      dept_grp_vp_area_descr = models.CharField(max_length=30)
      account = models.CharField(max_length=6) 
      account_desc = models.CharField(max_length=20)
-     charge_group = models.CharField(max_length=50)
+     charge_group = models.CharField(primary_key=True, max_length=50)
      charge_code = models.CharField(max_length=12)
      description = models.CharField(max_length=50)
      unit_rate = models.CharField(max_length=40)
@@ -588,17 +588,17 @@ class UmOscAvailableLocsV(models.Model):
           ordering = ('service_number',)
           db_table = 'PINN_CUSTOM\".\"um_osc_available_locs_v'
 
-class UmOscLocationsInUseV(models.Model):
-     campus_code = models.CharField(max_length=4)
+class UmOscLocationsInUseV(models.Model): 
+     campuscd = models.CharField(max_length=4)
      campus_desc = models.CharField(max_length=30)
      service_type = models.CharField(max_length=20)
-     service_number = models.CharField(max_length=60)
-     service_subscrib_id = models.IntegerField(9, null=False)
+     service_number = models.CharField(max_length=60)   
+     #service_subscrib_id = models.IntegerField(9, null=False)  
      status = models.CharField(max_length=15)
      service_id = models.IntegerField(9, null=False)
      location_id = models.IntegerField(9, null=False)
      path_id = models.IntegerField(9, null=False)
-     building_id = models.CharField(max_length=10, primary_key=True)
+     building_id = models.CharField(max_length=10, primary_key=True)  # DEBUG
      building_name = models.CharField(max_length=25)
      floor = models.CharField(max_length=18)
      floor_desc = models.CharField(max_length=50)
@@ -615,7 +615,7 @@ class UmOscVoipLocChangeInput(models.Model):
      uniqname = models.CharField(max_length=8) 
      service_id = models.IntegerField(9, null=False)
      service_number= models.CharField(max_length=60)
-     service_subscrib_id = models.IntegerField(9, null=False)
+     #service_subscrib_id = models.IntegerField(9, null=False)
      old_campuscd = models.CharField(max_length=4)
      old_campus_desc = models.CharField(max_length=30)
      old_location_id = models.IntegerField(9, null=False)
@@ -777,7 +777,7 @@ class UmOscAcctdetailMrcOccV(models.Model):
      billing_cycle = models.CharField(max_length=2)
      item_code = models.CharField(max_length=50)
      batch_date = models.DateField
-     invoice_date = models.DateField
+     invoice_date = models.DateField(null=True) # made this null=True
      account_number = models.CharField(max_length=100)
      account_subcode = models.CharField(max_length=10)
      item_description = models.CharField(max_length=100)
@@ -789,6 +789,15 @@ class UmOscAcctdetailMrcOccV(models.Model):
      unit_price = models.DecimalField(decimal_places=4, max_digits=19,  null=False)
      charge_to_dept = models.CharField(max_length=10)
      row_id = models.CharField(max_length=20, primary_key=True)
+     user_defined_id =  models.CharField(max_length=20, blank=True)
+     dtl_of_chrgs_telephony = models.PositiveIntegerField(null=True)            
+     dtl_of_chrgs_nontelephony = models.PositiveIntegerField(null=True) 
+     unique_identifier = models.CharField(max_length=200)
+     charge_name = models.CharField(max_length=100)
+     shortcode = models.CharField(max_length=6)
+     invoice_id = models.CharField(max_length=30)
+     uniqname = models.CharField(max_length=8)
+     voucher_comment = models.CharField(max_length=30)
 
      class Meta:
           managed = False

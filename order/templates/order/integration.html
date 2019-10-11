@@ -1,0 +1,115 @@
+<style>
+/* Remove default bullets */
+ul, #myUL {
+  list-style-type: none;
+}
+
+/* Remove margins and padding from the parent ul */
+#myUL {
+  margin: 0;
+  padding: 0;
+}
+
+/* Style the caret/arrow */
+.caret {
+  cursor: pointer; 
+  user-select: none; /* Prevent text selection */
+}
+
+/* Create the caret/arrow with a unicode, and style it */
+.caret::before {
+  content: "\25B6";
+  color: black;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+.caret-down::before {
+  transform: rotate(90deg); 
+}
+
+/* Hide the nested list */
+.nested {
+  display: none;
+}
+
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.active {
+  display: block;
+}
+</style>
+
+
+<h1>Order #{{order.id}}</h1>
+
+    <form action="/orders/integration/{{order.id}}" method="POST">{% csrf_token %}
+      <input type="hidden" value="{{order.id}}">
+      <input type="submit" value="reSubmit">Note that this runs in background, allow up to 20 seconds to complete and whatnot.
+    </form>
+
+<ul>
+    <li>{{ order.service }}</li>
+    <li>Ref#: {{ order.order_reference }}</li>
+    <li>Created: {{ order.create_date }}</li>
+    <li>{{ order.status }}</li>
+    <li>Dept: {{ order.chartcom.dept }}</li>
+    <li>Chartcom: {{ order.chartcom }}</li>
+    <li>{{ order.created_by }}</li>
+</ul>
+
+<ul>
+{% for order in order_list %}
+  <li><span class="caret">{{order.transaction}} @ {{ order.create_date }}</span>
+    <ul class="nested">
+
+            <pre id="{{order.id}}">{{order.sent}}</pre>
+            <pre>{{order.description}}</pre>
+
+    </ul>
+  </li>
+{% endfor %}
+</ul>
+
+<ul>
+{% for item in item_list %}
+    <li>{{ item.id }} - {{ item.description }}
+        <ul>
+            <li><span class="caret">data</span>
+                <ul class="nested">
+                        <code>{{ item.data }}</code>
+                </ul>
+            </li>
+            <li><span class="caret">note</span>
+                <ul class="nested">
+                    <pre>{{ item.note }}</pre>
+                    <!----{% with text=item.note %}
+                    <pre>{% include 'order/pinnacle_note.html' %}</pre>
+                    {% endwith %}--->
+                </ul>
+            </li>
+        </ul>
+    </li>
+
+{% endfor %}
+</ul>
+
+
+
+
+
+
+<script>
+var toggler = document.getElementsByClassName("caret");
+var i;
+
+for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function() {
+    this.parentElement.querySelector(".nested").classList.toggle("active");
+    this.classList.toggle("caret-down");
+  });
+}
+
+
+                        
+</script>

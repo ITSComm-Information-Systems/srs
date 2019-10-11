@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div id="main-content" class="container" role="main">
+<!-- <div id="main-content" class="container" role="main">
     <div class="container" role="main">
+        <h1>Your VoIP Location Change has been submitted.</h1>
         <div class="row">
             <div class="col-lg-12">
                 <div class="message">
@@ -18,5 +19,21 @@
             </div>
         </div>
     </div>
+</div> -->
+
+<div class="container" role="main">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="message">
+                <h1>YOUR VoIP LOCATION CHANGE HAS BEEN RECEIVED</h1>
+                <hr class="style1">
+                <p class="lead">
+                    {{ query }}
+                </p>
+                <a href="../../voip/" class="btn btn-outline-primary" role="button">Submit Another Change</a>                
+            </div>
+        </div>
+    </div>
 </div>
+
 {% endblock %}

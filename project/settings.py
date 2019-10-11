@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'oscauth',
     'project',
+    'django.forms', # try to override widgets
     'django.contrib.admin',
     'django.contrib.auth',
     'mozilla_django_oidc',  # Load after auth
@@ -49,6 +50,8 @@ INSTALLED_APPS = [
     'reports',
     'tools',
 ]
+
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'  # Override widgets
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -105,7 +108,8 @@ TEMPLATES = {
                 'project.context_processors.menu',
             ],
             'libraries':{
-                'index': 'reports.inventory.templatetags.index'
+                'index': 'reports.inventory.templatetags.index',
+                'tags': 'reports.soc.templatetags.tags'
             }
         },
 },
@@ -121,6 +125,14 @@ DATABASES = {
         'USER': os.getenv('DATABASE_USER','postgres'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD','w94zLR2dkkfo'),
         'HOST': os.getenv('DATABASE_SERVICE_NAME','pgoscdev.cvwq7quwqs3k.us-east-2.rds.amazonaws.com'),
+        'TEST':
+        {
+        'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
+        'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
+        'USER': os.getenv('DATABASE_USER','postgres'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD','w94zLR2dkkfo'),
+        'HOST': os.getenv('DATABASE_SERVICE_NAME','pgoscdev.cvwq7quwqs3k.us-east-2.rds.amazonaws.com'),
+        },
     },
     'pinnacle': {
         'NAME': os.getenv('ORACLE_DATABASE','pinntst.dsc.umich.edu:1521/pinndev.world'),

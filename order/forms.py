@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature, FeatureCategory, Restriction
+from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory
+from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 
 class FeaturesForm(forms.Form):
@@ -8,26 +9,19 @@ class FeaturesForm(forms.Form):
         queryset=Feature.objects.all(), 
         widget=forms.CheckboxSelectMultiple(),
     )
-    features = Feature.objects.all()
-    list = FeatureCategory.objects.all()
+    
+    categories = FeatureCategory.objects.all()
+    types = FeatureType.objects.all()
+    features = Feature.objects.all().order_by('display_seq_no')
 
-    for cat in list:
-        cat.type = ['STD','OPT','SC','VM']
-        cat.type[0] = features.filter(category=cat).filter(type='STD').order_by('display_seq_no')
-        cat.type[0].label = 'Standard'
-        cat.type[1] = features.filter(category=cat).filter(type='OPT').order_by('display_seq_no')
-        cat.type[1].label = 'Optional'
-        cat.type[2] = features.filter(category=cat).filter(type='SPD').order_by('display_seq_no')
-
-        cat.type[2].label = 'Speed Call'
-        last = cat.type[2].count()
-        if last > 0:
-            cat.type[2].last = (cat.type[2][last-1].id)
-
-        cat.type[3] = features.filter(category=cat).filter(type='VM').order_by('display_seq_no')
-        cat.type[3].label = 'Voicemail'
-        last = cat.type[3].count()
-        cat.type[3].last = (cat.type[3][last-1].id)
+    for cat in categories:
+        cat.types = []
+        for type in types:
+            q = features.filter(type=type).filter(category=cat).order_by('display_seq_no')
+            if q:
+                cat.types.append(q)
+                cat.types[-1].label = type.label
+                cat.types[-1].description = type.description
 
     template = 'order/features.html'
 
@@ -45,6 +39,8 @@ class RestrictionsForm(forms.Form):
         last = cat.res.count()
         cat.last = cat.res[last-1].id
 
+    information = Page.objects.get(permalink='/restriction')
+
     template = 'order/restrictions.html'
 
 
@@ -56,13 +52,19 @@ class AddlInfoForm(forms.Form):
 
     contact_yn = forms.ChoiceField(choices = TRUE_FALSE_CHOICES, label="Are you the on site contact?", required=True)
     contact_yn.type = 'Radio'
-    contact_id = forms.CharField(label='Uniqname', max_length=8)
-    contact_name = forms.CharField(label='Name', max_length=40)
-    contact_number = forms.CharField(label='Best number to contact.', max_length=10)
-    comments = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100'}) )
-    file = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
-
+    contact_id = forms.CharField(label='Uniqname of the on site contact person', max_length=8)
+    contact_name = forms.CharField(label='Name of the on site contact person', max_length=40)
+    contact_number = forms.CharField(label='Best number to contact', max_length=10)
+    comments = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100', 'class':'form-control'}) )
+    file = forms.FileField(label="Please attach any drawings, spreadsheets or floor plans with jack locations as needed", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
     template = 'order/dynamic_form.html'
+
+
+class ContactCenterForm(forms.Form):
+    phone_number = forms.CharField(label='summary', max_length=12)
+    description = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100'}) )
+
+    template = 'order/contact_center.html'
 
 
 class ReviewForm(forms.Form):
@@ -70,12 +72,37 @@ class ReviewForm(forms.Form):
     template = 'order/review.html'
 
 
+class AuthCodeCancelForm(forms.Form):
+    TYPE_CHOICES = (
+    ('Cancel', 'Cancel'),
+    ('Change', 'Change')
+    )
+    action = forms.ChoiceField(choices = TYPE_CHOICES, required=True)
+    subscriber_id = forms.CharField(label='summary', max_length=100)
+    name = forms.CharField(label='name', max_length=100)
+    template = 'order/auth_code_cancel.html'
+
+
+class AuthCodeForm(forms.Form):
+    TYPE_CHOICES = (
+    ('Individual', 'Individual'),
+    ('Workgroup', 'Workgroup')
+    )
+    type = forms.ChoiceField(choices = TYPE_CHOICES, required=True)
+    name = forms.CharField(label='summary', max_length=100)
+    template = 'order/auth_code.html'
+
+class CMCCodeForm(forms.Form):
+    code = forms.CharField(label='CMC Code', max_length=100)
+    template = 'order/cmc_code.html'
+
+
 class NewLocationForm(forms.Form):
     building_list = UmOSCBuildingV.objects.all()
-    building_code = forms.CharField(label='Building Code', max_length=100)
-    building_name = forms.CharField(label='Building Name', max_length=100)
-    floor = forms.CharField(label='Floor', max_length=100)
-    room = forms.CharField(label='Room', max_length=100)
+    new_building_code = forms.CharField(label='Building Code', max_length=100)
+    new_building_name = forms.CharField(label='Building Name', max_length=100)
+    new_floor = forms.CharField(label='Floor', max_length=100)
+    new_room = forms.CharField(label='Room', max_length=100)
 
     template = 'order/location.html'
 
@@ -84,8 +111,14 @@ class EquipmentForm(forms.Form):
     cat = ['Basic','VOIP']
     cat[0] = Product.objects.all().filter(category=1).order_by('display_seq_no')
     cat[0].id = 'basic'
-    cat[1] = Product.objects.all().filter(category=2).order_by('display_seq_no') 
+    cat[1] = Product.objects.all().filter(category__in=[2, 4]).order_by('display_seq_no') # Voip and Conference
     cat[1].id = 'voip'
+    template = 'order/equipment.html'
+
+
+class ProductForm(forms.Form):
+    category_list = ProductCategory.objects.all().order_by('display_seq_no') 
+    product_list = Product.objects.all().order_by('category','display_seq_no') 
     template = 'order/products.html'
 
 

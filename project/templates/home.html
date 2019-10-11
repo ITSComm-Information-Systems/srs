@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Welcome to the Service Request System</h1>
+<div class="row">
+    <div class="col-lg-8">
+        <div class="jumbotron">
+                <h2 class="lead"><strong>About the SRS</strong></h2>
+                <p class="lead">The Service Request System is your one-stop-shop for ordering and managing ITS telecommunications and infrastructure products and services like phone lines, phone features, videoconferencing, and more.</p>
+        </div>
+        
+        <!--Show this div if user has an access role-->
+        {% if user.is_authenticated %}
+            {% if perms.oscauth.can_order or perms.oscauth_can_report %}
+            <div class="alert alert-success" id="osc-users-msg">
+                <h2 class="lead"><strong>New to the SRS?</strong></h2>
+                <p>Visit <a href="/using_srs">Using the Service Request System</a> to learn how to use the SRS. </p>
+            </div>
+            {% else %}
+            <!--Show this div if user does not have an access role-->
+            <div class="alert alert-danger" id="non-user-msg">
+                <h2 class="lead"><strong>You have limited access to this system.</strong></h2>
+                <p>Based on your current access levels, you will only be able to access help pages. To gain additional permissions, contact your Department Manager. </p>
+                <p><a href="">Look up your Department Manager <i class="fas fa-chevron-right"></i></a></p>
+            </div>
+            {% endif %}
+        {% else %}
+        <div class="alert alert-danger" id="non-user-msg">
+                <h2 class="lead"><strong>You are not logged in.</strong></h2>
+                <a href="/oidc/authenticate/">Click Here to Log In</a>
+        </div>
+        {% endif %}
+    </div>
+    {% autoescape off %}
+        {{notices.bodytext}}
+    {% endautoescape %}
+</div>
+
+{% endblock %}

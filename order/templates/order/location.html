@@ -1,42 +1,66 @@
+<div class="col-lg-5 col-md-6 col-12">
+  <div class="form-group" id="searchBuilding">
+    <label for="buildingSearch" id="labelBuildingSearch">
+      <strong>Search for a Building Name or Building ID</strong>
+    </label>
+    <small id="buildingSearchBlock" class="form-text text-muted">
+        Search for the building name or building ID of where you want the new service to be activated or equipment to be delivered.
+      </small>
+    <input id="buildingSearch" class="form-group" type="text" aria-describedby="buildingSearchBlock"
+      placeholder="Search.." required>
+    <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+        aria-label="Icon signfying that user must enter a value"></i>Please enter a building.
+    </div>
+  </div>
 
-
-
-<div class="form-group" id="searchBuilding">
-Look Up Building Name or ID
-    <input id="buildingSearch" type="text" placeholder="Search.." required>
-    <div class="invalid-feedback">Please enter a building.</div>
-</div>
-
-  <table id="buildingTable" class="table table-hover">
-  {% for building in tab.form.building_list %}
-    <tr id="{{ building.building_code }}">
-      <td>{{ building.building_code }}</td>
+  <table id="buildingTable" class="table table-hover" aria-live=”polite”>
+    {% for building in tab.form.building_list %}
+    <tr tabindex="0"  id="{{ building.building_code }}" role="button" aria-label="Select location building {{ building.building_name }} with buidling code of {{ building.building_code }}">
+      <td >{{ building.building_code }}</td>
       <td name="buildingName">{{ building.building_name }}</td>
     </tr>
-  {% endfor %}
-    <tr id="buildingNA">
+    {% endfor %}
+    <tr id="buildingNA" role="button" aria-label="Building location not listed">
       <td>Not Listed</td>
       <td name="buildingName"></td>
     </tr>
   </table>
+  <div id="NewLocationDiv" role="button" aria-label="Add a new location that is not currently listed">
+    <b>Can't find the building you're looking for?   </b>
+    <button id = "NewLocationButton" type="button" class="btn btn-warning">Add New Location</button>
+  </div>
+</div>
 
 
-
-
-<div class="form-group" id="buildingFields">
-    <div class="col-xs-4">
-        <label for="buildingID">Building Code:</label>
-        <input type="text" name="buildingCode" required="" id="buildingID" class=" form-control">
-
-        <label for="buildingName">Building Name:</label>
-        <input type="text" name="buildingName" required="" id="buildingName" class=" form-control">
-
-        <label for="buildingFloor">Floor:</label>
-        <input type="text" name="buildingFloor" required="" id="buildingFloor" class=" form-control">
-        <div class="invalid-feedback">Please enter floor.</div>
-
-        <label for="buildingRoom">Room:</label>
-        <input type="text" name="buildingRoom" required="" id="buildingRoom" class=" form-control">
-        <div class="invalid-feedback">Please enter room.</div>
+<div class="col-lg-5 col-md-6 col-12" id="buildingFields">
+  <div class="form-group">
+    <label for="id_new_building_code">
+      <strong>Enter the Building Code (if known)</strong>
+    </label>
+    <input data-label="Building Code" type="text" name="newBuildingCode" required="" id="id_new_building_code" class=" form-control">
+  </div>
+  <div class="form-group">
+    <label for="id_new_building_name">
+      <strong>Enter the Building Name</strong>
+    </label>
+    <input data-label="Building Name" type="text" name="newBuildingName" required="" id="id_new_building_name" class=" form-control">
+  </div>
+  <div class="form-group">
+    <label for="id_new_floor">
+      <strong>Enter a Floor</strong>
+    </label>
+    <input data-label="Floor" type="text" name="newBuildingFloor" required="" id="id_new_floor" class=" form-control">
+    <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+        aria-label="Icon signfying that user must enter a value"></i>Please enter floor.
     </div>
+  </div>
+  <div class="form-group">
+    <label for="id_new_room">
+      <strong>Enter a Room Number</strong>
+    </label>
+    <input data-label="Room" type="text" name="newBuildingRoom" required="" id="id_new_room" class=" form-control">
+    <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+        aria-label="Icon signfying that user must enter a value"></i>Please enter room.
+    </div>
+  </div>
 </div>
