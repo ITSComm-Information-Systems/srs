@@ -14,6 +14,7 @@ from pages.models import Page
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
+from ast import literal_eval
 import cx_Oracle
 import json
 from django.core.files.storage import FileSystemStorage
@@ -37,6 +38,12 @@ def get_order_detail(request, order_id):
     order = Order.objects.get(id=order_id)
     item_list = Item.objects.filter(order=order)
 
+    for item in item_list:
+        detail = item.data['reviewSummary']
+        if isinstance(detail, str):
+            js = literal_eval(detail)
+            item.data['reviewSummary'] = js
+
     template = loader.get_template('order/order_detail.html')
     context = {
         'title': 'Order Summary',
@@ -51,7 +58,6 @@ class ManageChartcom(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def post(self, request):
-        print(request.POST)
         action = request.POST.get('action')
         id = request.POST.get('chartcomId')
         deptid = request.POST.get('deptid')
@@ -76,7 +82,6 @@ class ManageChartcom(PermissionRequiredMixin, View):
 
         if action == 'delete':
             x = Chartcom.objects.get(id=id).delete()
-            print(x)
 
         return HttpResponseRedirect('/orders/chartcom/' + deptid)
 
@@ -117,7 +122,6 @@ class Submit(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def post(self, request):
-        print(request)
 
         order_list = request.POST.getlist('order[]')
 
@@ -158,7 +162,6 @@ class Submit(PermissionRequiredMixin, View):
 @csrf_exempt
 def send_email(request):
     if request.method == "POST":
-        print(request.POST)
         subject = request.POST['emailSubject'] + ' - from ' + request.user.username
         body = request.POST['emailBody'] 
 
@@ -173,7 +176,6 @@ def send_email(request):
 def add_to_cart(request):
     if request.method == "POST":
 
-        print(request.POST)
         i = Item()
         i.created_by_id = request.user.id
 
@@ -211,10 +213,10 @@ def add_to_cart(request):
         
         tab = {title: tabdata}
         data['tabs'].append(tab)
-            
+
         postdata = request.POST.dict()
         
-        postdata['reviewSummary'] = data
+        postdata['reviewSummary'] = json.dumps(data)
         postdata['csrfmiddlewaretoken'] = ''
 
         i.description = label
@@ -390,8 +392,6 @@ class Cart(PermissionRequiredMixin, View):
         chartcoms = item_list.distinct('chartcom') #, 'chartcom_id')
         saved = item_list.distinct('chartcom')
 
-        #print(item_list)
-
         #item_list = Item.objects.filter(deptid=deptid,order__isnull=True).order_by('chartcom','-create_date')
 
         for acct in chartcoms:
@@ -428,7 +428,6 @@ class Review(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def post(self, request):
-        print(request.POST)
         dept = request.POST.get('deptSubmit')
         items_selected = request.POST.getlist('includeInOrder')
         item_list = Item.objects.filter(id__in=items_selected)

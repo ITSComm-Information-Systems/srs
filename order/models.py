@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, date
 from django.utils import timezone
 from django.db import connections
 from django.template.loader import render_to_string
+from ast import literal_eval
 import json, io, os
 import cx_Oracle
 
@@ -319,11 +320,9 @@ class Order(models.Model):
                 issue[con.field] = con.value
 
             if action.type != 'E':
-                print(action.type)
                 equipment_only = False
 
             if action_id != '41':
-                print(action_id)
                 wiring_only = False
 
             if issue['wo_type_category_id'] == '0':
@@ -405,7 +404,8 @@ class Item(models.Model):
         text = self.data['reviewSummary']
 
         if isinstance(text, str):  #TODO Legacy orders
-            note = text  
+            text = literal_eval(text)
+            note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
         else:
             note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
 
