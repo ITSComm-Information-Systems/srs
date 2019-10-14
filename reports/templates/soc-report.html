@@ -8,7 +8,6 @@
 <div>
     <strong>Report selection</strong>
     <a class='offset-3' href="../soc"><i class="fas fa-edit"></i>Edit your selection</a>
-    <!-- <a class="offset-2" id="edit-selection" href="../soc"><i class="fas fa-edit"></i></a> -->
 </div>
 
 <div class="row">
@@ -71,9 +70,9 @@
             <td></td>
             <td></td>
             {% if row.3 < 0 %}
-                <td class='prv-msgs'>{{ row.3 | currency }}</td>
+                <td class='prv-msgs r-align-text'>{{ row.3 | currency }}</td>
             {% else %}
-                <td>{{ row.3 | currency }}</td>
+                <td class="r-align-text">{{ row.3 | currency }}</td>
             {% endif %}
         </tr>
 
@@ -96,9 +95,9 @@
             <td></td>
             <td></td>
             {% if 0 > charge.2 %}
-                <td class='prv-msgs'>{{ charge.2 | currency }}</td>
+                <td class='prv-msgs r-align-text'>{{ charge.2 | currency }}</td>
             {% else %}
-                <td>{{ charge.2 | currency }}</td>
+                <td class="r-align-text">{{ charge.2 | currency }}</td>
             {% endif %}
             <td></td>
         </tr>
@@ -108,16 +107,16 @@
             <td>{{ code.0 }}</td>
             <td>{{ code.1 }}</td>
             {% if 0 > code.2 %}
-                <td class='prv-msgs'>{{ code.2 | currency }}</td>
+                <td class='prv-msgs r-align-text'>{{ code.2 | currency }}</td>
             {% else %}
-                <td>{{ code.2 | currency }}</td>
+                <td class="r-align-text">{{ code.2 | currency }}</td>
             {% endif %}
-            <td>{% divide code.3 num_months %}</td>
-            <td>{{ code.3 }}</td>
+            <td class="r-align-text">{% divide code.3 num_months %}</td>
+            <td class="r-align-text">{{ code.3 }}</td>
             {% if 0 > code.4 %}
-                <td class='prv-msgs'>{{ code.4 | currency }}</td>
+                <td class='prv-msgs r-align-text'>{{ code.4 | currency }}</td>
             {% else %}
-                <td>{{ code.4 | currency }}</td>
+                <td class="r-align-text">{{ code.4 | currency }}</td>
             {% endif %}
             <td></td>
             <td></td>
@@ -137,9 +136,9 @@
         <td></td>
         <td></td>
         {% if 0 > table.0.1 %}
-            <td class='prv-msgs'><strong>{{table.0.1 | currency }}</strong></td>
+            <td class='prv-msgs r-align-text'><strong>{{table.0.1 | currency }}</strong></td>
         {% else %}
-            <td><strong>{{ table.0.1 | currency }}</strong></td>
+            <td class="r-align-text"><strong>{{ table.0.1 | currency }}</strong></td>
         {% endif %}
     </tr>
     </tbody>

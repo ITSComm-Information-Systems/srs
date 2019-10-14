@@ -23,8 +23,9 @@
             <div class="form-group">
                 <label for="doc_chartcom" id="docChartfield"><strong>Select Chartfield(s)</strong></label>
                 <div class="mt-0 mb-1">
+                    <em class="prv-msgs">Please do not select more than 10 Chartfields at a time</em>
                     <small class="text-muted form-text" id="chartfieldInstructions">
-                            To select multiple, on Mac press and hold “Command” and select. On PC, press and hold “Ctrl” and select.
+                        To select multiple, on Mac press and hold “Command” and select. On PC, press and hold “Ctrl” and select.
                     </small>
                 </div>
                 <div class="form-check">
@@ -33,7 +34,7 @@
                         <strong>Select All</strong>
                     </label>
                 </div>
-                <select multiple="multiple" class="form-control" required aria-describedby="chartfieldInstructions" aria-labelledby="docChartfield" name="chartcoms[]" id="doc_chartcom">
+                <select multiple="multiple" class="form-control" required aria-describedby="chartfieldInstructions" aria-labelledby="docChartfield" name="chartcoms[]" id="doc_chartcom" size='10'>
                     {% for cf in dept_cfs %}
                     <option value="{{ cf }}">{{ cf }}</option>
                     {% endfor %}
