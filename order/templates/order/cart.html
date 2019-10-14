@@ -23,7 +23,9 @@
                         <select name="deptid" class="custom-select order-status-dropdown" onchange="this.form.submit()"
                             id="department-dropdown">
                             {% for dept in dept_list %}
-                            <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
+                                {% if dept.active == 'A' %}
+                                <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
+                                {% endif %}
                             {% endfor %}
                         </select>
                         <noscript><input type="submit" class="btn btn-outline-secondary" value="Go"></noscript>
