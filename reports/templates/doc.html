@@ -34,7 +34,7 @@
                         <strong>Select All</strong>
                     </label>
                 </div>
-                <select multiple="multiple" class="form-control" required aria-describedby="chartfieldInstructions" aria-labelledby="docChartfield" name="chartcoms[]" id="doc_chartcom">
+                <select multiple="multiple" class="form-control" required aria-describedby="chartfieldInstructions" aria-labelledby="docChartfield" name="chartcoms[]" id="doc_chartcom" size='10'>
                     {% for cf in dept_cfs %}
                     <option value="{{ cf }}">{{ cf }}</option>
                     {% endfor %}
