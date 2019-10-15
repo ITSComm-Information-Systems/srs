@@ -25,9 +25,11 @@
                             All Departments
                         </option> -->
                         {% for dept in dept_list %}
-                        <option id="mydept{{dept.dept}}" name="dept" data-filter="dept" value="{{dept.dept}}">
-                            {{dept.dept}} - {{dept.name}}
-                        </option>
+                            {% if dept.active == 'A' %}
+                            <option id="mydept{{dept.dept}}" name="dept" data-filter="dept" value="{{dept.dept}}">
+                                {{dept.dept}} - {{dept.name}}
+                            </option>
+                            {% endif %}
                         {% endfor %}
                     </select>
                 </div>
