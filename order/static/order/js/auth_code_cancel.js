@@ -18,10 +18,12 @@ $(document).ready(function() {
         
             rec.find("#change").attr("name", "type" + num).attr("id", "change" + num);
             rec.find("label[for='change']").attr("for", "change" + num);
-        
+            
             rec.find("#sub").attr("name", "sub" + num).attr("id","sub" + num);
+            rec.find("label[for='sub']").attr("for", "sub" + num);
 
             rec.find("#group").attr("name", "group" + num).attr("id","group" + num);
+            rec.find("label[for='group']").attr("for", "group" + num);
 
             $("#mainBody").append(rec);
 
