@@ -209,7 +209,12 @@ def add_to_cart(request):
             else:
                 fields = line.split('\t')
                 if len(fields) > 1:
-                    tabdata[fields[0]] = fields[1]
+                    if fields[0] != '':
+                        tabdata[fields[0]] = fields[1]
+                    else:
+                        tabdata[fields[1]] = ' '
+                else:
+                    tabdata[line] = ' '
         
         tab = {title: tabdata}
         data['tabs'].append(tab)
