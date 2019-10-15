@@ -378,6 +378,7 @@ class Cart(PermissionRequiredMixin, View):
 
         for dept in dept_list:
             deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
+            dept.active = deptinfo.dept_eff_status
             dept.name = deptinfo.dept_name
 
             if deptid == int(dept.dept):
@@ -478,6 +479,7 @@ class Status(PermissionRequiredMixin, View):
         for dept in dept_list:
             deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
             dept.name = deptinfo.dept_name
+            dept.active = deptinfo.dept_eff_status
 
             if deptid == int(dept.dept):
                 department = {'id': dept.dept, 'name': deptinfo.dept_name}
@@ -490,7 +492,7 @@ class Status(PermissionRequiredMixin, View):
 
         #items_selected = request.POST.getlist('includeInOrder')
         #order_list = item_list.distinct('chartcom')
-        chartcoms = Chartcom.objects.filter(dept__in=dept_list);
+        chartcoms = Chartcom.objects.filter(dept__in=dept_list)
         order_list = Order.objects.filter(chartcom__in=chartcoms).order_by('-create_date')
 
         item_list = Item.objects.filter(order__in=order_list)
