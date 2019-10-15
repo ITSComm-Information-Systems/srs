@@ -11,10 +11,16 @@
                 <input class="form-check-input wg-rad col-2" type="radio" value="Workgroup" name="type" id="workgroup"
                     required>
                 <label class="form-check-label wg-rad col-2" for="workgroup">Workgroup</label>
+                <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                    aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
+                <div role=”alert” class="valid-feedback">Good.</div>
             </div>
             <div class="form-check mt-3">
                 <label for="auth">Enter the Name of the Group/Individual</label>
                 <input class="col-12" id="auth" type="text" name="name" placeholder="Name of Group/Individual" required>
+                <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                    aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
+                <div role=”alert” class="valid-feedback">Good.</div>
             </div>
         </fieldset>
     </div>
