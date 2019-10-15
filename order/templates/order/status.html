@@ -25,9 +25,11 @@
                             All Departments
                         </option> -->
                         {% for dept in dept_list %}
-                        <option id="mydept{{dept.dept}}" name="dept" data-filter="dept" value="{{dept.dept}}">
-                            {{dept.dept}} - {{dept.name}}
-                        </option>
+                            {% if dept.active == 'A' %}
+                            <option id="mydept{{dept.dept}}" name="dept" data-filter="dept" value="{{dept.dept}}">
+                                {{dept.dept}} - {{dept.name}}
+                            </option>
+                            {% endif %}
                         {% endfor %}
                     </select>
                 </div>
@@ -85,9 +87,11 @@
                             <th scope="col">Submitted By</th>
                             <th scope="col" class="wismo-order-details">Order Details</th>
                             <th scope="col">Chartfield Billed</th>
-                            <th scope="col">Status <i class="fas fa-question-circle btn-link"
+                            <th scope="col">Status
+                                 <!-- <i class="fas fa-question-circle btn-link"
                                     aria-label="More Information icon" data-toggle="modal"
-                                    data-target="#statusIndicatorModal"></i></th>
+                                    data-target="#statusIndicatorModal"></i> -->
+                            </th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>

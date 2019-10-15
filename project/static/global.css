@@ -1249,3 +1249,7 @@ legend {
 pre {
 	width: inherit !important;
 }
+
+.r-align-text {
+	text-align: right;
+}
