@@ -10,6 +10,8 @@ $(document).ready(function() {
 
             var rec = $("#cmcdiv").clone();
 
+            rec.find("#cmc").attr('data-label', "Code " + num);
+
             rec.attr("id", "cmcdiv" + num);
 
             //rec.find("#workgroup").attr("name", "type" + num).attr("id", "workgroup" + num);
@@ -19,6 +21,8 @@ $(document).ready(function() {
             //rec.find("label[for='individual']").attr("for", "individual" + num);
             rec.find("label[for='cmc']").attr("for", "cmc" + num);
             rec.find("#cmc").attr("name", "auth" + num).attr("id","cmc" + num);
+            
+
         
             $("#mainBody").append(rec);
 
