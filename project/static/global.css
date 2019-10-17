@@ -977,8 +977,9 @@ h3.alert-heading {
 }
 
 .selected-card {
-	border-color:#28a745;
+	border-color:#28a745 !important;
 	box-shadow:5px 5px 10px grey;
+	border-width: 3px !important;
 }
 
 @media (max-width:576px) {
@@ -1252,4 +1253,9 @@ pre {
 
 .r-align-text {
 	text-align: right;
+}
+
+.card-not-selected {
+	border-color: #cc0000 !important;
+	border-width: 3px !important;
 }
