@@ -1,10 +1,9 @@
 {% for list in tab.form.cat %}
-<style>
-  .selected-card {
-			border-color: #28a745;
-			box-shadow: 5px 5px 10px grey;
-		}
-</style>
+<!-- use the following div to specify that user must select an equipment card. Add the class card-not-selected to all the cards as well. Remove that class when a card is selected.
+         When a model selected, add the class called selected-card to the card. -->
+    <div class="col-lg-3 col-md-4 col-6 alert alert-danger mt-4 invalid-feedback" role="alert">
+      Please select a model
+    </div>
   <div id="equip{{list.id}}" data-phoneset="{{list.id}}">
 
     <div class="card-columns">
