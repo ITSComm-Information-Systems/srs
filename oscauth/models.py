@@ -66,7 +66,7 @@ class AuthUserDept(models.Model):
         return AuthUserDeptV.objects.filter(user_id=self,codename='can_order')
 
     def get_report_departments(request):
-        if request.user.has_perm('can_order_all'):
+        if request.user.has_perm('oscauth.can_report_all'):
             query = UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').order_by('deptid')
             return query
         else:
@@ -80,10 +80,6 @@ class AuthUserDept(models.Model):
                 }
                 full_depts.append(dept)
             return full_depts
-    #     if self.has_perm('can_order_all'):
-    #         return UmCurrentDeptManagersV.objects.order_by('deptid').values_list('deptid', flat=True)
-    #     else:
-    #         return AuthUserDeptV.objects.filter(user_id=self.id,codename='can_report').order_by('dept').exclude(dept='All')
 
 
 class Grantor(models.Model):

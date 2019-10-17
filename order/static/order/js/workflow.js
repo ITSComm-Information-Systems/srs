@@ -318,6 +318,9 @@ $(document).ready(function() {
 
   function validateForm() {
 
+    loccard = false;
+    prodcard = false;
+
     inp = $("#step" + currStep + " :input:visible");
     valid = true;
     for (i = 0; i < inp.length; i++) {
@@ -326,6 +329,28 @@ $(document).ready(function() {
       } else {
         $(inp[i]).attr("aria-invalid", "true");
         inp[i].className += " invalid";
+        valid = false;
+      }
+      if($(inp[i]).hasClass('location-button')) {
+        loccard = true;
+      }
+      if($(inp[i]).hasClass('product-button')) {
+        prodcard = true;
+      }
+    }
+
+    if (loccard) {
+        if (!$(".location-button").hasClass("selected")) {
+          $(".location-card").addClass("card-not-selected");
+          $("#must_sel").show();
+          valid = false;
+        }
+    }
+
+    if (prodcard) {
+      if (!$(".product-button").hasClass("selected")) {
+        $(".product-card").addClass("card-not-selected");
+        $("#mustchoose").show();
         valid = false;
       }
     }
