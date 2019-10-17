@@ -162,11 +162,12 @@ class Submit(PermissionRequiredMixin, View):
 @csrf_exempt
 def send_email(request):
     if request.method == "POST":
-        subject = request.POST['emailSubject'] + ' - from ' + request.user.username
+        subject = request.POST['emailSubject'] + ' question from: ' + request.user.username
         body = request.POST['emailBody'] 
+        address = request.POST.get('emailAddress', 'ITCOM.csr@umich.edu')
 
         with connections['pinnacle'].cursor() as cursor:
-            cursor.callproc('um_osc_util_k.um_send_email_p', ['itcom.csr@umich.edu', subject, body])
+            cursor.callproc('um_osc_util_k.um_send_email_p', [address, body, subject])
         if body == "Cancel Order":
             return HttpResponseRedirect('/cancelorder') 
         return HttpResponseRedirect('/emailsent') 
