@@ -237,17 +237,16 @@ def submit(request):
 				request_no=None)
 			new_entry.save()
 
-			# Add record to Pinnacle
-			curr = connections['pinnacle'].cursor()
-			uniqname = request.user.username
-			datetime_added = date.today()
-			curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
-			curr.close()
+	# Add record to Pinnacle
+	curr = connections['pinnacle'].cursor()
+	uniqname = request.user.username
+	datetime_added = date.today()
+	curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
+	curr.close()
 
-
-		context = {
-			'title': 'Chartfield Change',
-		}
+	context = {
+		'title': 'Chartfield Change',
+	}
 
 	return HttpResponse(template.render(context, request))
 
