@@ -102,7 +102,7 @@
 
                         {% for order in order_list %}
                         <!-- First table row -->
-                        <tr data-dept="{{order.dept}}" data-order="{{order.id}}">
+                        <tr data-dept="{{order.dept}}" data-order="{{order.id}}" data-reference="{{order.order_reference}}">
                             <th scope="row">{{order.order_reference}}
                                 {% if request.session.exit_users_pk or perms.oscauth.can_impersonate %}
                                 <a href="/orders/integration/{{order.id}}"><i class="fas fa-info-circle"></i></a></th>
@@ -249,15 +249,15 @@
             order = e.relatedTarget.dataset.order
             row = $("tr[data-order='" + order + "']");
 
-            $("#preOrder").text(row.find("th").html());
+            $("#preOrder").text(row.data('reference'));
             $("#dateSubmitted").text(row.find("td").eq(0).html());
             $("#uniqname").text(row.find("td").eq(1).html());
             $("#orderDetails").html(row.find("td").eq(2).html());
             $("#chartCom").text(row.find("td").eq(3).html());
             $("#status").text(row.find("td").eq(4).html());
 
-            preorder = $(row).find("th").html();
-            $("#emailSubject").val("Cancel preorder " + preorder);
+            //preorder = $(row).find("th").html();
+            $("#emailSubject").val("Cancel preorder " + row.data('reference'));
         })
 
         $('#order-status-options').change(function () {

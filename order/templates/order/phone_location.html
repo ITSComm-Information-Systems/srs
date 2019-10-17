@@ -25,6 +25,15 @@
             <strong>Select the Current Service Location for:</strong> <em id="foundPhone">123-123-1234</em>
             <em class="prv-msgs select-loc-directions">You can only select one location</em>
         </div>
+        <!-- use the following div to specify that user must select a location card. 
+        Add the class card-not-selected to all the cards as well. Remove that class when a card is selected & add the class selected-card when the location card is selected -->
+        <div class="col-lg-4 col-12 alert alert-danger invalid-feedback" role="alert">
+            Please select a current service location
+        </div>
+        <!-- Use the following to indicate the the phone number the user enetered is not in the DB. Remove the "hidden" attribute & do not let the user proceed to next screen. -->
+        <div class="col-lg-4 col-12 alert alert-danger" role="alert" hidden>
+            The service number cannot be found in our database
+        </div>
         <div class="col-12">
             <div id="cardDeck" class="row card-columns">
 
