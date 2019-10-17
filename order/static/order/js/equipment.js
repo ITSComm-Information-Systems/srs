@@ -6,4 +6,7 @@ function selectProductCard(card) {
     $("button").removeClass('selected');
     $(card).addClass('selected');
 
+    $(".product-card").removeClass("card-not-selected")
+    $("#mustchoose").hide();
+
 }

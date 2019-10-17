@@ -103,5 +103,8 @@ function selectCard(card) {
     $("button").removeClass('selected');
     $(card).addClass('selected');
 
+    $(".location-card").removeClass("card-not-selected")
+    $("#mustchoose").hide();
+
 
 }
