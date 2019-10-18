@@ -1,10 +1,9 @@
 {% for list in tab.form.cat %}
-<style>
-  .selected-card {
-			border-color: #28a745;
-			box-shadow: 5px 5px 10px grey;
-		}
-</style>
+<!-- use the following div to specify that user must select an equipment card. Add the class card-not-selected to all the cards as well. Remove that class when a card is selected.
+         When a model selected, add the class called selected-card to the card. -->
+         <div id="mustchoose" class="col-lg-3 col-md-4 col-6 alert alert-danger mt-4 invalid-feedback" role="alert">
+          Please select a model
+        </div>
   <div id="equip{{list.id}}" data-phoneset="{{list.id}}">
 
     <div class="card-columns">
@@ -15,11 +14,12 @@
             <p class="card-title h5" id="card-title-of-{{ field }}">{{ field }}</p>
             <p class="card-text">{{ field.description }}</p>
             <p class="card-text"><strong>Price: ${{ field.price }}</strong></p>
-            <button id="product{{field.id}}" name="product" type="button" class="btn btn-outline-success select-button" value="{{ field }}" onclick="selectProductCard(this)" aria-describedby="card-title-of-{{ field }}">Select <span class="sr-only"> {{ field }}</span></button>
+            <button id="product{{field.id}}" name="product" type="button" class="btn btn-outline-success select-button product-button" value="{{ field }}" onclick="selectProductCard(this)" aria-describedby="card-title-of-{{ field }}">Select <span class="sr-only"> {{ field }}</span></button>
             
           </div>
       </div>
     {% endfor %}
+
     </div>
 
   </div>
