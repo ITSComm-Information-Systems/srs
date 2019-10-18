@@ -21,7 +21,7 @@ from django.db.models import indexes
 from django.db.models import Value
 from django.db.models.functions import Concat
 
-from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscDeptUnitsReptV
+from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscDeptUnitsReptV, UmOscBillCycleV
 from oscauth.forms import *
 import datetime
 from django.contrib.auth.decorators import login_required, permission_required
@@ -43,14 +43,15 @@ def get_soc(request):
     calendar = select_calendar_year(request)
     months = select_month(request)
 
-    dates = []
-    today = datetime.date.today()
-    for year in calendar:
-        for month in months:
-            if (month > today.month and int(year) == today.year) or int(year) > today.year:
-                pass
-            else:
-                dates.append(num_to_words(month) + ' ' + year)
+    dates = select_month(request)
+    # dates = []
+    # today = datetime.date.today()
+    # for year in calendar:
+    #     for month in months:
+    #         if (month > today.month and int(year) == today.year) or int(year) > today.year:
+    #             pass
+    #         else:
+    #             dates.append(num_to_words(month) + ' ' + year)
 
     # Get instructions
     instructions = Page.objects.get(permalink='/soc')
@@ -135,6 +136,12 @@ def generate(request):
         billing_period = str(month1) + ' ' + year1 + ' to ' + str(month2) + ' ' + year2
         format_billing_period = billing_period1 + ' - ' + billing_period2
 
+    # context = {
+    #     'test': billing_period
+    # }
+    # template = loader.get_template('soc-report.html')
+    # return HttpResponse(template.render(context,request))
+
 
     # Get report data
     table = []
@@ -183,12 +190,21 @@ def select_calendar_year(request):
 
 # Grabs month options for dropdown
 def select_month(request):
-    query = UmOscDeptUnitsReptV.objects.order_by('month').values_list('month',flat=True).distinct()
-    month_names = []
-    query = query.reverse()
-    for q in query:
-        month_names.append(int(q))
-    return month_names
+    # query = UmOscDeptUnitsReptV.objects.order_by('month').values_list('month',flat=True).distinct()
+    # month_names = []
+    # query = query.reverse()
+    # for q in query:
+    #     month_names.append(int(q))
+    # return month_names
+
+    format_dates = []
+    dates = list((d.billing_date for d in UmOscBillCycleV.objects.all().order_by('billing_date').reverse()))
+    for d in dates:
+       # date = datetime.datetime.strptime(d, "%d-%M-%y")
+        month = d.month
+        year = d.year
+        format_dates.append(num_to_words(month) + ' ' + str(year))
+    return format_dates
 
 
 # Calculates the number of months, given the billing period selected
@@ -263,7 +279,7 @@ def get_rows(unit, grouping, period, drange, request):
         month2 = period.split(' ')[3]
         year2 = period.split(' ')[4]
 
-        date_sql =  ' a.calendar_yr || a.month = %s between %s and %s '
+        date_sql =  ' a.calendar_yr || a.month between %s and %s '
         parms.append(year1 + month1)
         parms.append(year2 + month2)
 

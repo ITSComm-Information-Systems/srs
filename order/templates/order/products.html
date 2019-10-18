@@ -1,10 +1,3 @@
-
-<style>
-  .selected-card {
-			border-color: #28a745;
-			box-shadow: 5px 5px 10px grey;
-		}
-</style>
   <div id="equip{{list.id}}" data-phoneset="{{list.id}}">
       <label for="productCat">Select a Product Category</label>
       <select class="col-3 custom-select order-status-dropdown" id="productCat" onchange="filterProducts(this)">
@@ -13,7 +6,11 @@
           <option value="{{ cat.id }}">{{ cat }}</option>
           {% endfor %}
       </select>
-
+      <!-- use the following div to specify that user must select equipment. Add the class card-not-selected to all the cards as well. Remove that class when a card is selected.
+         When a model and quantity is selected, add the class called selected-card to the card. -->
+      <div class="col-lg-5 col-md-6 col-12 alert alert-danger mt-4 invalid-feedback" role="alert">
+        Please select a product and update the quantity
+      </div>
     <div class="card-deck">
     {% for field in tab.form.product_list %}
       <div class="card product-card" style="width: 18rem; display: none" data-product-category="{{ field.category_id }}">
