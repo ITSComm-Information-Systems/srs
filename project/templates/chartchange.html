@@ -19,7 +19,7 @@
         </div>
         <select name="deptids" class="custom-select" id="chart_deptids">
             {% for dept in deptids %}
-            <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.name }}</option>
+            <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.dept_name }}</option>
             {% endfor %}
         </select>
       </div>
