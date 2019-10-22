@@ -23,6 +23,9 @@ $(document).ready(function() {
 		nextPrev(-1, table, cf_change_table, review_table);
 	});
 
+	$('#chart_deptids').find('[data-default]').each(function(){
+		$(this).prop('selected', true);
+	});
 
 	// Create paginated tables
 	var table = $('#cf_users_table').DataTable({

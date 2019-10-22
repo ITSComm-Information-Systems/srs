@@ -257,7 +257,7 @@ def get_uniqname(request, uniqname_parm=''):
                 for query_dept in grantor_depts:
                     dept = query_dept.dept
 
-                    if dept_manager.filter(dept=dept).exists():
+                    if dept_manager and dept_manager.filter(dept=dept).exists():
                     #if dept in dept_manager:
                         manager = True
                     else:
