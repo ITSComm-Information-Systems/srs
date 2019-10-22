@@ -59,20 +59,37 @@ def chartchange(request):
 		select_dept = request.POST.get('select_dept')
 	else:
 		# Find all departments user has access to
-		user_depts = []
-		dept_query = AuthUserDeptV.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept')
-		for d in dept_query:
-			find_dept_info = UmOscDeptProfileV.objects.filter(deptid=d.dept)
-			dept = {
-				'deptid': d.dept,
-				'name': find_dept_info[0].dept_name
-			}
-			user_depts.append(dept)
+		# user_depts = []
+		# dept_query = AuthUserDeptV.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept')
+		# for d in dept_query:
+		# 	find_dept_info = UmOscDeptProfileV.objects.filter(deptid=d.dept)
+		# 	dept = {
+		# 		'deptid': d.dept,
+		# 		'name': find_dept_info[0].dept_name
+		# 	}
+		# 	user_depts.append(dept)
+		user_depts = AuthUserDept.get_report_departments(request)
 
 
-		# Set intitial department
-		if user_depts:
-			select_dept = user_depts[0]['deptid']
+		# Find associated chartfields
+		if user_depts and type(user_depts[0]) is dict:
+			#select_dept = user_depts[0]['deptid']
+			depts = [d['deptid'] for d in user_depts]
+			cclist = UmOscAcctsInUseV.objects.filter(deptid__in=depts).order_by('deptid')
+			if cclist:
+				select_dept = cclist[0].deptid  #First department with a chartcom
+				print(select_dept)
+			else:
+				select_dept = user_depts[0]['deptid']
+		elif user_depts:
+			#select_dept = user_depts[0].deptid
+			depts = [d.deptid for d in user_depts]
+			cclist = UmOscAcctsInUseV.objects.filter(deptid__in=depts).order_by('deptid')
+			if cclist:
+				select_dept = cclist[0].deptid  #First department with a chartcom
+				print(select_dept)
+			else:
+				select_dept = user_depts[0]['deptid']
 		else:
 			select_dept = ''
 	
@@ -106,8 +123,10 @@ def chartchange(request):
 
 
 	# Select department to change to
-	if user_depts:
+	if user_depts and type(user_depts[0]) is dict:
 		new_dept = user_depts[0]['deptid']
+	elif user_depts:
+		new_dept = user_depts[0].deptid
 	else:
 		new_dept = ''
 	new_cf = UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
