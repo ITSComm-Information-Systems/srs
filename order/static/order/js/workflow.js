@@ -319,7 +319,8 @@ $(document).ready(function() {
   function validateForm() {
 
     loccard = false;
-    prodcard = false;
+    prodbutton = false;
+    prodinput = false;
 
     inp = $("#step" + currStep + " :input:visible");
     valid = true;
@@ -335,7 +336,10 @@ $(document).ready(function() {
         loccard = true;
       }
       if($(inp[i]).hasClass('product-button')) {
-        prodcard = true;
+        prodbutton = true;
+      }
+      if($(inp[i]).hasClass('product-input')) {
+        prodinput = true;
       }
     }
 
@@ -347,8 +351,15 @@ $(document).ready(function() {
         }
     }
 
-    if (prodcard) {
+    if (prodbutton) {
       if (!$(".product-button").hasClass("selected")) {
+        $(".product-card").addClass("card-not-selected");
+        $("#mustchoose").show();
+        valid = false;
+      }
+    }  
+    if(prodinput){
+       if (!$(".product-input").hasClass("selected")) {
         $(".product-card").addClass("card-not-selected");
         $("#mustchoose").show();
         valid = false;
@@ -459,9 +470,13 @@ function chartcomChange(obj) {
   val = $('#' + obj.id + ' option:selected').data('chartcom');
 
   $(id).val(val);
+  console.log("INFO")
+  console.log(val);
+  console.log(id);
 
   if (obj.id == 'name_oneTimeCharges') {
     val = $('#' + obj.id + ' option:selected').data('chartcom-id');
+    console.log('VAL')
     console.log(val);
     $('#occ_key').val(val);
   }
@@ -477,13 +492,18 @@ function chartcomChange(obj) {
   function filterChartcom(obj) { 
     id = '#name_' + obj.dataset.target;
     console.log(id);
+    console.log("obj value");
+    console.log(obj.value);
+    $(id).find('option:selected').attr('selected', false);
     if (obj.value=='all') {
       $(id).find('[data-dept]').show();
     } else {
       $(id).find('[data-dept]').hide();
       $(id).find("[data-dept='" + obj.value + "']").show();
     }
-
+    $(id).find('option:selected').attr('selected', false);
+    console.log("SELECTED");
+    console.log($(id).find('option:selected'));
   }
 
   
