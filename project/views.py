@@ -17,11 +17,7 @@ from django.urls import resolve
 
 from ldap3 import Server, Connection, ALL
 
-<<<<<<< HEAD
 from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput, UmOscChartfieldV
-=======
-from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput
->>>>>>> 7cac631cbbb8e9009f4fefe320bd9a711243bea6
 from order.models import Chartcom
 from oscauth.models import AuthUserDept, AuthUserDeptV
 from datetime import datetime, date
