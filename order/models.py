@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 from ast import literal_eval
 import json, io, os
 import cx_Oracle
+from oscauth.utils import get_mc_user
 
 class Configuration(models.Model):   #Common fields for configuration models
     name = models.CharField(max_length=20)
@@ -253,6 +254,19 @@ class Order(models.Model):
     def dept(self):
         return self.chartcom.dept
 
+    def add_contact(self):
+
+        u = get_mc_user(self.created_by.username)
+        uniqname = str(getattr(u, 'uid'))
+        first_name = str(u['givenName'])
+        middle_name = ''
+        last_name = str(u['umichDisplaySn'])
+        primary_email = str(u['mail'])
+        primary_phone = str(u['telephoneNumber'])
+        dept = self.chartcom.dept
+
+        with connections['pinnacle'].cursor() as cursor:
+            cursor.callproc('pinn_custom.um_osc_util_k.um_add_new_contact_p', [uniqname, first_name, middle_name, last_name, primary_email, primary_phone, dept])
 
     def add_attachments(self):
 
@@ -284,6 +298,8 @@ class Order(models.Model):
 
 
     def create_preorder(self):
+
+        self.add_contact()
 
         data =  {  
                     "department_number": self.chartcom.dept,
