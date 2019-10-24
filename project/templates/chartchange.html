@@ -19,7 +19,11 @@
         </div>
         <select name="deptids" class="custom-select" id="chart_deptids">
             {% for dept in deptids %}
-            <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.dept_name }}</option>
+              {% if dept.deptid ==  dept_info.dept_id %}
+                <option value="{{ dept.deptid }}" data-default="true">{{ dept.deptid }} - {{ dept.dept_name }}</option>
+              {% else %}
+                <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.dept_name }}</option>
+              {% endif %}         
             {% endfor %}
         </select>
       </div>
