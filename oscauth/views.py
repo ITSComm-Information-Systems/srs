@@ -201,6 +201,13 @@ def get_uniqname(request, uniqname_parm=''):
         if len(uniqname_parm) < 3 or len(uniqname_parm) > 8 or uniqname_parm.isalpha is False:
             result = uniqname_parm + ' is not a valid uniqname'
             return  HttpResponse(template.render({'result': result, 'title':"Manage User Access"}, request))
+        # User tries to manage own access
+        elif uniqname_parm == request.user.username:
+            result = 'You are attempting to view your own access. '
+            osc_user = {
+                'exists': True
+            }
+            return  HttpResponse(template.render({'result': result, 'osc_user': osc_user, 'title':"Manage User Access"}, request))
         else:
             # Get User from MCommunity
             conn = Connection('ldap.umich.edu', auto_bind=True)
