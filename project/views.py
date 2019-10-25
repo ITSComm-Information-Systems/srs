@@ -17,7 +17,7 @@ from django.urls import resolve
 
 from ldap3 import Server, Connection, ALL
 
-from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput
+from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput, UmOscChartfieldV
 from order.models import Chartcom
 from oscauth.models import AuthUserDept, AuthUserDeptV
 from datetime import datetime, date
@@ -58,16 +58,6 @@ def chartchange(request):
 		user_depts = ''
 		select_dept = request.POST.get('select_dept')
 	else:
-		# Find all departments user has access to
-		# user_depts = []
-		# dept_query = AuthUserDeptV.objects.filter(user=request.user.id).order_by('dept').exclude(dept='All').distinct('dept')
-		# for d in dept_query:
-		# 	find_dept_info = UmOscDeptProfileV.objects.filter(deptid=d.dept)
-		# 	dept = {
-		# 		'deptid': d.dept,
-		# 		'name': find_dept_info[0].dept_name
-		# 	}
-		# 	user_depts.append(dept)
 		user_depts = AuthUserDept.get_report_departments(request)
 
 
@@ -155,7 +145,12 @@ def chartchange(request):
 @permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
 def change_dept(request):
 	selected_dept = request.GET.get('deptids', None)
-	cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
+	when = request.GET.get('when', None)
+
+	if 'when' == 'assign_new':
+		cf_options = list(UmOscAllActiveAcctNbrsV.objects.filter(deptid=selected_dept).order_by('account_number').values())
+	else:
+		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
 
 	find_name = UmOscDeptProfileV.objects.filter(deptid=selected_dept)
 	find_name = find_name[0]
