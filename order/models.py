@@ -257,7 +257,7 @@ class Order(models.Model):
     def add_contact(self):
 
         u = get_mc_user(self.created_by.username)
-        uniqname = str(getattr(u, 'uid'))
+        uniqname = str(u['uid'])
         first_name = str(u['givenName'])
         middle_name = ''
         last_name = str(u['umichDisplaySn'])
