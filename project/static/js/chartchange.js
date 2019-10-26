@@ -205,6 +205,7 @@ $(document).ready(function() {
 		$.ajax({
 			url: '/chartchange/ajax/',
 			data: {
+				'when': 'assign_new',
 				'deptids':$('#dept_text_search').val()
 			},
 			dataType:'json',
@@ -344,6 +345,7 @@ $(document).ready(function() {
 		$.ajax({
 			url: '/chartchange/ajax/',
 			data: {
+				'when': 'choose cf',
 				'deptids':selected
 			},
 			dataType:'json',
@@ -646,4 +648,3 @@ function load_4(cf_change_table, review_table) {
 		document.getElementById('submit-form').appendChild(input);
 	})
 }
-
