@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 $(document).ready(function() {
 	ph_count = 0;
 	record_count = 0;
@@ -1298,5 +1297,3 @@ function load_4(cf_change_table, review_table) {
 		document.getElementById('submit-form').appendChild(input);
 	})
 }
-
->>>>>>> 7cac631cbbb8e9009f4fefe320bd9a711243bea6
