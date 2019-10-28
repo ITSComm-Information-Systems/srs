@@ -62,3 +62,20 @@ def upsert_user(uniqname):
     osc_user.save()
 
     return osc_user
+
+
+def get_mc_user(uniqname):
+    # Get User from MCommunity.  Create them in OSC if they are not there otherwise update them.
+    server = Server(settings.MCOMMUNITY['SERVER'], use_ssl=True, get_info=ALL)
+    conn = Connection(server,
+                      user=settings.MCOMMUNITY['USERNAME'],
+                      password=settings.MCOMMUNITY['PASSWORD'],
+                      auto_bind=True)
+
+    conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","umichDisplaySn","telephoneNumber"])
+    
+    if conn.entries:
+        return conn.entries[0] 
+    else:
+        return None
+
