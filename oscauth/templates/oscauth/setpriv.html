@@ -25,16 +25,21 @@
         {% if uniqname_parm == '' %}
         {% else %}
             {% if result is not None and result != '' %}
-            <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i><strong class="prv-msgs">&nbsp;{{ result }}</strong>
-            {% else %}
-                {% if osc_user.exists %}
-                <div class='mt-5'>
-                    <h2 class='d-inline'>Assign Access Roles for: </h2><h3 class='d-inline'>{{ first_name }} {{ last_name }} ({{ uniqname_parm }})</h3>
-                    <p class='prv-msgs mt-2'>Inactive departments are shown with <strong>red text and the following icon:&nbsp;</strong><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></p>
-                </div>
+            <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i><strong class="prv-msgs">
+                &nbsp;{{ result }}
+                {% if result == 'You are attempting to view your own access. ' %}
+                    Please see <a href='/auth/mypriv/'>View System Privileges</a>.</strong>
                 {% else %}
-                    <strong>{{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
-                     - User not found, add a role to create them.
+                </strong>
+                    {% if osc_user.exists %}
+                    <div class='mt-5'>
+                        <h2 class='d-inline'>Assign Access Roles for: </h2><h3 class='d-inline'>{{ first_name }} {{ last_name }} ({{ uniqname_parm }})</h3>
+                        <p class='prv-msgs mt-2'>Inactive departments are shown with <strong>red text and the following icon:&nbsp;</strong><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i></p>
+                    </div>
+                    {% else %}
+                        <strong>{{ last_name }}, {{ first_name }}  ({{ uniqname_parm }})</strong> 
+                         - User not found, add a role to create them.
+                    {% endif %}
                 {% endif %}
             {% endif %}
         {% endif %}
