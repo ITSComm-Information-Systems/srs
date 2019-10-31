@@ -49,7 +49,7 @@ def homepage(request):
 	return HttpResponse(template.render(context, request))
 
 
-@permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
+@permission_required(('oscauth.can_order'), raise_exception=True)
 def chartchange(request):
 	template = loader.get_template('chartchange.html')
 
@@ -142,7 +142,7 @@ def chartchange(request):
 
 
 # Gives new chartfields when user changes department
-@permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
+@permission_required(('oscauth.can_order'), raise_exception=True)
 def change_dept(request):
 	selected_dept = request.GET.get('deptids', None)
 	when = request.GET.get('when', None)
@@ -161,7 +161,7 @@ def change_dept(request):
 
 
 # Finds chartfield data when user changes chartfield
-@permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
+@permission_required(('oscauth.can_order'), raise_exception=True)
 def get_cf_data(request):
 	selected_cf = request.GET.get('selected', None)
 	cf_data = list(UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values())
@@ -180,7 +180,7 @@ def get_cf_data(request):
 
 
 # Finds users for selected chartfield
-@permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
+@permission_required(('oscauth.can_order'), raise_exception=True)
 def get_users(request):
 	selected_cf = request.GET.get('selected', None)
 
@@ -226,7 +226,7 @@ def get_users(request):
 
 
 # Submits change to database
-@permission_required(('oscauth.can_order','oscauth.can_report'), raise_exception=True)
+@permission_required(('oscauth.can_order'), raise_exception=True)
 def submit(request):
 	template = loader.get_template('submitted.html')
 
