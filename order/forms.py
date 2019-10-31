@@ -60,6 +60,10 @@ class AddlInfoForm(forms.Form):
     template = 'order/dynamic_form.html'
 
 
+class VoicemailForm(forms.Form):
+    template = 'order/voicemail.html'
+
+
 class ContactCenterForm(forms.Form):
     phone_number = forms.CharField(label='summary', max_length=12)
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100'}) )
