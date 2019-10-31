@@ -119,7 +119,7 @@ def chartchange(request):
 		new_dept = user_depts[0].deptid
 	else:
 		new_dept = ''
-	new_cf = UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
+	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user.id, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
 
 	
 	context = {
@@ -148,7 +148,7 @@ def change_dept(request):
 	when = request.GET.get('when', None)
 
 	if 'when' == 'assign_new':
-		cf_options = list(UmOscAllActiveAcctNbrsV.objects.filter(deptid=selected_dept).order_by('account_number').values())
+		cf_options = Chartcom.get_user_chartcoms_for_dept(request.user.id, selected_dept) #list(UmOscAllActiveAcctNbrsV.objects.filter(deptid=selected_dept).order_by('account_number').values())
 	else:
 		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
 
