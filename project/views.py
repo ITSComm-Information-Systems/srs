@@ -147,8 +147,8 @@ def change_dept(request):
 	selected_dept = request.GET.get('deptids', None)
 	when = request.GET.get('when', None)
 
-	if 'when' == 'assign_new':
-		cf_options = Chartcom.get_user_chartcoms_for_dept(request.user.id, selected_dept) #list(UmOscAllActiveAcctNbrsV.objects.filter(deptid=selected_dept).order_by('account_number').values())
+	if when == 'assign_new':
+		cf_options = list(Chartcom.get_user_chartcoms_for_dept(request.user.id, selected_dept).values()) #list(UmOscAllActiveAcctNbrsV.objects.filter(deptid=selected_dept).order_by('account_number').values())
 	else:
 		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
 
