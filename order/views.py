@@ -29,6 +29,19 @@ def get_phone_location(request, phone_number):
     if not locations:
         phone_number = phone_number.replace("-",'')
         locations = list(UmOscServiceProfileV.objects.filter(service_number=phone_number).exclude(location_id=0).values())
+
+    if locations:
+        phone_dept = locations[0]['deptid']
+        authorized_departments = AuthUserDept.get_order_departments(request.user)
+
+        authorized = False
+
+        for dept in authorized_departments:
+            if dept.dept == phone_dept:
+                authorized = True
+
+        locations[0]['authorized'] = authorized
+
     return JsonResponse(locations, safe=False)
 
 
@@ -359,6 +372,8 @@ class Workflow(PermissionRequiredMixin, View):
                     js.append('equipment')
                 elif tab.name == 'QuantityModel':
                     js.append('product')
+                elif tab.name == 'Contact':
+                    js.append('voicemail')
 
         # Configurable conduit information
         conduit_check = Page.objects.get(permalink='/checkcond')

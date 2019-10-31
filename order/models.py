@@ -43,6 +43,7 @@ class Step(Configuration):
         ('ContactCenterForm', 'Contact Center'),
         ('BillingForm', 'Billing'),
         ('DynamicForm', 'Dynamic'),
+        ('VoicemailForm', 'Voicemail'),
 
     )
 
