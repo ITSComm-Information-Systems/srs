@@ -205,6 +205,11 @@ class Chartcom(models.Model):
 
         return user_chartcom_depts
 
+    def get_user_chartcoms_for_dept(self, dept):
+        chartcom_list = UserChartcomV.objects.filter(user=self, dept=dept).order_by('name')
+
+        return chartcom_list
+
 
 class UserChartcomV(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
