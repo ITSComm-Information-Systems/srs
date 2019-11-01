@@ -228,6 +228,7 @@ $(document).ready(function() {
 		$.ajax({
 			url: '/chartchange/ajax/',
 			data: {
+				'when': 'assign_new',
 				'deptids':$('#select_dept_3 option:selected').val()
 			},
 			dataType:'json',
