@@ -9,4 +9,4 @@ test:
     before_script:
         - pip install -r requirements.txt
     script:
-        - python3 manage.py test
+        - python3 manage.py test --keepdb
