@@ -58,7 +58,7 @@ def chartchange(request):
 		user_depts = ''
 		select_dept = request.POST.get('select_dept')
 	else:
-		user_depts = AuthUserDept.get_report_departments(request)
+		user_depts = AuthUserDept.get_order_departments(request.user.id)
 
 
 		# Find associated chartfields
@@ -73,7 +73,7 @@ def chartchange(request):
 				select_dept = user_depts[0]['deptid']
 		elif user_depts:
 			#select_dept = user_depts[0].deptid
-			depts = [d.deptid for d in user_depts]
+			depts = [d.dept for d in user_depts]
 			cclist = UmOscAcctsInUseV.objects.filter(deptid__in=depts).order_by('deptid')
 			if cclist:
 				select_dept = cclist[0].deptid  #First department with a chartcom
@@ -116,7 +116,7 @@ def chartchange(request):
 	if user_depts and type(user_depts[0]) is dict:
 		new_dept = user_depts[0]['deptid']
 	elif user_depts:
-		new_dept = user_depts[0].deptid
+		new_dept = user_depts[0].dept
 	else:
 		new_dept = ''
 	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user.id, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
