@@ -49,6 +49,11 @@ class AuthUserDeptV(models.Model):
     codename = models.CharField(max_length=20, blank=True)
     dept = models.CharField(max_length=10, blank=True, primary_key=True)
 
+    @property
+    def dept_name(self):
+        dept_name = UmOscDeptProfileV.objects.get(deptid=self.dept).dept_name
+        return dept_name
+
     class Meta:
         managed = False
         db_table = 'auth_user_dept_v'
