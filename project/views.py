@@ -22,7 +22,7 @@ from order.models import Chartcom
 from oscauth.models import AuthUserDept, AuthUserDeptV
 from datetime import datetime, date
 from django.contrib.auth.decorators import login_required, permission_required
-
+from django.db.models import F
 from pages.models import Page
 
 import json
@@ -58,26 +58,18 @@ def chartchange(request):
 		user_depts = ''
 		select_dept = request.POST.get('select_dept')
 	else:
-		user_depts = AuthUserDept.get_order_departments(request.user.id)
-
+		if request.user.has_perm('oscauth.can_report_all'):
+			user_depts = UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid')
+		else:
+			user_depts = AuthUserDept.get_order_departments(request.user.id)
 
 		# Find associated chartfields
-		if user_depts and type(user_depts[0]) is dict:
-			#select_dept = user_depts[0]['deptid']
-			depts = [d['deptid'] for d in user_depts]
-			cclist = UmOscAcctsInUseV.objects.filter(deptid__in=depts).order_by('deptid')
-			if cclist:
-				select_dept = cclist[0].deptid  #First department with a chartcom
-				print(select_dept)
-			else:
-				select_dept = user_depts[0]['deptid']
-		elif user_depts:
+		if user_depts:
 			#select_dept = user_depts[0].deptid
 			depts = [d.dept for d in user_depts]
 			cclist = UmOscAcctsInUseV.objects.filter(deptid__in=depts).order_by('deptid')
 			if cclist:
 				select_dept = cclist[0].deptid  #First department with a chartcom
-				print(select_dept)
 			else:
 				select_dept = user_depts[0]['deptid']
 		else:
@@ -111,17 +103,13 @@ def chartchange(request):
 			if n.account_number == selected_cf:
 				nickname = n.name
 
-
 	# Select department to change to
-	if user_depts and type(user_depts[0]) is dict:
-		new_dept = user_depts[0]['deptid']
-	elif user_depts:
+	if user_depts:
 		new_dept = user_depts[0].dept
 	else:
 		new_dept = ''
 	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user.id, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
 
-	
 	context = {
 		'title': 'Chartfield Change Request',
 		'deptids': user_depts,
