@@ -110,6 +110,9 @@ def chartchange(request):
 		new_dept = ''
 	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user.id, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
 
+	# Get notice
+	notice = Page.objects.get(permalink='/ccr')
+
 	context = {
 		'title': 'Chartfield Change Request',
 		'deptids': user_depts,
@@ -122,7 +125,8 @@ def chartchange(request):
 		'choose_cf_template': 'choose_cf.html',
 		'choose_users_template': 'choose_users.html',
 		'assign_new_template': 'assign_new.html',
-		'review_submit_template': 'review_submit.html'
+		'review_submit_template': 'review_submit.html',
+		'notice': notice
 	}
 
 	return HttpResponse(template.render(context, request))
