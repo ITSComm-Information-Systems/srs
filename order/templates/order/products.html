@@ -12,6 +12,15 @@
       <div class="col-lg-5 col-md-6 col-12 alert alert-danger mt-4 invalid-feedback" role="alert" id = "mustchoose">
         Please select a product and update the quantity
       </div>
+      <div id = "selecteditems" class = "selecteditems-box" style ="display:none;background-color:#E4E6E2;padding: 10px;width: 700px; height:auto;">
+        <strong>Items selected(Quantity - Model):</strong>
+        <ul id ="items_list">
+        </ul>
+      </div>
+      <script>
+        var selected_items = {}
+      </script>
+
     <div class="card-deck">
     {% for field in tab.form.product_list %}
       <div class="card product-card" style="width: 18rem; display: none" data-product-category="{{ field.category_id }}" >
@@ -23,7 +32,7 @@
             <div class="row" style="float-bottom">
                 <label class="col-6">Quantity</label>
                 <label hidden for="product{{field.id}}">{{ field }}</label>
-                <input  onchange="selectProductCard(this)"  name="product" id="product{{field.id}}" class="col-3 product-input" type="number " min="0" value="0">
+                <input  onchange="selectProductCard(this,'{{field}}' )" name="product" id="product{{field.id}}" class="col-3 product-input" type="number " min="0" value="0">
             </div>
 
           </div>
