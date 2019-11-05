@@ -1,10 +1,44 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory
+from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 
-class FeaturesForm(forms.Form):
+class TabForm(forms.Form):
+
+    template = 'order/dynamic_form.html'
+
+    def __init__(self, tab):
+        super(TabForm, self).__init__()
+        self.tab_name = tab.name
+        element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
+
+        for element in element_list:
+            if element.type == 'Radio':
+                field = forms.ChoiceField(label=element.label
+                                        , choices=eval(element.attributes))
+            elif element.type == 'Chart':
+                field = forms.ChoiceField(label=element.label
+                                        , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user.id))
+                                                                        #AuthUserDept.get_order_departments(request.user.id)
+                field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
+            elif element.type == 'NU':
+                field = forms.ChoiceField(label=element.label
+                                        , widget=forms.NumberInput(attrs={'min': "1"}))
+            elif element.type == 'ST':
+                field = forms.CharField(label=element.label)
+            else:
+                field = forms.IntegerField(label=element.label)
+
+            field.display_seq_no = element.display_seq_no
+            field.display_condition = element.display_condition
+            field.type = element.type
+            self.fields.update({element.name: field})
+
+            #rtab.form = f
+
+
+class FeaturesForm(TabForm):
     features = forms.ModelMultipleChoiceField(
         queryset=Feature.objects.all(), 
         widget=forms.CheckboxSelectMultiple(),
@@ -30,7 +64,7 @@ class FeaturesForm(forms.Form):
         fields = ('name', 'description',) 
 
 
-class RestrictionsForm(forms.Form):
+class RestrictionsForm(TabForm):
     res = Restriction.objects.all()
     list = FeatureCategory.objects.all()
 
@@ -44,7 +78,7 @@ class RestrictionsForm(forms.Form):
     template = 'order/restrictions.html'
 
 
-class AddlInfoForm(forms.Form):
+class AddlInfoForm(TabForm):
     TRUE_FALSE_CHOICES = (
     (True, 'Yes'),
     (False, 'No')
@@ -52,7 +86,9 @@ class AddlInfoForm(forms.Form):
 
     contact_yn = forms.ChoiceField(choices = TRUE_FALSE_CHOICES, label="Are you the on site contact?", required=True)
     contact_yn.type = 'Radio'
+
     contact_id = forms.CharField(label='Uniqname of the on site contact person', max_length=8)
+
     contact_name = forms.CharField(label='Name of the on site contact person', max_length=40)
     contact_number = forms.CharField(label='Best number to contact', max_length=10)
     comments = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100', 'class':'form-control'}) )
@@ -60,23 +96,23 @@ class AddlInfoForm(forms.Form):
     template = 'order/dynamic_form.html'
 
 
-class VoicemailForm(forms.Form):
+class VoicemailForm(TabForm):
     template = 'order/voicemail.html'
 
 
-class ContactCenterForm(forms.Form):
+class ContactCenterForm(TabForm):
     phone_number = forms.CharField(label='summary', max_length=12)
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100'}) )
 
     template = 'order/contact_center.html'
 
 
-class ReviewForm(forms.Form):
+class ReviewForm(TabForm):
     summary = forms.CharField(label='summary', max_length=6)
     template = 'order/review.html'
 
 
-class AuthCodeCancelForm(forms.Form):
+class AuthCodeCancelForm(TabForm):
     TYPE_CHOICES = (
     ('Cancel', 'Cancel'),
     ('Change', 'Change')
@@ -87,7 +123,7 @@ class AuthCodeCancelForm(forms.Form):
     template = 'order/auth_code_cancel.html'
 
 
-class AuthCodeForm(forms.Form):
+class AuthCodeForm(TabForm):
     TYPE_CHOICES = (
     ('Individual', 'Individual'),
     ('Workgroup', 'Workgroup')
@@ -96,12 +132,13 @@ class AuthCodeForm(forms.Form):
     name = forms.CharField(label='summary', max_length=100)
     template = 'order/auth_code.html'
 
-class CMCCodeForm(forms.Form):
+
+class CMCCodeForm(TabForm):
     code = forms.CharField(label='CMC Code', max_length=100)
     template = 'order/cmc_code.html'
 
 
-class NewLocationForm(forms.Form):
+class NewLocationForm(TabForm):
     building_list = UmOSCBuildingV.objects.all()
     new_building_code = forms.CharField(label='Building Code', max_length=100)
     new_building_name = forms.CharField(label='Building Name', max_length=100)
@@ -111,7 +148,7 @@ class NewLocationForm(forms.Form):
     template = 'order/location.html'
 
 
-class EquipmentForm(forms.Form):
+class EquipmentForm(TabForm):
     cat = ['Basic','VOIP']
     cat[0] = Product.objects.all().filter(category=1).order_by('display_seq_no')
     cat[0].id = 'basic'
@@ -120,13 +157,13 @@ class EquipmentForm(forms.Form):
     template = 'order/equipment.html'
 
 
-class ProductForm(forms.Form):
+class ProductForm(TabForm):
     category_list = ProductCategory.objects.all().order_by('display_seq_no') 
     product_list = Product.objects.all().order_by('category','display_seq_no') 
     template = 'order/products.html'
 
 
-class PhoneLocationForm(forms.Form):
+class PhoneLocationForm(TabForm):
     phone_number = forms.CharField(label='Current Phone Number')
     building = forms.CharField(label='Building', max_length=100)
     floor = forms.CharField(label='Floor', max_length=100)
