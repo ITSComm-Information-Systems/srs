@@ -396,6 +396,8 @@ class Cart(PermissionRequiredMixin, View):
 
     def get(self, request, deptid):
         dept_list = AuthUserDept.get_order_departments(request.user.id)
+        hasset = False;
+        first= {}
 
         for dept in dept_list:
             deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
@@ -404,10 +406,14 @@ class Cart(PermissionRequiredMixin, View):
 
             if deptid == int(dept.dept):
                 department = {'id': dept.dept, 'name': deptinfo.dept_name}
+            if hasset == False:
+                item_list = Item.objects.filter(deptid=dept.dept).exclude(order_id__gt=0).order_by('chartcom','-create_date')
+                chartcoms = item_list.distinct('chartcom')
+                if(len(chartcoms) != 0):
+                    hasset = True
+                    first = {'id': dept.dept, 'name':dept.name}
+                    deptid = dept.dept
 
-        if deptid == 0:
-            department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
-            deptid = dept_list[0].dept
 
         status = ['Ready to Order','Saved for Later']
         item_list = Item.objects.filter(deptid=deptid).exclude(order_id__gt=0).order_by('chartcom','-create_date')
@@ -438,7 +444,7 @@ class Cart(PermissionRequiredMixin, View):
         template = loader.get_template('order/cart.html')
         context = {
             'title': 'Cart',
-            'department': department,
+            'department': first,
             'dept_list': dept_list,
             'acct': chartcoms,
             'status': status,
