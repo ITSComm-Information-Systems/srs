@@ -296,7 +296,6 @@ $(document).ready(function() {
           tab.push({'label': label, 'value': value})
         }
       } else {
-
         name = $("#" + inp[i].id).attr('name')
         //console.log('name:' + name);
         if (!label) {
@@ -323,6 +322,9 @@ $(document).ready(function() {
     prodinput = false;
 
     inp = $("#step" + currStep + " :input:visible");
+     if(currStep == 2){
+      inp = $("#step" + currStep + " :input");
+     }
     valid = true;
     for (i = 0; i < inp.length; i++) {
       if (inp[i].checkValidity()) {
@@ -404,13 +406,13 @@ $(document).ready(function() {
       if(tabs[tab]) {
          heading = $('#reviewstep' + tab).data('label')
          summary = summary + '~' + heading + '^';
+         
         for (field = 0; field < tabs[tab].length; field++) {
           txt = '<b>' + tabs[tab][field].label.trim() + '</b>  ' + tabs[tab][field].value.trim() + '<br>';
           summary = summary + tabs[tab][field].label.trim() + '\t' + tabs[tab][field].value.trim() + '^';
           $('#reviewstep' + tab).append(txt);
         }
       }
-      //summary = summary + '\n';
     }
     $('#reviewSummary').val(summary); 
   }
@@ -470,14 +472,10 @@ function chartcomChange(obj) {
   val = $('#' + obj.id + ' option:selected').data('chartcom');
 
   $(id).val(val);
-  console.log("INFO")
-  console.log(val);
-  console.log(id);
+
 
   if (obj.id == 'name_oneTimeCharges') {
     val = $('#' + obj.id + ' option:selected').data('chartcom-id');
-    console.log('VAL')
-    console.log(val);
     $('#occ_key').val(val);
   }
 
@@ -491,9 +489,6 @@ function chartcomChange(obj) {
 
   function filterChartcom(obj) { 
     id = '#name_' + obj.dataset.target;
-    console.log(id);
-    console.log("obj value");
-    console.log(obj.value);
     $(id).find('option:selected').attr('selected', false);
     if (obj.value=='all') {
       $(id).find('[data-dept]').show();
@@ -502,8 +497,7 @@ function chartcomChange(obj) {
       $(id).find("[data-dept='" + obj.value + "']").show();
     }
     $(id).find('option:selected').attr('selected', false);
-    console.log("SELECTED");
-    console.log($(id).find('option:selected'));
+    
   }
 
   
