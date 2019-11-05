@@ -313,7 +313,7 @@ class Workflow(PermissionRequiredMixin, View):
         for index, tab in enumerate(tabs, start=1):
             tab.step = 'step' + str(index)
 
-            if tab.custom_form == '':
+            if tab.custom_form == '': #Deprecated
                 f = forms.Form()
                 f.template = 'order/dynamic_form.html'
                 element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
@@ -355,7 +355,7 @@ class Workflow(PermissionRequiredMixin, View):
                 tab.form = forms.Form()
                 tab.form.template = 'order/static.html'
             else:
-                tab.form = globals()[tab.custom_form]
+                tab.form = globals()[tab.custom_form](tab)
                 if tab.name == 'PhoneLocation':
                     js.append('phone_location')
                 elif tab.name == 'LocationNew':
