@@ -15,13 +15,21 @@
 <h1>{{ title }}</h1>
 <form action="/auth/get_uniqname/" id='first-form' method="POST">{% csrf_token %}
 
-    <div>
+    <div class="col-lg-8 col-12">
         <div class="form-group">
             <label for="uniqname-field">Enter a Uniqname</label><br>
             <small class="text-muted form-text mb-1" id="manageAccInstrcutions">Enter the uniqname of the person that you want to give/edit access</small>
-            <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short col-4" placeholder='Uniqname' aria-describedby="manageAccInstrcutions">
+            <input type='search' name="uniqname_parm" id="uniqname-field" class="form-control text-field-short col-lg-4 col-md-5 col-7" placeholder='Uniqname' aria-describedby="manageAccInstrcutions">
             <input id="search-btn" type='submit' value='Search' class="btn btn-primary">
         </div>
+    </div>
+    <div class="col-lg-4 col-md-5 col-sm-8 col-12">
+        <div class="alert alert-primary">
+            Need help? Please refer to our <a class="alert-link" href="https://documentation.its.umich.edu/node/1065" target="_blank">Access & Permissions document</a> to learn how to manage user access.
+        </div>
+    </div>
+
+    <div>
         {% if uniqname_parm == '' %}
         {% else %}
             {% if result is not None and result != '' %}
