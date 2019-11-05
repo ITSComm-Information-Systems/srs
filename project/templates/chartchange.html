@@ -20,9 +20,9 @@
         <select name="deptids" class="custom-select" id="chart_deptids">
             {% for dept in deptids %}
               {% if dept.deptid ==  dept_info.dept_id %}
-                <option value="{{ dept.deptid }}" data-default="true">{{ dept.deptid }} - {{ dept.dept_name }}</option>
+                <option value="{{ dept.dept }}" data-default="true">{{ dept.dept }} - {{ dept.dept_name }}</option>
               {% else %}
-                <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.dept_name }}</option>
+                <option value="{{ dept.dept }}">{{ dept.dept }} - {{ dept.dept_name }}</option>
               {% endif %}         
             {% endfor %}
         </select>
@@ -63,13 +63,14 @@
 
       <div style="overflow:auto;">
         <div style="float:right;">
-          <button type="button" class="btn btn-primary" id=cfPrevBtn disabled>Previous</button>
+          <button type="button" class="btn btn-outline-primary" id=cfPrevBtn disabled>Previous</button>
           <button type="button" class="btn btn-primary" id=cfNextBtn>Next</button>
         </div>
       </div>
     </div>
 
   </form>
+</div>
 
 
 {% endblock %}
