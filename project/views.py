@@ -65,13 +65,13 @@ def chartchange(request):
 
 		# Find associated chartfields
 		if user_depts:
-			#select_dept = user_depts[0].deptid
-			depts = [d.dept for d in user_depts]
-			cclist = UmOscAcctsInUseV.objects.filter(deptid__in=depts).order_by('deptid')
-			if cclist:
-				select_dept = cclist[0].deptid  #First department with a chartcom
-			else:
-				select_dept = user_depts[0]['deptid']
+			select_dept = user_depts[0].dept
+			# depts = [d.dept for d in user_depts]
+			# cclist = UmOscAcctsInUseV.objects.filter(deptid__in=depts).order_by('deptid')
+			# if cclist:
+			# 	select_dept = cclist[0].deptid  #First department with a chartcom
+			# else:
+			# 	select_dept = user_depts[0]['deptid']
 		else:
 			select_dept = ''
 	
