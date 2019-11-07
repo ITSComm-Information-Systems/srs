@@ -290,8 +290,14 @@ class Integration(PermissionRequiredMixin, View):
 
     def post(self, request, order_id):
         order = Order.objects.get(id=order_id)
-        order.create_preorder()
-        return HttpResponseRedirect('/orders/integration/' + str(order_id)) 
+
+        if request.POST['action'] == 'delete':
+            order.delete()
+            return HttpResponseRedirect('/orders/status/0') 
+        else:            
+            order.create_preorder()
+            return HttpResponseRedirect('/orders/integration/' + str(order_id)) 
+
 
     def get(self, request, order_id):
         order = Order.objects.get(id=order_id)
