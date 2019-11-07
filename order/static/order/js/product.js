@@ -1,3 +1,4 @@
+ //dictionary for selected items to quantity
 function filterProducts(obj) { 
     value = $( "#productCat option:selected" ).val();
     console.log(value);
@@ -6,7 +7,7 @@ function filterProducts(obj) {
     $("[data-product-category='" + value + "']").show();
 
   }
-  function selectProductCard(card) {
+  function selectProductCard(card,name) {
   	if($(card).context.value > 0){
 	    $(card).addClass('btn-outline-success');
 	    $('.product-card').removeClass('selected-card').val('Select');
@@ -14,7 +15,13 @@ function filterProducts(obj) {
 	    $(card).addClass('selected');
 
 	    $(".product-card").removeClass("card-not-selected")
-	    $("#mustchoose").hide();
-	}    
+		$("#mustchoose").hide();
+		$("#selecteditems").show();
+		selected_items[name] = $(card).context.value;
+		 var result = ''
+		 for(var key in  selected_items)
+			result += ('<li>'+ selected_items[key] + " - " + key  +'</li>');
+		document.getElementById("items_list").innerHTML = result
+	}   
 
 }
