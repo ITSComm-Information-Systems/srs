@@ -4,8 +4,7 @@
 
 <p id="test"></p>
 
-{% if cf_info %}
-<div class='row'>
+<div class='row cf-dropdown-div'>
     <div class="col-md-5">
         <form id="cf_dropdown" method="POST" name="cfs">{% csrf_token %}
             <div class="input-group" id="cf_dropdown_group">
@@ -23,11 +22,9 @@
         </form>
     </div>
 </div>
-{% endif %}
 
 <div class="mt-4 row">
-    {% if cf_info %}
-    <div class="col-md-10" id="cf_details">
+    <div class="col-md-10 cf-dropdown-div" id="cf_details">
       <table class="table table-striped table-sm">
         <caption style="caption-side:top;color:#000000;font-size:1rem">Details for Chartfield <strong class="cf_num">{{ selected_cf.account_number }}</strong>:</caption>
         <thead>
@@ -52,14 +49,16 @@
         </tbody>
       </table>
     </div>
-    {% else %}
+
     <div class="col-md-8" id="no_cfs_alert">
         <div class="alert alert-danger col-md-8" role="alert">
             <i class="fas fa-exclamation-triangle"></i>
             This department does not have any chartfields currently in use. Please select another department.
         </div>
     </div>
-    {% endif %}
+
+
+
     <div class="col-md-8" id="no_cfs_alert" hidden>
         <div class="alert alert-danger col-md-8" role="alert">
             <i class="fas fa-exclamation-triangle"></i>

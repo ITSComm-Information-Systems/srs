@@ -19,7 +19,7 @@
         </div>
         <select name="deptids" class="custom-select" id="chart_deptids">
             {% for dept in deptids %}
-              {% if dept.deptid ==  dept_info.dept_id %}
+              {% if dept.dept ==  dept_info.dept_id %}
                 <option value="{{ dept.dept }}" data-default="true">{{ dept.dept }} - {{ dept.dept_name }}</option>
               {% else %}
                 <option value="{{ dept.dept }}">{{ dept.dept }} - {{ dept.dept_name }}</option>
@@ -81,5 +81,8 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/sl-1.3.0/datatables.min.css"/>
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/sl-1.3.0/datatables.min.js"></script>
 <script type="text/javascript" src="/static/select.js"></script>
+<script> 
+  var cf_info = {% if cf_info %} true {% else %} false {% endif %};
+</script>
 <script src="/static/js/chartchange.js"></script>
 {% endblock %}
