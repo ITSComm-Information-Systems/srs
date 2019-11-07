@@ -2,6 +2,10 @@ $(document).ready(function() {
 
   // Workflow stuff
   $('a[data-toggle="tab"]').on('shown.bs.tab', function(event) {
+
+    //console.log(this.dataset.tab);
+    currTab = this.dataset.tab;
+
     currStep = $(this)[0].id.substring(10, 12) * 1;
     if (currStep == lastStep) {
         $('#nextBtn').html('Add to Cart');
@@ -217,6 +221,7 @@ $(document).ready(function() {
   });
 
   $("#nextBtn").click(function(event) {
+    //sendTabData();  // TODO Enable AJAX
     nextPrev(1);
   });
 
@@ -322,10 +327,14 @@ $(document).ready(function() {
     prodinput = false;
 
     inp = $("#step" + currStep + " :input:visible");
-     if(currStep == 2){
-      inp = $("#step" + currStep + " :input");
-     }
+     //if(currStep == 2){
+     // inp = $("#step" + currStep + " :input");
+     //}
+
     valid = true;
+
+
+
     for (i = 0; i < inp.length; i++) {
       if (inp[i].checkValidity()) {
         $(inp[i]).attr("aria-invalid", "false");
@@ -343,6 +352,12 @@ $(document).ready(function() {
       if($(inp[i]).hasClass('product-input')) {
         prodinput = true;
       }
+    }
+
+    if(currTab == 'PhoneLocation' && $("#foundPhone").html() == '123-123-1234') {
+      document.getElementById("id_phone_number").setCustomValidity("Not Found");
+      $("#workflowForm").addClass('was-validated');
+      valid = false;
     }
 
     if (loccard) {
@@ -446,7 +461,41 @@ $(document).ready(function() {
 })
 
 
+function sendTabData() {
+  data = $('#workflowForm').serializeArray();
+  data.push({name: 'tab', value: currTab});
 
+  $.ajax({
+      url : "/orders/ajax/send_tab_data/", 
+      type : "POST", 
+      data : data, 
+
+      beforeSend: function(){
+        console.log('complete');
+        $('#nextBtn').addClass('disabled'); 
+      },
+
+      success : function(json) {
+          console.log(json); // log the returned json to the console
+          console.log("success"); // another sanity check
+          nextPrev(1);
+      },
+
+      // handle a non-successful response
+      error : function(xhr,errmsg,err) {
+          $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+              " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+          console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+      },
+
+      // handle a non-successful response
+      complete: function(){
+        console.log('complete');
+        $('#nextBtn').removeClass('disabled'); ;
+      }
+
+  });
+};
 
 
 });  // Document Ready
@@ -499,5 +548,8 @@ function chartcomChange(obj) {
     $(id).find('option:selected').attr('selected', false);
     
   }
+
+
+
 
   

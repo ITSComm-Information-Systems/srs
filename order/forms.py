@@ -8,8 +8,25 @@ class TabForm(forms.Form):
 
     template = 'order/dynamic_form.html'
 
-    def __init__(self, tab):
-        super(TabForm, self).__init__()
+    def get_summary(self):
+        #print(self.fields)
+
+        for key, value in self.cleaned_data.items():
+            field = self.fields[key]
+            print(field.widget)
+            if field.type == 'Radio':
+                for choice in field.choices:
+                    if choice[0] == value:
+                        value = choice[1]
+
+            print(field.label, value)
+
+        return 'json data for summary page'
+
+    def __init__(self, tab, *args, **kwargs):
+        super(TabForm, self).__init__(*args, **kwargs)
+    #def __init__(self, tab, *args, **kwargs):
+    #    super(TabForm, self, *args, **kwargs).__init__()
         self.tab_name = tab.name
         element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
 
@@ -37,6 +54,8 @@ class TabForm(forms.Form):
 
             #rtab.form = f
 
+class BillingForm(TabForm):
+    pass
 
 class FeaturesForm(TabForm):
     features = forms.ModelMultipleChoiceField(
@@ -91,7 +110,7 @@ class AddlInfoForm(TabForm):
 
     contact_name = forms.CharField(label='Name of the on site contact person', max_length=40)
     contact_number = forms.CharField(label='Best number to contact', max_length=10)
-    comments = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols':'100', 'class':'form-control'}) )
+    comments = forms.CharField(label='Comments', required=False, widget=forms.Textarea(attrs={'cols':'100', 'class':'form-control'}) )
     file = forms.FileField(label="Please attach any drawings, spreadsheets or floor plans with jack locations as needed", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
     template = 'order/dynamic_form.html'
 
@@ -147,6 +166,8 @@ class NewLocationForm(TabForm):
 
     template = 'order/location.html'
 
+    def get_summary(self, postdata):
+        return 'override data'
 
 class EquipmentForm(TabForm):
     cat = ['Basic','VOIP']
