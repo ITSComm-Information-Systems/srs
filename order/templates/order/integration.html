@@ -44,8 +44,13 @@ ul, #myUL {
 <h1>Order #{{order.id}}</h1>
 
     <form action="/orders/integration/{{order.id}}" method="POST">{% csrf_token %}
-      <input type="hidden" value="{{order.id}}">
+      <input name="action" type="hidden" value="reprocess">
       <input type="submit" value="reSubmit">Note that this runs in background, allow up to 20 seconds to complete and whatnot.
+    </form>
+
+    <form action="/orders/integration/{{order.id}}" method="POST">{% csrf_token %}
+      <input name="action" type="hidden" value="delete">
+      Careful, this can't be undone.<input type="submit" value="delete" style="color: red">
     </form>
 
 <ul>
