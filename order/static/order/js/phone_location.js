@@ -44,6 +44,15 @@ $(document).ready(function() {
                 $("#foundPhone").text(phone_number);
                 $("#phLocationFields").show();
             }
+            if (data.length < 1) { // Validation
+              document.getElementById("id_phone_number").setCustomValidity("Not authorized");
+              $("#workflowForm").addClass('was-validated');
+            } else {
+              document.getElementById("id_phone_number").setCustomValidity("");
+              document.getElementById("id_phone_number").checkValidity();
+              $("#id_phone_number").removeClass('is-invalid');
+              $("#workflowForm").removeClass('was-validated');
+            }
           },
     
           error: function(){

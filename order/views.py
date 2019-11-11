@@ -18,6 +18,7 @@ from ast import literal_eval
 import cx_Oracle
 import json
 from django.core.files.storage import FileSystemStorage
+from django.views.decorators.csrf import csrf_exempt
 
 import threading
 
@@ -43,6 +44,23 @@ def get_phone_location(request, phone_number):
         locations[0]['authorized'] = authorized
 
     return JsonResponse(locations, safe=False)
+
+@csrf_exempt
+@permission_required('oscauth.can_order')
+def send_tab_data(request):
+
+    tab = request.POST.get('tab')
+    step = Step.objects.get(name=tab)
+    print(tab, step.custom_form)
+
+    f = globals()[step.custom_form](step, request.POST)
+
+    if f.is_valid():
+        print(f.get_summary())
+    else:
+        print('not valid', f.errors)  #TODO Send invalid messages
+
+    return JsonResponse('test', safe=False)  #TODO Send review data
 
 
 @permission_required('oscauth.can_order')
@@ -272,8 +290,14 @@ class Integration(PermissionRequiredMixin, View):
 
     def post(self, request, order_id):
         order = Order.objects.get(id=order_id)
-        order.create_preorder()
-        return HttpResponseRedirect('/orders/integration/' + str(order_id)) 
+
+        if request.POST['action'] == 'delete':
+            order.delete()
+            return HttpResponseRedirect('/orders/status/0') 
+        else:            
+            order.create_preorder()
+            return HttpResponseRedirect('/orders/integration/' + str(order_id)) 
+
 
     def get(self, request, order_id):
         order = Order.objects.get(id=order_id)

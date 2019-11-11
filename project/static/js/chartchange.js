@@ -14,6 +14,14 @@ $(document).ready(function() {
 	$('#chart_deptids :first-child').prop('selected', true);
 	$('#cf_dropdown :first-child').prop('selected', true);
 
+	// Hide chartfield selection if department doesn't have any
+	if (cf_info) {
+		$('#no_cfs_alert').hide();
+	}
+	else {
+		$('.cf-dropdown-div').hide();
+	}
+
 
 	// Next/prev buttons
 	$("#cfNextBtn").click(function(event) {
@@ -356,14 +364,16 @@ $(document).ready(function() {
 				if (data.length < 2) {
 					$('#cf_dropdown_group').hide();
 					$('#cf_details').hide();
-					$('#no_cfs_alert').removeAttr('hidden');
+					$('#no_cfs_alert').show();
 				}
 				else {
+					$('.cf_dropdown-div').show();
+					$('#no_cfs_alert').hide();
 					$('#cf_dropdown_group').show();
 					$('#cf_details').show();
-					$('#no_cfs_alert').attr('hidden', 'hidden');
+					// $('#no_cfs_alert').attr('hidden', 'hidden');
+					var drp = document.getElementById('cf_dropdown');
 					for (i = 0; i < data.length - 1; ++i) {
-						var drp = document.getElementById('cf_dropdown');
 						var option = document.createElement("OPTION");
 						option.value = data[i].account_number;
 						option.text = data[i].account_number;
