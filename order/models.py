@@ -393,6 +393,7 @@ class Order(models.Model):
 
         except cx_Oracle.DatabaseError as e:
         #except Exception as e:
+            LogItem().add_log_entry('Error', self.id, e)
             num = str(self.id)
             url = settings.SITE_URL + '/orders/integration/'  + num
             send_mail('SRS Order # ' + num + ' failed to submit', url, 'itscomm.information.systems@umich.edu', ['itscomm.information.systems@umich.edu'])
