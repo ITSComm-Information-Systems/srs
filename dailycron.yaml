@@ -1,0 +1,27 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: dev-daily
+spec:
+  schedule: '30 10 * * *'
+  ConcurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            parent: dailycron
+        spec:
+          containers:
+            -
+              name: batch
+              image: 'docker-registry.default.svc:5000/srs/dev'
+              envFrom:
+              - configMapRef:
+                  name: dev
+              - secretRef:
+                  name: dev
+              command:
+                - python3
+                - dailyjob
+          restartPolicy: OnFailure
