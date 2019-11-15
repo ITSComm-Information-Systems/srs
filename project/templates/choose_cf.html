@@ -1,3 +1,4 @@
+{% load ccr_tags %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <div class="mt-4 row"></div>
@@ -15,7 +16,7 @@
                 </div>
                 <select name="chartcom" class="custom-select" id="cf_dropdown">
                     {% for cf in cf_info %}
-                    <option name="dept" value="{{cf.account_number}}">{{ cf.account_number }}</option>
+                    <option name="dept" value="{{ cf|jsonify }}">{{ cf.account_number }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -26,7 +27,7 @@
 <div class="mt-4 row">
     <div class="col-md-10 cf-dropdown-div" id="cf_details">
       <table class="table table-striped table-sm">
-        <caption style="caption-side:top;color:#000000;font-size:1rem">Details for Chartfield <strong class="cf_num">{{ selected_cf.account_number }}</strong>:</caption>
+        <caption style="caption-side:top;color:#000000;font-size:1rem">Details for Chartfield <strong class="cf_num">{{ cf_info.first.account_number }}</strong>:</caption>
         <thead>
           <th scope="col">Fund</th>
           <th scope="col">Dept.</th>
