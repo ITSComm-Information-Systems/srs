@@ -113,8 +113,7 @@ TEMPLATES = {
             ],
             'libraries':{
                 'index': 'reports.inventory.templatetags.index',
-                'tags': 'reports.soc.templatetags.tags',
-                'ccr_tags': 'project.templatetags.ccr_tags'
+                'tags': 'reports.soc.templatetags.tags'
             }
         },
 },
