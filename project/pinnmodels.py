@@ -668,6 +668,13 @@ class UmOscAcctsInUseV(models.Model):
    project_grant_desc =  models.CharField(max_length=225, blank=True, null=True)
    active =  models.CharField(max_length=1, blank=True, null=True)
 
+   # CAN YOU ADD A PROPERTY TO LEGACY DATABASE?
+   @property
+   def nickname(self):
+       name = Chartcom.objects.filter(account_number=account_number)[0].name
+
+       return name
+
    class Meta:
         managed = False
         ordering = ('deptid', 'account_number')

@@ -66,12 +66,6 @@ def chartchange(request):
 		# Find associated chartfields
 		if user_depts:
 			select_dept = user_depts[0].dept
-			# depts = [d.dept for d in user_depts]
-			# cclist = UmOscAcctsInUseV.objects.filter(deptid__in=depts).order_by('deptid')
-			# if cclist:
-			# 	select_dept = cclist[0].deptid  #First department with a chartcom
-			# else:
-			# 	select_dept = user_depts[0]['deptid']
 		else:
 			select_dept = ''
 	
@@ -137,17 +131,15 @@ def chartchange(request):
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def change_dept(request):
 	selected_dept = request.GET.get('deptids', None)
+	selected_dept = selected_dept.split(' - ')[0]
 	when = request.GET.get('when', None)
 
+	# Get list of chartcoms in user's shortlist for user to select new
 	if when == 'assign_new':
-		cf_options = list(Chartcom.get_user_chartcoms_for_dept(request.user.id, selected_dept).values()) #list(UmOscAllActiveAcctNbrsV.objects.filter(deptid=selected_dept).order_by('account_number').values())
+		cf_options = list(Chartcom.get_user_chartcoms_for_dept(request.user.id, selected_dept).values()) 
+	# Get list of chartcoms in use
 	else:
 		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
-
-	find_name = UmOscDeptProfileV.objects.filter(deptid=selected_dept)
-	find_name = find_name[0]
-	name = { 'name': find_name.dept_name }
-	cf_options.append(name)
 
 	return JsonResponse(cf_options, safe=False)
 
