@@ -190,7 +190,6 @@ def get_uniqname(request, uniqname_parm=''):
     if request.method == 'POST':  #big work here
         uniqname_parm = request.POST['uniqname_parm']
 
-
     # Initial page - no uniqname provided yet
     if uniqname_parm == '':
         set_priv = ''
@@ -216,7 +215,7 @@ def get_uniqname(request, uniqname_parm=''):
             # User exists in MCommunity
             if conn.entries:
                 mc_user = conn.entries[0]
-                result = ''
+                result = uniqname_parm
 
                 try:
                     osc_user = User.objects.filter(username=uniqname_parm)

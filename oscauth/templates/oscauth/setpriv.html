@@ -13,6 +13,7 @@
     
 
 <h1>{{ title }}</h1>
+
 <form action="/auth/get_uniqname/" id='first-form' method="POST">{% csrf_token %}
 
     <div class="col-lg-8 col-12">
@@ -33,12 +34,11 @@
         {% if uniqname_parm == '' %}
         {% else %}
             {% if result is not None and result != '' %}
-            <i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i><strong class="prv-msgs">
-                &nbsp;{{ result }}
                 {% if result == 'You are attempting to view your own access. ' %}
+                	<i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i><strong class="prv-msgs">
+                	&nbsp;{{ result }}
                     Please see <a href='/auth/mypriv/'>View System Privileges</a>.</strong>
                 {% else %}
-                </strong>
                     {% if osc_user.exists %}
                     <div class='mt-5'>
                         <h2 class='d-inline'>Assign Access Roles for: </h2><h3 class='d-inline'>{{ first_name }} {{ last_name }} ({{ uniqname_parm }})</h3>
