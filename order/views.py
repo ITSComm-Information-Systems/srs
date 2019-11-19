@@ -69,11 +69,6 @@ def get_order_detail(request, order_id):
     order = Order.objects.get(id=order_id)
     item_list = Item.objects.filter(order=order)
 
-    for item in item_list:
-        detail = item.data['reviewSummary']
-        if isinstance(detail, str):
-            js = literal_eval(detail)
-            item.data['reviewSummary'] = js
 
     template = loader.get_template('order/order_detail.html')
     context = {
@@ -225,35 +220,33 @@ def add_to_cart(request):
 
         summary = request.POST['reviewSummary']
 
-        data = {}
         title = ''
-        data['tabs'] = []
+        data = []
 
         for line in summary.split('^'):
 
             if line[0:1] == '~':
                 if title:
-                    tab = {title: tabdata}
-                    data['tabs'].append(tab)
+                    tab = {'title': title, 'fields': tabdata}
+                    data.append(tab)
                     
-                tabdata = {}
+                tabdata = []
                 title = line[1:99]
             else:
                 fields = line.split('\t')
+
                 if len(fields) > 1:
-                    if fields[0] != '':
-                        tabdata[fields[0]] = fields[1]
-                    else:
-                        tabdata[fields[1]] = ' '
+                    tabdata.append({'label': fields[0], 'value': fields[1]})
                 else:
-                    tabdata[line] = ' '
+                    if line != '':
+                        tabdata.append({'label': line, 'value': ' '})
         
-        tab = {title: tabdata}
-        data['tabs'].append(tab)
+        tab = {'title': title, 'fields': tabdata}
+        data.append(tab)
 
         postdata = request.POST.dict()
         
-        postdata['reviewSummary'] = json.dumps(data)
+        postdata['reviewSummary'] = data
         postdata['csrfmiddlewaretoken'] = ''
 
         i.description = label

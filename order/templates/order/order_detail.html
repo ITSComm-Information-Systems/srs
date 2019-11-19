@@ -49,18 +49,16 @@
             <div id="collapse-{{ forloop.counter }}" class="collapse show" aria-labelledby="heading-{{ forloop.counter }}"
                 data-parent="#ordersAccordian">
                 <div class="card-body">
-                    {% for tab in item.data.reviewSummary.tabs %}
-                    {% for title, content in tab.items %}
-                    <div class="tabInformation">
-                        <p class="h4" id="tabTitle">{{ title }}</p>
-                        {% for key, value in content.items %}
-                        <div class="mb-1 indented-form-input">
-                            <strong class="question">{{key}}</strong>
-                            <p class="d-inline" id="questionAnswer">{{value}}</p>
+                    {% for tab in item.data.reviewSummary %}
+                        <div class="tabInformation">
+                            <p class="h4" id="tabTitle">{{ tab.title }}</p>
+                            {% for field in tab.fields %}             
+                                <div class="mb-1 indented-form-input">
+                                    <strong class="question">{{field.label}}</strong>
+                                    <p class="d-inline" id="questionAnswer">{{field.value}}</p>
+                                </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
-                    </div>
-                    {% endfor %}
                     {% endfor %}
                 </div>
             </div>
