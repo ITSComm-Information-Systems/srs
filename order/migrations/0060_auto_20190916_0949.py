@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('project', '__first__'),
         ('order', '0059_auto_20190829_1217'),
     ]
 

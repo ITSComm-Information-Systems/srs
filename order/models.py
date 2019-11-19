@@ -399,14 +399,6 @@ class Order(models.Model):
             send_mail('SRS Order # ' + num + ' failed to submit', url, 'itscomm.information.systems@umich.edu', ['itscomm.information.systems@umich.edu'])
 
 
-class PinnPreOrder(UmOscPreorderApiV):
-
-    def add_attachments(self):
-        print('add')
-
-    class Meta:
-        managed=False
-
 class Item(models.Model):
     description = models.CharField(max_length=100)
     create_date = models.DateTimeField('Date Created', auto_now_add=True)
