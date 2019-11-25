@@ -86,6 +86,10 @@ LOGIN_REDIRECT_URL = SITE_URL
 LOGOUT_REDIRECT_URL = SITE_URL
 LOGIN_URL = '/oidc/authenticate'
 
+EMAIL_HOST = 'vdc-relay.us-east-2.a.mail.umich.edu'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
 MCOMMUNITY = {
     'SERVER': os.getenv('MC_SERVER', 'ldap.umich.edu'),
     'USERNAME': os.getenv('MC_USERNAME', 'cn=EAS-OSC-McDirApp001,ou=Applications,o=services'),
@@ -109,7 +113,8 @@ TEMPLATES = {
             ],
             'libraries':{
                 'index': 'reports.inventory.templatetags.index',
-                'tags': 'reports.soc.templatetags.tags'
+                'tags': 'reports.soc.templatetags.tags',
+                'ccr_tags': 'project.templatetags.ccr_tags'
             }
         },
 },
@@ -122,16 +127,16 @@ DATABASES = {
     'default': {
         'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
         'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
-        'USER': os.getenv('DATABASE_USER','postgres'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD','w94zLR2dkkfo'),
-        'HOST': os.getenv('DATABASE_SERVICE_NAME','pgoscdev.cvwq7quwqs3k.us-east-2.rds.amazonaws.com'),
+        'USER': os.getenv('DATABASE_USER','pgoscdevweb'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD','4zWV4bpup350'),
+        'HOST': os.getenv('DATABASE_SERVICE_NAME','containernp-pg.aws.vdc.it.umich.edu'),
         'TEST':
         {
         'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
         'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
-        'USER': os.getenv('DATABASE_USER','postgres'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD','w94zLR2dkkfo'),
-        'HOST': os.getenv('DATABASE_SERVICE_NAME','pgoscdev.cvwq7quwqs3k.us-east-2.rds.amazonaws.com'),
+        'USER': os.getenv('DATABASE_USER','pgoscdevweb'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD','4zWV4bpup350'),
+        'HOST': os.getenv('DATABASE_SERVICE_NAME','containernp-pg.aws.vdc.it.umich.edu'),
         },
     },
     'pinnacle': {

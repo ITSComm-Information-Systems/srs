@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.mail import send_mail
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from oscauth.models import Role
@@ -391,18 +393,11 @@ class Order(models.Model):
 
         except cx_Oracle.DatabaseError as e:
         #except Exception as e:
-            print(e)
             LogItem().add_log_entry('Error', self.id, e)
-            pass
+            num = str(self.id)
+            url = settings.SITE_URL + '/orders/integration/'  + num
+            send_mail('SRS Order # ' + num + ' failed to submit', url, 'itscomm.information.systems@umich.edu', ['itscomm.information.systems@umich.edu'])
 
-
-class PinnPreOrder(UmOscPreorderApiV):
-
-    def add_attachments(self):
-        print('add')
-
-    class Meta:
-        managed=False
 
 class Item(models.Model):
     description = models.CharField(max_length=100)
