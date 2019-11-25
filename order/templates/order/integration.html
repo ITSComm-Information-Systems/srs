@@ -87,10 +87,11 @@ ul, #myUL {
             </li>
             <li><span class="caret">note</span>
                 <ul class="nested">
-                    <pre>{{ item.note }}</pre>
-                    <!----{% with text=item.note %}
+                    {% with description=item.description %}
+                    {% with text=item.data.reviewSummary %}
                     <pre>{% include 'order/pinnacle_note.html' %}</pre>
-                    {% endwith %}--->
+                    {% endwith %}
+                    {% endwith %}
                 </ul>
             </li>
         </ul>
