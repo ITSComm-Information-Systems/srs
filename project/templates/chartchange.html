@@ -22,7 +22,7 @@
               {% if dept.dept ==  dept_info.dept_id %}
                 <option value="{{ dept.dept }}" data-default="true">{{ dept.dept }} - {{ dept.dept_name }}</option>
               {% else %}
-                <option value="{{ dept.dept }}">{{ dept.dept }} - {{ dept.dept_name }}</option>
+                <option value="{{ dept.dept }} - {{ dept.dept_name }}">{{ dept.dept }} - {{ dept.dept_name }}</option>
               {% endif %}         
             {% endfor %}
         </select>
