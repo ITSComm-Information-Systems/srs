@@ -221,7 +221,7 @@ $(document).ready(function() {
 			// Reset chartfield options when department changes
 			success: function(data) {
 				$('#select_cf_3').empty();
-				for (i = 0; i < data.length - 1; ++i) {
+				for (i = 0; i < data.length; ++i) {
 					var drp = document.getElementById('select_cf_3');
 					var option = document.createElement("OPTION");
 					option.value = data[i].account_number;
@@ -244,7 +244,7 @@ $(document).ready(function() {
 			// Reset chartfield options when department changes
 			success: function(data) {
 				$('#select_cf_3').empty();
-				for (i = 0; i < data.length - 1; ++i) {
+				for (i = 0; i < data.length; ++i) {
 					var drp = document.getElementById('select_cf_3');
 					var option = document.createElement("OPTION");
 					option.value = data[i].account_number;
@@ -375,7 +375,7 @@ $(document).ready(function() {
 					$('#cf_dropdown_group').show();
 					$('#cf_details').show();
 					var drp = document.getElementById('cf_dropdown');
-					for (i = 0; i < data.length - 1; ++i) {
+					for (i = 0; i < data.length; ++i) {
 						var option = document.createElement("OPTION");
 						option.value = JSON.stringify(data[i]);
 						option.text = data[i].account_number;
