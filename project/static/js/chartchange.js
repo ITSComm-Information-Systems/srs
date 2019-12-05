@@ -362,7 +362,7 @@ $(document).ready(function() {
 			// Reset chartfield options when department changes
 			success: function(data) {
 				$('#cf_dropdown').empty();
-				if (data.length < 2) {
+				if (data.length < 1) {
 					$("#cfNextBtn").attr('disabled', 'true');
 					$('#cf_dropdown_group').hide();
 					$('#cf_details').hide();
