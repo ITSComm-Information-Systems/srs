@@ -24,7 +24,7 @@ from .forms import UserSuForm, AddUserForm
 from .utils import su_login_callback, custom_login_action, upsert_user
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from oscauth.forms import *
-from oscauth.utils import upsert_user
+from oscauth.utils import upsert_user, get_mc_user
 from pages.models import Page
 #from oscauth.models import AuthUserDept, Grantor, Role
 
@@ -209,12 +209,15 @@ def get_uniqname(request, uniqname_parm=''):
             return  HttpResponse(template.render({'result': result, 'osc_user': osc_user, 'title':"Manage User Access"}, request))
         else:
             # Get User from MCommunity
-            conn = Connection('ldap.umich.edu', auto_bind=True)
-            conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname_parm + ')', attributes=["uid","mail","user","givenName","sn"])
+            #conn = Connection('ldap.umich.edu', auto_bind=True)
+            #conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname_parm + ')', attributes=["uid","mail","user","givenName","sn"])
             
+            mc_user = get_mc_user(uniqname_parm)
+
             # User exists in MCommunity
-            if conn.entries:
-                mc_user = conn.entries[0]
+            if mc_user:
+            #if conn.entries:
+                #mc_user = conn.entries[0]
                 result = uniqname_parm
 
                 try:
@@ -226,7 +229,7 @@ def get_uniqname(request, uniqname_parm=''):
                     osc_user.exists = True
 
                 osc_user.username = mc_user.uid
-                last_name = mc_user.sn
+                last_name = mc_user.umichDisplaySn 
                 first_name = mc_user.givenName
 
                 if(request.user.has_perm('oscauth.can_administer_access_all')):
