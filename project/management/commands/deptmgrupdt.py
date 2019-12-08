@@ -115,7 +115,8 @@ class Command(BaseCommand):
             au_username = User.objects.get(username=row.user).username
 
             try:
-                au_uniqname = PinnDeptMgr.objects.filter(dept_mgr_uniqname=au_username).values('dept_mgr_uniqname').distinct()
+                #change filter to get since the former always returns an object add dept to the criteria
+                au_uniqname = PinnDeptMgr.objects.get(dept_mgr_uniqname=au_username,deptid = row.dept).values('dept_mgr_uniqname').distinct()
             except PinnDeptMgr.DoesNotExist:
                 au_uniqname = None
 
