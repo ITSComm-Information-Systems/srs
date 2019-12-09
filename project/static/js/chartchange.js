@@ -68,10 +68,10 @@ $(document).ready(function() {
             { "targets": [3],
               "mRender": function (data, type, full, meta) {
               	 if (data == 'Y') {
-          			return '<i class="fa fa-check-circle" style="color:green;" aria-hidden="true"></i>';
+          			return '<i class="fa fa-check-circle" aria-hidden="true"></i>';
           		 }
           		 else {
-          		 	return '<i class="far fa-times-circle" style="color:red;"></i>';
+          		 	return '<i class="far fa-times-circle"></i>';
           		 }
               }
 
@@ -83,10 +83,10 @@ $(document).ready(function() {
               	type = type[0];
               	if (type == 'PH' | type == 'RA') {
               		if (data == 'Y') {
-              			return '<i class="fa fa-check-circle" style="color:green;" aria-hidden="true"></i>';
+              			return '<i class="fa fa-check-circle" aria-hidden="true"></i>';
               		}
               		else {
-              			return '<i class="far fa-times-circle" style="color:red;"></i>';
+              			return '<i class="far fa-times-circle"></i>';
               		}
               	}
               	else {
