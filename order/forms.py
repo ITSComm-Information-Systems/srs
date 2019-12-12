@@ -8,20 +8,27 @@ class TabForm(forms.Form):
 
     template = 'order/dynamic_form.html'
 
-    def get_summary(self):
-        #print(self.fields)
+    def get_summary(self, visible):
+
+        summary = []
 
         for key, value in self.cleaned_data.items():
             field = self.fields[key]
-            print(field.widget)
-            if field.type == 'Radio':
-                for choice in field.choices:
-                    if choice[0] == value:
-                        value = choice[1]
 
-            print(field.label, value)
+            if key in visible:  # Add visible fields to the review page
+                if hasattr(field, 'choices'):
+                    for choice in field.choices:
+                        if choice[0] == value:
+                            value = choice[1]
 
-        return 'json data for summary page'
+                print(field.label,'~', value)
+                summary.append({'label': field.label, 'value': value})
+
+        return summary
+
+    def is_valid(self):
+        valid = super(TabForm, self).is_valid()
+        return True
 
     def __init__(self, tab, *args, **kwargs):
         super(TabForm, self).__init__(*args, **kwargs)
@@ -55,9 +62,13 @@ class TabForm(forms.Form):
             #rtab.form = f
 
 class BillingForm(TabForm):
-    pass
+
+    def get_summary(self, postdata):
+        return 'override data'
+
 
 class FeaturesForm(TabForm):
+
     features = forms.ModelMultipleChoiceField(
         queryset=Feature.objects.all(), 
         widget=forms.CheckboxSelectMultiple(),
@@ -166,8 +177,7 @@ class NewLocationForm(TabForm):
 
     template = 'order/location.html'
 
-    def get_summary(self, postdata):
-        return 'override data'
+
 
 class EquipmentForm(TabForm):
     cat = ['Basic','VOIP']
