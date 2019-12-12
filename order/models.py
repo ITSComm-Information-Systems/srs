@@ -254,13 +254,35 @@ class Order(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
-    status = models.CharField(max_length=20)
+    #status = models.CharField(max_length=20)
     priority = models.CharField(max_length=20, default='Medium', choices=PRIORITY_CHOICES)
     due_date = models.DateTimeField(blank=True, null=True)
 
     @property
     def dept(self):
         return self.chartcom.dept
+
+    @property
+    def status(self):
+        srs_status = 'N/A'
+
+        if self.order_reference == 'TBD':
+            srs_status = 'Submitted'
+        else:
+            try:
+                pin = UmOscPreorderApiV.objects.get(add_info_text_3=str(self.id),pre_order_issue=1)
+                srs_status = pin.work_status_name
+                if(pin.work_status_name == "Received"):
+                    srs_status = "Submitted"
+                if pin.status_code == 2:
+                    if(pin.work_status_name == "Cancelled"):
+                        srs_status = "Cancelled"
+                    else:
+                        srs_status = "Completed"
+            except:
+                print('error')
+
+        return srs_status
 
     def add_contact(self):
 
