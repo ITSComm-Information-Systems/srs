@@ -1,5 +1,6 @@
 $(document).ready(function() {
 
+  item_id = 0;
   // Workflow stuff
   $('a[data-toggle="tab"]').on('shown.bs.tab', function(event) {
 
@@ -327,10 +328,8 @@ $(document).ready(function() {
     prodinput = false;
 
     inp = $("#step" + currStep + " :input:visible");
-     //if(currStep == 2){
-     // inp = $("#step" + currStep + " :input");
-     //}
-
+    //console.log(inp);
+ 
     valid = true;
 
 
@@ -464,6 +463,17 @@ $(document).ready(function() {
 function sendTabData() {
   data = $('#workflowForm').serializeArray();
   data.push({name: 'tab', value: currTab});
+  data.push({name: 'item_id', value: item_id});
+  data.push({name: 'sequence', value: currStep});
+  //console.log('update', item_id);
+  // List the fields that are visible.  TODO use the data from validate form
+  inp = $("#step" + currStep + " :input:visible");
+
+  visible = []
+  for (i = 0; i < inp.length; i++) {
+    visible.push(inp[i].name);
+  }
+  data.push({name: 'visible', value: visible});
 
   $.ajax({
       url : "/orders/ajax/send_tab_data/", 
@@ -471,14 +481,15 @@ function sendTabData() {
       data : data, 
 
       beforeSend: function(){
-        console.log('complete');
-        $('#nextBtn').addClass('disabled'); 
+        console.log('before');
+        //$('#nextBtn').addClass('disabled'); 
       },
 
       success : function(json) {
           console.log(json); // log the returned json to the console
           console.log("success"); // another sanity check
-          nextPrev(1);
+          item_id = json;
+          //nextPrev(1);
       },
 
       // handle a non-successful response

@@ -1,5 +1,6 @@
 from django.db import connection
 from django.core.management.base import BaseCommand, CommandError
+from django.core.management import call_command
 
 from oscauth.utils import upsert_user
 from django.contrib.auth.models import User
@@ -31,5 +32,7 @@ class Command(BaseCommand):
 
         with connection.cursor() as cursor:
             cursor.execute(sql)
+
+        call_command('deptmgrupdt')
         
         print('end')
