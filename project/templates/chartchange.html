@@ -9,7 +9,7 @@
   </h1>
 
   <p hidden id="dept_mgr">{{ dept_info.dept_mgr }}</p>
-
+  {% if deptids|length > 1 %}
   <form  id="choose_dept" method="POST">{% csrf_token %}
     <div class="row align-items-start mb-4" id="select_dept">
       <div class="input-group col-md-5">
@@ -29,8 +29,8 @@
         </select>
       </div>
     </div>
-
   </form> 
+  {% endif %}
 
   <form method="POST">
     <ul class="nav justify-content-center nav-pills" id="chartchange_nav" role="tablist">
