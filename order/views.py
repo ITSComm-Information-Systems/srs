@@ -47,7 +47,7 @@ def get_phone_location(request, phone_number):
 
 @permission_required('oscauth.can_order')
 def send_tab_data(request):
-
+    print(request.POST)
     tab = request.POST.get('tab')
     step = Step.objects.get(name=tab)
     sequence = request.POST.get('sequence')
@@ -86,11 +86,13 @@ def send_tab_data(request):
 
         i.data = data
         i.save()
-
+        return JsonResponse(i.id, safe=False)
     else:
-        print('not valid', f.errors)  #TODO Send invalid messages
+        errors = f.errors.as_data()
+        print(type(errors), errors)  #TODO Send invalid messages
+        return JsonResponse(f.errors.as_json(), safe=False)
 
-    return JsonResponse(i.id, safe=False)  #TODO Send review data
+    #return JsonResponse(i.id, safe=False)  #TODO Send review data
 
 
 @permission_required('oscauth.can_order')
@@ -524,13 +526,13 @@ class Review(PermissionRequiredMixin, View):
 class Services(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
     
-    def get(self, request):
+    def get(self, request, group_id):
 
         link_list = Page.objects.get(permalink='/links')
 
         template = loader.get_template('order/service.html')
-        action_list = Action.objects.all().order_by('service','display_seq_no')
-        service_list = Service.objects.all().order_by('display_seq_no')
+        action_list = Action.objects.filter(active=True).order_by('service','display_seq_no')
+        service_list = Service.objects.filter(group_id=group_id,active=True).order_by('display_seq_no')
 
         for service in service_list:
             service.actions = action_list.filter(service=service)

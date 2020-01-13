@@ -1,5 +1,14 @@
 $(document).ready(function() {
 
+  $('[data-toggle="popover"]').popover();
+
+  use_cart = $("#wfcart").val();
+  console.log("cart:", use_cart);
+  if (use_cart=="True") {
+    console.log('use the cart');
+  } else {
+    console.log('submit immediately');
+  }
   item_id = 0;
   // Workflow stuff
   $('a[data-toggle="tab"]').on('shown.bs.tab', function(event) {
@@ -9,8 +18,12 @@ $(document).ready(function() {
 
     currStep = $(this)[0].id.substring(10, 12) * 1;
     if (currStep == lastStep) {
+      if (use_cart=="True") {
         $('#nextBtn').html('Add to Cart');
         fillReviewForm();
+      } else {
+        $('#nextBtn').html('Submit Now');
+      }
     } else {
         $('#nextBtn').html('Next');
     }
@@ -222,8 +235,12 @@ $(document).ready(function() {
   });
 
   $("#nextBtn").click(function(event) {
-    //sendTabData();  // TODO Enable AJAX
-    nextPrev(1);
+    if (use_cart=="True") {  // TODO Enable AJAX
+      nextPrev(1);
+    } else {
+      nextPrev(1);
+      //sendTabData();
+    }
   });
 
   $("#prevBtn").click(function(event) {
@@ -460,6 +477,48 @@ $(document).ready(function() {
 })
 
 
+function showErrors(json) {
+
+  console.log(typeof json);
+
+
+
+  for(field in data) {
+    //var obj = data[i];
+
+    console.log(field);
+  }
+
+
+  console.log('process errors', json);
+  data = JSON.parse(json);
+  console.log('data', data)
+  for(field in data) {
+    //var obj = data[i];
+
+    errors = data[field];
+    for (i = 0; i < 1; i++) {
+      console.log(errors[i].message, field);
+    }
+
+    //if (data.length < 1) { // Validation
+    //  document.getElementById('volumeSize').setCustomValidity("Not authorized");
+    //  $("#volumeSize").addClass('was-validated');
+    //} else {
+    //  document.getElementById("id_phone_number").setCustomValidity("");
+    //  document.getElementById("id_phone_number").checkValidity();
+    //  $("#id_phone_number").removeClass('is-invalid');
+    //  $("#workflowForm").removeClass('was-validated');
+    //}
+
+    //console.log( data['storageID'][0].message )
+
+  }
+  $("#workflowForm").addClass('was-validated');
+
+}
+
+
 function sendTabData() {
   data = $('#workflowForm').serializeArray();
   data.push({name: 'tab', value: currTab});
@@ -490,6 +549,7 @@ function sendTabData() {
           console.log("success"); // another sanity check
           item_id = json;
           //nextPrev(1);
+          showErrors(json)
       },
 
       // handle a non-successful response

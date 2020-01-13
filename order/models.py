@@ -46,7 +46,11 @@ class Step(Configuration):
         ('BillingForm', 'Billing'),
         ('DynamicForm', 'Dynamic'),
         ('VoicemailForm', 'Voicemail'),
-
+        ('DetailsCIFSForm', 'CIFS Details'),
+        ('DetailsNFSForm', 'NFS Details'),
+        ('AccessCIFSForm', 'CIFS Access'),
+        ('AccessNFSForm', 'NFS Access'),
+        ('BillingStorageForm', 'Billing'),
     )
 
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
@@ -60,8 +64,11 @@ class Element(Configuration):
         ('NU', 'Number'),
         ('Chart', 'Chartcom'),
         ('Label', 'Label'),
+        ('Checkbox', 'Checkbox'),
     )
     label = models.TextField()
+    description = models.TextField(blank=True)
+    help_text = models.TextField(blank=True)
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
     attributes = models.CharField(blank=True, max_length=1000)
@@ -83,8 +90,13 @@ class Product(Configuration):
     picture = models.FileField(upload_to='pictures',blank=True, null=True)
 
 
+class ServiceGroup(Configuration):
+    active = models.BooleanField(default=True)
+
+
 class Service(Configuration):
     active = models.BooleanField(default=True)
+    group = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE)
 
 
 class FeatureCategory(models.Model):
@@ -146,6 +158,7 @@ class Action(Configuration):
         ('E', 'Equipment'),
     )
     cart_label = models.CharField(max_length=100, blank=True, null=True)
+    use_cart = models.BooleanField(default=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='A')
     description = models.TextField(blank=True, null=True)
