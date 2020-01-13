@@ -13,6 +13,7 @@ class TabForm(forms.Form):
         summary = []
 
         for key, value in self.cleaned_data.items():
+            print('klist', key)
             field = self.fields[key]
 
             if key in visible:  # Add visible fields to the review page
@@ -28,7 +29,7 @@ class TabForm(forms.Form):
 
     def is_valid(self):
         valid = super(TabForm, self).is_valid()
-        return True
+        return False
 
     def __init__(self, tab, *args, **kwargs):
         super(TabForm, self).__init__(*args, **kwargs)
@@ -39,21 +40,26 @@ class TabForm(forms.Form):
 
         for element in element_list:
             if element.type == 'Radio':
-                field = forms.ChoiceField(label=element.label
-                                        , choices=eval(element.attributes))
+                field = forms.ChoiceField(choices=eval(element.attributes))
             elif element.type == 'Chart':
-                field = forms.ChoiceField(label=element.label
+                field = forms.ChoiceField(label=element.label, help_text=element.description
                                         , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user.id))
                                                                         #AuthUserDept.get_order_departments(request.user.id)
                 field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
             elif element.type == 'NU':
-                field = forms.ChoiceField(label=element.label
-                                        , widget=forms.NumberInput(attrs={'min': "1"}))
+                field = forms.ChoiceField(widget=forms.NumberInput(attrs={'min': "1"}))
             elif element.type == 'ST':
-                field = forms.CharField(label=element.label)
+                field = forms.CharField()
+            elif element.type == 'Checkbox':
+                field = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=eval(element.attributes))
             else:
-                field = forms.IntegerField(label=element.label)
+                field = forms.IntegerField(label=element.label, help_text=element.description)
 
+            field.name = element.name
+            field.label = element.label
+            field.help_text = element.help_text
+            field.description = element.description
+            field.attributes = element.attributes
             field.display_seq_no = element.display_seq_no
             field.display_condition = element.display_condition
             field.type = element.type
@@ -124,6 +130,26 @@ class AddlInfoForm(TabForm):
     comments = forms.CharField(label='Comments', required=False, widget=forms.Textarea(attrs={'cols':'100', 'class':'form-control'}) )
     file = forms.FileField(label="Please attach any drawings, spreadsheets or floor plans with jack locations as needed", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
     template = 'order/dynamic_form.html'
+
+
+class DetailsCIFSForm(TabForm):
+    template = 'order/cifs_details.html'
+
+
+class AccessCIFSForm(TabForm):
+    template = 'order/cifs_access.html'
+
+
+class DetailsNFSForm(TabForm):
+    template = 'order/nfs_details.html'
+
+
+class AccessNFSForm(TabForm):
+    template = 'order/nfs_access.html'
+
+
+class BillingStorageForm(TabForm):
+    template = 'order/billing_storage.html'
 
 
 class VoicemailForm(TabForm):

@@ -113,8 +113,15 @@
 			<div class="collapse navbar-collapse navbars" aria-labelledby="main-nav" role="navigation">
 				<ul class="navbar-nav /nav-fill w-100">
 					{% if perms.oscauth.can_order %}
-					<li class="nav-item">
-						<a class="nav-link {% if page_name == 'Request Service' %}active{% endif %}" href="/orders/services/"><i class="fas fa-check-circle white"></i> Request Service</a>
+					<li class="nav-item dropdown">
+						<a class="nav-link {% if page_name == 'Request Service' %}active{% endif %}" <i class="fas fa-check-circle white"></i> Request Service</a>
+
+						<div class="dropdown-menu" aria-labelledby="reportsDropdown">
+							{% for group in service_groups %}
+								<a class="dropdown-item" href="/orders/services/{{group.id}}">{{group.label}}</a>
+							{% endfor %}
+						</div>
+
 					</li>
 					{% endif %}
 					{% if perms.oscauth.can_report %}

@@ -13,7 +13,7 @@ urlpatterns = [
     path('sendemail/', views.send_email),
     path('submit/', views.Submit.as_view()), 
     path('review/', views.Review.as_view()),
-    path('services/', Services.as_view()),
+    path('services/<int:group_id>', Services.as_view()),
     path('wf/<int:action_id>', Workflow.as_view()),
 
     path('detail/<int:order_id>', views.get_order_detail),

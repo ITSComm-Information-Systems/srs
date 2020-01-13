@@ -1,0 +1,91 @@
+{% with fields=tab.form.fields %}
+<h2>Storage Details</h2>
+<div class="row mb-4">
+    <div class="col-6">
+        <div class="col-12">
+            <div class="form-group">
+                <label for="dept">
+                    <strong>{{ fields.department.label }}</strong>
+                </label>
+                <select id="dept" class="form-control" name="department" required>
+                    <option>Dept 1</option>
+                </select>
+                <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                        aria-label="Icon signifying that user must enter a value"></i>Please enter a
+                    value.</div>
+                <div role="alert" class="valid-feedback">Good.</div>
+            </div>
+            <div class="form-group">
+                <label for="identifier">
+                    <strong>{{ fields.storageID.label }}</strong>
+                    {{ fields.storageID.help_text }}
+                </label>
+                <input id="identifier" class="form-control" type="text" placeholder="123456" name="storageID" required>
+                <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                        aria-label="Icon signifying that user must enter a value"></i>Please enter a
+                    value.</div>
+                <div role="alert" class="valid-feedback">Good.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="alert alert-secondary">
+            <strong>Your storage volume name:</strong>
+            paco
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-6">
+        <div class="col-12">
+            <div class="form-group">
+                <label for="volume">
+                    <strong>{{ fields.volumeSize.label }}</strong>
+                </label>
+                <small id="helptext" class="form-text text-muted">
+                    {{ fields.volumeSize.help_text }}
+                </small>
+                <select id="volume" name="volumeSize" aria-describedby="helptext" class="form-control" required>
+                    {% for choice in fields.volumeSize.choices %}
+                    <option>{{ choice|last }}</option>
+                    {% endfor %}
+                </select>
+                <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                        aria-label="Icon signifying that user must enter a value"></i>Please enter a
+                    value.</div>
+                <div role="alert" class="valid-feedback">Good.</div>
+            </div>
+            <fieldset>
+                <legend><strong>{{ fields.performanceLevel.label }}</strong> <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+                    data-trigger="focus" data-placement="bottom" 
+                    data-content="{{ fields.performanceLevel.help_text }}"><i class="far fa-question-circle"></i> <span class="sr-only">Learn about Performance Levels</span>
+                </a></legend>
+                {% for choice in fields.performanceLevel.choices %}
+                <div class="form-group form-check">
+                    <input class="form-check-input " type="radio" value="{{ choice|first }}" name="performanceLevel" id="perflevel_{{ choice|first }}" required>
+                    <label class="form-check-label " for="perflevel_{{ choice|first }}">{{ choice|last }}</label>
+                </div>
+                {% endfor %}
+            </fieldset>
+            <fieldset>
+                <legend><strong>{{ fields.addOns.label }}</strong> <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+                    data-trigger="popover" data-placement="bottom" 
+                    data-content="{{ fields.addOns.help_text }}"><i class="far fa-question-circle"></i> <span class="sr-only">Learn about add ons</span>
+                </a></legend>
+                {% for choice in fields.addOns.choices %}
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="checkbox" id="Replication" value="{{ choice|first }}"">
+                    <label class="form-check-label" for="Replication">{{ choice|last }}</label>
+                </div>
+                {% endfor %}
+            </fieldset>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="alert alert-secondary">
+            <strong>Your monthly charge:</strong>
+            $6.18
+        </div>
+    </div>
+</div>
+{% endwith %}

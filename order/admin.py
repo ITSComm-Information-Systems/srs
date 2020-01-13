@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.shortcuts import render
 
-from .models import Service, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -11,7 +11,7 @@ class ActionAdmin(admin.ModelAdmin):
     list_filter = ('service','type')
     list_display  = ['display_seq_no','label','service','type']
     ordering = ('display_seq_no',)
-    fields = ('name',('label','cart_label'), ('display_seq_no','active'),('service','type'), 'description', ('steps','charge_types'), ('route','destination'))
+    fields = ('name',('label','use_cart','cart_label'), ('display_seq_no','active'),('service','type'), 'description', ('steps','charge_types'), ('route','destination'))
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         step_list = Step.objects.all().filter(action = object_id).order_by('display_seq_no')
@@ -31,6 +31,11 @@ class ActionAdmin(admin.ModelAdmin):
 
 class ElementAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','type','target']
+    ordering = ('display_seq_no',)
+
+
+class ServiceGroupAdmin(admin.ModelAdmin):
+    list_display  = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
 
 
@@ -74,6 +79,7 @@ admin.site.register(Constant)
 admin.site.register(ProductCategory, ProductCategoryAdmin)
 admin.site.register(Element, ElementAdmin)
 admin.site.register(Service, ServiceAdmin)
+admin.site.register(ServiceGroup, ServiceGroupAdmin)
 admin.site.register(Action, ActionAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Step, StepAdmin)
