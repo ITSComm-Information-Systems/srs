@@ -115,7 +115,10 @@ def generate_report(request):
                     'qty': int(a.quantity),
                     'total_charges': a.charge_amount,
                     'project_name': a.unique_identifier,
-                    'date': a.invoice_date
+                    'date': a.invoice_date,
+                    'shortcode': a.shortcode,
+                    'voucher_comment': a.voucher_comment,
+                    'quantity_vouchered': quantity_vouchered
                 }
                 # Add N/A
                 if  not user_id['project_name']:
