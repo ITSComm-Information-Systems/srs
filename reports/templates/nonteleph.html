@@ -70,7 +70,7 @@
 							<tbody>
 								{% for v in value.rows %}
 								<tr>
-									{% if key == 'MiStroage' %}
+									{% if key == 'MiStorage' %}
 										<td class='first-col'>{{ v.user_defined_id }}</td>
 										<td>{{ v.voucher_comment }}</td>
 										<td>{{ v.quantity_vouchered }}</td>
@@ -115,6 +115,10 @@
 									<td class='first-col'><strong>Total</strong></td>
 									<td></td>
 									{% if key == 'Container Services' %}
+									<td></td>
+									{% endif %}
+									{% if key == 'MiStorage' %}
+									<td></td>
 									<td></td>
 									{% endif %}
 									<td></td>
