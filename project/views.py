@@ -51,6 +51,19 @@ def homepage(request):
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def chartchange(request):
+	# Check for currently-running bill cycle
+	curr = connections['pinnacle'].cursor()
+	running = curr.callfunc('UM_OSC_UTIL_K.UM_IS_BILL_RUNNING_F', str)
+	curr.close()
+
+	if running == 'Y':
+		template = loader.get_template('billingcycle.html')
+		context = {
+			'title': 'Chartfield Change Request',
+		}
+		return HttpResponse(template.render(context, request))
+
+	# Not currently billing
 	template = loader.get_template('chartchange.html')
 
 	# Find initial department
@@ -149,16 +162,6 @@ def change_dept(request):
 def get_cf_data(request):
 	selected_cf = request.GET.get('selected', None)
 	cf_data = list(UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values())
-
-	# # Find chartfield nickname
-	# nickname = ''
-	# nicknames = Chartcom.objects.all()
-	# for n in nicknames:
-	# 	if n.account_number == selected_cf:
-	# 		nickname = n.name
-
-	# nn = {'nickname': nickname }
-	# cf_data.append(nn)
 
 	if not cf_data:
 		cf_data = {'fund': 'wtf'}
