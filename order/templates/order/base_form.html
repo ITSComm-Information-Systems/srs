@@ -1,0 +1,7 @@
+<div class="col-6">
+{% for field in tab.form %}
+{% with field=field.field %}
+{% include field.template_name %}
+{% endwith %}
+{% endfor %}
+</div>

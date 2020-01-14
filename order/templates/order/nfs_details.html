@@ -1,70 +1,12 @@
-{% with fields=tab.form.fields %}
-<h2>Storage Details</h2>
+<h2>{{ tab.label }}</h2>
 <div class="row mb-4">
     <div class="col-6">
         <div class="col-12">
-            <div class="form-group">
-                <label for="name">
-                    <strong>{{ fields.storageID.label }}</strong>
-                </label>
-                <small class="text-muted form-text" id="namingConventionText">{{ fields.storageID.description }}</small>
-                <input type="text" id="storageID" class="form-control" name="storageID" required>
-                <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
-                        aria-label="Icon signifying that user must enter a value"></i>Please enter a
-                    value.</div>
-                <div role="alert" class="valid-feedback">Good.</div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row mt-4">
-    <div class="col-6">
-        <div class="col-12">
-            <div class="form-group">
-                <label for="volume">
-                    <strong>{{ fields.volumeSize.label }}</strong>
-                </label>
-                <small id="helptext" class="form-text text-muted">{{ fields.volumeSize.description }}</small>
-                <select id="volumeSize" aria-describedby="helptext" class="form-control" name="volumeSize" required>
-                    <option>1</option>
-                </select>
-                <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
-                        aria-label="Icon signifying that user must enter a value"></i>Please enter a
-                    value.</div>
-                <div role="alert" class="valid-feedback">Good.</div>
-            </div>
-            <fieldset>
-                <legend><strong>{{ fields.performanceLevel.label }}</strong> <a tabindex="0" role="button" data-toggle="popover" data-container="body"
-                    data-trigger="focus" data-placement="bottom" 
-                    data-content="{{ fields.performanceLevel.help_text }}"><i class="far fa-question-circle"></i> <span class="sr-only">Learn about Performance Levels</span>
-                </a></legend>
-                {% for choice in fields.performanceLevel.choices %}
-                <div class="form-group form-check">
-                    <input class="form-check-input " type="radio" value="{{ choice|first }}" name="performanceLevel" id="perflevel_{{ choice|first }}" required>
-                    <label class="form-check-label " for="perflevel_{{ choice|first }}">{{ choice|last }}</label>
-                </div>
-                {% endfor %}
-            </fieldset>
-            <fieldset>
-                <legend><strong>{{ fields.addOns.label }}</strong> <a tabindex="0" role="button" data-toggle="popover" data-container="body"
-                    data-trigger="popover" data-placement="bottom" 
-                    data-content="{{ fields.addOns.help_text }}"><i class="far fa-question-circle"></i> <span class="sr-only">Learn about add ons</span>
-                </a></legend>
-                {% for choice in fields.addOns.choices %}
-                <div class="form-group form-check">
-                    <input class="form-check-input" type="checkbox" id="addOns_{{ choice|first }}" name="addOns" value="{{ choice|first }}">
-                    <label class="form-check-label" for="addOns_{{ choice|first }}">{{ choice|last }}</label>
-                </div>
-                {% endfor %}
-            </fieldset>
-            <fieldset>
-                <legend><strong>{{ fields.flux.label }}</strong></legend>
-                <div class="form-group form-check">
-                    <input class="form-check-input" type="checkbox" id="flux" name="flux" value="flux">
-                    <label class="form-check-label" for="flux">Make this storage available to the Flux
-                        cluster</label>
-                </div>
-            </fieldset>
+            {% for field in tab.form %}
+            {% with field=field.field %}
+            {% include field.template_name %}
+            {% endwith %}
+            {% endfor %}
         </div>
     </div>
     <div class="col-3">
@@ -74,4 +16,4 @@
         </div>
     </div>
 </div>
-{% endwith %}
+

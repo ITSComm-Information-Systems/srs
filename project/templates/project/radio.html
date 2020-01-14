@@ -1,0 +1,19 @@
+<fieldset>
+    <legend><strong>{{ field.label }}</strong> 
+    {% if field.help_text %}
+        <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+        data-trigger="focus" data-placement="bottom" 
+        data-content="{{ field.help_text }}"><i class="far fa-question-circle"></i> <span class="sr-only">{{ field.help_text }}</span>
+        </a>
+    {% endif %}
+    </legend>
+    {% if field.description %}
+        <small class="text-muted form-text" id="{{ field.name }}_desc">{{ field.description }}</small>
+    {% endif %}
+    {% for choice in field.choices %}
+    <div class="form-group form-check">
+        <input class="form-check-input " type="radio" value="{{ choice|first }}" name="{{ field.name }}" id="{{ field.name }}_{{ choice|first }}" required>
+        <label class="form-check-label " for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
+    </div>
+    {% endfor %}
+</fieldset>
