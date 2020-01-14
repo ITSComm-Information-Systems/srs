@@ -3,12 +3,7 @@ $(document).ready(function() {
   $('[data-toggle="popover"]').popover();
 
   use_cart = $("#wfcart").val();
-  console.log("cart:", use_cart);
-  if (use_cart=="True") {
-    console.log('use the cart');
-  } else {
-    console.log('submit immediately');
-  }
+
   item_id = 0;
   // Workflow stuff
   $('a[data-toggle="tab"]').on('shown.bs.tab', function(event) {
@@ -235,12 +230,16 @@ $(document).ready(function() {
   });
 
   $("#nextBtn").click(function(event) {
+
     if (use_cart=="True") {  // TODO Enable AJAX
+      if (n == 1 && !validateForm()) return false;
       nextPrev(1);
     } else {
-      nextPrev(1);
-      //sendTabData();
+      sendTabData();
     }
+
+
+
   });
 
   $("#prevBtn").click(function(event) {
@@ -412,7 +411,9 @@ $(document).ready(function() {
 
   function nextPrev(n) {
 
-    if (n == 1 && !validateForm()) return false;
+
+
+    //if (n == 1 && !validateForm()) return false;
   
     currStep = currStep + n;
   
@@ -457,8 +458,6 @@ $(document).ready(function() {
     $("#subscriberId").show();
     count = $("[id^=authdiv]").length;
 
-    console.log(max + '-' + count);
-
     $("#subscriberId").removeAttr('data-sequence');
     $("#subscriberId").removeAttr('data-condition');
     var rec = $("#subscriberId").clone();
@@ -479,16 +478,6 @@ $(document).ready(function() {
 
 function showErrors(json) {
 
-  console.log(typeof json);
-
-
-
-  for(field in data) {
-    //var obj = data[i];
-
-    console.log(field);
-  }
-
 
   console.log('process errors', json);
   data = JSON.parse(json);
@@ -499,8 +488,14 @@ function showErrors(json) {
     errors = data[field];
     for (i = 0; i < 1; i++) {
       console.log(errors[i].message, field);
+      //field.className += " invalid";
     }
 
+    //if (inp[i].checkValidity()) {
+    //  $(inp[i]).attr("aria-invalid", "false");
+    //} else {
+    //  $(inp[i]).attr("aria-invalid", "true");
+    //  inp[i].className += " invalid";
     //if (data.length < 1) { // Validation
     //  document.getElementById('volumeSize').setCustomValidity("Not authorized");
     //  $("#volumeSize").addClass('was-validated');
@@ -545,11 +540,19 @@ function sendTabData() {
       },
 
       success : function(json) {
-          console.log(json); // log the returned json to the console
+          console.log('json', json); // log the returned json to the console
           console.log("success"); // another sanity check
-          item_id = json;
+
+          if (Number.isInteger(json)) {
+            item_id = json;
+            $("#workflowForm").removeClass('was-validated');
+            nextPrev(1);
+          } else {
+            //$("#workflowForm").addClass('was-validated');
+            showErrors(json)
+          }
           //nextPrev(1);
-          showErrors(json)
+          //showErrors(json)
       },
 
       // handle a non-successful response

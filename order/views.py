@@ -78,7 +78,8 @@ def send_tab_data(request):
             i = Item.objects.get(id=item_id)
             review_summary = i.data['reviewSummary']
             tabnum = int(sequence) - 1
-            if len(review_summary) < tabnum:
+            print('uh', tabnum, sequence)
+            if len(review_summary) < int(sequence):
                 review_summary.append(tab)
             else:
                 review_summary[tabnum] = tab
@@ -86,6 +87,7 @@ def send_tab_data(request):
 
         i.data = data
         i.save()
+        note = render_to_string('order/pinnacle_note.html', {'text': 'a', 'description': 'b'})
         return JsonResponse(i.id, safe=False)
     else:
         errors = f.errors.as_data()

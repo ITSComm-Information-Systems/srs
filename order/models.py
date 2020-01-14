@@ -29,6 +29,7 @@ class Configuration(models.Model):   #Common fields for configuration models
 class Step(Configuration):
     FORM_CHOICES = (
         ('', ''),
+        ('TabForm', 'Base Form'),
         ('PhoneLocationForm', 'Phone Location'),
         ('EquipmentForm', 'Equipment'),
         ('NewLocationForm', 'New Location'),
@@ -44,7 +45,6 @@ class Step(Configuration):
         ('ProductForm', 'Quantity Model'),
         ('ContactCenterForm', 'Contact Center'),
         ('BillingForm', 'Billing'),
-        ('DynamicForm', 'Dynamic'),
         ('VoicemailForm', 'Voicemail'),
         ('DetailsCIFSForm', 'CIFS Details'),
         ('DetailsNFSForm', 'NFS Details'),
