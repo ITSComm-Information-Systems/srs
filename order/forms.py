@@ -29,7 +29,7 @@ class TabForm(forms.Form):
 
     def is_valid(self):
         valid = super(TabForm, self).is_valid()
-        return False
+        return valid
 
     def __init__(self, tab, *args, **kwargs):
         super(TabForm, self).__init__(*args, **kwargs)
