@@ -6,7 +6,7 @@ from project.pinnmodels import UmOSCBuildingV
 
 class TabForm(forms.Form):
 
-    template = 'order/dynamic_form.html'
+    template = 'order/base_form.html'
 
     def get_summary(self, visible):
 
@@ -41,6 +41,7 @@ class TabForm(forms.Form):
         for element in element_list:
             if element.type == 'Radio':
                 field = forms.ChoiceField(choices=eval(element.attributes))
+                field.template_name = 'project/radio.html'
             elif element.type == 'Chart':
                 field = forms.ChoiceField(label=element.label, help_text=element.description
                                         , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user.id))
@@ -48,10 +49,13 @@ class TabForm(forms.Form):
                 field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
             elif element.type == 'NU':
                 field = forms.ChoiceField(widget=forms.NumberInput(attrs={'min': "1"}))
+                field.template_name = 'project/number.html'
             elif element.type == 'ST':
                 field = forms.CharField()
+                field.template_name = 'project/text.html'
             elif element.type == 'Checkbox':
                 field = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=eval(element.attributes))
+                field.template_name = 'project/checkbox.html'
             else:
                 field = forms.IntegerField(label=element.label, help_text=element.description)
 
