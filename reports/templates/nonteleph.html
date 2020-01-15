@@ -72,7 +72,7 @@
 								{% for v in value.rows %}
 								<tr>
 									{% if key == 'MiStorage' %}
-										<td class='first-col'>{{ v.user_defined_id }}</td>
+										<td class='first-col'>{{ v.unique_id }}</td>
 										<td>{{ v.voucher_comment }}</td>
 										<td>{{ v.quantity_vouchered }}</td>
 										<td>{{ v.descr|options }}</td>
