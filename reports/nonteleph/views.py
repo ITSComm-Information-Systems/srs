@@ -121,7 +121,7 @@ def generate_report(request):
                     'quantity_vouchered': a.quantity_vouchered
                 }
                 # Add N/A
-                if  not user_id['project_name']:
+                if not user_id['project_name']:
                     user_id['project_name'] = 'N/A'
                 # Determine charge vs credit
                 if a.unit_price < 0:
@@ -150,7 +150,7 @@ def generate_report(request):
                         r['total_charges'] += a.charge_amount
                         breakout = True
                     # Non-container Services
-                    elif prefix != 'Container Services' and r['user_defined_id'] == a.user_defined_id and unit_price == '{:,.2f}'.format(a.unit_price):
+                    elif prefix != 'Container Services' and prefix != 'MiStorage' and r['user_defined_id'] == a.user_defined_id and unit_price == '{:,.2f}'.format(a.unit_price):
                         r['qty'] += int(a.quantity)
                         r['total_charges'] += a.charge_amount
                         breakout = True
