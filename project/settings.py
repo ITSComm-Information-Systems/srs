@@ -114,7 +114,8 @@ TEMPLATES = {
             'libraries':{
                 'index': 'reports.inventory.templatetags.index',
                 'tags': 'reports.soc.templatetags.tags',
-                'ccr_tags': 'project.templatetags.ccr_tags'
+                'ccr_tags': 'project.templatetags.ccr_tags',
+                'descr': 'reports.nonteleph.templatetags.descr'
             }
         },
 },
