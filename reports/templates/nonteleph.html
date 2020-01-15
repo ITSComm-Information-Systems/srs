@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load descr %}
 {% block content %}
 	<h1>{{title}}</h1>
 	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
@@ -74,10 +75,10 @@
 										<td class='first-col'>{{ v.user_defined_id }}</td>
 										<td>{{ v.voucher_comment }}</td>
 										<td>{{ v.quantity_vouchered }}</td>
-										<td>{{ v.descr }}</td>
+										<td>{{ v.descr|options }}</td>
 										<td>{{ v.date }}</td>
 										<td>{{ v.shortcode }}</td>
-										<td>{{ v.descr }}</td>
+										<td>{{ v.descr|protocol }}</td>
 										<td class='total-col'>{{ v.total_charges }}</td>
 
 									{% else %}
