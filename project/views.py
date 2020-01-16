@@ -115,8 +115,7 @@ def chartchange(request):
 		new_dept = user_depts[0].dept
 	else:
 		new_dept = ''
-	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user.id, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
-
+	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
 	# Get notice
 	notice = Page.objects.get(permalink='/ccr')
 
@@ -149,7 +148,7 @@ def change_dept(request):
 
 	# Get list of chartcoms in user's shortlist for user to select new
 	if when == 'assign_new':
-		cf_options = list(Chartcom.get_user_chartcoms_for_dept(request.user.id, selected_dept).values()) 
+		cf_options = Chartcom.get_user_chartcoms_for_dept(request.user, selected_dept)
 	# Get list of chartcoms in use
 	else:
 		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
