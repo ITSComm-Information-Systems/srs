@@ -208,7 +208,20 @@ class Chartcom(models.Model):
         return user_chartcom_depts
 
     def get_user_chartcoms_for_dept(self, dept):
-        chartcom_list = UserChartcomV.objects.filter(user=self, dept=dept).order_by('name')
+
+        if self.has_perm('can_order_all'):
+            chartcom_list = Chartcom.objects.filter(dept=dept)
+            cc_list = []
+            for cc in chartcom_list:
+                item = vars(cc)
+                item['account_number'] = cc.account_number
+                delattr(cc, '_state')
+                cc_list.append(item)
+                
+            chartcom_list = cc_list
+            
+        else:
+            chartcom_list = list(UserChartcomV.objects.filter(user=self, dept=dept).order_by('name').values())
 
         return chartcom_list
 
