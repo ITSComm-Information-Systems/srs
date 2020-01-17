@@ -6,8 +6,14 @@ $(document).ready(function() {
     $("#bill_period").prop("selectedIndex", 0);
 
     $('#filterapply').on('click', function(e) {
-        alert('test');
-        e.preventDefault();
+    	e.preventDefault();
+    	test1 = $('#location').val();
+    	test2 = $('#type').val();
+    	test3 = $('#cf').val();
+
+    	var filters = [test1, test2, test3];
+
+    	filter(filters);
     });
 })
 
@@ -82,4 +88,44 @@ function downloadCSV(csv, filename) {
 
     // Click download link
     downloadLink.click();
+}
+
+function filter(filters) {
+	// let location = false, type = false, cf = false;
+
+	// Determine filter types
+	// for (var i = 0; i < filters.length; ++i) {
+	// 	let filter = filters[i];
+	// 	if (filter != '') {
+	// 		// Location filter
+	// 		if (i == 0) {
+	// 			location = filter
+	// 		}
+	// 		// Type filter
+	// 		else if (i == 1) {
+	// 			type = filter
+	// 		}
+	// 		// Chartfield filter
+	// 		else {
+	// 			cf = filter
+	// 		}
+	// 	}
+	// }
+
+	let location = filters[0], type = filters[1], cf = filters[2];
+
+	$('#invLocTable tr').each(function() {
+		if (location) {
+			alert($(this).find('.location').html());
+		}
+
+		if ($(this).find('.type').html() == type) {
+			$(this).remove();
+		}
+
+		if ($(this).find('.cf').html() == cf) {
+			$(this).remove();
+		}
+
+    })
 }
