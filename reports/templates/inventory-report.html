@@ -224,7 +224,7 @@
                 <td style="vertical-align:middle">{{phone.0.usage}}</td>
                 <td style="vertical-align:middle" class='type'>{{phone.0.cd_descr}}</td>
                 <td style="vertical-align:middle">{{phone.0.first_name}} {{phone.0.last_name}}</td>
-                <td>{% for charge in phone %}
+                <td class='location'>{% for charge in phone %}
                         {% if charge.jack%}
                             Location: {{charge.building}}<br> 
                             Floor: {{charge.floor}}

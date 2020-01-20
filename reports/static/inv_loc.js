@@ -95,12 +95,14 @@ function filter(filters) {
 
 	$('#invLocTable tr.datarow').each(function() {
 		current_loc = $(this).find('.location').html();
-		if (location) {
-			alert($(this).find('.location').html());
+		current_loc = current_loc.split('<br>')[0]
+		current_loc = current_loc.split('Location: ')[1]
+		if (location && current_loc != location) {
+			$(this).hide();
 		}
 
-		if ($(this).find('.type').html() != type) {
-			$(this).hide(); // consider changing to hide so you can show when filters are removed
+		if (type && $(this).find('.type').html() != type) {
+			$(this).hide();
 		}
 
 		if ($(this).find('.cf').html() == cf) {
