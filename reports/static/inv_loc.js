@@ -93,10 +93,10 @@ function downloadCSV(csv, filename) {
 function filter(filters) {
 	let location = filters[0], type = filters[1], cf = filters[2];
 
-	$('#invLocTable tr.datarow').each(function() {
+	$('.invLocTable tr.datarow').each(function() {
 		current_loc = $(this).find('.location').html();
-		current_loc = current_loc.split('<br>')[0]
-		current_loc = current_loc.split('Location: ')[1]
+		current_loc = current_loc.split('<br>')[0];
+		current_loc = current_loc.split('Location: ')[1];
 		if (location && current_loc != location) {
 			$(this).hide();
 		}
@@ -104,10 +104,14 @@ function filter(filters) {
 		if (type && $(this).find('.type').html() != type) {
 			$(this).hide();
 		}
-
-		if ($(this).find('.cf').html() == cf) {
-			$(this).remove();
-		}
-
     })
+
+    if (cf) {
+    	$('.chartfield-title').each(function() {
+    		current_cf = $(this).html().split('Chartfield: ')[1];
+    		id = '#invLocTable'.concat(current_cf);
+    		alert(id);
+	    	$(id).hide();
+	    })
+    }
 }
