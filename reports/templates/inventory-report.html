@@ -195,10 +195,10 @@
 
 {% for classification in formated_data %}
 <div class="table-responsive">
-    <h3 class="text-dark font-weight-bold">
+    <h3 class="text-dark font-weight-bold chartfield-title">
         Chartfield: {{classification.0.0.chartfield}}
     </h3>
-    <table class="table table-sm mb-5 table-striped" id="invLocTable">
+    <table class="table table-sm mb-5 table-striped invLocTable" id="invLocTable">
         <thead class="thead-dark">
             <tr data-name="{{ classification.0.0.chartfield }}">
                 <th class="user_id_report_col">User ID</th>
