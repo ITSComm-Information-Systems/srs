@@ -11,7 +11,7 @@
         
         <!--Show this div if user has an access role-->
         {% if user.is_authenticated %}
-            {% if perms.oscauth.can_order or perms.oscauth_can_report %}
+            {% if perms.oscauth.can_order or perms.oscauth.can_report %}
             <div class="alert alert-success" id="osc-users-msg">
                 <h2 class="lead"><strong>New to the SRS?</strong></h2>
                 <p>Refer to <a href="https://documentation.its.umich.edu/node/1206" target="new" class="alert-link">Using the Service Request System.</a> </p>
