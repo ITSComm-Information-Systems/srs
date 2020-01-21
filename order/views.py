@@ -452,7 +452,7 @@ class Cart(PermissionRequiredMixin, View):
             dept.name = deptinfo.dept_name
 
             if deptid == int(dept.dept):
-                department = {'id': dept.dept, 'name': deptinfo.dept_name}
+                first = {'id': dept.dept, 'name': deptinfo.dept_name}
             if hasset == False:
                 item_list = Item.objects.filter(deptid=dept.dept).exclude(order_id__gt=0).order_by('chartcom','-create_date')
                 chartcoms = item_list.distinct('chartcom')
@@ -460,6 +460,9 @@ class Cart(PermissionRequiredMixin, View):
                     hasset = True
                     first = {'id': dept.dept, 'name':dept.name}
                     deptid = dept.dept
+        if deptid == 0 and first =={}:
+            first_dept = UmOscDeptProfileV.objects.get(deptid=dept_list[0].dept)
+            first = {'id':first_dept.deptid, 'name': first_dept.dept_name}
 
 
         status = ['Ready to Order','Saved for Later']
