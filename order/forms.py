@@ -40,7 +40,7 @@ class TabForm(forms.Form):
 
         for element in element_list:
             if element.type == 'Radio':
-                field = forms.ChoiceField(choices=eval(element.attributes))
+                field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.RadioSelect(attrs={'class': 'form-control'}))
                 field.template_name = 'project/radio.html'
             elif element.type == 'Chart':
                 field = forms.ChoiceField(label=element.label, help_text=element.description
@@ -51,7 +51,7 @@ class TabForm(forms.Form):
                 field = forms.ChoiceField(widget=forms.NumberInput(attrs={'min': "1"}))
                 field.template_name = 'project/number.html'
             elif element.type == 'ST':
-                field = forms.CharField()
+                field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
                 field.template_name = 'project/text.html'
             elif element.type == 'Checkbox':
                 field = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=eval(element.attributes))

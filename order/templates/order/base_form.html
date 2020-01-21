@@ -1,7 +1,6 @@
+base form
 <div class="col-6">
 {% for field in tab.form %}
-{% with field=field.field %}
-{% include field.template_name %}
-{% endwith %}
+{% include field.field.template_name %}
 {% endfor %}
 </div>
