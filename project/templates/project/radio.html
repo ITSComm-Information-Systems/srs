@@ -10,10 +10,5 @@
     {% if field.description %}
         <small class="text-muted form-text" id="{{ field.name }}_desc">{{ field.description }}</small>
     {% endif %}
-    {% for choice in field.choices %}
-    <div class="form-group form-check">
-        <input class="form-check-input " type="radio" value="{{ choice|first }}" name="{{ field.name }}" id="{{ field.name }}_{{ choice|first }}" required>
-        <label class="form-check-label " for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
-    </div>
-    {% endfor %}
+    {{ field }}
 </fieldset>

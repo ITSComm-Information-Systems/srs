@@ -47,15 +47,12 @@ def get_phone_location(request, phone_number):
 
 @permission_required('oscauth.can_order')
 def send_tab_data(request):
-    print(request.POST)
+
     tab = request.POST.get('tab')
     step = Step.objects.get(name=tab)
     sequence = request.POST.get('sequence')
     visible = request.POST.get('visible')
     item_id = request.POST.get('item_id')
-
-    print(item_id, tab, visible, sequence)
-
     try:
         f = globals()[step.custom_form](step, request.POST)
     except: 
@@ -78,7 +75,6 @@ def send_tab_data(request):
             i = Item.objects.get(id=item_id)
             review_summary = i.data['reviewSummary']
             tabnum = int(sequence) - 1
-            print('uh', tabnum, sequence)
             if len(review_summary) < int(sequence):
                 review_summary.append(tab)
             else:
@@ -87,14 +83,14 @@ def send_tab_data(request):
 
         i.data = data
         i.save()
-        note = render_to_string('order/pinnacle_note.html', {'text': 'a', 'description': 'b'})
+
         return JsonResponse(i.id, safe=False)
     else:
-        errors = f.errors.as_data()
-        print(type(errors), errors)  #TODO Send invalid messages
-        return JsonResponse(f.errors.as_json(), safe=False)
+        tab = {'form': f}
+        tabhtml = loader.render_to_string(f.template, {'tab': tab})
+        print('errors', f.errors)
+        return JsonResponse({'x': tabhtml}, safe=False)
 
-    #return JsonResponse(i.id, safe=False)  #TODO Send review data
 
 
 @permission_required('oscauth.can_order')

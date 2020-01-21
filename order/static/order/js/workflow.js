@@ -232,7 +232,7 @@ $(document).ready(function() {
   $("#nextBtn").click(function(event) {
 
     if (use_cart=="True") {  // TODO Enable AJAX
-      if (n == 1 && !validateForm()) return false;
+      //if (n == 1 && !validateForm()) return false;
       nextPrev(1);
     } else {
       sendTabData();
@@ -413,7 +413,7 @@ $(document).ready(function() {
 
 
 
-    //if (n == 1 && !validateForm()) return false;
+    if (n == 1 && !validateForm()) return false;
   
     currStep = currStep + n;
   
@@ -476,43 +476,6 @@ $(document).ready(function() {
 })
 
 
-function showErrors(json) {
-
-
-  console.log('process errors', json);
-  data = JSON.parse(json);
-  console.log('data', data)
-  for(field in data) {
-    //var obj = data[i];
-
-    errors = data[field];
-    for (i = 0; i < 1; i++) {
-      console.log(errors[i].message, field);
-      //field.className += " invalid";
-    }
-
-    //if (inp[i].checkValidity()) {
-    //  $(inp[i]).attr("aria-invalid", "false");
-    //} else {
-    //  $(inp[i]).attr("aria-invalid", "true");
-    //  inp[i].className += " invalid";
-    //if (data.length < 1) { // Validation
-    //  document.getElementById('volumeSize').setCustomValidity("Not authorized");
-    //  $("#volumeSize").addClass('was-validated');
-    //} else {
-    //  document.getElementById("id_phone_number").setCustomValidity("");
-    //  document.getElementById("id_phone_number").checkValidity();
-    //  $("#id_phone_number").removeClass('is-invalid');
-    //  $("#workflowForm").removeClass('was-validated');
-    //}
-
-    //console.log( data['storageID'][0].message )
-
-  }
-  $("#workflowForm").addClass('was-validated');
-
-}
-
 
 function sendTabData() {
   data = $('#workflowForm').serializeArray();
@@ -543,13 +506,15 @@ function sendTabData() {
           console.log('json', json); // log the returned json to the console
           console.log("success"); // another sanity check
 
+          $('#step' + currStep).html(json['x']);
+
           if (Number.isInteger(json)) {
             item_id = json;
             $("#workflowForm").removeClass('was-validated');
             nextPrev(1);
           } else {
-            //$("#workflowForm").addClass('was-validated');
-            showErrors(json)
+            $("#workflowForm").addClass('was-validated');
+            //showErrors(json)
           }
           //nextPrev(1);
           //showErrors(json)
