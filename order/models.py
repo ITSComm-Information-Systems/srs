@@ -51,6 +51,7 @@ class Step(Configuration):
         ('AccessCIFSForm', 'CIFS Access'),
         ('AccessNFSForm', 'NFS Access'),
         ('BillingStorageForm', 'Billing'),
+        ('VolumeSelectionForm', 'Volume Selection'),
     )
 
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
@@ -65,6 +66,7 @@ class Element(Configuration):
         ('Chart', 'Chartcom'),
         ('Label', 'Label'),
         ('Checkbox', 'Checkbox'),
+        ('McGroup', 'MCommunity Group'),
     )
     label = models.TextField()
     description = models.TextField(blank=True)
@@ -254,6 +256,26 @@ class LogItem(models.Model):
         self.description = descr
         self.save()
     
+
+class StorageInstance(models.Model):
+    TYPE_CHOICES = (
+        ('SILVER', 'Silver'),
+        ('GOLD', 'Gold'),
+    )
+
+    name = models.CharField(max_length=100)
+    owner = models.CharField(max_length=100)
+    chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
+    size = models.PositiveIntegerField()
+    type = models.CharField(max_length=20, default='Silver', choices=TYPE_CHOICES)
+    assign_date = models.DateTimeField('Assign Date', auto_now_add=True)
+    charge_identifier = models.CharField(max_length=100)
+
+    def get_user_volumes(self, user_id):
+        volume_list = UserChartcomV.objects.filter(user=self, dept=dept).order_by('name')
+
+        return volume_list
+
 
 class Order(models.Model):
     PRIORITY_CHOICES = (

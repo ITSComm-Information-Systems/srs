@@ -1,8 +1,16 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element
+from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
+
+
+class McGroup(forms.CharField):
+    widget = forms.EmailInput
+    #default_validators = [validators.validate_email]
+
+    def __init__(self, **kwargs):
+        super().__init__(strip=True, **kwargs)
 
 class TabForm(forms.Form):
 
@@ -39,6 +47,7 @@ class TabForm(forms.Form):
         element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
 
         for element in element_list:
+
             if element.type == 'Radio':
                 field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.RadioSelect(attrs={'class': 'form-control'}))
                 field.template_name = 'project/radio.html'
@@ -57,9 +66,13 @@ class TabForm(forms.Form):
                 field = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=eval(element.attributes))
                 field.template_name = 'project/checkbox.html'
             else:
-                field = forms.IntegerField(label=element.label, help_text=element.description)
+                field = globals()[element.type]
+                field.field_name = element.name
+                field.template_name = 'project/text.html'
+                #field = forms.IntegerField(label=element.label, help_text=element.description)
 
-            field.name = element.name
+            #field.name = element.name
+            #print(field.name)
             field.label = element.label
             field.help_text = element.help_text
             field.description = element.description
@@ -67,6 +80,7 @@ class TabForm(forms.Form):
             field.display_seq_no = element.display_seq_no
             field.display_condition = element.display_condition
             field.type = element.type
+
             self.fields.update({element.name: field})
 
             #rtab.form = f
@@ -134,6 +148,12 @@ class AddlInfoForm(TabForm):
     comments = forms.CharField(label='Comments', required=False, widget=forms.Textarea(attrs={'cols':'100', 'class':'form-control'}) )
     file = forms.FileField(label="Please attach any drawings, spreadsheets or floor plans with jack locations as needed", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
     template = 'order/dynamic_form.html'
+
+
+class VolumeSelectionForm(TabForm):
+    template = 'order/volume_selection.html'
+
+    volume_list = StorageInstance.objects.all()
 
 
 class DetailsCIFSForm(TabForm):

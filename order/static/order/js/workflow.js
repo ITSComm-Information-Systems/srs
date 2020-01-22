@@ -588,7 +588,12 @@ function chartcomChange(obj) {
     
   }
 
+function modifyVolume(volumeID) {
+  console.log('mod', volumeID)
+  $('#pills-step2').removeClass('disabled');
+  $('#pills-tab li:nth-child(2) a').tab('show');
 
-
-
+  //$('#pills-step'+currStep).removeClass('disabled');
+  //$('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
+}
   
