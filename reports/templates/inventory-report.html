@@ -101,9 +101,7 @@
         </div>
         <div class="inv-filter-btns mt-2">
             <input type='submit' value='Apply Filters' class="btn btn-primary">
-            {% if location_filter or type_filter or cf_filter or date_filter%}
             <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs">
-            {% endif %}
         </div>
 
         {% else %}
@@ -154,9 +152,7 @@
 
             <div class="col-3">
                 <input type='submit' id='filterapply' value='Apply Filters' class="btn btn-primary">
-                {% if location_filter or type_filter or cf_filter or date_filter%}
-                <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs">
-                {% endif %}
+                <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs" id='filterremove'>
             </div>
         </div>
 

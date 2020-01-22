@@ -13,7 +13,19 @@ $(document).ready(function() {
 
     	var filters = [test1, test2, test3];
 
-    	filter(filters);
+    	filter(filters, 'filter');
+    });
+
+
+    $('#filterremove').on('click', function(e) {
+    	e.preventDefault();
+    	test1 = $('#location').val();
+    	test2 = $('#type').val();
+    	test3 = $('#cf').val();
+
+    	var filters = [test1, test2, test3];
+
+    	filter(filters, 'remvove');
     });
 })
 
@@ -90,7 +102,7 @@ function downloadCSV(csv, filename) {
     downloadLink.click();
 }
 
-function filter(filters) {
+function filter(filters, action) {
 	let location = filters[0], type = filters[1], cf = filters[2];
 
 	$('.invLocTable tr.datarow').each(function() {
@@ -98,11 +110,21 @@ function filter(filters) {
 		current_loc = current_loc.split('<br>')[0];
 		current_loc = current_loc.split('Location: ')[1];
 		if (location && current_loc != location) {
-			$(this).hide();
+			if (action == 'filter') {
+				$(this).hide();
+			}
+			else {
+				$(this).show();
+			}
 		}
 
 		if (type && $(this).find('.type').html() != type) {
-			$(this).hide();
+			if (action == 'filter') {
+				$(this).hide();
+			}
+			else {
+				$(this).show();
+			}
 		}
     })
 
@@ -111,7 +133,12 @@ function filter(filters) {
     		current_cf = $(this).html().split('Chartfield: ')[1].trim();
     		if (current_cf != cf) {
     			id = '#'.concat(current_cf);
-    			$(id).hide();
+    			if (action == 'filter') {
+    				$(id).hide();
+    			}
+    			else {
+    				$(id).show();
+    			}
     		}
 	    })
     }
