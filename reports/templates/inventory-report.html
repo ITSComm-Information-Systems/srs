@@ -194,7 +194,7 @@
 </button>
 
 {% for classification in formated_data %}
-<div class="table-responsive">
+<div class="table-responsive" id="{{classification.0.0.chartfield}}">
     <h3 class="text-dark font-weight-bold chartfield-title">
         Chartfield: {{classification.0.0.chartfield}}
     </h3>

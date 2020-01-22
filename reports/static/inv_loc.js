@@ -108,10 +108,11 @@ function filter(filters) {
 
     if (cf) {
     	$('.chartfield-title').each(function() {
-    		current_cf = $(this).html().split('Chartfield: ')[1];
-    		id = '#invLocTable'.concat(current_cf);
-    		alert(id);
-	    	$(id).hide();
+    		current_cf = $(this).html().split('Chartfield: ')[1].trim();
+    		if (current_cf != cf) {
+    			id = '#'.concat(current_cf);
+    			$(id).hide();
+    		}
 	    })
     }
 }
