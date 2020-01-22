@@ -115,6 +115,9 @@ function filter(filters, action) {
 			}
 			else {
 				$(this).show();
+				    $("#location").prop("selectedIndex", 0);
+			    	$("#type").prop("selectedIndex", 0);
+			    	$("#cf").prop("selectedIndex", 0);
 			}
 		}
 
@@ -124,6 +127,9 @@ function filter(filters, action) {
 			}
 			else {
 				$(this).show();
+				    $("#location").prop("selectedIndex", 0);
+    				$("#type").prop("selectedIndex", 0);
+    				$("#cf").prop("selectedIndex", 0);
 			}
 		}
     })
@@ -138,6 +144,9 @@ function filter(filters, action) {
     			}
     			else {
     				$(id).show();
+    				    $("#location").prop("selectedIndex", 0);
+    					$("#type").prop("selectedIndex", 0);
+    					$("#cf").prop("selectedIndex", 0);
     			}
     		}
 	    })
