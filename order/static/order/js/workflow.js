@@ -587,11 +587,50 @@ function chartcomChange(obj) {
     $(id).find('option:selected').attr('selected', false);
     
   }
+  
+function early() {
+  console.log('end of funcion');
+}
 
-function modifyVolume(volumeID) {
-  console.log('mod', volumeID)
-  $('#pills-step2').removeClass('disabled');
-  $('#pills-tab li:nth-child(2) a').tab('show');
+
+
+function modifyVolume(del_flag, volumeID) {
+  currStep = 4;
+  if(del_flag==1) {
+    lastStep = document.getElementsByClassName("tab-pane").length;
+    $('#pills-step'+lastStep).removeClass('disabled');
+    $('#pills-tab li:last-child a').tab('show') 
+
+    $('[data-tab="nfsAccess"]').hide();
+    $('[data-tab="detailsNFS"]').hide();
+    $('[data-tab="storageBilling"]').hide();
+    $('[data-tab="PhoneLocation"]').hide();
+    $('[data-tab="PhoneLocation"]').hide();
+
+    //$('[data-tab="detailsNFS"]').hide();
+    //console.log('delete flag');
+    $('#reviewstep1').html('aaum-maize');
+  } else {
+    $('#pills-step2').removeClass('disabled');
+    $('#pills-tab li:nth-child(2) a').tab('show');
+
+    row = $("tr[data-id='" + volumeID + "']");
+    console.log('row', row);
+
+    x = row.find("td").eq(0).html();
+    console.log('x', x);
+
+    $("#preOrder").val(row.data('reference'));
+    $("#dateSubmitted").val(row.find("td").eq(0).html());
+    $("#uniqname").val(row.find("td").eq(1).html());
+    $("#orderDetails").val(row.find("td").eq(2).html());
+    $("#id_owner").val(row.find("td").eq(3).html());
+    $("#id_volumeSize").val(row.find("td").eq(4).html());
+
+
+  }
+
+
 
   //$('#pills-step'+currStep).removeClass('disabled');
   //$('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
