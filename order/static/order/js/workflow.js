@@ -1,5 +1,7 @@
 $(document).ready(function() {
 
+  $('#productType_1').attr('disabled', true);
+
   $('[data-toggle="popover"]').popover();
 
   use_cart = $("#wfcart").val();
