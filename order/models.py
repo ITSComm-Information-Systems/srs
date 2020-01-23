@@ -67,6 +67,7 @@ class Element(Configuration):
         ('Label', 'Label'),
         ('Checkbox', 'Checkbox'),
         ('McGroup', 'MCommunity Group'),
+        ('HTML', 'Static HTML'),
     )
     label = models.TextField()
     description = models.TextField(blank=True)

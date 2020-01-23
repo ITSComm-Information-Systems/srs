@@ -18,14 +18,14 @@
                 {% for volume in tab.form.volume_list %}
                     
                     <tr>
-                        <th scope="row">{{ volume.name }}</th>
+                        <th data-id="{{volume.id}}" scope="row">{{ volume.name }}</th>
                         <td>{{ volume.owner }}</td>
                         <td>{{ volume.size }}GB</td>
                         <td>{{ volume.type }}</td>
                         <td>{{ volume.add_ons }}</td>
                         <td>{{ volume.chartcom }}</td>
                         <td class="action">
-                            <a href="#" onclick="modifyVolume({{ volume.id }})">Edit</a><a href="#">Delete</a>
+                            <a href="#" onclick="modifyVolume(0, {{ volume.id }})">Edit</a><a href="#" onclick="modifyVolume(1, {{ volume.id }})">Delete</a>
                         </td>
                     </tr>
                 {% endfor %}
