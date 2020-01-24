@@ -4,6 +4,10 @@ $(document).ready(function() {
 	// Select first options by default
     $("#dept_id").prop("selectedIndex", 0);
     $("#bill_period").prop("selectedIndex", 0);
+    $("#filters-info").hide();
+    $('#location-filter').hide();
+    $('#type-filter').hide();
+    $('#cf-filter').hide();
 
     $('#filterapply').on('click', function(e) {
     	e.preventDefault();
@@ -14,6 +18,8 @@ $(document).ready(function() {
     	var filters = [test1, test2, test3];
 
     	filter(filters, 'filter');
+
+    	$('#filters-info').show();
     });
 
 
@@ -25,7 +31,9 @@ $(document).ready(function() {
 
     	var filters = [test1, test2, test3];
 
-    	filter(filters, 'remvove');
+    	filter(filters, 'remove');
+
+    	$('#filters-info').hide();
     });
 })
 
@@ -112,24 +120,38 @@ function filter(filters, action) {
 		if (location && current_loc != location) {
 			if (action == 'filter') {
 				$(this).hide();
+				html = '<strong>Location: </strong>'.concat(location).concat('<br>');
+				$('#location-filter').html(html);
+				$('#location-filter').show();
 			}
 			else {
 				$(this).show();
-				    $("#location").prop("selectedIndex", 0);
-			    	$("#type").prop("selectedIndex", 0);
-			    	$("#cf").prop("selectedIndex", 0);
+
+				$('#location-filter').html('');
+				$('#location-filter').hide();
+
+			    $("#location").prop("selectedIndex", 0);
+		    	$("#type").prop("selectedIndex", 0);
+		    	$("#cf").prop("selectedIndex", 0);
 			}
 		}
 
 		if (type && $(this).find('.type').html() != type) {
 			if (action == 'filter') {
 				$(this).hide();
+				html = '<strong>User ID Type: </strong>'.concat(type).concat('<br>');
+				$('#type-filter').html(html);
+				$('#type-filter').show();
 			}
 			else {
 				$(this).show();
-				    $("#location").prop("selectedIndex", 0);
-    				$("#type").prop("selectedIndex", 0);
-    				$("#cf").prop("selectedIndex", 0);
+
+				$('#type-filter').html('');
+				$('#type-filter').hide();
+
+			    $("#location").prop("selectedIndex", 0);
+				$("#type").prop("selectedIndex", 0);
+				$("#cf").prop("selectedIndex", 0);
 			}
 		}
     })
@@ -141,12 +163,19 @@ function filter(filters, action) {
     			id = '#'.concat(current_cf);
     			if (action == 'filter') {
     				$(id).hide();
+    				html = '<strong>Chartfield: </strong>'.concat(cf).concat('<br>');
+					$('#cf-filter').html(html);
+					$('#cf-filter').show();
     			}
     			else {
     				$(id).show();
-    				    $("#location").prop("selectedIndex", 0);
-    					$("#type").prop("selectedIndex", 0);
-    					$("#cf").prop("selectedIndex", 0);
+
+    				$('#cf-filter').html('');
+					$('#cf-filter').hide();
+
+				    $("#location").prop("selectedIndex", 0);
+					$("#type").prop("selectedIndex", 0);
+					$("#cf").prop("selectedIndex", 0);
     			}
     		}
 	    })

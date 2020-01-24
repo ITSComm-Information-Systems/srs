@@ -161,30 +161,24 @@
 
     {% endif %}
 
-    {% if location_filter or type_filter or cf_filter or date_filter%}
-    <hr class="style1 2">
+    <div id='filters-info'>
+        <hr class="style1 2">
         <div class='form-row'>
             <div>
                 <div class="mb-2">
                     <strong>Current Filters:</strong>
                 </div>
                 <div class='indented-form-input'>
-                    {% if location_filter %}<strong>Location:</strong> {{ location_filter }}<br>{% endif %}
-                    {% if type_filter %}<strong>User ID Type:</strong> {{ type_filter }}<br>{% endif %}
-                    {% if cf_filter %}<strong>Chartfield:</strong> {{ cf_filter }}<br>{% endif %}
-                    {% if date_filter %}<strong>Last Call Date:</strong> {{ date_filter }}<br>{% endif %}
+                    <div id='location-filter'></div>
+                    <div id='type-filter'></div>
+                    <div id='cf-filter'></div>
                 </div>
             </div>
         </div>
-
-        <!-- <hr class="style1 3"> -->
-    {% endif %}
+    </div>
 </form>
 
 {% if formated_data %}
-<!-- {% if not location_filter or type_filter or  cf_filter or  date_filter %} -->
-<!-- <hr class="style1 2"> -->
-<!-- {% endif %} -->
 <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right" aria-label="Downdload Report as CSV File">
     Download CSV
 </button>
