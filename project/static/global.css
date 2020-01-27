@@ -1235,7 +1235,7 @@ legend {
 	
 }
 
-#invLocTable.table-sm td, #invLocTable.table-sm th {
+.invLocTable.table-sm td, .invLocTable.table-sm th {
     padding: 0.75rem 0.3rem;
 }
 
@@ -1243,7 +1243,7 @@ legend {
 	width:100%;
 }
 
-#invLocTable {
+.invLocTable {
 	font-size: 12px;
 }
 
