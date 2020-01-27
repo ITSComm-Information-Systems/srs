@@ -48,32 +48,37 @@ def get_phone_location(request, phone_number):
 @permission_required('oscauth.can_order')
 def send_tab_data(request):
 
-    tab = request.POST.get('tab')
-    step = Step.objects.get(name=tab)
+    tab_name = request.POST.get('tab')
+    step = Step.objects.get(name=tab_name)
     sequence = request.POST.get('sequence')
     visible = request.POST.get('visible')
     item_id = request.POST.get('item_id')
+
     try:
         f = globals()[step.custom_form](step, request.POST)
     except: 
         f = TabForm(step)
 
     if f.is_valid():
+        valid = True
         summary = f.get_summary(visible)
         tab = {'title': step.label, 'fields': summary}
         data = request.POST.dict()
         data['csrfmiddlewaretoken'] = ''
+        action = Action.objects.get(id=request.POST.get('action_id'))
 
         if int(item_id) == 0:
             i = Item()
             i.created_by_id = request.user.id
             i.description = ' '
             data['reviewSummary'] = [tab]
+            data['tab_list'] = action.get_tab_list()
             i.deptid = '0'
             i.chartcom_id = 14388  #TODO need default chartcom
         else:
             i = Item.objects.get(id=item_id)
             review_summary = i.data['reviewSummary']
+            data['tab_list'] = i.data['tab_list']
             tabnum = int(sequence) - 1
             if len(review_summary) < int(sequence):
                 review_summary.append(tab)
@@ -83,14 +88,35 @@ def send_tab_data(request):
 
         i.data = data
         i.save()
+        item_id = i.id
 
-        return JsonResponse(i.id, safe=False)
+        step = Step.objects.get(name='detailsNFS')
+        
+        for index, tab in enumerate(i.data['tab_list'], start=0):
+            if tab['name'] == request.POST.get('tab'):
+                next_tab = i.data['tab_list'][index+1]
+                break
+
+        tab_name = next_tab['name']
+        step = Step.objects.get(name=next_tab['name'])
+
+        try:
+            f = globals()[step.custom_form](step, request.POST)
+        except: 
+            f = TabForm(step)
+        
+        if step.name == 'Review':
+            f.data = i.data['reviewSummary']
+
     else:
-        tab = {'form': f}
-        tabhtml = loader.render_to_string(f.template, {'tab': tab})
-        print('errors', f.errors)
-        return JsonResponse({'x': tabhtml}, safe=False)
+        valid = False
 
+    tab_content = loader.render_to_string(f.template, {'tab': {'form': f}})
+
+    return JsonResponse({'valid': valid
+                        ,'item_id': item_id
+                        ,'tab_name': tab_name
+                        ,'tab_content': tab_content}, safe=False)
 
 
 @permission_required('oscauth.can_order')

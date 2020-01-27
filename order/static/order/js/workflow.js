@@ -479,64 +479,7 @@ $(document).ready(function() {
 
 
 
-function sendTabData() {
-  data = $('#workflowForm').serializeArray();
-  data.push({name: 'tab', value: currTab});
-  data.push({name: 'item_id', value: item_id});
-  data.push({name: 'sequence', value: currStep});
-  //console.log('update', item_id);
-  // List the fields that are visible.  TODO use the data from validate form
-  inp = $("#step" + currStep + " :input:visible");
 
-  visible = []
-  for (i = 0; i < inp.length; i++) {
-    visible.push(inp[i].name);
-  }
-  data.push({name: 'visible', value: visible});
-
-  $.ajax({
-      url : "/orders/ajax/send_tab_data/", 
-      type : "POST", 
-      data : data, 
-
-      beforeSend: function(){
-        console.log('before');
-        //$('#nextBtn').addClass('disabled'); 
-      },
-
-      success : function(json) {
-          console.log('json', json); // log the returned json to the console
-          console.log("success"); // another sanity check
-
-          $('#step' + currStep).html(json['x']);
-
-          if (Number.isInteger(json)) {
-            item_id = json;
-            $("#workflowForm").removeClass('was-validated');
-            nextPrev(1);
-          } else {
-            $("#workflowForm").addClass('was-validated');
-            //showErrors(json)
-          }
-          //nextPrev(1);
-          //showErrors(json)
-      },
-
-      // handle a non-successful response
-      error : function(xhr,errmsg,err) {
-          $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
-              " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
-          console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-      },
-
-      // handle a non-successful response
-      complete: function(){
-        console.log('complete');
-        $('#nextBtn').removeClass('disabled'); ;
-      }
-
-  });
-};
 
 
 });  // Document Ready
@@ -638,3 +581,66 @@ function modifyVolume(del_flag, volumeID) {
   //$('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
 }
   
+
+
+
+
+function sendTabData() {
+  data = $('#workflowForm').serializeArray();
+  data.push({name: 'tab', value: currTab});
+  data.push({name: 'item_id', value: item_id});
+  data.push({name: 'sequence', value: currStep});
+  //console.log('update', item_id);
+  // List the fields that are visible.  TODO use the data from validate form
+  inp = $("#step" + currStep + " :input:visible");
+
+  visible = []
+  for (i = 0; i < inp.length; i++) {
+    visible.push(inp[i].name);
+  }
+  data.push({name: 'visible', value: visible});
+
+  $.ajax({
+      url : "/orders/ajax/send_tab_data/", 
+      type : "POST", 
+      data : data, 
+
+      beforeSend: function(){
+        console.log('before');
+        //$('#nextBtn').addClass('disabled'); 
+      },
+
+      success : function(json) {
+          valid = json['valid'];
+          tab_name = json['tab_name'];
+          tab_content = json['tab_content'];
+
+          console.log(tab_content);
+          
+          pane = $('[data-pane="' + tab_name + '"]').html(tab_content);
+
+          if (valid) {
+            $("#workflowForm").removeClass('was-validated');
+            item_id = json['item_id'];
+            $('[data-tab="' + tab_name + '"]').removeClass('disabled');
+            $('#pills-tab a[href="#' + pane[0].id + '"]').tab('show')
+          } else {
+            $("#workflowForm").addClass('was-validated');
+          }
+      },
+
+      // handle a non-successful response
+      error : function(xhr,errmsg,err) {
+          $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+              " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+          console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+      },
+
+      // handle a non-successful response
+      complete: function(){
+        console.log('complete');
+        $('#nextBtn').removeClass('disabled'); ;
+      }
+
+  });
+};

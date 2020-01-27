@@ -20,7 +20,7 @@
   </ul>
   <div class="tab-content" id="pills-tabContent">
     {% for tab in tab_list %}
-      <div class="tab-pane fade" id="{{ tab.step }}" role="tabpanel" aria-labelledby="pills-{{ tab.step }}">
+      <div class="tab-pane fade" id="{{ tab.step }}" data-pane="{{ tab.name }}" role="tabpanel" aria-labelledby="pills-{{ tab.step }}">
           {% include tab.form.template %}
       </div>
     {% endfor %}
