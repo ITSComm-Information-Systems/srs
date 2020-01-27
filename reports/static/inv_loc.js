@@ -114,6 +114,8 @@ function filter(filters, action) {
 	let location = filters[0], type = filters[1], cf = filters[2];
 
 	$('.invLocTable tr.datarow').each(function() {
+		current_cf = $(this).attr('id').split(':')[1];
+
 		current_loc = $(this).find('.location').html();
 		current_loc = current_loc.split('<br>')[0];
 		current_loc = current_loc.split('Location: ')[1];
@@ -154,6 +156,12 @@ function filter(filters, action) {
 				$("#cf").prop("selectedIndex", 0);
 			}
 		}
+		if (table_empty(current_cf)) {
+			$('#'.concat(current_cf)).hide();
+		}
+		else {
+			$('#'.concat(current_cf)).show();
+		}
     })
 
     if (cf) {
@@ -180,4 +188,14 @@ function filter(filters, action) {
     		}
 	    })
     }
+}
+
+function table_empty(cf) {
+	condition = true;
+	$('#invLocTable'.concat(cf).concat(' tr.datarow')).each(function() {
+		if ($(this).is(':visible')) {
+			condition = false;
+		}
+	})
+	return condition;
 }
