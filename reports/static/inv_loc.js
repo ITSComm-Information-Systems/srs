@@ -25,13 +25,14 @@ $(document).ready(function() {
 
     $('#filterremove').on('click', function(e) {
     	e.preventDefault();
-    	test1 = $('#location').val();
-    	test2 = $('#type').val();
-    	test3 = $('#cf').val();
+    	// test1 = $('#location').val();
+    	// test2 = $('#type').val();
+    	// test3 = $('#cf').val();
 
-    	var filters = [test1, test2, test3];
+    	// var filters = [test1, test2, test3];
 
-    	filter(filters, 'remove');
+    	// filter(filters, 'remove');
+    	remove_filters();
 
     	$('#filters-info').hide();
     });
@@ -108,6 +109,25 @@ function downloadCSV(csv, filename) {
 
     // Click download link
     downloadLink.click();
+}
+
+function remove_filters() {
+	$('.invLocTable tr.datarow').each(function() {
+		current_cf = $(this).attr('id').split(':')[1];
+		$('#invLocTable'.concat(current_cf)).show();
+		$(this).show();
+
+		$('#location-filter').html('');
+		$('#location-filter').hide();
+		$('#type-filter').html('');
+		$('#type-filter').hide();
+		$('#cf-filter').html('');
+		$('#cf-filter').hide();
+
+	    $("#location").prop("selectedIndex", 0);
+    	$("#type").prop("selectedIndex", 0);
+    	$("#cf").prop("selectedIndex", 0);
+    })
 }
 
 function filter(filters, action) {
