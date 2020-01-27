@@ -10,7 +10,7 @@ function filterProducts(obj) {
   function selectProductCard(card,name) {
   	if($(card).context.value > 0){
 	    $(card).addClass('btn-outline-success');
-	    $('.product-card').removeClass('selected-card').val('Select');
+	    //$('.product-card').removeClass('selected-card').val('Select');
 	    $(card).closest('.product-card').addClass('selected-card').val('Selected');
 	    $(card).addClass('selected');
 
@@ -20,8 +20,16 @@ function filterProducts(obj) {
 		selected_items[name] = $(card).context.value;
 		 var result = ''
 		 for(var key in  selected_items)
-			result += ('<li>'+ selected_items[key] + " - " + key  +'</li>');
+			result += ('<li class="ul-'+ $(card).attr('id') + '">' + selected_items[key] + " - " + key  +'</li>');
 		document.getElementById("items_list").innerHTML = result
-	}   
+	}
+	else {
+		$(card).closest('.product-card').removeClass("selected-card");
+		$(card).removeClass('selected').removeClass('btn-outline-success');
+        var id = $(card).attr('id');
+        $(".ul-"+id).remove();
+        console.log("here")
+        console.log($("#"+id).val());
+	} 
 
 }
