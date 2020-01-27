@@ -18,3 +18,18 @@
 </div>
 <!------ capture notes -->
 <input id="reviewSummary" type="hidden" name="reviewSummary" value="">
+
+<!--- new section to handle saved data -->
+{% for section in tab.form.data %}
+<div data-tab="{{ tab.name }}" class="card border-secondary mb-3">
+  <div class="card-header">{{section.title}}</div>
+  <div class="card-body">
+      {% for field in section.fields %}             
+      <div class="mb-1 indented-form-input">
+          <strong class="question">{{field.label}}</strong>
+          <p class="d-inline" id="questionAnswer">{{field.value}}</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endfor %}

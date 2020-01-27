@@ -175,6 +175,11 @@ class Action(Configuration):
     def __str__(self):
         return self.label 
 
+    def get_tab_list(self):
+        #tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
+        tab_list = list(Step.objects.filter(action=self.id).order_by('display_seq_no').values('name'))
+
+        return tab_list
 
 
 class Constant(models.Model):

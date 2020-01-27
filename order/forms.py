@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance
+from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 
@@ -16,12 +16,19 @@ class TabForm(forms.Form):
 
     template = 'order/base_form.html'
 
+    def get_next_tab(self, action_id):
+
+        step = Step.objects.get(name='detailsNFS')
+        next_tab = TabForm(step)
+        print('show')
+        return next_tab
+
     def get_summary(self, visible):
 
         summary = []
 
         for key, value in self.cleaned_data.items():
-            print('klist', key)
+            #print('klist', key)
             field = self.fields[key]
 
             if key in visible:  # Add visible fields to the review page
@@ -30,7 +37,7 @@ class TabForm(forms.Form):
                         if choice[0] == value:
                             value = choice[1]
 
-                print(field.label,'~', value)
+                #print(field.label,'~', value)
                 summary.append({'label': field.label, 'value': value})
 
         return summary
@@ -69,12 +76,13 @@ class TabForm(forms.Form):
                 field = forms.CharField(required=False)
                 field.template_name = 'project/static.html'
             else:
+                print('use globals', element.type)
                 field = globals()[element.type]
                 field.field_name = element.name
                 field.template_name = 'project/text.html'
                 #field = forms.IntegerField(label=element.label, help_text=element.description)
 
-            #field.name = element.name
+            field.name = element.name
             #print(field.name)
             field.label = element.label
             field.help_text = element.help_text
@@ -86,7 +94,6 @@ class TabForm(forms.Form):
 
             self.fields.update({element.name: field})
 
-            #rtab.form = f
 
 class BillingForm(TabForm):
 
@@ -152,7 +159,6 @@ class AddlInfoForm(TabForm):
     file = forms.FileField(label="Please attach any drawings, spreadsheets or floor plans with jack locations as needed", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
     template = 'order/dynamic_form.html'
 
-
 class VolumeSelectionForm(TabForm):
     template = 'order/volume_selection.html'
 
@@ -191,7 +197,7 @@ class ContactCenterForm(TabForm):
 
 
 class ReviewForm(TabForm):
-    summary = forms.CharField(label='summary', max_length=6)
+    #summary = forms.CharField(label='summary', max_length=6)
     template = 'order/review.html'
 
 
