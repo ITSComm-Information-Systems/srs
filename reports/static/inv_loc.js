@@ -114,7 +114,7 @@ function downloadCSV(csv, filename) {
 function remove_filters() {
 	$('.invLocTable tr.datarow').each(function() {
 		current_cf = $(this).attr('id').split(':')[1];
-		$('#invLocTable'.concat(current_cf)).show();
+		$('#invLocTable:'.concat(current_cf)).show();
 		$(this).show();
 
 		$('#location-filter').html('');
