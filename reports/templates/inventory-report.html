@@ -209,7 +209,7 @@
         </thead>
         <tbody>
             {% for phone in classification %}
-            <tr class='datarow'>
+            <tr class='datarow' id="data:{{classification.0.0.chartfield}}">
                 <td style="vertical-align:middle">{{phone.0.user_defined_id}}</td>
                 <td style="vertical-align:middle">{{phone.0.usage}}</td>
                 <td style="vertical-align:middle" class='type'>{{phone.0.cd_descr}}</td>
