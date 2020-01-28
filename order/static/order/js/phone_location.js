@@ -106,11 +106,14 @@ function selectCard(card) {
 
 
 
-   $(".current-button").text("Select");
-   $(card).addClass('btn-outline-success')
-   $('.location-card').removeClass('selected-card').val('Select')
-   $(card).closest('.location-card').addClass('selected-card').val('Selected')
-   $(card).text("Selected");
+    $(".current-button").text("Select");
+    $(card).addClass('btn-outline-success')
+    $('.location-card').removeClass('selected-card').val('Select')
+    $(card).closest('.location-card').addClass('selected-card').val('Selected')
+
+    $("button").removeClass('selected');
+    $(card).addClass('selected');
+    $(card).text("Selected");
 
     $(".location-card").removeClass("card-not-selected")
     $("#mustchoose").hide();
