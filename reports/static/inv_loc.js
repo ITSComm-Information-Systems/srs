@@ -114,20 +114,20 @@ function downloadCSV(csv, filename) {
 function remove_filters() {
 	$('.invLocTable tr.datarow').each(function() {
 		current_cf = $(this).attr('id').split(':')[1];
-		$('#invLocTable:'.concat(current_cf)).show();
+		$('#'.concat(current_cf)).show();
 		$(this).show();
-
-		$('#location-filter').html('');
-		$('#location-filter').hide();
-		$('#type-filter').html('');
-		$('#type-filter').hide();
-		$('#cf-filter').html('');
-		$('#cf-filter').hide();
-
-	    $("#location").prop("selectedIndex", 0);
-    	$("#type").prop("selectedIndex", 0);
-    	$("#cf").prop("selectedIndex", 0);
     })
+
+    $('#location-filter').html('');
+    $('#location-filter').hide();
+    $('#type-filter').html('');
+    $('#type-filter').hide();
+    $('#cf-filter').html('');
+    $('#cf-filter').hide();
+
+    $("#location").prop("selectedIndex", 0);
+    $("#type").prop("selectedIndex", 0);
+    $("#cf").prop("selectedIndex", 0);
 }
 
 function filter(filters, action) {
