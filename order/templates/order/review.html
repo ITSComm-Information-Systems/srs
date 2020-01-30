@@ -10,6 +10,8 @@
 </div>
 {% endif %}
 {% endfor %}
+
+{% if tab_list %}
 <div class="alert alert-danger alert-dismissible fade show" role="alert">
   <strong>Please note:</strong> You cannot edit orders once they are added to the cart
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -18,6 +20,7 @@
 </div>
 <!------ capture notes -->
 <input id="reviewSummary" type="hidden" name="reviewSummary" value="">
+{% endif %}
 
 <!--- new section to handle saved data -->
 {% for section in tab.form.data %}
@@ -27,9 +30,14 @@
       {% for field in section.fields %}             
       <div class="mb-1 indented-form-input">
           <strong class="question">{{field.label}}</strong>
+          {% if field.value == "checked" %}
+          <i class="fas fa-check-square"></i>
+          {% else %}
           <p class="d-inline" id="questionAnswer">{{field.value}}</p>
+          {% endif %}
       </div>
     {% endfor %}
   </div>
 </div>
+
 {% endfor %}

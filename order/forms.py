@@ -4,13 +4,9 @@ from .models import Product, Service, Action, Feature, FeatureCategory, FeatureT
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 
+from project.forms.fields import McGroup
 
-class McGroup(forms.CharField):
-    widget = forms.EmailInput
-    #default_validators = [validators.validate_email]
 
-    def __init__(self, **kwargs):
-        super().__init__(strip=True, **kwargs)
 
 class TabForm(forms.Form):
 
@@ -37,7 +33,9 @@ class TabForm(forms.Form):
                         if choice[0] == value:
                             value = choice[1]
 
-                #print(field.label,'~', value)
+                if field.type == 'Checkbox' and value[0] == 'yes':
+                    value = 'checked'
+                #todo performance
                 summary.append({'label': field.label, 'value': value})
 
         return summary
@@ -75,10 +73,13 @@ class TabForm(forms.Form):
             elif element.type == 'HTML':
                 field = forms.CharField(required=False)
                 field.template_name = 'project/static.html'
+            elif element.type == 'McGroup--':
+                field = McGroup()
+                field.template_name = 'project/static.html'
             else:
                 print('use globals', element.type)
-                field = globals()[element.type]
-                field.field_name = element.name
+                field = globals()[element.type](label=element.name)
+                #field.field_name = element.name
                 field.template_name = 'project/text.html'
                 #field = forms.IntegerField(label=element.label, help_text=element.description)
 
@@ -91,6 +92,9 @@ class TabForm(forms.Form):
             field.display_seq_no = element.display_seq_no
             field.display_condition = element.display_condition
             field.type = element.type
+
+            #if field.errors:
+            #    print(field.name, field.errors)
 
             self.fields.update({element.name: field})
 
