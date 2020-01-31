@@ -24,6 +24,7 @@ class McGroup(forms.CharField):
     def validate(self, value):
 
         if not get_mc_group(value):
+            self.widget.attrs.update({'class': 'form-control is-invalid'})
             raise ValidationError('That is not a valid group in MCommunity', code='mcgroup')
 
 
