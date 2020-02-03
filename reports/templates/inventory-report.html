@@ -179,7 +179,7 @@
 </form>
 
 {% if formated_data %}
-<button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right" aria-label="Downdload Report as CSV File">
+<button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" id='download-link' class="btn btn-success float-right" aria-label="Downdload Report as CSV File">
     Download CSV
 </button>
 
@@ -254,7 +254,7 @@
                             {% endif %}
                         {% endif %}<br>
                     {% endfor %}</td> 
-                <td>{% for charge in phone %}
+                <td class='row-total'>{% for charge in phone %}
                         {% if charge.charge_amount%}
                             {% if 0 > charge.charge_amount %}
                                 <span class='prv-msgs'>{{charge.charge_amount | currency }}</span>
@@ -266,7 +266,7 @@
             </tr>
             {% endfor %}
         </tbody>
-        <tr class="bg-warning total-charges-inv">
+        <tr class="bg-warning total-charges-inv" id='total-row{{ classification.0.0.chartfield }}'>
             <td colspan="1">Total</td>
             <td></td>
             <td></td>
