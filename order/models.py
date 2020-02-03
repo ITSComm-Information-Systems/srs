@@ -265,15 +265,15 @@ class LogItem(models.Model):
 
 class StorageInstance(models.Model):
     TYPE_CHOICES = (
-        ('SILVER', 'Silver'),
-        ('GOLD', 'Gold'),
+        ('NFS', 'NFS'),
+        ('CIFS', 'CIFS'),
     )
 
     name = models.CharField(max_length=100)
     owner = models.CharField(max_length=100)
-    chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
+    shortcode = models.PositiveIntegerField()
     size = models.PositiveIntegerField()
-    type = models.CharField(max_length=20, default='Silver', choices=TYPE_CHOICES)
+    type = models.CharField(max_length=20, default='NFS', choices=TYPE_CHOICES)
     assign_date = models.DateTimeField('Assign Date', auto_now_add=True)
     charge_identifier = models.CharField(max_length=100)
 
@@ -281,6 +281,20 @@ class StorageInstance(models.Model):
         volume_list = UserChartcomV.objects.filter(user=self, dept=dept).order_by('name')
 
         return volume_list
+
+
+class StorageHost(models.Model):
+    storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+
+class StorageOption(models.Model):
+    OPTION_CHOICES = (
+        ('SNAP', 'Snapshots'),
+        ('REPL', 'Replication'),
+    )
+    options = models.CharField(max_length=20, default='NFS', choices=OPTION_CHOICES)
+    name = models.CharField(max_length=100)
 
 
 class Order(models.Model):
