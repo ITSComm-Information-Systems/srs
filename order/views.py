@@ -55,7 +55,7 @@ def send_tab_data(request):
     item_id = request.POST.get('item_id')
 
     try:
-        f = globals()[step.custom_form](step, request=request)
+        f = globals()[step.custom_form](step, request.POST)
     except: 
         f = TabForm(step)
 
