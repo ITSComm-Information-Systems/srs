@@ -272,15 +272,10 @@ class StorageInstance(models.Model):
     name = models.CharField(max_length=100)
     owner = models.CharField(max_length=100)
     shortcode = models.PositiveIntegerField()
+    deptid = models.CharField(max_length=6)
     size = models.PositiveIntegerField()
-    type = models.CharField(max_length=20, default='NFS', choices=TYPE_CHOICES)
-    assign_date = models.DateTimeField('Assign Date', auto_now_add=True)
-    charge_identifier = models.CharField(max_length=100)
-
-    def get_user_volumes(self, user_id):
-        volume_list = UserChartcomV.objects.filter(user=self, dept=dept).order_by('name')
-
-        return volume_list
+    type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
+    created_date = models.DateTimeField('Assign Date')
 
 
 class StorageHost(models.Model):
@@ -288,13 +283,20 @@ class StorageHost(models.Model):
     name = models.CharField(max_length=100)
 
 
+class StorageMember(models.Model):
+    storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
+    username = models.CharField(max_length=8)
+
+
 class StorageOption(models.Model):
     OPTION_CHOICES = (
         ('SNAP', 'Snapshots'),
         ('REPL', 'Replication'),
+        ('FLUX', 'Flux'),
     )
-    options = models.CharField(max_length=20, default='NFS', choices=OPTION_CHOICES)
-    name = models.CharField(max_length=100)
+
+    storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
+    option = models.CharField(max_length=4, choices=OPTION_CHOICES)
 
 
 class Order(models.Model):

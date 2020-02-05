@@ -91,8 +91,8 @@ def get_mc_group(name):
     conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member"])
     
     if conn.entries:
-        print(conn.entries)
+        #print(conn.entries)
         return conn.entries[0] 
     else:
-        print('none found')
+        print(f'none found for {name}')
         return None
