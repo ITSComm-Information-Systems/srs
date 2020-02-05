@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step
+from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 
@@ -45,11 +45,15 @@ class TabForm(forms.Form):
         return valid
 
     def __init__(self, tab, *args, **kwargs):
+        self.request = kwargs.pop('request' ,None)
         super(TabForm, self).__init__(*args, **kwargs)
     #def __init__(self, tab, *args, **kwargs):
     #    super(TabForm, self, *args, **kwargs).__init__()
+
         self.tab_name = tab.name
         element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
+
+        #print(self.request)
 
         for element in element_list:
 
@@ -166,7 +170,12 @@ class AddlInfoForm(TabForm):
 class VolumeSelectionForm(TabForm):
     template = 'order/volume_selection.html'
 
-    volume_list = StorageInstance.objects.all()
+    def __init__(self, *args, **kwargs):
+        super(VolumeSelectionForm, self).__init__(*args, **kwargs)
+        print(self.request.user)
+        self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user)
+
+
 
 
 class DetailsCIFSForm(TabForm):

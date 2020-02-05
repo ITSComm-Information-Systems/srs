@@ -55,7 +55,7 @@ def send_tab_data(request):
     item_id = request.POST.get('item_id')
 
     try:
-        f = globals()[step.custom_form](step, request.POST)
+        f = globals()[step.custom_form](step, request=request)
     except: 
         f = TabForm(step)
 
@@ -428,7 +428,7 @@ class Workflow(PermissionRequiredMixin, View):
                 tab.form = forms.Form()
                 tab.form.template = 'order/static.html'
             else:
-                tab.form = globals()[tab.custom_form](tab)
+                tab.form = globals()[tab.custom_form](tab, request=request)
                 if tab.name == 'PhoneLocation':
                     js.append('phone_location')
                 elif tab.name == 'LocationNew':
