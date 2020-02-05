@@ -615,7 +615,7 @@ function sendTabData() {
           tab_name = json['tab_name'];
           tab_content = json['tab_content'];
 
-          console.log(tab_content);
+          //console.log(tab_content);
           
           pane = $('[data-pane="' + tab_name + '"]').html(tab_content);
 
@@ -626,6 +626,7 @@ function sendTabData() {
             $('#pills-tab a[href="#' + pane[0].id + '"]').tab('show')
           } else {
             $("#workflowForm").addClass('was-validated');
+            console.log('not valid');
           }
       },
 
