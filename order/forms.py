@@ -18,6 +18,12 @@ class TabForm(forms.Form):
         next_tab = TabForm(step)
         return next_tab
 
+    def clean(self):
+        
+        for field in self.fields:
+            if self.has_error(field):
+                self.fields[field].widget.attrs.update({'class': 'form-control is-invalid'}) 
+
     def get_summary(self, visible):
 
         summary = []
@@ -38,9 +44,9 @@ class TabForm(forms.Form):
 
         return summary
 
-    def is_valid(self):
-        valid = super(TabForm, self).is_valid()
-        return valid
+    #def is_valid(self):
+    #    valid = super(TabForm, self).is_valid()
+    #    return valid
 
     def __init__(self, tab, *args, **kwargs):
         self.request = kwargs.pop('request' ,None)
@@ -92,7 +98,7 @@ class TabForm(forms.Form):
             field.type = element.type
 
             self.fields.update({element.name: field})
-
+        
 
 class BillingForm(TabForm):
 

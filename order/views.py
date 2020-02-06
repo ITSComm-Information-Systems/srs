@@ -54,10 +54,10 @@ def send_tab_data(request):
     visible = request.POST.get('visible')
     item_id = request.POST.get('item_id')
 
-    try:
-        f = globals()[step.custom_form](step, request.POST)
-    except: 
-        f = TabForm(step)
+    #try:  TODO
+    f = globals()[step.custom_form](step, request.POST)
+    #except: 
+    #    f = TabForm(step)
 
     if f.is_valid():
         valid = True
