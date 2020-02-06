@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember
+from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember, StorageHost
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 
@@ -192,7 +192,8 @@ class DetailsNFSForm(TabForm):
 
 
 class AccessNFSForm(TabForm):
-    
+    template = 'order/nfs_access.html'
+
     def __init__(self, *args, **kwargs):
         super(AccessNFSForm, self).__init__(*args, **kwargs)
 
@@ -201,6 +202,8 @@ class AccessNFSForm(TabForm):
                 instance_id = self.request.POST['instance_id']
                 si = StorageInstance.objects.get(id=instance_id)
                 self.fields["owner"].initial = si.owner
+                self.host_list = StorageHost.objects.filter(storage_instance_id=instance_id)
+                
 
 class BillingStorageForm(TabForm):
     template = 'order/billing_storage.html'
