@@ -16,7 +16,6 @@ class TabForm(forms.Form):
 
         step = Step.objects.get(name='detailsNFS')
         next_tab = TabForm(step)
-        print('show')
         return next_tab
 
     def get_summary(self, visible):
@@ -24,7 +23,6 @@ class TabForm(forms.Form):
         summary = []
 
         for key, value in self.cleaned_data.items():
-            #print('klist', key)
             field = self.fields[key]
 
             if key in visible:  # Add visible fields to the review page
@@ -53,8 +51,6 @@ class TabForm(forms.Form):
         self.tab_name = tab.name
         element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
 
-        #print(self.request)
-
         for element in element_list:
 
             if element.type == 'Radio':
@@ -81,14 +77,12 @@ class TabForm(forms.Form):
                 field = McGroup()
                 field.template_name = 'project/static.html'
             else:
-                print('use globals', element.type)
                 field = globals()[element.type](label=element.name)
                 #field.field_name = element.name
                 field.template_name = 'project/text.html'
                 #field = forms.IntegerField(label=element.label, help_text=element.description)
 
             field.name = element.name
-            #print(field.name)
             field.label = element.label
             field.help_text = element.help_text
             field.description = element.description
@@ -96,9 +90,6 @@ class TabForm(forms.Form):
             field.display_seq_no = element.display_seq_no
             field.display_condition = element.display_condition
             field.type = element.type
-
-            #if field.errors:
-            #    print(field.name, field.errors)
 
             self.fields.update({element.name: field})
 
@@ -167,15 +158,19 @@ class AddlInfoForm(TabForm):
     file = forms.FileField(label="Please attach any drawings, spreadsheets or floor plans with jack locations as needed", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
     template = 'order/dynamic_form.html'
 
+
 class VolumeSelectionForm(TabForm):
     template = 'order/volume_selection.html'
 
+    def is_valid(self, *args, **kwargs):
+        super(VolumeSelectionForm, self).is_valid(*args, **kwargs)
+        return True
+
     def __init__(self, *args, **kwargs):
         super(VolumeSelectionForm, self).__init__(*args, **kwargs)
-        print(self.request.user)
-        self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user)
-
-
+        
+        if not self.is_bound:
+            self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user)
 
 
 class DetailsCIFSForm(TabForm):
@@ -191,8 +186,15 @@ class DetailsNFSForm(TabForm):
 
 
 class AccessNFSForm(TabForm):
-    template = 'order/nfs_access.html'
+    
+    def __init__(self, *args, **kwargs):
+        super(AccessNFSForm, self).__init__(*args, **kwargs)
 
+        if self.request:
+            if self.request.method == 'POST':
+                instance_id = self.request.POST['instance_id']
+                si = StorageInstance.objects.get(id=instance_id)
+                self.fields["owner"].initial = si.owner
 
 class BillingStorageForm(TabForm):
     template = 'order/billing_storage.html'

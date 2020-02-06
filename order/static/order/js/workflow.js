@@ -556,6 +556,11 @@ function modifyVolume(del_flag, volumeID) {
     //console.log('delete flag');
     $('#reviewstep1').html('aaum-maize');
   } else {
+    $('#instance_id').val(volumeID);
+    sendTabData();
+
+
+    /*
     $('#pills-step2').removeClass('disabled');
     $('#pills-tab li:nth-child(2) a').tab('show');
 
@@ -571,7 +576,7 @@ function modifyVolume(del_flag, volumeID) {
     $("#orderDetails").val(row.find("td").eq(2).html());
     $("#id_owner").val(row.find("td").eq(3).html());
     $("#id_volumeSize").val(row.find("td").eq(4).html());
-
+    */
 
   }
 
