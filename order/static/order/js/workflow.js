@@ -478,6 +478,9 @@ $(document).ready(function() {
 })
 
 
+$('[data-tab="volumeSelection"]').ready(function() {
+  $("#nextBtn").hide();
+});
 
 
 
@@ -538,6 +541,12 @@ function early() {
 }
 
 
+function addHost() {
+  // clone host_new
+  var rec = $("#host_new").clone();
+  rec.attr("id", "host_0");
+  $("#host_list").append(rec);   // TODO Find last host
+}
 
 function modifyVolume(del_flag, volumeID) {
   currStep = 4;
@@ -558,26 +567,7 @@ function modifyVolume(del_flag, volumeID) {
   } else {
     $('#instance_id').val(volumeID);
     sendTabData();
-
-
-    /*
-    $('#pills-step2').removeClass('disabled');
-    $('#pills-tab li:nth-child(2) a').tab('show');
-
-    row = $("tr[data-id='" + volumeID + "']");
-    console.log('row', row);
-
-    x = row.find("td").eq(0).html();
-    console.log('x', x);
-
-    $("#preOrder").val(row.data('reference'));
-    $("#dateSubmitted").val(row.find("td").eq(0).html());
-    $("#uniqname").val(row.find("td").eq(1).html());
-    $("#orderDetails").val(row.find("td").eq(2).html());
-    $("#id_owner").val(row.find("td").eq(3).html());
-    $("#id_volumeSize").val(row.find("td").eq(4).html());
-    */
-
+    $("#nextBtn").show();
   }
 
 

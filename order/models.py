@@ -277,6 +277,21 @@ class StorageInstance(models.Model):
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     created_date = models.DateTimeField('Assign Date')
 
+    @property
+    def add_ons(self):
+        add_ons = 'Basic'
+        options = StorageOption.objects.filter(id=self.id)
+        for option in options:
+            if option.option == 'REPL':
+                add_ons = f'{add_ons} + Replication'
+            if option.option == 'SNAP':
+                add_ons = f'{add_ons} + Snapshots'
+            if option.option == 'FLUX':
+                add_ons = f'{add_ons} + Flux'
+            print(option.option)
+
+        return add_ons
+
 
 class StorageHost(models.Model):
     storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
