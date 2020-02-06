@@ -625,12 +625,13 @@ function sendTabData() {
           pane = $('[data-pane="' + tab_name + '"]').html(tab_content);
 
           if (valid) {
-            $("#workflowForm").removeClass('was-validated');
+            $("input").removeClass('is-invalid');
+            //$("#workflowForm").removeClass('was-validated');
             item_id = json['item_id'];
             $('[data-tab="' + tab_name + '"]').removeClass('disabled');
             $('#pills-tab a[href="#' + pane[0].id + '"]').tab('show')
           } else {
-            $("#workflowForm").addClass('was-validated');
+            //$("#workflowForm").addClass('was-validated');
             console.log('not valid');
           }
       },
