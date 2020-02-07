@@ -477,11 +477,13 @@ $(document).ready(function() {
     }
 })
 
-
-$('[data-tab="volumeSelection"]').ready(function() {
+$('[data-tab="volumeSelection"]').on('shown.bs.tab', function(event) {
   $("#nextBtn").hide();
 });
 
+$('[data-tab="volumeSelection"]').on('hidden.bs.tab', function(event) {
+  $("#nextBtn").show();
+});
 
 
 
@@ -536,16 +538,23 @@ function chartcomChange(obj) {
     
   }
   
-function early() {
-  console.log('end of funcion');
-}
-
 
 function addHost() {
   // clone host_new
+  if (typeof host_count == "undefined") {
+    host_count = 0;
+  } else {
+    host_count = host_count + 1;
+  }
+  
+  console.log(host_count, '<');
+
   var rec = $("#host_new").clone();
-  rec.attr("id", "host_0");
+
+  rec.attr("id", "host_new_" + host_count);
+  rec.show();
   $("#host_list").append(rec);   // TODO Find last host
+  $("#host_new").hide()
 }
 
 function modifyVolume(del_flag, volumeID) {

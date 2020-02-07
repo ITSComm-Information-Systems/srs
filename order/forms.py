@@ -174,7 +174,7 @@ class VolumeSelectionForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(VolumeSelectionForm, self).__init__(*args, **kwargs)
-        
+
         if not self.is_bound:
             self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user)
 
@@ -196,6 +196,7 @@ class AccessNFSForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(AccessNFSForm, self).__init__(*args, **kwargs)
+        self['permittedHosts'].field.required = False
 
         if self.request:
             if self.request.method == 'POST':
@@ -203,6 +204,13 @@ class AccessNFSForm(TabForm):
                 si = StorageInstance.objects.get(id=instance_id)
                 self.fields["owner"].initial = si.owner
                 self.host_list = StorageHost.objects.filter(storage_instance_id=instance_id)
+        else:
+            self.host_list = []
+            hosts = self.data.getlist('permittedHosts')
+            for host in hosts:
+                if host:
+                    self.host_list.append({'name': host})
+
                 
 
 class BillingStorageForm(TabForm):
