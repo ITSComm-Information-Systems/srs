@@ -615,12 +615,17 @@ function sendTabData() {
       },
 
       success : function(json) {
-          valid = json['valid'];
+          redirect = json['redirect'];
+
+          if (typeof(redirect) != 'undefined') {
+            window.location.replace(redirect);
+            return;
+          }
+
           tab_name = json['tab_name'];
+          valid = json['valid'];
           tab_content = json['tab_content'];
 
-          //console.log(tab_content);
-          
           pane = $('[data-pane="' + tab_name + '"]').html(tab_content);
 
           if (valid) {

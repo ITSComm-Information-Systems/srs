@@ -288,15 +288,18 @@ class StorageInstance(models.Model):
                 add_ons = f'{add_ons} + Snapshots'
             if option.option == 'FLUX':
                 add_ons = f'{add_ons} + Flux'
-            print(option.option)
 
         return add_ons
 
+    def __str__(self):
+        return self.name
 
 class StorageHost(models.Model):
     storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
 
 class StorageMember(models.Model):
     storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
@@ -313,6 +316,8 @@ class StorageOption(models.Model):
     storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
     option = models.CharField(max_length=4, choices=OPTION_CHOICES)
 
+    def __str__(self):
+        return self.option
 
 class Order(models.Model):
     PRIORITY_CHOICES = (
@@ -521,7 +526,31 @@ class Item(models.Model):
             note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
 
         return note
-        
+
+    def submit_incident(self):
+        print('submit incident')
+
+        text = self.data['reviewSummary']
+        #text = literal_eval(text)
+        note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
+
+        body = ( 'schema:SN_Incident\n'
+                 'service_provider:ITS\n'
+                 'business_service:MiStorage\n'
+                 'service_detail:\n'
+                 'urgency:2\n'
+                 'impact:2\n'
+                 'assignment_group:ITS Storage\n'
+                 'category:break_fix\n'
+                 'state:New\n'
+                 'ci:\n'
+                 'owner_group:ITS Service Center\n'
+                 'owner_group:ITS Service Center\n'
+                 f'description:{note}\n' )
+
+
+
+        send_mail('Subject', body, 'itscomm.information.systems@umich.edu', ['umichdev@service-now.com','djamison@umich.edu'])
 
     def leppard(self):
         pour=['me']
