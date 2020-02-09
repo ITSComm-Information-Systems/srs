@@ -49,6 +49,12 @@ def get_phone_location(request, phone_number):
 def send_tab_data(request):
     
     tab_name = request.POST.get('tab')
+
+    if tab_name == 'Review':
+        item = Item.objects.get(id = request.POST['item_id'])
+        item.submit_incident()
+        return JsonResponse({'redirect': '/requestsent'}, safe=False)
+
     step = Step.objects.get(name=tab_name)
     sequence = request.POST.get('sequence')
     visible = request.POST.get('visible')
