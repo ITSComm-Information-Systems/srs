@@ -23,7 +23,7 @@ class TabForm(forms.Form):
         for field in self.fields:
             print(field, self.has_error(field))
             if self.has_error(field):
-                self.fields[field].widget.attrs.update({'class': 'egg form-control is-invalid'}) 
+                self.fields[field].widget.attrs.update({'class': 'form-control is-invalid'}) 
 
     def get_summary(self, visible):
 
@@ -33,15 +33,17 @@ class TabForm(forms.Form):
             field = self.fields[key]
 
             if key in visible:  # Add visible fields to the review page
+                label = field.label
                 if hasattr(field, 'choices'):
                     for choice in field.choices:
                         if choice[0] == value:
                             value = choice[1]
 
-                if field.type == 'Checkbox' and value[0] == 'yes':
-                    value = 'checked'
-                #todo performance
-                summary.append({'label': field.label, 'value': value})
+                if field.type == 'Checkbox':
+                    label = field.choices[0][1]
+                    value = field.choices[0][0]
+                
+                summary.append({'label': label, 'value': value})
 
         return summary
 
@@ -69,8 +71,8 @@ class TabForm(forms.Form):
                                                                         #AuthUserDept.get_order_departments(request.user.id)
                 field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
             elif element.type == 'NU':
-                field = forms.ChoiceField(widget=forms.NumberInput(attrs={'min': "1"}))
-                field.template_name = 'project/number.html'
+                field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1"}))
+                field.template_name = 'project/text.html'
             elif element.type == 'ST':
                 field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
                 field.template_name = 'project/text.html'
