@@ -93,6 +93,7 @@ def send_tab_data(request):
             data['reviewSummary'] = review_summary
 
         i.data = data
+        i.description = action.cart_label
         i.save()
         item_id = i.id
 

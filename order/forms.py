@@ -21,8 +21,9 @@ class TabForm(forms.Form):
     def clean(self):
         
         for field in self.fields:
+            print(field, self.has_error(field))
             if self.has_error(field):
-                self.fields[field].widget.attrs.update({'class': 'form-control is-invalid'}) 
+                self.fields[field].widget.attrs.update({'class': 'egg form-control is-invalid'}) 
 
     def get_summary(self, visible):
 
@@ -193,6 +194,21 @@ class DetailsNFSForm(TabForm):
 
 class AccessNFSForm(TabForm):
     template = 'order/nfs_access.html'
+
+    def get_summary(self, *args, **kwargs):
+        summary = super().get_summary(*args, **kwargs)
+
+        hosts = self.data.getlist('permittedHosts')
+        host_value = ''
+        for host in hosts:
+            if host_value:
+                host_value = host_value + ',' + host
+            else:
+                host_value = host
+
+        summary[1]['value'] = host_value
+
+        return summary
 
     def __init__(self, *args, **kwargs):
         super(AccessNFSForm, self).__init__(*args, **kwargs)
