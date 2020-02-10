@@ -528,10 +528,8 @@ class Item(models.Model):
         return note
 
     def submit_incident(self):
-        print('submit incident')
 
         text = self.data['reviewSummary']
-        #text = literal_eval(text)
         note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
 
         body = ( 'schema:SN_Incident\n'
@@ -548,9 +546,7 @@ class Item(models.Model):
                  'owner_group:ITS Service Center\n'
                  f'description:{note}\n' )
 
-
-
-        send_mail('Subject', body, 'itscomm.information.systems@umich.edu', ['umichdev@service-now.com','djamison@umich.edu'])
+        send_mail(self.description, body, 'itscomm.information.systems@umich.edu', ['umichdev@service-now.com','djamison@umich.edu'])
 
     def leppard(self):
         pour=['me']
