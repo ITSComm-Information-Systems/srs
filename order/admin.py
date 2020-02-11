@@ -1,11 +1,12 @@
 from django.contrib import admin
 from django.shortcuts import render
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageOption, StorageRate
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
     ordering = ('display_seq_no',)
+
 
 class ActionAdmin(admin.ModelAdmin):
     list_filter = ('service','type')
@@ -43,6 +44,7 @@ class ServiceAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
 
+
 class StepAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
@@ -63,20 +65,24 @@ class FeatureAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','label']
     ordering = ('display_seq_no',)
 
+
 class RestrictionAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
+
 
 class FeatureCategoryAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
 
+
 class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
 
+
 class StorageInstanceAdmin(admin.ModelAdmin):
-    list_display = ['name','type','size','add_ons','owner']
+    list_display = ['name','type','size','rate','owner']
     ordering = ('name',)
     search_fields = ['name']
 
@@ -101,5 +107,4 @@ admin.site.register(FeatureCategory, FeatureCategoryAdmin)
 
 admin.site.register(StorageInstance, StorageInstanceAdmin)
 admin.site.register(StorageHost)
-admin.site.register(StorageOption)
 admin.site.register(StorageRate, StorageRateAdmin)
