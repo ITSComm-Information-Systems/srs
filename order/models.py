@@ -319,6 +319,15 @@ class StorageOption(models.Model):
     def __str__(self):
         return self.option
 
+
+class StorageRate(Configuration):
+    rate = models.DecimalField(max_digits=8, decimal_places=6)
+
+    def get_total_cost(self, size):
+        total_cost = round(self.rate * int(size), 2)
+        return total_cost
+
+
 class Order(models.Model):
     PRIORITY_CHOICES = (
         ('High', 'Expedited'),
