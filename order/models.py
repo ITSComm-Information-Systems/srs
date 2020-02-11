@@ -263,6 +263,14 @@ class LogItem(models.Model):
         self.save()
     
 
+class StorageRate(Configuration):
+    rate = models.DecimalField(max_digits=8, decimal_places=6)
+
+    def get_total_cost(self, size):
+        total_cost = round(self.rate * int(size), 2)
+        return total_cost
+
+
 class StorageInstance(models.Model):
     TYPE_CHOICES = (
         ('NFS', 'NFS'),
@@ -272,27 +280,16 @@ class StorageInstance(models.Model):
     name = models.CharField(max_length=100)
     owner = models.CharField(max_length=100)
     shortcode = models.PositiveIntegerField()
+    uid = models.PositiveIntegerField(blank=True)
     deptid = models.CharField(max_length=6)
     size = models.PositiveIntegerField()
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
+    rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)
     created_date = models.DateTimeField('Assign Date')
-
-    @property
-    def add_ons(self):
-        add_ons = 'Basic'
-        options = StorageOption.objects.filter(id=self.id)
-        for option in options:
-            if option.option == 'REPL':
-                add_ons = f'{add_ons} + Replication'
-            if option.option == 'SNAP':
-                add_ons = f'{add_ons} + Snapshots'
-            if option.option == 'FLUX':
-                add_ons = f'{add_ons} + Flux'
-
-        return add_ons
 
     def __str__(self):
         return self.name
+
 
 class StorageHost(models.Model):
     storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
@@ -304,28 +301,6 @@ class StorageHost(models.Model):
 class StorageMember(models.Model):
     storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
     username = models.CharField(max_length=8)
-
-
-class StorageOption(models.Model):
-    OPTION_CHOICES = (
-        ('SNAP', 'Snapshots'),
-        ('REPL', 'Replication'),
-        ('FLUX', 'Flux'),
-    )
-
-    storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
-    option = models.CharField(max_length=4, choices=OPTION_CHOICES)
-
-    def __str__(self):
-        return self.option
-
-
-class StorageRate(Configuration):
-    rate = models.DecimalField(max_digits=8, decimal_places=6)
-
-    def get_total_cost(self, size):
-        total_cost = round(self.rate * int(size), 2)
-        return total_cost
 
 
 class Order(models.Model):
