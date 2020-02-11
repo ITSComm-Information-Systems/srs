@@ -1,12 +1,17 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember, StorageHost
+from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember, StorageHost, StorageRate
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 
 from project.forms.fields import McGroup
 
+def get_storage_options(type):
+    opt_list = []
+    for opt in StorageRate.objects.filter(name=type):
+        opt_list.append((opt.id, opt.label))
 
+    return opt_list
 
 class TabForm(forms.Form):
 
@@ -21,7 +26,6 @@ class TabForm(forms.Form):
     def clean(self):
         
         for field in self.fields:
-            print(field, self.has_error(field))
             if self.has_error(field):
                 self.fields[field].widget.attrs.update({'class': 'form-control is-invalid'}) 
 
@@ -34,9 +38,11 @@ class TabForm(forms.Form):
 
             if key in visible:  # Add visible fields to the review page
                 label = field.label
-                if hasattr(field, 'choices'):
+
+                if field.type == 'Radio':
+                    print(key, value)
                     for choice in field.choices:
-                        if choice[0] == value:
+                        if str(choice[0]) == value:
                             value = choice[1]
 
                 if field.type == 'Checkbox':
@@ -71,7 +77,7 @@ class TabForm(forms.Form):
                                                                         #AuthUserDept.get_order_departments(request.user.id)
                 field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
             elif element.type == 'NU':
-                field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1"}))
+                field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1", 'class': 'form-control'}))
                 field.template_name = 'project/text.html'
             elif element.type == 'ST':
                 field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -232,7 +238,18 @@ class AccessNFSForm(TabForm):
                 
 
 class BillingStorageForm(TabForm):
-    template = 'order/billing_storage.html'
+
+    def __init__(self, *args, **kwargs):
+        super(BillingStorageForm, self).__init__(*args, **kwargs)
+        self.total_cost = 33.33
+
+    def get_summary(self, *args, **kwargs):
+        summary = super().get_summary(*args, **kwargs)
+        option = StorageRate.objects.get(id=self.data['selectOptionType'])
+        total_cost = option.get_total_cost(self.data['sizeGigabyte'])
+        summary.append({'label': 'Total Cost', 'value': str(total_cost)})
+        return summary
+
 
 
 class VoicemailForm(TabForm):

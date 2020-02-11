@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.shortcuts import render
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageOption
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageOption, StorageRate
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -80,6 +80,12 @@ class StorageInstanceAdmin(admin.ModelAdmin):
     ordering = ('name',)
     search_fields = ['name']
 
+
+class StorageRateAdmin(admin.ModelAdmin):
+    list_display = ['display_seq_no','name','label','rate']
+    ordering = ('display_seq_no',)
+
+
 admin.site.register(Constant)
 admin.site.register(ProductCategory, ProductCategoryAdmin)
 admin.site.register(Element, ElementAdmin)
@@ -96,3 +102,4 @@ admin.site.register(FeatureCategory, FeatureCategoryAdmin)
 admin.site.register(StorageInstance, StorageInstanceAdmin)
 admin.site.register(StorageHost)
 admin.site.register(StorageOption)
+admin.site.register(StorageRate, StorageRateAdmin)
