@@ -97,15 +97,18 @@ def send_tab_data(request):
         i.save()
         item_id = i.id
 
-        step = Step.objects.get(name='detailsNFS')
+        #step = Step.objects.get(name='detailsNFS')
         
-        for index, tab in enumerate(i.data['tab_list'], start=0):
-            if tab['name'] == request.POST.get('tab'):
-                next_tab = i.data['tab_list'][index+1]
-                break
-
-        tab_name = next_tab['name']
-        step = Step.objects.get(name=next_tab['name'])
+        if request.POST.get('volaction'):
+            tab_name = 'Review'
+            step = Step.objects.get(name='Review')
+        else:
+            for index, tab in enumerate(i.data['tab_list'], start=0):
+                if tab['name'] == request.POST.get('tab'):
+                    next_tab = i.data['tab_list'][index+1]
+                    tab_name = next_tab['name']
+                    step = Step.objects.get(name=next_tab['name'])
+                    break
 
         try:
             f = globals()[step.custom_form](step, request=request)

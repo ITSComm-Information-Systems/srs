@@ -23,9 +23,7 @@
                         <td>{{ volume.storage_instance.size }}GB</td>
                         <td>{{ volume.storage_instance.rate.label }}</td>
                         <td>{{ volume.storage_instance.shortcode }}</td>
-                        <td class="action">
-                            <a href="#" onclick="modifyVolume(0, {{ volume.storage_instance.id }})">Edit</a><a href="#" onclick="modifyVolume(1, {{ volume.storage_instance.id }})">Delete</a>
-                        </td>
+                        <td class="action"><a href="#" onclick="modifyVolume(0, {{ volume.storage_instance.id }})">Edit</a><a href="#" class="delete" onclick="modifyVolume(1, {{ volume.storage_instance.id }})">Delete</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
