@@ -8,7 +8,7 @@ from project.forms.fields import McGroup
 
 def get_storage_options(type):
     opt_list = []
-    for opt in StorageRate.objects.filter(name=type):
+    for opt in StorageRate.objects.filter(type=type):
         opt_list.append((opt.id, opt.label))
 
     return opt_list
@@ -306,7 +306,6 @@ class BillingStorageForm(TabForm):
         return summary
 
 
-
 class VoicemailForm(TabForm):
     template = 'order/voicemail.html'
 
@@ -357,7 +356,6 @@ class NewLocationForm(TabForm):
     new_room = forms.CharField(label='Room', max_length=100)
 
     template = 'order/location.html'
-
 
 
 class EquipmentForm(TabForm):
