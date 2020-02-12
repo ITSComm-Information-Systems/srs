@@ -40,7 +40,6 @@ class TabForm(forms.Form):
                 label = field.label
 
                 if field.type == 'Radio':
-                    print(key, value)
                     for choice in field.choices:
                         if str(choice[0]) == value:
                             value = choice[1]
@@ -188,18 +187,6 @@ class VolumeSelectionForm(TabForm):
             self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user)
 
 
-class DetailsCIFSForm(TabForm):
-    template = 'order/cifs_details.html'
-
-
-class AccessCIFSForm(TabForm):
-    template = 'order/cifs_access.html'
-
-
-class DetailsNFSForm(TabForm):
-    template = 'order/nfs_details.html'
-
-
 class AccessNFSForm(TabForm):
     template = 'order/nfs_access.html'
 
@@ -224,10 +211,12 @@ class AccessNFSForm(TabForm):
 
         if self.request:
             if self.request.method == 'POST':
-                instance_id = self.request.POST['instance_id']
-                si = StorageInstance.objects.get(id=instance_id)
-                self.fields["owner"].initial = si.owner
-                self.host_list = StorageHost.objects.filter(storage_instance_id=instance_id)
+                instance_id = self.request.POST.get('instance_id')
+                if instance_id:
+                    si = StorageInstance.objects.get(id=instance_id)
+                    self.fields["volumeAdmin"].initial = si.uid
+                    self.fields["owner"].initial = si.owner
+                    self.host_list = StorageHost.objects.filter(storage_instance_id=instance_id)
         else:
             self.host_list = []
             hosts = self.data.getlist('permittedHosts')
@@ -235,13 +224,59 @@ class AccessNFSForm(TabForm):
                 if host:
                     self.host_list.append({'name': host})
 
-                
+
+class DetailsNFSForm(TabForm):
+
+    def __init__(self, *args, **kwargs):
+        super(DetailsNFSForm, self).__init__(*args, **kwargs)
+        self['flux'].field.required = False
+
+        if self.request:
+            if self.request.method == 'POST':
+                instance_id = self.request.POST.get('instance_id')
+                if instance_id:
+                    si = StorageInstance.objects.get(id=instance_id)
+                    self.fields["sizeGigabyte"].initial = si.size
+                    self.fields["storageID"].initial = si.name
+
+
+class DetailsCIFSForm(TabForm):
+
+    def __init__(self, *args, **kwargs):
+        super(DetailsCIFSForm, self).__init__(*args, **kwargs)
+
+        if self.request:
+            if self.request.method == 'POST':
+                instance_id = self.request.POST.get('instance_id')
+                if instance_id:
+                    si = StorageInstance.objects.get(id=instance_id)
+                    self.fields["mcommGroup"].initial = si.owner
+                    self.fields["activeDir"].initial = 'TBD'
+                    self.fields["netShare"].initial = si.name
+                    self.fields["selectOptionType"].initial = si.name
+                    self.fields["sizeGigabyte"].initial = si.size
+
+
+#class AccessCIFSForm(TabForm):
+#    template = 'order/cifs_access.html'
+
 
 class BillingStorageForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(BillingStorageForm, self).__init__(*args, **kwargs)
-        self.total_cost = 33.33
+
+        if self.request:
+            if self.request.method == 'POST':
+                instance_id = self.request.POST.get('instance_id')
+                if instance_id:
+                    si = StorageInstance.objects.get(id=instance_id)
+                    self.fields["shortcode"].initial = si.shortcode
+                    #self.fields["billingAuthority"].choices[0].selected = True
+                    #f = self.fields["billingAuthority"].widget.optgroups
+                    #print(type(f))
+                    self.fields["serviceLvlAgreement"].widget.attrs.update({'class': 'biology'}) 
+                    #self.fields[field].widget.attrs.update({'class': 'form-control is-invalid'}) 
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)

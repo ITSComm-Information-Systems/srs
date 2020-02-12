@@ -280,7 +280,7 @@ class StorageInstance(models.Model):
     name = models.CharField(max_length=100)
     owner = models.CharField(max_length=100)
     shortcode = models.PositiveIntegerField()
-    uid = models.PositiveIntegerField(blank=True)
+    uid = models.PositiveIntegerField(null=True)
     deptid = models.CharField(max_length=6)
     size = models.PositiveIntegerField()
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
@@ -519,18 +519,13 @@ class Item(models.Model):
         body = ( 'schema:SN_Incident\n'
                  'service_provider:ITS\n'
                  'business_service:MiStorage\n'
-                 'service_detail:\n'
-                 'urgency:2\n'
-                 'impact:2\n'
                  'assignment_group:ITS Storage\n'
-                 'category:break_fix\n'
+                 'category:Catalog Order\n'
                  'state:New\n'
-                 'ci:\n'
-                 'owner_group:ITS Service Center\n'
                  'owner_group:ITS Service Center\n'
                  f'description:{note}\n' )
 
-        send_mail(self.description, body, 'itscomm.information.systems@umich.edu', ['umichdev@service-now.com','djamison@umich.edu'])
+        send_mail(self.description, body, self.created_by.email, ['umichdev@service-now.com','djamison@umich.edu'])
 
     def leppard(self):
         pour=['me']
