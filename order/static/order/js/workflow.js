@@ -562,6 +562,7 @@ function modifyVolume(del_flag, volumeID) {
 
   $('#instance_id').val(volumeID);
 
+
   if(del_flag==1) {
     lastStep = document.getElementsByClassName("tab-pane").length;
     $('#pills-step'+lastStep).removeClass('disabled');
@@ -578,7 +579,7 @@ function modifyVolume(del_flag, volumeID) {
     sendTabData();
   }
 
-
+  $('[data-tab="volumeSelection"]').hide();
 
   //$('#pills-step'+currStep).removeClass('disabled');
   //$('#pills-tab li:nth-child(' + currStep + ') a').tab('show');

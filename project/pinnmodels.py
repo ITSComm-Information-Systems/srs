@@ -11,6 +11,31 @@ from django.contrib.auth.models import User
 # This view uses the Pinnacle location table and includes locations added by ITS staff
 #  as well as the official builfing codes from MPathways
 
+
+class UmBillInputApiV(models.Model):
+     um_bill_input_id = models.IntegerField(primary_key=True)
+     data_source = models.CharField(max_length=50)
+     assign_date = models.CharField(max_length=20)
+     unique_identifier = models.CharField(max_length=200)
+     short_code = models.CharField(max_length=100)
+     charge_identifier = models.CharField(max_length=200)
+     quantity_vouchered = models.IntegerField()
+     invoice_id = models.CharField(max_length=100)
+     m_uniqname = models.CharField(max_length=100)
+     voucher_comment = models.CharField(max_length=100)
+     load_date = models.DateField()
+     date_processed = models.DateField(null=True)
+     full_input_record = models.CharField(max_length=1000)
+     bill_input_file_id = models.IntegerField()
+     total_amount = models.DecimalField(max_digits=13, decimal_places=2)
+
+     class Meta:
+          managed = False
+          db_table = 'PS_RATING\".\"um_bill_input_api_v'
+
+     def __str__(self):
+          return self.um_bill_input_id
+
 class UmOSCBuildingV(models.Model):
    building_code = models.CharField(max_length=15, primary_key=True)
    building_name = models.CharField(max_length=100,null=True) 

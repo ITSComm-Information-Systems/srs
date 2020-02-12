@@ -264,6 +264,12 @@ class LogItem(models.Model):
     
 
 class StorageRate(Configuration):
+    TYPE_CHOICES = (
+        ('NFS', 'NFS'),
+        ('CIFS', 'CIFS'),
+    )
+
+    type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     rate = models.DecimalField(max_digits=8, decimal_places=6)
 
     def get_total_cost(self, size):

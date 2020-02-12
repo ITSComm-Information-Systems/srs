@@ -82,13 +82,14 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 
 
 class StorageInstanceAdmin(admin.ModelAdmin):
-    list_display = ['name','type','size','rate','owner']
+    list_display = ['name','type','size','rate','owner', 'created_date']
     ordering = ('name',)
-    search_fields = ['name']
+    search_fields = ['name','owner']
+    list_filter = ('type',)
 
 
 class StorageRateAdmin(admin.ModelAdmin):
-    list_display = ['display_seq_no','name','label','rate']
+    list_display = ['display_seq_no','name','label','type','rate']
     ordering = ('display_seq_no',)
 
 
