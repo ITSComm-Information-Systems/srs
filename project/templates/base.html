@@ -123,6 +123,10 @@
 						</div>
 
 					</li>
+					{% else %}
+					<li class="nav-item dropdown">
+						<a href="/orders/services/2" class="nav-link" <i class="fas fa-check-circle white"></i>Request Storage</a>
+					</li>
 					{% endif %}
 					{% if perms.oscauth.can_report %}
 					<li class="nav-item dropdown">

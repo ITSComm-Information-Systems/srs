@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_protect
 from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceProfileV, UmOscChartfieldV
 from oscauth.models import AuthUserDept
 from pages.models import Page
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from pages.models import Page
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -385,8 +385,19 @@ class Integration(PermissionRequiredMixin, View):
             'item_list': item_list,})
 
 
-class Workflow(PermissionRequiredMixin, View):
-    permission_required = 'oscauth.can_order'
+class Workflow(UserPassesTestMixin, View):
+
+    def test_func(self):
+        action_id = self.request.resolver_match.kwargs['action_id']
+        action = Action.objects.get(id=action_id)
+
+        if action.service.group_id == 2:  # MiStorage requires no permissions
+            return True
+        else:
+            if self.request.user.has_perm('oscauth.can_order'):
+                return True
+            else:
+                return False
 
     def get(self, request, action_id):
 
@@ -558,8 +569,18 @@ class Review(PermissionRequiredMixin, View):
         return HttpResponse(template.render(context, request))
 
 
-class Services(PermissionRequiredMixin, View):
-    permission_required = 'oscauth.can_order'
+class Services(UserPassesTestMixin, View):
+
+    def test_func(self):
+        group_id = self.request.resolver_match.kwargs['group_id']
+
+        if group_id == 2:  # MiStorage requires no permissions
+            return True
+        else:
+            if self.request.user.has_perm('oscauth.can_order'):
+                return True
+            else:
+                return False
     
     def get(self, request, group_id):
 
