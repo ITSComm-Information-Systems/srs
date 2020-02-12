@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 
 from oscauth.utils import get_mc_group
-from order.models import StorageInstance, StorageOption, StorageHost, StorageMember, Item
+from order.models import StorageInstance, StorageHost, StorageMember, Item
 
 import datetime, csv
 
@@ -18,8 +18,5 @@ class Command(BaseCommand):
         item=Item.objects.get(id=item_id)
         print(item.data)
         item.submit_incident()
-
-
-
 
         print(datetime.datetime.now(), 'End')

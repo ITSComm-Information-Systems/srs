@@ -110,7 +110,7 @@ def send_tab_data(request):
         try:
             f = globals()[step.custom_form](step, request=request)
         except:
-            print('tab error')
+            print('bind form tab error')
             f = TabForm(step)
         
         if step.name == 'Review':

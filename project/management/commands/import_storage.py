@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 
 from oscauth.utils import get_mc_group
-from order.models import StorageInstance, StorageOption, StorageHost, StorageMember
+from order.models import StorageInstance, StorageHost, StorageMember, StorageRate
 
 import datetime, csv
 
@@ -12,9 +12,9 @@ class Command(BaseCommand):
         parser.add_argument('filename',type=str)
 
     def handle(self, *args, **options):
-        print(datetime.datetime.now(), 'Add Members')
-        self.add_members()
-        return
+        #print(datetime.datetime.now(), 'Add Members')
+        #self.add_members()
+        #return
 
         print(datetime.datetime.now(), 'start')
         filename = options['filename']
@@ -45,35 +45,23 @@ class Command(BaseCommand):
         instance.size = row[4]
         instance.created_date = row[5].strip("'")
 
-        options = row[6].strip("'").split(' + ')
+        options = row[6].strip("'")
 
         if row[2] == 'nfs_storage':
-            instance.type = 'NFS'  
+            instance.type = 'NFS' 
+            instance.uid = row[9]
             hosts = row[11].strip("'").split(' ')
-            if row[10] == 'on':
-                options.append('flux')
+            #if row[10] == 'on':
+            #    options.append('flux')
 
         if row[2] == 'cifs_storage':
             instance.type = 'CIFS'
             hosts = None
             instance.deptid = row[9]
 
+        instance.rate = StorageRate.objects.get(name=instance.type, label=options)
+
         instance.save()
-
-        for option in options:
-            if option == 'Snapshots':
-                val = 'SNAP'
-            elif option == 'Replication':
-                val = 'REPL'
-            elif option == 'flux':
-                val = 'FLUX'
-            else:
-                continue
-
-            opt = StorageOption()
-            opt.storage_instance = instance
-            opt.option = val
-            opt.save()
 
         if hosts:
             for host in hosts:
