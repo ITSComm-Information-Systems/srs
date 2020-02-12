@@ -559,24 +559,23 @@ function addHost() {
 
 function modifyVolume(del_flag, volumeID) {
   currStep = 4;
+
+  $('#instance_id').val(volumeID);
+
   if(del_flag==1) {
     lastStep = document.getElementsByClassName("tab-pane").length;
     $('#pills-step'+lastStep).removeClass('disabled');
-    $('#pills-tab li:last-child a').tab('show') 
+    //$('#pills-tab li:last-child a').tab('show') 
 
     $('[data-tab="nfsAccess"]').hide();
     $('[data-tab="detailsNFS"]').hide();
+    $('[data-tab="detailsCIFS"]').hide();
     $('[data-tab="storageBilling"]').hide();
-    $('[data-tab="PhoneLocation"]').hide();
-    $('[data-tab="PhoneLocation"]').hide();
 
-    //$('[data-tab="detailsNFS"]').hide();
-    //console.log('delete flag');
-    $('#reviewstep1').html('aaum-maize');
+    sendTabData({name: 'volaction', value: 'Delete'});
   } else {
     $('#instance_id').val(volumeID);
     sendTabData();
-    $("#nextBtn").show();
   }
 
 
@@ -589,8 +588,11 @@ function modifyVolume(del_flag, volumeID) {
 
 
 
-function sendTabData() {
+function sendTabData(field) {
   data = $('#workflowForm').serializeArray();
+  if (field != 'undefined') {
+    data.push(field)
+  }
   data.push({name: 'tab', value: currTab});
   data.push({name: 'item_id', value: item_id});
   data.push({name: 'sequence', value: currStep});
@@ -625,7 +627,7 @@ function sendTabData() {
           tab_name = json['tab_name'];
           valid = json['valid'];
           tab_content = json['tab_content'];
-
+          console.log(tab_name)
           pane = $('[data-pane="' + tab_name + '"]').html(tab_content);
 
           if (valid) {

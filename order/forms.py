@@ -176,6 +176,21 @@ class AddlInfoForm(TabForm):
 class VolumeSelectionForm(TabForm):
     template = 'order/volume_selection.html'
 
+    def get_summary(self, *args, **kwargs):
+        #summary = super().get_summary(*args, **kwargs)
+        print('summary', self.data['instance_id'], self.data.get('volaction') )
+        instance = StorageInstance.objects.get(id=self.data['instance_id'])
+
+        if self.data.get('volaction') == 'Delete':
+            summary = [{'label': 'Are you sure you want to delete this volume?', 'value': ''}
+                        ,{'label': 'Volume Name:', 'value': instance.name}
+                        ,{'label': 'Ownewr:', 'value': instance.owner}]
+        else:
+            summary = [{'label': 'Volume Name:', 'value': instance.name}]
+
+        return summary
+
+
     def is_valid(self, *args, **kwargs):
         super(VolumeSelectionForm, self).is_valid(*args, **kwargs)
         return True
@@ -184,7 +199,13 @@ class VolumeSelectionForm(TabForm):
         super(VolumeSelectionForm, self).__init__(*args, **kwargs)
 
         if not self.is_bound:
-            self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user)
+        #if self.request:
+            if self.request.path == '/orders/wf/47':
+                type = 'NFS'
+            else:
+                type = 'CIFS'
+
+            self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user, storage_instance__type=type)
 
 
 class AccessNFSForm(TabForm):
@@ -202,7 +223,6 @@ class AccessNFSForm(TabForm):
                 host_value = host
 
         summary[1]['value'] = host_value
-
         return summary
 
     def __init__(self, *args, **kwargs):
