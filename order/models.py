@@ -285,7 +285,7 @@ class StorageInstance(models.Model):
 
     name = models.CharField(max_length=100)
     owner = models.CharField(max_length=100)
-    shortcode = models.PositiveIntegerField()
+    shortcode = models.CharField(max_length=100)
     uid = models.PositiveIntegerField(null=True)
     deptid = models.CharField(max_length=6)
     size = models.PositiveIntegerField()

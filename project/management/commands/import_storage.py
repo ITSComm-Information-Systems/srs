@@ -59,7 +59,7 @@ class Command(BaseCommand):
             hosts = None
             instance.deptid = row[9]
 
-        instance.rate = StorageRate.objects.get(name=instance.type, label=options)
+        instance.rate = StorageRate.objects.get(type=instance.type, label=options)
 
         instance.save()
 
