@@ -33,7 +33,7 @@ class Command(BaseCommand):
             print(f'Processed {line_count} lines.')
 
         print(datetime.datetime.now(), 'Add Members')
-        self.add_members()
+        #self.add_members()
 
         print(datetime.datetime.now(), 'end')
 
@@ -50,6 +50,8 @@ class Command(BaseCommand):
         if row[2] == 'nfs_storage':
             instance.type = 'NFS' 
             instance.uid = row[9]
+            if row[10] == 'on':
+                instance.flux = True
             hosts = row[11].strip("'").split(' ')
             #if row[10] == 'on':
             #    options.append('flux')

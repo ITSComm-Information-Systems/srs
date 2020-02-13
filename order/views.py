@@ -45,7 +45,7 @@ def get_phone_location(request, phone_number):
 
     return JsonResponse(locations, safe=False)
 
-@permission_required('oscauth.can_order')
+#@permission_required('oscauth.can_order')
 def send_tab_data(request):
     
     tab_name = request.POST.get('tab')

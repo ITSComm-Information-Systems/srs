@@ -258,7 +258,8 @@ class DetailsNFSForm(TabForm):
                     si = StorageInstance.objects.get(id=instance_id)
                     self.fields["sizeGigabyte"].initial = si.size
                     self.fields["storageID"].initial = si.name
-
+                    self.fields["selectOptionType"].initial = si.rate_id
+                    self.fields['flux'].initial = si.flux  
 
 class DetailsCIFSForm(TabForm):
 
@@ -273,7 +274,7 @@ class DetailsCIFSForm(TabForm):
                     self.fields["mcommGroup"].initial = si.owner
                     self.fields["activeDir"].initial = 'TBD'
                     self.fields["netShare"].initial = si.name
-                    self.fields["selectOptionType"].initial = si.name
+                    self.fields["selectOptionType"].initial = si.rate_id
                     self.fields["sizeGigabyte"].initial = si.size
 
 
@@ -292,11 +293,8 @@ class BillingStorageForm(TabForm):
                 if instance_id:
                     si = StorageInstance.objects.get(id=instance_id)
                     self.fields["shortcode"].initial = si.shortcode
-                    #self.fields["billingAuthority"].choices[0].selected = True
-                    #f = self.fields["billingAuthority"].widget.optgroups
-                    #print(type(f))
-                    self.fields["serviceLvlAgreement"].widget.attrs.update({'class': 'biology'}) 
-                    #self.fields[field].widget.attrs.update({'class': 'form-control is-invalid'}) 
+                    self.fields["billingAuthority"].initial = 'yes'
+                    self.fields["serviceLvlAgreement"].initial = 'yes'
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
