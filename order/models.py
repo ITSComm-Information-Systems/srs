@@ -290,6 +290,7 @@ class StorageInstance(models.Model):
     deptid = models.CharField(max_length=6)
     size = models.PositiveIntegerField()
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
+    flux = models.BooleanField(default=False)
     rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)
     created_date = models.DateTimeField('Assign Date')
 
