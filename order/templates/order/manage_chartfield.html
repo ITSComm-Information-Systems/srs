@@ -14,6 +14,7 @@
                         </small>
                     </h1>
                 </div>
+                {% if dept_list|length > 1 %}
                 <div class="col-12 dept-select">
                     <form action="/orders/chartcom/" id="cart-department-dropdown" method="POST">{% csrf_token %}
                         <div class="input-group dept-dropdown">
@@ -32,6 +33,7 @@
                         </div>
                     </form>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

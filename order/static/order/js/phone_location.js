@@ -10,8 +10,8 @@ $(document).ready(function() {
         //phone_number = phone_number.replace(/\D/g,'');
         phone_number=  phone_number.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
         phone_number = phone_number.replace(/\s+/g, '');
-        console.log("phone_number")
-        console.log(phone_number)
+        //console.log("phone_number")
+        //console.log(phone_number)
     
         $("#phLocationFields").show();
         $("#phBuildingID").val('');
@@ -73,9 +73,10 @@ $(document).ready(function() {
 
 
 function selectCard(card) {
-    //console.log(locations);
     if (card.id == 'updateLocation') {
         $("#newLocationFields").show();
+        current_number = $("#foundPhone").html()
+        $("#service_number").val(current_number);
     } else {
         $("#newLocationFields").hide();
         div = $(card).parent();
