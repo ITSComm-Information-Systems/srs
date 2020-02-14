@@ -1,9 +1,15 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
+<<<<<<< HEAD
   name: dev-daily
 spec:
   schedule: '30 10 * * *'
+=======
+  name: production-daily
+spec:
+  schedule: '0 2 * * *'
+>>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
   ConcurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -15,6 +21,7 @@ spec:
           containers:
             -
               name: batch
+<<<<<<< HEAD
               image: 'docker-registry.default.svc:5000/srs/dev'
               envFrom:
               - configMapRef:
@@ -23,5 +30,14 @@ spec:
                   name: dev
               command:
                 - python3
+=======
+              image: 'docker-registry.default.svc:5000/srs/production'
+              envFrom:
+              - configMapRef:
+                  name: production
+              command:
+                - python3
+                - manage.py
+>>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
                 - dailyjob
           restartPolicy: OnFailure

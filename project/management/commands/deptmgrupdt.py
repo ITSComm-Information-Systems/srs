@@ -63,7 +63,8 @@ class Command(BaseCommand):
                 pu_group = None
 
             try:
-                pu_user_group = AuthUserDept.group
+                #pu_user_group = AuthUserDept.group
+                pu_user_group = AuthUserDept.objects.get(user_id=pu_id, group_id=pu_group, dept = row.deptid)
             except AuthUserDept.DoesNotExist:
                 pu_user_group = None
 
@@ -104,7 +105,7 @@ class Command(BaseCommand):
         print('Records added to AuthUserDept: %s' % auth_added_count) 
         print('Records not added to AuthUserDept: %s' % auth_not_added_count) 
         print('-------------------------------------------')
-
+        
         print('-------------------------------------------')
         print('Remove Access for Expired Department Managers')
         print('-------------------------------------------')
@@ -114,7 +115,8 @@ class Command(BaseCommand):
             au_username = User.objects.get(username=row.user).username
 
             try:
-                au_uniqname = PinnDeptMgr.objects.filter(dept_mgr_uniqname=au_username).values('dept_mgr_uniqname').distinct()
+                #change filter to get since the former always returns an object add dept to the criteria
+                au_uniqname = PinnDeptMgr.objects.get(dept_mgr_uniqname=au_username,deptid = row.dept)
             except PinnDeptMgr.DoesNotExist:
                 au_uniqname = None
 

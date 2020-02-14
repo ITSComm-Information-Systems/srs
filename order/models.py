@@ -208,7 +208,20 @@ class Chartcom(models.Model):
         return user_chartcom_depts
 
     def get_user_chartcoms_for_dept(self, dept):
-        chartcom_list = UserChartcomV.objects.filter(user=self, dept=dept).order_by('name')
+
+        if self.has_perm('can_order_all'):
+            chartcom_list = Chartcom.objects.filter(dept=dept)
+            cc_list = []
+            for cc in chartcom_list:
+                item = vars(cc)
+                item['account_number'] = cc.account_number
+                delattr(cc, '_state')
+                cc_list.append(item)
+                
+            chartcom_list = cc_list
+            
+        else:
+            chartcom_list = list(UserChartcomV.objects.filter(user=self, dept=dept).order_by('name').values())
 
         return chartcom_list
 
@@ -254,13 +267,35 @@ class Order(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
-    status = models.CharField(max_length=20)
+    #status = models.CharField(max_length=20)
     priority = models.CharField(max_length=20, default='Medium', choices=PRIORITY_CHOICES)
     due_date = models.DateTimeField(blank=True, null=True)
 
     @property
     def dept(self):
         return self.chartcom.dept
+
+    @property
+    def status(self):
+        srs_status = 'N/A'
+
+        if self.order_reference == 'TBD':
+            srs_status = 'Submitted'
+        else:
+            try:
+                pin = UmOscPreorderApiV.objects.get(add_info_text_3=str(self.id),pre_order_issue=1)
+                srs_status = pin.work_status_name
+                if(pin.work_status_name == "Received"):
+                    srs_status = "Submitted"
+                if pin.status_code == 2:
+                    if(pin.work_status_name == "Cancelled"):
+                        srs_status = "Cancelled"
+                    else:
+                        srs_status = "Completed"
+            except:
+                print('error')
+
+        return srs_status
 
     def add_contact(self):
 

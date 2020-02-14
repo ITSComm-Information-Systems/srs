@@ -68,10 +68,10 @@ $(document).ready(function() {
             { "targets": [3],
               "mRender": function (data, type, full, meta) {
               	 if (data == 'Y') {
-          			return '<i class="fa fa-check-circle" style="color:green;" aria-hidden="true"></i>';
+          			return '<i class="fa fa-check-circle" aria-hidden="true"></i>';
           		 }
           		 else {
-          		 	return '<i class="far fa-times-circle" style="color:red;"></i>';
+          		 	return '<i class="far fa-times-circle"></i>';
           		 }
               }
 
@@ -83,10 +83,10 @@ $(document).ready(function() {
               	type = type[0];
               	if (type == 'PH' | type == 'RA') {
               		if (data == 'Y') {
-              			return '<i class="fa fa-check-circle" style="color:green;" aria-hidden="true"></i>';
+              			return '<i class="fa fa-check-circle" aria-hidden="true"></i>';
               		}
               		else {
-              			return '<i class="far fa-times-circle" style="color:red;"></i>';
+              			return '<i class="far fa-times-circle"></i>';
               		}
               	}
               	else {
@@ -221,7 +221,7 @@ $(document).ready(function() {
 			// Reset chartfield options when department changes
 			success: function(data) {
 				$('#select_cf_3').empty();
-				for (i = 0; i < data.length - 1; ++i) {
+				for (i = 0; i < data.length; ++i) {
 					var drp = document.getElementById('select_cf_3');
 					var option = document.createElement("OPTION");
 					option.value = data[i].account_number;
@@ -244,7 +244,7 @@ $(document).ready(function() {
 			// Reset chartfield options when department changes
 			success: function(data) {
 				$('#select_cf_3').empty();
-				for (i = 0; i < data.length - 1; ++i) {
+				for (i = 0; i < data.length; ++i) {
 					var drp = document.getElementById('select_cf_3');
 					var option = document.createElement("OPTION");
 					option.value = data[i].account_number;
@@ -362,7 +362,11 @@ $(document).ready(function() {
 			// Reset chartfield options when department changes
 			success: function(data) {
 				$('#cf_dropdown').empty();
+<<<<<<< HEAD
 				if (data.length < 2) {
+=======
+				if (data.length < 1) {
+>>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
 					$("#cfNextBtn").attr('disabled', 'true');
 					$('#cf_dropdown_group').hide();
 					$('#cf_details').hide();
@@ -375,7 +379,7 @@ $(document).ready(function() {
 					$('#cf_dropdown_group').show();
 					$('#cf_details').show();
 					var drp = document.getElementById('cf_dropdown');
-					for (i = 0; i < data.length - 1; ++i) {
+					for (i = 0; i < data.length; ++i) {
 						var option = document.createElement("OPTION");
 						option.value = JSON.stringify(data[i]);
 						option.text = data[i].account_number;
@@ -429,6 +433,18 @@ function nextPrev(n, table, cf_change_table, review_table) {
   	}
   }
 
+  // Load third page correctly
+  if (n == 1 && currStep == 2) {
+  	load_3(table, cf_change_table);
+  	if (table_empty(cf_change_table)) {
+  		$('#empty-validate').removeClass('hidden');
+  		return false;
+  	}
+  	else {
+  		$('#empty-validate').addClass('hidden');
+  	}
+  }
+
 
   currStep = currStep + n;
 
@@ -445,11 +461,6 @@ function nextPrev(n, table, cf_change_table, review_table) {
   	$('#dept_search').show();
   	$('#select_dept').show();
   	$("#cfPrevBtn").attr('disabled', 'disabled');
-  }
-
-  // Load third page correctly
-  if (n == 1 && currStep == 3) {
-  	load_3(table, cf_change_table);
   }
 
   if (n == 1 && currStep == 4) {
@@ -560,6 +571,7 @@ function change_current_page(selected) {
 	$('.dept_full_name').html('<strong>Department:&nbsp;</strong>' + dept_title);
 	$('.dept_mgr').html('<strong>Department Manager:&nbsp;</strong>' + dept_mgr);
 
+<<<<<<< HEAD
 // 	// $.ajax({
 // 	// 	url: '/chartchange/old-cf/',
 // 	// 	data: {
@@ -615,6 +627,8 @@ function change_current_page(selected) {
 	// 		alert('uh oh');
 	// 	}
 	// })
+=======
+>>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
 	$('#cf_users_table').DataTable().ajax.reload();
 }
 
@@ -641,7 +655,6 @@ function load_3(table, cf_change_table) {
 				charges,
 				charges
 			]).draw();
-			//col0.removeAttr('checked');
 		}
 	})
 }
@@ -708,4 +721,8 @@ function load_4(cf_change_table, review_table) {
         input.value = user_id + '//' + mrc + '//' + toll + '//' + local;
 		document.getElementById('submit-form').appendChild(input);
 	})
+}
+
+function table_empty(table) {
+	return !table.data().any();	
 }

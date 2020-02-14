@@ -82,7 +82,7 @@ def make_report(request):
     filter_months = (months_list[5], months_list[11])
 
     # Pull data using selected department ID and billing date
-    data = UmOscReptInvlocV.objects.filter(billing_date__exact = date, org__exact = dept_id).order_by('fund','org', 'program', 'subclass', 'project_grant', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+    data = UmOscReptInvlocV.objects.filter(billing_date__exact = date, org__exact = dept_id).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
     
     # Find data to populate filter
     buildings = data.exclude(building = None).order_by('building').values_list('building', flat = True).distinct()
@@ -97,27 +97,27 @@ def make_report(request):
     # If they filter by location
     if request.POST.get('location')!= '' and request.POST.get('location')!= None:
         location_filter = request.POST.get('location')
-        data = data.filter(building__exact = location_filter).order_by('fund','org', 'program', 'subclass', 'project_grant', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+       # data = data.filter(building__exact = location_filter).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
     # If they filter by User ID type
     if request.POST.get('type')!= ''and  request.POST.get('type')!= None:
         type_filter = request.POST.get('type')
-        data = data.filter(cd_descr__exact = type_filter).order_by('fund','org', 'program', 'subclass', 'project_grant', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+        data = data.filter(cd_descr__exact = type_filter).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
     # If they filter by chartfield
     if request.POST.get('cf')!= '' and  request.POST.get('cf')!= None:
         cf_filter = request.POST.get('cf')
-        data = data.filter(chartfield__exact = cf_filter).order_by('fund','org', 'program', 'subclass', 'project_grant', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+        data = data.filter(chartfield__exact = cf_filter).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
     # If they filter by date
     if request.POST.get('date')!= '' and  request.POST.get('date')!= None:
         date_filter = request.POST.get('date')
         if date_filter == '6-12':
             date_filter = "Greater than 6 months and less than 12 months"
-            data = data.filter(last_call_date__lte = months_list[5], last_call_date__gte = months_list[11]).order_by('fund','org', 'program', 'subclass', 'project_grant', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+            data = data.filter(last_call_date__lte = months_list[5], last_call_date__gte = months_list[11]).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
         else:
             date_filter = "Greater than 12 months"
-            data = data.filter(last_call_date__lte = months_list[11]).order_by('fund','org', 'program', 'subclass', 'project_grant', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+            data = data.filter(last_call_date__lte = months_list[11]).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
       
     # Format the report data
-    if list(data) != []:
+    if list(data):
         formated_data, cost_table = format_data(data,request)
     first = datetime.strptime(date,'%Y-%m-%d').date() == curr_period
 
@@ -143,7 +143,6 @@ def make_report(request):
         'date_filter': date_filter,
         'first': first,
         'months_list': filter_months,
-
     }
     return HttpResponse(template.render(context,request))
 
@@ -154,21 +153,35 @@ def format_data(data,request):
     chartfield_cost = 0
     cost_table = []
 
-    current_classification = data.order_by('fund','org', 'program', 'subclass', 'project_grant').values_list('fund','org', 'program', 'subclass', 'project_grant').distinct()[0]
+    # Find first chartfield
+    current_classification = data.order_by('chartfield').values_list('chartfield').distinct()[0][0]
+    
+    # Build data structure
     current_table = []
     same_phone = []
-    current_number = data.order_by('fund','org', 'program', 'subclass', 'project_grant').values_list('id').distinct()[0][0]
+
+    # Get ID of first entry of data set (filtered by selected department and date)
+    current_number = data.order_by('chartfield').values_list('user_defined_id').distinct()[0][0]
+
+    # Loop through all report data
     for point in data:
-        classification = (point['fund'],point['org'],point['program'],point['subclass'],point['project_grant'])
-        number = point['id']
-        if number!=current_number:
+        # Create chartfield-like object
+        classification = point['chartfield']
+        number = point['user_defined_id']
+
+        # Current loop variable is different than the previous (current)
+        if number != current_number:
+            # If this is the first entry of the data set, add it to the current User ID list
             if point == data[0]:
                 same_phone.append(point)
                 continue
             current_table.append(same_phone)
             same_phone = []
             current_number = number
+
         
+        # If new chartfield is reached, append previous chartfield's data to result table
+        # and reset current chartfield
         if classification != current_classification:
             whole_table.append(current_table)
             current_table = []
@@ -176,10 +189,13 @@ def format_data(data,request):
             cost_table.append(chartfield_cost)
             chartfield_cost = 0
 
+        # Add user ID info to tables       
         same_phone.append(point)
-        if point['charge_amount']!=None:
+        if point['charge_amount'] != None:
             chartfield_cost += point['charge_amount']
-    if same_phone != []:
+
+    # Add last data point if necessary        
+    if same_phone:
         current_table.append(same_phone)
         whole_table.append(current_table)
         cost_table.append(chartfield_cost)

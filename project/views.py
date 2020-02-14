@@ -51,6 +51,19 @@ def homepage(request):
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def chartchange(request):
+	# Check for currently-running bill cycle
+	curr = connections['pinnacle'].cursor()
+	running = curr.callfunc('UM_OSC_UTIL_K.UM_IS_BILL_RUNNING_F', str)
+	curr.close()
+
+	if running == 'Y':
+		template = loader.get_template('billingcycle.html')
+		context = {
+			'title': 'Chartfield Change Request',
+		}
+		return HttpResponse(template.render(context, request))
+
+	# Not currently billing
 	template = loader.get_template('chartchange.html')
 
 	# Find initial department
@@ -102,8 +115,7 @@ def chartchange(request):
 		new_dept = user_depts[0].dept
 	else:
 		new_dept = ''
-	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user.id, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
-
+	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
 	# Get notice
 	notice = Page.objects.get(permalink='/ccr')
 
@@ -136,7 +148,11 @@ def change_dept(request):
 
 	# Get list of chartcoms in user's shortlist for user to select new
 	if when == 'assign_new':
+<<<<<<< HEAD
 		cf_options = list(Chartcom.get_user_chartcoms_for_dept(request.user.id, selected_dept).values()) 
+=======
+		cf_options = Chartcom.get_user_chartcoms_for_dept(request.user, selected_dept)
+>>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
 	# Get list of chartcoms in use
 	else:
 		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
@@ -150,6 +166,7 @@ def get_cf_data(request):
 	selected_cf = request.GET.get('selected', None)
 	cf_data = list(UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values())
 
+<<<<<<< HEAD
 	# # Find chartfield nickname
 	# nickname = ''
 	# nicknames = Chartcom.objects.all()
@@ -160,6 +177,8 @@ def get_cf_data(request):
 	# nn = {'nickname': nickname }
 	# cf_data.append(nn)
 
+=======
+>>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
 	if not cf_data:
 		cf_data = {'fund': 'wtf'}
 	return JsonResponse(cf_data, safe=False)
