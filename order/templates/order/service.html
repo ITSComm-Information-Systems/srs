@@ -55,6 +55,9 @@
             {% endautoescape %}
 
         </div>
+        {% autoescape off %}
+        {{ notices.bodytext }}
+        {% endautoescape %}
     </div>
 </div>
 

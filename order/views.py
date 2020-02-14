@@ -584,7 +584,8 @@ class Services(UserPassesTestMixin, View):
     
     def get(self, request, group_id):
 
-        link_list = Page.objects.get(permalink='/links')
+        link_list = Page.objects.get(permalink=f'/links/{group_id}')
+        notices = Page.objects.get(permalink=f'/notices/{group_id}')
 
         template = loader.get_template('order/service.html')
         action_list = Action.objects.filter(active=True).order_by('service','display_seq_no')
@@ -597,6 +598,7 @@ class Services(UserPassesTestMixin, View):
             'title': 'Request Service',
             'service_list': service_list,
             'link_list': link_list,
+            'notices': notices,
             'page_name': 'Request Service'
         }
         return HttpResponse(template.render(context, request))

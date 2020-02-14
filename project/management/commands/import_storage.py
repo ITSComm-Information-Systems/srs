@@ -33,7 +33,7 @@ class Command(BaseCommand):
             print(f'Processed {line_count} lines.')
 
         print(datetime.datetime.now(), 'Add Members')
-        #self.add_members()
+        self.add_members()
 
         print(datetime.datetime.now(), 'end')
 
