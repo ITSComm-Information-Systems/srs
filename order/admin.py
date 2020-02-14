@@ -82,10 +82,43 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 
 
 class StorageInstanceAdmin(admin.ModelAdmin):
-    list_display = ['name','type','size','rate','owner', 'created_date']
     ordering = ('name',)
     search_fields = ['name','owner']
     list_filter = ('type',)
+
+    def changelist_view(self, request, extra_context=None):
+
+        q = request.META['QUERY_STRING']
+
+        if q == 'type__exact=NFS':
+            self.list_display = ['name','uid','flux','size','rate','owner','created_date']
+        elif q == 'type__exact=CIFS':
+            self.list_display = ['name','size','rate','owner', 'created_date']
+        else:
+            self.list_display = ['name','type','size','rate','owner', 'created_date']            
+
+        return super().changelist_view(
+            request, extra_context=extra_context,
+        )
+
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+
+        instance = StorageInstance.objects.get(id=object_id)
+
+        if instance.type == 'CIFS':
+            self.exclude = ['flux','uid']
+
+        else:
+            host_list = StorageHost.objects.all().filter(storage_instance_id=object_id)
+                
+            extra_context = {
+                'host_list': host_list,
+            }
+        return super().change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
+
 
 
 class StorageRateAdmin(admin.ModelAdmin):

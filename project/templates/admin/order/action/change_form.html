@@ -26,19 +26,22 @@
                 <td> {{ element.attributes }} </td>
                 <td> {{ element.display_condition }} </td>
                 <td> {{ element.target }} </td>
+                <td><a class="related-widget-wrapper-link change-related" id="change_id_service"  title="Delete Element" href="/admin/order/element/{{ element.id }}/delete/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-deletelink.svg" alt="Delete"></a></td>
             </tr>
             {% endfor %}
         {% endfor %}
         </table>
         <hr>
-        <h4>Constants</h4>
+        <h4>Constants<a id="add_constant_id" class="related-widget-wrapper-link add-related"  href="/admin/order/constant/add/?_to_field=id&amp;_popup=1&amp;action={{object_id}}" title="Add Constant"><img src="/static/admin/img/icon-addlink.svg" alt="Add"></a></h4>
         <table>
-            <tr>
-                <td><a style = "float:left; margin-left: 106px;" id="add_constant_id" class="related-widget-wrapper-link add-related"  href="/admin/order/constant/add/?_to_field=id&amp;_popup=1&amp;action={{object_id}}" title="Add Constant"><img src="/static/admin/img/icon-addlink.svg" alt="Add"></a></td>
-            </tr>
             {% for con in consts %}
-            <td><a href="/admin/order/constant/{{ con.id }}/change/">{{ con.field }}</a></td><td>{{ con.value }}</td> 
-            </tr>
+                <tr>
+                    <td></td>
+                    <td><a class="related-widget-wrapper-link change-related" id="change_id"  title="Change Constant" href="/admin/order/constant/{{ con.id }}/change/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-changelink.svg" alt="Edit"></a></td>
+                    <td>{{ con.field }}</td>
+                    <td>{{ con.value }}</td> 
+                    <td><a class="related-widget-wrapper-link change-related" id="change_id"  title="Delete Constant" href="/admin/order/constant/{{ con.id }}/delete/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-deletelink.svg" alt="Delete"></a></td>
+                </tr>
             {% endfor %}
         </table>
 
