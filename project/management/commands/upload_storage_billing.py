@@ -2,19 +2,20 @@ from django.core.management.base import BaseCommand, CommandError
 
 from order.models import StorageInstance #, StorageHost, StorageMember, StorageRate
 from project.pinnmodels import UmBillInputApiV
+from django.db import connections
 
-import datetime, csv
+from datetime import datetime, timedelta
 
 class Command(BaseCommand):
     help = 'Upload Billing daat for MiStorage to Pinnacle'
 
     def handle(self, *args, **options):
-        print(datetime.datetime.now(), 'Upload File')
+        print(datetime.now(), 'Upload Records')
 
-        today = datetime.datetime.now().strftime('%m%d%Y')
+        today = datetime.now().strftime('%m%d%Y')
         x = 0
 
-        instances = StorageInstance.objects.filter(pk=[4422, 4421, 4405, 4397, 3526, 3480, 3956, 4039, 4155, 4015])
+        instances = StorageInstance.objects.filter(pk__gt=4730, pk__lt=4831, name='notaname')
         for instance in instances:
             print(instance, instance.rate.get_total_cost(instance.size))
 
@@ -31,4 +32,16 @@ class Command(BaseCommand):
             rec.save()
             x =+1
 
-        print(datetime.datetime.now(), x, 'Records Loaded')
+        print(datetime.now(), x, 'Records Loaded')
+
+        #print(datetime.now(), 'Load Infrastructure Billing')
+        #with connections['pinnacle'].cursor() as cursor:
+        #    result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load Infrastructure Billing', datetime.now() + timedelta(minutes=5), 'MiStorage', today] )
+        #print(datetime.now(), result)
+
+        print(datetime.now(), 'Update Expense Subcode')
+        with connections['pinnacle'].cursor() as cursor:
+            result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21002', 'Update Expense Subcode', datetime.now() + timedelta(minutes=15), 'MiStorage'] )
+        print(datetime.now(), result)
+
+        print(datetime.now(), 'Process Complete')
