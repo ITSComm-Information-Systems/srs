@@ -67,6 +67,13 @@ $(document).ready(function() {
     }
   }
 
+  if ( $("#wfid").val() == 50 ) {  // Hide workflow for "Review Storage" (cost data) 
+    $('#pills-step1').hide();
+    $('p').hide();
+    $('h2').hide();
+    $('#nextBtn').hide();
+  }
+
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
 

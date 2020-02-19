@@ -294,6 +294,11 @@ class StorageInstance(models.Model):
     rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)
     created_date = models.DateTimeField('Assign Date')
 
+    @property
+    def total_cost(self):
+        total_cost = round(self.rate.rate * int(self.size), 2)
+        return total_cost
+
     def __str__(self):
         return self.name
 

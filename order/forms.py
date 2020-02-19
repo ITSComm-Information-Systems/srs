@@ -176,6 +176,8 @@ class AddlInfoForm(TabForm):
 class VolumeSelectionForm(TabForm):
     template = 'order/volume_selection.html'
 
+    total_cost = 0
+
     def get_summary(self, *args, **kwargs):
         #summary = super().get_summary(*args, **kwargs)
         print('summary', self.data['instance_id'], self.data.get('volaction') )
@@ -199,13 +201,19 @@ class VolumeSelectionForm(TabForm):
         super(VolumeSelectionForm, self).__init__(*args, **kwargs)
 
         if not self.is_bound:
-        #if self.request:
             if self.request.path == '/orders/wf/47':
-                type = 'NFS'
-            else:
-                type = 'CIFS'
+                self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user, storage_instance__type='NFS')
 
-            self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user, storage_instance__type=type)
+            elif self.request.path == '/orders/wf/49':
+                self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user, storage_instance__type='CIFS')
+            else:
+                self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user)
+                
+                for vol in self.volume_list:
+                    self.total_cost = self.total_cost + vol.storage_instance.total_cost
+                    
+                self.template = 'order/volume_review.html'
+
 
 
 class AccessNFSForm(TabForm):
