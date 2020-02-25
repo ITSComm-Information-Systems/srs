@@ -67,6 +67,7 @@ class Element(Configuration):
         ('Label', 'Label'),
         ('Checkbox', 'Checkbox'),
         ('McGroup', 'MCommunity Group'),
+        ('ShortCode', 'Short Code'),
         ('HTML', 'Static HTML'),
     )
     label = models.TextField()

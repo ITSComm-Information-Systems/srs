@@ -4,12 +4,13 @@ from .models import Product, Service, Action, Feature, FeatureCategory, FeatureT
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 
-from project.forms.fields import McGroup
+from project.forms.fields import McGroup, ShortCode
 
 def get_storage_options(type):
     opt_list = []
     for opt in StorageRate.objects.filter(type=type):
-        opt_list.append((opt.id, opt.label))
+        label = f'{opt.label} ({opt.rate} / per MB)'
+        opt_list.append((opt.id, label))
 
     return opt_list
 

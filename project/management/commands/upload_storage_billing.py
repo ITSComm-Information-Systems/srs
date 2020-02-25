@@ -13,6 +13,7 @@ class Command(BaseCommand):
         print(datetime.now(), 'Upload Records')
 
         today = datetime.now().strftime('%m%d%Y')
+        today = int(today)
         x = 0
 
         instances = StorageInstance.objects.filter(pk__gt=4730, pk__lt=4831)
@@ -38,7 +39,7 @@ class Command(BaseCommand):
 
         with connections['pinnacle'].cursor() as cursor:
             result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load Infrastructure Billings'
-                                   , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),"'MiStorage',2122020"] )
+                                   , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'MiStorage',{today}"] )
         
         print(datetime.now(), result)
         print(datetime.now(), 'Update Expense Code')
