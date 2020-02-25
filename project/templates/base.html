@@ -123,7 +123,7 @@
 						</div>
 
 					</li>
-					{% else %}
+					{% elif user.is_authenticated %}
 					<li class="nav-item dropdown">
 						<a href="/orders/services/2" class="nav-link"><i class="fas fa-check-circle white"></i> Request Service</a>
 					</li>

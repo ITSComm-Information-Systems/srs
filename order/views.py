@@ -392,7 +392,10 @@ class Workflow(UserPassesTestMixin, View):
         action = Action.objects.get(id=action_id)
 
         if action.service.group_id == 2:  # MiStorage requires no permissions
-            return True
+            if self.request.user.is_authenticated:
+                return True
+            else:
+                return False
         else:
             if self.request.user.has_perm('oscauth.can_order'):
                 return True
@@ -575,7 +578,10 @@ class Services(UserPassesTestMixin, View):
         group_id = self.request.resolver_match.kwargs['group_id']
 
         if group_id == 2:  # MiStorage requires no permissions
-            return True
+            if self.request.user.is_authenticated:
+                return True
+            else:
+                return False
         else:
             if self.request.user.has_perm('oscauth.can_order'):
                 return True
