@@ -303,6 +303,12 @@ class BillingStorageForm(TabForm):
                     self.fields["shortcode"].initial = si.shortcode
                     self.fields["billingAuthority"].initial = 'yes'
                     self.fields["serviceLvlAgreement"].initial = 'yes'
+                else:
+                    option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
+                    total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
+                    descr = self.fields['totalCost'].description.replace('99', str(total_cost))
+                    self.fields['totalCost'].description = descr
+
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
