@@ -9,7 +9,7 @@ from project.forms.fields import McGroup, ShortCode
 def get_storage_options(type):
     opt_list = []
     for opt in StorageRate.objects.filter(type=type):
-        label = f'{opt.label} ({opt.rate} / per MB)'
+        label = f'{opt.label} ({opt.rate} / per GB)'
         opt_list.append((opt.id, label))
 
     return opt_list
@@ -181,7 +181,7 @@ class VolumeSelectionForm(TabForm):
 
     def get_summary(self, *args, **kwargs):
         #summary = super().get_summary(*args, **kwargs)
-        print('summary', self.data['instance_id'], self.data.get('volaction') )
+        #print('summary', self.data['instance_id'], self.data.get('volaction') )
         instance = StorageInstance.objects.get(id=self.data['instance_id'])
 
         if self.data.get('volaction') == 'Delete':
@@ -214,7 +214,6 @@ class VolumeSelectionForm(TabForm):
                     self.total_cost = self.total_cost + vol.storage_instance.total_cost
                     
                 self.template = 'order/volume_review.html'
-
 
 
 class AccessNFSForm(TabForm):
@@ -299,17 +298,15 @@ class BillingStorageForm(TabForm):
         if self.request:
             if self.request.method == 'POST':
                 instance_id = self.request.POST.get('instance_id')
+                option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
+                total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
+                descr = self.fields['totalCost'].description.replace('~', str(total_cost))
+                self.fields['totalCost'].description = descr
                 if instance_id:
                     si = StorageInstance.objects.get(id=instance_id)
                     self.fields["shortcode"].initial = si.shortcode
                     self.fields["billingAuthority"].initial = 'yes'
                     self.fields["serviceLvlAgreement"].initial = 'yes'
-                else:
-                    option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
-                    total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
-                    descr = self.fields['totalCost'].description.replace('99', str(total_cost))
-                    self.fields['totalCost'].description = descr
-
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
