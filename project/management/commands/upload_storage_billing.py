@@ -15,7 +15,7 @@ class Command(BaseCommand):
         today = datetime.now().strftime('%m%d%Y')
         x = 0
 
-        instances = StorageInstance.objects.filter(pk__gt=4730, pk__lt=4831, name='notaname')
+        instances = StorageInstance.objects.filter(pk__gt=4730, pk__lt=4831)
         for instance in instances:
             print(instance, instance.rate.get_total_cost(instance.size))
 
@@ -30,18 +30,22 @@ class Command(BaseCommand):
             rec.voucher_comment = instance.owner
             rec.bill_input_file_id = today
             rec.save()
-            x =+1
+            x+=1
 
         print(datetime.now(), x, 'Records Loaded')
 
-        #print(datetime.now(), 'Load Infrastructure Billing')
-        #with connections['pinnacle'].cursor() as cursor:
-        #    result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load Infrastructure Billing', datetime.now() + timedelta(minutes=5), 'MiStorage', today] )
-        #print(datetime.now(), result)
+        print(datetime.now(), 'Load Infrastructure Billing')
 
-        print(datetime.now(), 'Update Expense Subcode')
         with connections['pinnacle'].cursor() as cursor:
-            result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21002', 'Update Expense Subcode', datetime.now() + timedelta(minutes=15), 'MiStorage'] )
+            result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load Infrastructure Billings'
+                                   , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),"'MiStorage',2122020"] )
+        
         print(datetime.now(), result)
+        print(datetime.now(), 'Update Expense Code')
 
+        with connections['pinnacle'].cursor() as cursor:
+            result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21002', 'Update Expense Subcode'
+                                  , (datetime.now() + timedelta(minutes=15)).strftime('%d-%b-%y %H:%M'), 'MiStorage'] )
+
+        print(datetime.now(), result)
         print(datetime.now(), 'Process Complete')
