@@ -25,12 +25,13 @@
                             id="department-dropdown">
                             {% for dept in dept_list %}
                                 {% if dept.active == 'A' %}
-                                <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
+                                <option name="dept" value="{{dept.deptid}}">{{dept.deptid}} - {{dept.name}}</option>
                                 {% endif %}
                             {% endfor %}
                         </select>
                         <noscript><input type="submit" class="btn btn-outline-secondary" value="Go"></noscript>
                     </div>
+                    <p>*Departments without items in cart are not displayed in list.</p>
                 </form>
             </div>
         </div>

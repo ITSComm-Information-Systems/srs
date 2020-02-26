@@ -442,27 +442,25 @@ class Cart(PermissionRequiredMixin, View):
         return HttpResponseRedirect('/orders/cart/' + request.POST['deptid'])
 
     def get(self, request, deptid):
-        dept_list = AuthUserDept.get_order_departments(request.user.id)
-        hasset = False;
+        
+        depts = []
+        user_dept_list = AuthUserDept.get_order_departments(request.user.id)
+        for dept in user_dept_list:
+            depts.append(dept.dept)
+
         first= {}
 
+        dept_list = Item.objects.filter(deptid__in=depts).exclude(order_id__gt=0).distinct('deptid')
+        if deptid == 0 and len(dept_list) > 0:
+            deptid = int(dept_list[0].deptid)
+
         for dept in dept_list:
-            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
+            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.deptid)
             dept.active = deptinfo.dept_eff_status
             dept.name = deptinfo.dept_name
 
-            if deptid == int(dept.dept):
-                first = {'id': dept.dept, 'name': deptinfo.dept_name}
-            if hasset == False:
-                item_list = Item.objects.filter(deptid=dept.dept).exclude(order_id__gt=0).order_by('chartcom','-create_date')
-                chartcoms = item_list.distinct('chartcom')
-                if(len(chartcoms) != 0):
-                    hasset = True
-                    first = {'id': dept.dept, 'name':dept.name}
-                    deptid = dept.dept
-        if deptid == 0 and first =={}:
-            first_dept = UmOscDeptProfileV.objects.get(deptid=dept_list[0].dept)
-            first = {'id':first_dept.deptid, 'name': first_dept.dept_name}
+            if deptid == int(dept.deptid):
+                first = {'id': dept.deptid, 'name': deptinfo.dept_name}
 
 
         status = ['Ready to Order','Saved for Later']
