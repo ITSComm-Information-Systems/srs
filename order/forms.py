@@ -328,6 +328,16 @@ class ContactCenterForm(TabForm):
 
 
 class ReviewForm(TabForm):
+
+    def __init__(self, *args, **kwargs):
+        super(ReviewForm, self).__init__(*args, **kwargs)
+        print(self.request.POST)
+
+        if self.request.POST.get('action_id') == '47' or self.request.POST.get('action_id') == '49':
+            item_id = self.request.POST.get('item_id')
+            instance_id = self.request.POST.get('instance_id')
+            print(item_id, instance_id)
+
     #summary = forms.CharField(label='summary', max_length=6)
     template = 'order/review.html'
 
