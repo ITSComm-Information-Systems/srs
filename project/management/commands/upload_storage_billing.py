@@ -16,7 +16,7 @@ class Command(BaseCommand):
         today = int(today)
         x = 0
 
-        instances = StorageInstance.objects.filter(pk__gt=4730, pk__lt=4831)
+        instances = StorageInstance.objects.filter(pk__gt=4710, pk__lt=4715)
         for instance in instances:
             print(instance, instance.rate.get_total_cost(instance.size))
 
@@ -42,11 +42,11 @@ class Command(BaseCommand):
                                    , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'MiStorage',{today}"] )
         
         print(datetime.now(), result)
-        print(datetime.now(), 'Update Expense Code')
+        #print(datetime.now(), 'Update Expense Code')
 
-        with connections['pinnacle'].cursor() as cursor:
-            result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21002', 'Update Expense Subcode'
-                                  , (datetime.now() + timedelta(minutes=15)).strftime('%d-%b-%y %H:%M'), 'MiStorage'] )
+        #with connections['pinnacle'].cursor() as cursor:
+        #    result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21002', 'Update Expense Subcode'
+        #                          , (datetime.now() + timedelta(minutes=15)).strftime('%d-%b-%y %H:%M'), 'MiStorage'] )
 
-        print(datetime.now(), result)
+        #print(datetime.now(), result)
         print(datetime.now(), 'Process Complete')
