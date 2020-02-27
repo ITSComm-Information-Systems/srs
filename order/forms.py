@@ -28,7 +28,10 @@ class TabForm(forms.Form):
         
         for field in self.fields:
             if self.has_error(field):
-                self.fields[field].widget.attrs.update({'class': 'form-control is-invalid'}) 
+                if self.fields[field].type == 'Radio' or self.fields[field].type == 'Checkbox':
+                    self.fields[field].widget.attrs.update({'class': ' is-invalid'}) #form-control makes radio buttons wonky
+                else:
+                    self.fields[field].widget.attrs.update({'class': ' is-invalid form-control'}) 
 
     def get_summary(self, visible):
 
@@ -69,7 +72,8 @@ class TabForm(forms.Form):
         for element in element_list:
 
             if element.type == 'Radio':
-                field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.RadioSelect(attrs={'class': 'form-control'}))
+                #field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.RadioSelect(attrs={'class': 'form-control'}))
+                field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.RadioSelect())
                 field.template_name = 'project/radio.html'
             elif element.type == 'Chart':
                 field = forms.ChoiceField(label=element.label, help_text=element.description
@@ -187,7 +191,7 @@ class VolumeSelectionForm(TabForm):
         if self.data.get('volaction') == 'Delete':
             summary = [{'label': 'Are you sure you want to delete this volume?', 'value': ''}
                         ,{'label': 'Volume Name:', 'value': instance.name}
-                        ,{'label': 'Ownewr:', 'value': instance.owner}]
+                        ,{'label': 'Owner:', 'value': instance.owner}]
         else:
             summary = [{'label': 'Volume Name:', 'value': instance.name}]
 
@@ -294,19 +298,25 @@ class BillingStorageForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(BillingStorageForm, self).__init__(*args, **kwargs)
+        total_cost = 0
 
         if self.request:
             if self.request.method == 'POST':
                 instance_id = self.request.POST.get('instance_id')
                 option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
                 total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
-                descr = self.fields['totalCost'].description.replace('~', str(total_cost))
-                self.fields['totalCost'].description = descr
+
                 if instance_id:
                     si = StorageInstance.objects.get(id=instance_id)
                     self.fields["shortcode"].initial = si.shortcode
                     self.fields["billingAuthority"].initial = 'yes'
                     self.fields["serviceLvlAgreement"].initial = 'yes'
+        else:
+            option = StorageRate.objects.get(id=self.data['selectOptionType'])
+            total_cost = option.get_total_cost(self.data['sizeGigabyte'])
+
+        descr = self.fields['totalCost'].description.replace('~', str(total_cost))
+        self.fields['totalCost'].description = descr
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
@@ -331,7 +341,6 @@ class ReviewForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
-        print(self.request.POST)
 
         if self.request.POST.get('action_id') == '47' or self.request.POST.get('action_id') == '49':
             item_id = self.request.POST.get('item_id')
