@@ -1,8 +1,27 @@
+var popOverSettings = {
+  placement: 'bottom',
+  container: 'body',
+  html: true,
+  trigger: 'hover',
+  selector: '[data-toggle="popover"]', //Sepcify the selector here
+  content: function () {
+      return $('#popover-content').html();
+  }
+}
+
+
+
 $(document).ready(function() {
 
   $('#productType_1').attr('disabled', true);
 
-  $('[data-toggle="popover"]').popover();
+
+  $(document).on("click", "a.remove" , function() {
+    $(this).parent().remove();
+  });
+
+  $('body').popover(popOverSettings);
+  //$('[data-toggle="popover"]').popover();
 
   use_cart = $("#wfcart").val();
 
@@ -484,8 +503,8 @@ $(document).ready(function() {
     }
 })
 
-$('[data-tab="volumeSelection"]').on('shown.bs.tab', function(event) {
-  $("#nextBtn").hide();
+$('[data-tab="volumeSelection"]').ready(function() {
+  //$("#nextBtn").hide();
 });
 
 $('[data-tab="volumeSelection"]').on('hidden.bs.tab', function(event) {

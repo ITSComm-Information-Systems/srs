@@ -253,7 +253,7 @@ class Submit(PermissionRequiredMixin, View):
         return HttpResponseRedirect('/submitted') 
 
 @csrf_exempt
-def send_email(request):
+def send_email(request):   #Pinnacle will route non prod emails to a test address
     if request.method == "POST":
         subject = request.POST['emailSubject'] + ' question from: ' + request.user.username
         body = request.POST['emailBody'] 
