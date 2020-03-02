@@ -93,11 +93,11 @@ class StorageInstanceAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         urls = super().get_urls()
-        print(urls)
-        my_urls = [
+
+        download_url = [
             path('download_csv/', self.download_csv),
         ]
-        return my_urls + urls
+        return download_url + urls
 
     def download_csv(self, request):
         # Create the HttpResponse object with the appropriate CSV header.
