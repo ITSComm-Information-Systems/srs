@@ -40,6 +40,7 @@ class TabForm(forms.Form):
         for key, value in self.cleaned_data.items():
             field = self.fields[key]
 
+
             if key in visible:  # Add visible fields to the review page
                 label = field.label
 
@@ -48,9 +49,13 @@ class TabForm(forms.Form):
                         if str(choice[0]) == value:
                             value = choice[1]
 
-                if field.type == 'Checkbox':
+                if field.type == 'Checkbox':  
                     label = field.choices[0][1]
-                    value = field.choices[0][0]
+                    if len(value) > 0:  #TODO handle more than one Yes/No field.
+                        value = 'Yes'
+                    else:
+                        value = 'No'
+
                 
                 summary.append({'label': label, 'value': value})
 
@@ -185,7 +190,7 @@ class VolumeSelectionForm(TabForm):
 
     def get_summary(self, *args, **kwargs):
         #summary = super().get_summary(*args, **kwargs)
-        #print('summary', self.data['instance_id'], self.data.get('volaction') )
+
         instance = StorageInstance.objects.get(id=self.data['instance_id'])
 
         if self.data.get('volaction') == 'Delete':
@@ -235,6 +240,16 @@ class AccessNFSForm(TabForm):
                 host_value = host
 
         summary[1]['value'] = host_value
+
+        instance_id = self.data.get('instance_id')
+        if instance_id:
+            si = StorageInstance.objects.get(id=instance_id)
+            if summary[0]['value'] != si.uid:
+                print(summary[0]['value'], si.uid)
+                summary[0]['label'] = '*' + summary[0]['label']
+            if summary[1]['value'] != si.owner:
+                summary[1]['label'] = '*' + summary[1]['label']
+
         return summary
 
     def __init__(self, *args, **kwargs):
@@ -259,6 +274,27 @@ class AccessNFSForm(TabForm):
 
 class DetailsNFSForm(TabForm):
 
+    def get_summary(self, *args, **kwargs):
+        summary = super().get_summary(*args, **kwargs)
+        instance_id = self.data.get('instance_id')
+        
+        if instance_id:
+            si = StorageInstance.objects.get(id=instance_id)
+            if summary[0]['value'] != si.name:
+                summary[0]['label'] = '*' + summary[0]['label']
+            if self.data['selectOptionType'] != str(si.rate_id):
+                summary[1]['label'] = '*' + summary[1]['label']
+            if summary[2]['value'] != si.size:
+                summary[2]['label'] = '*' + summary[2]['label']
+            if si.flux:
+                if summary[3]['value'] == 'No':
+                    summary[3]['label'] = '*' + summary[3]['label']
+            else:
+                if summary[3]['value'] == 'Yes':
+                    summary[3]['label'] = '*' + summary[3]['label']
+
+        return summary
+
     def __init__(self, *args, **kwargs):
         super(DetailsNFSForm, self).__init__(*args, **kwargs)
         self['flux'].field.required = False
@@ -274,6 +310,23 @@ class DetailsNFSForm(TabForm):
                     self.fields['flux'].initial = si.flux  
 
 class DetailsCIFSForm(TabForm):
+
+    def get_summary(self, *args, **kwargs):
+        summary = super().get_summary(*args, **kwargs)
+        instance_id = self.data.get('instance_id')
+        
+        if instance_id:
+            si = StorageInstance.objects.get(id=instance_id)
+            if summary[0]['value'] != si.owner:
+                summary[0]['label'] = '*' + summary[0]['label']
+            if summary[2]['value'] != si.name:
+                summary[2]['label'] = '*' + summary[2]['label']
+            if self.data['selectOptionType'] != str(si.rate_id):
+                summary[3]['label'] = '*' + summary[3]['label']
+            if summary[4]['value'] != si.size:
+                summary[4]['label'] = '*' + summary[4]['label']
+
+        return summary
 
     def __init__(self, *args, **kwargs):
         super(DetailsCIFSForm, self).__init__(*args, **kwargs)
@@ -323,6 +376,15 @@ class BillingStorageForm(TabForm):
         option = StorageRate.objects.get(id=self.data['selectOptionType'])
         total_cost = option.get_total_cost(self.data['sizeGigabyte'])
         summary.append({'label': 'Total Cost', 'value': str(total_cost)})
+
+        instance_id = self.data.get('instance_id')
+        
+        if instance_id:
+            si = StorageInstance.objects.get(id=instance_id)
+            if self.data['shortcode'] != si.shortcode:
+                summary[0]['label'] = '*' + summary[0]['label']
+
+
         return summary
 
 
@@ -345,7 +407,6 @@ class ReviewForm(TabForm):
         if self.request.POST.get('action_id') == '47' or self.request.POST.get('action_id') == '49':
             item_id = self.request.POST.get('item_id')
             instance_id = self.request.POST.get('instance_id')
-            print(item_id, instance_id)
 
     #summary = forms.CharField(label='summary', max_length=6)
     template = 'order/review.html'
