@@ -9,6 +9,7 @@
   <input type="hidden" id="wfid" name="action_id" value="{{action.id}}">
   <input type="hidden" id="wftype" name="action_type" value="{{action.type}}">
   <input type="hidden" id="wfname" name="action" value="{{title}}">
+  <input type="hidden" id="wfcart" name="cart" value="{{action.use_cart}}">
 
 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     {% for tab in tab_list %}
@@ -19,7 +20,7 @@
   </ul>
   <div class="tab-content" id="pills-tabContent">
     {% for tab in tab_list %}
-      <div class="tab-pane fade" id="{{ tab.step }}" role="tabpanel" aria-labelledby="pills-{{ tab.step }}">
+      <div class="tab-pane fade" id="{{ tab.step }}" data-pane="{{ tab.name }}" role="tabpanel" aria-labelledby="pills-{{ tab.step }}">
           {% include tab.form.template %}
       </div>
     {% endfor %}

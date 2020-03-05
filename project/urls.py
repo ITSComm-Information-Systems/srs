@@ -5,8 +5,8 @@ from django.urls import path
 from django.conf.urls.static import static
 from . import views
 
-admin.AdminSite.site_header = 'OSC Administration'
-admin.AdminSite.site_title = 'OSC Site Admin'
+admin.AdminSite.site_header = 'SRS Administration'
+admin.AdminSite.site_title = 'SRS Site Admin'
 
 urlpatterns = [
     path('oidc/', include('mozilla_django_oidc.urls')),

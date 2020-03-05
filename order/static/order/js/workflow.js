@@ -1,4 +1,29 @@
+var popOverSettings = {
+  placement: 'bottom',
+  container: 'body',
+  html: true,
+  trigger: 'hover',
+  selector: '[data-toggle="popover"]', //Sepcify the selector here
+  content: function () {
+      return $('#popover-content').html();
+  }
+}
+
+
+
 $(document).ready(function() {
+
+  $('#productType_1').attr('disabled', true);
+
+
+  $(document).on("click", "a.remove" , function() {
+    $(this).parent().remove();
+  });
+
+  $('body').popover(popOverSettings);
+  //$('[data-toggle="popover"]').popover();
+
+  use_cart = $("#wfcart").val();
 
   item_id = 0;
   // Workflow stuff
@@ -9,8 +34,12 @@ $(document).ready(function() {
 
     currStep = $(this)[0].id.substring(10, 12) * 1;
     if (currStep == lastStep) {
+      if (use_cart=="True") {
         $('#nextBtn').html('Add to Cart');
         fillReviewForm();
+      } else {
+        $('#nextBtn').html('Submit Now');
+      }
     } else {
         $('#nextBtn').html('Next');
     }
@@ -55,6 +84,13 @@ $(document).ready(function() {
     for (i = 1; i < lastStep+1; i++) {
       $('#pills-step'+ i).removeClass('disabled'); 
     }
+  }
+
+  if ( $("#wfid").val() == 50 ) {  // Hide workflow for "Review Storage" (cost data) 
+    $('#pills-step1').hide();
+    $('p').hide();
+    $('h2').hide();
+    $('#nextBtn').hide();
   }
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
@@ -222,8 +258,16 @@ $(document).ready(function() {
   });
 
   $("#nextBtn").click(function(event) {
-    //sendTabData();  // TODO Enable AJAX
-    nextPrev(1);
+
+    if (use_cart=="True") {  // TODO Enable AJAX
+      //if (n == 1 && !validateForm()) return false;
+      nextPrev(1);
+    } else {
+      sendTabData();
+    }
+
+
+
   });
 
   $("#prevBtn").click(function(event) {
@@ -395,6 +439,8 @@ $(document).ready(function() {
 
   function nextPrev(n) {
 
+
+
     if (n == 1 && !validateForm()) return false;
   
     currStep = currStep + n;
@@ -440,8 +486,6 @@ $(document).ready(function() {
     $("#subscriberId").show();
     count = $("[id^=authdiv]").length;
 
-    console.log(max + '-' + count);
-
     $("#subscriberId").removeAttr('data-sequence');
     $("#subscriberId").removeAttr('data-condition');
     var rec = $("#subscriberId").clone();
@@ -459,54 +503,14 @@ $(document).ready(function() {
     }
 })
 
+$('[data-tab="volumeSelection"]').ready(function() {
+  //$("#nextBtn").hide();
+});
 
-function sendTabData() {
-  data = $('#workflowForm').serializeArray();
-  data.push({name: 'tab', value: currTab});
-  data.push({name: 'item_id', value: item_id});
-  data.push({name: 'sequence', value: currStep});
-  //console.log('update', item_id);
-  // List the fields that are visible.  TODO use the data from validate form
-  inp = $("#step" + currStep + " :input:visible");
+$('[data-tab="volumeSelection"]').on('hidden.bs.tab', function(event) {
+  $("#nextBtn").show();
+});
 
-  visible = []
-  for (i = 0; i < inp.length; i++) {
-    visible.push(inp[i].name);
-  }
-  data.push({name: 'visible', value: visible});
-
-  $.ajax({
-      url : "/orders/ajax/send_tab_data/", 
-      type : "POST", 
-      data : data, 
-
-      beforeSend: function(){
-        console.log('before');
-        //$('#nextBtn').addClass('disabled'); 
-      },
-
-      success : function(json) {
-          console.log(json); // log the returned json to the console
-          console.log("success"); // another sanity check
-          item_id = json;
-          //nextPrev(1);
-      },
-
-      // handle a non-successful response
-      error : function(xhr,errmsg,err) {
-          $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
-              " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
-          console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-      },
-
-      // handle a non-successful response
-      complete: function(){
-        console.log('complete');
-        $('#nextBtn').removeClass('disabled'); ;
-      }
-
-  });
-};
 
 
 });  // Document Ready
@@ -559,8 +563,124 @@ function chartcomChange(obj) {
     $(id).find('option:selected').attr('selected', false);
     
   }
-
-
-
-
   
+
+function addHost() {
+  // clone host_new
+  if (typeof host_count == "undefined") {
+    host_count = 0;
+  } else {
+    host_count = host_count + 1;
+  }
+  
+  console.log(host_count, '<');
+
+  var rec = $("#host_new").clone();
+
+  rec.attr("id", "host_new_" + host_count);
+  rec.show();
+  $("#host_list").append(rec);   // TODO Find last host
+  $("#host_new").hide()
+}
+
+function modifyVolume(del_flag, volumeID) {
+  currStep = 4;
+
+  $('#instance_id').val(volumeID);
+
+
+  if(del_flag==1) {
+    lastStep = document.getElementsByClassName("tab-pane").length;
+    $('#pills-step'+lastStep).removeClass('disabled');
+    //$('#pills-tab li:last-child a').tab('show') 
+
+    $('[data-tab="nfsAccess"]').hide();
+    $('[data-tab="detailsNFS"]').hide();
+    $('[data-tab="detailsCIFS"]').hide();
+    $('[data-tab="storageBilling"]').hide();
+
+    sendTabData({name: 'volaction', value: 'Delete'});
+  } else {
+    $('#instance_id').val(volumeID);
+    sendTabData();
+  }
+
+  $('[data-tab="volumeSelection"]').hide();
+
+  //$('#pills-step'+currStep).removeClass('disabled');
+  //$('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
+}
+  
+
+
+
+
+function sendTabData(field) {
+  data = $('#workflowForm').serializeArray();
+  if (field != 'undefined') {
+    data.push(field)
+  }
+  data.push({name: 'tab', value: currTab});
+  data.push({name: 'item_id', value: item_id});
+  data.push({name: 'sequence', value: currStep});
+  //console.log('update', item_id);
+  // List the fields that are visible.  TODO use the data from validate form
+  inp = $("#step" + currStep + " :input:visible");
+
+  visible = []
+  for (i = 0; i < inp.length; i++) {
+    visible.push(inp[i].name);
+  }
+  data.push({name: 'visible', value: visible});
+
+  $.ajax({
+      url : "/orders/ajax/send_tab_data/", 
+      type : "POST", 
+      data : data, 
+
+      beforeSend: function(){
+        console.log('before');
+        //$('#nextBtn').addClass('disabled'); 
+      },
+
+      success : function(json) {
+          redirect = json['redirect'];
+
+          if (typeof(redirect) != 'undefined') {
+            window.location.replace(redirect);
+            return;
+          }
+
+          tab_name = json['tab_name'];
+          valid = json['valid'];
+          tab_content = json['tab_content'];
+          console.log(tab_name)
+          pane = $('[data-pane="' + tab_name + '"]').html(tab_content);
+
+          if (valid) {
+            $("input").removeClass('is-invalid');
+            //$("#workflowForm").removeClass('was-validated');
+            item_id = json['item_id'];
+            $('[data-tab="' + tab_name + '"]').removeClass('disabled');
+            $('#pills-tab a[href="#' + pane[0].id + '"]').tab('show')
+          } else {
+            //$("#workflowForm").addClass('was-validated');
+            console.log('not valid');
+          }
+      },
+
+      // handle a non-successful response
+      error : function(xhr,errmsg,err) {
+          $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+              " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+          console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+      },
+
+      // handle a non-successful response
+      complete: function(){
+        console.log('complete');
+        $('#nextBtn').removeClass('disabled'); ;
+      }
+
+  });
+};
