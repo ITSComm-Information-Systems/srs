@@ -114,7 +114,8 @@ TEMPLATES = {
             'libraries':{
                 'index': 'reports.inventory.templatetags.index',
                 'tags': 'reports.soc.templatetags.tags',
-                'ccr_tags': 'project.templatetags.ccr_tags'
+                'ccr_tags': 'project.templatetags.ccr_tags',
+                'descr': 'reports.nonteleph.templatetags.descr'
             }
         },
 },
@@ -202,7 +203,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

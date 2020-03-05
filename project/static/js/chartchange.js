@@ -68,10 +68,10 @@ $(document).ready(function() {
             { "targets": [3],
               "mRender": function (data, type, full, meta) {
               	 if (data == 'Y') {
-          			return '<i class="fa fa-check-circle" style="color:green;" aria-hidden="true"></i>';
+          			return '<i class="fa fa-check-circle" aria-hidden="true"></i>';
           		 }
           		 else {
-          		 	return '<i class="far fa-times-circle" style="color:red;"></i>';
+          		 	return '<i class="far fa-times-circle"></i>';
           		 }
               }
 
@@ -83,10 +83,10 @@ $(document).ready(function() {
               	type = type[0];
               	if (type == 'PH' | type == 'RA') {
               		if (data == 'Y') {
-              			return '<i class="fa fa-check-circle" style="color:green;" aria-hidden="true"></i>';
+              			return '<i class="fa fa-check-circle" aria-hidden="true"></i>';
               		}
               		else {
-              			return '<i class="far fa-times-circle" style="color:red;"></i>';
+              			return '<i class="far fa-times-circle"></i>';
               		}
               	}
               	else {
@@ -429,6 +429,18 @@ function nextPrev(n, table, cf_change_table, review_table) {
   	}
   }
 
+  // Load third page correctly
+  if (n == 1 && currStep == 2) {
+  	load_3(table, cf_change_table);
+  	if (table_empty(cf_change_table)) {
+  		$('#empty-validate').removeClass('hidden');
+  		return false;
+  	}
+  	else {
+  		$('#empty-validate').addClass('hidden');
+  	}
+  }
+
 
   currStep = currStep + n;
 
@@ -445,11 +457,6 @@ function nextPrev(n, table, cf_change_table, review_table) {
   	$('#dept_search').show();
   	$('#select_dept').show();
   	$("#cfPrevBtn").attr('disabled', 'disabled');
-  }
-
-  // Load third page correctly
-  if (n == 1 && currStep == 3) {
-  	load_3(table, cf_change_table);
   }
 
   if (n == 1 && currStep == 4) {
@@ -560,61 +567,6 @@ function change_current_page(selected) {
 	$('.dept_full_name').html('<strong>Department:&nbsp;</strong>' + dept_title);
 	$('.dept_mgr').html('<strong>Department Manager:&nbsp;</strong>' + dept_mgr);
 
-// 	// $.ajax({
-// 	// 	url: '/chartchange/old-cf/',
-// 	// 	data: {
-// 	// 		'selected': selected
-// 	// 	},
-// 	// 	dataType:'json',
-// 	// 	success: function(data) {
-// 	// 		cf = data;
-// 	// 		$("#fund").html(cf[0].fund);
-// 	// 		$("#deptid").html(cf[0].deptid);
-// 	// 		$("#program").html(cf[0].program);
-// 	// 		$("#class_code").html(cf[0].class_code);
-// 	// 		$("#project_grant").html(cf[0].project_grant);
-// 	// 		$('#cf_shortcode').html(cf[0].shortcode);
-// 	// 		$('#cf_nickname').html(cf[1].nickname);
-// 	// 		$('.cf_num').html(cf[0].account_number);
-// 	// 		if (cf[1].nickname) {
-// 	// 			$('.cf_nickname').html('(' + cf[1].nickname + ')');
-// 	// 		}
-// 	// 		$('.dept_full_name').html('<strong>Department:&nbsp;</strong>' + dept_title);
-// 	// 		$('.dept_mgr').html('<strong>Department Manager:&nbsp;</strong>' + dept_mgr);
-// 	// 	},
-// 	// 	error: function(data) {
-// 	// 		alert('uh oh');
-// 	// 	}
-// 	// })
-
-
-	// $.ajax({
-	// 	url: '/chartchange/old-cf/',
-	// 	data: {
-	// 		'selected': selected
-	// 	},
-	// 	dataType:'json',
-	// 	success: function(data) {
-	// 		cf = data;
-	// 		alert(data);
-	// 		$("#fund").html(cf[0].fund);
-	// 		$("#deptid").html(cf[0].deptid);
-	// 		$("#program").html(cf[0].program);
-	// 		$("#class_code").html(cf[0].class_code);
-	// 		$("#project_grant").html(cf[0].project_grant);
-	// 		$('#cf_shortcode').html(cf[0].shortcode);
-	// 		$('#cf_nickname').html(cf[0].nickname);
-	// 		$('.cf_num').html(cf[0].account_number);
-	// 		if (cf[0].nickname) {
-	// 			$('.cf_nickname').html('(' + cf[0].nickname + ')');
-	// 		}
-	// 		$('.dept_full_name').html('<strong>Department:&nbsp;</strong>' + dept_title);
-	// 		$('.dept_mgr').html('<strong>Department Manager:&nbsp;</strong>' + dept_mgr);
-	// 	},
-	// 	error: function(data) {
-	// 		alert('uh oh');
-	// 	}
-	// })
 	$('#cf_users_table').DataTable().ajax.reload();
 }
 
@@ -641,7 +593,6 @@ function load_3(table, cf_change_table) {
 				charges,
 				charges
 			]).draw();
-			//col0.removeAttr('checked');
 		}
 	})
 }
@@ -708,4 +659,8 @@ function load_4(cf_change_table, review_table) {
         input.value = user_id + '//' + mrc + '//' + toll + '//' + local;
 		document.getElementById('submit-form').appendChild(input);
 	})
+}
+
+function table_empty(table) {
+	return !table.data().any();	
 }

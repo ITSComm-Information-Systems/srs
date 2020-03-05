@@ -34,68 +34,72 @@
     <input type="text" name="dept_id" id="dept_id" value="{{dept_id}}-{{dept_name}}" readonly hidden>
     <input type="text" name="bill_period" id="bill_period" value="{{bill_period}}" readonly hidden>
 
-    <div class="mt-2 mb-2">
-        <strong>Filter By:</strong>
-    </div>
+        <div class="mt-2 mb-2">
+            <strong>Filter By:</strong>
+        </div>
 
-    
+        
         {% if first %}
-        <div class="form-row">
-            <div class="col-3" id="select_loc">
-                <div class="input-group col-auto">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="location">
-                            Location
-                        </label>
-                    </div>
-                    <select class="custom-select" name="location"
-                        id="location">
-                        <option value=''>--Select--
+            <div class="form-row">
+                <div class="col-3" id="select_loc">
+                    <div class="input-group col-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="location">
+                                Location
+                            </label>
+                        </div>
+                        <select class="custom-select" name="location"
+                            id="location">
+                            <option value=''>--Select--</option>
                             {% for building in buildings %}
-                        <option value="{{ building }}">{{ building }}{% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div class="col-3" id="select_type">
-                <div class="input-group col-auto">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="type">User ID Type</label>
+                                <option value="{{ building }}">{{ building }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
+                </div>
 
-                    <select class="custom-select" name="type" id="type">
-                        <option value=''>--Select--
+                <div class="col-3" id="select_type">
+                    <div class="input-group col-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="type">User ID Type</label>
+                        </div>
+
+                        <select class="custom-select" name="type" id="type">
+                            <option value=''>--Select--</option>
                             {% for type in user_types %}
-                        <option value="{{ type }}">{{ type }}{% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div class="col-3" id="select_cf">
-                <div class="input-group col-auto">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="cf">Chartfield</label>
+                                <option value="{{ type }}">{{ type }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
+                </div>
 
-                    <select class="custom-select" name="cf" id="cf">
-                        <option value=''>--Select--
+                <div class="col-3" id="select_cf">
+                    <div class="input-group col-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="cf">Chartfield</label>
+                        </div>
+
+                        <select class="custom-select" name="cf" id="cf">
+                            <option value=''>--Select--</option>
                             {% for chartfield in chartfields %}
-                        <option value="{{ chartfield }}">{{ chartfield }}{% endfor %}
-                    </select>
-                </div>
-            </div>
-            
-            <div class="col-3" id="select_date">
-                <div class="input-group col-auto">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="date">Last Call Date</label>
+                                <option value="{{ chartfield }}">{{ chartfield }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
+                </div>
+                
+                <div class="col-3" id="select_date">
+                    <div class="input-group col-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="date">Last Call Date</label>
+                        </div>
 
-                    <select class="custom-select" name="date" id="date">
-                        <option value=''>--Select--
-                        <option value="6-12">Greater than 6 months and less than 12 months
-                        <option value="12+">Greater than 12 months
-                    </select>
+                        <select class="custom-select" name="date" id="date">
+                            <option value=''>--Select--</option>
+                            <option value="6-12">Greater than 6 months and less than 12 months</option>
+                            <option value="12+">Greater than 12 months</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -105,58 +109,57 @@
         </div>
 
         {% else %}
-        <div class="form-row">
-            <div class="col-3" id="select_loc">
-                <div class="input-group col-auto">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="location">
-                            Location
-                        </label>
-                    </div>
-                    <select class="custom-select" name="location"
-                        id="location">
-                        <option value=''>--Select--
+            <div class="form-row">
+                <div class="col-3" id="select_loc">
+                    <div class="input-group col-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="location">
+                                Location
+                            </label>
+                        </div>
+                        <select class="custom-select" name="location" id="location">
+                            <option value=''>--Select--</option>
                             {% for building in buildings %}
-                        <option value="{{ building }}">{{ building }}{% endfor %}
-                    </select>
-                </div>
-            </div>
-    
-            <div class="col-3" id="select_type">
-                <div class="input-group col-auto">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="type">User ID Type</label>
+                                <option value="{{ building }}">{{ building }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-    
-                    <select class="custom-select" name="type" id="type">
-                        <option value=''>--Select--
+                </div>
+        
+                <div class="col-3" id="select_type">
+                    <div class="input-group col-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="type">User ID Type</label>
+                        </div>
+        
+                        <select class="custom-select" name="type" id="type">
+                            <option value=''>--Select--</option>
                             {% for type in user_types %}
-                        <option value="{{ type }}">{{ type }}{% endfor %}
-                    </select>
-                </div>
-            </div>
-    
-            <div class="col-3" id="select_cf">
-                <div class="input-group col-auto">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="cf">Chartfield</label>
+                                <option value="{{ type }}">{{ type }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-    
-                    <select class="custom-select" name="cf" id="cf">
-                        <option value=''>--Select--
-                            {% for chartfield in chartfields %}
-                        <option value="{{ chartfield }}">{{ chartfield }}{% endfor %}
-                    </select>
                 </div>
-            </div> 
+        
+                <div class="col-3" id="select_cf">
+                    <div class="input-group col-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="cf">Chartfield</label>
+                        </div>
+        
+                        <select class="custom-select" name="cf" id="cf">
+                            <option value=''>--Select--</option>
+                            {% for chartfield in chartfields %}
+                                <option value="{{ chartfield }}">{{ chartfield }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div> 
 
             <div class="col-3">
                 <input type='submit' id='filterapply' value='Apply Filters' class="btn btn-primary">
                 <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs" id='filterremove'>
             </div>
-        </div>
-
-
         {% endif %}
 
     {% endif %}
@@ -287,19 +290,23 @@
     </table>
 </div>
 
-{% endfor %}
 {% else %}
-<div class="mt-2">
-    <div class="alert alert-danger col-md-8" role="alert">
-        <i class="fas fa-exclamation-triangle prv-msgs"></i>
-        No charges for {{dept_name}} on {{bill_period}}
-        {% if location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%} with the current
-        filters. {% endif %}
+    <div class="mt-2">
+        <div class="alert alert-danger col-md-8" role="alert">
+            <i class="fas fa-exclamation-triangle prv-msgs"></i>
+            No charges for {{dept_name}} on {{bill_period}}
+            {% if location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%} 
+                 with the current filters.
+            {% endif %}
+        </div>
     </div>
-</div>
 {% endif%}
 
 <button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i> <br> Scroll to top</button>
+{% endblock %}
+
+{% block js %}
+<script src="/../static/inv_loc.js"></script>
 
 {% endblock %}
 
