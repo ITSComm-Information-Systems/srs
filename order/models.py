@@ -288,6 +288,7 @@ class StorageInstance(models.Model):
     owner = models.CharField(max_length=100)
     shortcode = models.CharField(max_length=100)
     uid = models.PositiveIntegerField(null=True)
+    ad_group = models.CharField(max_length=100, null=True)
     deptid = models.CharField(max_length=6)
     size = models.PositiveIntegerField()
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
