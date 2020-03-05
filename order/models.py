@@ -29,6 +29,7 @@ class Configuration(models.Model):   #Common fields for configuration models
 class Step(Configuration):
     FORM_CHOICES = (
         ('', ''),
+        ('TabForm', 'Base Form'),
         ('PhoneLocationForm', 'Phone Location'),
         ('EquipmentForm', 'Equipment'),
         ('NewLocationForm', 'New Location'),
@@ -44,9 +45,13 @@ class Step(Configuration):
         ('ProductForm', 'Quantity Model'),
         ('ContactCenterForm', 'Contact Center'),
         ('BillingForm', 'Billing'),
-        ('DynamicForm', 'Dynamic'),
         ('VoicemailForm', 'Voicemail'),
-
+        ('DetailsCIFSForm', 'CIFS Details'),
+        ('DetailsNFSForm', 'NFS Details'),
+        ('AccessCIFSForm', 'CIFS Access'),
+        ('AccessNFSForm', 'NFS Access'),
+        ('BillingStorageForm', 'Billing'),
+        ('VolumeSelectionForm', 'Volume Selection'),
     )
 
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
@@ -60,8 +65,14 @@ class Element(Configuration):
         ('NU', 'Number'),
         ('Chart', 'Chartcom'),
         ('Label', 'Label'),
+        ('Checkbox', 'Checkbox'),
+        ('McGroup', 'MCommunity Group'),
+        ('ShortCode', 'Short Code'),
+        ('HTML', 'Static HTML'),
     )
     label = models.TextField()
+    description = models.TextField(blank=True)
+    help_text = models.TextField(blank=True)
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
     attributes = models.CharField(blank=True, max_length=1000)
@@ -83,8 +94,13 @@ class Product(Configuration):
     picture = models.FileField(upload_to='pictures',blank=True, null=True)
 
 
+class ServiceGroup(Configuration):
+    active = models.BooleanField(default=True)
+
+
 class Service(Configuration):
     active = models.BooleanField(default=True)
+    group = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE)
 
 
 class FeatureCategory(models.Model):
@@ -146,6 +162,7 @@ class Action(Configuration):
         ('E', 'Equipment'),
     )
     cart_label = models.CharField(max_length=100, blank=True, null=True)
+    use_cart = models.BooleanField(default=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='A')
     description = models.TextField(blank=True, null=True)
@@ -159,6 +176,11 @@ class Action(Configuration):
     def __str__(self):
         return self.label 
 
+    def get_tab_list(self):
+        #tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
+        tab_list = list(Step.objects.filter(action=self.id).order_by('display_seq_no').values('name'))
+
+        return tab_list
 
 
 class Constant(models.Model):
@@ -254,6 +276,59 @@ class LogItem(models.Model):
         self.description = descr
         self.save()
     
+
+class StorageRate(Configuration):
+    TYPE_CHOICES = (
+        ('NFS', 'NFS'),
+        ('CIFS', 'CIFS'),
+    )
+
+    type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
+    rate = models.DecimalField(max_digits=8, decimal_places=6)
+
+    def get_total_cost(self, size):
+        total_cost = round(self.rate * int(size), 2)
+        return total_cost
+
+
+class StorageInstance(models.Model):
+    TYPE_CHOICES = (
+        ('NFS', 'NFS'),
+        ('CIFS', 'CIFS'),
+    )
+
+    name = models.CharField(max_length=100)
+    owner = models.CharField(max_length=100)
+    shortcode = models.CharField(max_length=100)
+    uid = models.PositiveIntegerField(null=True)
+    ad_group = models.CharField(max_length=100, null=True)
+    deptid = models.CharField(max_length=6)
+    size = models.PositiveIntegerField()
+    type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
+    flux = models.BooleanField(default=False)
+    rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)
+    created_date = models.DateTimeField('Assign Date')
+
+    @property
+    def total_cost(self):
+        total_cost = round(self.rate.rate * int(self.size), 2)
+        return total_cost
+
+    def __str__(self):
+        return self.name
+
+
+class StorageHost(models.Model):
+    storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class StorageMember(models.Model):
+    storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
+    username = models.CharField(max_length=8)
+
 
 class Order(models.Model):
     PRIORITY_CHOICES = (
@@ -462,7 +537,22 @@ class Item(models.Model):
             note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
 
         return note
-        
+
+    def submit_incident(self):
+
+        text = self.data['reviewSummary']
+        note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
+
+        body = ( 'schema:SN_Incident\n'
+                 'service_provider:ITS\n'
+                 'business_service:MiStorage\n'
+                 'assignment_group:ITS Storage\n'
+                 'category:Catalog Order\n'
+                 'state:New\n'
+                 'owner_group:ITS Service Center\n'
+                 f'description:{note}\n' )
+
+        send_mail(self.description, body, self.created_by.email, ['umichdev@service-now.com','djamison@umich.edu'])
 
     def leppard(self):
         pour=['me']

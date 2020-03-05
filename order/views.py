@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_protect
 from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceProfileV, UmOscChartfieldV
 from oscauth.models import AuthUserDept
 from pages.models import Page
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from pages.models import Page
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -45,52 +45,89 @@ def get_phone_location(request, phone_number):
 
     return JsonResponse(locations, safe=False)
 
-@permission_required('oscauth.can_order')
+#@permission_required('oscauth.can_order')
 def send_tab_data(request):
+    
+    tab_name = request.POST.get('tab')
 
-    tab = request.POST.get('tab')
-    step = Step.objects.get(name=tab)
+    if tab_name == 'Review':
+        item = Item.objects.get(id = request.POST['item_id'])
+        item.submit_incident()
+        return JsonResponse({'redirect': '/requestsent'}, safe=False)
+
+    step = Step.objects.get(name=tab_name)
     sequence = request.POST.get('sequence')
     visible = request.POST.get('visible')
     item_id = request.POST.get('item_id')
 
-    print(item_id, tab, visible, sequence)
-
-    try:
-        f = globals()[step.custom_form](step, request.POST)
-    except: 
-        f = TabForm(step)
+    #try:  TODO
+    f = globals()[step.custom_form](step, request.POST)
+    #except: 
+    #    f = TabForm(step)
 
     if f.is_valid():
+        valid = True
         summary = f.get_summary(visible)
         tab = {'title': step.label, 'fields': summary}
         data = request.POST.dict()
         data['csrfmiddlewaretoken'] = ''
+        action = Action.objects.get(id=request.POST.get('action_id'))
 
         if int(item_id) == 0:
             i = Item()
             i.created_by_id = request.user.id
             i.description = ' '
             data['reviewSummary'] = [tab]
+            data['tab_list'] = action.get_tab_list()
             i.deptid = '0'
             i.chartcom_id = 14388  #TODO need default chartcom
         else:
             i = Item.objects.get(id=item_id)
             review_summary = i.data['reviewSummary']
+            data['tab_list'] = i.data['tab_list']
             tabnum = int(sequence) - 1
-            if len(review_summary) < tabnum:
+            if len(review_summary) < int(sequence):
                 review_summary.append(tab)
             else:
                 review_summary[tabnum] = tab
             data['reviewSummary'] = review_summary
 
         i.data = data
+        i.description = action.cart_label
         i.save()
+        item_id = i.id
+
+        #step = Step.objects.get(name='detailsNFS')
+        
+        if request.POST.get('volaction'):
+            tab_name = 'Review'
+            step = Step.objects.get(name='Review')
+        else:
+            for index, tab in enumerate(i.data['tab_list'], start=0):
+                if tab['name'] == request.POST.get('tab'):
+                    next_tab = i.data['tab_list'][index+1]
+                    tab_name = next_tab['name']
+                    step = Step.objects.get(name=next_tab['name'])
+                    break
+
+        try:
+            f = globals()[step.custom_form](step, request=request)
+        except:
+            print('bind form tab error')
+            f = TabForm(step)
+        
+        if step.name == 'Review':
+            f.data = i.data['reviewSummary']
 
     else:
-        print('not valid', f.errors)  #TODO Send invalid messages
+        valid = False
 
-    return JsonResponse(i.id, safe=False)  #TODO Send review data
+    tab_content = loader.render_to_string(f.template, {'tab': {'form': f}})
+
+    return JsonResponse({'valid': valid
+                        ,'item_id': item_id
+                        ,'tab_name': tab_name
+                        ,'tab_content': tab_content}, safe=False)
 
 
 @permission_required('oscauth.can_order')
@@ -216,7 +253,7 @@ class Submit(PermissionRequiredMixin, View):
         return HttpResponseRedirect('/submitted') 
 
 @csrf_exempt
-def send_email(request):
+def send_email(request):   #Pinnacle will route non prod emails to a test address
     if request.method == "POST":
         subject = request.POST['emailSubject'] + ' question from: ' + request.user.username
         body = request.POST['emailBody'] 
@@ -348,8 +385,22 @@ class Integration(PermissionRequiredMixin, View):
             'item_list': item_list,})
 
 
-class Workflow(PermissionRequiredMixin, View):
-    permission_required = 'oscauth.can_order'
+class Workflow(UserPassesTestMixin, View):
+
+    def test_func(self):
+        action_id = self.request.resolver_match.kwargs['action_id']
+        action = Action.objects.get(id=action_id)
+
+        if action.service.group_id == 2:  # MiStorage requires no permissions
+            if self.request.user.is_authenticated:
+                return True
+            else:
+                return False
+        else:
+            if self.request.user.has_perm('oscauth.can_order'):
+                return True
+            else:
+                return False
 
     def get(self, request, action_id):
 
@@ -402,7 +453,7 @@ class Workflow(PermissionRequiredMixin, View):
                 tab.form = forms.Form()
                 tab.form.template = 'order/static.html'
             else:
-                tab.form = globals()[tab.custom_form](tab)
+                tab.form = globals()[tab.custom_form](tab, request=request)
                 if tab.name == 'PhoneLocation':
                     js.append('phone_location')
                 elif tab.name == 'LocationNew':
@@ -522,16 +573,30 @@ class Review(PermissionRequiredMixin, View):
         return HttpResponse(template.render(context, request))
 
 
-class Services(PermissionRequiredMixin, View):
-    permission_required = 'oscauth.can_order'
-    
-    def get(self, request):
+class Services(UserPassesTestMixin, View):
 
-        link_list = Page.objects.get(permalink='/links')
+    def test_func(self):
+        group_id = self.request.resolver_match.kwargs['group_id']
+
+        if group_id == 2:  # MiStorage requires no permissions
+            if self.request.user.is_authenticated:
+                return True
+            else:
+                return False
+        else:
+            if self.request.user.has_perm('oscauth.can_order'):
+                return True
+            else:
+                return False
+    
+    def get(self, request, group_id):
+
+        link_list = Page.objects.get(permalink=f'/links/{group_id}')
+        notices = Page.objects.get(permalink=f'/notices/{group_id}')
 
         template = loader.get_template('order/service.html')
-        action_list = Action.objects.all().order_by('service','display_seq_no')
-        service_list = Service.objects.all().order_by('display_seq_no')
+        action_list = Action.objects.filter(active=True).order_by('service','display_seq_no')
+        service_list = Service.objects.filter(group_id=group_id,active=True).order_by('display_seq_no')
 
         for service in service_list:
             service.actions = action_list.filter(service=service)
@@ -540,6 +605,7 @@ class Services(PermissionRequiredMixin, View):
             'title': 'Request Service',
             'service_list': service_list,
             'link_list': link_list,
+            'notices': notices,
             'page_name': 'Request Service'
         }
         return HttpResponse(template.render(context, request))
