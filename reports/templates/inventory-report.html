@@ -29,12 +29,10 @@
     </div>
 </div>
 
-
-{% comment %}
-{% if formated_data or location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%}
-    <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
-        <input type="text" name="dept_id" id="dept_id" value="{{dept_id}}-{{dept_name}}" readonly hidden>
-        <input type="text" name="bill_period" id="bill_period" value="{{bill_period}}" readonly hidden>
+{% if formated_data %}
+<form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
+    <input type="text" name="dept_id" id="dept_id" value="{{dept_id}}-{{dept_name}}" readonly hidden>
+    <input type="text" name="bill_period" id="bill_period" value="{{bill_period}}" readonly hidden>
 
         <div class="mt-2 mb-2">
             <strong>Filter By:</strong>
@@ -104,13 +102,11 @@
                     </div>
                 </div>
             </div>
-
-            <div class="inv-filter-btns mt-2">
-                <input type='button' value='Apply Filters' class="btn btn-primary" id="applyfilters">
-                {% if location_filter or type_filter or cf_filter or date_filter%}
-                    <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs">
-                {% endif %}
-            </div>
+        </div>
+        <div class="inv-filter-btns mt-2">
+            <input type='submit' value='Apply Filters' class="btn btn-primary">
+            <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs">
+        </div>
 
         {% else %}
             <div class="form-row">
@@ -160,152 +156,139 @@
                     </div>
                 </div> 
 
-                <div class="col-3">
-                    <input type='button' value='Apply Filters' class="btn btn-primary" id="applyfilters">
-                    {% if location_filter or type_filter or cf_filter or date_filter%}
-                        <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs">
-                    {% endif %}
-                </div>
+            <div class="col-3">
+                <input type='submit' id='filterapply' value='Apply Filters' class="btn btn-primary">
+                <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs" id='filterremove'>
             </div>
         {% endif %}
 
-        {% if location_filter or type_filter or cf_filter or date_filter%}
-            <hr class="style1 2">
-            <div class='form-row'>
-                <div>
-                    <div class="mb-2">
-                        <strong>Current Filters:</strong>
-                    </div>
-                    <div class='indented-form-input'>
-                        {% if location_filter %}<strong>Location:</strong> {{ location_filter }}<br>{% endif %}
-                        {% if type_filter %}<strong>User ID Type:</strong> {{ type_filter }}<br>{% endif %}
-                        {% if cf_filter %}<strong>Chartfield:</strong> {{ cf_filter }}<br>{% endif %}
-                        {% if date_filter %}<strong>Last Call Date:</strong> {{ date_filter }}<br>{% endif %}
-                    </div>
+    {% endif %}
+
+    <div id='filters-info'>
+        <hr class="style1 2">
+        <div class='form-row'>
+            <div>
+                <div class="mb-2">
+                    <strong>Current Filters:</strong>
+                </div>
+                <div class='indented-form-input'>
+                    <div id='location-filter'></div>
+                    <div id='type-filter'></div>
+                    <div id='cf-filter'></div>
                 </div>
             </div>
-        {% endif %}
-    </form>
-{% endif %}
-{% endcomment %}
-
+        </div>
+    </div>
+</form>
 
 {% if formated_data %}
-    <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right" aria-label="Downdload Report as CSV File">
-        Download CSV
-    </button>
+<button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" id='download-link' class="btn btn-success float-right" aria-label="Downdload Report as CSV File">
+    Download CSV
+</button>
 
-    {% for classification in formated_data %}
-        <div class="table-responsive">
-            <h3 class="text-dark font-weight-bold">
-                Chartfield: {{classification.0.0.chartfield}}
-            </h3>
-            <table class="table table-sm mb-5 table-striped" id= "invLocTable">
-                <thead class="thead-dark">
-                    <tr data-name="{{ classification.0.0.chartfield }}">
-                        <th class="user_id_report_col">User ID</th>
-                        <th>Usage</th>
-                        <th>User ID Type</th>
-                        <th>User Name</th>
-                        <th>Location</th>
-                        <th>Calling Range</th>
-                        <th>Last Outbound Call Date</th>
-                        <th>Account</th>
-                        <th class="charge_cd_report_col">Charge Code</th>
-                        <th>Quantity</th>
-                        <th>Unit Rate</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for phone in classification %}
-                        <tr>
-                            <td style="vertical-align:middle">{{phone.0.user_defined_id}}</td>
-                            <td style="vertical-align:middle">{{phone.0.usage}}</td>
-                            <td style="vertical-align:middle">{{phone.0.cd_descr}}</td>
-                            <td style="vertical-align:middle">{{phone.0.first_name}} {{phone.0.last_name}}</td>
-                            <td>
-                                {% for charge in phone %}
-                                    {% if charge.jack %}
-                                        Location: {{charge.building}}<br> 
-                                        Floor: {{charge.floor}}
-                                        Room: {{charge.room}}<br>
-                                        Jack: {{charge.jack}}<br>
-                                        (As of {{charge.location_since_date}})<br>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for charge in phone %}
-                                    {% if charge.ncos_desc%}
-                                        {{charge.ncos_desc}} 
-                                        {% if charge.ncos %}
-                                            ({{charge.ncos}})<br>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>{{phone.0.last_call_date}}</td>
-                            <td>{{phone.0.mrc_account}}</td>
-                            <td>{% for charge in phone %}
-                                    {% if charge.item_code%}
-                                        {{charge.item_code}}<br>
-                                    {% endif%}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for charge in phone %}
-                                    {% if charge.quantity%}
-                                        {{charge.quantity}}
-                                    {% endif %}<br>
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for charge in phone %}
-                                    {% if charge.unit_price %}
-                                        {% if 0 > charge.unit_price %}
-                                            <span class='prv-msgs'>{{charge.unit_price | currency }}</span>
-                                        {% else %}
-                                            {{ charge.unit_price | currency }}
-                                        {% endif %}
-                                    {% endif %}<br>
-                                {% endfor %}</td> 
-                            <td>
-                                {% for charge in phone %}
-                                    {% if charge.charge_amount%}
-                                        {% if 0 > charge.charge_amount %}
-                                            <span class='prv-msgs'>{{charge.charge_amount | currency }}</span>
-                                        {% else %}
-                                            {{ charge.charge_amount | currency }}
-                                        {% endif %}
-                                    {% endif %}<br>
-                                {% endfor %}
-                            </td>
-                        </tr>
+{% for classification in formated_data %}
+<div class="table-responsive" id="{{classification.0.0.chartfield}}">
+    <h3 class="text-dark font-weight-bold chartfield-title">
+        Chartfield: {{classification.0.0.chartfield}}
+    </h3>
+    <table class="table table-sm mb-5 table-striped invLocTable" id="invLocTable{{classification.0.0.chartfield}}">
+        <thead class="thead-dark">
+            <tr data-name="{{ classification.0.0.chartfield }}">
+                <th class="user_id_report_col">User ID</th>
+                <th>Usage</th>
+                <th>User ID Type</th>
+                <th>User Name</th>
+                <th>Location</th>
+                <th>Calling Range</th>
+                <th>Last Outbound Call Date</th>
+                <th>Account</th>
+                <th class="charge_cd_report_col">Charge Code</th>
+                <!-- <th>Charge Description</th> -->
+                <th>Quantity</th>
+                <th>Unit Rate</th>
+                <th>Amount</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            {% for phone in classification %}
+            <tr class='datarow' id="data:{{classification.0.0.chartfield}}">
+                <td style="vertical-align:middle">{{phone.0.user_defined_id}}</td>
+                <td style="vertical-align:middle">{{phone.0.usage}}</td>
+                <td style="vertical-align:middle" class='type'>{{phone.0.cd_descr}}</td>
+                <td style="vertical-align:middle">{{phone.0.first_name}} {{phone.0.last_name}}</td>
+                <td class='location'>{% for charge in phone %}
+                        {% if charge.jack%}
+                            Location: {{charge.building}}<br> 
+                            Floor: {{charge.floor}}
+                            Room: {{charge.room}}<br>
+                            Jack: {{charge.jack}}<br>
+                            (As of {{charge.location_since_date}})<br>
+                        {% endif %}
                     {% endfor %}
-                </tbody>
-                <tr class="bg-warning total-charges-inv">
-                    <td colspan="1">Total</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    {% if 0 > cost_table|index:forloop.counter0 %}
-                        <td colspan="1" class="total-col prv-msgs">{{cost_table|index:forloop.counter0 | currency }}</td>
-                    {% else %}
-                        <td colspan="1" class="total-col">{{cost_table|index:forloop.counter0 | currency }}</td>
-                    {% endif %}
-                </tr>
-            </table>
-        </div>
-    {% endfor %}
-
+                </td>
+                <td>{% for charge in phone %}
+                        {% if charge.ncos_desc%}
+                            {{charge.ncos_desc}} 
+                            {% if charge.ncos %}
+                                ({{charge.ncos}})<br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{phone.0.last_call_date}}</td>
+                <td>{{phone.0.mrc_account}}</td>
+                <td>{% for charge in phone %}
+                        {% if charge.item_code%}
+                            {{charge.item_code}}<br>
+                        {% endif%}
+                    {% endfor %}
+                </td>
+                <!-- <td>{% for charge in phone %}{% if charge.item_description%}
+                    {{charge.item_description}}<br>{% endif %}{% endfor %}</td> -->
+                <td>{% for charge in phone %}{% if charge.quantity%} {{charge.quantity}}{% endif %}<br>{% endfor %}</td>
+                <td>
+                    {% for charge in phone %}
+                        {% if charge.unit_price %}
+                            {% if 0 > charge.unit_price %}
+                                <span class='prv-msgs'>{{charge.unit_price | currency }}</span>
+                            {% else %}
+                                {{ charge.unit_price | currency }}
+                            {% endif %}
+                        {% endif %}<br>
+                    {% endfor %}</td> 
+                <td class='row-total'>{% for charge in phone %}
+                        {% if charge.charge_amount%}
+                            {% if 0 > charge.charge_amount %}
+                                <span class='prv-msgs'>{{charge.charge_amount | currency }}</span>
+                            {% else %}
+                                {{ charge.charge_amount | currency }}
+                            {% endif %}
+                        {% endif %}<br>
+                    {% endfor %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tr class="bg-warning total-charges-inv" id='total-row{{ classification.0.0.chartfield }}'>
+            <td colspan="1">Total</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% if 0 > cost_table|index:forloop.counter0 %}
+                <td colspan="1" class="total-col prv-msgs">{{cost_table|index:forloop.counter0 | currency }}</td>
+            {% else %}
+                <td colspan="1" class="total-col">{{cost_table|index:forloop.counter0 | currency }}</td>
+            {% endif %}
+        </tr>
+    </table>
+</div>
 
 {% else %}
     <div class="mt-2">
@@ -325,84 +308,8 @@
 {% block js %}
 <script src="/../static/inv_loc.js"></script>
 
-<script>
-    // When the user scrolls down 20px from the top of the document, show the button
-    window.onscroll = function () { scrollFunction() };
+{% endblock %}
 
-    function scrollFunction() {
-        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-            document.getElementById("scrollTop").style.display = "block";
-        } else {
-            document.getElementById("scrollTop").style.display = "none";
-        }
-    }
-
-    // When the user clicks on the button, scroll to the top of the document
-    function topFunction() {
-        document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
-    }
-
-</script>
-
-<script>
-    function exportTableToCSV(filename) {
-        var csv = [];
-        var rows = document.querySelectorAll("table tr");
-
-        for (var i = 0; i < rows.length; i++) {
-            var row = [], cols = rows[i].querySelectorAll("td, th");
-            var name = rows[i].getAttribute('data-name');
-
-            for (var j = 0; j < cols.length; ++j) {
-                var text = cols[j].innerText;
-
-                // New chartfield
-                if (text == 'User ID') {
-                    if (i != 0) {
-                        row.push('\n'); // does this work on mac?
-                        csv.push(row);
-                        row = [];
-                    }
-                    row.push(name);
-                    csv.push(row);
-                    row = [];
-                }
-                text = '"' + text + '"';
-                row.push(text);
-            }
-
-            csv.push(row.join(","));
-        }
-
-        // Download CSV file
-        downloadCSV(csv.join("\n"), filename);
-    }
-
-    function downloadCSV(csv, filename) {
-        var csvFile;
-        var downloadLink;
-
-        // CSV file
-        csvFile = new Blob([csv], { type: "text/csv" });
-
-        // Download link
-        downloadLink = document.createElement("a");
-
-        // File name
-        downloadLink.download = filename;
-
-        // Create a link to the file
-        downloadLink.href = window.URL.createObjectURL(csvFile);
-
-        // Hide download link
-        downloadLink.style.display = "none";
-
-        // Add the link to DOM
-        document.body.appendChild(downloadLink);
-
-        // Click download link
-        downloadLink.click();
-    }
-</script>
+{% block js %}
+<script src="/../static/inv_loc.js"></script>
 {% endblock %}
