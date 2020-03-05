@@ -228,6 +228,10 @@ class VolumeSelectionForm(TabForm):
 class AccessNFSForm(TabForm):
     template = 'order/nfs_access.html'
 
+    def clean_volumeAdmin(self):
+        if self.data['volumeAdmin'] == '0':
+            raise forms.ValidationError('Root access is not allowed.  Enter a value other than 0', code='root')
+
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
 
@@ -243,6 +247,7 @@ class AccessNFSForm(TabForm):
 
         instance_id = self.data.get('instance_id')
         if instance_id:
+            print(summary)
             si = StorageInstance.objects.get(id=instance_id)
             if summary[0]['value'] != si.uid:
                 print(summary[0]['value'], si.uid)
