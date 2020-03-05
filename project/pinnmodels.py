@@ -804,6 +804,7 @@ class UmOscAcctdetailMrcOccV(models.Model):
      unique_identifier = models.CharField(max_length=200)
      charge_name = models.CharField(max_length=100)
      shortcode = models.CharField(max_length=6)
+     quantity_vouchered = models.IntegerField(9)
      invoice_id = models.CharField(max_length=30)
      uniqname = models.CharField(max_length=8)
      voucher_comment = models.CharField(max_length=30)
