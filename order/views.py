@@ -45,22 +45,52 @@ def get_phone_location(request, phone_number):
 
     return JsonResponse(locations, safe=False)
 
-@csrf_exempt
 @permission_required('oscauth.can_order')
 def send_tab_data(request):
 
     tab = request.POST.get('tab')
     step = Step.objects.get(name=tab)
-    print(tab, step.custom_form)
+    sequence = request.POST.get('sequence')
+    visible = request.POST.get('visible')
+    item_id = request.POST.get('item_id')
 
-    f = globals()[step.custom_form](step, request.POST)
+    print(item_id, tab, visible, sequence)
+
+    try:
+        f = globals()[step.custom_form](step, request.POST)
+    except: 
+        f = TabForm(step)
 
     if f.is_valid():
-        print(f.get_summary())
+        summary = f.get_summary(visible)
+        tab = {'title': step.label, 'fields': summary}
+        data = request.POST.dict()
+        data['csrfmiddlewaretoken'] = ''
+
+        if int(item_id) == 0:
+            i = Item()
+            i.created_by_id = request.user.id
+            i.description = ' '
+            data['reviewSummary'] = [tab]
+            i.deptid = '0'
+            i.chartcom_id = 14388  #TODO need default chartcom
+        else:
+            i = Item.objects.get(id=item_id)
+            review_summary = i.data['reviewSummary']
+            tabnum = int(sequence) - 1
+            if len(review_summary) < tabnum:
+                review_summary.append(tab)
+            else:
+                review_summary[tabnum] = tab
+            data['reviewSummary'] = review_summary
+
+        i.data = data
+        i.save()
+
     else:
         print('not valid', f.errors)  #TODO Send invalid messages
 
-    return JsonResponse('test', safe=False)  #TODO Send review data
+    return JsonResponse(i.id, safe=False)  #TODO Send review data
 
 
 @permission_required('oscauth.can_order')
@@ -173,7 +203,7 @@ class Submit(PermissionRequiredMixin, View):
             order.created_by_id = request.user.id
             order.chartcom = firstitem.chartcom
             order.service = service
-            order.status = 'Submitted'
+            #order.status = 'Submitted'
             if priority == 'expediteOrder':
                 order.priority = 'High'
             order.due_date = due_date
@@ -412,24 +442,25 @@ class Cart(PermissionRequiredMixin, View):
         return HttpResponseRedirect('/orders/cart/' + request.POST['deptid'])
 
     def get(self, request, deptid):
-        dept_list = AuthUserDept.get_order_departments(request.user.id)
-        hasset = False;
+        
+        depts = []
+        user_dept_list = AuthUserDept.get_order_departments(request.user.id)
+        for dept in user_dept_list:
+            depts.append(dept.dept)
+
         first= {}
 
+        dept_list = Item.objects.filter(deptid__in=depts).exclude(order_id__gt=0).distinct('deptid')
+        if deptid == 0 and len(dept_list) > 0:
+            deptid = int(dept_list[0].deptid)
+
         for dept in dept_list:
-            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
+            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.deptid)
             dept.active = deptinfo.dept_eff_status
             dept.name = deptinfo.dept_name
 
-            if deptid == int(dept.dept):
-                department = {'id': dept.dept, 'name': deptinfo.dept_name}
-            if hasset == False:
-                item_list = Item.objects.filter(deptid=dept.dept).exclude(order_id__gt=0).order_by('chartcom','-create_date')
-                chartcoms = item_list.distinct('chartcom')
-                if(len(chartcoms) != 0):
-                    hasset = True
-                    first = {'id': dept.dept, 'name':dept.name}
-                    deptid = dept.dept
+            if deptid == int(dept.deptid):
+                first = {'id': dept.deptid, 'name': deptinfo.dept_name}
 
 
         status = ['Ready to Order','Saved for Later']
@@ -546,11 +577,11 @@ class Status(PermissionRequiredMixin, View):
                 order.items = item_list.filter(order=order)
             else:
                 try:
-                    pin = UmOscPreorderApiV.objects.get(pre_order_number=order.order_reference,pre_order_issue=1)
+                    pin = UmOscPreorderApiV.objects.get(add_info_text_3=str(order.id),pre_order_issue=1)
                     srs_status = pin.work_status_name
                     if(pin.work_status_name == "Received"):
                     	srs_status = "Submitted"
-                    if(pin.work_status_code == 2):
+                    if pin.status_code == 2:
                     	if(pin.work_status_name == "Cancelled"):
                     		srs_status = "Cancelled"
                     	else:
@@ -558,9 +589,10 @@ class Status(PermissionRequiredMixin, View):
                     
 
                     order.items = [{'description': pin.comment_text,'status': srs_status}]
+                    order.status = srs_status
                 except:
                     order.items = item_list.filter(order=order)
-
+                    
         template = loader.get_template('order/status.html')
         context = {
             'title': 'Track Orders',
