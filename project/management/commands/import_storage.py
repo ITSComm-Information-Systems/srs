@@ -59,7 +59,8 @@ class Command(BaseCommand):
         if row[2] == 'cifs_storage':
             instance.type = 'CIFS'
             hosts = None
-            instance.deptid = row[9]
+            instance.ad_group = row[9].strip("'")
+            instance.deptid = row[10]
 
         instance.rate = StorageRate.objects.get(type=instance.type, label=options)
 

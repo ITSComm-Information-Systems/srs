@@ -228,32 +228,41 @@ class VolumeSelectionForm(TabForm):
 class AccessNFSForm(TabForm):
     template = 'order/nfs_access.html'
 
-    def clean_volumeAdmin(self):
-        if self.data['volumeAdmin'] == '0':
-            raise forms.ValidationError('Root access is not allowed.  Enter a value other than 0', code='root')
+    #def clean_volumeAdmin(self):
+    #    if self.data['volumeAdmin'] == '0':
+    #        raise forms.ValidationError('Root access is not allowed.  Enter a value other than 0', code='root')
+
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
 
         hosts = self.data.getlist('permittedHosts')
-        host_value = ''
-        for host in hosts:
-            if host_value:
-                host_value = host_value + ',' + host
-            else:
-                host_value = host
 
-        summary[1]['value'] = host_value
+        if len(hosts) > 1:
+            host_value = ''
+            for host in hosts:
+                if host_value:
+                    host_value = host_value + ',' + host
+                else:
+                    host_value = host
+
+            summary[2]['value'] = host_value
 
         instance_id = self.data.get('instance_id')
         if instance_id:
-            print(summary)
+
             si = StorageInstance.objects.get(id=instance_id)
             if summary[0]['value'] != si.uid:
-                print(summary[0]['value'], si.uid)
                 summary[0]['label'] = '*' + summary[0]['label']
             if summary[1]['value'] != si.owner:
                 summary[1]['label'] = '*' + summary[1]['label']
+        
+            host_list = list(StorageHost.objects.filter(storage_instance=si).values('name').values_list('name', flat=True))
+            host_list.insert(0,'')
+            if hosts != host_list:
+                if len(summary) > 2:
+                    summary[2]['label'] = '*' + summary[2]['label']
+
 
         return summary
 
@@ -324,6 +333,8 @@ class DetailsCIFSForm(TabForm):
             si = StorageInstance.objects.get(id=instance_id)
             if summary[0]['value'] != si.owner:
                 summary[0]['label'] = '*' + summary[0]['label']
+            if summary[1]['value'] != si.ad_group:
+                summary[1]['label'] = '*' + summary[1]['label']
             if summary[2]['value'] != si.name:
                 summary[2]['label'] = '*' + summary[2]['label']
             if self.data['selectOptionType'] != str(si.rate_id):
@@ -342,7 +353,7 @@ class DetailsCIFSForm(TabForm):
                 if instance_id:
                     si = StorageInstance.objects.get(id=instance_id)
                     self.fields["mcommGroup"].initial = si.owner
-                    self.fields["activeDir"].initial = 'TBD'
+                    self.fields["activeDir"].initial = si.ad_group
                     self.fields["netShare"].initial = si.name
                     self.fields["selectOptionType"].initial = si.rate_id
                     self.fields["sizeGigabyte"].initial = si.size
