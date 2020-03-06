@@ -552,7 +552,35 @@ class Item(models.Model):
                  'owner_group:ITS Service Center\n'
                  f'description:{note}\n' )
 
-        send_mail(self.description, body, self.created_by.email, ['umichdev@service-now.com','djamison@umich.edu'])
+        send_mail(self.description, body, self.created_by.email, [settings.SERVICENOW_EMAIL])
+        self.update_mistorage()
+
+    def update_mistorage(self):
+
+        instance_id = self.data.get('instance_id')
+
+        if instance_id:
+            si = StorageInstance.objects.get(id=instance_id)
+        else:
+            si = StorageInstance()
+
+        if self.data.get('action_id') == '46' or self.data.get('action_id') == '47':
+            si.type = 'NFS'
+            si.owner = self.data.get('owner')
+            si.name = self.data.get('storageID')
+            si.uid = self.data.get('volumeAdmin')
+            if self.data.get('flux') == 'yes':
+                si.flux = True
+        else:
+            si.type = 'CIFS'
+            si.owner = self.data.get('mcommGroup')
+            si.name = self.data.get('netShare')
+            si.ad_group = self.data.get('activeDir')
+
+        si.size = self.data.get('sizeGigabyte')
+        si.shortcode = self.data.get('shortcode')
+        si.rate_id = self.data.get('selectOptionType')
+        si.save()
 
     def leppard(self):
         pour=['me']

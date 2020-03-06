@@ -90,6 +90,8 @@ EMAIL_HOST = 'vdc-relay.us-east-2.a.mail.umich.edu'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+SERVICENOW_EMAIL = os.getenv('SERVICENOW_EMAIL', 'umichdev@service-now.com')
+
 MCOMMUNITY = {
     'SERVER': os.getenv('MC_SERVER', 'ldap.umich.edu'),
     'USERNAME': os.getenv('MC_USERNAME', 'cn=EAS-OSC-McDirApp001,ou=Applications,o=services'),
