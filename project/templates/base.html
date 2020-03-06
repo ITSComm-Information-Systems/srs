@@ -113,6 +113,10 @@
 			<div class="collapse navbar-collapse navbars" aria-labelledby="main-nav" role="navigation">
 				<ul class="navbar-nav nav-fill nav-bar-links">
 					{% if perms.oscauth.can_order %}
+					<li class="nav-item">
+						<a class="nav-link {% if page_name == 'Request Service' %}active{% endif %}" href="/orders/services/1"><i class="fas fa-check-circle white"></i> Request Service</a>
+					</li>
+					<!----
 					<li class="nav-item dropdown">
 						<a class="nav-link {% if page_name == 'Request Service' %}active{% endif %}"> <i class="fas fa-check-circle white"></i> Request Service</a>
 
@@ -123,10 +127,13 @@
 						</div>
 
 					</li>
+					-->
 					{% elif user.is_authenticated %}
+					<!---
 					<li class="nav-item dropdown">
 						<a href="/orders/services/2" class="nav-link"><i class="fas fa-check-circle white"></i> Request Service</a>
-					</li>
+					</li> 
+					-->
 					{% endif %}
 					{% if perms.oscauth.can_report %}
 					<li class="nav-item dropdown">
