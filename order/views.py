@@ -79,7 +79,7 @@ def send_tab_data(request):
             i.description = ' '
             data['reviewSummary'] = [tab]
             data['tab_list'] = action.get_tab_list()
-            i.deptid = '0'
+            i.deptid = '1'
             i.chartcom_id = 14388  #TODO need default chartcom
         else:
             i = Item.objects.get(id=item_id)
