@@ -3,7 +3,7 @@ from order.models import ServiceGroup
 import os
 
 def menu(request):
-    background_color = os.getenv('BACKGROUND_COLOR', 'green')
+    background_color = os.getenv('BACKGROUND_COLOR', 'grey')
 
     service_groups = ServiceGroup.objects.filter(active=True).order_by('display_seq_no')
 
