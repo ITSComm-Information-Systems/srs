@@ -6,7 +6,7 @@ from django.db import models
 class Page(models.Model):
     title = models.CharField(max_length=60)
     permalink = models.CharField(unique=True, max_length=12)
-    update_date = models.DateTimeField()
+    update_date = models.DateTimeField(auto_now=True)
     bodytext = models.TextField()
     display_seq_no = models.PositiveIntegerField(unique=True, blank=True, null=True)
 
