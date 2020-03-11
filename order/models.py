@@ -540,6 +540,18 @@ class Item(models.Model):
 
     def submit_incident(self):
 
+        action_id = self.data['action_id']
+        action = Action.objects.get(id=action_id)
+
+        o = Order()
+        o.order_reference = 'ServiceNow'
+        o.chartcom = self.chartcom
+        o.service = action.service
+        o.created_by = self.created_by
+        o.save()
+        self.order = o
+        self.save()
+
         text = self.data['reviewSummary']
         note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
 
