@@ -212,12 +212,12 @@ class VolumeSelectionForm(TabForm):
 
         if not self.is_bound:
             if self.request.path == '/orders/wf/47':
-                self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user, storage_instance__type='NFS')
+                self.volume_list = StorageMember.objects.filter(username=self.request.user, storage_instance__type='NFS').distinct('storage_instance__name').order_by('storage_instance__name')
 
             elif self.request.path == '/orders/wf/49':
-                self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user, storage_instance__type='CIFS')
+                self.volume_list = StorageMember.objects.filter(username=self.request.user, storage_instance__type='CIFS').distinct('storage_instance__name').order_by('storage_instance__name')
             else:
-                self.volume_list = StorageMember.objects.select_related().filter(username=self.request.user)
+                self.volume_list = StorageMember.objects.filter(username=self.request.user).distinct('storage_instance__name').order_by('storage_instance__name')
                 
                 for vol in self.volume_list:
                     self.total_cost = self.total_cost + vol.storage_instance.total_cost
