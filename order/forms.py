@@ -1,10 +1,11 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember, StorageHost, StorageRate
+#from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember, StorageHost, StorageRate
+from .models import *
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 
-from project.forms.fields import McGroup, ShortCode
+from project.forms.fields import *
 
 def get_storage_options(type):
     opt_list = []
@@ -66,7 +67,7 @@ class TabForm(forms.Form):
     #    return valid
 
     def __init__(self, tab, *args, **kwargs):
-        self.request = kwargs.pop('request' ,None)
+        self.request = kwargs.pop('request', None)
         super(TabForm, self).__init__(*args, **kwargs)
     #def __init__(self, tab, *args, **kwargs):
     #    super(TabForm, self, *args, **kwargs).__init__()
@@ -74,7 +75,7 @@ class TabForm(forms.Form):
         self.tab_name = tab.name
         element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
 
-        for element in element_list:
+        for element in element_list:  # Bind fields based on setup data in Admin Module
 
             if element.type == 'Radio':
                 #field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.RadioSelect(attrs={'class': 'form-control'}))
@@ -101,12 +102,14 @@ class TabForm(forms.Form):
                 field = McGroup()
                 field.template_name = 'project/static.html'
             else:
+                # Use custom field from project.forms.fields
                 field = globals()[element.type](label=element.name)
                 #field.field_name = element.name
                 field.template_name = 'project/text.html'
                 #field = forms.IntegerField(label=element.label, help_text=element.description)
 
             field.name = element.name
+            field.current_user = self.request.user
             field.label = element.label
             field.help_text = element.help_text
             field.description = element.description
@@ -120,8 +123,38 @@ class TabForm(forms.Form):
 
 class BillingForm(TabForm):
 
-    def get_summary(self, postdata):
-        return 'override data'
+    template = 'order/billing.html'
+
+    def get_summary(self, visible):
+
+        summary = []
+        occ = self.data.get('cc_oneTimeCharges')
+        if occ:
+            summary.append({'label': 'One Time Charges', 'value': occ})
+
+        mrc = self.data.get('cc_MRC')
+        if mrc:
+            summary.append({'label': 'Monthly Recurring Charges', 'value': mrc})
+
+        loc = self.data.get('cc_LOC')
+        if loc:
+            summary.append({'label': 'Local Charges', 'value': loc})
+
+        ld = self.data.get('cc_LD')
+        if ld:
+            summary.append({'label': 'Long Distance Charges', 'value': ld})
+
+        return summary
+
+
+
+    def __init__(self, *args, **kwargs):
+        super(BillingForm, self).__init__(*args, **kwargs)
+
+        action_id = self.request.POST['action_id']
+        self.charge_types = ChargeType.objects.filter(action__id=action_id).order_by('display_seq_no')
+        self.dept_list = Chartcom.get_user_chartcom_depts(self.request.user.id) 
+        self.chartcom_list = UserChartcomV.objects.filter(user=self.request.user).order_by('name')
 
 
 class FeaturesForm(TabForm):
@@ -166,21 +199,30 @@ class RestrictionsForm(TabForm):
 
 
 class AddlInfoForm(TabForm):
-    TRUE_FALSE_CHOICES = (
-    (True, 'Yes'),
-    (False, 'No')
-    )
 
-    contact_yn = forms.ChoiceField(choices = TRUE_FALSE_CHOICES, label="Are you the on site contact?", required=True)
-    contact_yn.type = 'Radio'
+    def is_valid(self, *args, **kwargs):
+        super(AddlInfoForm, self).is_valid(*args, **kwargs)
+        return True
 
-    contact_id = forms.CharField(label='Uniqname of the on site contact person', max_length=8)
+    #TRUE_FALSE_CHOICES = (
+    #(True, 'Yes'),
+    #(False, 'No')
+    #)
 
-    contact_name = forms.CharField(label='Name of the on site contact person', max_length=40)
-    contact_number = forms.CharField(label='Best number to contact', max_length=10)
-    comments = forms.CharField(label='Comments', required=False, widget=forms.Textarea(attrs={'cols':'100', 'class':'form-control'}) )
+    #contact_yn = forms.ChoiceField(choices = TRUE_FALSE_CHOICES, label="Are you the on site contact?", required=True)
+    #contact_yn.type = 'Radio'
+
+    #contact_id = forms.CharField(label='Uniqname of the on site contact person', max_length=8)
+    #contact_id.type = 'ST'
+
+    #contact_name = forms.CharField(label='Name of the on site contact person', max_length=40)
+    #contact_name.type = 'ST'
+
+    #contact_number = forms.CharField(label='Best number to contact', max_length=10)
+    #comments = forms.CharField(label='Comments', required=False, widget=forms.Textarea(attrs={'cols':'100', 'class':'form-control'}) )
     file = forms.FileField(label="Please attach any drawings, spreadsheets or floor plans with jack locations as needed", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
-    template = 'order/dynamic_form.html'
+    file.type = 'file'
+    template = 'order/addl_info.html'
 
 
 class VolumeSelectionForm(TabForm):
