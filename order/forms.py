@@ -125,8 +125,28 @@ class BillingForm(TabForm):
 
     template = 'order/billing.html'
 
-    def get_summary(self, postdata):
-        return 'override data'
+    def get_summary(self, visible):
+
+        summary = []
+        occ = self.data.get('cc_oneTimeCharges')
+        if occ:
+            summary.append({'label': 'One Time Charges', 'value': occ})
+
+        mrc = self.data.get('cc_MRC')
+        if mrc:
+            summary.append({'label': 'Monthly Recurring Charges', 'value': mrc})
+
+        loc = self.data.get('cc_LOC')
+        if loc:
+            summary.append({'label': 'Local Charges', 'value': loc})
+
+        ld = self.data.get('cc_LD')
+        if ld:
+            summary.append({'label': 'Long Distance Charges', 'value': ld})
+
+        return summary
+
+
 
     def __init__(self, *args, **kwargs):
         super(BillingForm, self).__init__(*args, **kwargs)
