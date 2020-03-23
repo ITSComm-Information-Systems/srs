@@ -89,32 +89,6 @@ def make_report(request):
     user_types = data.exclude(cd_descr = None).order_by('cd_descr').values_list("cd_descr", flat= True).distinct()
     chartfields = data.exclude(chartfield = None).order_by('chartfield').values_list('chartfield',flat = True).distinct()
     total_charge = 0
-
-    location_filter = ''
-    type_filter = ''
-    cf_filter = ''
-    date_filter = ''
-    # If they filter by location
-    if request.POST.get('location')!= '' and request.POST.get('location')!= None:
-        location_filter = request.POST.get('location')
-       # data = data.filter(building__exact = location_filter).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
-    # If they filter by User ID type
-    if request.POST.get('type')!= ''and  request.POST.get('type')!= None:
-        type_filter = request.POST.get('type')
-        data = data.filter(cd_descr__exact = type_filter).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
-    # If they filter by chartfield
-    if request.POST.get('cf')!= '' and  request.POST.get('cf')!= None:
-        cf_filter = request.POST.get('cf')
-        data = data.filter(chartfield__exact = cf_filter).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
-    # If they filter by date
-    if request.POST.get('date')!= '' and  request.POST.get('date')!= None:
-        date_filter = request.POST.get('date')
-        if date_filter == '6-12':
-            date_filter = "Greater than 6 months and less than 12 months"
-            data = data.filter(last_call_date__lte = months_list[5], last_call_date__gte = months_list[11]).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
-        else:
-            date_filter = "Greater than 12 months"
-            data = data.filter(last_call_date__lte = months_list[11]).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
       
     # Format the report data
     if list(data):
@@ -137,10 +111,6 @@ def make_report(request):
         'buildings': list(buildings),
         'user_types': list(user_types),
         'chartfields': list(chartfields),
-        'location_filter': location_filter,
-        'type_filter': type_filter,
-        'cf_filter': cf_filter,
-        'date_filter': date_filter,
         'first': first,
         'months_list': filter_months,
     }
