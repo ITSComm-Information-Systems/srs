@@ -4,19 +4,24 @@ $(document).ready(function() {
     // Select first options by default
     $("#dept_id").prop("selectedIndex", 0);
     $("#bill_period").prop("selectedIndex", 0);
+
+    // Initially hide "current filters" div and remove filters button
     $("#filters-info").hide();
     $('#location-filter').hide();
     $('#type-filter').hide();
     $('#cf-filter').hide();
+    $('#date-filter').hide();
     $('#filterremove').hide();
 
+    // Apply filters on click
     $('#filterapply').on('click', function(e) {
         e.preventDefault();
-        test1 = $('#location').val();
-        test2 = $('#type').val();
-        test3 = $('#cf').val();
+        loc = $('#location').val();
+        type = $('#type').val();
+        cf = $('#cf').val();
+        date = $('#date').val();
 
-        var filters = [test1, test2, test3];
+        var filters = [loc, type, cf, date];
 
         filter(filters, 'filter');
 
@@ -24,14 +29,17 @@ $(document).ready(function() {
     });
 
 
+    // Remove filters on click
     $('#filterremove').on('click', function(e) {
         e.preventDefault();
         remove_filters();
 
+        // Hide "current filters" div
         $('#filters-info').hide();
     });
 })
 
+// Scroll to top funcctionality
 function scrollFunction() {
     if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
         document.getElementById("scrollTop").style.display = "block";
@@ -46,6 +54,8 @@ function topFunction() {
     document.documentElement.scrollTop = 0;
 }
 
+
+// Allow user to download full report to CSV
 function exportTableToCSV(filename) {
     var csv = [];
     var rows = document.querySelectorAll("table tr");
@@ -60,7 +70,7 @@ function exportTableToCSV(filename) {
             // New chartfield
             if (text == 'User ID') {
                 if (i != 0) {
-                    row.push('\n'); // does this work on mac?
+                    row.push('\n');
                     csv.push(row);
                     row = [];
                 }
@@ -79,6 +89,8 @@ function exportTableToCSV(filename) {
     downloadCSV(csv.join("\n"), filename);
 }
 
+
+// Create clickable download button
 function downloadCSV(csv, filename) {
     var csvFile;
     var downloadLink;
@@ -105,7 +117,10 @@ function downloadCSV(csv, filename) {
     downloadLink.click();
 }
 
+
+// Removes all filters
 function remove_filters() {
+    // Re-allow CSV downloads and show totals again
     $('.invLocTable tr.datarow').each(function() {
         current_cf = $(this).attr('id').split(':')[1];
         $('#total-row'.concat(current_cf)).show();
@@ -114,6 +129,7 @@ function remove_filters() {
         $(this).show();
     })
 
+    // Clear and hide current filters and remove filters button
     $('#location-filter').html('');
     $('#location-filter').hide();
     $('#type-filter').html('');
@@ -122,60 +138,77 @@ function remove_filters() {
     $('#cf-filter').hide();
     $('#filterremove').hide();
 
+    // Clear out filter option selected
     $("#location").prop("selectedIndex", 0);
     $("#type").prop("selectedIndex", 0);
     $("#cf").prop("selectedIndex", 0);
+    $("#date").prop("selectedIndex", 0);
 }
 
+
+// Filter data in tables
 function filter(filters, action) {
-    let location = filters[0], type = filters[1], cf = filters[2];
+    let location = filters[0], type = filters[1], cf = filters[2], date = filters[3];
     $('#filterremove').show();
 
+    
+    // Filter by chartfield, if specified
+    if (cf) {
+        $('.chartfield-title').each(function() {
+            current_cf = $(this).html().split('Chartfield: ')[1].trim();
+            if (current_cf != cf) {
+                id = '#'.concat(current_cf);
+                $(id).hide();
+                html = '<strong>Chartfield: </strong>'.concat(cf).concat('<br>');
+                $('#cf-filter').html(html);
+                $('#cf-filter').show();
+            }
+        })
+    }
+
+    // Additional filters
     $('.invLocTable tr.datarow').each(function() {
         current_cf = $(this).attr('id').split(':')[1];
+
+        // Remove totals and ability to download
         $('#total-row'.concat(current_cf)).hide();
         $('#download-link').hide();
 
+        // Get current location from table
         current_loc = $(this).find('.location').html();
         current_loc = current_loc.split('<br>')[0];
         current_loc = current_loc.split('Location: ')[1];
+
+        // Filter by location, if specified
         if (location && current_loc != location) {
-            if (action == 'filter') {
-                $(this).hide();
-                html = '<strong>Location: </strong>'.concat(location).concat('<br>');
-                $('#location-filter').html(html);
-                $('#location-filter').show();
-            }
-            else {
-                $(this).show();
-
-                $('#location-filter').html('');
-                $('#location-filter').hide();
-
-                $("#location").prop("selectedIndex", 0);
-                $("#type").prop("selectedIndex", 0);
-                $("#cf").prop("selectedIndex", 0);
-            }
+            $(this).hide();
+            html = '<strong>Location: </strong>'.concat(location).concat('<br>');
+            $('#location-filter').html(html);
+            $('#location-filter').show();
         }
 
+        // Filter by type, if specified
         if (type && $(this).find('.type').html() != type) {
-            if (action == 'filter') {
+            $(this).hide();
+            html = '<strong>User ID Type: </strong>'.concat(type).concat('<br>');
+            $('#type-filter').html(html);
+            $('#type-filter').show();
+        }
+
+        // Filter by last call date, if specified
+        if (date) {
+            filter_match = ((date = '6-12' && $(this).find('.lt12').html() && $(this).find('.gt6').html()) ||
+                (date = '12+' && !$(this).find('.lt12').html()) || $(this).find('.date').html() == 'None')
+
+            if (filter_match == false) {
                 $(this).hide();
-                html = '<strong>User ID Type: </strong>'.concat(type).concat('<br>');
-                $('#type-filter').html(html);
-                $('#type-filter').show();
-            }
-            else {
-                $(this).show();
-
-                $('#type-filter').html('');
-                $('#type-filter').hide();
-
-                $("#location").prop("selectedIndex", 0);
-                $("#type").prop("selectedIndex", 0);
-                $("#cf").prop("selectedIndex", 0);
+                html = '<strong>Last Call Date: </strong>'.concat(date).concat('<br>');
+                $('#date-filter').html(html);
+                $('#date-filter').show();
             }
         }
+
+
         if (table_empty(current_cf)) {
             $('#'.concat(current_cf)).hide();
         }
@@ -183,31 +216,6 @@ function filter(filters, action) {
             $('#'.concat(current_cf)).show();
         }
     })
-
-    if (cf) {
-        $('.chartfield-title').each(function() {
-            current_cf = $(this).html().split('Chartfield: ')[1].trim();
-            if (current_cf != cf) {
-                id = '#'.concat(current_cf);
-                if (action == 'filter') {
-                    $(id).hide();
-                    html = '<strong>Chartfield: </strong>'.concat(cf).concat('<br>');
-                    $('#cf-filter').html(html);
-                    $('#cf-filter').show();
-                }
-                else {
-                    $(id).show();
-
-                    $('#cf-filter').html('');
-                    $('#cf-filter').hide();
-
-                    $("#location").prop("selectedIndex", 0);
-                    $("#type").prop("selectedIndex", 0);
-                    $("#cf").prop("selectedIndex", 0);
-                }
-            }
-        })
-    }
 }
 
 function table_empty(cf) {

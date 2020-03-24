@@ -16,6 +16,7 @@ from django import forms
 from ldap3 import Server, Connection, ALL
 from oscauth.models import AuthUserDept, Grantor, Role, AuthUserDeptV
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Case, When, Value, IntegerField
 
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscReptInvlocV, UmOscBillCycleV
 from oscauth.forms import *
@@ -89,7 +90,20 @@ def make_report(request):
     user_types = data.exclude(cd_descr = None).order_by('cd_descr').values_list("cd_descr", flat= True).distinct()
     chartfields = data.exclude(chartfield = None).order_by('chartfield').values_list('chartfield',flat = True).distinct()
     total_charge = 0
-      
+
+    # # If they filter by date
+    # if request.POST.get('date')!= '' and  request.POST.get('date')!= None:
+    #     date_filter = request.POST.get('date')
+    #     if date_filter == '6-12':
+    #         date_filter = "Greater than 6 months and less than 12 months"
+    #         data = data.filter(last_call_date__lte = months_list[5], last_call_date__gte = months_list[11]).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+    #     else:
+    #         date_filter = "Greater than 12 months"
+    #         data = data.filter(last_call_date__lte = months_list[11]).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+    data = data.annotate(lt_twelve = Case(When(last_call_date__lt=months_list[11], then=Value(1)), default=Value(0), output_field=IntegerField()),
+                        gt_six = Case(When(last_call_date__gt=months_list[5], then=Value(1)), default=Value(0), output_field=IntegerField()))
+
+
     # Format the report data
     if list(data):
         formated_data, cost_table = format_data(data,request)
