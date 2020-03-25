@@ -95,6 +95,7 @@
 
                             <select class="custom-select" name="date" id="date">
                                 <option value=''>--Select--</option>
+                                <option value="lt6">Less than 6 months</option>
                                 <option value="6-12">Greater than 6 months and less than 12 months</option>
                                 <option value="12+">Greater than 12 months</option>
                             </select>
@@ -104,13 +105,12 @@
                 {% endif %}
             </div>
 
-            <div class="row mb-2">
-                <div></div>
-                <input type='submit' id='filterapply' value='Apply Filters' class="btn btn-primary float-right">
+            <div class="form-row mb-2">
+                <input type='submit' id='filterapply' value='Apply Filters' class="btn btn-primary">
                 <input type='submit' value='Remove Filters' class="btn btn-danger" id='filterremove'>
             </div>
 
-            <div class='row' id='filters-info'>
+            <div id='filters-info'>
                 <hr class="style1 2">
                 <div class='form-row'>
                     <div>

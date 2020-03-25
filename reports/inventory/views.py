@@ -100,8 +100,8 @@ def make_report(request):
     #     else:
     #         date_filter = "Greater than 12 months"
     #         data = data.filter(last_call_date__lte = months_list[11]).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
-    data = data.annotate(lt_twelve = Case(When(last_call_date__lt=months_list[11], then=Value(1)), default=Value(0), output_field=IntegerField()),
-                        gt_six = Case(When(last_call_date__gt=months_list[5], then=Value(1)), default=Value(0), output_field=IntegerField()))
+    data = data.annotate(lt_twelve = Case(When(last_call_date__gt=months_list[11], then=Value(1)), default=Value(0), output_field=IntegerField()),
+                        gt_six = Case(When(last_call_date__lt=months_list[5], then=Value(1)), default=Value(0), output_field=IntegerField()))
 
 
     # Format the report data
