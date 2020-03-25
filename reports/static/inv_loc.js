@@ -197,10 +197,10 @@ function filter(filters, action) {
 
         // Filter by last call date, if specified
         if (date) {
-            filter_match = ((date = '6-12' && $(this).find('.lt12').html() && $(this).find('.gt6').html()) ||
-                (date = '12+' && !$(this).find('.lt12').html()) || $(this).find('.date').html() == 'None')
+            filter_match = ((date == '6-12' && $(this).find('.lt12').html() == 1 && $(this).find('.gt6').html() == 1) ||
+                (date == '12+' && $(this).find('.lt12').html() == 0) || (date == 'lt6' && $(this).find('.gt6').html() == 0))
 
-            if (filter_match == false) {
+            if (filter_match == false || $(this).find('.date').html() == 'None') {
                 $(this).hide();
                 html = '<strong>Last Call Date: </strong>'.concat(date).concat('<br>');
                 $('#date-filter').html(html);
