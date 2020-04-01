@@ -95,9 +95,9 @@
 
                             <select class="custom-select" name="date" id="date">
                                 <option value=''>--Select--</option>
-                                <option value="lt6">Less than 6 months</option>
-                                <option value="6-12">Greater than 6 months and less than 12 months</option>
-                                <option value="12+">Greater than 12 months</option>
+                                <option id='lt6' value="lt6">Less than 6 months</option>
+                                <option id='6-12' value="6-12">Greater than 6 months and less than 12 months</option>
+                                <option id='gt12' value="gt12">Greater than 12 months</option>
                             </select>
                         </div>
                     </div>
@@ -105,35 +105,34 @@
                 {% endif %}
             </div>
 
-            <div class="form-row mb-2">
-                <input type='submit' id='filterapply' value='Apply Filters' class="btn btn-primary">
-                <input type='submit' value='Remove Filters' class="btn btn-danger" id='filterremove'>
-            </div>
-
-            <div id='filters-info'>
-                <hr class="style1 2">
-                <div class='form-row'>
-                    <div>
-                        <div class="mb-2">
-                            <strong>Current Filters:</strong>
-                        </div>
-                        <div class='indented-form-input'>
-                            <div id='location-filter'></div>
-                            <div id='type-filter'></div>
-                            <div id='cf-filter'></div>
-                            <div id='date-filter'></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </form>
     </div>
 
-    <div class='row float-right mt-2'>
-        <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" id='download-link' class="btn btn-success" aria-label="Downdload Report as CSV File">
+    <div class="row float-right mt-2 mb-2">
+        <input type='submit' id='filterapply' value='Apply Filters' class="btn btn-primary float-right">
+        <input type='submit' value='Remove Filters' class="btn btn-danger float-right" id='filterremove'>
+        <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" id='download-link' class="btn btn-success float-right" aria-label="Downdload Report as CSV File">
             Download CSV
         </button>
-    </div>
+    </div><br>
+
+    <div id='filters-info'>
+        <br>
+        <hr class="style1 2">
+        <div class='row'>
+            <div>
+                <div class="mb-2">
+                    <strong>Current Filters:</strong>
+                </div>
+                <div class='indented-form-input'>
+                    <div id='location-filter'></div>
+                    <div id='type-filter'></div>
+                    <div id='cf-filter'></div>
+                    <div id='date-filter'></div>
+                </div>
+            </div>
+        </div>
+    </div><br>
 
     {% for classification in formated_data %}
         <div class="table-responsive" id="{{classification.0.0.chartfield}}">
@@ -215,6 +214,7 @@
                                 {% endfor %}</td>
                             <td class='hidden lt12'>{{ phone.0.lt_twelve }}</td>
                             <td class='hidden gt6'>{{ phone.0.gt_six }}</td>
+                            <td class='hidden chartfield'>{{ classification.0.0.chartfield }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
