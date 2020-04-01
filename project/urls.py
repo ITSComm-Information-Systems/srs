@@ -5,14 +5,47 @@ from django.urls import path
 from django.conf.urls.static import static
 from . import views
 
+#from django.contrib.auth.models import User
+from order.models import StorageInstance
+from rest_framework import routers, serializers, viewsets
+
+
 admin.AdminSite.site_header = 'SRS Administration'
 admin.AdminSite.site_title = 'SRS Site Admin'
+
+
+# Serializers define the API representation.
+class StorageInstanceSerializer(serializers.HyperlinkedModelSerializer):
+    #hosts = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = StorageInstance
+        fields = ['name','owner','shortcode','uid','ad_group','deptid','size','type','flux','created_date']
+ 
+
+# ViewSets define the view behavior.
+class StorageViewSet(viewsets.ModelViewSet):
+
+    queryset = StorageInstance.objects.all()
+    serializer_class = StorageInstanceSerializer
+
+    def get_queryset(self):
+        print(self.kwargs)
+        queryset = StorageInstance.objects.all()
+        return queryset
+
+
+# Routers provide an easy way of automatically determining the URL conf.
+router = routers.DefaultRouter()
+router.register(r'storageinstances', StorageViewSet)
 
 urlpatterns = [
     path('oidc/', include('mozilla_django_oidc.urls')),
     path('orders/', include('order.urls')),
     path('pages/', include('pages.urls')),
     path('auth/', include('oscauth.urls')),
+    #path('auth-api/', include('rest_framework.urls')),
+    path('api/', include(router.urls)),
     path('admin/', admin.site.urls),
     path('reports/',include('reports.urls')),
     path('chartchange/ajax/', views.change_dept),

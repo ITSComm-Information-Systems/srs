@@ -322,7 +322,7 @@ class StorageInstance(models.Model):
 
 
 class StorageHost(models.Model):
-    storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
+    storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
     def __str__(self):
