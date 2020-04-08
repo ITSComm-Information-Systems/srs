@@ -49,11 +49,16 @@ def get_phone_location(request, phone_number):
 def send_tab_data(request):
     
     tab_name = request.POST.get('tab')
-
     if tab_name == 'Review':
         item = Item.objects.get(id = request.POST['item_id'])
-        item.submit_incident()
-        return JsonResponse({'redirect': '/requestsent'}, safe=False)
+
+        if request.POST['cart']=='True':
+            item.deptid = Chartcom.objects.get(id=item.chartcom_id).dept
+            item.save()
+            return JsonResponse({'redirect': f'/orders/cart/{item.deptid}'}, safe=False)
+        else:
+            item.submit_incident()
+            return JsonResponse({'redirect': '/requestsent'}, safe=False)
 
     step = Step.objects.get(name=tab_name)
     sequence = request.POST.get('sequence')
@@ -61,7 +66,9 @@ def send_tab_data(request):
     item_id = request.POST.get('item_id')
 
     #try:  TODO
-    f = globals()[step.custom_form](step, request.POST)
+    f = globals()[step.custom_form](step
+        , request.POST     # Bind the form
+        , request=request) # Pass entire request so user, etc is available for validation routines
     #except: 
     #    f = TabForm(step)
 
@@ -92,6 +99,7 @@ def send_tab_data(request):
                 review_summary[tabnum] = tab
             data['reviewSummary'] = review_summary
 
+        i.chartcom_id = request.POST.get('oneTimeCharges', 14388)
         i.data = data
         i.description = action.cart_label
         i.save()

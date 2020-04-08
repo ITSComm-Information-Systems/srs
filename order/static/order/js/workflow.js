@@ -10,7 +10,6 @@ var popOverSettings = {
 }
 
 
-
 $(document).ready(function() {
 
   $('#productType_1').attr('disabled', true);
@@ -24,6 +23,7 @@ $(document).ready(function() {
   //$('[data-toggle="popover"]').popover();
 
   use_cart = $("#wfcart").val();
+  use_ajax = $("#wfajax").val();
 
   item_id = 0;
   // Workflow stuff
@@ -259,14 +259,12 @@ $(document).ready(function() {
 
   $("#nextBtn").click(function(event) {
 
-    if (use_cart=="True") {  // TODO Enable AJAX
+    if (use_ajax=="False") {  // TODO Enable AJAX
       //if (n == 1 && !validateForm()) return false;
       nextPrev(1);
     } else {
       sendTabData();
     }
-
-
 
   });
 
@@ -573,8 +571,6 @@ function addHost() {
     host_count = host_count + 1;
   }
   
-  console.log(host_count, '<');
-
   var rec = $("#host_new").clone();
 
   rec.attr("id", "host_new_" + host_count);
@@ -623,7 +619,7 @@ function sendTabData(field) {
   data.push({name: 'tab', value: currTab});
   data.push({name: 'item_id', value: item_id});
   data.push({name: 'sequence', value: currStep});
-  //console.log('update', item_id);
+
   // List the fields that are visible.  TODO use the data from validate form
   inp = $("#step" + currStep + " :input:visible");
 
