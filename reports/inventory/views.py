@@ -139,17 +139,17 @@ def format_data(data,request):
     cost_table = []
 
     # Find first chartfield
-    current_classification = data.order_by('chartfield').values_list('chartfield').distinct()[0][0]
+    current_classification = data.order_by('chartfield', 'user_defined_id').values_list('chartfield').distinct()[0][0]
     
     # Build data structure
     current_table = []
     same_phone = []
 
     # Get ID of first entry of data set (filtered by selected department and date)
-    current_number = data.order_by('chartfield').values_list('user_defined_id').distinct()[0][0]
+    current_number = data.order_by('chartfield', 'user_defined_id').values_list('user_defined_id').distinct()[0][0]
 
     # Loop through all report data
-    for point in data:
+    for point in data.order_by('chartfield', 'user_defined_id'):
         # Create chartfield-like object
         classification = point['chartfield']
         number = point['user_defined_id']
@@ -157,7 +157,7 @@ def format_data(data,request):
         # Current loop variable is different than the previous (current)
         if number != current_number:
             # If this is the first entry of the data set, add it to the current User ID list
-            if point == data[0]:
+            if point == data.order_by('chartfield', 'user_defined_id')[0]:
                 same_phone.append(point)
                 continue
             current_table.append(same_phone)
