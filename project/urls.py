@@ -16,11 +16,11 @@ admin.AdminSite.site_title = 'SRS Site Admin'
 
 # Serializers define the API representation.
 class StorageInstanceSerializer(serializers.HyperlinkedModelSerializer):
-    #hosts = serializers.StringRelatedField(many=True)
+    hosts = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = StorageInstance
-        fields = ['name','owner','shortcode','uid','ad_group','deptid','size','type','flux','created_date']
+        fields = ['id','name','owner','shortcode','uid','ad_group','deptid','size','type','flux','created_date','hosts']
  
 
 # ViewSets define the view behavior.
@@ -30,8 +30,13 @@ class StorageViewSet(viewsets.ModelViewSet):
     serializer_class = StorageInstanceSerializer
 
     def get_queryset(self):
-        print(self.kwargs)
-        queryset = StorageInstance.objects.all()
+        name = self.request.GET.get('name')
+
+        if name:
+            queryset = StorageInstance.objects.filter(name=name)
+        else:
+            queryset = StorageInstance.objects.all()
+
         return queryset
 
 
