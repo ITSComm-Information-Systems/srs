@@ -31,10 +31,12 @@
 
 {% if formated_data %}
     <div>
+        {% if data_length %}
         <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
             <input type="text" name="dept_id" id="dept_id" value="{{dept_id}}-{{dept_name}}" readonly hidden>
             <input type="text" name="bill_period" id="bill_period" value="{{bill_period}}" readonly hidden>
 
+            
             <div class="mt-2 mb-2">
                 <strong>Filter By:</strong>
             </div>
@@ -104,13 +106,15 @@
 
                 {% endif %}
             </div>
-
         </form>
+        {% endif %}
     </div>
 
     <div class="row float-right mt-2 mb-2">
+        {% if data_length %}
         <input type='submit' id='filterapply' value='Apply Filters' class="btn btn-primary float-right">
         <input type='submit' value='Remove Filters' class="btn btn-danger float-right" id='filterremove'>
+        {% endif %}
         <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" id='download-link' class="btn btn-success float-right" aria-label="Downdload Report as CSV File">
             Download CSV
         </button>

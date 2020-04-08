@@ -27,39 +27,15 @@ $(document).ready(function() {
         lt12Cols.push($(this).find('.lt12'));
         gt6Cols.push($(this).find('.gt6'));
     })
-    // var locCols = $(),
-    //     typeCols = [],
-    //     cfCols = $(),
-    //     lt12Cols = $(),
-    //     gt6Cols = $();
-
-    // $('.invLocTable tr.datarow').each(function() {
-    //     var columns = $(this).find('td');
-
-    //     locCols.add(columns.eq('.location'));
-    //     console.log(columns.eq('.type'));
-    //     typeCols.push(columns.eq('.type'));
-    //     cfCols.add(columns.eq('.chartfield'));
-    //     lt12Cols.add(columns.eq('.lt12'));
-    //     gt6Cols.add(columns.eq('.gt6'));
-    // });
 
 
     // Apply filters on click
     $('#filterapply').on('click', function(e) {
-        e.preventDefault();
-        loc = $('#location').val();
-        type = $('#type').val();
-        cf = $('#cf').val();
-        date = $('#date').val();
+            e.preventDefault();
 
-        // var filters = [loc, type, cf, date];
+            filter();
 
-        // filter(filters, 'filter');
-
-        new_filter();
-
-        $('#filters-info').show();
+            $('#filters-info').show();
     });
 
 
@@ -170,6 +146,8 @@ function remove_filters() {
     $('#type-filter').hide();
     $('#cf-filter').html('');
     $('#cf-filter').hide();
+    $('#date-filter').html('');
+    $('#date-filter').hide();
     $('#filterremove').hide();
 
     // Clear out filter option selected
@@ -179,107 +157,39 @@ function remove_filters() {
     $("#date").prop("selectedIndex", 0);
 }
 
-
-// Filter data in tables
-function filter(filters, action) {
-    let location = filters[0], type = filters[1], cf = filters[2], date = filters[3];
+function filter() {
     $('#filterremove').show();
 
-    
-    // Filter by chartfield, if specified
-    if (cf) {
-        $('.chartfield-title').each(function() {
-            current_cf = $(this).html().split('Chartfield: ')[1].trim();
-            if (current_cf != cf) {
-                id = '#'.concat(current_cf);
-                $(id).hide();
-                html = '<strong>Chartfield: </strong>'.concat(cf).concat('<br>');
-                $('#cf-filter').html(html);
-                $('#cf-filter').show();
-            }
-        })
-    }
-
-    if (location || type || date) {
-        // Additional filters
-        $('.invLocTable tr.datarow').each(function() {
-            current_cf = $(this).attr('id').split(':')[1];
-
-            // Remove totals and ability to download
-            $('#total-row'.concat(current_cf)).hide();
-            $('#download-link').hide();
-
-            var columns = $(this).find('td');
-
-            //current_loc = columns.eq('.location').html();
-
-            // Get current location from table
-            current_loc = $(this).find('.location').html();
-            current_loc = current_loc.split('<br>')[0];
-            current_loc = current_loc.split('Location: ')[1];
-
-            // Filter by location, if specified
-            if (location && current_loc != location) {
-                $(this).hide();
-                html = '<strong>Location: </strong>'.concat(location).concat('<br>');
-                $('#location-filter').html(html);
-                $('#location-filter').show();
-            }
-
-            // Filter by type, if specified
-            if (type && $(this).find('.type').html() != type) {
-                $(this).hide();
-                html = '<strong>User ID Type: </strong>'.concat(type).concat('<br>');
-                $('#type-filter').html(html);
-                $('#type-filter').show();
-            }
-
-            // Filter by last call date, if specified
-            if (date) {
-                filter_match = ((date == '6-12' && $(this).find('.lt12').html() == 1 && $(this).find('.gt6').html() == 1) ||
-                    (date == 'gt12' && $(this).find('.lt12').html() == 0) || (date == 'lt6' && $(this).find('.gt6').html() == 0))
-
-                if (filter_match == false || $(this).find('.date').html() == 'None') {
-                    $(this).hide();
-                    html = '<strong>Last Call Date: </strong>'.concat($('#'.concat(date)).html()).concat('<br>');
-                    $('#date-filter').html(html);
-                    $('#date-filter').show();
-                }
-            }
-
-
-            if (table_empty(current_cf)) {
-                $('#'.concat(current_cf)).hide();
-            }
-            else {
-                $('#'.concat(current_cf)).show();
-            }
-        })
-    }
-}
-
-function new_filter() {
     var loc = $('#location').val(),
     type = $('#type').val(),
     cf = $('#cf').val(),
     date = $('#date').val();
 
     // Remove totals and ability to download
-    // $('#total-row'.concat(current_cf)).hide();
-    // $('#download-link').hide();
+    affected_cfs = []
+    $('#download-link').hide();
+
+    //console.log(locCols);
 
     if (loc) {
         for (i = 0; i < locCols.length; i++) {
-            current_loc = locCols[i][0].innerText;
+            // current_loc = locCols[i][0].innerText;
+            current_loc = locCols[i][0].outerHTML;
             if (current_loc) {
+                //console.log(current_loc)
+                // current_loc = current_loc.split('Location: ')[1];
+                // current_loc = current_loc.split('Floor: ')[0];
+                // current_loc = current_loc.replace('\n', '');
+
+                current_loc = current_loc.split('<br>')[0];
                 current_loc = current_loc.split('Location: ')[1];
-                current_loc = current_loc.split('Floor: ')[0];
-                current_loc = current_loc.replace('\n', '');
+
             }
 
-            if (current_loc == loc) {
+            if (current_loc != loc) {
                 locCols[i].parent().hide();
-                html = '<strong>Location: </strong>'.concat(current_loc).concat('<br>');
+                affected_cfs.push(cfCols[i][0].innerText);
+                html = '<strong>Location: </strong>'.concat(loc).concat('<br>');
                 $('#location-filter').html(html);
                 $('#location-filter').show();
             }
@@ -288,8 +198,9 @@ function new_filter() {
 
     if (type) {
         for (i = 0; i < typeCols.length; i++) {
-            if (typeCols[i][0].innerText == type) {
+            if (typeCols[i][0].innerText != type) {
                 typeCols[i].parent().hide();
+                affected_cfs.push(cfCols[i][0].innerText);
                 html = '<strong>User ID Type: </strong>'.concat(type).concat('<br>');
                 $('#type-filter').html(html);
                 $('#type-filter').show();
@@ -299,10 +210,10 @@ function new_filter() {
 
     if (cf) {
         for (i = 0; i < cfCols.length; i++) {
-            console.log(cfCols[i][0].innerText);
-            if (cfCols[i][0].innerText == cf) {
-                id = '#'.concat(cf);
-                $(id).hide();
+            if (cfCols[i][0].innerText != cf) {
+                id = '#'.concat(cfCols[i][0].innerText);
+                $(id).hide();            
+                affected_cfs.push(cfCols[i][0].innerText);
                 html = '<strong>Chartfield: </strong>'.concat(cf).concat('<br>');
                 $('#cf-filter').html(html);
                 $('#cf-filter').show();
@@ -311,71 +222,31 @@ function new_filter() {
     }
 
     if (date) {
-        filter_match = ((date == '6-12' && $(this).find('.lt12').html() == 1 && $(this).find('.gt6').html() == 1) ||
-                    (date == 'gt12' && $(this).find('.lt12').html() == 0) || (date == 'lt6' && $(this).find('.gt6').html() == 0))
+        for (i = 0; i < gt6Cols.length; i++) {
+            filter_match = ((date == '6-12' && lt12Cols[i][0].innerText == 1 && gt6Cols[i][0].innerText == 1) ||
+                    (date == 'gt12' && lt12Cols[i][0].innerText == 0) || (date == 'lt6' && gt6Cols[i][0].innerText == 0))
 
-        if (filter_match == false || $(this).find('.date').html() == 'None') {
-            $(this).hide();
-            html = '<strong>Last Call Date: </strong>'.concat($('#'.concat(date)).html()).concat('<br>');
-            $('#date-filter').html(html);
-            $('#date-filter').show();
-        }
 
-                
-        for (i = 0; i < typeCols.length; i++) {
-            if (typeCols[i][0].innerText == type) {
-                typeCols[i].parent().hide();
-                html = '<strong>User ID Type: </strong>'.concat(type).concat('<br>');
-                $('#type-filter').html(html);
-                $('#type-filter').show();
+            if (filter_match == false || (lt12Cols[i][0].innerText == 0 && gt6Cols[i][0].innerText == 0)) {
+                gt6Cols[i].parent().hide();
+                affected_cfs.push(cfCols[i][0].innerText);
+                html = '<strong>Last Call Date: </strong>'.concat($('#'.concat(date)).html()).concat('<br>');
+                $('#date-filter').html(html);
+                $('#date-filter').show();
             }
         }
     }
 
-    // if (table_empty(current_cf)) {
-    //     $('#'.concat(current_cf)).hide();
-    // }
-    // else {
-    //     $('#'.concat(current_cf)).show();
-    // }
+    for (i = 0; i < affected_cfs.length; i++) {
+        $('#total-row'.concat(affected_cfs[i])).hide();
 
-    // // EDIT EDIT EDIT EDIT
-    // current_loc = $(this).find('.location').html();
-    // current_loc = current_loc.split('<br>')[0];
-    // current_loc = current_loc.split('Location: ')[1];
-    // locCols.add(current_loc);
-
-
-    // if (loc) {
-    //     locCols.each(function() {
-    //         if (!this.html() == loc) {
-    //             $(this).parent().hide();
-    //         }
-    //     })
-    // }
-
-    // if (type) {
-    //     typeCols.each(function() {
-    //         if (!this == type) {
-    //             $(this).parent().hide();
-    //         }
-    //     })
-    // }
-
-    // if (cf) {
-    //     cfCols.each(function() {
-    //         if (!this == cf) {
-    //             $(this).parent().hide();
-    //         }
-    //     })
-    // }
-
-    // if (date) {
-    //     // write later
-    // }
-
-
-
+        if (table_empty(affected_cfs[i])) {
+            $('#'.concat(affected_cfs[i])).hide();
+        }
+        else {
+            $('#'.concat(affected_cfs[i])).show();
+        }
+    }
 }
 
 function table_empty(cf) {
