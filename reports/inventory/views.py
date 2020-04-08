@@ -119,6 +119,7 @@ def make_report(request):
         'dept_mgr_uniq': dept_mgr_uniq,
         'bill_period': bill_period,
         'data': list(data),
+        'data_length': len(data) < 1000,
         'total_charge': total_charge,
         'formated_data': formated_data,
         'cost_table': list(cost_table),
@@ -201,3 +202,10 @@ def get_depts(request):
             }
             full_depts.append(dept)
         return full_depts
+
+def filter(request):
+    template = loader.get_template('inventory-report.html')
+    context = {
+        'title': 'Test!!!',
+    }
+    return HttpResponse(template.render(context,request))
