@@ -1,0 +1,58 @@
+<div class="col-6">
+
+    <fieldset id="contactYN" data-sequence="10" >
+        <legend id="legendcontact_yn">
+            <strong>{{ tab.form.contactYN.label }}</strong>
+        </legend>
+
+        <div class="form-check custom-radio">
+            <input type="radio" class="form-check-input" id="contactYN_Yes" value="True"
+                name="contactYN" required onclick="onsite(true)">
+            <label class="form-check-label" for="contactYN_Yes">Yes</label>
+        </div>
+        
+        <div class="form-check custom-radio">
+            <input type="radio" class="form-check-input" id="contactYN_No" value="False"
+                name="contactYN" required onclick="onsite(false)">
+            <label class="form-check-label" for="contactYN_No">No</label>
+            
+            <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                    aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>
+        </div>
+        <br>
+    </fieldset>
+    
+    <div id="contact_info" style="display: none;">
+        {% with field=tab.form.contactID %}
+        {% include field.field.template_name %}
+        {% endwith %}
+    
+        {% with field=tab.form.contactName %}
+        {% include field.field.template_name %}
+        {% endwith %}
+
+        {% with field=tab.form.contactNumber %}
+        {% include field.field.template_name %}
+        {% endwith %}
+    </div>
+
+    <div id="addl_comments" style="display: none;">
+        <label for="id_comments"><strong>{{ tab.form.addlComments.label }}</strong></label> 
+        <textarea name="comments" cols="100" rows="10" class="form-control" id="id_comments"></textarea>
+        
+        <label for="id_file">Please attach any drawings, spreadsheets or floor plans with jack locations as needed:</label> <input type="file" name="file" multiple id="id_file">
+    </div>
+
+    <script>
+        function onsite(yesno) {
+            if(yesno) {
+                $("#contact_info").hide();
+            } else {
+                $("#contact_info").show();
+            }
+
+            $("#addl_comments").show();
+        }
+    </script>
+
+</div>

@@ -68,6 +68,8 @@ class Element(Configuration):
         ('Checkbox', 'Checkbox'),
         ('McGroup', 'MCommunity Group'),
         ('ShortCode', 'Short Code'),
+        ('Phone', 'Phone Number'),
+        ('Uniqname', 'Uniqname'),
         ('HTML', 'Static HTML'),
     )
     label = models.TextField()
@@ -163,6 +165,7 @@ class Action(Configuration):
     )
     cart_label = models.CharField(max_length=100, blank=True, null=True)
     use_cart = models.BooleanField(default=True)
+    use_ajax = models.BooleanField(default=False)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='A')
     description = models.TextField(blank=True, null=True)
@@ -319,7 +322,7 @@ class StorageInstance(models.Model):
 
 
 class StorageHost(models.Model):
-    storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
+    storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
     def __str__(self):
