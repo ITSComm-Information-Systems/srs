@@ -16,6 +16,7 @@ from django import forms
 from ldap3 import Server, Connection, ALL
 from oscauth.models import AuthUserDept, Grantor, Role, AuthUserDeptV
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Case, When, Value, IntegerField
 
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscReptInvlocV, UmOscBillCycleV
 from oscauth.forms import *
@@ -90,32 +91,19 @@ def make_report(request):
     chartfields = data.exclude(chartfield = None).order_by('chartfield').values_list('chartfield',flat = True).distinct()
     total_charge = 0
 
-    location_filter = ''
-    type_filter = ''
-    cf_filter = ''
-    date_filter = ''
-    # If they filter by location
-    if request.POST.get('location')!= '' and request.POST.get('location')!= None:
-        location_filter = request.POST.get('location')
-       # data = data.filter(building__exact = location_filter).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
-    # If they filter by User ID type
-    if request.POST.get('type')!= ''and  request.POST.get('type')!= None:
-        type_filter = request.POST.get('type')
-        data = data.filter(cd_descr__exact = type_filter).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
-    # If they filter by chartfield
-    if request.POST.get('cf')!= '' and  request.POST.get('cf')!= None:
-        cf_filter = request.POST.get('cf')
-        data = data.filter(chartfield__exact = cf_filter).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
-    # If they filter by date
-    if request.POST.get('date')!= '' and  request.POST.get('date')!= None:
-        date_filter = request.POST.get('date')
-        if date_filter == '6-12':
-            date_filter = "Greater than 6 months and less than 12 months"
-            data = data.filter(last_call_date__lte = months_list[5], last_call_date__gte = months_list[11]).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
-        else:
-            date_filter = "Greater than 12 months"
-            data = data.filter(last_call_date__lte = months_list[11]).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
-      
+    # # If they filter by date
+    # if request.POST.get('date')!= '' and  request.POST.get('date')!= None:
+    #     date_filter = request.POST.get('date')
+    #     if date_filter == '6-12':
+    #         date_filter = "Greater than 6 months and less than 12 months"
+    #         data = data.filter(last_call_date__lte = months_list[5], last_call_date__gte = months_list[11]).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+    #     else:
+    #         date_filter = "Greater than 12 months"
+    #         data = data.filter(last_call_date__lte = months_list[11]).order_by('chartfield', 'user_defined_id', 'rptorder', 'item_code').values().distinct()
+    data = data.annotate(lt_twelve = Case(When(last_call_date__gt=months_list[11], then=Value(1)), default=Value(0), output_field=IntegerField()),
+                        gt_six = Case(When(last_call_date__lt=months_list[5], then=Value(1)), default=Value(0), output_field=IntegerField()))
+
+
     # Format the report data
     if list(data):
         formated_data, cost_table = format_data(data,request)
@@ -131,16 +119,13 @@ def make_report(request):
         'dept_mgr_uniq': dept_mgr_uniq,
         'bill_period': bill_period,
         'data': list(data),
+        'data_length': len(data) < 1000,
         'total_charge': total_charge,
         'formated_data': formated_data,
         'cost_table': list(cost_table),
         'buildings': list(buildings),
         'user_types': list(user_types),
         'chartfields': list(chartfields),
-        'location_filter': location_filter,
-        'type_filter': type_filter,
-        'cf_filter': cf_filter,
-        'date_filter': date_filter,
         'first': first,
         'months_list': filter_months,
     }
@@ -217,3 +202,10 @@ def get_depts(request):
             }
             full_depts.append(dept)
         return full_depts
+
+def filter(request):
+    template = loader.get_template('inventory-report.html')
+    context = {
+        'title': 'Test!!!',
+    }
+    return HttpResponse(template.render(context,request))
