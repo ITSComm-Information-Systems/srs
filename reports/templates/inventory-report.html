@@ -29,90 +29,18 @@
     </div>
 </div>
 
+{% if formated_data %}
+    <div>
+        {% if data_length %}
+        <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
+            <input type="text" name="dept_id" id="dept_id" value="{{dept_id}}-{{dept_name}}" readonly hidden>
+            <input type="text" name="bill_period" id="bill_period" value="{{bill_period}}" readonly hidden>
 
-{% comment %}
-{% if formated_data or location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%}
-    <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
-        <input type="text" name="dept_id" id="dept_id" value="{{dept_id}}-{{dept_name}}" readonly hidden>
-        <input type="text" name="bill_period" id="bill_period" value="{{bill_period}}" readonly hidden>
-
-        <div class="mt-2 mb-2">
-            <strong>Filter By:</strong>
-        </div>
-
-        
-        {% if first %}
-            <div class="form-row">
-                <div class="col-3" id="select_loc">
-                    <div class="input-group col-auto">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="location">
-                                Location
-                            </label>
-                        </div>
-                        <select class="custom-select" name="location"
-                            id="location">
-                            <option value=''>--Select--</option>
-                            {% for building in buildings %}
-                                <option value="{{ building }}">{{ building }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-
-                <div class="col-3" id="select_type">
-                    <div class="input-group col-auto">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="type">User ID Type</label>
-                        </div>
-
-                        <select class="custom-select" name="type" id="type">
-                            <option value=''>--Select--</option>
-                            {% for type in user_types %}
-                                <option value="{{ type }}">{{ type }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-
-                <div class="col-3" id="select_cf">
-                    <div class="input-group col-auto">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="cf">Chartfield</label>
-                        </div>
-
-                        <select class="custom-select" name="cf" id="cf">
-                            <option value=''>--Select--</option>
-                            {% for chartfield in chartfields %}
-                                <option value="{{ chartfield }}">{{ chartfield }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="col-3" id="select_date">
-                    <div class="input-group col-auto">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="date">Last Call Date</label>
-                        </div>
-
-                        <select class="custom-select" name="date" id="date">
-                            <option value=''>--Select--</option>
-                            <option value="6-12">Greater than 6 months and less than 12 months</option>
-                            <option value="12+">Greater than 12 months</option>
-                        </select>
-                    </div>
-                </div>
+            
+            <div class="mt-2 mb-2">
+                <strong>Filter By:</strong>
             </div>
 
-            <div class="inv-filter-btns mt-2">
-                <input type='button' value='Apply Filters' class="btn btn-primary" id="applyfilters">
-                {% if location_filter or type_filter or cf_filter or date_filter%}
-                    <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs">
-                {% endif %}
-            </div>
-
-        {% else %}
             <div class="form-row">
                 <div class="col-3" id="select_loc">
                     <div class="input-group col-auto">
@@ -129,13 +57,13 @@
                         </select>
                     </div>
                 </div>
-        
+
                 <div class="col-3" id="select_type">
                     <div class="input-group col-auto">
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="type">User ID Type</label>
                         </div>
-        
+
                         <select class="custom-select" name="type" id="type">
                             <option value=''>--Select--</option>
                             {% for type in user_types %}
@@ -144,13 +72,13 @@
                         </select>
                     </div>
                 </div>
-        
+
                 <div class="col-3" id="select_cf">
                     <div class="input-group col-auto">
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="cf">Chartfield</label>
                         </div>
-        
+
                         <select class="custom-select" name="cf" id="cf">
                             <option value=''>--Select--</option>
                             {% for chartfield in chartfields %}
@@ -160,47 +88,62 @@
                     </div>
                 </div> 
 
-                <div class="col-3">
-                    <input type='button' value='Apply Filters' class="btn btn-primary" id="applyfilters">
-                    {% if location_filter or type_filter or cf_filter or date_filter%}
-                        <input type='submit' value='Remove Filters' class="btn btn-link prv-msgs">
-                    {% endif %}
+                {% if first %}
+                    <div class="col-3" id="select_date">
+                        <div class="input-group col-auto">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="date">Last Call Date</label>
+                            </div>
+
+                            <select class="custom-select" name="date" id="date">
+                                <option value=''>--Select--</option>
+                                <option id='lt6' value="lt6">Less than 6 months</option>
+                                <option id='6-12' value="6-12">Greater than 6 months and less than 12 months</option>
+                                <option id='gt12' value="gt12">Greater than 12 months</option>
+                            </select>
+                        </div>
+                    </div>
+
+                {% endif %}
+            </div>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="row float-right mt-2 mb-2">
+        {% if data_length %}
+        <input type='submit' id='filterapply' value='Apply Filters' class="btn btn-primary float-right">
+        <input type='submit' value='Remove Filters' class="btn btn-danger float-right" id='filterremove'>
+        {% endif %}
+        <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" id='download-link' class="btn btn-success float-right" aria-label="Downdload Report as CSV File">
+            Download CSV
+        </button>
+    </div><br>
+
+    <div id='filters-info'>
+        <br>
+        <hr class="style1 2">
+        <div class='row'>
+            <div>
+                <div class="mb-2">
+                    <strong>Current Filters:</strong>
+                </div>
+                <div class='indented-form-input'>
+                    <div id='location-filter'></div>
+                    <div id='type-filter'></div>
+                    <div id='cf-filter'></div>
+                    <div id='date-filter'></div>
                 </div>
             </div>
-        {% endif %}
-
-        {% if location_filter or type_filter or cf_filter or date_filter%}
-            <hr class="style1 2">
-            <div class='form-row'>
-                <div>
-                    <div class="mb-2">
-                        <strong>Current Filters:</strong>
-                    </div>
-                    <div class='indented-form-input'>
-                        {% if location_filter %}<strong>Location:</strong> {{ location_filter }}<br>{% endif %}
-                        {% if type_filter %}<strong>User ID Type:</strong> {{ type_filter }}<br>{% endif %}
-                        {% if cf_filter %}<strong>Chartfield:</strong> {{ cf_filter }}<br>{% endif %}
-                        {% if date_filter %}<strong>Last Call Date:</strong> {{ date_filter }}<br>{% endif %}
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    </form>
-{% endif %}
-{% endcomment %}
-
-
-{% if formated_data %}
-    <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" class="btn btn-success float-right" aria-label="Downdload Report as CSV File">
-        Download CSV
-    </button>
+        </div>
+    </div><br>
 
     {% for classification in formated_data %}
-        <div class="table-responsive">
-            <h3 class="text-dark font-weight-bold">
+        <div class="table-responsive" id="{{classification.0.0.chartfield}}">
+            <h3 class="text-dark font-weight-bold chartfield-title">
                 Chartfield: {{classification.0.0.chartfield}}
             </h3>
-            <table class="table table-sm mb-5 table-striped" id= "invLocTable">
+            <table class="table table-sm mb-5 table-striped invLocTable" id="invLocTable{{classification.0.0.chartfield}}">
                 <thead class="thead-dark">
                     <tr data-name="{{ classification.0.0.chartfield }}">
                         <th class="user_id_report_col">User ID</th>
@@ -215,18 +158,19 @@
                         <th>Quantity</th>
                         <th>Unit Rate</th>
                         <th>Amount</th>
+                        <th class="hidden">Less than 12 months</th>
+                        <th class="hidden">Greater than 6 months</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for phone in classification %}
-                        <tr>
+                        <tr class='datarow' id="data:{{classification.0.0.chartfield}}">
                             <td style="vertical-align:middle">{{phone.0.user_defined_id}}</td>
                             <td style="vertical-align:middle">{{phone.0.usage}}</td>
-                            <td style="vertical-align:middle">{{phone.0.cd_descr}}</td>
+                            <td style="vertical-align:middle" class='type'>{{phone.0.cd_descr}}</td>
                             <td style="vertical-align:middle">{{phone.0.first_name}} {{phone.0.last_name}}</td>
-                            <td>
-                                {% for charge in phone %}
-                                    {% if charge.jack %}
+                            <td class='location'>{% for charge in phone %}
+                                    {% if charge.jack%}
                                         Location: {{charge.building}}<br> 
                                         Floor: {{charge.floor}}
                                         Room: {{charge.room}}<br>
@@ -235,8 +179,7 @@
                                     {% endif %}
                                 {% endfor %}
                             </td>
-                            <td>
-                                {% for charge in phone %}
+                            <td>{% for charge in phone %}
                                     {% if charge.ncos_desc%}
                                         {{charge.ncos_desc}} 
                                         {% if charge.ncos %}
@@ -245,7 +188,7 @@
                                     {% endif %}
                                 {% endfor %}
                             </td>
-                            <td>{{phone.0.last_call_date}}</td>
+                            <td class='date'>{{phone.0.last_call_date}}</td>
                             <td>{{phone.0.mrc_account}}</td>
                             <td>{% for charge in phone %}
                                     {% if charge.item_code%}
@@ -253,13 +196,7 @@
                                     {% endif%}
                                 {% endfor %}
                             </td>
-                            <td>
-                                {% for charge in phone %}
-                                    {% if charge.quantity%}
-                                        {{charge.quantity}}
-                                    {% endif %}<br>
-                                {% endfor %}
-                            </td>
+                            <td>{% for charge in phone %}{% if charge.quantity%} {{charge.quantity}}{% endif %}<br>{% endfor %}</td>
                             <td>
                                 {% for charge in phone %}
                                     {% if charge.unit_price %}
@@ -270,8 +207,7 @@
                                         {% endif %}
                                     {% endif %}<br>
                                 {% endfor %}</td> 
-                            <td>
-                                {% for charge in phone %}
+                            <td class='row-total'>{% for charge in phone %}
                                     {% if charge.charge_amount%}
                                         {% if 0 > charge.charge_amount %}
                                             <span class='prv-msgs'>{{charge.charge_amount | currency }}</span>
@@ -279,12 +215,14 @@
                                             {{ charge.charge_amount | currency }}
                                         {% endif %}
                                     {% endif %}<br>
-                                {% endfor %}
-                            </td>
+                                {% endfor %}</td>
+                            <td class='hidden lt12'>{{ phone.0.lt_twelve }}</td>
+                            <td class='hidden gt6'>{{ phone.0.gt_six }}</td>
+                            <td class='hidden chartfield'>{{ classification.0.0.chartfield }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
-                <tr class="bg-warning total-charges-inv">
+                <tr class="bg-warning total-charges-inv" id='total-row{{ classification.0.0.chartfield }}'>
                     <td colspan="1">Total</td>
                     <td></td>
                     <td></td>
@@ -296,6 +234,8 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td class='hidden'></td>
+                    <td class='hidden'></td>
                     {% if 0 > cost_table|index:forloop.counter0 %}
                         <td colspan="1" class="total-col prv-msgs">{{cost_table|index:forloop.counter0 | currency }}</td>
                     {% else %}
@@ -305,104 +245,21 @@
             </table>
         </div>
     {% endfor %}
-
-
 {% else %}
     <div class="mt-2">
         <div class="alert alert-danger col-md-8" role="alert">
             <i class="fas fa-exclamation-triangle prv-msgs"></i>
             No charges for {{dept_name}} on {{bill_period}}
-            {% if location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%} 
-                 with the current filters.
-            {% endif %}
+            {% if location_filter != '' or  type_filter != '' or cf_filter != '' or date_filter != ''%} with the current
+            filters. {% endif %}
         </div>
     </div>
 {% endif%}
 
 <button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i> <br> Scroll to top</button>
+
 {% endblock %}
 
 {% block js %}
 <script src="/../static/inv_loc.js"></script>
-
-<script>
-    // When the user scrolls down 20px from the top of the document, show the button
-    window.onscroll = function () { scrollFunction() };
-
-    function scrollFunction() {
-        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-            document.getElementById("scrollTop").style.display = "block";
-        } else {
-            document.getElementById("scrollTop").style.display = "none";
-        }
-    }
-
-    // When the user clicks on the button, scroll to the top of the document
-    function topFunction() {
-        document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
-    }
-
-</script>
-
-<script>
-    function exportTableToCSV(filename) {
-        var csv = [];
-        var rows = document.querySelectorAll("table tr");
-
-        for (var i = 0; i < rows.length; i++) {
-            var row = [], cols = rows[i].querySelectorAll("td, th");
-            var name = rows[i].getAttribute('data-name');
-
-            for (var j = 0; j < cols.length; ++j) {
-                var text = cols[j].innerText;
-
-                // New chartfield
-                if (text == 'User ID') {
-                    if (i != 0) {
-                        row.push('\n'); // does this work on mac?
-                        csv.push(row);
-                        row = [];
-                    }
-                    row.push(name);
-                    csv.push(row);
-                    row = [];
-                }
-                text = '"' + text + '"';
-                row.push(text);
-            }
-
-            csv.push(row.join(","));
-        }
-
-        // Download CSV file
-        downloadCSV(csv.join("\n"), filename);
-    }
-
-    function downloadCSV(csv, filename) {
-        var csvFile;
-        var downloadLink;
-
-        // CSV file
-        csvFile = new Blob([csv], { type: "text/csv" });
-
-        // Download link
-        downloadLink = document.createElement("a");
-
-        // File name
-        downloadLink.download = filename;
-
-        // Create a link to the file
-        downloadLink.href = window.URL.createObjectURL(csvFile);
-
-        // Hide download link
-        downloadLink.style.display = "none";
-
-        // Add the link to DOM
-        document.body.appendChild(downloadLink);
-
-        // Click download link
-        downloadLink.click();
-    }
-</script>
 {% endblock %}
