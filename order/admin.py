@@ -105,11 +105,11 @@ class StorageInstanceAdmin(admin.ModelAdmin):
         response['Content-Disposition'] = 'attachment; filename="mistorage.csv"'
 
         writer = csv.writer(response)
-        writer.writerow(['Name', 'Owner', 'Size', 'Type','Created Date','Shortcode','Deptid','UID','Flux Flag'])
+        writer.writerow(['Name', 'Owner', 'Size', 'Type','Created Date','Shortcode','Deptid','UID','Flux Flag','Rate','Total Cost'])
 
-        instance_list = StorageInstance.objects.all()
+        instance_list = StorageInstance.objects.all().select_related()
         for i in instance_list:
-            writer.writerow([i.name,i.owner,i.size,i.type,i.created_date,i.shortcode,i.deptid,i.uid,i.flux ])
+            writer.writerow([i.name,i.owner,i.size,i.type,i.created_date,i.shortcode,i.deptid,i.uid,i.flux,i.rate,i.total_cost ])
 
         return response
 
