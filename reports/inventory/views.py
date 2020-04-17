@@ -132,21 +132,21 @@ def make_report(request):
     return HttpResponse(template.render(context,request))
 
 
-def format_data(data,request):
+def format_data(data, request):
     whole_table = []
     
     chartfield_cost = 0
     cost_table = []
 
     # Find first chartfield
-    current_classification = data.order_by('chartfield').values_list('chartfield').distinct()[0][0]
+    current_classification = data.values_list('chartfield').distinct()[0][0]
     
     # Build data structure
     current_table = []
     same_phone = []
 
     # Get ID of first entry of data set (filtered by selected department and date)
-    current_number = data.order_by('chartfield').values_list('user_defined_id').distinct()[0][0]
+    current_number = data.values_list('user_defined_id').distinct()[0][0]
 
     # Loop through all report data
     for point in data:
