@@ -15,4 +15,10 @@ class Migration(migrations.Migration):
             name='custom_form',
             field=models.CharField(blank=True, choices=[('', ''), ('PhoneLocationForm', 'Phone Location'), ('EquipmentForm', 'Equipment'), ('NewLocationForm', 'New Location'), ('AddlInfoForm', 'Additional Information'), ('ReviewForm', 'Review'), ('ChartfieldForm', 'Chartfield'), ('RestrictionsForm', 'Restrictions'), ('FeaturesForm', 'Features'), ('StaticForm', 'Static Page'), ('AuthCodeForm', 'Auth Codes'), ('AuthCodeCancelForm', 'Auth Codes'), ('CMCCodeForm', 'CMC Codes'), ('ProductForm', 'Quantity Model'), ('ContactCenterForm', 'Contact Center'), ('BillingForm', 'Billing'), ('DynamicForm', 'Dynamic'), ('VoicemailForm', 'Voicemail')], max_length=20),
         ),
+<<<<<<< HEAD
+        migrations.DeleteModel(
+            name='PinnPreOrder',
+        ),
+=======
+>>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
     ]
