@@ -148,7 +148,11 @@ def change_dept(request):
 
 	# Get list of chartcoms in user's shortlist for user to select new
 	if when == 'assign_new':
+<<<<<<< HEAD
+		cf_options = list(Chartcom.get_user_chartcoms_for_dept(request.user.id, selected_dept).values()) 
+=======
 		cf_options = Chartcom.get_user_chartcoms_for_dept(request.user, selected_dept)
+>>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
 	# Get list of chartcoms in use
 	else:
 		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
@@ -162,6 +166,19 @@ def get_cf_data(request):
 	selected_cf = request.GET.get('selected', None)
 	cf_data = list(UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values())
 
+<<<<<<< HEAD
+	# # Find chartfield nickname
+	# nickname = ''
+	# nicknames = Chartcom.objects.all()
+	# for n in nicknames:
+	# 	if n.account_number == selected_cf:
+	# 		nickname = n.name
+
+	# nn = {'nickname': nickname }
+	# cf_data.append(nn)
+
+=======
+>>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
 	if not cf_data:
 		cf_data = {'fund': 'wtf'}
 	return JsonResponse(cf_data, safe=False)

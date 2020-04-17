@@ -362,7 +362,11 @@ $(document).ready(function() {
 			// Reset chartfield options when department changes
 			success: function(data) {
 				$('#cf_dropdown').empty();
+<<<<<<< HEAD
+				if (data.length < 2) {
+=======
 				if (data.length < 1) {
+>>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
 					$("#cfNextBtn").attr('disabled', 'true');
 					$('#cf_dropdown_group').hide();
 					$('#cf_details').hide();
@@ -567,6 +571,64 @@ function change_current_page(selected) {
 	$('.dept_full_name').html('<strong>Department:&nbsp;</strong>' + dept_title);
 	$('.dept_mgr').html('<strong>Department Manager:&nbsp;</strong>' + dept_mgr);
 
+<<<<<<< HEAD
+// 	// $.ajax({
+// 	// 	url: '/chartchange/old-cf/',
+// 	// 	data: {
+// 	// 		'selected': selected
+// 	// 	},
+// 	// 	dataType:'json',
+// 	// 	success: function(data) {
+// 	// 		cf = data;
+// 	// 		$("#fund").html(cf[0].fund);
+// 	// 		$("#deptid").html(cf[0].deptid);
+// 	// 		$("#program").html(cf[0].program);
+// 	// 		$("#class_code").html(cf[0].class_code);
+// 	// 		$("#project_grant").html(cf[0].project_grant);
+// 	// 		$('#cf_shortcode').html(cf[0].shortcode);
+// 	// 		$('#cf_nickname').html(cf[1].nickname);
+// 	// 		$('.cf_num').html(cf[0].account_number);
+// 	// 		if (cf[1].nickname) {
+// 	// 			$('.cf_nickname').html('(' + cf[1].nickname + ')');
+// 	// 		}
+// 	// 		$('.dept_full_name').html('<strong>Department:&nbsp;</strong>' + dept_title);
+// 	// 		$('.dept_mgr').html('<strong>Department Manager:&nbsp;</strong>' + dept_mgr);
+// 	// 	},
+// 	// 	error: function(data) {
+// 	// 		alert('uh oh');
+// 	// 	}
+// 	// })
+
+
+	// $.ajax({
+	// 	url: '/chartchange/old-cf/',
+	// 	data: {
+	// 		'selected': selected
+	// 	},
+	// 	dataType:'json',
+	// 	success: function(data) {
+	// 		cf = data;
+	// 		alert(data);
+	// 		$("#fund").html(cf[0].fund);
+	// 		$("#deptid").html(cf[0].deptid);
+	// 		$("#program").html(cf[0].program);
+	// 		$("#class_code").html(cf[0].class_code);
+	// 		$("#project_grant").html(cf[0].project_grant);
+	// 		$('#cf_shortcode').html(cf[0].shortcode);
+	// 		$('#cf_nickname').html(cf[0].nickname);
+	// 		$('.cf_num').html(cf[0].account_number);
+	// 		if (cf[0].nickname) {
+	// 			$('.cf_nickname').html('(' + cf[0].nickname + ')');
+	// 		}
+	// 		$('.dept_full_name').html('<strong>Department:&nbsp;</strong>' + dept_title);
+	// 		$('.dept_mgr').html('<strong>Department Manager:&nbsp;</strong>' + dept_mgr);
+	// 	},
+	// 	error: function(data) {
+	// 		alert('uh oh');
+	// 	}
+	// })
+=======
+>>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
 	$('#cf_users_table').DataTable().ajax.reload();
 }
 
