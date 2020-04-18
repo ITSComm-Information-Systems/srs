@@ -579,6 +579,10 @@ class Item(models.Model):
         else:
             si = StorageInstance()
 
+        if self.data.get('volaction') == 'Delete':
+            si.delete()
+            return
+
         if self.data.get('action_id') == '46' or self.data.get('action_id') == '47':
             si.type = 'NFS'
             si.owner = self.data.get('owner')
