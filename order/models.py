@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 from ast import literal_eval
 import json, io, os
 import cx_Oracle
-from oscauth.utils import get_mc_user
+from oscauth.utils import get_mc_user, get_mc_group
 
 class Configuration(models.Model):   #Common fields for configuration models
     name = models.CharField(max_length=20)
@@ -294,6 +294,18 @@ class StorageRate(Configuration):
         return total_cost
 
 
+class StorageOwner(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class StorageMember(models.Model):
+    storage_owner = models.ForeignKey(StorageOwner, on_delete=models.CASCADE)
+    username = models.CharField(max_length=8)
+
+
 class StorageInstance(models.Model):
     TYPE_CHOICES = (
         ('NFS', 'NFS'),
@@ -301,7 +313,8 @@ class StorageInstance(models.Model):
     )
 
     name = models.CharField(max_length=100)
-    owner = models.CharField(max_length=100)
+    owner = models.ForeignKey(StorageOwner, on_delete=models.CASCADE, null=True)
+    owner_name = models.CharField(max_length=100)
     shortcode = models.CharField(max_length=100)
     uid = models.PositiveIntegerField(null=True)
     ad_group = models.CharField(max_length=100, null=True, blank=True)
@@ -320,6 +333,29 @@ class StorageInstance(models.Model):
     def __str__(self):
         return self.name
 
+    def get_owner_instance(self, name):
+
+        mc = get_mc_group(name)
+
+        if mc:
+            dn = mc.entry_dn[3:mc.entry_dn.find(',')]
+
+            try:
+                so = StorageOwner.objects.get(name=dn)
+            except: #Make it so
+                so = StorageOwner()
+                so.name = dn
+                so.save()
+
+                for member in mc['member']:
+                    uid = member[4:member.find(',')]
+                    sm = StorageMember()
+                    sm.storage_owner = so
+                    sm.username = uid
+                    sm.save()
+
+            return so
+
 
 class StorageHost(models.Model):
     storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
@@ -327,10 +363,6 @@ class StorageHost(models.Model):
 
     def __str__(self):
         return self.name
-
-class StorageMember(models.Model):
-    storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
-    username = models.CharField(max_length=8)
 
 
 class Order(models.Model):
@@ -585,14 +617,14 @@ class Item(models.Model):
 
         if self.data.get('action_id') == '46' or self.data.get('action_id') == '47':
             si.type = 'NFS'
-            si.owner = self.data.get('owner')
+            si.owner = si.get_owner_instance(self.data.get('owner'))
             si.name = self.data.get('storageID')
             si.uid = self.data.get('volumeAdmin')
             if self.data.get('flux') == 'yes':
                 si.flux = True
         else:
             si.type = 'CIFS'
-            si.owner = self.data.get('mcommGroup')
+            si.owner = si.get_owner_instance( self.data.get('mcommGroup') )
             si.name = self.data.get('netShare')
             si.ad_group = self.data.get('activeDir')
 
