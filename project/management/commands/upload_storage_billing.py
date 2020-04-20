@@ -37,8 +37,6 @@ class Command(BaseCommand):
             rec.save()
             x+=1
 
-            break
-
         print(datetime.now(), x, 'Records Loaded')
         print(datetime.now(), total_cost, 'Total Cost')
 
