@@ -19,13 +19,13 @@
                 {% for volume in tab.form.volume_list %}
                     
                     <tr>
-                        <th data-id="{{volume.storage_instance.id}}" scope="row">{{ volume.storage_instance.name }}</th>
-                        <td>{{ volume.storage_instance.type }}</td>
-                        <td>{{ volume.storage_instance.dept }}</td>
-                        <td>{{ volume.storage_instance.shortcode }}</td>
-                        <td>{{ volume.storage_instance.size }}GB</td>
-                        <td>{{ volume.storage_instance.rate.label }}</td>
-                        <td style="text-align:right">{{ volume.storage_instance.total_cost }}</td>
+                        <th data-id="{{volume.id}}" scope="row">{{ volume.name }}</th>
+                        <td>{{ volume.type }}</td>
+                        <td>{{ volume.dept }}</td>
+                        <td>{{ volume.shortcode }}</td>
+                        <td>{{ volume.size }}GB</td>
+                        <td>{{ volume.rate.label }}</td>
+                        <td style="text-align:right">{{ volume.total_cost }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

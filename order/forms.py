@@ -238,7 +238,7 @@ class VolumeSelectionForm(TabForm):
         if self.data.get('volaction') == 'Delete':
             summary = [{'label': 'Are you sure you want to delete this volume?', 'value': ''}
                         ,{'label': 'Volume Name:', 'value': instance.name}
-                        ,{'label': 'Owner:', 'value': instance.owner}]
+                        ,{'label': 'Owner:', 'value': instance.owner.name}]
         else:
             summary = [{'label': 'Volume Name:', 'value': instance.name}]
 
@@ -253,16 +253,20 @@ class VolumeSelectionForm(TabForm):
         super(VolumeSelectionForm, self).__init__(*args, **kwargs)
 
         if not self.is_bound:
+            groups = list(StorageMember.objects.filter(username=self.request.user).values_list('storage_owner_id'))
             if self.request.path == '/orders/wf/47':
-                self.volume_list = StorageMember.objects.filter(username=self.request.user, storage_instance__type='NFS').distinct('storage_instance__name').order_by('storage_instance__name')
+                #self.volume_list = StorageMember.objects.filter(username=self.request.user, storage_instance__type='NFS').distinct('storage_instance__name').order_by('storage_instance__name')
+                self.volume_list = StorageInstance.objects.filter(type='NFS',owner__in=groups).order_by('name')
 
             elif self.request.path == '/orders/wf/49':
-                self.volume_list = StorageMember.objects.filter(username=self.request.user, storage_instance__type='CIFS').distinct('storage_instance__name').order_by('storage_instance__name')
+                #self.volume_list = StorageMember.objects.filter(username=self.request.user, storage_instance__type='CIFS').distinct('storage_instance__name').order_by('storage_instance__name')
+                self.volume_list = StorageInstance.objects.filter(type='CIFS',owner__in=groups).order_by('name')
             else:
-                self.volume_list = StorageMember.objects.filter(username=self.request.user).distinct('storage_instance__name').order_by('storage_instance__name')
+                #self.volume_list = StorageMember.objects.filter(username=self.request.user).distinct('storage_instance__name').order_by('storage_instance__name')
+                self.volume_list = StorageInstance.objects.filter(owner__in=groups).order_by('name')
                 
                 for vol in self.volume_list:
-                    self.total_cost = self.total_cost + vol.storage_instance.total_cost
+                    self.total_cost = self.total_cost + vol.total_cost
                     
                 self.template = 'order/volume_review.html'
 
