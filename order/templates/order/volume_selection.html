@@ -18,12 +18,12 @@
                 {% for volume in tab.form.volume_list %}
                     
                     <tr>
-                        <th data-id="{{volume.storage_instance.id}}" scope="row">{{ volume.storage_instance.name }}</th>
-                        <td>{{ volume.storage_instance.owner }}</td>
-                        <td>{{ volume.storage_instance.size }}GB</td>
-                        <td>{{ volume.storage_instance.rate.label }}</td>
-                        <td>{{ volume.storage_instance.shortcode }}</td>
-                        <td class="action"><a href="#" onclick="modifyVolume(0, {{ volume.storage_instance.id }})">Edit</a><a href="#" class="delete" onclick="modifyVolume(1, {{ volume.storage_instance.id }})">Delete</a></td>
+                        <th data-id="{{volume.id}}" scope="row">{{ volume.name }}</th>
+                        <td>{{ volume.owner }}</td>
+                        <td>{{ volume.size }}GB</td>
+                        <td>{{ volume.rate.label }}</td>
+                        <td>{{ volume.shortcode }}</td>
+                        <td class="action"><a href="#" onclick="modifyVolume(0, {{ volume.id }})">Edit</a><a href="#" class="delete" onclick="modifyVolume(1, {{ volume.id }})">Delete</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
