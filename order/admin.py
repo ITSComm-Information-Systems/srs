@@ -88,7 +88,7 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 
 class StorageInstanceAdmin(admin.ModelAdmin):
     ordering = ('name',)
-    search_fields = ['name','owner']
+    search_fields = ['name','owner__name']
     list_filter = ('type',)
 
     def get_urls(self):
