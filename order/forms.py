@@ -88,7 +88,7 @@ class TabForm(forms.Form):
                 field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
             elif element.type == 'NU':
                 field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1", 'class': 'form-control'}))
-                field.template_name = 'project/text.html'
+                field.template_name = 'project/number.html'
             elif element.type == 'ST':
                 field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
                 field.template_name = 'project/text.html'
@@ -109,7 +109,7 @@ class TabForm(forms.Form):
                 #field = forms.IntegerField(label=element.label, help_text=element.description)
 
             field.name = element.name
-            field.current_user = self.request.user
+            #field.current_user = self.request.user
             field.label = element.label
             field.help_text = element.help_text
             field.description = element.description
@@ -342,7 +342,7 @@ class DetailsNFSForm(TabForm):
             si = StorageInstance.objects.get(id=instance_id)
             if summary[0]['value'] != si.name:
                 summary[0]['label'] = '*' + summary[0]['label']
-            if self.data['selectOptionType'] != str(si.rate_id):
+            if self.data.get('selectOptionType') != str(si.rate_id):
                 summary[1]['label'] = '*' + summary[1]['label']
             if summary[2]['value'] != si.size:
                 summary[2]['label'] = '*' + summary[2]['label']
@@ -405,8 +405,8 @@ class DetailsCIFSForm(TabForm):
                     self.fields["sizeGigabyte"].initial = si.size
 
 
-#class AccessCIFSForm(TabForm):
-#    template = 'order/cifs_access.html'
+class BackupDetailsForm(TabForm):
+    template = 'order/backup_details.html'
 
 
 class BillingStorageForm(TabForm):
@@ -418,25 +418,26 @@ class BillingStorageForm(TabForm):
         if self.request:
             if self.request.method == 'POST':
                 instance_id = self.request.POST.get('instance_id')
-                option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
-                total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
+                #option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
+                #total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
 
                 if instance_id:
                     si = StorageInstance.objects.get(id=instance_id)
                     self.fields["shortcode"].initial = si.shortcode
                     self.fields["billingAuthority"].initial = 'yes'
                     self.fields["serviceLvlAgreement"].initial = 'yes'
-        else:
-            option = StorageRate.objects.get(id=self.data['selectOptionType'])
-            total_cost = option.get_total_cost(self.data['sizeGigabyte'])
+        #else:
+            #option = StorageRate.objects.get(id=self.data['selectOptionType'])
+            #total_cost = option.get_total_cost(self.data['sizeGigabyte'])
 
         descr = self.fields['totalCost'].description.replace('~', str(total_cost))
         self.fields['totalCost'].description = descr
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
-        option = StorageRate.objects.get(id=self.data['selectOptionType'])
-        total_cost = option.get_total_cost(self.data['sizeGigabyte'])
+        #option = StorageRate.objects.get(id=self.data['selectOptionType'])
+        #total_cost = option.get_total_cost(self.data['sizeGigabyte'])
+        total_cost = '33.33'
         summary.append({'label': 'Total Cost', 'value': str(total_cost)})
 
         instance_id = self.data.get('instance_id')

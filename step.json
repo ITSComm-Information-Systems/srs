@@ -1,0 +1,1 @@
+[{"model": "order.step", "pk": 67, "fields": {"name": "backUpDetails", "label": "Backup Details", "display_seq_no": 10, "custom_form": "TabForm", "progressive_disclosure": false}}]
