@@ -612,14 +612,18 @@ class Item(models.Model):
                 'Accept': 'application/json' 
                 }
             payload = {
-                "TypeID": 12,
+                "TypeID": 63,
                 "Title": self.description,
                 "Description": f'{note}\n',
-                "ResponsibleGroupID": 220,
+                "ResponsibleGroupID": 104,
+                "ServiceID": 215,
+                "FormID": 20,
+                "Classification": 46,
                 "RequestorEmail": self.created_by.email,
                 }
             data_string = json.dumps(payload)
             response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
+            print(response.text)
         else:
             body = ( 'schema:SN_Incident\n'
                     'service_provider:ITS\n'
