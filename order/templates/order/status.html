@@ -25,11 +25,11 @@
                             All Departments
                         </option> -->
                         {% for dept in dept_list %}
-                            {% if dept.active == 'A' %}
-                            <option id="mydept{{dept.dept}}" name="dept" data-filter="dept" value="{{dept.dept}}">
-                                {{dept.dept}} - {{dept.name}}
+
+                            <option id="mydept{{dept.deptid}}" name="dept" data-filter="dept" value="{{dept.deptid}}">
+                                {{dept.deptid}} - {{dept.dept_name}}
                             </option>
-                            {% endif %}
+
                         {% endfor %}
                     </select>
                 </div>
@@ -102,7 +102,7 @@
 
                         {% for order in order_list %}
                         <!-- First table row -->
-                        <tr data-dept="{{order.dept}}" data-order="{{order.id}}" data-reference="{{order.order_reference}}">
+                        <tr data-dept="{{order.deptid}}" data-order="{{order.id}}" data-reference="{{order.order_reference}}">
                             <th scope="row">{{order.order_reference}}
                                 {% if request.session.exit_users_pk or perms.oscauth.can_impersonate %}
                                 <a href="/orders/integration/{{order.id}}"><i class="fas fa-info-circle"></i></a></th>
@@ -117,7 +117,7 @@
                                 <a href="/orders/detail/{{ order.id }}">Order details</a>
                             </td>
                             <td>{{ order.chartcom.name }} ({{order.chartcom.account_number}})</td>
-                            <td>{{order.status}}</td>
+                            <td>{{order.srs_status}}</td>
                             <td class="action">
                                 <!-- <a class="delete" href="#">Cancel</a> -->
                                 <a class="cancel" href="#" data-toggle="modal" data-target="#cancelOrderModal"
