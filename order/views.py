@@ -47,13 +47,29 @@ def get_phone_location(request, phone_number):
 
 #@permission_required('oscauth.can_order')
 def send_tab_data(request):
-    
+
     tab_name = request.POST.get('tab')
+    print(request.POST)
     if tab_name == 'Review':
         item = Item.objects.get(id = request.POST['item_id'])
 
+
+        label = Action.objects.get(id=request.POST['action_id']).cart_label
+
+        x = label.find('[', 0)
+        y = label.find(']', x)
+
+        while x > 0:
+            tag = label[x+1:y]
+            element = request.POST[tag]
+            label = label.replace('['+tag+']', element)
+            x = label.find('[', x)
+            y = label.find(']', x)
+
+
         if request.POST['cart']=='True':
             item.deptid = Chartcom.objects.get(id=item.chartcom_id).dept
+            item.description = label
             item.save()
             return JsonResponse({'redirect': f'/orders/cart/{item.deptid}'}, safe=False)
         else:
