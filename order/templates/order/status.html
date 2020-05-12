@@ -37,7 +37,6 @@
         </div>
     </div>
 </div>
-
 <div role="contentinfo">
     <div class="row cart-table">
         <div class="col-12">
@@ -96,6 +95,24 @@
                     </div>
                 </div>
 
+                <!-- Status filter -->
+                <div class="col-3">
+                    <div class="input-group col-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="orderStatus">
+                                Status
+                            </label>
+                        </div>
+                        <select class="custom-select" name="orderStatus" id="orderStatus">
+                            <option value=''>--Select--</option>
+                            {% for status in status_list %}
+                            <option data-dept='{{status.1}}' value="{{ status.0 }}">{{ status.0 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button id='clearfilters' class='btn btn-primary'>Clear Filters</button>
+                <br>
             </div>
             <!-- End of Order Status Filter Dropdown -->
             <!-- </div> -->
@@ -130,7 +147,7 @@
                         <!-- First table row -->
                         <tr data-dept="{{order.deptid}}" data-order="{{order.id}}"
                             data-reference="{{order.order_reference}}" submitter="{{ order.created_by }}"
-                            submitDate='{{ order.create_date|date:"m/d/Y" }}'>
+                            submitDate='{{ order.create_date|date:"m/d/Y" }}' orderStatus='{{order.srs_status}}'>
                             <th scope="row">{{order.order_reference}}
                                 {% if request.session.exit_users_pk or perms.oscauth.can_impersonate %}
                                 <a href="/orders/integration/{{order.id}}"><i class="fas fa-info-circle"></i></a>
@@ -295,7 +312,6 @@
             $("#statusTable tr:visible").filter(function () {
                 $(this).toggle($(this).text().toLowerCase().indexOf(status) > -1)
             });
-            console.log(status);
         });
 
         $('#selectDept').on('change', function () {
@@ -310,6 +326,7 @@
                 //reset filters
                 $('#submitDate').val('').change()
                 $('#submitter').val('').change()
+                $('#orderStatus').val('').change()
             }
         });
 
@@ -321,25 +338,51 @@
         });
 
         //Filters
-        $('#submitDate, #submitter').on('change', function () {
-            console.log('changed')
+
+        $('#clearfilters').click(function () {
+            $('#submitDate').val('').change()
+            $('#submitter').val('').change()
+            $('#orderStatus').val('').change()
+        })
+
+        $('#submitDate, #submitter, #orderStatus').on('change', function () {
             $("[data-dept='" + $('#selectDept option:selected').val() + "']").show();
-            //if both are blank, reset
-            if (($('#submitDate').val() == '') && ($('#submitter').val() == '')) {
+            //default all are blank
+            if (($('#submitDate').val() == '') && ($('#submitter').val() == '') && ($('#orderStatus').val() == '')) {
                 console.log('default view')
             }
-            //if submitdate is blank
-            else if (($('#submitDate').val() == '') && ($('#submitter').val() != '')) {
+            //only submitter has value
+            else if (($('#submitDate').val() == '') && ($('#submitter').val() != '') && ($('#orderStatus').val() == '')) {
                 $('tbody tr').not('[submitter="' + $('#submitter').val() + '"]').hide()
             }
-            //if submitter is blank
-            else if (($('#submitDate').val() != '') && ($('#submitter').val() == '')) {
+            //only submitDate has value
+            else if (($('#submitDate').val() != '') && ($('#submitter').val() == '') && ($('#orderStatus').val() == '')) {
                 $('tbody tr').not('[submitDate="' + $('#submitDate').val() + '"]').hide()
             }
-            //if both are filled
+            //only orderStatus has value
+            else if (($('#submitDate').val() == '') && ($('#submitter').val() == '') && ($('#orderStatus').val() != '')) {
+                $('tbody tr').not('[orderStatus="' + $('#orderStatus').val() + '"]').hide()
+            }
+            //only submitter is blank, hide all that don't match the other 2
+            else if (($('#submitDate').val() != '') && ($('#submitter').val() == '') && ($('#orderStatus').val() != '')) {
+                $('tbody tr').not('[submitDate="' + $('#submitDate').val() + '"]').hide()
+                $('tbody tr').not('[orderStatus="' + $('#orderStatus').val() + '"]').hide()
+            }
+            //only submitDate is blank
+            else if (($('#submitDate').val() == '') && ($('#submitter').val() != '') && ($('#orderStatus').val() != '')) {
+                $('tbody tr').not('[orderStatus="' + $('#orderStatus').val() + '"]').hide()
+                $('tbody tr').not('[submitter="' + $('#submitter').val() + '"]').hide()
+            }
+            //only orderStatus is blank
+            else if (($('#submitDate').val() != '') && ($('#submitter').val() != '') && ($('#orderStatus').val() == '')) {
+                $('tbody tr').not('[submitter="' + $('#submitter').val() + '"]').hide()
+                $('tbody tr').not('[submitDate="' + $('#submitDate').val() + '"]').hide()
+            }
+            //if all are filled
             else {
                 $('tbody tr').not('[submitter="' + $('#submitter').val() + '"]').hide()
                 $('tbody tr').not('[submitDate="' + $('#submitDate').val() + '"]').hide()
+                $('tbody tr').not('[orderStatus="' + $('#orderStatus').val() + '"]').hide()
             };
 
         });

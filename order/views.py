@@ -651,6 +651,7 @@ class Status(PermissionRequiredMixin, View):
         depts = set()
         dates_list = set()
         people_list = set()
+        status_list = set()
         i = 0
         x = len(item_list)
         
@@ -658,9 +659,9 @@ class Status(PermissionRequiredMixin, View):
             depts.add(order.chartcom.dept)
             order.deptid = order.chartcom.dept
 
-            dates_list.add((order.create_date.strftime('%m/%d/%Y'), order.deptid))
+            dates_list.add((order.create_date, order.deptid))
             
-            people_list.add((order.created_by, order.deptid))
+            people_list.add((order.created_by.username, order.deptid))
             
             pin = next((x for x in pins if x.add_info_text_3 == str(order.id)), None)
             order.srs_status = "Submitted"
@@ -674,12 +675,17 @@ class Status(PermissionRequiredMixin, View):
                         order.srs_status = "Completed"
 
             order.items = []
+            status_list.add((order.srs_status, order.deptid))
 
             while item_list[i].order_id == order.id and i < x-1:
                 order.items.append(item_list[i])
                 i = i + 1
 
         dept_list = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('deptid')
+
+        datetimesort=sorted(dates_list, key=lambda x:x[0], reverse=True)
+        dates_list=[(x[0].strftime('%m/%d/%Y'), x[1]) for x in datetimesort]
+        people_list=sorted(people_list)
 
         if deptid == 0:
             department = {'id': dept_list[0].deptid, 'name':dept_list[0].dept_name}
@@ -692,6 +698,7 @@ class Status(PermissionRequiredMixin, View):
             'order_list': order_list,
             'dates_list': dates_list,
             'people_list': people_list,
+            'status_list':status_list,
             'status_help': Page.objects.get(permalink='/status'),
         }
         return HttpResponse(template.render(context, request))
