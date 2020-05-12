@@ -321,27 +321,28 @@
         });
 
         //Filters
-        $('#submitDate').on('change', function () {
-            if (this.value == '') {
-                $("[data-dept='" + $('#selectDept option:selected').val() + "']").show();
-            } else {
-                $("[data-dept='" + $('#selectDept option:selected').val() + "']").show();
-                console.log(this.value)
-                $('tbody tr').not('[submitDate="'+this.value+'"]').hide()
+        $('#submitDate, #submitter').on('change', function () {
+            console.log('changed')
+            $("[data-dept='" + $('#selectDept option:selected').val() + "']").show();
+            //if both are blank, reset
+            if (($('#submitDate').val() == '') && ($('#submitter').val() == '')) {
+                console.log('default view')
             }
-        });
-
-        $('#submitter').on('change', function () {
-            if (this.value == '') {                
-                $("[data-dept='" + $('#selectDept option:selected').val() + "']").show();
-            } else {
-                $("[data-dept='" + $('#selectDept option:selected').val() + "']").show();
-                console.log(this.value)
-                $('tbody tr').not('[submitter="'+this.value+'"]').hide()
-
+            //if submitdate is blank
+            else if (($('#submitDate').val() == '') && ($('#submitter').val() != '')) {
+                $('tbody tr').not('[submitter="' + $('#submitter').val() + '"]').hide()
             }
-        });
+            //if submitter is blank
+            else if (($('#submitDate').val() != '') && ($('#submitter').val() == '')) {
+                $('tbody tr').not('[submitDate="' + $('#submitDate').val() + '"]').hide()
+            }
+            //if both are filled
+            else {
+                $('tbody tr').not('[submitter="' + $('#submitter').val() + '"]').hide()
+                $('tbody tr').not('[submitDate="' + $('#submitDate').val() + '"]').hide()
+            };
 
+        });
     });
 
 </script>
