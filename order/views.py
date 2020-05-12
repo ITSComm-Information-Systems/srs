@@ -649,12 +649,19 @@ class Status(PermissionRequiredMixin, View):
         pins = UmOscPreorderApiV.objects.filter(add_info_text_3__in=order_id_list,pre_order_issue=1)
 
         depts = set()
+        dates_list = set()
+        people_list = set()
         i = 0
         x = len(item_list)
         
         for order in order_list:
             depts.add(order.chartcom.dept)
             order.deptid = order.chartcom.dept
+
+            dates_list.add((order.create_date.strftime('%m/%d/%Y'), order.deptid))
+            
+            people_list.add((order.created_by, order.deptid))
+            
             pin = next((x for x in pins if x.add_info_text_3 == str(order.id)), None)
             order.srs_status = "Submitted"
             if pin:
@@ -683,6 +690,8 @@ class Status(PermissionRequiredMixin, View):
             'title': 'Track Orders',
             'dept_list': dept_list,
             'order_list': order_list,
+            'dates_list': dates_list,
+            'people_list': people_list,
             'status_help': Page.objects.get(permalink='/status'),
         }
         return HttpResponse(template.render(context, request))
