@@ -21,7 +21,7 @@ class StorageInstanceSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = StorageInstance
-        fields = ['id','name','owner','shortcode','uid','ad_group','deptid','size','type','flux','created_date','hosts']
+        fields = ['id','name','owner','shortcode','uid','ad_group','deptid','size','autogrow','type','flux','created_date','hosts']
  
 
 # ViewSets define the view behavior.

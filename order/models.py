@@ -320,6 +320,7 @@ class StorageInstance(models.Model):
     ad_group = models.CharField(max_length=100, null=True, blank=True)
     deptid = models.CharField(max_length=6, null=True, blank=True)
     size = models.PositiveIntegerField()
+    autogrow = models.BooleanField(default=False)
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     flux = models.BooleanField(default=False)
     rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)
