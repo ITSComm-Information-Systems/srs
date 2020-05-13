@@ -17,6 +17,7 @@ admin.AdminSite.site_title = 'SRS Site Admin'
 # Serializers define the API representation.
 class StorageInstanceSerializer(serializers.HyperlinkedModelSerializer):
     hosts = serializers.StringRelatedField(many=True)
+    owner = serializers.StringRelatedField()
 
     class Meta:
         model = StorageInstance
