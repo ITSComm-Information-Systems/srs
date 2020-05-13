@@ -93,23 +93,7 @@ $(document).ready(function() {
     $('#nextBtn').hide();
   }
 
-  if ( $("#wfid").val() == 40 ) {  // Add Voicemail
-    $('#div_cancelRebuild').hide();
-    $('#div_pinOrPass').hide();
-  }
-
-  if ( $("#wfid").val() == 16 ) {  // Reset Voicemail Password/PIN
-    $('#div_cancelRebuild').hide();
-  }
-
-  if ( $("#wfid").val() == 15 ) {  // Cancel Rebuild Voicemail
-    $('#div_pinOrPass').hide();
-  }
-
-
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
-
-
 
   var callback = function() {
     if (preFields.index(this) <= pointer) { // User changed a previous answer.
