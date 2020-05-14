@@ -25,7 +25,7 @@ SECRET_KEY = os.getenv(
 )
 
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [os.getenv('SITE_URL']
 
 
 # Application definition
