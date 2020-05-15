@@ -409,6 +409,10 @@ class BackupDetailsForm(TabForm):
     template = 'order/backup_details.html'
 
 
+    def is_valid(self, *args, **kwargs):
+        super(BackupDetailsForm, self).is_valid(*args, **kwargs)
+        return True
+
 class BillingStorageForm(TabForm):
 
     def __init__(self, *args, **kwargs):
