@@ -5,15 +5,11 @@
 
     <div class="form-group">
         <label for="deptf">
-            <strong>HI SYDNEY USER ID</strong>
+            <strong>TESTING</strong>
         </label>
         <br>
-        <select type='select' name="dept_parm" id="deptf" size="1" class="form-control text-field-short col-4" onchange="this.form.submit()">
-            <option></option>
-            {% for dept in dept_list %}
-            <option value={{ dept.deptid }} >{{ dept.deptid }} - {{ dept.dept_name }}</option>
-            {% endfor %}
-        </select>
+        <p><input type='text'></p><button class='btn btn-primary'>Submit</button>
+
     </div>
 </form>
 
@@ -52,5 +48,5 @@
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript" src="/static/select.js"></script>
+<!-- <script type="text/javascript" src="/static/select.js"></script> -->
 {% endblock %}
