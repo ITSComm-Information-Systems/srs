@@ -24,6 +24,10 @@ import threading
 
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment, ChargeType, UserChartcomV
 
+#import for filter
+from django.db.models import Case, When, Value, IntegerField
+
+
 @permission_required('oscauth.can_order')
 def get_phone_location(request, phone_number):
     locations = list(UmOscServiceProfileV.objects.filter(service_number=phone_number).exclude(location_id=0).values())
@@ -690,6 +694,8 @@ class Status(PermissionRequiredMixin, View):
         if deptid == 0:
             department = {'id': dept_list[0].deptid, 'name':dept_list[0].dept_name}
             deptid = dept_list[0].deptid 
+
+        order_list.annotate(Case)
                     
         template = loader.get_template('order/status.html')
         context = {
