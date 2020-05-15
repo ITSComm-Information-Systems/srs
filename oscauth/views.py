@@ -614,3 +614,55 @@ def delete_priv(osc_user, role, dept):
 
     return result
 
+def userid(request, dept_parm=''):
+    template = loader.get_template('oscauth/userid.html')
+    dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
+    if dept_parm == '':
+        context = {
+            'title' : 'Department Look Up',
+            'dept_list': dept_list
+        }
+        return  HttpResponse(template.render(context, request))
+
+    dept_info = UmCurrentDeptManagersV.objects.filter(deptid=dept_parm)
+    users = AuthUserDept.objects.filter(dept=dept_parm).order_by('group','user__last_name','user__first_name')
+    rows = []
+    prev_user = ''
+    group_name = ''
+    col1 = ''
+    col2 = ''
+    roles = ''
+    i = 0
+    for dept in dept_info:
+        deptid = dept.deptid
+        dept_name = dept.dept_name
+        dept_status = dept.dept_status
+        dept_mgr_name = dept.dept_mgr_name
+        dept_mgr_uniqname = dept.dept_mgr_uniqname
+
+    for user in users:
+        last_name = User.objects.get(username=user.user).last_name
+        first_name = User.objects.get(username=user.user).first_name
+        group_name = Group.objects.get(name=user.group).name
+        if user.user == prev_user:
+            roles = roles + ', ' + group_name
+        else:
+            if prev_user != '':
+                data = {'col1' : col1, 'col2' : col2, 'roles': roles}
+                rows.append(data)
+            i = i + 1
+            col1 = user.user
+            col2 = last_name + ', ' + first_name
+            roles = group_name
+        prev_user = user.user
+    data = {'col1' : col1, 'col2' : col2, 'roles': roles}
+    rows.append(data)
+    context = {
+        'title' : 'Department Look Up',
+        'dept_list': dept_list,
+        'dept_status': dept_status,
+        'subtitle1': 'Access For Department: ' + dept_parm + ' - '+ dept_name ,
+        'subtitle2': 'Department Manager: ' + dept_mgr_name + ' (' + dept_mgr_uniqname + ')',
+        'rows': rows
+    }
+    return HttpResponse(template.render(context, request))
