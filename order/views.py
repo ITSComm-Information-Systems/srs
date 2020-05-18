@@ -25,7 +25,8 @@ import threading
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment, ChargeType, UserChartcomV
 
 #import for filter
-from django.db.models import Case, When, Value, IntegerField
+#from datetime import datetime
+from django.db.models import Case, When, Value, F
 
 
 @permission_required('oscauth.can_order')
@@ -658,12 +659,30 @@ class Status(PermissionRequiredMixin, View):
         status_list = set()
         i = 0
         x = len(item_list)
-        
+
+        order_list=order_list.annotate(timeDiff=Case(
+            When(
+                create_date__lt=date.today()-timedelta(days=30), #diff is less than 30
+                then=Value("less than 30")
+            ),
+            When(
+                create_date__lt=date.today()-timedelta(days=91), 
+                then=Value("30-90")
+            ),
+            When(
+                create_date__lt=date.today()-timedelta(days=181),
+                then=Value("91-180")
+            ),
+            When(
+                create_date__lt=date.today()-timedelta(days=366),
+                then=Value("181-365")
+            ),
+        ))
         for order in order_list:
             depts.add(order.chartcom.dept)
             order.deptid = order.chartcom.dept
 
-            dates_list.add((order.create_date, order.deptid))
+            dates_list.add((order.timeDiff, order.deptid))
             
             people_list.add((order.created_by.username, order.deptid))
             
@@ -695,7 +714,8 @@ class Status(PermissionRequiredMixin, View):
             department = {'id': dept_list[0].deptid, 'name':dept_list[0].dept_name}
             deptid = dept_list[0].deptid 
 
-        order_list.annotate(Case)
+        #add information based on timedelta
+        
                     
         template = loader.get_template('order/status.html')
         context = {
