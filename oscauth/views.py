@@ -22,7 +22,7 @@ from ldap3 import Server, Connection, ALL
 from .models import AuthUserDept, Grantor, Role, Group, User
 from .forms import UserSuForm, AddUserForm
 from .utils import su_login_callback, custom_login_action, upsert_user
-from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
+from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscAcctChangeInput
 from oscauth.forms import *
 from oscauth.utils import upsert_user, get_mc_user
 from pages.models import Page
@@ -616,53 +616,55 @@ def delete_priv(osc_user, role, dept):
 
 def userid(request, dept_parm=''):
     template = loader.get_template('oscauth/userid.html')
-    dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
-    if dept_parm == '':
-        context = {
-            'title' : 'Department Look Up',
-            'dept_list': dept_list
-        }
-        return  HttpResponse(template.render(context, request))
+    test=UmOscAcctChangeInput.objects.filter(user_defined_id='CC-629360171-01')
+    # dept_list = UmOscAcctChangeInput.objects.all().order_by('deptid')
+    # if dept_parm == '':
+    #     context = {
+    #         'title' : 'Department Look Up',
+    #         'dept_list': dept_list
+    #     }
+    #     return  HttpResponse(template.render(context, request))
 
-    dept_info = UmCurrentDeptManagersV.objects.filter(deptid=dept_parm)
-    users = AuthUserDept.objects.filter(dept=dept_parm).order_by('group','user__last_name','user__first_name')
-    rows = []
-    prev_user = ''
-    group_name = ''
-    col1 = ''
-    col2 = ''
-    roles = ''
-    i = 0
-    for dept in dept_info:
-        deptid = dept.deptid
-        dept_name = dept.dept_name
-        dept_status = dept.dept_status
-        dept_mgr_name = dept.dept_mgr_name
-        dept_mgr_uniqname = dept.dept_mgr_uniqname
+    # dept_info = UmOscAcctChangeInput.objects.filter(deptid=dept_parm)
+    # users = AuthUserDept.objects.filter(dept=dept_parm).order_by('group','user__last_name','user__first_name')
+    # rows = []
+    # prev_user = ''
+    # group_name = ''
+    # col1 = ''
+    # col2 = ''
+    # roles = ''
+    # i = 0
+    for dept in test:
+        deptid = dept.uniqname
+        dept_name = dept.mrc_account_number
+        dept_status = dept.toll_account_number
+        dept_mgr_name = dept.local_account_number
+        dept_mgr_uniqname = dept.date_added
 
-    for user in users:
-        last_name = User.objects.get(username=user.user).last_name
-        first_name = User.objects.get(username=user.user).first_name
-        group_name = Group.objects.get(name=user.group).name
-        if user.user == prev_user:
-            roles = roles + ', ' + group_name
-        else:
-            if prev_user != '':
-                data = {'col1' : col1, 'col2' : col2, 'roles': roles}
-                rows.append(data)
-            i = i + 1
-            col1 = user.user
-            col2 = last_name + ', ' + first_name
-            roles = group_name
-        prev_user = user.user
-    data = {'col1' : col1, 'col2' : col2, 'roles': roles}
-    rows.append(data)
+    # for user in users:
+    #     last_name = User.objects.get(username=user.user).last_name
+    #     first_name = User.objects.get(username=user.user).first_name
+    #     group_name = Group.objects.get(name=user.group).name
+    #     if user.user == prev_user:
+    #         roles = roles + ', ' + group_name
+    #     else:
+    #         if prev_user != '':
+    #             data = {'col1' : col1, 'col2' : col2, 'roles': roles}
+    #             rows.append(data)
+    #         i = i + 1
+    #         col1 = user.user
+    #         col2 = last_name + ', ' + first_name
+    #         roles = group_name
+    #     prev_user = user.user
+    # data = {'col1' : col1, 'col2' : col2, 'roles': roles}
+    # rows.append(data)
     context = {
-        'title' : 'Department Look Up',
-        'dept_list': dept_list,
-        'dept_status': dept_status,
-        'subtitle1': 'Access For Department: ' + dept_parm + ' - '+ dept_name ,
+        'title' : 'User ID Look Up',
+        'test': test,
+        # 'dept_list': dept_list,
+        # 'dept_status': dept_status,
+        # 'subtitle1': 'Access For Department: ' + dept_parm + ' - '+ dept_name ,
         'subtitle2': 'Department Manager: ' + dept_mgr_name + ' (' + dept_mgr_uniqname + ')',
-        'rows': rows
+        # 'rows': rows
     }
     return HttpResponse(template.render(context, request))
