@@ -614,38 +614,34 @@ def delete_priv(osc_user, role, dept):
 
     return result
 
-def userid(request, user_param=''):
+def userid(request, user_param = ''):
     template = loader.get_template('oscauth/userid.html')
     user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id=user_param)
-    testing=UmOscAcctSubscribersV.objects.filter(user_defined_id='VI-AVTBT00016-01')
-    # dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
-    
 
+    # dept_manager = UmCurrentDeptManagersV.objects.filter('deptid')
     # dept_info = UmCurrentDeptManagersV.objects.filter(deptid=dept_parm)
     # users = AuthUserDept.objects.filter(dept=dept_parm).order_by('group','user__last_name','user__first_name')
     rows = []
-
-    for user in testing:
-        Id = 'tester1'
-        building = ''
-        floor = ''
-        room = ''
-        jack = ''
-        mrc = ''
-        toll = ''
-        local = ''
-        Id = user.subscriber_id
-        jack = user.user_defined_id
-        data = {'Id' : Id, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
+    for user in user_list:
+        Id = user.user_defined_id
+        chartcom = user.chartcom
+        building = user.building
+        floor = user.floor
+        room = user.room
+        jack = user.jack
+        mrc = user.mrc_charged
+        toll = user.toll_charged
+        local = user.local_charged
+        data = {'Id' : Id, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
         rows.append(data)
     
     context = {
         'title' : 'USER ID Look Up',
+        'user_param': user_param,
         # 'dept_list': dept_list,
         # 'dept_status': dept_status,
         'subtitle1': 'Results for: ' + user_param ,
         'rows': rows,
         'user_list':user_list,
-        'testing':testing
     }
     return HttpResponse(template.render(context, request))
