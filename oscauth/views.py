@@ -614,13 +614,17 @@ def delete_priv(osc_user, role, dept):
 
     return result
 
-def userid(request, user_param = ''):
+def get_userid(request):
+    if request.method == 'POST':
+        user_param = request.POST['user_param']
+        return HttpResponseRedirect('/auth/userid/')
+    else:
+        userid = ''
+
+def userid(request, user_param=''):
     template = loader.get_template('oscauth/userid.html')
     user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id=user_param)
 
-    # dept_manager = UmCurrentDeptManagersV.objects.filter('deptid')
-    # dept_info = UmCurrentDeptManagersV.objects.filter(deptid=dept_parm)
-    # users = AuthUserDept.objects.filter(dept=dept_parm).order_by('group','user__last_name','user__first_name')
     rows = []
     for user in user_list:
         Id = user.user_defined_id
@@ -638,8 +642,6 @@ def userid(request, user_param = ''):
     context = {
         'title' : 'USER ID Look Up',
         'user_param': user_param,
-        # 'dept_list': dept_list,
-        # 'dept_status': dept_status,
         'subtitle1': 'Results for: ' + user_param ,
         'rows': rows,
         'user_list':user_list,

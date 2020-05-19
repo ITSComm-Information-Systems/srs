@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>{{ title }}</h1>
-<form action="/auth/userid/" method="POST">{% csrf_token %}
+<form method="POST">{% csrf_token %}
 
     <div class="form-group">
         <label for="deptf">
@@ -9,7 +9,6 @@
         </label>
         <br>
         <input type='text' name="user_param" id="deptf" size="1" class="form-control text-field-short col-4">
-        </select>
         <input type='submit' class='btn btn-primary'>
     </div>
 
