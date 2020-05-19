@@ -22,7 +22,7 @@ from ldap3 import Server, Connection, ALL
 from .models import AuthUserDept, Grantor, Role, Group, User
 from .forms import UserSuForm, AddUserForm
 from .utils import su_login_callback, custom_login_action, upsert_user
-from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscAcctChangeInput
+from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscAcctSubscribersV
 from oscauth.forms import *
 from oscauth.utils import upsert_user, get_mc_user
 from pages.models import Page
@@ -616,8 +616,8 @@ def delete_priv(osc_user, role, dept):
 
 def userid(request, user_param=''):
     template = loader.get_template('oscauth/userid.html')
-    # user_list= UmOscAcctChangeInput.objects.filter(user_defined_id__in=user_param)
-    testing=UmOscAcctChangeInput.objects.filter(user_defined_id='VI-AVTBT00016-01')
+    user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id=user_param)
+    testing=UmOscAcctSubscribersV.objects.filter(user_defined_id='VI-AVTBT00016-01')
     # dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
     
 
@@ -625,15 +625,6 @@ def userid(request, user_param=''):
     # users = AuthUserDept.objects.filter(dept=dept_parm).order_by('group','user__last_name','user__first_name')
     rows = []
 
-    # i = 0
-    # for dept in dept_info:
-    #     deptid = dept.deptid
-    #     dept_name = dept.dept_name
-    #     dept_status = dept.dept_status
-    #     dept_mgr_name = dept.dept_mgr_name
-    #     dept_mgr_uniqname = dept.dept_mgr_uniqname
-
-    # prev_user = ''
     for user in testing:
         Id = 'tester1'
         building = ''
@@ -643,12 +634,10 @@ def userid(request, user_param=''):
         mrc = ''
         toll = ''
         local = ''
-        Id = user.uniqname
+        Id = user.subscriber_id
         jack = user.user_defined_id
         data = {'Id' : Id, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
         rows.append(data)
-    #     prev_user = user.user
-
     
     context = {
         'title' : 'USER ID Look Up',
@@ -656,7 +645,7 @@ def userid(request, user_param=''):
         # 'dept_status': dept_status,
         'subtitle1': 'Results for: ' + user_param ,
         'rows': rows,
-        # 'user_list':user_list,
+        'user_list':user_list,
         'testing':testing
     }
     return HttpResponse(template.render(context, request))
