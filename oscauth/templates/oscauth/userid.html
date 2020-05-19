@@ -10,13 +10,13 @@
         <br>
         <input type='text' name="user_param" id="deptf" size="1" class="form-control text-field-short col-4">
         </select>
-        <button class='btn btn-primary'>Submit</button>
+        <input type='submit' class='btn btn-primary'>
     </div>
 
 </form>
 <p>start testing</p>
-{% for user in testing%}
-<p> {{ user.user_defined_id }}{{ user.uniqname }}</option>
+{% for user in user_list %}
+<p>{{user.subscriber_id}}</p>
 {% endfor %}
 <p>end testing</p>
 <div class="mt-4">
