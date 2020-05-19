@@ -614,10 +614,11 @@ def delete_priv(osc_user, role, dept):
 
     return result
 
-def userid(request, dept_parm=''):
+def userid(request, user_param=''):
     template = loader.get_template('oscauth/userid.html')
-    test=UmOscAcctChangeInput.objects.filter(user_defined_id='CC-629360171-01')
-    # dept_list = UmOscAcctChangeInput.objects.all().order_by('deptid')
+    user_list= UmOscAcctChangeInput.objects.filter(user_defined_id__in=user_param)
+    testing=UmOscAcctChangeInput.objects.filter(user_defined_id__in='VI-AVTBT')
+    # dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
     # if dept_parm == '':
     #     context = {
     #         'title' : 'Department Look Up',
@@ -625,22 +626,27 @@ def userid(request, dept_parm=''):
     #     }
     #     return  HttpResponse(template.render(context, request))
 
-    # dept_info = UmOscAcctChangeInput.objects.filter(deptid=dept_parm)
+    # dept_info = UmCurrentDeptManagersV.objects.filter(deptid=dept_parm)
     # users = AuthUserDept.objects.filter(dept=dept_parm).order_by('group','user__last_name','user__first_name')
-    # rows = []
-    # prev_user = ''
-    # group_name = ''
-    # col1 = ''
-    # col2 = ''
-    # roles = ''
-    # i = 0
-    for dept in test:
-        deptid = dept.uniqname
-        dept_name = dept.mrc_account_number
-        dept_status = dept.toll_account_number
-        dept_mgr_name = dept.local_account_number
-        dept_mgr_uniqname = dept.date_added
+    rows = []
+    Id = ''
+    building = ''
+    floor = ''
+    room = ''
+    jack = ''
+    mrc = ''
+    toll = ''
+    local = ''
 
+    # i = 0
+    # for dept in dept_info:
+    #     deptid = dept.deptid
+    #     dept_name = dept.dept_name
+    #     dept_status = dept.dept_status
+    #     dept_mgr_name = dept.dept_mgr_name
+    #     dept_mgr_uniqname = dept.dept_mgr_uniqname
+
+    # prev_user = ''
     # for user in users:
     #     last_name = User.objects.get(username=user.user).last_name
     #     first_name = User.objects.get(username=user.user).first_name
@@ -656,15 +662,16 @@ def userid(request, dept_parm=''):
     #         col2 = last_name + ', ' + first_name
     #         roles = group_name
     #     prev_user = user.user
-    # data = {'col1' : col1, 'col2' : col2, 'roles': roles}
-    # rows.append(data)
+
+    data = {'Id' : Id, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
+    rows.append(data)
     context = {
-        'title' : 'User ID Look Up',
-        'test': test,
+        'title' : 'USER ID Look Up',
         # 'dept_list': dept_list,
         # 'dept_status': dept_status,
-        # 'subtitle1': 'Access For Department: ' + dept_parm + ' - '+ dept_name ,
-        'subtitle2': 'Department Manager: ' + dept_mgr_name + ' (' + dept_mgr_uniqname + ')',
-        # 'rows': rows
+        'subtitle1': 'Results for: ' + user_param ,
+        'rows': rows,
+        'user_list':user_list,
+        'testing':testing
     }
     return HttpResponse(template.render(context, request))
