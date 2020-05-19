@@ -106,6 +106,12 @@ MCOMMUNITY = {
     'PASSWORD': os.getenv('MC_PASSWORD', 'N/A'),
 }
 
+UM_API = {
+    'CLIENT_ID': os.getenv('UM_API_CLIENT_ID'),
+    'CLIENT_SECRET': os.getenv('UM_API_CLIENT_SECRET'),
+    'AUTH_TOKEN': os.getenv('UM_API_AUTH_TOKEN'),
+    'BASE_URL': os.getenv('UM_API_URL'),
+}
 
 ROOT_URLCONF = 'project.urls'
 
