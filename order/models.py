@@ -10,9 +10,9 @@ from django.utils import timezone
 from django.db import connections
 from django.template.loader import render_to_string
 from ast import literal_eval
-import json, io, os
+import json, io, os, requests
 import cx_Oracle
-from oscauth.utils import get_mc_user
+from oscauth.utils import get_mc_user, get_mc_group
 
 class Configuration(models.Model):   #Common fields for configuration models
     name = models.CharField(max_length=20)
@@ -294,6 +294,18 @@ class StorageRate(Configuration):
         return total_cost
 
 
+class StorageOwner(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class StorageMember(models.Model):
+    storage_owner = models.ForeignKey(StorageOwner, on_delete=models.CASCADE)
+    username = models.CharField(max_length=8)
+
+
 class StorageInstance(models.Model):
     TYPE_CHOICES = (
         ('NFS', 'NFS'),
@@ -301,12 +313,14 @@ class StorageInstance(models.Model):
     )
 
     name = models.CharField(max_length=100)
-    owner = models.CharField(max_length=100)
+    owner = models.ForeignKey(StorageOwner, on_delete=models.CASCADE, null=True)
+    owner_name = models.CharField(max_length=100)
     shortcode = models.CharField(max_length=100)
     uid = models.PositiveIntegerField(null=True)
     ad_group = models.CharField(max_length=100, null=True, blank=True)
     deptid = models.CharField(max_length=6, null=True, blank=True)
     size = models.PositiveIntegerField()
+    autogrow = models.BooleanField(default=False)
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     flux = models.BooleanField(default=False)
     rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)
@@ -320,6 +334,29 @@ class StorageInstance(models.Model):
     def __str__(self):
         return self.name
 
+    def get_owner_instance(self, name):
+
+        mc = get_mc_group(name)
+
+        if mc:
+            dn = mc.entry_dn[3:mc.entry_dn.find(',')]
+
+            try:
+                so = StorageOwner.objects.get(name=dn)
+            except: #Make it so
+                so = StorageOwner()
+                so.name = dn
+                so.save()
+
+                for member in mc['member']:
+                    uid = member[4:member.find(',')]
+                    sm = StorageMember()
+                    sm.storage_owner = so
+                    sm.username = uid
+                    sm.save()
+
+            return so
+
 
 class StorageHost(models.Model):
     storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
@@ -327,10 +364,6 @@ class StorageHost(models.Model):
 
     def __str__(self):
         return self.name
-
-class StorageMember(models.Model):
-    storage_instance = models.ForeignKey(StorageInstance, on_delete=models.CASCADE)
-    username = models.CharField(max_length=8)
 
 
 class Order(models.Model):
@@ -547,7 +580,7 @@ class Item(models.Model):
         action = Action.objects.get(id=action_id)
 
         o = Order()
-        o.order_reference = 'ServiceNow'
+        o.order_reference = action.destination
         o.chartcom = self.chartcom
         o.service = action.service
         o.created_by = self.created_by
@@ -558,16 +591,52 @@ class Item(models.Model):
         text = self.data['reviewSummary']
         note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
 
-        body = ( 'schema:SN_Incident\n'
-                 'service_provider:ITS\n'
-                 'business_service:MiStorage\n'
-                 'assignment_group:ITS Storage\n'
-                 'category:Catalog Order\n'
-                 'state:New\n'
-                 'owner_group:ITS Service Center\n'
-                 f'description:{note}\n' )
+        if action.destination == 'TDX':
+            client_id = settings.UM_API['CLIENT_ID']
+            auth_token = settings.UM_API['AUTH_TOKEN']
+            base_url = settings.UM_API['BASE_URL']
 
-        send_mail(self.description, body, self.created_by.email, [settings.SERVICENOW_EMAIL])
+            headers = { 
+                'Authorization': f'Basic {auth_token}',
+                'accept': 'application/json'
+                }
+
+            url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
+            response = requests.post(url, headers=headers)
+            response_token = json.loads(response.text)
+            access_token = response_token.get('access_token')
+
+            headers = {
+                'X-IBM-Client-Id': client_id,
+                'Authorization': 'Bearer ' + access_token,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json' 
+                }
+            payload = {
+                "TypeID": 57,
+                "Title": self.description,
+                "Description": f'{note}\n',
+                "ResponsibleGroupID": 104,
+                "ServiceID": 215,
+                "FormID": 20,
+                "Classification": 46,
+                "RequestorEmail": self.created_by.email,
+                }
+            data_string = json.dumps(payload)
+            response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
+            #print(response.text)
+        else:
+            body = ( 'schema:SN_Incident\n'
+                    'service_provider:ITS\n'
+                    'business_service:MiStorage\n'
+                    'assignment_group:ITS Storage\n'
+                    'category:Catalog Order\n'
+                    'state:New\n'
+                    'owner_group:ITS Service Center\n'
+                    f'description:{note}\n' )
+
+            send_mail(self.description, body, self.created_by.email, [settings.SERVICENOW_EMAIL])
+
         self.update_mistorage()
 
     def update_mistorage(self):
@@ -579,16 +648,20 @@ class Item(models.Model):
         else:
             si = StorageInstance()
 
+        if self.data.get('volaction') == 'Delete':
+            si.delete()
+            return
+
         if self.data.get('action_id') == '46' or self.data.get('action_id') == '47':
             si.type = 'NFS'
-            si.owner = self.data.get('owner')
+            si.owner = si.get_owner_instance(self.data.get('owner'))
             si.name = self.data.get('storageID')
             si.uid = self.data.get('volumeAdmin')
             if self.data.get('flux') == 'yes':
                 si.flux = True
         else:
             si.type = 'CIFS'
-            si.owner = self.data.get('mcommGroup')
+            si.owner = si.get_owner_instance( self.data.get('mcommGroup') )
             si.name = self.data.get('netShare')
             si.ad_group = self.data.get('activeDir')
 
