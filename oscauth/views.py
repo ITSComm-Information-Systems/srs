@@ -616,27 +616,14 @@ def delete_priv(osc_user, role, dept):
 
 def userid(request, user_param=''):
     template = loader.get_template('oscauth/userid.html')
-    user_list= UmOscAcctChangeInput.objects.filter(user_defined_id__in=user_param)
-    testing=UmOscAcctChangeInput.objects.filter(user_defined_id__in='VI-AVTBT')
+    # user_list= UmOscAcctChangeInput.objects.filter(user_defined_id__in=user_param)
+    testing=UmOscAcctChangeInput.objects.filter(user_defined_id='VI-AVTBT00016-01')
     # dept_list = UmCurrentDeptManagersV.objects.all().order_by('deptid')
-    # if dept_parm == '':
-    #     context = {
-    #         'title' : 'Department Look Up',
-    #         'dept_list': dept_list
-    #     }
-    #     return  HttpResponse(template.render(context, request))
+    
 
     # dept_info = UmCurrentDeptManagersV.objects.filter(deptid=dept_parm)
     # users = AuthUserDept.objects.filter(dept=dept_parm).order_by('group','user__last_name','user__first_name')
     rows = []
-    Id = ''
-    building = ''
-    floor = ''
-    room = ''
-    jack = ''
-    mrc = ''
-    toll = ''
-    local = ''
 
     # i = 0
     # for dept in dept_info:
@@ -647,31 +634,29 @@ def userid(request, user_param=''):
     #     dept_mgr_uniqname = dept.dept_mgr_uniqname
 
     # prev_user = ''
-    # for user in users:
-    #     last_name = User.objects.get(username=user.user).last_name
-    #     first_name = User.objects.get(username=user.user).first_name
-    #     group_name = Group.objects.get(name=user.group).name
-    #     if user.user == prev_user:
-    #         roles = roles + ', ' + group_name
-    #     else:
-    #         if prev_user != '':
-    #             data = {'col1' : col1, 'col2' : col2, 'roles': roles}
-    #             rows.append(data)
-    #         i = i + 1
-    #         col1 = user.user
-    #         col2 = last_name + ', ' + first_name
-    #         roles = group_name
+    for user in testing:
+        Id = 'tester1'
+        building = ''
+        floor = ''
+        room = ''
+        jack = ''
+        mrc = ''
+        toll = ''
+        local = ''
+        Id = user.uniqname
+        jack = user.user_defined_id
+        data = {'Id' : Id, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
+        rows.append(data)
     #     prev_user = user.user
 
-    data = {'Id' : Id, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
-    rows.append(data)
+    
     context = {
         'title' : 'USER ID Look Up',
         # 'dept_list': dept_list,
         # 'dept_status': dept_status,
         'subtitle1': 'Results for: ' + user_param ,
         'rows': rows,
-        'user_list':user_list,
+        # 'user_list':user_list,
         'testing':testing
     }
     return HttpResponse(template.render(context, request))
