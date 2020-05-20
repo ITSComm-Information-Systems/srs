@@ -383,7 +383,9 @@ $(document).ready(function() {
 					}
 					change_current_page(data[0]);
 				}
-				$('#dept_title').html('Department: ' + selected); //data[data.length - 1].name);
+				name_display = selected.split(':');
+				$('#dept_title').html('Department: ' + name_display[0]); //data[data.length - 1].name);
+				$('#dept_mgr').html(name_display[1]);
 				$('#cfc-2').addClass('disabled');
 				$('#cfc-3').addClass('disabled');
 				$('#cfc-4').addClass('disabled');
@@ -566,7 +568,6 @@ function change_current_page(selected) {
 	}
 	$('.dept_full_name').html('<strong>Department:&nbsp;</strong>' + dept_title);
 	$('.dept_mgr').html('<strong>Department Manager:&nbsp;</strong>' + dept_mgr);
-
 	$('#cf_users_table').DataTable().ajax.reload();
 }
 
