@@ -3,6 +3,7 @@ var current_tab = 0
 $(document).ready(function() {
 	// Show first page
     $('#pills-step1').removeClass('disabled');
+    $('#pills-step1').addClass('active');
     $('#step1').removeClass('fade');
     $('#step1').addClass('active');
     current_tab = 1;
@@ -20,10 +21,12 @@ function next(num_tabs) {
 	// Hide current page
 	$('#step' + current_tab).addClass('fade');
 	$('#step' + current_tab).removeClass('active');
+	$('#pills-step' + current_tab).removeClass('active');
 
 	// Enable next page
 	current_tab = current_tab + 1;
 	$('#pills-step' + current_tab).removeClass('disabled');
+	$('#pills-step' + current_tab).addClass('active');
     $('#step' + current_tab).removeClass('fade');
     $('#step' + current_tab).addClass('active');
 
@@ -45,9 +48,11 @@ function prev() {
 	// Hide current page
 	$('#step' + current_tab).addClass('fade');
 	$('#step' + current_tab).removeClass('active');
+	$('#pills-step' + current_tab).removeClass('active');
 
 	// Show previous page
 	current_tab = current_tab - 1;
+	$('#pills-step' + current_tab).addClass('active');
 	$('#step' + current_tab).removeClass('fade');
     $('#step' + current_tab).addClass('active');
 
