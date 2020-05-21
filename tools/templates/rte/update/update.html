@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<form action='view-times/' method='post' onsubmit='return validate()'>{% csrf_token %}
+	<div class='form-group col-md-6'>
+		<label for="techid"><strong>Tech ID</strong></label>
+	    <input type="text" class="form-control" id="techid" name='techid'>
+	</div>
+	<div class='form-row col-md-6'>
+		<div class='form-group'>
+			<label for="date-start"><strong>From Date</strong></label>
+		    <input type="date" class="form-control" id="date-start" name='date-start'>
+		</div>
+		<div class='form-group'>
+			<label for="date-end"><strong>To Date</strong></label>
+	    	<input type="date" class="form-control" id="date-end" name='date-end'>
+		</div>
+	</div>
+	<button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<div class='alert alert-danger mt-2' hidden id='error-notice'></div>
+
+{% endblock %}
+
+{% block js %}
+<script src="/static/js/rte/update.js"></script>
+{% endblock %}

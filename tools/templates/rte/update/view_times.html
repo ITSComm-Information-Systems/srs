@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<div class='alert'>
+	{{ techid }}
+	{{ start_date }}
+	{{ end_date }}
+</div>
+
+<table class='table table-striped' id='update-results-table'>
+	<thead>
+		<tr>
+			<th scope='col'><input type="checkbox" value=""></th>
+			<th scope='col'>Work Order</th>
+			<th scope='col'>Assigned Date</th>
+			<th scope='col'>Duration</th>
+			<th scope='col'>Rate Level</th>
+			<th scope='col'>Assigned Group</th>
+			<th scope='col'>Status</th>
+			<th scope='col'>Billed</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for entry in entries %}
+			<tr>
+				<td><input type="checkbox" value="" {% ifequal entry.status_name 'Closed' %}disabled{% endifequal %}></td>
+				<td>{{ entry.work_order_display }}</td>
+				<td>{{ entry.assigned_date }}</td>
+				<td>{{ entry.actual_mins_display }}</td>
+				<td>{{ entry.rate_number.labor_rate_level_name }}</td>
+				<td>{{ entry.assn_wo_group_name }}</td>
+				<td>{{ entry.status_name }}</td>
+				<td>{% ifequal entry.billed 'Yes' %}<i class="fas fa-check"></i>{% endifequal %}</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<nav aria-label="results pagination navigation">
+  <ul class="pagination justify-content-end" id='pagination'>
+    <li class="page-item disabled" id='previous'>
+      <a class="page-link" tabindex="-1" id="previous-tab">Previous</a>
+    </li>
+  </ul>
+</nav>
+
+<button class='btn btn-primary float-right' type='submit'>Edit</button>
+
+{% endblock %}
+
+{% block js %}
+<script src="/static/js/rte/update.js"></script>
+{% endblock %}

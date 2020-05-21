@@ -3,10 +3,10 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
-    # path('single-tech/', views.single_tech),
-    # path('multiple-tech/', views.multiple_tech),
-    # path('update/', views.update),
+    path('single-tech/', views.single_tech),
+    path('multiple-tech/', views.multiple_tech),
+    path('update/view-times/', views.view_times),
+    path('update/', views.update),
     url(r'', views.load_rte),
     
 ]
