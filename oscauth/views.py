@@ -614,18 +614,30 @@ def delete_priv(osc_user, role, dept):
 
     return result
 
-def get_userid(request):
-    if request.method == 'POST':
-        user_param = request.POST['user_param']
-        return HttpResponseRedirect('/auth/userid/')
-    else:
-        userid = ''
-
-def userid(request, user_param=''):
+def userid(request):
     template = loader.get_template('oscauth/userid.html')
-    user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id=user_param)
-
+    
+    user_param=''
     rows = []
+    user_list=[]
+
+    if request.method=='POST':
+        user_param = request.POST.get('user_param')
+
+    if user_param == '':
+        context = {
+            'title' : 'User ID Look Up',
+            'user_list': 'blank'
+        }
+        return  HttpResponse(template.render(context, request))
+    
+    if len(user_param)==10:
+        user_list= UmOscAcctSubscribersV.objects.filter(dn=user_param)
+    else:
+        user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id=user_param)
+
+
+    
     for user in user_list:
         Id = user.user_defined_id
         chartcom = user.chartcom
@@ -640,8 +652,7 @@ def userid(request, user_param=''):
         rows.append(data)
     
     context = {
-        'title' : 'USER ID Look Up',
-        'user_param': user_param,
+        'title' : 'User ID Look Up',
         'subtitle1': 'Results for: ' + user_param ,
         'rows': rows,
         'user_list':user_list,
