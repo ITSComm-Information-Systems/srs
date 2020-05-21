@@ -13,34 +13,16 @@
     </div>
 
 </form>
-<p>start testing</p>
-<!-- {% for user in user_list %}
-<p>subscriber_id: {{user.subscriber_id}}</p>
-<p>user_defined_id: {{user.user_defined_id}}</p>
-<p>chartcom: {{user.chartcom}}</p>
-<p>dn: {{user.dn}}</p>
-<p>service_type: {{user.service_type}}</p>
-<p>service_status: {{user.service_status}}</p>
-<p>location_id: {{user.location_id}}</p>
-<p>building: {{user.building}}</p>
-<p>floor: {{user.floor}}</p>
-<p>room: {{user.room}}</p>
-<p>jack: {{user.jack}}</p>
-<p>mrc_charged: {{user.mrc_charged}}</p>
-<p>toll_charged: {{user.toll_charged}}</p>
-<p>local_charged: {{user.local_charged}}</p>
-{% endfor %} -->
-<p>end testing</p>
-
-
+{% if request.POST and user_list != 'blank' %}
 <div class="mt-4">
-    {% if user_list != '' %}
+    {% if user_list %}
     <h2>{{ subtitle1 }}</h2>
-    {% else %}
-    <strong class="mt-3 prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for inactive department"></i>
-        USERID Not Found.</strong>
+    {% else%}
+    <strong class="mt-3 prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for user id not found"></i>
+        User ID Not Found.</strong>
     {% endif %}
 </div>
+{% endif %}
 
 {% if rows %}
 
