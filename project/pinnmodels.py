@@ -1004,3 +1004,92 @@ class UmOscRptSubscrib_Api_V(models.Model):
           ordering = ('subscriber_prefix',)
           db_table = 'PS_RATING\".\"um_osc_rpt_subscrib_api_v'
 
+class UmRteCurrentTimeAssignedV(models.Model):
+    wo_labor_id = models.IntegerField(primary_key=True)
+    wo_tcom_id = models.FloatField()
+    category_code = models.CharField(max_length=1)
+    project_type_code = models.CharField(max_length=3, blank=True, null=True)
+    project_number = models.FloatField(blank=True, null=True)
+    project_name = models.CharField(max_length=50, blank=True, null=True)
+    work_order_display = models.CharField(max_length=98, blank=True, null=True)
+    pre_order_number = models.BigIntegerField(blank=True, null=True)
+    pre_order_issue = models.BigIntegerField(blank=True, null=True)
+    wo_type_code = models.CharField(max_length=2, blank=True, null=True)
+    wo_number = models.IntegerField(blank=True, null=True)
+    wo_issue = models.IntegerField(blank=True, null=True)
+    status_name = models.CharField(max_length=60, blank=True, null=True)
+    work_status_name = models.CharField(max_length=71, blank=True, null=True)
+    assigned_labor_code = models.CharField(max_length=9, blank=True, null=True)
+    is_occ_billed = models.FloatField(blank=True, null=True)
+    billed = models.CharField(max_length=3, blank=True, null=True)
+    labor_code = models.CharField(max_length=9, blank=True, null=True)
+    labor_name_display = models.CharField(max_length=104, blank=True, null=True)
+    skill_code = models.CharField(max_length=3, blank=True, null=True)
+    skill_name = models.CharField(max_length=25, blank=True, null=True)
+    rate_number = models.ForeignKey('UmRteRateLevelV', db_column='rate_number', to_field='labor_rate_level_code',
+                                    on_delete=models.CASCADE)
+    labor_cost_name = models.CharField(max_length=60, blank=True, null=True)
+    rate_used = models.DecimalField(max_digits=19, decimal_places=4)
+    assigned_date = models.DateField(blank=True, null=True)
+    actual_mins = models.BigIntegerField()
+    actual_mins_display = models.CharField(max_length=10, blank=True, null=True)
+    assn_wo_group_code = models.CharField(max_length=32, blank=True, null=True)
+    assn_wo_group_name = models.CharField(max_length=64, blank=True, null=True)
+    comment_text = models.CharField(max_length=4000, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'PINN_CUSTOM\".\"UM_RTE_CURRENT_TIME_ASSIGNED_V'
+
+
+class UmRteLaborGroupV(models.Model):
+    wo_group_labor_id = models.BigIntegerField(primary_key=True)
+    wo_group_labor_group_id = models.BigIntegerField()
+    wo_group_code = models.CharField(max_length=32, blank=True, null=True)
+    wo_group_name = models.CharField(max_length=64, blank=True, null=True)
+    labor_id = models.IntegerField()
+    wo_group_labor_code = models.CharField(max_length=9)
+    labor_name_display = models.CharField(max_length=104, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'PINN_CUSTOM\".\"UM_RTE_LABOR_GROUP_V'
+
+
+class UmRteRateLevelV(models.Model):
+    labor_rate_level_code = models.CharField(max_length=20, primary_key=True)
+    labor_rate_level_name = models.CharField(max_length=60)
+
+    class Meta:
+        managed = False
+        db_table = 'PINN_CUSTOM\".\"UM_RTE_RATE_LEVEL_V'
+
+
+class UmRteServiceOrderV(models.Model):
+    wo_tcom_id = models.FloatField(primary_key=True)
+    full_prord_wo_number = models.CharField(max_length=98, blank=True, null=True)
+    pre_order_number = models.BigIntegerField(blank=True, null=True)
+    pre_order_issue = models.BigIntegerField(blank=True, null=True)
+    wo_type_code = models.CharField(max_length=2, blank=True, null=True)
+    wo_number = models.IntegerField(blank=True, null=True)
+    wo_issue = models.IntegerField(blank=True, null=True)
+    status_name = models.CharField(max_length=60, blank=True, null=True)
+    category_code = models.CharField(max_length=1)
+    assigned_labor_code = models.CharField(max_length=9, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'PINN_CUSTOM\".\"UM_RTE_SERVICE_ORDER_V'
+
+
+class UmRteTechnicianV(models.Model):
+    labor_id = models.IntegerField(primary_key=True)
+    labor_code = models.CharField(max_length=9)
+    labor_name_display = models.CharField(max_length=4000, blank=True, null=True)
+    labor_name_display2 = models.CharField(max_length=4000, blank=True, null=True)
+    uniqname = models.CharField(max_length=128, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'PINN_CUSTOM\".\"UM_RTE_TECHNICIAN_V'
+
