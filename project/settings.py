@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'pages',
     'reports',
     'tools',
+    'apps'
 ]
 
 REST_FRAMEWORK = {
