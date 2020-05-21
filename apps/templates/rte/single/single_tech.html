@@ -31,8 +31,8 @@
 {% if tech_name %}
 	<div class='mt-4'>
 		<form id='addlInfoForm' method='post' action=''>{% csrf_token %}
-			<p><strong>Tech Name: </strong>{{ tech_name.labor_name_display2 }}</p>
-			<p><strong>Tech ID: </strong>{{ tech_id }}</p>
+			<p><strong>Tech Name: </strong><div id='tech_name'>{{ tech_name.labor_name_display2 }}</div></p>
+			<p><strong>Tech ID: </strong><div id='tech_id'>{{ tech_id }}</div></p>
 
 			<div class="form-group" id="selectAssignedGroup">
 		        <label for="agSelect" id="labelAGSelect">
@@ -45,20 +45,6 @@
 				</select>
 		        <div role=”alert” class="invalid-feedback" id='error-assigned-group'><i class="fas fa-exclamation-triangle"
 		            aria-label="Icon signfying that user must enter a value"></i>Please select an assigned group.
-		        </div>
-		  	</div>
-
-		  	<div class="form-group" id="selectRateLevel">
-		        <label for="rateSelect" id="labelRateSelect">
-		            <strong>Rate Level </strong>
-		        </label>
-		        <select id='rateSelect'>
-		        	{% for rate in rate_levels %}
-		        		<option>{{ rate.labor_rate_level_name }}</option>
-		        	{% endfor %}
-				</select>
-		        <div role=”alert” class="invalid-feedback" id='error-rate-level'><i class="fas fa-exclamation-triangle"
-		            aria-label="Icon signfying that user must enter a value"></i>Please select a rate level.
 		        </div>
 		  	</div>
 	  	</form>
