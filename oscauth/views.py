@@ -244,12 +244,12 @@ def get_uniqname(request, uniqname_parm=''):
                 print(dept_manager)
                 #grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
                 grantor_roles = Grantor.objects.values('grantor_role').distinct()
-#                 this_grantors_roles = AuthUserDept.objects.filter(user=request.user.id).values("group").distinct()
-# # The list of roles should only include those that this particular user can grant
-# #                grantable_roles = Grantor.objects.filter(grantor_role__in=this_grantors_roles).values("granted_role_id").distinct()
+                #this_grantors_roles = AuthUserDept.objects.filter(user=request.user.id).values("group").distinct()
+                # # The list of roles should only include those that this particular user can grant
+                # #grantable_roles = Grantor.objects.filter(grantor_role__in=this_grantors_roles).values("granted_role_id").distinct()
 
-# # The list of depts should be dependent on the role selected
-# #   e.g. if proxy is selected, only those depts for which thia grantor has the dept manager role should be displayed
+                # # The list of depts should be dependent on the role selected
+                # #   e.g. if proxy is selected, only those depts for which thia grantor has the dept manager role should be displayed
                 grantor_depts = AuthUserDept.objects.filter(user=request.user.id,group__in=grantor_roles).exclude(dept='All').order_by('dept')
 
                 rows = []
@@ -260,8 +260,8 @@ def get_uniqname(request, uniqname_parm=''):
 
                 for role in grantable_roles:
                     role = role.role
-#                    role = grantable_roles.granted_role_id
-#                    role = Role.objects.get(id=granted_role_id).role
+                    #role = grantable_roles.granted_role_id
+                    #role = Role.objects.get(id=granted_role_id).role
 
                 for query_dept in grantor_depts:
                     dept = query_dept.dept
@@ -640,6 +640,7 @@ def userid(request):
     
     for user in user_list:
         Id = user.user_defined_id
+        manager = 'unknown'
         chartcom = user.chartcom
         building = user.building
         floor = user.floor
@@ -648,7 +649,7 @@ def userid(request):
         mrc = user.mrc_charged
         toll = user.toll_charged
         local = user.local_charged
-        data = {'Id' : Id, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
+        data = {'Id' : Id, 'manager':manager, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
         rows.append(data)
     
     context = {

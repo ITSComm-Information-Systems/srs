@@ -5,7 +5,7 @@
 
     <div class="form-group">
         <label for="deptf">
-            <strong>Enter a USER ID</strong>
+            <strong>Enter a User ID</strong>
         </label>
         <br>
         <input type='text' name="user_param" id="deptf" size="1" class="form-control text-field-short col-4">
@@ -29,7 +29,8 @@
 <table class="table table-hover table-striped table-sm">
     <thead>
         <tr>
-            <th scope="col">USER ID</th>
+            <th scope="col">User ID</th>
+            <th scope="col">Manager</th>
             <th scope="col">Chartcom</th>
             <th scope="col">Building</th>
             <th scope="col">Floor</th>
@@ -44,6 +45,7 @@
         {% for row in rows %}
         <tr>
             <th scope="row"> {{ row.Id }}</th>
+            <td> {{ row.manager }}</td>
             <td> {{ row.chartcom }}</td>
             <td> {{ row.building }}</td>
             <td> {{ row.floor }}</td>
