@@ -25,7 +25,7 @@ import threading
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment, ChargeType, UserChartcomV
 
 #import for filter
-#from datetime import datetime
+import datetime
 from django.db.models import Case, When, Value, F
 
 
@@ -452,7 +452,7 @@ class Workflow(UserPassesTestMixin, View):
                     elif element.type == 'Chart':
                         field = forms.ChoiceField(label=element.label
                                                 , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user.id))
-                                                                                #AuthUserDept.get_order_departments(request.user.id)
+                                            #AuthUserDept.get_order_departments(request.user.id)
                         field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
                     elif element.type == 'NU':
                         field = forms.ChoiceField(label=element.label
@@ -642,7 +642,7 @@ class Services(UserPassesTestMixin, View):
 
 class Status(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
-
+    
     def get(self, request, deptid):
         auth_depts = AuthUserDept.get_order_departments(request.user.id)
         auth_dept_list = list(dept.dept for dept in auth_depts)
@@ -654,38 +654,28 @@ class Status(PermissionRequiredMixin, View):
         pins = UmOscPreorderApiV.objects.filter(add_info_text_3__in=order_id_list,pre_order_issue=1)
 
         depts = set()
-        dates_list = set()
         people_list = set()
         status_list = set()
+        dates_list = set()
         i = 0
         x = len(item_list)
 
-        order_list=order_list.annotate(timeDiff=Case(
-            When(
-                create_date__lt=date.today()-timedelta(days=30), #diff is less than 30
-                then=Value("less than 30")
-            ),
-            When(
-                create_date__lt=date.today()-timedelta(days=91), 
-                then=Value("30-90")
-            ),
-            When(
-                create_date__lt=date.today()-timedelta(days=181),
-                then=Value("91-180")
-            ),
-            When(
-                create_date__lt=date.today()-timedelta(days=366),
-                then=Value("181-365")
-            ),
-        ))
         for order in order_list:
-            depts.add(order.chartcom.dept)
             order.deptid = order.chartcom.dept
+            dept_list = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('deptid')
 
-            dates_list.add((order.timeDiff, order.deptid))
-            
-            people_list.add((order.created_by.username, order.deptid))
-            
+            #datetime filter
+            result=datetime.date.today()-order.create_date.date()
+            if result<datetime.timedelta(31):
+                order.timeDiff = (1,"30 days")
+            elif result<datetime.timedelta(91):
+                order.timeDiff = (2,"31-90 days")
+            elif result<datetime.timedelta(181):
+                order.timeDiff = (3,"91-180 days")
+            elif result<datetime.timedelta(366):
+                order.timeDiff = (4,"181-365 days")
+   
+                       
             pin = next((x for x in pins if x.add_info_text_3 == str(order.id)), None)
             order.srs_status = "Submitted"
             if pin:
@@ -698,25 +688,23 @@ class Status(PermissionRequiredMixin, View):
                         order.srs_status = "Completed"
 
             order.items = []
-            status_list.add((order.srs_status, order.deptid))
-
             while item_list[i].order_id == order.id and i < x-1:
                 order.items.append(item_list[i])
                 i = i + 1
+            
+            people_list.add((order.created_by.username, order.deptid))
+            status_list.add((order.srs_status, order.deptid))
+            depts.add(order.chartcom.dept)
+            dates_list.add((order.timeDiff, order.deptid))
 
-        dept_list = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('deptid')
-
-        datetimesort=sorted(dates_list, key=lambda x:x[0], reverse=True)
-        dates_list=[(x[0].strftime('%m/%d/%Y'), x[1]) for x in datetimesort]
+        
         people_list=sorted(people_list)
+        dates_list=sorted(dates_list, key=lambda x:x[0][0])
 
         if deptid == 0:
             department = {'id': dept_list[0].deptid, 'name':dept_list[0].dept_name}
             deptid = dept_list[0].deptid 
-
-        #add information based on timedelta
-        
-                    
+         
         template = loader.get_template('order/status.html')
         context = {
             'title': 'Track Orders',
