@@ -47,13 +47,29 @@ def get_phone_location(request, phone_number):
 
 #@permission_required('oscauth.can_order')
 def send_tab_data(request):
-    
+
     tab_name = request.POST.get('tab')
+
     if tab_name == 'Review':
         item = Item.objects.get(id = request.POST['item_id'])
 
+
+        label = Action.objects.get(id=request.POST['action_id']).cart_label
+
+        x = label.find('[', 0)
+        y = label.find(']', x)
+
+        while x > 0:
+            tag = label[x+1:y]
+            element = request.POST[tag]
+            label = label.replace('['+tag+']', element)
+            x = label.find('[', x)
+            y = label.find(']', x)
+
+
         if request.POST['cart']=='True':
             item.deptid = Chartcom.objects.get(id=item.chartcom_id).dept
+            item.description = label
             item.save()
             return JsonResponse({'redirect': f'/orders/cart/{item.deptid}'}, safe=False)
         else:
@@ -623,55 +639,66 @@ class Status(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
     def get(self, request, deptid):
-        dept_list = AuthUserDept.get_order_departments(request.user.id)
+        auth_depts = AuthUserDept.get_order_departments(request.user.id)
+        auth_dept_list = list(dept.dept for dept in auth_depts)
+     
+        order_list = Order.objects.filter(chartcom__dept__in=auth_dept_list).order_by('-create_date', 'id').select_related()
+        item_list = Item.objects.filter(order__in=order_list).order_by('-order__create_date', 'order_id')
 
-        for dept in dept_list:
-            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
-            dept.name = deptinfo.dept_name
-            dept.active = deptinfo.dept_eff_status
+        order_id_list = list(str(order.id) for order in order_list)
+        pins = UmOscPreorderApiV.objects.filter(add_info_text_3__in=order_id_list,pre_order_issue=1)
 
-            if deptid == int(dept.dept):
-                department = {'id': dept.dept, 'name': deptinfo.dept_name}
+        depts = set()
+        dates_list = set()
+        people_list = set()
+        status_list = set()
+        i = 0
+        x = len(item_list)
+        
+        for order in order_list:
+            depts.add(order.chartcom.dept)
+            order.deptid = order.chartcom.dept
+
+            dates_list.add((order.create_date, order.deptid))
+            
+            people_list.add((order.created_by.username, order.deptid))
+            
+            pin = next((x for x in pins if x.add_info_text_3 == str(order.id)), None)
+            order.srs_status = "Submitted"
+            if pin:
+                if(pin.work_status_name == "Received"):
+                    order.srs_status = "Submitted"
+                if pin.status_code == 2:
+                    if(pin.work_status_name == "Cancelled"):
+                        order.srs_status = "Cancelled"
+                    else:
+                        order.srs_status = "Completed"
+
+            order.items = []
+            status_list.add((order.srs_status, order.deptid))
+
+            while item_list[i].order_id == order.id and i < x-1:
+                order.items.append(item_list[i])
+                i = i + 1
+
+        dept_list = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('deptid')
+
+        datetimesort=sorted(dates_list, key=lambda x:x[0], reverse=True)
+        dates_list=[(x[0].strftime('%m/%d/%Y'), x[1]) for x in datetimesort]
+        people_list=sorted(people_list)
 
         if deptid == 0:
-            department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
-            deptid = dept_list[0].dept 
-
-        status_help = Page.objects.get(permalink='/status')
-
-        #items_selected = request.POST.getlist('includeInOrder')
-        #order_list = item_list.distinct('chartcom')
-        chartcoms = Chartcom.objects.filter(dept__in=dept_list)
-        order_list = Order.objects.filter(chartcom__in=chartcoms).order_by('-create_date')
-
-        item_list = Item.objects.filter(order__in=order_list)
-
-        for num, order in enumerate(order_list, start=1):
-            if order.order_reference == 'TBD':
-                order.items = item_list.filter(order=order)
-            else:
-                try:
-                    pin = UmOscPreorderApiV.objects.get(add_info_text_3=str(order.id),pre_order_issue=1)
-                    srs_status = pin.work_status_name
-                    if(pin.work_status_name == "Received"):
-                    	srs_status = "Submitted"
-                    if pin.status_code == 2:
-                    	if(pin.work_status_name == "Cancelled"):
-                    		srs_status = "Cancelled"
-                    	else:
-                    		srs_status = "Completed"
-                    
-
-                    order.items = [{'description': pin.comment_text,'status': srs_status}]
-                    order.status = srs_status
-                except:
-                    order.items = item_list.filter(order=order)
+            department = {'id': dept_list[0].deptid, 'name':dept_list[0].dept_name}
+            deptid = dept_list[0].deptid 
                     
         template = loader.get_template('order/status.html')
         context = {
             'title': 'Track Orders',
             'dept_list': dept_list,
             'order_list': order_list,
-            'status_help': status_help,
+            'dates_list': dates_list,
+            'people_list': people_list,
+            'status_list':status_list,
+            'status_help': Page.objects.get(permalink='/status'),
         }
         return HttpResponse(template.render(context, request))

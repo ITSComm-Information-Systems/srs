@@ -200,29 +200,14 @@ class RestrictionsForm(TabForm):
 
 class AddlInfoForm(TabForm):
 
-    def is_valid(self, *args, **kwargs):
-        super(AddlInfoForm, self).is_valid(*args, **kwargs)
-        return True
-
-    #TRUE_FALSE_CHOICES = (
-    #(True, 'Yes'),
-    #(False, 'No')
-    #)
-
-    #contact_yn = forms.ChoiceField(choices = TRUE_FALSE_CHOICES, label="Are you the on site contact?", required=True)
-    #contact_yn.type = 'Radio'
-
-    #contact_id = forms.CharField(label='Uniqname of the on site contact person', max_length=8)
-    #contact_id.type = 'ST'
-
-    #contact_name = forms.CharField(label='Name of the on site contact person', max_length=40)
-    #contact_name.type = 'ST'
-
-    #contact_number = forms.CharField(label='Best number to contact', max_length=10)
-    #comments = forms.CharField(label='Comments', required=False, widget=forms.Textarea(attrs={'cols':'100', 'class':'form-control'}) )
     file = forms.FileField(label="Please attach any drawings, spreadsheets or floor plans with jack locations as needed", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
     file.type = 'file'
     template = 'order/addl_info.html'
+
+
+    def is_valid(self, *args, **kwargs):
+        super(AddlInfoForm, self).is_valid(*args, **kwargs)
+        return True
 
 
 class VolumeSelectionForm(TabForm):
@@ -456,7 +441,22 @@ class BillingStorageForm(TabForm):
 
 
 class VoicemailForm(TabForm):
-    template = 'order/voicemail.html'
+
+    def __init__(self, *args, **kwargs):
+        super(VoicemailForm, self).__init__(*args, **kwargs)
+
+        if self.is_bound:
+            action_id = self.request.POST.get('action_id')
+        else:
+            action_id = self.request.path[-2:]
+
+        if action_id == '40':   # Add
+            del(self.fields['cancelRebuild'])
+            del(self.fields['pinOrPass'])
+        elif action_id =='16':  # Reset Pin
+            del(self.fields['cancelRebuild'])
+        elif action_id =='15':  # Cancel/Rebuild
+            del(self.fields['pinOrPass'])
 
 
 class ContactCenterForm(TabForm):

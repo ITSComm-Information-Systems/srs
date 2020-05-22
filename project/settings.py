@@ -24,11 +24,10 @@ SECRET_KEY = os.getenv(
     '9e4@&tw46$l31)zrqe3wi+-slqm(ruvz&se0^%9#6(_w3ui!c0'
 )
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', True)
 
 ALLOWED_HOSTS = ['*']
 
+DEBUG = os.getenv('DEBUG', False)
 
 # Application definition
 
@@ -106,6 +105,12 @@ MCOMMUNITY = {
     'PASSWORD': os.getenv('MC_PASSWORD', 'N/A'),
 }
 
+UM_API = {
+    'CLIENT_ID': os.getenv('UM_API_CLIENT_ID'),
+    'CLIENT_SECRET': os.getenv('UM_API_CLIENT_SECRET'),
+    'AUTH_TOKEN': os.getenv('UM_API_AUTH_TOKEN'),
+    'BASE_URL': os.getenv('UM_API_URL'),
+}
 
 ROOT_URLCONF = 'project.urls'
 

@@ -95,8 +95,6 @@ $(document).ready(function() {
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
-
-
   var callback = function() {
     if (preFields.index(this) <= pointer) { // User changed a previous answer.
       for (i = preFields.index(this)+1; i < preFields.length; i++) {
