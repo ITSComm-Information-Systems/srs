@@ -22,7 +22,7 @@ from ldap3 import Server, Connection, ALL
 from .models import AuthUserDept, Grantor, Role, Group, User
 from .forms import UserSuForm, AddUserForm
 from .utils import su_login_callback, custom_login_action, upsert_user
-from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscAcctSubscribersV
+from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscAcctSubscribersV,UmOscServiceProfileV
 from oscauth.forms import *
 from oscauth.utils import upsert_user, get_mc_user
 from pages.models import Page
@@ -635,12 +635,10 @@ def userid(request):
         user_list= UmOscAcctSubscribersV.objects.filter(dn=user_param)
     else:
         user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id=user_param)
-
-
+    extra= '' #UmCurrentDeptManagersV.objects.all()
     
     for user in user_list:
         Id = user.user_defined_id
-        manager = 'unknown'
         chartcom = user.chartcom
         building = user.building
         floor = user.floor
@@ -649,6 +647,10 @@ def userid(request):
         mrc = user.mrc_charged
         toll = user.toll_charged
         local = user.local_charged
+
+        deptid=UmOscServiceProfileV.objects.get(service_number=user.dn).deptid
+        manager = AuthUserDept.objects.get(dept=deptid, group = 3).user.username
+
         data = {'Id' : Id, 'manager':manager, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
         rows.append(data)
     
@@ -657,5 +659,6 @@ def userid(request):
         'subtitle1': 'Results for: ' + user_param ,
         'rows': rows,
         'user_list':user_list,
+        'extra':extra
     }
     return HttpResponse(template.render(context, request))
