@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.template import loader
-from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV
+from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV
 
 # Base RTE view
 def load_rte(request):
@@ -47,6 +47,8 @@ def single_tech(request):
 
     all_techs = UmRteTechnicianV.objects.all()
 
+    all_wos = UmRteServiceOrderV.objects.all()
+
     # Load after search
     if request.method == 'POST':
 
@@ -60,7 +62,9 @@ def single_tech(request):
         rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
 
         context = {
+            'wf': 'single',
             'all_techs': all_techs,
+            'all_wos': all_wos,
             'tech_id': tech_id,
             'tech_name': tech_name,
             'assigned_groups': assigned_groups,
@@ -75,11 +79,16 @@ def single_tech(request):
     # Original load
     else:
         context = {
+            'wf': 'single',
             'all_techs': all_techs,
             'title': 'Single Technician, Multiple Orders',
             'tab_list': tab_list
         }
         return HttpResponse(template.render(context, request))
+
+# Review single tech times
+def single_review():
+    pass
 
 
 # Multiple technicians, single order
@@ -116,6 +125,7 @@ def multiple_tech(request):
     tab_list.append(tab3)
 
     context = {
+        'wf': 'double',
         'title': 'Multiple Technicians, Single Work Order',
         'tab_list': tab_list,
         'num_tabs': len(tab_list)
