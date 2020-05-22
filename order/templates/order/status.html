@@ -21,15 +21,15 @@
                         </label>
                     </div>
                     <select class="custom-select order-status-dropdown" id="selectDept">
-<!--                         <option id="alldepts" name="dept" data-filter="dept" value="all_departments">
+                        <!--                         <option id="alldepts" name="dept" data-filter="dept" value="all_departments">
                             All Departments
                         </option> -->
                         {% for dept in dept_list %}
-                            {% if dept.active == 'A' %}
-                            <option id="mydept{{dept.dept}}" name="dept" data-filter="dept" value="{{dept.dept}}">
-                                {{dept.dept}} - {{dept.name}}
-                            </option>
-                            {% endif %}
+
+                        <option id="mydept{{dept.deptid}}" name="dept" data-filter="dept" value="{{dept.deptid}}">
+                            {{dept.deptid}} - {{dept.dept_name}}
+                        </option>
+
                         {% endfor %}
                     </select>
                 </div>
@@ -37,14 +37,13 @@
         </div>
     </div>
 </div>
-
 <div role="contentinfo">
     <div class="row cart-table">
         <div class="col-12">
             <!-- Beginning of Filter/Search -->
             <!-- <div class="filter-container"> -->
-                <!-- Beginning of Search Bar -->
-                <!-- <div class="input-group mb-3 search-bar">
+            <!-- Beginning of Search Bar -->
+            <!-- <div class="input-group mb-3 search-bar">
                     <div class="input-group-prepend">
                         <span class="input-group-text">
                             <i class="fas fa-search" aria-label="Search Icon"></i>
@@ -54,24 +53,68 @@
                         placeholder="Search by pre-order or uniqname…" aria-label="Search by pre-order or uniqname…"
                         aria-describedby="basic-addon2">
                 </div> -->
-                <!-- End of Search -->
+            <!-- End of Search -->
 
-                <!-- Beginning of Order Status Filter Dropdown -->
-                <!-- <div class="input-group mb-3 order-status">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text">
-                            Filter By Order Status
-                        </label>
+            <!-- Beginning of Order Status Filter Dropdown -->
+            <div class="mt-2 mb-2">
+                <strong>Filter By:</strong>
+            </div>
+            <div class="form-row">
+
+                <!-- Date submitted filter -->
+                <div class="col-3">
+                    <div class="input-group col-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="submitDate">
+                                Date Submitted
+                            </label>
+                        </div>
+                        <select class="custom-select" name="submitDate" id="submitDate">
+                            <option value=''>--Select--</option>
+                            {% for date in dates_list%}
+                            <option data-dept="{{date.1}}" value="{{ date.0 }}"> {{ date.0 }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <select class="custom-select order-status-dropdown" id="order-status-options">
-                        <option selected>Select a status indicator</option>
-                        <option value="Submitted">Submitted</option>
-                        <option value="Scheduled">Scheduled for</option>
-                        <option value="Billed">Billed</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                </div> -->
-                <!-- End of Order Status Filter Dropdown -->
+                </div>
+
+                <!-- Submitted by filter -->
+                <div class="col-3">
+                    <div class="input-group col-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="submitter">
+                                Submitted By
+                            </label>
+                        </div>
+                        <select class="custom-select" name="submitter" id="submitter">
+                            <option value=''>--Select--</option>
+                            {% for people in people_list %}
+                            <option data-dept="{{people.1}}" value="{{ people.0 }}">{{ people.0 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Status filter -->
+                <div class="col-3">
+                    <div class="input-group col-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="orderStatus">
+                                Status
+                            </label>
+                        </div>
+                        <select class="custom-select" name="orderStatus" id="orderStatus">
+                            <option value=''>--Select--</option>
+                            {% for status in status_list %}
+                            <option data-dept='{{status.1}}' value="{{ status.0 }}">{{ status.0 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button id='clearfilters' class='btn btn-primary'>Clear Filters</button>
+                <br>
+            </div>
+            <!-- End of Order Status Filter Dropdown -->
             <!-- </div> -->
             <!-- End of Filter/Search -->
 
@@ -88,7 +131,7 @@
                             <th scope="col" class="wismo-order-details">Order Details</th>
                             <th scope="col">Chartfield Billed</th>
                             <th scope="col">Status
-                                 <!-- <i class="fas fa-question-circle btn-link"
+                                <!-- <i class="fas fa-question-circle btn-link"
                                     aria-label="More Information icon" data-toggle="modal"
                                     data-target="#statusIndicatorModal"></i> -->
                             </th>
@@ -102,22 +145,25 @@
 
                         {% for order in order_list %}
                         <!-- First table row -->
-                        <tr data-dept="{{order.dept}}" data-order="{{order.id}}" data-reference="{{order.order_reference}}">
+                        <tr data-dept="{{order.deptid}}" data-order="{{order.id}}"
+                            data-reference="{{order.order_reference}}" submitter="{{ order.created_by }}"
+                            submitDate='{{ order.create_date|date:"m/d/Y" }}' orderStatus='{{order.srs_status}}'>
                             <th scope="row">{{order.order_reference}}
                                 {% if request.session.exit_users_pk or perms.oscauth.can_impersonate %}
-                                <a href="/orders/integration/{{order.id}}"><i class="fas fa-info-circle"></i></a></th>
+                                <a href="/orders/integration/{{order.id}}"><i class="fas fa-info-circle"></i></a>
+                            </th>
                             {% endif %}
-                            <td>{{ order.create_date|date:"m/d/y" }}</td>
+                            <td>{{ order.create_date|date:"m/d/Y" }}</td>
                             <td>{{ order.created_by }}</td>
                             <td>
                                 {% for item in order.items %}
-                                <p
-                                    style='font-family: Roboto; font-size: 1rem; margin-bottom: 0rem;'>{{ item.description }}</p>
+                                <p style='font-family: Roboto; font-size: 1rem; margin-bottom: 0rem;'>
+                                    {{ item.description }}</p>
                                 {% endfor %}
                                 <a href="/orders/detail/{{ order.id }}">Order details</a>
                             </td>
                             <td>{{ order.chartcom.name }} ({{order.chartcom.account_number}})</td>
-                            <td>{{order.status}}</td>
+                            <td>{{order.srs_status}}</td>
                             <td class="action">
                                 <!-- <a class="delete" href="#">Cancel</a> -->
                                 <a class="cancel" href="#" data-toggle="modal" data-target="#cancelOrderModal"
@@ -214,7 +260,8 @@
                             </div>
                             <div class="modal-footer">
                                 <!-- cancel Form button -->
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Keep Order</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Keep
+                                    Order</button>
                                 <!-- Submit Form button -->
 
                                 <label for="submitBtn" hidden>Cancel Order</label>
@@ -238,7 +285,7 @@
     $(document).ready(function () {
         $('[data-toggle="popover"]').popover();
 
-        $('[data-dept]').hide();
+        $('[data-dept]').hide(); //hides all elements with data-dept attribute
         $("[data-dept='" + $('#selectDept').val() + "']").show();
 
         dept = $("#selectDept option:selected").text();
@@ -265,7 +312,6 @@
             $("#statusTable tr:visible").filter(function () {
                 $(this).toggle($(this).text().toLowerCase().indexOf(status) > -1)
             });
-            console.log(status);
         });
 
         $('#selectDept').on('change', function () {
@@ -276,6 +322,11 @@
                 $("[data-dept='" + this.value + "']").show();
                 dept = $("#selectDept option:selected").text();
                 $('#deptHeading').text(dept);
+
+                //reset filters
+                $('#submitDate').val('').change()
+                $('#submitter').val('').change()
+                $('#orderStatus').val('').change()
             }
         });
 
@@ -286,6 +337,55 @@
             });
         });
 
+        //Filters
+
+        $('#clearfilters').click(function () {
+            $('#submitDate').val('').change()
+            $('#submitter').val('').change()
+            $('#orderStatus').val('').change()
+        })
+
+        $('#submitDate, #submitter, #orderStatus').on('change', function () {
+            $("[data-dept='" + $('#selectDept option:selected').val() + "']").show();
+            //default all are blank
+            if (($('#submitDate').val() == '') && ($('#submitter').val() == '') && ($('#orderStatus').val() == '')) {
+                console.log('default view')
+            }
+            //only submitter has value
+            else if (($('#submitDate').val() == '') && ($('#submitter').val() != '') && ($('#orderStatus').val() == '')) {
+                $('tbody tr').not('[submitter="' + $('#submitter').val() + '"]').hide()
+            }
+            //only submitDate has value
+            else if (($('#submitDate').val() != '') && ($('#submitter').val() == '') && ($('#orderStatus').val() == '')) {
+                $('tbody tr').not('[submitDate="' + $('#submitDate').val() + '"]').hide()
+            }
+            //only orderStatus has value
+            else if (($('#submitDate').val() == '') && ($('#submitter').val() == '') && ($('#orderStatus').val() != '')) {
+                $('tbody tr').not('[orderStatus="' + $('#orderStatus').val() + '"]').hide()
+            }
+            //only submitter is blank, hide all that don't match the other 2
+            else if (($('#submitDate').val() != '') && ($('#submitter').val() == '') && ($('#orderStatus').val() != '')) {
+                $('tbody tr').not('[submitDate="' + $('#submitDate').val() + '"]').hide()
+                $('tbody tr').not('[orderStatus="' + $('#orderStatus').val() + '"]').hide()
+            }
+            //only submitDate is blank
+            else if (($('#submitDate').val() == '') && ($('#submitter').val() != '') && ($('#orderStatus').val() != '')) {
+                $('tbody tr').not('[orderStatus="' + $('#orderStatus').val() + '"]').hide()
+                $('tbody tr').not('[submitter="' + $('#submitter').val() + '"]').hide()
+            }
+            //only orderStatus is blank
+            else if (($('#submitDate').val() != '') && ($('#submitter').val() != '') && ($('#orderStatus').val() == '')) {
+                $('tbody tr').not('[submitter="' + $('#submitter').val() + '"]').hide()
+                $('tbody tr').not('[submitDate="' + $('#submitDate').val() + '"]').hide()
+            }
+            //if all are filled
+            else {
+                $('tbody tr').not('[submitter="' + $('#submitter').val() + '"]').hide()
+                $('tbody tr').not('[submitDate="' + $('#submitDate').val() + '"]').hide()
+                $('tbody tr').not('[orderStatus="' + $('#orderStatus').val() + '"]').hide()
+            };
+
+        });
     });
 
 </script>

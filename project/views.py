@@ -163,7 +163,7 @@ def get_cf_data(request):
 	cf_data = list(UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values())
 
 	if not cf_data:
-		cf_data = {'fund': 'wtf'}
+		cf_data = {'fund': 'missing'}
 	return JsonResponse(cf_data, safe=False)
 
 

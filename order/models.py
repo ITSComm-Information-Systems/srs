@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.db import connections
 from django.template.loader import render_to_string
 from ast import literal_eval
-import json, io, os
+import json, io, os, requests
 import cx_Oracle
 from oscauth.utils import get_mc_user, get_mc_group
 
@@ -321,6 +321,7 @@ class StorageInstance(models.Model):
     ad_group = models.CharField(max_length=100, null=True, blank=True)
     deptid = models.CharField(max_length=6, null=True, blank=True)
     size = models.PositiveIntegerField()
+    autogrow = models.BooleanField(default=False)
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     flux = models.BooleanField(default=False)
     rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)
@@ -580,7 +581,7 @@ class Item(models.Model):
         action = Action.objects.get(id=action_id)
 
         o = Order()
-        o.order_reference = 'ServiceNow'
+        o.order_reference = action.destination
         o.chartcom = self.chartcom
         o.service = action.service
         o.created_by = self.created_by
@@ -591,16 +592,52 @@ class Item(models.Model):
         text = self.data['reviewSummary']
         note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
 
-        body = ( 'schema:SN_Incident\n'
-                 'service_provider:ITS\n'
-                 'business_service:MiStorage\n'
-                 'assignment_group:ITS Storage\n'
-                 'category:Catalog Order\n'
-                 'state:New\n'
-                 'owner_group:ITS Service Center\n'
-                 f'description:{note}\n' )
+        if action.destination == 'TDX':
+            client_id = settings.UM_API['CLIENT_ID']
+            auth_token = settings.UM_API['AUTH_TOKEN']
+            base_url = settings.UM_API['BASE_URL']
 
-        send_mail(self.description, body, self.created_by.email, [settings.SERVICENOW_EMAIL])
+            headers = { 
+                'Authorization': f'Basic {auth_token}',
+                'accept': 'application/json'
+                }
+
+            url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
+            response = requests.post(url, headers=headers)
+            response_token = json.loads(response.text)
+            access_token = response_token.get('access_token')
+
+            headers = {
+                'X-IBM-Client-Id': client_id,
+                'Authorization': 'Bearer ' + access_token,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json' 
+                }
+            payload = {
+                "TypeID": 57,
+                "Title": self.description,
+                "Description": f'{note}\n',
+                "ResponsibleGroupID": 104,
+                "ServiceID": 215,
+                "FormID": 20,
+                "Classification": 46,
+                "RequestorEmail": self.created_by.email,
+                }
+            data_string = json.dumps(payload)
+            response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
+            #print(response.text)
+        else:
+            body = ( 'schema:SN_Incident\n'
+                    'service_provider:ITS\n'
+                    'business_service:MiStorage\n'
+                    'assignment_group:ITS Storage\n'
+                    'category:Catalog Order\n'
+                    'state:New\n'
+                    'owner_group:ITS Service Center\n'
+                    f'description:{note}\n' )
+
+            send_mail(self.description, body, self.created_by.email, [settings.SERVICENOW_EMAIL])
+
         self.update_mistorage()
 
     def update_mistorage(self):
