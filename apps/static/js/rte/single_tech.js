@@ -64,8 +64,8 @@ function validate_search() {
 
 // Transition from tech ID select to work order select
 function techid_to_wo() {
-    $('.tech_id').html($('#tech_id').text());
-    $('.tech_name').html($('#tech_name').text());
+    $('.tech_id').html($('#tech_id').val());
+    $('.tech_name').html($('#tech_name').val());
     $('.assigned_group').html($('#agSelect').val());
 }
 
