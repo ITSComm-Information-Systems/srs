@@ -3,7 +3,8 @@
 
     {% for field in tab.form %}
 
-    {% if field.name == 'nodeName' %}
+
+    {% if field.name == 'nodeNames' %}
         <div id="host_list" class="form-group">
             <label for="hosts">
                 <strong>{{ field.label }}</strong>
@@ -12,20 +13,33 @@
             <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
 
             <div class="form-inline" id="host_new" style="display: none;">
-                <input class="form-control form-inline" name="nodeName" type="text" value="{{ host.name }}" aria-describedy="hostsText">
-                <input type="time">
+                <input class="form-control form-inline nodeName" name="nodeNames" type="text" value="{{ host.name }}" aria-describedy="hostsText">
+                <select name="backupTime" id="backupTime" class="form-control">
+                    {% for opt in tab.form.time_list %}
+                        <option value="{{opt}}">{{opt}}</option>
+                    {% endfor %}
+                </select>
                 &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>
             </div>
 
-            {% for host in tab.form.host_list %}
+            {% for node in tab.form.node_list %}
             <div class="form-inline" id="host_{{ host.id }}">
-                <input class="form-control form-inline" name="nodeName" type="text" value="{{ host.name }}" aria-describedy="hostsText">
-                <input type="time">
+                <input class="form-control form-inline" name="nodeNames" type="text" value="{{ node.name }}" aria-describedy="hostsText">
+                <select name="backupTime" class="form-control">
+                    {% for opt in tab.form.time_list %}
+                        {% if opt == node.time %}
+                            <option selected value="{{opt}}">{{opt}}</option>
+                        {% else %}
+                            <option value="{{opt}}">{{opt}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
                 &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>
             </div>
             {% endfor %}
         </div>
         <a href="javascript:addHost()" class="d-block"><i class="fas fa-plus-circle"></i> Add another node</a><hr>
+    {% elif field.name == 'backupTime' %}
     {% else %}
         {% include field.field.template_name %}
     {% endif %}
