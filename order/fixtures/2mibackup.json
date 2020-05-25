@@ -1,0 +1,1 @@
+[{"model": "order.action", "pk": 51, "fields": {"name": "addBackup", "label": "Subscribe to Backup", "display_seq_no": 10, "cart_label": "Subscribe to Backup", "use_cart": false, "use_ajax": true, "type": "A", "description": "", "active": true, "service": 8, "route": "P", "destination": "", "charge_types": [1], "steps": [67, 47, 60]}}]

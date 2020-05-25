@@ -43,7 +43,11 @@
 		<nav class="navbar navbar-expand-lg" id="aux-nav" aria-label="Auxiliary Navigation">
 			<div class="container">
 				<div class="navbar-brand">
-					<a class="logo" href="/">Online Service Center</a>
+					{% if debug %}
+						<pre>{{ connections }}</pre>
+					{% else %}
+						<a class="logo" href="/">Service Request System</a>
+					{% endif %}
 				</div>
 				<button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target=".navbars" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<i class="fas fa-bars text-light"></i>

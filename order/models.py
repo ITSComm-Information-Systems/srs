@@ -51,6 +51,7 @@ class Step(Configuration):
         ('AccessCIFSForm', 'CIFS Access'),
         ('AccessNFSForm', 'NFS Access'),
         ('BillingStorageForm', 'Billing'),
+        ('BackupDetailsForm', 'Backup Details'),
         ('VolumeSelectionForm', 'Volume Selection'),
     )
 
