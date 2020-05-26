@@ -649,7 +649,11 @@ def userid(request):
         local = user.local_charged
 
         deptid=UmOscServiceProfileV.objects.get(service_number=user.dn).deptid
-        manager = AuthUserDept.objects.get(dept=deptid, group = 3).user.username
+        uniqname = AuthUserDept.objects.get(dept=deptid, group = 3).user.username
+        firstname=AuthUserDept.objects.get(dept=deptid, group = 3).user.first_name
+        lastname=AuthUserDept.objects.get(dept=deptid, group = 3).user.last_name
+
+        manager= lastname+', '+firstname+" ("+uniqname+")"
 
         data = {'Id' : Id, 'manager':manager, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
         rows.append(data)
