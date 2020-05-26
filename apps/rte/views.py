@@ -87,8 +87,14 @@ def single_tech(request):
         return HttpResponse(template.render(context, request))
 
 # Review single tech times
-def single_review():
-    pass
+def single_submit(request, tech):
+    template = loader.get_template('rte/submitted.html')
+
+    context = {
+        'test': 'test'
+    }
+
+    return HttpResponse(template.render(context, request))
 
 
 # Multiple technicians, single order

@@ -32,7 +32,8 @@ function next(num_tabs) {
 
     // Disable if on last tab
     if (!(current_tab < num_tabs)) {
-    	$('#nextBtn').addClass('disabled');
+    	$('#nextBtn').html('Submit');
+    	//$('#nextBtn').addClass('disabled');
 	}
 }
 
@@ -55,6 +56,7 @@ function prev() {
 	$('#pills-step' + current_tab).addClass('active');
 	$('#step' + current_tab).removeClass('fade');
     $('#step' + current_tab).addClass('active');
+    $('#nextBtn').html('Next');
 
 	// Disable if on first tab
 	if (current_tab == 1) {
