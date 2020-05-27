@@ -7,6 +7,8 @@ $(document).ready(function() {
     $('#step1').removeClass('fade');
     $('#step1').addClass('active');
     current_tab = 1;
+
+    $('#submitBtn').hide();
 })
 
 function next(num_tabs) {
@@ -30,10 +32,10 @@ function next(num_tabs) {
     $('#step' + current_tab).removeClass('fade');
     $('#step' + current_tab).addClass('active');
 
-    // Disable if on last tab
+    // Make submit if on last tab
     if (!(current_tab < num_tabs)) {
-    	$('#nextBtn').html('Submit');
-    	//$('#nextBtn').addClass('disabled');
+    	$('#nextBtn').hide();
+    	$('#submitBtn').show();
 	}
 }
 
@@ -56,7 +58,8 @@ function prev() {
 	$('#pills-step' + current_tab).addClass('active');
 	$('#step' + current_tab).removeClass('fade');
     $('#step' + current_tab).addClass('active');
-    $('#nextBtn').html('Next');
+    $('#nextBtn').show();
+    $('#submitBtn').hide();
 
 	// Disable if on first tab
 	if (current_tab == 1) {

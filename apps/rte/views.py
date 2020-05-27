@@ -53,7 +53,6 @@ def single_tech(request):
     if request.method == 'POST':
 
         tech_id = request.POST.get('techSearch')
-        print('tech id: {}'.format(tech_id))
 
         tech_name = UmRteTechnicianV.objects.get(labor_code=tech_id)
 
@@ -87,11 +86,30 @@ def single_tech(request):
         return HttpResponse(template.render(context, request))
 
 # Review single tech times
-def single_submit(request, tech):
+def single_submit(request):
     template = loader.get_template('rte/submitted.html')
 
+    entries = []
+    if request.method == 'POST':
+        num_entries = request.POST.get('num_entries')
+        tech_id = request.POST.get('tech_id')
+        assigned_group = request.POST.get('assigned_group')
+
+        for i in range(1, int(num_entries) + 1):
+            entry = {
+                'tech_id': tech_id,
+                'work_order': request.POST.get(str(i) + '_work_order'),
+                'rate_level': request.POST.get(str(i) + '_rate'),
+                'assigned_group': assigned_group,
+                'assigned_date': request.POST.get(str(i) + '_assigned_date'),
+                'duration': request.POST.get(str(i) + '_duration'),
+                'notes': request.POST.get(str(i) + '_notes')
+            }
+            entries.append(entry)
+
     context = {
-        'test': 'test'
+        'title': 'Rapid Time Entry Submit',
+        'entries': entries
     }
 
     return HttpResponse(template.render(context, request))
