@@ -70,10 +70,20 @@
 				<th scope="col">Assigned Date</th>
 				<th scope="col">Duration</th>
 				<th scope="col">Notes</th>
+				<th scope="col"></th>
 			</tr>
 		</thead>
 		<tbody>
 		</tbody>
 	</table>
 </div>
+
+<div class='alert alert-danger hidden col-8' id='max-entries'>
+	You may only submit 10 time entries at a time. Please submit additional entries to report time for more than 10 work order instances.
+</div>
+
+<form action='submitted/' method='POST' id='single-input-form' hidden>{% csrf_token %}
+	<input type='text' name='tech_id' class='tech_id' hidden>
+	<input type='text' name='assigned_group' class='assigned_group' hidden>
+</form>
 
