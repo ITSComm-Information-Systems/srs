@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<h1>{{ title }}</h1>
+	
+	<p><strong>Are you entering time for:</strong></p>
+	
+	<div class='row'>
+		<div class='col-6'>
+			<div class="alert alert-secondary" role="alert">
+				<strong><a href='single-tech/'>Single Technician, Multiple Work Orders</a></strong>
+			</div>
+
+			<div class="alert alert-secondary" role="alert">
+				<strong><a href='multiple-tech/'>Multiple Technicians, Single Work Order</a></strong>
+			</div>
+
+			<div class="alert alert-secondary" role="alert">
+				<strong><a href='update/'>View/Update Time</a></strong>
+			</div>
+		</div>
+		<div class='col-4'>
+			<div class='alert alert-primary' role='alert'>
+				<p>Note: You can only modify entered time, you cannot delete billed time.</p>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
