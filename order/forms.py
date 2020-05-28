@@ -7,9 +7,9 @@ from project.pinnmodels import UmOSCBuildingV
 
 from project.forms.fields import *
 
-def get_storage_options(type):
+def get_storage_options(service, type):
     opt_list = []
-    for opt in StorageRate.objects.filter(type=type):
+    for opt in StorageRate.objects.filter(type=type, service_id=service):
         label = f'{opt.label} ({opt.rate} / per GB)'
         opt_list.append((opt.id, label))
 
@@ -61,12 +61,17 @@ class TabForm(forms.Form):
 
         return summary
 
-    def __init__(self, tab, *args, **kwargs):
+    def __init__(self, tab, action, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         super(TabForm, self).__init__(*args, **kwargs)
 
+        self.action = action
+
         self.tab_name = tab.name
-        element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
+
+        exclude_list = self.action.get_hidden_fields()
+
+        element_list = Element.objects.all().filter(step_id = tab.id).exclude(name__in=exclude_list).order_by('display_seq_no')
 
         for element in element_list:  # Bind fields based on setup data in Admin Module
 
@@ -233,16 +238,16 @@ class VolumeSelectionForm(TabForm):
 
         if not self.is_bound:
             groups = list(StorageMember.objects.filter(username=self.request.user).values_list('storage_owner_id'))
-            if self.request.path == '/orders/wf/47':
-                #self.volume_list = StorageMember.objects.filter(username=self.request.user, storage_instance__type='NFS').distinct('storage_instance__name').order_by('storage_instance__name')
-                self.volume_list = StorageInstance.objects.filter(type='NFS',owner__in=groups).order_by('name')
+            action_id = int(self.request.path[11:])
+            service = Action.objects.get(id=action_id).service
+            print('service', service)
 
-            elif self.request.path == '/orders/wf/49':
-                #self.volume_list = StorageMember.objects.filter(username=self.request.user, storage_instance__type='CIFS').distinct('storage_instance__name').order_by('storage_instance__name')
-                self.volume_list = StorageInstance.objects.filter(type='CIFS',owner__in=groups).order_by('name')
+            if action_id == 47 or action_id == 53 or action_id == 59:
+                self.volume_list = StorageInstance.objects.filter(service=service, type='NFS', owner__in=groups).order_by('name')
+            elif action_id == 49 or action_id == 55 or action_id == 60:
+                self.volume_list = StorageInstance.objects.filter(service=service, type='CIFS', owner__in=groups).order_by('name')
             else:
-                #self.volume_list = StorageMember.objects.filter(username=self.request.user).distinct('storage_instance__name').order_by('storage_instance__name')
-                self.volume_list = StorageInstance.objects.filter(owner__in=groups).order_by('name')
+                self.volume_list = StorageInstance.objects.filter(service=service, owner__in=groups).order_by('name')
                 
                 for vol in self.volume_list:
                     self.total_cost = self.total_cost + vol.total_cost
