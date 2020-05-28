@@ -51,6 +51,7 @@ class Step(Configuration):
         ('AccessCIFSForm', 'CIFS Access'),
         ('AccessNFSForm', 'NFS Access'),
         ('BillingStorageForm', 'Billing'),
+        ('BackupDetailsForm', 'Backup Details'),
         ('VolumeSelectionForm', 'Volume Selection'),
     )
 
@@ -173,6 +174,7 @@ class Action(Configuration):
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     charge_types = models.ManyToManyField(ChargeType)
     steps = models.ManyToManyField(Step)
+    override = JSONField(null=True, blank=True)
     route = models.CharField(max_length=1, choices=ROUTE_CHOICES, default='P')
     destination = models.CharField(max_length=40, blank=True)
 
@@ -184,6 +186,12 @@ class Action(Configuration):
         tab_list = list(Step.objects.filter(action=self.id).order_by('display_seq_no').values('name'))
 
         return tab_list
+
+    def get_hidden_fields(self):
+        try:
+            return self.override['hide']
+        except:
+            return []
 
 
 class Constant(models.Model):
@@ -286,6 +294,7 @@ class StorageRate(Configuration):
         ('CIFS', 'CIFS'),
     )
 
+    service = models.ForeignKey(Service, on_delete=models.PROTECT)
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     rate = models.DecimalField(max_digits=8, decimal_places=6)
 
@@ -314,7 +323,8 @@ class StorageInstance(models.Model):
 
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(StorageOwner, on_delete=models.CASCADE, null=True)
-    owner_name = models.CharField(max_length=100)
+    owner_name = models.CharField(max_length=100) # TODO Remove
+    service = models.ForeignKey(Service, on_delete=models.PROTECT)
     shortcode = models.CharField(max_length=100)
     uid = models.PositiveIntegerField(null=True)
     ad_group = models.CharField(max_length=100, null=True, blank=True)
@@ -622,20 +632,17 @@ class Item(models.Model):
                 "Classification": 46,
                 "RequestorEmail": self.created_by.email,
                 }
+
+            cons = Constant.objects.filter(action=action_id)
+            for con in cons:  # Populate issue with constants
+                print('con', con)
+                #issue[con.field] = con.value
+
             data_string = json.dumps(payload)
             response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
             #print(response.text)
         else:
-            body = ( 'schema:SN_Incident\n'
-                    'service_provider:ITS\n'
-                    'business_service:MiStorage\n'
-                    'assignment_group:ITS Storage\n'
-                    'category:Catalog Order\n'
-                    'state:New\n'
-                    'owner_group:ITS Service Center\n'
-                    f'description:{note}\n' )
-
-            send_mail(self.description, body, self.created_by.email, [settings.SERVICENOW_EMAIL])
+            print('Destination not found')
 
         self.update_mistorage()
 
@@ -647,6 +654,7 @@ class Item(models.Model):
             si = StorageInstance.objects.get(id=instance_id)
         else:
             si = StorageInstance()
+            si.service = Action.objects.get(id=self.data.get('action_id')).service
 
         if self.data.get('volaction') == 'Delete':
             si.delete()
