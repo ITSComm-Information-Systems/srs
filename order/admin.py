@@ -19,12 +19,30 @@ class ActionAdmin(admin.ModelAdmin):
     ordering = ('display_seq_no',)
     fields = ('name',('label','use_cart','cart_label'), ('display_seq_no','active','use_ajax'),('service','type'), 'description', ('steps','charge_types'), ('route','destination'))
 
+    def save_model(self, request, obj, form, change):
+        tab_list = Step.objects.filter(action=obj)
+        show_fields = request.POST.getlist('show_field')
+        unchecked_fields = list(Element.objects.filter(step__in=tab_list).exclude(name__in=show_fields).values_list('name', flat=True))
+
+        if obj.override:
+            obj.override['hide'] = unchecked_fields
+        else:
+            obj.override = {"hide": unchecked_fields}
+
+        super().save_model(request, obj, form, change)
+
     def change_view(self, request, object_id, form_url='', extra_context=None):
         step_list = Step.objects.all().filter(action = object_id).order_by('display_seq_no')
         consts = Constant.objects.filter(action = object_id)
+        action = Action.objects.get(id=object_id)
+        hidden_fields = action.get_hidden_fields()
 
         for step in step_list:
             step.element_list = Element.objects.all().filter(step_id = step.id).order_by('display_seq_no')
+
+            for element in step.element_list:
+                if element.name not in hidden_fields:
+                    element.checked = True
             
         extra_context = {
             'step_list': step_list,
@@ -89,7 +107,7 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 class StorageInstanceAdmin(admin.ModelAdmin):
     ordering = ('name',)
     search_fields = ['name','owner__name']
-    list_filter = ('type',)
+    list_filter = ('type','service')
 
     def get_urls(self):
         urls = super().get_urls()
@@ -147,10 +165,10 @@ class StorageInstanceAdmin(admin.ModelAdmin):
         )
 
 
-
 class StorageRateAdmin(admin.ModelAdmin):
-    list_display = ['display_seq_no','name','label','type','rate']
-    ordering = ('display_seq_no',)
+    list_display = ['display_seq_no','name','label','type','rate','service']
+    ordering = ('service','display_seq_no',)
+    list_filter = ('service',)
 
 
 admin.site.register(Constant)
