@@ -1,0 +1,60 @@
+<div class='card border-dark col-9 pb-0'>
+	<div class='card-body'>
+		<p class='d-inline mr-4'><strong>Tech ID:</strong>&nbsp;<span class='tech_id'></span></p>
+		<p class='d-inline mr-4'><strong>Tech Name:</strong>&nbsp;<span class='tech_name'></span></p>
+		<p class='d-inline'><strong>Assigned Group:</strong>&nbsp;<span class='assigned_group'></span></p>
+	</div>
+</div>
+
+<h3>Enter time</h3>
+
+<div class='row'>
+	<div class="form-group col-2" id="searchWorkOrder">
+		<label for="workOrderSearch" id="labelWorkOrderSearch">
+	        <strong>Work Order</strong>
+	    </label>
+	    <input name='workOrderSearch' id="workOrderSearch" class="form-control" type="text" aria-describedby="workOrderSearchBlock"
+	        placeholder="Search..">
+		<table id="workOrderTable" class="table table-hover" aria-live=”polite”>
+	        {% for wo in all_wos %}
+	            <tr tabindex="0"  id="{{ wo.full_prord_wo_number }}" role="button" aria-label="Select work order 
+	                {{ wo.full_prord_wo_number }}">
+	                <td>{{ wo.full_prord_wo_number }}</td>
+	            </tr>
+	        {% endfor %}
+		</table>
+	</div>
+
+	<div class="form-group col-2" id="selectRateLevel">
+		<label for="rateSelect" id="labelRateSelect">
+		    <strong>Rate Level </strong>
+		</label>
+		<select class='custom-select' id='rateSelect'>
+			{% for rate in rate_levels %}
+				<option>{{ rate.labor_rate_level_name }}</option>
+			{% endfor %}
+		</select>
+	</div>
+
+	<div class='form-group col-2'>
+		<label for="assigned_date"><strong>Assigned Date</strong></label>
+	    <input type="date" class="form-control" id="assigned_date" name='assigned_date'>
+	</div>	
+
+	<div class='form-group col-2'>
+		<label for="duration"><strong>Duration</strong></label>
+		<div class='form-inline' id='duration'>
+			<input class='form-control col-6' type="text" name="duration-hours" id="duration-hours" placeholder='HH'>
+			<input class='form-control col-6' type="text" name="duration-mins" id="duration-mins" placeholder='MM'>
+		</div>
+	</div>
+
+	<div class='form-group col-3'>
+		<label for="notes"><strong>Notes</strong></label>
+		<div class='form-inline'>
+		    <input type="text" class="form-control" id="notes" name='notes'>
+		    <button class='btn btn-primary'>Add</button>
+		</div>
+	</div>
+</div>
+
