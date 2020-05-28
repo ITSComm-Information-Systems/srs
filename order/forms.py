@@ -406,6 +406,9 @@ class BackupDetailsForm(TabForm):
                 for count, node in enumerate(nodes):
                     if node:
                         self.node_list.append({'name': node, 'time': times[count]})
+        else:
+            self.node_list = []
+            self.node_list.append({'name': '', 'time': ''})
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
@@ -436,6 +439,8 @@ class BillingStorageForm(TabForm):
         if self.request:
             if self.request.method == 'POST':
                 if self.request.POST['action_id'] == '51':
+                    tc = self.fields['totalCost'].description.replace('~', '564 / TB / Yr.')
+                    self.fields['totalCost'].description = tc
                     return
 
                 instance_id = self.request.POST.get('instance_id')

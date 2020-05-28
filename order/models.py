@@ -644,6 +644,9 @@ class Item(models.Model):
         else:
             print('Destination not found')
 
+        if action.service_id == 8:  # No update for MiBackup
+            return 
+
         self.update_mistorage()
 
     def update_mistorage(self):
