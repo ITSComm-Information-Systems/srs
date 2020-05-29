@@ -574,7 +574,10 @@ function addHost() {
   rec.attr("id", "host_new_" + host_count);
   rec.show();
   $("#host_list").append(rec);   // TODO Find last host
+
   $("#host_new").hide()
+
+  $(".nodeName").focus(); 
 }
 
 function modifyVolume(del_flag, volumeID) {

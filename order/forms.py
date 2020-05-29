@@ -7,9 +7,9 @@ from project.pinnmodels import UmOSCBuildingV
 
 from project.forms.fields import *
 
-def get_storage_options(type):
+def get_storage_options(service, type):
     opt_list = []
-    for opt in StorageRate.objects.filter(type=type):
+    for opt in StorageRate.objects.filter(type=type, service_id=service):
         label = f'{opt.label} ({opt.rate} / per GB)'
         opt_list.append((opt.id, label))
 
@@ -57,23 +57,21 @@ class TabForm(forms.Form):
                     else:
                         value = 'No'
 
-                
                 summary.append({'label': label, 'value': value})
 
         return summary
 
-    #def is_valid(self):
-    #    valid = super(TabForm, self).is_valid()
-    #    return valid
-
-    def __init__(self, tab, *args, **kwargs):
+    def __init__(self, tab, action, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         super(TabForm, self).__init__(*args, **kwargs)
-    #def __init__(self, tab, *args, **kwargs):
-    #    super(TabForm, self, *args, **kwargs).__init__()
+
+        self.action = action
 
         self.tab_name = tab.name
-        element_list = Element.objects.all().filter(step_id = tab.id).order_by('display_seq_no')
+
+        exclude_list = self.action.get_hidden_fields()
+
+        element_list = Element.objects.all().filter(step_id = tab.id).exclude(name__in=exclude_list).order_by('display_seq_no')
 
         for element in element_list:  # Bind fields based on setup data in Admin Module
 
@@ -88,7 +86,8 @@ class TabForm(forms.Form):
                 field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
             elif element.type == 'NU':
                 field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1", 'class': 'form-control'}))
-                field.template_name = 'project/text.html'
+                field.initial = element.attributes
+                field.template_name = 'project/number.html'
             elif element.type == 'ST':
                 field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
                 field.template_name = 'project/text.html'
@@ -109,7 +108,7 @@ class TabForm(forms.Form):
                 #field = forms.IntegerField(label=element.label, help_text=element.description)
 
             field.name = element.name
-            field.current_user = self.request.user
+            #field.current_user = self.request.user
             field.label = element.label
             field.help_text = element.help_text
             field.description = element.description
@@ -239,16 +238,16 @@ class VolumeSelectionForm(TabForm):
 
         if not self.is_bound:
             groups = list(StorageMember.objects.filter(username=self.request.user).values_list('storage_owner_id'))
-            if self.request.path == '/orders/wf/47':
-                #self.volume_list = StorageMember.objects.filter(username=self.request.user, storage_instance__type='NFS').distinct('storage_instance__name').order_by('storage_instance__name')
-                self.volume_list = StorageInstance.objects.filter(type='NFS',owner__in=groups).order_by('name')
+            action_id = int(self.request.path[11:])
+            service = Action.objects.get(id=action_id).service
+            print('service', service)
 
-            elif self.request.path == '/orders/wf/49':
-                #self.volume_list = StorageMember.objects.filter(username=self.request.user, storage_instance__type='CIFS').distinct('storage_instance__name').order_by('storage_instance__name')
-                self.volume_list = StorageInstance.objects.filter(type='CIFS',owner__in=groups).order_by('name')
+            if action_id == 47 or action_id == 53 or action_id == 59:
+                self.volume_list = StorageInstance.objects.filter(service=service, type='NFS', owner__in=groups).order_by('name')
+            elif action_id == 49 or action_id == 55 or action_id == 60:
+                self.volume_list = StorageInstance.objects.filter(service=service, type='CIFS', owner__in=groups).order_by('name')
             else:
-                #self.volume_list = StorageMember.objects.filter(username=self.request.user).distinct('storage_instance__name').order_by('storage_instance__name')
-                self.volume_list = StorageInstance.objects.filter(owner__in=groups).order_by('name')
+                self.volume_list = StorageInstance.objects.filter(service=service, owner__in=groups).order_by('name')
                 
                 for vol in self.volume_list:
                     self.total_cost = self.total_cost + vol.total_cost
@@ -294,27 +293,27 @@ class AccessNFSForm(TabForm):
                 if len(summary) > 2:
                     summary[2]['label'] = '*' + summary[2]['label']
 
-
         return summary
 
     def __init__(self, *args, **kwargs):
         super(AccessNFSForm, self).__init__(*args, **kwargs)
         self['permittedHosts'].field.required = False
 
-        if self.request:
-            if self.request.method == 'POST':
+        if self.request.method == 'POST': # Skip for initial load on Add
+            if self.is_bound:   # Reload Host list
+                self.host_list = []
+                hosts = self.data.getlist('permittedHosts')
+                for host in hosts:
+                    if host:
+                        self.host_list.append({'name': host})
+
+            else:  # Load instance data if it exists.
                 instance_id = self.request.POST.get('instance_id')
-                if instance_id:
+                if instance_id: # 
                     si = StorageInstance.objects.get(id=instance_id)
                     self.fields["volumeAdmin"].initial = si.uid
                     self.fields["owner"].initial = si.owner
                     self.host_list = StorageHost.objects.filter(storage_instance_id=instance_id)
-        else:
-            self.host_list = []
-            hosts = self.data.getlist('permittedHosts')
-            for host in hosts:
-                if host:
-                    self.host_list.append({'name': host})
 
 
 class DetailsNFSForm(TabForm):
@@ -327,7 +326,7 @@ class DetailsNFSForm(TabForm):
             si = StorageInstance.objects.get(id=instance_id)
             if summary[0]['value'] != si.name:
                 summary[0]['label'] = '*' + summary[0]['label']
-            if self.data['selectOptionType'] != str(si.rate_id):
+            if self.data.get('selectOptionType') != str(si.rate_id):
                 summary[1]['label'] = '*' + summary[1]['label']
             if summary[2]['value'] != si.size:
                 summary[2]['label'] = '*' + summary[2]['label']
@@ -390,9 +389,46 @@ class DetailsCIFSForm(TabForm):
                     self.fields["sizeGigabyte"].initial = si.size
 
 
-#class AccessCIFSForm(TabForm):
-#    template = 'order/cifs_access.html'
+class BackupDetailsForm(TabForm):
+    template = 'order/backup_details.html'
 
+    def __init__(self, *args, **kwargs):
+        super(BackupDetailsForm, self).__init__(*args, **kwargs)
+
+        self.time_list = eval(self.fields['backupTime'].attributes)
+
+        if self.request.method == 'POST': # Skip for initial load on Add
+            if self.is_bound:   # Reload Host list
+                self.node_list = []
+                nodes = self.data.getlist('nodeNames')
+                times = self.data.getlist('backupTime')
+
+                for count, node in enumerate(nodes):
+                    if node:
+                        self.node_list.append({'name': node, 'time': times[count]})
+        else:
+            self.node_list = []
+            self.node_list.append({'name': '', 'time': ''})
+
+    def get_summary(self, *args, **kwargs):
+        summary = super().get_summary(*args, **kwargs)
+        nodes = self.data.getlist('nodeNames')
+        times = self.data.getlist('backupTime')
+        if len(nodes) > 1:
+            node_value = ''
+            times[0] = ''
+            for count, node in enumerate(nodes):
+
+                if node_value:
+                    node_value = node_value + ', ' + node + '@' + times[count]
+                else:
+                    if node:
+                        node_value = node + '@' + times[count]
+
+            summary[1]['value'] = node_value
+            summary.pop(2) # Remove backupTime field from summary
+            
+        return summary
 
 class BillingStorageForm(TabForm):
 
@@ -402,6 +438,11 @@ class BillingStorageForm(TabForm):
 
         if self.request:
             if self.request.method == 'POST':
+                if self.request.POST['action_id'] == '51':
+                    tc = self.fields['totalCost'].description.replace('~', '564 / TB / Yr.')
+                    self.fields['totalCost'].description = tc
+                    return
+
                 instance_id = self.request.POST.get('instance_id')
                 option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
                 total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
@@ -412,6 +453,9 @@ class BillingStorageForm(TabForm):
                     self.fields["billingAuthority"].initial = 'yes'
                     self.fields["serviceLvlAgreement"].initial = 'yes'
         else:
+            if self.data['action_id'] == '51':
+                return
+
             option = StorageRate.objects.get(id=self.data['selectOptionType'])
             total_cost = option.get_total_cost(self.data['sizeGigabyte'])
 
@@ -420,8 +464,9 @@ class BillingStorageForm(TabForm):
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
-        option = StorageRate.objects.get(id=self.data['selectOptionType'])
-        total_cost = option.get_total_cost(self.data['sizeGigabyte'])
+        #option = StorageRate.objects.get(id=self.data['selectOptionType'])
+        #total_cost = option.get_total_cost(self.data['sizeGigabyte'])
+        total_cost = '33.33'
         summary.append({'label': 'Total Cost', 'value': str(total_cost)})
 
         instance_id = self.data.get('instance_id')
