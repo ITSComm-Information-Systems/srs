@@ -76,6 +76,15 @@ def chartchange(request):
 		else:
 			user_depts = AuthUserDept.get_order_departments(request.user.id)
 
+			depts = []
+			for d in user_depts:
+				dept = {
+					'dept': d.dept,
+					'dept_name': d.dept_name,
+					'dept_mgr': UmOscDeptProfileV.objects.get(deptid=d.dept).dept_mgr
+				}
+				depts.append(dept)
+
 		# Find associated chartfields
 		if user_depts:
 			select_dept = user_depts[0].dept
@@ -121,7 +130,7 @@ def chartchange(request):
 
 	context = {
 		'title': 'Chartfield Change Request',
-		'deptids': user_depts,
+		'deptids': depts,
 		'dept_info': dept_info,
 		'selected_cf': selected_cf,
 		'cf_info': chartfield_list,
