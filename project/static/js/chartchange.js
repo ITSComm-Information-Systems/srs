@@ -383,9 +383,12 @@ $(document).ready(function() {
 					}
 					change_current_page(data[0]);
 				}
+				console.log(selected);
 				name_display = selected.split(':');
 				$('#dept_title').html('Department: ' + name_display[0]); //data[data.length - 1].name);
 				$('#dept_mgr').html(name_display[1]);
+				$('.dept_full_name').html(name_display[0]);
+				$('.dept_mgr').html(name_display[1]);
 				$('#cfc-2').addClass('disabled');
 				$('#cfc-3').addClass('disabled');
 				$('#cfc-4').addClass('disabled');
@@ -393,7 +396,7 @@ $(document).ready(function() {
 		})
 	})
 
-	// Reload data when new chartfield is selected - SHOULD I MOVE THIS TO THE ABOVE FUNCITON, CHANGE WHEN DEPT IS CHANGED?
+	// Reload data when new chartfield is selected
 	$('#cf_dropdown').on('change', function() {
 		var sel = document.getElementById("cf_dropdown");
 		var selected = sel.options[sel.selectedIndex].value;
@@ -478,6 +481,8 @@ function nextPrev(n, table, cf_change_table, review_table) {
 // Navigation bar functionality
 function tab_func1() {
 	currStep = 1;
+	record_count = 0;
+	$('#record-count').html(record_count + ' Records Selected');
  	$('#dept_search').show();
   	$('#select_dept').show();
   	$("#cfPrevBtn").attr('disabled', 'disabled');
@@ -566,8 +571,8 @@ function change_current_page(selected) {
 	if (selected.nickname) {
 		$('.cf_nickname').html('(' + selected.nickname + ')');
 	}
-	$('.dept_full_name').html('<strong>Department:&nbsp;</strong>' + dept_title);
-	$('.dept_mgr').html('<strong>Department Manager:&nbsp;</strong>' + dept_mgr);
+	// $('.dept_full_name').html('<strong>Department:&nbsp;</strong>' + dept_title);
+	// $('.dept_mgr').html('<strong>Department Manager:&nbsp;</strong>' + dept_mgr);
 	$('#cf_users_table').DataTable().ajax.reload();
 }
 
