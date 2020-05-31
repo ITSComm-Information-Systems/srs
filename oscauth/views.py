@@ -22,7 +22,7 @@ from ldap3 import Server, Connection, ALL
 from .models import AuthUserDept, Grantor, Role, Group, User
 from .forms import UserSuForm, AddUserForm
 from .utils import su_login_callback, custom_login_action, upsert_user
-from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
+from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscAcctSubscribersV,UmOscServiceProfileV
 from oscauth.forms import *
 from oscauth.utils import upsert_user, get_mc_user
 from pages.models import Page
@@ -244,12 +244,12 @@ def get_uniqname(request, uniqname_parm=''):
                 print(dept_manager)
                 #grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
                 grantor_roles = Grantor.objects.values('grantor_role').distinct()
-#                 this_grantors_roles = AuthUserDept.objects.filter(user=request.user.id).values("group").distinct()
-# # The list of roles should only include those that this particular user can grant
-# #                grantable_roles = Grantor.objects.filter(grantor_role__in=this_grantors_roles).values("granted_role_id").distinct()
+                #this_grantors_roles = AuthUserDept.objects.filter(user=request.user.id).values("group").distinct()
+                # # The list of roles should only include those that this particular user can grant
+                # #grantable_roles = Grantor.objects.filter(grantor_role__in=this_grantors_roles).values("granted_role_id").distinct()
 
-# # The list of depts should be dependent on the role selected
-# #   e.g. if proxy is selected, only those depts for which thia grantor has the dept manager role should be displayed
+                # # The list of depts should be dependent on the role selected
+                # #   e.g. if proxy is selected, only those depts for which thia grantor has the dept manager role should be displayed
                 grantor_depts = AuthUserDept.objects.filter(user=request.user.id,group__in=grantor_roles).exclude(dept='All').order_by('dept')
 
                 rows = []
@@ -260,8 +260,8 @@ def get_uniqname(request, uniqname_parm=''):
 
                 for role in grantable_roles:
                     role = role.role
-#                    role = grantable_roles.granted_role_id
-#                    role = Role.objects.get(id=granted_role_id).role
+                    #role = grantable_roles.granted_role_id
+                    #role = Role.objects.get(id=granted_role_id).role
 
                 for query_dept in grantor_depts:
                     dept = query_dept.dept
@@ -614,3 +614,55 @@ def delete_priv(osc_user, role, dept):
 
     return result
 
+def userid(request):
+    template = loader.get_template('oscauth/userid.html')
+    
+    user_param=''
+    rows = []
+    user_list=[]
+
+    if request.method=='POST':
+        user_param = request.POST.get('user_param')
+
+    if user_param == '':
+        context = {
+            'title' : 'User ID Look Up',
+            'user_list': 'blank'
+        }
+        return  HttpResponse(template.render(context, request))
+    
+    if len(user_param)==10:
+        user_list= UmOscAcctSubscribersV.objects.filter(dn=user_param)
+    else:
+        user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id=user_param)
+    extra= '' #UmCurrentDeptManagersV.objects.all()
+    
+    for user in user_list:
+        Id = user.user_defined_id
+        chartcom = user.chartcom
+        building = user.building
+        floor = user.floor
+        room = user.room
+        jack = user.jack
+        mrc = user.mrc_charged
+        toll = user.toll_charged
+        local = user.local_charged
+
+        deptid=UmOscServiceProfileV.objects.get(service_number=user.dn).deptid
+        uniqname = AuthUserDept.objects.get(dept=deptid, group = 3).user.username
+        firstname=AuthUserDept.objects.get(dept=deptid, group = 3).user.first_name
+        lastname=AuthUserDept.objects.get(dept=deptid, group = 3).user.last_name
+
+        manager= lastname+', '+firstname+" ("+uniqname+")"
+
+        data = {'Id' : Id, 'manager':manager, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
+        rows.append(data)
+    
+    context = {
+        'title' : 'User ID Look Up',
+        'subtitle1': 'Results for: ' + user_param ,
+        'rows': rows,
+        'user_list':user_list,
+        'extra':extra
+    }
+    return HttpResponse(template.render(context, request))
