@@ -148,14 +148,35 @@ def multiple_tech(request):
     }
     tab_list.append(tab3)
 
-    context = {
-        'wf': 'double',
-        'title': 'Multiple Technicians, Single Work Order',
-        'tab_list': tab_list,
-        'num_tabs': len(tab_list)
-    }
 
-    return HttpResponse(template.render(context, request))
+    all_wos = UmRteServiceOrderV.objects.all()
+
+    # Load after search
+    if request.method == 'POST':
+
+        selected_wo = request.POST.get('workOrderSearch')
+
+        context = {
+            'wf': 'multiple',
+            'title': 'Multiple Technicians, Single Work Order',
+            'tab_list': tab_list,
+            'num_tabs': len(tab_list),
+            'all_wos': all_wos,
+            'selected_wo': selected_wo
+        }
+
+        return HttpResponse(template.render(context, request))
+
+    # Original load
+    else:
+        context = {
+            'wf': 'multiple',
+            'title': 'Multiple Technicians, Single Work Order',
+            'tab_list': tab_list,
+            'num_tabs': len(tab_list),
+            'all_wos': all_wos
+        }
+        return HttpResponse(template.render(context, request))
 
 
 # View/modify time
