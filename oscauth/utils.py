@@ -79,3 +79,20 @@ def get_mc_user(uniqname):
     else:
         return None
 
+
+def get_mc_group(name):
+    # Get User from MCommunity.  Create them in OSC if they are not there otherwise update them.
+    server = Server(settings.MCOMMUNITY['SERVER'], use_ssl=True, get_info=ALL)
+    conn = Connection(server,
+                      user=settings.MCOMMUNITY['USERNAME'],
+                      password=settings.MCOMMUNITY['PASSWORD'],
+                      auto_bind=True)
+
+    conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member"])
+    
+    if conn.entries:
+        #print(conn.entries)
+        return conn.entries[0] 
+    else:
+        print(f'none found for {name}')
+        return None
