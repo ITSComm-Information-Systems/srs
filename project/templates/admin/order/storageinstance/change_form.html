@@ -1,0 +1,18 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+{% block after_field_sets %}
+{% if host_list %}                                                           
+<fieldset class="module aligned {{ fieldset.classes }}">
+    <h4>Allowed Hosts <a id="add_host_id" class="related-widget-wrapper-link add-related"  href="/admin/order/storagehost/add/?storage_instance={{object_id}}&amp;_popup=1" title="Add Host"><img src="/static/admin/img/icon-addlink.svg" alt="Add"></a> </h4>
+    <ul>
+        {% for host in host_list %}
+            <li>
+            <a class="related-widget-wrapper-link change-related" id="change_id_service"  title="Change Host Address" href="/admin/order/storagehost/{{ host.id }}/change/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-changelink.svg" alt="Change"></a>
+            {{ host.name }}
+            <a class="related-widget-wrapper-link change-related" id="change_id_service"  title="Delete Host Address" href="/admin/order/storagehost/{{ host.id }}/delete/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-deletelink.svg" alt="Delete"></a>
+            </li>
+        {% endfor %}
+    </ul>
+</fieldset>
+{% endif %}
+{% endblock %}

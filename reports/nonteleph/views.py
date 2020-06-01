@@ -84,7 +84,7 @@ def generate_report(request):
     charge_types = []
     for cf in chartcoms:
         # Create tables for each user defined ID type
-        all_data = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf).order_by('voucher_comment', 'item_description', 'invoice_date', 'user_defined_id')
+        all_data = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf).order_by('unique_identifier', 'voucher_comment', 'item_description', 'invoice_date', 'user_defined_id')
         prefixes = {}
         charges = {}
         total = 0
@@ -115,10 +115,14 @@ def generate_report(request):
                     'qty': int(a.quantity),
                     'total_charges': a.charge_amount,
                     'project_name': a.unique_identifier,
-                    'date': a.invoice_date
+                    'date': a.invoice_date,
+                    'shortcode': a.shortcode,
+                    'voucher_comment': a.voucher_comment,
+                    'quantity_vouchered': a.quantity_vouchered,
+                    'unique_id': a.unique_identifier
                 }
                 # Add N/A
-                if  not user_id['project_name']:
+                if not user_id['project_name']:
                     user_id['project_name'] = 'N/A'
                 # Determine charge vs credit
                 if a.unit_price < 0:
@@ -147,7 +151,7 @@ def generate_report(request):
                         r['total_charges'] += a.charge_amount
                         breakout = True
                     # Non-container Services
-                    elif prefix != 'Container Services' and r['user_defined_id'] == a.user_defined_id and unit_price == '{:,.2f}'.format(a.unit_price):
+                    elif prefix != 'Container Services' and prefix != 'MiStorage' and r['user_defined_id'] == a.user_defined_id and unit_price == '{:,.2f}'.format(a.unit_price):
                         r['qty'] += int(a.quantity)
                         r['total_charges'] += a.charge_amount
                         breakout = True

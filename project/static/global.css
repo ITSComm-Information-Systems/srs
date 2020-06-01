@@ -1219,7 +1219,7 @@ legend {
 	width:100%;
 }
 
-#invLocTable {
+.invLocTable {
 	font-size: 12px;
 }
 
@@ -1246,4 +1246,16 @@ pre {
 
 .bold-link {
 	font-weight: 700;
+}
+
+.icon-select {
+	font-family: 'FontAwesome', 'Second Font name';
+  }
+
+@media (min-width:992px) {
+	.nav-bar-links {
+		width:100%;
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+	}
 }

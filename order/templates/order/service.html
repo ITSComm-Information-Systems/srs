@@ -46,6 +46,9 @@
     </div>
 
     <div class="col-xl-3 col-md-6 col-12 helpful-links">
+        {% autoescape off %}
+        {{ notices.bodytext }}
+        {% endautoescape %}
         <div class="alert alert-secondary hlinks" role="alert">
             <h3 class="alert-heading">
                 Helpful ITS Links
@@ -67,6 +70,8 @@
         $('#phoneData-tab').addClass(' active');
         $('#phoneData').addClass(' active show');
 
+        $('#MiStorage-tab').addClass(' active');
+        $('#MiStorage').addClass(' active show');
 
     $('.nav-link').on('show.bs.tab', function(event) {
         id = '#' + event.target.id.slice(0,-4);

@@ -180,7 +180,7 @@ def get_cf_data(request):
 =======
 >>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
 	if not cf_data:
-		cf_data = {'fund': 'wtf'}
+		cf_data = {'fund': 'missing'}
 	return JsonResponse(cf_data, safe=False)
 
 

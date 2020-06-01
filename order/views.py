@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_protect
 from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceProfileV, UmOscChartfieldV
 from oscauth.models import AuthUserDept
 from pages.models import Page
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from pages.models import Page
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -23,6 +23,11 @@ from django.views.decorators.csrf import csrf_exempt
 import threading
 
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment, ChargeType, UserChartcomV
+
+#import for filter
+import datetime
+from django.db.models import Case, When, Value, F
+
 
 @permission_required('oscauth.can_order')
 def get_phone_location(request, phone_number):
@@ -45,52 +50,113 @@ def get_phone_location(request, phone_number):
 
     return JsonResponse(locations, safe=False)
 
-@permission_required('oscauth.can_order')
+#@permission_required('oscauth.can_order')
 def send_tab_data(request):
 
-    tab = request.POST.get('tab')
-    step = Step.objects.get(name=tab)
+    tab_name = request.POST.get('tab')
+
+    if tab_name == 'Review':
+        item = Item.objects.get(id = request.POST['item_id'])
+
+
+        label = Action.objects.get(id=request.POST['action_id']).cart_label
+
+        x = label.find('[', 0)
+        y = label.find(']', x)
+
+        while x > 0:
+            tag = label[x+1:y]
+            element = request.POST[tag]
+            label = label.replace('['+tag+']', element)
+            x = label.find('[', x)
+            y = label.find(']', x)
+
+
+        if request.POST['cart']=='True':
+            item.deptid = Chartcom.objects.get(id=item.chartcom_id).dept
+            item.description = label
+            item.save()
+            return JsonResponse({'redirect': f'/orders/cart/{item.deptid}'}, safe=False)
+        else:
+            item.submit_incident()
+            return JsonResponse({'redirect': '/requestsent'}, safe=False)
+
+    step = Step.objects.get(name=tab_name)
     sequence = request.POST.get('sequence')
     visible = request.POST.get('visible')
     item_id = request.POST.get('item_id')
 
-    print(item_id, tab, visible, sequence)
-
-    try:
-        f = globals()[step.custom_form](step, request.POST)
-    except: 
-        f = TabForm(step)
+    #try:  TODO
+    f = globals()[step.custom_form](step
+        , request.POST     # Bind the form
+        , request=request) # Pass entire request so user, etc is available for validation routines
+    #except: 
+    #    f = TabForm(step)
 
     if f.is_valid():
+        valid = True
         summary = f.get_summary(visible)
         tab = {'title': step.label, 'fields': summary}
         data = request.POST.dict()
         data['csrfmiddlewaretoken'] = ''
+        action = Action.objects.get(id=request.POST.get('action_id'))
 
         if int(item_id) == 0:
             i = Item()
             i.created_by_id = request.user.id
             i.description = ' '
             data['reviewSummary'] = [tab]
-            i.deptid = '0'
+            data['tab_list'] = action.get_tab_list()
+            i.deptid = '1'
             i.chartcom_id = 14388  #TODO need default chartcom
         else:
             i = Item.objects.get(id=item_id)
             review_summary = i.data['reviewSummary']
+            data['tab_list'] = i.data['tab_list']
             tabnum = int(sequence) - 1
-            if len(review_summary) < tabnum:
+            if len(review_summary) < int(sequence):
                 review_summary.append(tab)
             else:
                 review_summary[tabnum] = tab
             data['reviewSummary'] = review_summary
 
+        i.chartcom_id = request.POST.get('oneTimeCharges', 14388)
         i.data = data
+        i.description = action.cart_label
         i.save()
+        item_id = i.id
+
+        #step = Step.objects.get(name='detailsNFS')
+        
+        if request.POST.get('volaction'):
+            tab_name = 'Review'
+            step = Step.objects.get(name='Review')
+        else:
+            for index, tab in enumerate(i.data['tab_list'], start=0):
+                if tab['name'] == request.POST.get('tab'):
+                    next_tab = i.data['tab_list'][index+1]
+                    tab_name = next_tab['name']
+                    step = Step.objects.get(name=next_tab['name'])
+                    break
+
+        try:
+            f = globals()[step.custom_form](step, request=request)
+        except:
+            print('bind form tab error')
+            f = TabForm(step)
+        
+        if step.name == 'Review':
+            f.data = i.data['reviewSummary']
 
     else:
-        print('not valid', f.errors)  #TODO Send invalid messages
+        valid = False
 
-    return JsonResponse(i.id, safe=False)  #TODO Send review data
+    tab_content = loader.render_to_string(f.template, {'tab': {'form': f}})
+
+    return JsonResponse({'valid': valid
+                        ,'item_id': item_id
+                        ,'tab_name': tab_name
+                        ,'tab_content': tab_content}, safe=False)
 
 
 @permission_required('oscauth.can_order')
@@ -216,7 +282,7 @@ class Submit(PermissionRequiredMixin, View):
         return HttpResponseRedirect('/submitted') 
 
 @csrf_exempt
-def send_email(request):
+def send_email(request):   #Pinnacle will route non prod emails to a test address
     if request.method == "POST":
         subject = request.POST['emailSubject'] + ' question from: ' + request.user.username
         body = request.POST['emailBody'] 
@@ -348,8 +414,22 @@ class Integration(PermissionRequiredMixin, View):
             'item_list': item_list,})
 
 
-class Workflow(PermissionRequiredMixin, View):
-    permission_required = 'oscauth.can_order'
+class Workflow(UserPassesTestMixin, View):
+
+    def test_func(self):
+        action_id = self.request.resolver_match.kwargs['action_id']
+        action = Action.objects.get(id=action_id)
+
+        if action.service.group_id == 2:  # MiStorage requires no permissions
+            if self.request.user.is_authenticated:
+                return True
+            else:
+                return False
+        else:
+            if self.request.user.has_perm('oscauth.can_order'):
+                return True
+            else:
+                return False
 
     def get(self, request, action_id):
 
@@ -372,7 +452,7 @@ class Workflow(PermissionRequiredMixin, View):
                     elif element.type == 'Chart':
                         field = forms.ChoiceField(label=element.label
                                                 , widget=forms.Select(attrs={'class': "form-control"}), choices=Chartcom.get_user_chartcoms(request.user.id))
-                                                                                #AuthUserDept.get_order_departments(request.user.id)
+                                            #AuthUserDept.get_order_departments(request.user.id)
                         field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
                     elif element.type == 'NU':
                         field = forms.ChoiceField(label=element.label
@@ -402,7 +482,7 @@ class Workflow(PermissionRequiredMixin, View):
                 tab.form = forms.Form()
                 tab.form.template = 'order/static.html'
             else:
-                tab.form = globals()[tab.custom_form](tab)
+                tab.form = globals()[tab.custom_form](tab, request=request)
                 if tab.name == 'PhoneLocation':
                     js.append('phone_location')
                 elif tab.name == 'LocationNew':
@@ -442,27 +522,25 @@ class Cart(PermissionRequiredMixin, View):
         return HttpResponseRedirect('/orders/cart/' + request.POST['deptid'])
 
     def get(self, request, deptid):
-        dept_list = AuthUserDept.get_order_departments(request.user.id)
-        hasset = False;
+        
+        depts = []
+        user_dept_list = AuthUserDept.get_order_departments(request.user.id)
+        for dept in user_dept_list:
+            depts.append(dept.dept)
+
         first= {}
 
+        dept_list = Item.objects.filter(deptid__in=depts).exclude(order_id__gt=0).distinct('deptid')
+        if deptid == 0 and len(dept_list) > 0:
+            deptid = int(dept_list[0].deptid)
+
         for dept in dept_list:
-            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
+            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.deptid)
             dept.active = deptinfo.dept_eff_status
             dept.name = deptinfo.dept_name
 
-            if deptid == int(dept.dept):
-                first = {'id': dept.dept, 'name': deptinfo.dept_name}
-            if hasset == False:
-                item_list = Item.objects.filter(deptid=dept.dept).exclude(order_id__gt=0).order_by('chartcom','-create_date')
-                chartcoms = item_list.distinct('chartcom')
-                if(len(chartcoms) != 0):
-                    hasset = True
-                    first = {'id': dept.dept, 'name':dept.name}
-                    deptid = dept.dept
-        if deptid == 0 and first =={}:
-            first_dept = UmOscDeptProfileV.objects.get(deptid=dept_list[0].dept)
-            first = {'id':first_dept.deptid, 'name': first_dept.dept_name}
+            if deptid == int(dept.deptid):
+                first = {'id': dept.deptid, 'name': deptinfo.dept_name}
 
 
         status = ['Ready to Order','Saved for Later']
@@ -524,16 +602,30 @@ class Review(PermissionRequiredMixin, View):
         return HttpResponse(template.render(context, request))
 
 
-class Services(PermissionRequiredMixin, View):
-    permission_required = 'oscauth.can_order'
-    
-    def get(self, request):
+class Services(UserPassesTestMixin, View):
 
-        link_list = Page.objects.get(permalink='/links')
+    def test_func(self):
+        group_id = self.request.resolver_match.kwargs['group_id']
+
+        if group_id == 2:  # MiStorage requires no permissions
+            if self.request.user.is_authenticated:
+                return True
+            else:
+                return False
+        else:
+            if self.request.user.has_perm('oscauth.can_order'):
+                return True
+            else:
+                return False
+    
+    def get(self, request, group_id):
+
+        link_list = Page.objects.get(permalink=f'/links/{group_id}')
+        notices = Page.objects.get(permalink=f'/notices/{group_id}')
 
         template = loader.get_template('order/service.html')
-        action_list = Action.objects.all().order_by('service','display_seq_no')
-        service_list = Service.objects.all().order_by('display_seq_no')
+        action_list = Action.objects.filter(active=True).order_by('service','display_seq_no')
+        service_list = Service.objects.filter(group_id=group_id,active=True).order_by('display_seq_no')
 
         for service in service_list:
             service.actions = action_list.filter(service=service)
@@ -542,6 +634,7 @@ class Services(PermissionRequiredMixin, View):
             'title': 'Request Service',
             'service_list': service_list,
             'link_list': link_list,
+            'notices': notices,
             'page_name': 'Request Service'
         }
         return HttpResponse(template.render(context, request))
@@ -549,57 +642,77 @@ class Services(PermissionRequiredMixin, View):
 
 class Status(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
-
+    
     def get(self, request, deptid):
-        dept_list = AuthUserDept.get_order_departments(request.user.id)
+        auth_depts = AuthUserDept.get_order_departments(request.user.id)
+        auth_dept_list = list(dept.dept for dept in auth_depts)
+     
+        order_list = Order.objects.filter(chartcom__dept__in=auth_dept_list).order_by('-create_date', 'id').select_related()
+        item_list = Item.objects.filter(order__in=order_list).order_by('-order__create_date', 'order_id')
 
-        for dept in dept_list:
-            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
-            dept.name = deptinfo.dept_name
-            dept.active = deptinfo.dept_eff_status
+        order_id_list = list(str(order.id) for order in order_list)
+        pins = UmOscPreorderApiV.objects.filter(add_info_text_3__in=order_id_list,pre_order_issue=1)
 
-            if deptid == int(dept.dept):
-                department = {'id': dept.dept, 'name': deptinfo.dept_name}
+        depts = set()
+        people_list = set()
+        status_list = set()
+        dates_list = set()
+        i = 0
+        x = len(item_list)
+
+        for order in order_list:
+            order.deptid = order.chartcom.dept
+            dept_list = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('deptid')
+
+            #datetime filter
+            result=datetime.date.today()-order.create_date.date()
+            if result<datetime.timedelta(31):
+                order.timeDiff = (1,"30 days")
+            elif result<datetime.timedelta(91):
+                order.timeDiff = (2,"31-90 days")
+            elif result<datetime.timedelta(181):
+                order.timeDiff = (3,"91-180 days")
+            elif result<datetime.timedelta(366):
+                order.timeDiff = (4,"181-365 days")
+   
+                       
+            pin = next((x for x in pins if x.add_info_text_3 == str(order.id)), None)
+            order.srs_status = "Submitted"
+            if pin:
+                if(pin.work_status_name == "Received"):
+                    order.srs_status = "Submitted"
+                if pin.status_code == 2:
+                    if(pin.work_status_name == "Cancelled"):
+                        order.srs_status = "Cancelled"
+                    else:
+                        order.srs_status = "Completed"
+
+            order.items = []
+            while item_list[i].order_id == order.id and i < x-1:
+                order.items.append(item_list[i])
+                i = i + 1
+            
+            people_list.add((order.created_by.username, order.deptid))
+            status_list.add((order.srs_status, order.deptid))
+            depts.add(order.chartcom.dept)
+            dates_list.add((order.timeDiff, order.deptid))
+
+        
+        people_list=sorted(people_list)
+        dates_list=sorted(dates_list, key=lambda x:x[0][0])
 
         if deptid == 0:
-            department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
-            deptid = dept_list[0].dept 
-
-        status_help = Page.objects.get(permalink='/status')
-
-        #items_selected = request.POST.getlist('includeInOrder')
-        #order_list = item_list.distinct('chartcom')
-        chartcoms = Chartcom.objects.filter(dept__in=dept_list)
-        order_list = Order.objects.filter(chartcom__in=chartcoms).order_by('-create_date')
-
-        item_list = Item.objects.filter(order__in=order_list)
-
-        for num, order in enumerate(order_list, start=1):
-            if order.order_reference == 'TBD':
-                order.items = item_list.filter(order=order)
-            else:
-                try:
-                    pin = UmOscPreorderApiV.objects.get(add_info_text_3=str(order.id),pre_order_issue=1)
-                    srs_status = pin.work_status_name
-                    if(pin.work_status_name == "Received"):
-                    	srs_status = "Submitted"
-                    if pin.status_code == 2:
-                    	if(pin.work_status_name == "Cancelled"):
-                    		srs_status = "Cancelled"
-                    	else:
-                    		srs_status = "Completed"
-                    
-
-                    order.items = [{'description': pin.comment_text,'status': srs_status}]
-                    order.status = srs_status
-                except:
-                    order.items = item_list.filter(order=order)
-                    
+            department = {'id': dept_list[0].deptid, 'name':dept_list[0].dept_name}
+            deptid = dept_list[0].deptid 
+         
         template = loader.get_template('order/status.html')
         context = {
             'title': 'Track Orders',
             'dept_list': dept_list,
             'order_list': order_list,
-            'status_help': status_help,
+            'dates_list': dates_list,
+            'people_list': people_list,
+            'status_list':status_list,
+            'status_help': Page.objects.get(permalink='/status'),
         }
         return HttpResponse(template.render(context, request))

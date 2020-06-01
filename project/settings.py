@@ -24,10 +24,8 @@ SECRET_KEY = os.getenv(
     '9e4@&tw46$l31)zrqe3wi+-slqm(ruvz&se0^%9#6(_w3ui!c0'
 )
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', True)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [os.getenv('ALLOWED_HOST')]
 
 
 # Application definition
@@ -44,12 +42,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'rest_framework',
+
     'debug_toolbar',
     'order',
     'pages',
     'reports',
     'tools',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAdminUser'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'  # Override widgets
 
@@ -90,12 +96,20 @@ EMAIL_HOST = 'vdc-relay.us-east-2.a.mail.umich.edu'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+SERVICENOW_EMAIL = os.getenv('SERVICENOW_EMAIL', 'umichdev@service-now.com')
+
 MCOMMUNITY = {
     'SERVER': os.getenv('MC_SERVER', 'ldap.umich.edu'),
     'USERNAME': os.getenv('MC_USERNAME', 'cn=EAS-OSC-McDirApp001,ou=Applications,o=services'),
     'PASSWORD': os.getenv('MC_PASSWORD', 'N/A'),
 }
 
+UM_API = {
+    'CLIENT_ID': os.getenv('UM_API_CLIENT_ID'),
+    'CLIENT_SECRET': os.getenv('UM_API_CLIENT_SECRET'),
+    'AUTH_TOKEN': os.getenv('UM_API_AUTH_TOKEN'),
+    'BASE_URL': os.getenv('UM_API_URL'),
+}
 
 ROOT_URLCONF = 'project.urls'
 
@@ -114,7 +128,8 @@ TEMPLATES = {
             'libraries':{
                 'index': 'reports.inventory.templatetags.index',
                 'tags': 'reports.soc.templatetags.tags',
-                'ccr_tags': 'project.templatetags.ccr_tags'
+                'ccr_tags': 'project.templatetags.ccr_tags',
+                'descr': 'reports.nonteleph.templatetags.descr'
             }
         },
 },
