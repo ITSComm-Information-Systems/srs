@@ -95,6 +95,8 @@ function techid_to_wo() {
 
 // Transition from work order select to review/submit
 function wo_to_review() {
+    $('#single-review').html('');
+    $('#tech-info-review').html('');
     $('#single-review').append($("#single-input").html());
     $('#tech-info-review').append($("#tech-info-input").html());
 }
@@ -102,7 +104,7 @@ function wo_to_review() {
 // Add row to input table
 function add_to_table(num_entries) {
     if (num_entries < 10) {
-        num_entries = num_entries + 1;
+        num_entries = num_entries + 1; 
         var html = '<tr id="row-' + num_entries + '">' + 
                         '<th>' + $('#workOrderSearch').val() + '</th>' +
                         '<th>' + $('#rateSelect').val() + '</th>' +
