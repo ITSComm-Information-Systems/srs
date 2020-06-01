@@ -1,6 +1,7 @@
 import csv
 
 from django.http import HttpResponse
+from django.template import loader
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import path
@@ -16,8 +17,18 @@ class ProductAdmin(admin.ModelAdmin):
 class ActionAdmin(admin.ModelAdmin):
     list_filter = ('service','type')
     list_display  = ['display_seq_no','label','service','type']
-    ordering = ('display_seq_no',)
+    ordering = ('service','display_seq_no',)
     fields = ('name',('label','use_cart','cart_label'), ('display_seq_no','active','use_ajax'),('service','type'), 'description', ('steps','charge_types'), ('route','destination'))
+
+
+    def get_urls(self):
+        urls = super().get_urls()
+
+        override_url = [
+            path('<int:action_id>/override/', self.override_view),
+        ]
+        return override_url + urls
+
 
     def save_model(self, request, obj, form, change):
         tab_list = Step.objects.filter(action=obj)
@@ -30,6 +41,18 @@ class ActionAdmin(admin.ModelAdmin):
             obj.override = {"hide": unchecked_fields}
 
         super().save_model(request, obj, form, change)
+
+    def override_view(self, request, action_id):
+        #response = HttpResponse(content_type='text/csv')
+        template = loader.get_template('admin/order/action/override_form.html')
+        #template = loader.get_template('admin/add_label_form.html')
+        context = {
+            'title': 'Order Summary',
+            #'order': order,
+            #'item_list': item_list
+        }
+        return HttpResponse(template.render(context, request))
+        #return response
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         step_list = Step.objects.all().filter(action = object_id).order_by('display_seq_no')
