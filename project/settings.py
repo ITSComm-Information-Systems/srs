@@ -25,7 +25,7 @@ SECRET_KEY = os.getenv(
 )
 
 
-ALLOWED_HOSTS = [os.getenv('ALLOWED_HOST')]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
