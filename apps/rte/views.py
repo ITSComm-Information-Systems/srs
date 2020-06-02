@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.template import loader
 from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV
+from django.http import JsonResponse
 
 # Base RTE view
 def load_rte(request):
@@ -150,6 +151,8 @@ def multiple_tech(request):
 
 
     all_wos = UmRteServiceOrderV.objects.all()
+    all_techs = UmRteTechnicianV.objects.all()
+    rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
 
     # Load after search
     if request.method == 'POST':
@@ -162,6 +165,8 @@ def multiple_tech(request):
             'tab_list': tab_list,
             'num_tabs': len(tab_list),
             'all_wos': all_wos,
+            'all_techs': all_techs,
+            'rate_levels': rate_levels,
             'selected_wo': selected_wo
         }
 
@@ -177,6 +182,21 @@ def multiple_tech(request):
             'all_wos': all_wos
         }
         return HttpResponse(template.render(context, request))
+
+# Find assigned group based on tech ID
+def get_assigned_group(request):
+    techid = request.GET.get('techid', None)
+    print(techid)
+    assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=techid).values())
+
+    # assigned_groups = [
+    #     {"wo_group_name:" "hello"},
+    #     {"wo_group_name": "hi"},
+    #     {"wo_group_name": "please"},
+    #     {"wo_group_name": "work"},
+    # ]
+
+    return JsonResponse(assigned_groups, safe=False)
 
 
 # View/modify time
