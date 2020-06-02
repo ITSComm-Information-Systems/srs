@@ -1,1 +1,98 @@
-<p>Input time here.</p>
+<div id='wo-info-input'>
+	<div class='card border-dark col-5 pb-0'>
+		<div class='card-body'>
+			<p class='d-inline'><strong>Work Order:</strong>&nbsp;<span class='work_order'></span></p>
+
+		</div>
+	</div>
+</div>
+
+<h3>Enter time</h3>
+
+<div class='row'>
+	<div class="form-group col-2" id="searchTechMultiple">
+		<label for="techSearchMultiple" id="labelTechSearchMultiple">
+	        <strong>Tech ID/Name</strong>
+	    </label>
+	    <input name='techSearchMultiple' id="techSearchMultiple" class="form-control" type="text" aria-describedby="techSearchBlockMultiple"
+	        placeholder="Search..">
+		<table id="techTableMultiple" class="table table-hover" aria-live=”polite”>
+	        {% for tech in all_techs %}
+	            <tr tabindex="0"  id="{{ tech.labor_code }}" role="button" aria-label="Select tech 
+	                {{ tech.labor_name_display2 }} with tech ID of {{ tech.labor_code }}">
+	                <td >{{ tech.labor_code }}</td>
+	                <td name="techName">{{ tech.labor_name_display2 }}</td>
+	            </tr>
+	        {% endfor %}
+		</table>
+	</div>
+
+	<div class="form-group col-2" id="selectAssignedGroupMultiple">
+		<label for="assignedGroupSelectMultiple" id="labelAssignedGroupSelectMultiple">
+		    <strong>Assigned Group</strong>
+		</label>
+		<select class='custom-select' id='assignedGroupSelectMultiple'>
+		</select>
+	</div>
+
+	<div class="form-group col-2" id="selectRateLevelMultiple">
+		<label for="rateSelectMultiple" id="labelRateSelectMultiple">
+		    <strong>Rate Level </strong>
+		</label>
+		<select class='custom-select' id='rateSelectMultiple'>
+			{% for rate in rate_levels %}
+				<option>{{ rate.labor_rate_level_name }}</option>
+			{% endfor %}
+		</select>
+	</div>
+
+	<div class='form-group col-2'>
+		<label for="assigned_date_multiple"><strong>Assigned Date</strong></label>
+	    <input type="date" class="form-control" id="assigned_date_multiple" name='assigned_date_multiple'>
+	</div>	
+
+	<div class='form-group col-2'>
+		<label for="duration_multiple"><strong>Duration</strong></label>
+		<div class='form-inline' id='duration_multiple'>
+			<input class='form-control col-6' type="text" name="duration-hours-multiple" id="duration-hours-multiple" placeholder='HH'>
+			<input class='form-control col-6' type="text" name="duration-mins-multiple" id="duration-mins-multiple" placeholder='MM'>
+		</div>
+	</div>
+
+	<div class='form-group col-2'>
+		<label for="notes-multiple"><strong>Notes</strong></label>
+		<input type="text" class="form-control" id="notes-multiple" name='notes-multiple'>
+	</div>
+</div>
+
+<button class='btn btn-primary float-right' id='multiple-add'>Add</button><br>
+
+<div id='multiple-input'>
+	<h3 id='multiple-input-title'>Time Entries</h3>
+	<table class='table mt-4' id='multiple-input-table'>
+		<thead>
+			<tr>
+				<th scope="col">Tech ID</th>
+				<th scope="col">Assigned Group</th>
+				<th scope="col">Rate Level</th>
+				<th scope="col">Assigned Date</th>
+				<th scope="col">Duration</th>
+				<th scope="col">Notes</th>
+				<th scope="col" id='delete-title-multiple'></th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+
+<div class='alert alert-danger hidden col-8' id='max-entries-multiple'>
+	You may only submit 10 time entries at a time. Please submit additional entries to report time for more than 10 technicians.
+</div>
+
+
+<form action='submitted/' method='POST' id='multiple-input-form' hidden>{% csrf_token %}
+	<input type='text' name='tech_id' class='tech_id' hidden>
+	<input type='text' name='assigned_group' class='assigned_group' hidden>
+</form>
+
