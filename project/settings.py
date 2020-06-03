@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'pages',
     'reports',
     'tools',
-    'apps'
+    'apps.rapid_time_entry'
 ]
 
 REST_FRAMEWORK = {
