@@ -1,9 +1,6 @@
 from django.db import connection
 from django.core.management.base import BaseCommand, CommandError
-<<<<<<< HEAD
-=======
 from django.core.management import call_command
->>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
 
 from oscauth.utils import upsert_user
 from django.contrib.auth.models import User
@@ -35,10 +32,7 @@ class Command(BaseCommand):
 
         with connection.cursor() as cursor:
             cursor.execute(sql)
-<<<<<<< HEAD
-=======
 
         call_command('deptmgrupdt')
->>>>>>> 6bda00dc59214388fe2575f626f3134fb1f372f7
         
         print('end')
