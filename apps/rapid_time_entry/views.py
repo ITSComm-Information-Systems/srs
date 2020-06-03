@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.template import loader
 from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV
+from django.http import JsonResponse
 
 # Base RTE view
 def load_rte(request):
@@ -53,7 +54,6 @@ def single_tech(request):
     if request.method == 'POST':
 
         tech_id = request.POST.get('techSearch')
-        print('tech id: {}'.format(tech_id))
 
         tech_name = UmRteTechnicianV.objects.get(labor_code=tech_id)
 
@@ -87,8 +87,33 @@ def single_tech(request):
         return HttpResponse(template.render(context, request))
 
 # Review single tech times
-def single_review():
-    pass
+def single_submit(request):
+    template = loader.get_template('rte/submitted.html')
+
+    entries = []
+    if request.method == 'POST':
+        num_entries = request.POST.get('num_entries')
+        tech_id = request.POST.get('tech_id')
+        assigned_group = request.POST.get('assigned_group')
+
+        for i in range(1, int(num_entries) + 1):
+            entry = {
+                'tech_id': tech_id,
+                'work_order': request.POST.get(str(i) + '_work_order'),
+                'rate_level': request.POST.get(str(i) + '_rate'),
+                'assigned_group': assigned_group,
+                'assigned_date': request.POST.get(str(i) + '_assigned_date'),
+                'duration': request.POST.get(str(i) + '_duration'),
+                'notes': request.POST.get(str(i) + '_notes')
+            }
+            entries.append(entry)
+
+    context = {
+        'title': 'Rapid Time Entry Submit',
+        'entries': entries
+    }
+
+    return HttpResponse(template.render(context, request))
 
 
 # Multiple technicians, single order
@@ -124,11 +149,74 @@ def multiple_tech(request):
     }
     tab_list.append(tab3)
 
+
+    all_wos = UmRteServiceOrderV.objects.all()
+    all_techs = UmRteTechnicianV.objects.all()
+    rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
+
+    # Load after search
+    if request.method == 'POST':
+
+        selected_wo = request.POST.get('workOrderSearch')
+
+        context = {
+            'wf': 'multiple',
+            'title': 'Multiple Technicians, Single Work Order',
+            'tab_list': tab_list,
+            'num_tabs': len(tab_list),
+            'all_wos': all_wos,
+            'all_techs': all_techs,
+            'rate_levels': rate_levels,
+            'selected_wo': selected_wo
+        }
+
+        return HttpResponse(template.render(context, request))
+
+    # Original load
+    else:
+        context = {
+            'wf': 'multiple',
+            'title': 'Multiple Technicians, Single Work Order',
+            'tab_list': tab_list,
+            'num_tabs': len(tab_list),
+            'all_wos': all_wos
+        }
+        return HttpResponse(template.render(context, request))
+
+
+# Find assigned group based on tech ID
+def get_assigned_group(request):
+    techid = request.GET.get('techid', None)
+    print(techid)
+    assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=techid).values())
+
+    return JsonResponse(assigned_groups, safe=False)
+
+
+# Submit multiple tech times
+def multiple_submit(request):
+    template = loader.get_template('rte/submitted.html')
+
+    entries = []
+    if request.method == 'POST':
+        num_entries = request.POST.get('num_entries')
+        work_order = request.POST.get('work_order')
+
+        for i in range(1, int(num_entries) + 1):
+            entry = {
+                'tech_id': request.POST.get(str(i) + '_techid'),
+                'work_order': work_order,
+                'rate_level': request.POST.get(str(i) + '_rate'),
+                'assigned_group': request.POST.get(str(i) + '_assigned_group'),
+                'assigned_date': request.POST.get(str(i) + '_assigned_date'),
+                'duration': request.POST.get(str(i) + '_duration'),
+                'notes': request.POST.get(str(i) + '_notes')
+            }
+            entries.append(entry)
+
     context = {
-        'wf': 'double',
-        'title': 'Multiple Technicians, Single Work Order',
-        'tab_list': tab_list,
-        'num_tabs': len(tab_list)
+        'title': 'Rapid Time Entry Submit',
+        'entries': entries
     }
 
     return HttpResponse(template.render(context, request))

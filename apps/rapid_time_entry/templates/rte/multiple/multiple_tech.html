@@ -1,0 +1,42 @@
+<form id='workOrderForm' method='post' action=''>{% csrf_token %}
+    <div class="form-group" id="searchWorkOrder">
+        <label for="workOrderSearch" id="labelWorkOrderSearch">
+            <strong>Search for a Work Order</strong>
+        </label>
+        <small id="workOrderBlock" class="form-text text-muted">
+            Search for the work order for which like to enter time.
+        </small>
+    	<div class='form-group'>
+    		<div class='form-inline'>
+		        <input name='workOrderSearch' autocomplete='off' id="workOrderSearch" class="form-control" type="text" aria-describedby="workOrderBlock"
+		            placeholder="Search...">
+		        <button class='btn btn-primary' type='submit'>Search</button>
+		    </div>
+	        <div role=”alert” class="invalid-feedback" id='error-work-order'><i class="fas fa-exclamation-triangle"
+	            aria-label="Icon signfying that user must enter a value"></i>Please enter a work order.
+	        </div>
+	    </div>
+  	</div>
+
+    <div class='col-4'>
+	    <table id="workOrderTable" class="table table-hover" aria-live=”polite”>
+	        {% for wo in all_wos %}
+	            <tr tabindex="0"  id="{{ wo.full_prord_wo_number }}" role="button" aria-label="Select work order 
+	                {{ wo.full_prord_wo_number }}">
+	                <td >{{ wo.full_prord_wo_number }}</td>
+	            </tr>
+	        {% endfor %}
+	    </table>
+	</div>
+
+</form>
+
+
+{% if selected_wo %}
+	<div class='form-group col-4 mt-4'>
+		<label for="tech_id" id="teachIdLabel">
+            <strong>Selected Work Order</strong>
+        </label>
+        <input readonly class='form-control' id="work_order" value="{{ selected_wo }}">
+	</div>
+{% endif %}
