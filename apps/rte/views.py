@@ -183,20 +183,43 @@ def multiple_tech(request):
         }
         return HttpResponse(template.render(context, request))
 
+
 # Find assigned group based on tech ID
 def get_assigned_group(request):
     techid = request.GET.get('techid', None)
     print(techid)
     assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=techid).values())
 
-    # assigned_groups = [
-    #     {"wo_group_name:" "hello"},
-    #     {"wo_group_name": "hi"},
-    #     {"wo_group_name": "please"},
-    #     {"wo_group_name": "work"},
-    # ]
-
     return JsonResponse(assigned_groups, safe=False)
+
+
+# Submit multiple tech times
+def multiple_submit(request):
+    template = loader.get_template('rte/submitted.html')
+
+    entries = []
+    if request.method == 'POST':
+        num_entries = request.POST.get('num_entries')
+        work_order = request.POST.get('work_order')
+
+        for i in range(1, int(num_entries) + 1):
+            entry = {
+                'tech_id': request.POST.get(str(i) + '_techid'),
+                'work_order': work_order,
+                'rate_level': request.POST.get(str(i) + '_rate'),
+                'assigned_group': request.POST.get(str(i) + '_assigned_group'),
+                'assigned_date': request.POST.get(str(i) + '_assigned_date'),
+                'duration': request.POST.get(str(i) + '_duration'),
+                'notes': request.POST.get(str(i) + '_notes')
+            }
+            entries.append(entry)
+
+    context = {
+        'title': 'Rapid Time Entry Submit',
+        'entries': entries
+    }
+
+    return HttpResponse(template.render(context, request))
 
 
 # View/modify time
