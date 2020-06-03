@@ -550,7 +550,7 @@ function maintain_checks(checked, starts_with) {
 // Updates chartfield information when changed
 function change_current_page(selected) {
 	if (typeof(selected) == "string") {
-		selected = JSON.parse(selected.replace(/'/g, '"'));
+		selected = JSON.parse(selected);
 	}
 
 	var dept_title = $('#dept_title').text();
