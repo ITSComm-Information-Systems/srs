@@ -3,8 +3,10 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-	path('single-tech/review/', views.single_review),
+	path('single-tech/submitted/', views.single_submit),
     path('single-tech/', views.single_tech),
+    path('multiple-tech/get-assigned-group/', views.get_assigned_group),
+    path('multiple-tech/submitted/', views.multiple_submit),
     path('multiple-tech/', views.multiple_tech),
     path('update/view-times/', views.view_times),
     path('update/', views.update),
