@@ -55,8 +55,8 @@ $(document).ready(function() {
 
     // Submit entries
     $('.multiple-submit').on('click', function() {
-        var form_html = '<input name="num_entries" type="text" value="' + num_entries + '" hidden>';
-        $('multiple-input-form').append(form_html);
+        var form_html = '<input name="num_entries" type="text" value="' + num_entries_multiple + '" hidden>';
+        $('#multiple-input-form').append(form_html);
         $('#multiple-input-form').submit();
     })
 
@@ -83,7 +83,7 @@ function add_to_multiple_table(num_entries) {
                         '<th>' + $('#notes-multiple').val() + '</th>' +
                         '<th><button class="btn btn-danger delete_row_multiple" id="' + num_entries + '">Delete</button>' +
                     '</tr>';
-        var form_html = '<input type="text" name="' + num_entries + '_work_order" value="' + $('#workOrderSearchMultiple').val() + '" hidden>' +
+        var form_html = '<input type="text" name="' + num_entries + '_techid" value="' + $('#techSearchMultiple').val() + '" hidden>' +
                         '<input type="text" name="' + num_entries + '_assigned_group" value="' + $('#assignedGroupSelectMultiple').val() + '" hidden>' +
                         '<input type="text" name="' + num_entries + '_rate" value="' + $('#rateSelectMultiple').val() + '" hidden>' +
                         '<input type="date" name="' + num_entries + '_assigned_date" value="' + $('#assigned_date_multiple').val() + '" hidden>' +
@@ -124,7 +124,7 @@ function delete_row_multiple(row_num, num_entries) {
 // Transition to time input tab
 function wo_to_techid() {
     $('.work_order').html($('#work_order').val());
-    $('.woek_order').val($('#work_order').val());
+    $('.work_order').val($('#work_order').val());
 }
 
 // Transition to review page
