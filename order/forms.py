@@ -439,7 +439,7 @@ class BillingStorageForm(TabForm):
         if self.request:
             if self.request.method == 'POST':
                 if self.request.POST['action_id'] == '51':
-                    tc = self.fields['totalCost'].description.replace('~', '564 / TB / Yr.')
+                    tc = self.fields['totalCost'].description.replace('~', '47 per TB')
                     self.fields['totalCost'].description = tc
                     return
 
@@ -464,10 +464,12 @@ class BillingStorageForm(TabForm):
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
-        #option = StorageRate.objects.get(id=self.data['selectOptionType'])
-        #total_cost = option.get_total_cost(self.data['sizeGigabyte'])
-        total_cost = '33.33'
-        summary.append({'label': 'Total Cost', 'value': str(total_cost)})
+
+        print(self.data['action_id'])
+        if self.data['action_id'] != '51':
+            option = StorageRate.objects.get(id=self.data['selectOptionType'])
+            total_cost = option.get_total_cost(self.data['sizeGigabyte'])
+            summary.append({'label': 'Total Cost', 'value': str(total_cost)})
 
         instance_id = self.data.get('instance_id')
         
