@@ -1,10 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>{{ title }}</h1>
-{{extra}}
-
 <form method="POST">{% csrf_token %}
-
     <div class="form-group">
         <label for="deptf">
             <strong>Enter a User ID</strong>
@@ -13,8 +10,8 @@
         <input type='text' name="user_param" id="deptf" size="1" class="form-control text-field-short col-4" placeholder='Ex: PH-73476320000-01 or 7347632000'>
         <input type='submit' class='btn btn-primary'>
     </div>
-
 </form>
+
 {% if request.POST and user_list != 'blank' %}
 <div class="mt-4">
     {% if user_list %}
