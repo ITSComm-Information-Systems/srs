@@ -24,6 +24,23 @@ $(document).ready(function() {
 		current_page = paginate($(this).text(), rows_per_page, current_page, tr);
 		next_prev(current_page, num_pages);
   	});
+
+  	$("#techTable").hide();
+
+    $("#techSearch").on("keyup", function() {
+        $("#techTable").show();
+        var value = $(this).val().toLowerCase();
+        $("#techTable tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    $('#techTable tr').click(function() {
+        var tech_name = $(this).find("td").eq(1).html();   
+        var tech_id = $(this).find("td").eq(0).html(); 
+        $("#techSearch").val(tech_id + ':' + tech_name);  
+        $('#techTable').hide();
+    });
 })
 
 /// Validate update/search submission
