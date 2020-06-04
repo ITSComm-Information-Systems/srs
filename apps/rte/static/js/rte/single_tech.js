@@ -98,6 +98,7 @@ function wo_to_review() {
     $('#single-review').html('');
     $('#tech-info-review').html('');
     $('#single-review').append($("#single-input").html());
+    $('#single-review tr').find('.delete-col').remove();
     $('#tech-info-review').append($("#tech-info-input").html());
 }
 
@@ -111,7 +112,7 @@ function add_to_table(num_entries) {
                         '<th>' + $('#assigned_date').val() + '</th>' +
                         '<th>' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</th>' +
                         '<th>' + $('#notes').val() + '</th>' +
-                        '<th><button class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button>' +
+                        '<th class="delete-col"><button class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button>' +
                     '</tr>';
         var form_html = '<input type="text" name="' + num_entries + '_work_order" value="' + $('#workOrderSearch').val() + '" hidden>' +
                         '<input type="text" name="' + num_entries + '_rate" value="' + $('#rateSelect').val() + '" hidden>' +

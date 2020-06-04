@@ -81,7 +81,7 @@ function add_to_multiple_table(num_entries) {
                         '<th>' + $('#assigned_date_multiple').val() + '</th>' +
                         '<th>' + format_duration($('#duration-hours-multiple').val(), $('#duration-mins-multiple').val()) + '</th>' +
                         '<th>' + $('#notes-multiple').val() + '</th>' +
-                        '<th><button class="btn btn-danger delete_row_multiple" id="' + num_entries + '">Delete</button>' +
+                        '<th class="delete-col"><button class="btn btn-danger delete_row_multiple" id="' + num_entries + '">Delete</button>' +
                     '</tr>';
         var form_html = '<input type="text" name="' + num_entries + '_techid" value="' + $('#techSearchMultiple').val() + '" hidden>' +
                         '<input type="text" name="' + num_entries + '_assigned_group" value="' + $('#assignedGroupSelectMultiple').val() + '" hidden>' +
@@ -132,6 +132,7 @@ function techid_to_review() {
     $('#multiple-review').html('');
     $('#wo-info-review').html('');
     $('#multiple-review').append($("#multiple-input").html());
+    $('#multiple-review tr').find('.delete-col').remove();
     $('#wo-info-review').append($("#wo-info-input").html());
 }
 
