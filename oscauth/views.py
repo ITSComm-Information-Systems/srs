@@ -635,7 +635,6 @@ def userid(request):
         user_list= UmOscAcctSubscribersV.objects.filter(dn=user_param)
     else:
         user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id=user_param)
-    extra= '' #UmCurrentDeptManagersV.objects.all()
     
     for user in user_list:
         Id = user.user_defined_id
@@ -647,22 +646,23 @@ def userid(request):
         mrc = user.mrc_charged
         toll = user.toll_charged
         local = user.local_charged
+        
+        for x in UmOscServiceProfileV.objects.filter(service_number=user.dn, service_status_code="In Service", subscriber_status="Active"):
+            deptid=x.deptid
+            uniqname = AuthUserDept.objects.get(dept=deptid, group = 3).user.username
+            firstname=AuthUserDept.objects.get(dept=deptid, group = 3).user.first_name
+            lastname=AuthUserDept.objects.get(dept=deptid, group = 3).user.last_name
 
-        deptid=UmOscServiceProfileV.objects.get(service_number=user.dn).deptid
-        uniqname = AuthUserDept.objects.get(dept=deptid, group = 3).user.username
-        firstname=AuthUserDept.objects.get(dept=deptid, group = 3).user.first_name
-        lastname=AuthUserDept.objects.get(dept=deptid, group = 3).user.last_name
+            manager= lastname+', '+firstname+" ("+uniqname+")"
 
-        manager= lastname+', '+firstname+" ("+uniqname+")"
+            data = {'Id' : Id, 'manager':manager, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
+            rows.append(data)
 
-        data = {'Id' : Id, 'manager':manager, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
-        rows.append(data)
     
     context = {
         'title' : 'User ID Look Up',
         'subtitle1': 'Results for: ' + user_param ,
         'rows': rows,
         'user_list':user_list,
-        'extra':extra
     }
     return HttpResponse(template.render(context, request))
