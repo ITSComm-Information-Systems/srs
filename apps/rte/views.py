@@ -288,20 +288,28 @@ def view_time_display(request):
     # Search by work order
     if work_order:
         results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, work_order_display=work_order).order_by('assigned_date','work_order_display')
+        search_topic = 'Work Order'
+        search_criteria = work_order
 
     # Search dates
     else:
         # Search by date range
         if date_range:
             date_start, date_end = get_date_range(date_range)
+        else:
+            date_start = datetime.strptime(date_start, '%Y-%m-%d')
+            date_end = datetime.strptime(date_end, '%Y-%m-%d')
 
         results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, assigned_date__gt=date_start,
                                                            assigned_date__lt=date_end).order_by('assigned_date','work_order_display')
+        search_topic = 'Date Range'
+        search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
 
     context = {
         'title': 'View Time',
-        'date_start': date_start,
-        'date_end': date_end,
+        'techid': techid,
+        'search_topic': search_topic,
+        'search_criteria': search_criteria,
         'entries': results
     }
     return HttpResponse(template.render(context, request))
