@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.template import loader
 from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV
 from django.http import JsonResponse
+from datetime import datetime, timedelta
 
 # Base RTE view
 def load_rte(request):
@@ -222,39 +223,109 @@ def multiple_submit(request):
     return HttpResponse(template.render(context, request))
 
 
-# View/modify time
+# Modify time
 def update(request):
     template = loader.get_template('rte/update/update.html')
 
+    all_techs = UmRteTechnicianV.objects.all()
+
     context = {
-        'title': 'View/Update Time',
-        'tech_id': request.user.username,  # change to tech ID
+        'title': 'Update Time',
+        'all_techs': all_techs,  # change to tech ID
     }
     return HttpResponse(template.render(context, request))
 
 
-# Find times based on date and tech ID
-def view_times(request):
-    template = loader.get_template('rte/update/view_times.html')
+# Find open, unbilled entries based on tech ID
+def select_times(request):
+    template = loader.get_template('rte/update/select_times.html')
 
-    start_date = 'N/A'
-    end_date = 'N/A'
     techid = ''
+    tech_name = ''
     if request.method == 'POST':
-        start_date = request.POST.get('date-start')
-        end_date = request.POST.get('date-end')
-        techid = request.POST.get('techid')
+        tech = request.POST.get('techSearch')
+        techid = tech.split(':')[0]
+        tech_name = tech.split(':')[1]
 
-    results = UmRteCurrentTimeAssignedV.objects.filter(assigned_date__gte=start_date,
-                                                       assigned_date__lte=end_date,
-                                                       labor_code=techid.upper()).order_by('work_order_display',
-                                                                                           'assigned_date')
+    results = UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
+                                                       billed="No",
+                                                       labor_code=techid.upper()).order_by('assigned_date',
+                                                                                           'work_order_display')
 
     context = {
-        'title': 'View/Update Time',
+        'title': 'Update Time',
         'techid': techid,
-        'start_date': start_date,
-        'end_date': end_date,
+        'tech_name': tech_name,
         'entries': results
     }
     return HttpResponse(template.render(context, request))
+
+
+# View times
+def view_time_load(request):
+    template = loader.get_template('rte/view/search.html')
+
+    all_techs = UmRteTechnicianV.objects.all()
+    all_wos = UmRteServiceOrderV.objects.all()
+
+    context = {
+        'title': 'View Time',
+        'all_techs': all_techs,
+        'all_wos': all_wos
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def view_time_display(request):
+    template = loader.get_template('rte/view/display.html')
+
+    techid = request.POST.get('techSearch')
+    work_order = request.POST.get('workOrderSearch')
+    date_start = request.POST.get('calendarRangeStart')
+    date_end = request.POST.get('calendarRangeEnd')
+    date_range = request.POST.get('dateRangeSelect')
+
+    # Search by work order
+    if work_order:
+        results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, work_order_display=work_order).order_by('assigned_date','work_order_display')
+        search_topic = 'Work Order'
+        search_criteria = work_order
+
+    # Search dates
+    else:
+        # Search by date range
+        if date_range:
+            date_start, date_end = get_date_range(date_range)
+        else:
+            date_start = datetime.strptime(date_start, '%Y-%m-%d')
+            date_end = datetime.strptime(date_end, '%Y-%m-%d')
+
+        results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, assigned_date__gt=date_start,
+                                                           assigned_date__lt=date_end).order_by('assigned_date','work_order_display')
+        search_topic = 'Date Range'
+        search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
+
+    context = {
+        'title': 'View Time',
+        'techid': techid,
+        'search_topic': search_topic,
+        'search_criteria': search_criteria,
+        'entries': results
+    }
+    return HttpResponse(template.render(context, request))
+
+
+# Get begin and end date, given date range
+def get_date_range(date_range):
+    date_end = datetime.date(datetime.now())
+
+    if date_range == 'Last Week':
+        date_start = date_end - timedelta(days=7)
+
+    if date_range == 'Last 3 Months':
+        date_start = date_end - timedelta(days=92)
+
+    if date_range == 'Last 6 Months':
+        date_start = date_end - timedelta(days=183)
+
+    return date_start, date_end
