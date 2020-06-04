@@ -4,11 +4,57 @@
 
 <h1>{{ title }}</h1>
 
-{{ date_start }}
+<div class='card card-border col-4 mb-4'>
+	<div class='card-body'>
+		<strong>Tech ID:&nbsp;</strong>{{ techid }}<br>
+		<strong>{{ search_topic }}:&nbsp;</strong>{{ search_criteria }}
+	</div>
+</div>
 
-{{ date_end }}
+{% if entries %}
+	<table class='table table-striped' id='view-time-table'>
+		<thead>
+			<th>Work Order</th>
+			<th>Assigned Date</th>
+			<th>Duration</th>
+			<th>Assigned Group</th>
+			<th>Rate Level</th>
+			<th>Status</th>
+			<th>Billed</th>
+		</thead>
+		<tbody>
+			{% for entry in entries %}
+				<tr>
+					<td>{{ entry.work_order_display }}</td>
+					<td>{{ entry.assigned_date }}</td>
+					<td>{{ entry.actual_mins_display }}</td>
+					<td>{{ entry.assn_wo_group_name }}</td>
+					<td>{{ entry.rate_number.labor_rate_level_name }}</td>
+					<td>{{ entry.status_name }}</td>
+					<td>{% if entry.billed %}<i class="fas fa-check"></i>{% else %}<i class="fal fa-times"></i>{% endif %}</td>
+				</tr>
+			{% endfor%}
+		</tbody>
+	</table>
 
-{{ entries }}
+	<nav aria-label="results pagination navigation">
+	  <ul class="pagination justify-content-end" id='pagination'>
+	    <li class="page-item disabled" id='previous'>
+	      <a class="page-link" tabindex="-1" id="previous-tab">Previous</a>
+	    </li>
+	  </ul>
+	</nav>
+{% else %}
+
+
+	<div class='alert alert-danger col-4'>
+		No time entries for the selected criteria.
+	</div>
+	<button type="button" class="btn btn-primary"> 
+	  <a href="/apps/rte/view-time/" style="color:inherit">Search Again</a>
+	</button>
+
+{% endif %}
 
 {% endblock %}
 
