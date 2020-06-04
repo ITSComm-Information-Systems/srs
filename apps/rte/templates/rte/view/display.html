@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+{{ date_start }}
+
+{{ date_end }}
+
+{{ entries }}
+
+{% endblock %}
+
+{% block js %}
+<script src="/static/js/rte/view_times.js"></script>
+{% endblock %}
