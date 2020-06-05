@@ -383,7 +383,7 @@ $(document).ready(function() {
 					}
 					change_current_page(data[0]);
 				}
-				name_display = selected.split(':');
+				name_display = selected.split('?');
 				$('#dept_title').html('Department: ' + name_display[0]);
 				$('#dept_mgr').html(name_display[1]);
 				$('.dept_full_name').html(name_display[0]);
