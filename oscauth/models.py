@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User, Group
 from project.pinnmodels import UmCurrentDeptManagersV, UmOscDeptProfileV
+from oscauth.utils import McGroup
 
 
 class Role(models.Model):  
@@ -103,3 +104,64 @@ class Grantor(models.Model):
     class Meta:
         db_table = 'auth_grantor'
         unique_together = (("grantor_role", "granted_role"),)
+
+
+class LDAPGroup(models.Model):
+    name = models.CharField(max_length=100)
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+    def lookup(self, name):
+        mc = McGroup(name)  # Check name vs MCommunity
+
+        if not mc.dn:
+            return None
+
+        try:
+            lg = LDAPGroup.objects.get(name=mc.dn) # Lookup group with DN
+            return lg
+        except:
+            lg = LDAPGroup()
+            lg.name = mc.dn
+            lg.save()
+
+            for member in mc.members:   # Add members since this is a new group
+                lgm = LDAPGroupMember()
+                lgm.ldap_group = lg
+                lgm.username = member
+                lgm.save()
+
+            return lg
+
+    def update_membership(self):
+        mc = McGroup(self.name)
+
+        if not mc.dn:
+            self.active = False
+            self.save()
+            return None
+
+        db_members = set(LDAPGroupMember.objects.filter(ldap_group=self).values_list('username', flat=True) )
+
+        for username in mc.members.difference(db_members):
+            print('add', username)
+            lgm = LDAPGroupMember()
+            lgm.ldap_group = self
+            lgm.username = username
+            lgm.save()
+
+        for username in db_members.difference(mc.members):
+            LDAPGroupMember.objects.filter(ldap_group = self, username = username).delete()
+            print('delete', username)
+
+        return mc.members
+
+
+class LDAPGroupMember(models.Model):
+    ldap_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE)
+    username = models.CharField(max_length=8)
+
+    def __str__(self):
+        return self.username
