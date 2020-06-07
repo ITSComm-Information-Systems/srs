@@ -1,0 +1,18 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+{% block after_field_sets %}
+{% if node_list %}                                                           
+<fieldset class="module aligned {{ fieldset.classes }}">
+    <h4>Backup Nodes <a id="add_node_id" class="related-widget-wrapper-link add-related"  href="/admin/order/backupnode/add/?backup_domain={{object_id}}&amp;_popup=1" title="Add node"><img src="/static/admin/img/icon-addlink.svg" alt="Add"></a> </h4>
+    <ul>
+        {% for node in node_list %}
+            <li>
+            <a class="related-widget-wrapper-link change-related" id="change_id_service"  title="Change node Address" href="/admin/order/backupnode/{{ node.id }}/change/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-changelink.svg" alt="Change"></a>
+            {{ node.name }}
+            <a class="related-widget-wrapper-link change-related" id="change_id_service"  title="Delete node Address" href="/admin/order/backupnode/{{ node.id }}/delete/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-deletelink.svg" alt="Delete"></a>
+            </li>
+        {% endfor %}
+    </ul>
+</fieldset>
+{% endif %}
+{% endblock %}

@@ -1,4 +1,4 @@
-import csv
+import csv, json
 
 from django.http import HttpResponse
 from django.template import loader
@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import path
 
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -66,10 +66,15 @@ class ActionAdmin(admin.ModelAdmin):
             for element in step.element_list:
                 if element.name not in hidden_fields:
                     element.checked = True
-            
+    
+        override = 'x'
+        #p,arsed = json.loads(action.override)
+        #,override = json.dumps(parsed, indent=4)
+
         extra_context = {
             'step_list': step_list,
-            'consts': consts
+            'consts': consts,
+            'override': override
         }
         return super().change_view(
             request, object_id, form_url, extra_context=extra_context,
@@ -194,6 +199,22 @@ class StorageRateAdmin(admin.ModelAdmin):
     list_filter = ('service',)
 
 
+class BackupDomainAdmin(admin.ModelAdmin):
+    list_display = ['name','owner','shortcode','total_cost']
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+
+        node_list = BackupNode.objects.all().filter(backup_domain_id=object_id)
+                
+        extra_context = {
+            'node_list': node_list,
+        }
+
+        return super().change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
+
+
 admin.site.register(Constant)
 admin.site.register(ProductCategory, ProductCategoryAdmin)
 admin.site.register(Element, ElementAdmin)
@@ -210,3 +231,6 @@ admin.site.register(FeatureCategory, FeatureCategoryAdmin)
 admin.site.register(StorageInstance, StorageInstanceAdmin)
 admin.site.register(StorageHost)
 admin.site.register(StorageRate, StorageRateAdmin)
+
+admin.site.register(BackupDomain, BackupDomainAdmin)
+admin.site.register(BackupNode)
