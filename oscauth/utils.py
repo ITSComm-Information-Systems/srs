@@ -96,3 +96,28 @@ def get_mc_group(name):
     else:
         print(f'none found for {name}')
         return None
+
+class McGroup:
+
+    def __init__(self, name):
+        server = Server(settings.MCOMMUNITY['SERVER'], use_ssl=True, get_info=ALL)
+        conn = Connection(server,
+                        user=settings.MCOMMUNITY['USERNAME'],
+                        password=settings.MCOMMUNITY['PASSWORD'],
+                        auto_bind=True)
+
+        conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member"])
+        
+        if conn.entries:
+            self.response = conn.entries
+            self.dn = conn.entries[0].entry_dn[3:conn.entries[0].entry_dn.find(',')]
+
+            self.members = set()
+
+            for member in conn.entries[0]['member']:
+                uid = member[4:member.find(',')]
+                self.members.add(uid)  # Eliminate duplicates by adding to set
+
+        else:
+            print(f'none found for {name}')
+            self = None

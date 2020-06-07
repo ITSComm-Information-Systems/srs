@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from oscauth.models import Role
+from oscauth.models import Role, LDAPGroup
 from project.pinnmodels import UmOscPreorderApiV
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
@@ -370,6 +370,24 @@ class StorageInstance(models.Model):
 
 class StorageHost(models.Model):
     storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class BackupDomain(models.Model):
+    name = models.CharField(max_length=100)
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE)
+    shortcode = models.CharField(max_length=100)
+    total_cost = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def __str__(self):
+        return self.name
+    
+
+class BackupNode(models.Model):
+    backup_domain = models.ForeignKey(BackupDomain, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
     def __str__(self):
