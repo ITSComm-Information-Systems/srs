@@ -11,7 +11,7 @@
 <h3>Enter time</h3>
 
 <div class='row'>
-	<div class="form-group col-2" id="searchWorkOrder">
+	<div class="form-group col-3" id="searchWorkOrder">
 		<label for="workOrderSearch" id="labelWorkOrderSearch">
 	        <strong>Work Order</strong>
 	    </label>
@@ -22,6 +22,7 @@
 	            <tr tabindex="0"  id="{{ wo.full_prord_wo_number }}" role="button" aria-label="Select work order 
 	                {{ wo.full_prord_wo_number }}">
 	                <td>{{ wo.full_prord_wo_number }}</td>
+	                <td>{{ wo.comment_text|truncatechars:200 }}</td>
 	            </tr>
 	        {% endfor %}
 		</table>
