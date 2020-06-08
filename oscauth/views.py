@@ -647,8 +647,11 @@ def userid(request):
         toll = user.toll_charged
         local = user.local_charged
         
+        deptid_list=set()
         for x in UmOscServiceProfileV.objects.filter(service_number=user.dn, service_status_code="In Service", subscriber_status="Active"):
-            deptid=x.deptid
+            deptid_list.add(x.deptid)
+            
+        for deptid in deptid_list:
             uniqname = AuthUserDept.objects.get(dept=deptid, group = 3).user.username
             firstname=AuthUserDept.objects.get(dept=deptid, group = 3).user.first_name
             lastname=AuthUserDept.objects.get(dept=deptid, group = 3).user.last_name
