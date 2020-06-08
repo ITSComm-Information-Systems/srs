@@ -7,14 +7,14 @@
             <strong>Enter a User ID</strong>
         </label>
         <br>
-        <input type='text' name="user_param" id="deptf" size="1" class="form-control text-field-short col-4" placeholder='Ex: PH-73476320000-01 or 7347632000'>
+        <input type='text' name="user_param" id="deptf" size="1" class="form-control text-field-short col-4" placeholder='Ex: PH-7347632000-01 or 7347632000'>
         <input type='submit' class='btn btn-primary'>
     </div>
 </form>
 
 {% if request.POST and user_list != 'blank' %}
 <div class="mt-4">
-    {% if user_list %}
+    {% if rows %}
     <h2>{{ subtitle1 }}</h2>
     {% else%}
     <strong class="mt-3 prv-msgs"><i class="fas fa-exclamation-triangle" aria-label="Icon for user id not found"></i>
