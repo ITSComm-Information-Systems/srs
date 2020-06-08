@@ -49,6 +49,7 @@
 			            <tr tabindex="0"  id="{{ wo.full_prord_wo_number }}" role="button" aria-label="Select work order 
 			                {{ wo.full_prord_wo_number }}">
 			                <td>{{ wo.full_prord_wo_number }}</td>
+			                <td>{{ wo.comment_text|truncatechars:200 }}</td>
 			            </tr>
 			        {% endfor %}
 			    </table>

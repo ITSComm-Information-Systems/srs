@@ -1,19 +1,12 @@
-{% extends 'base.html' %}
-
-{% block content %}
-
-<h1>{{ title }}</h1>
-
 <div class='card mb-4 col-4'>
 	<div class='card-body'>
 		<strong>Tech ID:&nbsp;</strong>{{ techid }}<br>
-		<strong>Tech Name:&nbsp;</strong>{{ tech_name }}
 	</div>
 </div>
 
-<strong>Please select which entries you would like to update.</strong>
+<strong>Please select up to 10 entries to update.</strong>
 
-<table class='table table-striped mt-2' id='update-results-table'>
+<table class='table table-striped mt-2' id='select-entries-table'>
 	<thead>
 		<tr>
 			<th scope='col'><input type="checkbox" value=""></th>
@@ -46,13 +39,4 @@
   </ul>
 </nav>
 
-<div class='row'>
-	<div></div>
-	<button class='btn btn-primary float-right' type='submit'>Edit</button>
-</div>
-
-{% endblock %}
-
-{% block js %}
-<script src="/static/js/rte/update.js"></script>
-{% endblock %}
+<p id='assigned_groups'>{{ assigned_groups|safe }}</p>

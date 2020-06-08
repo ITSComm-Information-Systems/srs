@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from django.template import loader
-from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV
+from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput
 from django.http import JsonResponse
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 # Base RTE view
 def load_rte(request):
@@ -98,15 +98,57 @@ def single_submit(request):
         assigned_group = request.POST.get('assigned_group')
 
         for i in range(1, int(num_entries) + 1):
+            work_order = request.POST.get(str(i) + '_work_order')
+            rate_level = UmRteRateLevelV.objects.get(labor_rate_level_name=request.POST.get(str(i) + '_rate'))
+            assigned_date = request.POST.get(str(i) + '_assigned_date')
+            duration = request.POST.get(str(i) + '_duration')
+            notes = request.POST.get(str(i) + '_notes')
+
+            work_order = UmRteServiceOrderV.objects.get(full_prord_wo_number=request.POST.get(str(i) + '_work_order'))
+            tech = UmRteTechnicianV.objects.get(labor_code=tech_id)
+            assigned_group = UmRteLaborGroupV.objects.get(wo_group_name=assigned_group, wo_group_labor_code=tech_id)
+
+            new_entry = UmRteInput(
+                uniqname=request.user.username,
+                wo_labor_id=None,
+                wo_tcom_id=work_order.wo_tcom_id,
+                full_prord_wo_number=work_order.full_prord_wo_number,
+                labor_id=tech.labor_id,
+                labor_code=tech.labor_code,
+                wo_group_labor_group_id=assigned_group.wo_group_labor_group_id,
+                wo_group_code=assigned_group.wo_group_code,
+                assigned_date=datetime.strptime(assigned_date, '%Y-%m-%d').date(),
+                complete_date=datetime.strptime(assigned_date + ' ' + duration, '%Y-%m-%d %H:%M'),
+                rate_number=rate_level,
+                actual_mins_display=duration,
+                notes=notes,
+                date_added=date.today(),
+                date_processed=None,
+                messages=None,
+                request_no=None)
+            new_entry.save()
+
             entry = {
-                'tech_id': tech_id,
-                'work_order': request.POST.get(str(i) + '_work_order'),
-                'rate_level': request.POST.get(str(i) + '_rate'),
-                'assigned_group': assigned_group,
-                'assigned_date': request.POST.get(str(i) + '_assigned_date'),
-                'duration': request.POST.get(str(i) + '_duration'),
-                'notes': request.POST.get(str(i) + '_notes')
+                'uniqname':request.user.username,
+                'wo_labor_id':None,
+                'wo_tcom_id':work_order.wo_tcom_id,
+                'full_prord_wo_number':work_order.full_prord_wo_number,
+                'labor_id':tech.labor_id,
+                'labor_code':tech.labor_code,
+                'wo_group_labor_group_id':assigned_group.wo_group_labor_group_id,
+                'wo_group_code':assigned_group.wo_group_code,
+                'assigned_date':datetime.strptime(assigned_date, '%Y-%m-%d').date(),
+                'completed_date':datetime.strptime(assigned_date + ' ' + duration, '%Y-%m-%d %H:%M'),
+                'rate_number':rate_level,
+                'actual_mins_display':duration,
+                'notes':notes,
+                'date_added':date.today(),
+                'date_processed':None,
+                'messages':None,
+                'request_no':None
             }
+
+
             entries.append(entry)
 
     context = {
@@ -159,6 +201,7 @@ def multiple_tech(request):
     if request.method == 'POST':
 
         selected_wo = request.POST.get('workOrderSearch')
+        selected_wo_desc = all_wos.get(full_prord_wo_number=selected_wo).comment_text
 
         context = {
             'wf': 'multiple',
@@ -168,7 +211,8 @@ def multiple_tech(request):
             'all_wos': all_wos,
             'all_techs': all_techs,
             'rate_levels': rate_levels,
-            'selected_wo': selected_wo
+            'selected_wo': selected_wo,
+            'selected_wo_desc': selected_wo_desc
         }
 
         return HttpResponse(template.render(context, request))
@@ -225,14 +269,94 @@ def multiple_submit(request):
 
 # Modify time
 def update(request):
-    template = loader.get_template('rte/update/update.html')
+    template = loader.get_template('rte/workflow.html')
+
+    tab_list = []
+
+    # Select technician tab
+    tab1 = {
+        'name': 'techSelect',
+        'step': 'step1',
+        'label': 'Select Technician',
+        'template': 'rte/update/update.html'
+    }
+    tab_list.append(tab1)
+
+    # Select entries to edit tab
+    tab2 = {
+        'name': 'selectEntries',
+        'step': 'step2',
+        'label': 'Select Entries',
+        'template': 'rte/update/select_times.html'
+    }
+    tab_list.append(tab2)
+
+    # Edit entries tab
+    tab3 = {
+        'name': 'editEntries',
+        'step': 'step3',
+        'label': 'Edit Entries',
+        'template': 'rte/update/edit_times.html'
+    }
+    tab_list.append(tab3)
+
+    # Review and Submit tab
+    tab4 = {
+        'name': 'reviewStep',
+        'step': 'step4',
+        'label': 'Review and Submit',
+        'template': 'rte/update/review_submit.html'
+    }
+    tab_list.append(tab4)
 
     all_techs = UmRteTechnicianV.objects.all()
+    rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
+
+    # Load after search
+    if request.method == 'POST':
+        selected_tech = request.POST.get('techSearch')
+        results = UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
+                                                       billed="No",
+                                                       labor_code=selected_tech).order_by('assigned_date',
+                                                                                           'work_order_display')
+        assigned_groups = [group.wo_group_name for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=selected_tech)]
+
+        context = {
+            'wf': 'update',
+            'title': 'Update Time',
+            'tab_list': tab_list,
+            'num_tabs': len(tab_list),
+            'all_techs': all_techs,
+            'rate_levels': rate_levels,
+            'assigned_groups': assigned_groups,
+            'techid': selected_tech,
+            'entries': results
+        }
+
+        return HttpResponse(template.render(context, request))
+
+    # Original load
+    else:
+        context = {
+            'wf': 'update',
+            'title': 'Update Time',
+            'tab_list': tab_list,
+            'num_tabs': len(tab_list),
+            'all_techs': all_techs
+        }
+        return HttpResponse(template.render(context, request))
+
+# Submit updated times
+def update_submit(request):
+    template = loader.get_template('rte/submitted.html')
+
+    entries = []
 
     context = {
-        'title': 'Update Time',
-        'all_techs': all_techs,  # change to tech ID
+        'title': 'Rapid Time Entry Submit',
+        'entries': entries
     }
+
     return HttpResponse(template.render(context, request))
 
 

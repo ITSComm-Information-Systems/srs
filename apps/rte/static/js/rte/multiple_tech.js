@@ -125,6 +125,7 @@ function delete_row_multiple(row_num, num_entries) {
 function wo_to_techid() {
     $('.work_order').html($('#work_order').val());
     $('.work_order').val($('#work_order').val());
+    $('.comment_text').html($('#work_order_text').text());
 }
 
 // Transition to review page
