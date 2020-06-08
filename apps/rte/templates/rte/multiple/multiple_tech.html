@@ -24,6 +24,7 @@
 	            <tr tabindex="0"  id="{{ wo.full_prord_wo_number }}" role="button" aria-label="Select work order 
 	                {{ wo.full_prord_wo_number }}">
 	                <td >{{ wo.full_prord_wo_number }}</td>
+	                <td >{{ wo.comment_text|truncatechars:200 }}</td>
 	            </tr>
 	        {% endfor %}
 	    </table>
@@ -34,9 +35,19 @@
 
 {% if selected_wo %}
 	<div class='form-group col-4 mt-4'>
-		<label for="tech_id" id="teachIdLabel">
+		<label for="work-order" id="workOrderLabel">
             <strong>Selected Work Order</strong>
         </label>
         <input readonly class='form-control' id="work_order" value="{{ selected_wo }}">
+
+        <label for="wo_desc" id="workOrderDescLabel" class="mt-2">
+            <strong>Comment Text</strong>
+        </label>
+        <div class='card' id="wo_desc">
+        	<div class='card-body' id='work_order_text'>
+        		{{ selected_wo_desc }}
+        	</div>
+        </div>
+
 	</div>
 {% endif %}

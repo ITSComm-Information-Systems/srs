@@ -1076,6 +1076,7 @@ class UmRteServiceOrderV(models.Model):
     status_name = models.CharField(max_length=60, blank=True, null=True)
     category_code = models.CharField(max_length=1)
     assigned_labor_code = models.CharField(max_length=9, blank=True, null=True)
+    comment_text = models.CharField(max_length=4000, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1092,4 +1093,28 @@ class UmRteTechnicianV(models.Model):
     class Meta:
         managed = False
         db_table = 'PINN_CUSTOM\".\"UM_RTE_TECHNICIAN_V'
+
+class UmRteInput(models.Model):
+  uniqname = models.CharField(max_length=8, blank=True, null=True)
+  wo_labor_id = models.IntegerField()
+  wo_tcom_id = models.FloatField()
+  full_prord_wo_number = models.CharField(max_length=98, blank=True, null=True)
+  labor_id = models.IntegerField()
+  labor_code = models.CharField(max_length=9)
+  wo_group_labor_group_id = models.BigIntegerField()
+  wo_group_code = models.CharField(max_length=32, blank=True, null=True)
+  assigned_date = models.DateField(blank=True, null=True)
+  complete_date = models.DateField(blank=True, null=True)
+  rate_number = models.ForeignKey('UmRteRateLevelV', db_column='rate_number', to_field='labor_rate_level_code',
+                                    on_delete=models.CASCADE)
+  actual_mins_display = models.CharField(max_length=10, blank=True, null=True)
+  notes = models.CharField(max_length=4000, blank=True, null=True)
+  date_added = models.DateField(blank=True, null=True)
+  date_processed = models.DateField(blank=True, null=True)
+  messages = models.CharField(max_length=2000, blank=True, null=True)
+  request_no = models.BigIntegerField(primary_key=True)
+
+  class Meta:
+        managed = False
+        db_table = 'PINN_CUSTOM\".\"UM_RTE_INPUT'
 
