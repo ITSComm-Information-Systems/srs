@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from oscauth.models import Role
+from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
@@ -53,6 +53,7 @@ class Step(Configuration):
         ('BillingStorageForm', 'Billing'),
         ('BackupDetailsForm', 'Backup Details'),
         ('VolumeSelectionForm', 'Volume Selection'),
+        ('SubscriptionSelForm', 'Subscription Selection'),
     )
 
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
@@ -376,6 +377,28 @@ class StorageHost(models.Model):
         return self.name
 
 
+class BackupDomain(models.Model):
+    name = models.CharField(max_length=100)
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE)
+    shortcode = models.CharField(max_length=100)
+    total_cost = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def __str__(self):
+        return self.name
+    
+    def get_user_subscriptions(self, username):
+        groups = list(LDAPGroupMember.objects.filter(username=username).values_list('ldap_group_id'))
+        return BackupDomain.objects.filter(owner__in=groups).order_by('name')
+        
+
+class BackupNode(models.Model):
+    backup_domain = models.ForeignKey(BackupDomain, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
 class Order(models.Model):
     PRIORITY_CHOICES = (
         ('High', 'Expedited'),
@@ -645,9 +668,25 @@ class Item(models.Model):
             print('Destination not found')
 
         if action.service_id == 8:  # No update for MiBackup
+            self.update_mibackup()
             return 
 
         self.update_mistorage()
+
+    def update_mibackup(self):
+        bd = BackupDomain()
+        bd.name = 'temp'
+        bd.owner = LDAPGroup().lookup( self.data['mCommunityName'] )
+        bd.shortcode = self.data['shortcode']
+        bd.total_cost = 0
+        bd.save()
+
+        for node in self.data['nodes']:
+            if node != '':
+                n = BackupNode()
+                n.backup_domain = bd
+                n.name = node
+                n.save()
 
     def update_mistorage(self):
 

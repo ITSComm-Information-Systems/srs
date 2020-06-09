@@ -124,6 +124,7 @@ def send_tab_data(request):
         i.chartcom_id = request.POST.get('oneTimeCharges', 14388)
         i.data = data
         i.description = action.cart_label
+        i.data['nodes'] = request.POST.getlist('nodeNames')
         i.save()
         item_id = i.id
 
