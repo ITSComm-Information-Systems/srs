@@ -1,0 +1,45 @@
+<h2>Subscription Review</h2>
+<p>Please select the storage volume you wish to modify</p>
+<input type="hidden" id="instance_id" name="instance_id" value="0">
+<div class="row mb-4">
+    <div class="table-responsive-lg">
+        <table class="table table-hover table-striped table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Policy Domain</th>
+                    <th scope="col">MCommunity Group</th>
+                    <th scope="col">Number of Nodes</th>
+                    <th scope="col">Shortcode</th>
+                    <th scope="col">Total Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sub in tab.form.subscription_list %}
+                    
+                    <tr>
+                        <td>{{ sub.name }}</td>
+                        <td>{{ sub.owner }}</td>
+                        <td style="text-align:center">{{ sub.node_count }}
+                            <a tabindex="0" role="button" data-toggle="popover" data-container="body"
+                            data-trigger="focus" data-placement="bottom" 
+                            data-content="{% for node in sub.node_list %} <li>{{node}}</li> {% endfor %}"><i class="fa fa-info-circle"></i> <span class="sr-only">{{ field.help_text }}</span>
+                            </a>
+                        </td>
+                        <td>{{ sub.shortcode }}</td>
+                        <td style="text-align:right">{{ sub.total_cost }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Total Cost</th>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align:right">{{ tab.form.total_cost }}0</td>                 
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+

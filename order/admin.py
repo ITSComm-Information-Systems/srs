@@ -67,9 +67,7 @@ class ActionAdmin(admin.ModelAdmin):
                 if element.name not in hidden_fields:
                     element.checked = True
     
-        override = 'x'
-        #p,arsed = json.loads(action.override)
-        #,override = json.dumps(parsed, indent=4)
+        override = json.dumps(action.override, indent=4)
 
         extra_context = {
             'step_list': step_list,
