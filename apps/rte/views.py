@@ -104,15 +104,15 @@ def single_submit(request):
             duration = request.POST.get(str(i) + '_duration')
             notes = request.POST.get(str(i) + '_notes')
 
-            work_order = UmRteServiceOrderV.objects.get(full_prord_wo_number=request.POST.get(str(i) + '_work_order'))
+            service_order = UmRteServiceOrderV.objects.get(full_prord_wo_number=request.POST.get(str(i) + '_work_order'))
             tech = UmRteTechnicianV.objects.get(labor_code=tech_id)
             assigned_group = UmRteLaborGroupV.objects.get(wo_group_name=assigned_group, wo_group_labor_code=tech_id)
 
             new_entry = UmRteInput(
                 uniqname=request.user.username,
                 wo_labor_id=None,
-                wo_tcom_id=work_order.wo_tcom_id,
-                full_prord_wo_number=work_order.full_prord_wo_number,
+                wo_tcom_id=service_order.wo_tcom_id,
+                full_prord_wo_number=service_order.full_prord_wo_number,
                 labor_id=tech.labor_id,
                 labor_code=tech.labor_code,
                 wo_group_labor_group_id=assigned_group.wo_group_labor_group_id,
@@ -131,8 +131,8 @@ def single_submit(request):
             entry = {
                 'uniqname':request.user.username,
                 'wo_labor_id':None,
-                'wo_tcom_id':work_order.wo_tcom_id,
-                'full_prord_wo_number':work_order.full_prord_wo_number,
+                'wo_tcom_id':service_order.wo_tcom_id,
+                'full_prord_wo_number':service_order.full_prord_wo_number,
                 'labor_id':tech.labor_id,
                 'labor_code':tech.labor_code,
                 'wo_group_labor_group_id':assigned_group.wo_group_labor_group_id,
@@ -248,14 +248,65 @@ def multiple_submit(request):
         work_order = request.POST.get('work_order')
 
         for i in range(1, int(num_entries) + 1):
+            # entry = {
+            #     'tech_id': request.POST.get(str(i) + '_techid'),
+            #     'work_order': work_order,
+            #     'rate_level': request.POST.get(str(i) + '_rate'),
+            #     'assigned_group': request.POST.get(str(i) + '_assigned_group'),
+            #     'assigned_date': request.POST.get(str(i) + '_assigned_date'),
+            #     'duration': request.POST.get(str(i) + '_duration'),
+            #     'notes': request.POST.get(str(i) + '_notes')
+            # }
+
+            tech_id = request.POST.get(str(i) + '_techid')
+            assigned_group = request.POST.get(str(i) + '_assigned_group')
+            rate_level = UmRteRateLevelV.objects.get(labor_rate_level_name=request.POST.get(str(i) + '_rate'))
+            assigned_date = request.POST.get(str(i) + '_assigned_date')
+            duration = request.POST.get(str(i) + '_duration')
+            notes = request.POST.get(str(i) + '_notes')
+
+            service_order = UmRteServiceOrderV.objects.get(full_prord_wo_number=work_order)
+            tech = UmRteTechnicianV.objects.get(labor_code=tech_id)
+            assigned_group = UmRteLaborGroupV.objects.get(wo_group_name=assigned_group, wo_group_labor_code=tech_id)
+
+            new_entry = UmRteInput(
+                uniqname=request.user.username,
+                wo_labor_id=None,
+                wo_tcom_id=service_order.wo_tcom_id,
+                full_prord_wo_number=service_order.full_prord_wo_number,
+                labor_id=tech.labor_id,
+                labor_code=tech.labor_code,
+                wo_group_labor_group_id=assigned_group.wo_group_labor_group_id,
+                wo_group_code=assigned_group.wo_group_code,
+                assigned_date=datetime.strptime(assigned_date, '%Y-%m-%d').date(),
+                complete_date=datetime.strptime(assigned_date + ' ' + duration, '%Y-%m-%d %H:%M'),
+                rate_number=rate_level,
+                actual_mins_display=duration,
+                notes=notes,
+                date_added=date.today(),
+                date_processed=None,
+                messages=None,
+                request_no=None)
+            new_entry.save()
+
             entry = {
-                'tech_id': request.POST.get(str(i) + '_techid'),
-                'work_order': work_order,
-                'rate_level': request.POST.get(str(i) + '_rate'),
-                'assigned_group': request.POST.get(str(i) + '_assigned_group'),
-                'assigned_date': request.POST.get(str(i) + '_assigned_date'),
-                'duration': request.POST.get(str(i) + '_duration'),
-                'notes': request.POST.get(str(i) + '_notes')
+                'uniqname':request.user.username,
+                'wo_labor_id':None,
+                'wo_tcom_id':service_order.wo_tcom_id,
+                'full_prord_wo_number':service_order.full_prord_wo_number,
+                'labor_id':tech.labor_id,
+                'labor_code':tech.labor_code,
+                'wo_group_labor_group_id':assigned_group.wo_group_labor_group_id,
+                'wo_group_code':assigned_group.wo_group_code,
+                'assigned_date':datetime.strptime(assigned_date, '%Y-%m-%d').date(),
+                'completed_date':datetime.strptime(assigned_date + ' ' + duration, '%Y-%m-%d %H:%M'),
+                'rate_number':rate_level,
+                'actual_mins_display':duration,
+                'notes':notes,
+                'date_added':date.today(),
+                'date_processed':None,
+                'messages':None,
+                'request_no':None
             }
             entries.append(entry)
 
