@@ -209,6 +209,47 @@ class AddlInfoForm(TabForm):
         return True
 
 
+class SubscriptionSelForm(TabForm):
+    template = 'order/subscription_review.html'
+
+    def get_summary(self, *args, **kwargs):
+        #summary = super().get_summary(*args, **kwargs)
+
+        subscription = BackupDomain.objects.get(id=self.data['instance_id'])
+
+        if self.data.get('volaction') == 'Delete':
+            summary = [{'label': 'Are you sure you want to delete this subscription?', 'value': ''}
+                        ,{'label': 'Domain Name:', 'value': subscription.name}
+                        ,{'label': 'Owner:', 'value': subscription.owner.name}]
+        else:
+            summary = [{'label': 'Domain Name:', 'value': subscription.name}]
+
+        return summary
+
+    def is_valid(self, *args, **kwargs):
+        super(SubscriptionSelForm, self).is_valid(*args, **kwargs)
+        return True
+
+    def __init__(self, *args, **kwargs):
+        super(SubscriptionSelForm, self).__init__(*args, **kwargs)
+
+        self.subscription_list = BackupDomain().get_user_subscriptions(self.request.user.username)
+        self.total_cost = 0
+
+        for sub in self.subscription_list:
+            sub.node_list = BackupNode.objects.filter(backup_domain=sub)
+            sub.node_count = sub.node_list.count()
+            self.total_cost = self.total_cost + sub.total_cost
+        
+        self.total_cost = round(self.total_cost,2)
+
+        if not self.is_bound:
+            action_id = int(self.request.path[11:])
+
+            if action_id == 62:
+                self.template = 'order/subscription_selection.html'
+
+
 class VolumeSelectionForm(TabForm):
     template = 'order/volume_selection.html'
 
@@ -240,7 +281,6 @@ class VolumeSelectionForm(TabForm):
             groups = list(StorageMember.objects.filter(username=self.request.user).values_list('storage_owner_id'))
             action_id = int(self.request.path[11:])
             service = Action.objects.get(id=action_id).service
-            print('service', service)
 
             if action_id == 47 or action_id == 53 or action_id == 59:
                 self.volume_list = StorageInstance.objects.filter(service=service, type='NFS', owner__in=groups).order_by('name')
@@ -406,6 +446,12 @@ class BackupDetailsForm(TabForm):
                 for count, node in enumerate(nodes):
                     if node:
                         self.node_list.append({'name': node, 'time': times[count]})
+            else:
+                instance_id = self.request.POST.get('instance_id')
+                if instance_id: 
+                    bd = BackupDomain.objects.get(id=instance_id)
+                    self.fields["mCommunityName"].initial = bd.owner
+                    self.node_list = BackupNode.objects.filter(backup_domain=instance_id)
         else:
             self.node_list = []
             self.node_list.append({'name': '', 'time': ''})
@@ -438,9 +484,18 @@ class BillingStorageForm(TabForm):
 
         if self.request:
             if self.request.method == 'POST':
-                if self.request.POST['action_id'] == '51':
+                if self.request.POST['action_id'] == '51' or self.request.POST['action_id'] == '62':
                     tc = self.fields['totalCost'].description.replace('~', '47 per TB')
                     self.fields['totalCost'].description = tc
+                    instance_id = self.request.POST.get('instance_id')
+                    if instance_id:
+                        si = BackupDomain.objects.get(id=instance_id)
+                        self.fields["shortcode"].initial = si.shortcode
+                        self.fields["billingAuthority"].initial = 'yes'
+                        self.fields["serviceLvlAgreement"].initial = 'yes'
+                        
+
+
                     return
 
                 instance_id = self.request.POST.get('instance_id')
@@ -448,12 +503,16 @@ class BillingStorageForm(TabForm):
                 total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
 
                 if instance_id:
-                    si = StorageInstance.objects.get(id=instance_id)
+                    if self.data['action_id'] == '51' or self.request.POST['action_id'] == '62':
+                        si = BackupDomain.objects.get(id=instance_id)
+                    else:
+                        si = StorageInstance.objects.get(id=instance_id)
+
                     self.fields["shortcode"].initial = si.shortcode
                     self.fields["billingAuthority"].initial = 'yes'
                     self.fields["serviceLvlAgreement"].initial = 'yes'
         else:
-            if self.data['action_id'] == '51':
+            if self.data['action_id'] == '51' or self.request.POST['action_id'] == '62':
                 return
 
             option = StorageRate.objects.get(id=self.data['selectOptionType'])
@@ -465,8 +524,7 @@ class BillingStorageForm(TabForm):
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
 
-        print(self.data['action_id'])
-        if self.data['action_id'] != '51':
+        if self.data['action_id'] != '51' and self.request.POST['action_id'] != '62':
             option = StorageRate.objects.get(id=self.data['selectOptionType'])
             total_cost = option.get_total_cost(self.data['sizeGigabyte'])
             summary.append({'label': 'Total Cost', 'value': str(total_cost)})
@@ -474,9 +532,14 @@ class BillingStorageForm(TabForm):
         instance_id = self.data.get('instance_id')
         
         if instance_id:
-            si = StorageInstance.objects.get(id=instance_id)
-            if self.data['shortcode'] != si.shortcode:
-                summary[0]['label'] = '*' + summary[0]['label']
+            if self.data['action_id'] == '51' or self.request.POST['action_id'] == '62':
+                si = BackupDomain.objects.get(id=instance_id)
+                if self.data['shortcode'] != si.shortcode:
+                    summary[0]['label'] = '*' + summary[0]['label']
+            else:
+                si = StorageInstance.objects.get(id=instance_id)
+                if self.data['shortcode'] != si.shortcode:
+                    summary[0]['label'] = '*' + summary[0]['label']
 
 
         return summary

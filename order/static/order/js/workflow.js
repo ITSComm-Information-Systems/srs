@@ -59,9 +59,6 @@ $(document).ready(function() {
       vals = []
     }
 
-
-
-
   })
 
 
@@ -86,7 +83,7 @@ $(document).ready(function() {
     }
   }
 
-  if ( $("#wfid").val() == 50 ) {  // Hide workflow for "Review Storage" (cost data) 
+  if ( $("#wfid").val() == 50  || $("#wfid").val() == 63 ) {  // Hide workflow for "Review Storage" (cost data) 
     $('#pills-step1').hide();
     $('p').hide();
     $('h2').hide();
@@ -610,7 +607,30 @@ function modifyVolume(del_flag, volumeID) {
   
 
 
+function modifySubscription(del_flag, subscriptionID) {
+  currStep = 4;
 
+  $('#instance_id').val(subscriptionID);
+
+  if(del_flag==1) {
+    lastStep = document.getElementsByClassName("tab-pane").length;
+    $('#pills-step'+lastStep).removeClass('disabled');
+    //$('#pills-tab li:last-child a').tab('show') 
+
+    $('[data-tab="backupDetails"]').hide();
+    $('[data-tab="storageBilling"]').hide();
+
+    sendTabData({name: 'volaction', value: 'Delete'});
+  } else {
+    $('#instance_id').val(subscriptionID);
+    sendTabData();
+  }
+
+  $('[data-tab="subscriptionSelect"]').hide();
+
+  //$('#pills-step'+currStep).removeClass('disabled');
+  //$('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
+}
 
 function sendTabData(field) {
   data = $('#workflowForm').serializeArray();
