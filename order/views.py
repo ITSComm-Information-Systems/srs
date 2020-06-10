@@ -484,7 +484,14 @@ class Workflow(UserPassesTestMixin, View):
                 tab.form = forms.Form()
                 tab.form.template = 'order/static.html'
             else:
-                tab.form = globals()[tab.custom_form](tab, action, request=request)
+                if not action.use_ajax or index==1:
+                    tab.form = globals()[tab.custom_form](tab, action, request=request)
+                else:
+                    f = forms.Form()
+                    f.template = 'order/dynamic_form.html'
+                    tab.form = f
+
+
                 if tab.name == 'PhoneLocation':
                     js.append('phone_location')
                 elif tab.name == 'LocationNew':
