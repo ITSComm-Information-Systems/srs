@@ -482,49 +482,32 @@ class BillingStorageForm(TabForm):
         super(BillingStorageForm, self).__init__(*args, **kwargs)
         total_cost = 0
 
-        if self.request:
-            if self.request.method == 'POST':
-                if self.request.POST['action_id'] == '51' or self.request.POST['action_id'] == '62':
-                    tc = self.fields['totalCost'].description.replace('~', '47 per TB')
-                    self.fields['totalCost'].description = tc
-                    instance_id = self.request.POST.get('instance_id')
-                    if instance_id:
-                        si = BackupDomain.objects.get(id=instance_id)
-                        self.fields["shortcode"].initial = si.shortcode
-                        self.fields["billingAuthority"].initial = 'yes'
-                        self.fields["serviceLvlAgreement"].initial = 'yes'
-                        
+        if self.action.type == 'M':  # If modify then get existing data
+            instance_id = self.request.POST.get('instance_id')
 
+            if instance_id:
+                if self.action.service.name == 'miStorage':
+                    si = StorageInstance.objects.get(id=instance_id)
+                else: # miBackup
+                    si = BackupDomain.objects.get(id=instance_id)
+        
+                self.fields["shortcode"].initial = si.shortcode
+                self.fields["billingAuthority"].initial = 'yes'
+                self.fields["serviceLvlAgreement"].initial = 'yes'
 
-                    return
-
-                instance_id = self.request.POST.get('instance_id')
-                option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
-                total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
-
-                if instance_id:
-                    if self.data['action_id'] == '51' or self.request.POST['action_id'] == '62':
-                        si = BackupDomain.objects.get(id=instance_id)
-                    else:
-                        si = StorageInstance.objects.get(id=instance_id)
-
-                    self.fields["shortcode"].initial = si.shortcode
-                    self.fields["billingAuthority"].initial = 'yes'
-                    self.fields["serviceLvlAgreement"].initial = 'yes'
+        if self.action.service.name == 'miStorage':
+            option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
+            total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
+            descr = self.fields['totalCost'].description.replace('~', str(total_cost))
         else:
-            if self.data['action_id'] == '51' or self.request.POST['action_id'] == '62':
-                return
-
-            option = StorageRate.objects.get(id=self.data['selectOptionType'])
-            total_cost = option.get_total_cost(self.data['sizeGigabyte'])
-
-        descr = self.fields['totalCost'].description.replace('~', str(total_cost))
+            descr = self.fields['totalCost'].description.replace('~', '47 per TB')
+        
         self.fields['totalCost'].description = descr
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
 
-        if self.data['action_id'] != '51' and self.request.POST['action_id'] != '62':
+        if self.action.service.name == 'miStorage':
             option = StorageRate.objects.get(id=self.data['selectOptionType'])
             total_cost = option.get_total_cost(self.data['sizeGigabyte'])
             summary.append({'label': 'Total Cost', 'value': str(total_cost)})
@@ -532,16 +515,15 @@ class BillingStorageForm(TabForm):
         instance_id = self.data.get('instance_id')
         
         if instance_id:
-            if self.data['action_id'] == '51' or self.request.POST['action_id'] == '62':
-                si = BackupDomain.objects.get(id=instance_id)
-                if self.data['shortcode'] != si.shortcode:
-                    summary[0]['label'] = '*' + summary[0]['label']
-            else:
+            if self.action.service.name == 'miStorage':
                 si = StorageInstance.objects.get(id=instance_id)
                 if self.data['shortcode'] != si.shortcode:
                     summary[0]['label'] = '*' + summary[0]['label']
-
-
+            else:
+                si = BackupDomain.objects.get(id=instance_id)
+                if self.data['shortcode'] != si.shortcode:
+                    summary[0]['label'] = '*' + summary[0]['label']
+                    
         return summary
 
 
