@@ -1,6 +1,6 @@
 $(document).ready(function() {
     // Table searches - tech ID
-	$("#techTable").hide();
+    $("#techTable").hide();
 
     $("#techSearch").on("keyup", function() {
         $("#techTable").show();
@@ -42,21 +42,21 @@ $(document).ready(function() {
     $('#selectByDateRangeDiv').hide();
 
     $('#selectByWorkOrder').on('change', function() {
-    	$('#selectByWorkOrderDiv').show();
-	    $('#selectByCalendarRangeDiv').hide();
-	    $('#selectByDateRangeDiv').hide();
+        $('#selectByWorkOrderDiv').show();
+        $('#selectByCalendarRangeDiv').hide();
+        $('#selectByDateRangeDiv').hide();
     });
 
     $('#selectByCalendarRange').on('change', function() {
-    	$('#selectByWorkOrderDiv').hide();
-	    $('#selectByCalendarRangeDiv').show();
-	    $('#selectByDateRangeDiv').hide();
+        $('#selectByWorkOrderDiv').hide();
+        $('#selectByCalendarRangeDiv').show();
+        $('#selectByDateRangeDiv').hide();
     });
 
     $('#selectByDateRange').on('change', function() {
-    	$('#selectByWorkOrderDiv').hide();
-	    $('#selectByCalendarRangeDiv').hide();
-	    $('#selectByDateRangeDiv').show();
+        $('#selectByWorkOrderDiv').hide();
+        $('#selectByCalendarRangeDiv').hide();
+        $('#selectByDateRangeDiv').show();
     });
 
 
