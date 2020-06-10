@@ -1,6 +1,8 @@
-<div class='card mb-4 col-4'>
-	<div class='card-body'>
-		<strong>Tech ID:&nbsp;</strong>{{ techid }}<br>
+<div id='tech-info'>
+	<div class='card mb-4 col-4'>
+		<div class='card-body'>
+			<strong>Tech ID:&nbsp;</strong>{{ techid }}<br>
+		</div>
 	</div>
 </div>
 
@@ -9,32 +11,12 @@
 		<tr>
 			<th scope='col'>Work Order</th>
 			<th scope='col'>Assigned Date</th>
-			<th scope='col'>Duration</th>
+			<th scope='col' style='width: 10%;'>Duration</th>
 			<th scope='col'>Rate Level</th>
-			<th scope='col'>Assigned Group</th>
+			<th scope='col' style='width: 19%;'>Assigned Group</th>
+			<th scope='col' style='width: 30%;'>Notes</th>
 		</tr>
 	</thead>
 	<tbody>
-		{% for i in '0123456789'|make_list %}
-			<tr>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td>
-					<select class='form-control'>
-						{% for rate in rate_levels %}
-							<option>{{ rate.labor_rate_level_name }}</option>
-						{% endfor %}
-					</select>
-				</td>
-				<td>
-					<select class='form-control'>
-						{% for group in assigned_groups %}
-							<option>{{ group.wo_group_name }}</option>
-						{% endfor %}
-					</select>
-				</td>
-			</tr>
-		{% endfor %}
 	</tbody>
 </table>

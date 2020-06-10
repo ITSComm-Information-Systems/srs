@@ -46,6 +46,17 @@ $(document).ready(function() {
     	if (current_tab === 3) {
     		copy_selected();
     	}
+
+    	if (current_tab === 4) {
+    		review_submit();
+    	}
+    })
+
+    // Submit entries
+    $('.update-submit').on('click', function() {
+        var form_html = '<input name="num_entries" type="text" value="' +$('#review-update-table').find('tbody tr:has(td)').length + '" hidden>';
+        $('#update-entries-form').append(form_html);
+        $('#update-entries-form').submit();
     })
 })
 
@@ -120,8 +131,9 @@ function next_prev(current_page, num_pages) {
 // Copy selected rows for update
 function copy_selected() {
 	var num_checked = 0;
+	$('#update-entries-table tbody').html('');
 
-	$('#select-entries-table tr').each (function() {
+	$('#select-entries-table tbody tr').each (function() {
 		var row = $(this);
 		var col0 = row.find('td:first-child input[type="checkbox"]'); // checkbox
 		var work_order = row.find('td:nth-child(2)').text();
@@ -130,28 +142,106 @@ function copy_selected() {
 		var duration_mins = split_duration(row.find('td:nth-child(4)').text(), 'mins');
 		var rate_level = row.find('td:nth-child(5)').text();
 		var assigned_group = row.find('td:nth-child(6)').text();
+		var wo_labor_id = row.find('td:nth-child(7)').text();
+
+		var rate_levels = $('#rate_levels').text();
+		rate_levels = rate_levels.replace('[', '').replace(']', '').replace(/'/g, "").replace(/ /g, '');
+		rate_levels = rate_levels.split(',');
+
 		var assigned_groups = $('#assigned_groups').text();
-		assigned_groups = assigned_groups.replace('[', '').replace(']', '').replace("'", "").replace("'", "")
-		assigned_groups = assigned_groups.split(',')
-		console.log(assigned_groups);
+		assigned_groups = assigned_groups.replace('[', '').replace(']', '').replace(/'/g, "");
+		assigned_groups = assigned_groups.split(',');
 
 		if (col0.is(':checked')) {
-			var editable_row = $('#update-entries-table tbody tr').eq(num_checked);
-			editable_row.find('td:nth-child(1)').html(work_order);
-			editable_row.find('td:nth-child(2)').html('<input class="form-control" type="date" value="' + format_date(assigned_date) + '">');
-			editable_row.find('td:nth-child(3)').html("<div class='form-inline'>" +
-														"<input class='form-control col-2' type='text' value='" + duration_hours + "' placeholder='HH'>" +
-														"<input class='form-control col-2' type='text' value='" + duration_mins + "' placeholder='MM'>" +
-													  "</div>");
+			var new_row = '<tr>' +
+						  	  '<td>' + work_order + '</td>' +
+						  	  '<td>' +
+						  	  	    '<input class="form-control" type="date" value="' + format_date(assigned_date) + '">' +
+						  	  '</td>' +
+						  	  '<td>' +
+								    "<input class='form-control d-inline col-6 hours' type='text' value='" + duration_hours + "' placeholder='HH'>" +
+								    "<input class='form-control d-inline col-6 mins' type='text' value='" + duration_mins + "' placeholder='MM'>" +
+						  	  '</td>' +
+						  	  '<td>' +
+						  	      '<select class="form-control">';
+
+			for (i = 0; i < rate_levels.length; i++) {
+				if (rate_levels[i] === rate_level) {
+					new_row = new_row + '<option selected>' + rate_levels[i] + '</option>';
+				}
+				else {
+					new_row = new_row + '<option>' + rate_levels[i] + '</option>';
+				}
+			}
+
+			new_row = new_row + '</select>' +
+							  	  '</td>' +
+							  	  '<td>' +
+							  	      '<select class="form-control">'
+
+			for (i = 0; i < assigned_groups.length; i++) {
+				if (assigned_groups[i].replace(/^\s+/g, '') === assigned_group) {
+					new_row = new_row + '<option selected>' + assigned_groups[i].replace(/^\s+/g, '') + '</option>';
+				}
+				else {
+					new_row = new_row + '<option>' + assigned_groups[i].replace(/^\s+/g, '') + '</option>';
+				}
+			}
+
+			new_row = new_row + '</select>' +
+							'</td>' +
+							'<td>' +
+								'<input class="form-control" type="text" placeholder="Enter a new note...">' +
+							'</td>' +
+							'<td hidden>' + wo_labor_id + '</td>' +
+						'</tr>';
+
+			$('#update-entries-table tbody:last-child').append(new_row);
 			num_checked = num_checked + 1;
 		}
 	})
+	return(num_checked);
+}
 
-	for (i = num_checked + 1; i <= 10; i++) {
-		console.log(i);
-		$('#update-entries-table tbody tr:nth-child(' + i + ')').remove();
-		console.log('removed');
-	}
+// Copy rows to review submit page
+function review_submit() {
+	$('#tech-info-box').html('');
+	$('#tech-info-box').append($('#tech-info').html());
+
+	$('#review-update-table tbody').html('');
+
+	var i = 1;
+	$('#update-entries-table tbody tr').each (function() {
+		var row = $(this);
+		var work_order = row.find('td:nth-child(1)').text();
+		var assigned_date = row.find('td:nth-child(2) input').val();
+		var duration_hours = row.find('td:nth-child(3) .hours').val();
+		var duration_mins = row.find('td:nth-child(3) .mins').val();
+		var rate_level = row.find('td:nth-child(4) select').val();
+		var assigned_group = row.find('td:nth-child(5) select').val();
+		var notes = row.find('td:nth-child(6) input').val();
+		var wo_labor_id = row.find('td:nth-child(7)').text();
+
+		var new_row = '<tr>' +
+					      '<td>' + work_order + '</td>' +
+					      '<td>' + assigned_date + '</td>' +
+					      '<td>' + format_duration(duration_hours, duration_mins) + '</td>' +
+					      '<td>' + rate_level + '</td>' +
+					      '<td>' + assigned_group + '</td>' +
+					      '<td>' + notes + '</td>' +
+					  '</td>'
+		$('#review-update-table tbody:last-child').append(new_row);
+
+		var form_html = '<input type="text" name="' + i + '_work_order" value="' + work_order + '" hidden>' +
+                        '<input type="text" name="' + i + '_rate" value="' + rate_level + '" hidden>' +
+                        '<input type="date" name="' + i + '_assigned_date" value="' + assigned_date + '" hidden>' +
+                        '<input type="text" name="' + i + '_duration" value="' + format_duration(duration_hours, duration_mins) + '" hidden>' +
+                        '<input type="text" name="' + i + '_assigned_group" value="' + assigned_group + '" hidden>' +
+                        '<input type="text" name="' + i + '_notes" value="' + notes + '" hidden>' +
+                        '<input type="text" name="' + i + '_wo_labor_id" value="' + wo_labor_id + '"hidden>';
+        $('#update-entries-form').append(form_html);
+        i = i + 1;
+	})
 }
 
 // Split duration into hours and mins
@@ -163,6 +253,23 @@ function split_duration(duration, part) {
 	else {
 		return(split[1]);
 	}
+}
+
+// Format input date to HH:MM
+function format_duration(hours, mins) {
+    if (hours.length == 0) {
+        hours = '00';
+    }
+    if (hours.length == 1) {
+        hours = '0' + hours;
+    }
+    if (mins.length == 0) {
+        mins = '00';
+    }
+    if (mins.length == 1){
+        mins = '0' + mins;
+    }
+    return(hours + ':' + mins);
 }
 
 // Format date

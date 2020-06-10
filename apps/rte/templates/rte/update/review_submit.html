@@ -1,1 +1,20 @@
-<p>hi</p>
+<div id='tech-info-box'></div>
+
+<table class='table table-striped mt-2' id='review-update-table'>
+	<thead>
+		<tr>
+			<th scope='col'>Work Order</th>
+			<th scope='col'>Assigned Date</th>
+			<th scope='col'>Duration</th>
+			<th scope='col'>Rate Level</th>
+			<th scope='col'>Assigned Group</th>
+			<th scope='col'>Notes</th>
+		</tr>
+	</thead>
+	<tbody>
+	</tbody>
+</table>
+
+<form action='submitted/' method='POST' id='update-entries-form' hidden>{% csrf_token %}
+	<input type='text' name='tech_id' value="{{ techid }}" hidden>
+</form>
