@@ -31,6 +31,14 @@
 	#aux-nav {
 		background-color: {{ background_color }}
 	 } 
+	 @media (min-width:992px) {
+	.nav-bar-links {
+		width:100%;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
 	</style>
 
 	<title>SRS - {{ title }}</title>
@@ -50,30 +58,7 @@
 				</button>
 				<div class="collapse navbar-collapse navbars" aria-labelledby="aux-nav" role="navigation">
 					<ul class="navbar-nav ml-auto">
-						{% if user.is_authenticated %}
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle {% if title == 'Chartfield Change Request' or title == 'Manage User Access' or title == 'Department Look Up' or title == 'Manage Chartfields' or title == 'VoIP Location Change' %}active{% endif %}" href="javascript;" id="toolsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								Permissions &amp; Billing
-							</a>
-							<div class="dropdown-menu" aria-labelledby="toolsDropdown">
-								{% if perms.oscauth.can_order or perms.oscauth_can_report %}
-								<a class="dropdown-item" href="/chartchange/">Chartfield Change Request</a>
-								{% endif %}
-								{% if perms.oscauth.can_administer_access %}
-									<a class="dropdown-item" href="/auth/get_uniqname/">Manage User Access</a>
-								{% endif %}
-								<a class="dropdown-item" href="/auth/deptpriv/">Department Look Up</a>
-								<a class="dropdown-item" href="/auth/userid/">User ID Look Up</a>
-								{% if perms.oscauth.can_administer_access %}
-								<a class="dropdown-item" href="/orders/chartcom/0">Manage Chartfields</a>
-								{% endif %}
-								<!-- <a class="dropdown-item" href="/tools/costestimator">Cost Estimator</a> -->
-								{% if perms.oscauth.can_move_voip %}
-									<a class="dropdown-item" href="/tools/voip/">VoIP Location Change</a>
-								{% endif %}
-							</div>
-						</li>
-						{% endif %}
+						
 						<li class="nav-item">
 							<a class="nav-link {% if title == 'Help' %}active {% endif %}" href="/help">Help</a>
 						</li>
@@ -113,49 +98,26 @@
 		<div class="container">
 			<div class="collapse navbar-collapse navbars" aria-labelledby="main-nav" role="navigation">
 				<ul class="navbar-nav nav-fill nav-bar-links">
-					{% if perms.oscauth.can_order %}
 					<li class="nav-item dropdown">
-						<a class="nav-link {% if page_name == 'Request Service' %}active{% endif %}"> <i class="fas fa-check-circle white"></i> Request Service</a>
-
-						<div class="dropdown-menu" aria-labelledby="reportsDropdown">
-							{% for group in service_groups %}
-								<a class="dropdown-item" href="/orders/services/{{group.id}}">{{group.label}}</a>
-							{% endfor %}
-						</div>
+						<b>
+						<a href="/apps/rte/" class="nav-link"><i class="fas fa-clock"></i> Rapid Time Entry</a>
+						</b>
 
 					</li>
-					{% elif user.is_authenticated %}
 					<li class="nav-item dropdown">
-						<a href="/orders/services/2" class="nav-link"><i class="fas fa-check-circle white"></i> Request Service</a>
-					</li> 
-					{% endif %}
-					{% if perms.oscauth.can_report %}
-					<li class="nav-item dropdown">
+						<b>
+						<a class="nav-link"><i class="fas fa-file-invoice"></i> Bill of Materials</a>
+						<b/>
 						
-						<a class="nav-link dropdown-toggle {% if title == 'Telephony Detail of Charges' or title == 'Inventory & Location Report' or title == 'Non-Telephony Detail of Charges' or title == 'Summary of Charges' or title == 'Toll Statements' %}active{% endif %}" href="#" id="reportsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								<i class="fas fa-chart-line"></i>
-							Run Reports
-						</a>
-						<div class="dropdown-menu" aria-labelledby="reportsDropdown">
-							<a class="dropdown-item" href="https://tableau.dsc.umich.edu/t/UM/views/telecom_dashboard_db_conn_month_actives/DepartmentalTelephoneServiceMetrics?:embed=y&:showShareOptions=true&:display_count=no&:showVizHome=no" target="_blank">Departmental Telephone Service Metrics</a>
-							<a class="dropdown-item" href="/reports/inventory/">Inventory &amp; Location Report</a>
-							<a class="dropdown-item" href="/reports/nonteleph/">Non-Telephony Detail of Charges</a>
-							<a class="dropdown-item" href="/reports/soc">Summary of Charges</a>
-							<a class="dropdown-item" href="/reports/doc/">Telephony Detail of Charges</a>
-							<a class="dropdown-item" href="/reports/tolls/">Toll Statements</a>
-						</div>
-						{% endif %}
+						
 					</li>
-					{% if perms.oscauth.can_order %}
-					<li class="nav-item">
-						<a class="nav-link {% if title == 'Cart' %}active{% endif %}" href="/orders/cart/0"><i class="fas fa-shopping-cart"></i> View Cart</a>
+					<li class="nav-item dropdown">
+						<b>
+						<a class="nav-link"><i class="fas fa-hand-holding-usd"></i> MBid</a>
+						</b>
+						
 					</li>
-					<li class="nav-item">
-						<a class="nav-link {% if title == 'Track Orders' %}active{% endif %}" href="/orders/status/0"><i class="fas fa-list-ul"></i> Track Orders</a>
-					</li>
-					{% endif %}
 				</ul>
-			</div>
 		</div>
 		</nav>
 	</header>

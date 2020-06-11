@@ -24,4 +24,6 @@ urlpatterns = [
     path('get_uniqname/', views.get_uniqname),
     path('modpriv/', views.modpriv),
 
+    path('userid/',views.userid),
+
 ]

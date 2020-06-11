@@ -15,4 +15,8 @@ def index(request, pagename):
         'page_list':  Page.objects.all(),
     }
     # assert False
+    if pagename[1:5] == 'apps':
+        return render(request, 'baseapps.html', context)
+    else:
+        return render(request, 'base.html', context)
     return render(request, 'base.html', context)
