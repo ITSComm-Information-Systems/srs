@@ -16,7 +16,7 @@ function next(num_tabs) {
 	$('#prevBtn').removeClass('disabled');
 
 	// Validate next action
-	if (!(current_tab < num_tabs && validate_next())) {
+	if (!(current_tab < num_tabs && validate_next(current_tab))) {
 		return(false);
 	}
 
@@ -44,7 +44,7 @@ function prev() {
 	$('#nextBtn').removeClass('disabled');
 
 	// Validate previous action
-	if (!(current_tab != 1 && validate_prev())) {
+	if (!(current_tab != 1)) {
 		return(false);
 	}
 
@@ -67,10 +67,15 @@ function prev() {
 	}
 }
 
-function validate_next() {
-	return(true);
-}
-
-function validate_prev() {
-	return(true);
+function validate_next(current_tab) {
+	console.log('in workflow validate function');
+	if ($('#nextBtn').hasClass('single-next')) {
+		return(validate_single(current_tab));
+	}
+	if ($('#nextBtn').hasClass('multiple-next')) {
+		return(validate_multiple(current_tab));
+	}
+	if ($('#nextBtn').hasClass('update-next')) {
+		return(validate_update(current_tab));
+	}
 }

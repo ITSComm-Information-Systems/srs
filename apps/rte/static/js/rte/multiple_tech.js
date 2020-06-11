@@ -62,7 +62,10 @@ $(document).ready(function() {
 
     // Add new row to input table
     $('#multiple-add').on('click', function() {
-        num_entries_multiple = add_to_multiple_table(num_entries_multiple);
+        if (validate_add()) {
+            num_entries_multiple = add_to_multiple_table(num_entries_multiple);
+            $('#add-error').addClass('hidden');
+        }
     });
 
     $('#multiple-input-table').on('click', '.delete_row_multiple', function() {
@@ -162,4 +165,93 @@ function load_assigned_groups(techid) {
             console.log(errorThrown);
         }
     })
+}
+
+function validate_search_multiple() {
+    if ($('#workOrderSearch').val() === '') {
+        $('#error-work-order').show();
+        return false;
+    }
+    return true;
+}
+
+// Validate work order before advancing
+function validate_wo() {
+    if (!$('#work_order').val()) {
+        $('#wo-error').html('Please enter a work order.');
+        $('#wo-error').removeAttr('hidden');
+        return(false);
+    }
+    return(true);
+}
+
+// Validate entries before advancing
+function validate_multiple_entries() {
+    if ($('#multiple-input-table > tbody > tr').length === 0) {
+        $('#entries-error').html('Please enter time before proceeding.');
+        $('#entries-error').removeClass('hidden');
+        return(false);
+    }
+    return(true);
+}
+
+// Make sure all entry fields are filled
+function validate_add() {
+    $('#entries-error').addClass('hidden');
+
+    if (!$('#techSearchMultiple').val()) {
+        $('#add-error').html('Please enter a tech ID.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if (!$('#assignedGroupSelectMultiple').val()) {
+        $('#add-error').html('Please select an assigned group.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if (!$('#assigned_date_multiple').val()) {
+        $('#add-error').html('Please enter an assigned date.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    var regex = new RegExp('([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))');
+    if (!regex.test($('#assigned_date_multiple').val())) {
+        $('#add-error').html('Please enter a valid date. You entered: ' + $('#assigned_date_multiple').val() + '.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if (!$('#duration-hours-multiple').val() && !$('#duration-mins-multiple').val()) {
+        $('#add-error').html('Please enter time worked.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if ($('#duration-hours-multiple').val() > 23 || $('#duration-hours-multiple').val() < 0) {
+        $('#add-error').html('Please enter a value for hours between 0 and 23.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if ($('#duration-mins-multiple').val() > 59 || $('#duration-mins-multiple').val() < 0) {
+        $('#add-error').html('Please enter a value for minutes between 0 and 59.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+    $('#entries-error').addClass('hidden');
+    return(true);
+}
+
+// Validate moving on in workflow
+function validate_multiple() {
+    if (current_tab === 1) {
+        return(validate_wo());
+    }
+    if (current_tab === 2) {
+        return(validate_multiple_entries());
+    }
+    return(true);
 }

@@ -10,7 +10,7 @@
             <div class='form-inline'>
                 <input name='techSearch' autocomplete='off' id="techSearch" class="form-control" type="text" aria-describedby="buildingTechBlock"
                     placeholder="Search...">
-                <button class='btn btn-primary' type='submit'>Search</button>
+                <button class='btn btn-primary' type='submit'>Enter</button>
             </div>
             <div role=”alert” class="invalid-feedback" id='error-tech-id'><i class="fas fa-exclamation-triangle"
                 aria-label="Icon signfying that user must enter a value"></i>Please enter a tech ID.
@@ -55,3 +55,5 @@
         </select>
     </div>
 {% endif %}
+
+<div hidden class='alert alert-danger col-4' id='tech-error'></div>

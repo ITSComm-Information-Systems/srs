@@ -1,4 +1,4 @@
-<form id='workOrderForm' method='post' action=''>{% csrf_token %}
+<form id='workOrderForm' method='post' action='' onsubmit='return validate_search_multiple()'>{% csrf_token %}
     <div class="form-group" id="searchWorkOrder">
         <label for="workOrderSearch" id="labelWorkOrderSearch">
             <strong>Search for a Work Order</strong>
@@ -10,7 +10,7 @@
             <div class='form-inline'>
                 <input name='workOrderSearch' autocomplete='off' id="workOrderSearch" class="form-control" type="text" aria-describedby="workOrderBlock"
                     placeholder="Search...">
-                <button class='btn btn-primary' type='submit'>Search</button>
+                <button class='btn btn-primary' type='submit'>Enter</button>
             </div>
             <div role=”alert” class="invalid-feedback" id='error-work-order'><i class="fas fa-exclamation-triangle"
                 aria-label="Icon signfying that user must enter a value"></i>Please enter a work order.
@@ -45,9 +45,11 @@
         </label>
         <div class='card' id="wo_desc">
             <div class='card-body' id='work_order_text'>
-                {{ selected_wo_desc }}
+                {{ selected_wo_desc|truncatechars:200 }}
             </div>
         </div>
 
     </div>
 {% endif %}
+
+<div class='alert alert-danger col-4' id='wo-error' hidden></div>
