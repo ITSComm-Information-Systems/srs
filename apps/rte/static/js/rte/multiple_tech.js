@@ -62,7 +62,7 @@ $(document).ready(function() {
 
     // Add new row to input table
     $('#multiple-add').on('click', function() {
-        if (validate_add()) {
+        if (validate_add_multiple()) {
             num_entries_multiple = add_to_multiple_table(num_entries_multiple);
             $('#add-error').addClass('hidden');
         }
@@ -196,7 +196,9 @@ function validate_multiple_entries() {
 }
 
 // Make sure all entry fields are filled
-function validate_add() {
+function validate_add_multiple() {
+    console.log('here for some reason???');
+
     $('#entries-error').addClass('hidden');
 
     if (!$('#techSearchMultiple').val()) {

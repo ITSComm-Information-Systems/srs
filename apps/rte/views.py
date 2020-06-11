@@ -132,7 +132,10 @@ def single_submit(request):
         curr = connections['pinnacle'].cursor()
         uniqname = request.user.username
         datetime_added = date.today()
-        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, datetime_added])
+        try:
+            curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, datetime_added])
+        except:
+            print('error')
         curr.close()
 
     context = {
@@ -215,7 +218,6 @@ def multiple_tech(request):
 # Find assigned group based on tech ID
 def get_assigned_group(request):
     techid = request.GET.get('techid', None)
-    print(techid)
     assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=techid).values())
 
     return JsonResponse(assigned_groups, safe=False)

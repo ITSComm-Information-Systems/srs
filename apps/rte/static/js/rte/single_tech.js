@@ -164,6 +164,7 @@ function delete_row(row_num, num_entries) {
 // Make sure user enters tech ID
 function validate_tech() {
     if (!$('#tech_id').val()) {
+        console.log('here????');
         $('#tech-error').html('Please enter a tech ID.');
         $('#tech-error').removeAttr('hidden');
         return(false);
@@ -178,6 +179,8 @@ function validate_tech() {
 
 // Make sure all entry fields are filled
 function validate_add() {
+    console.log('validate add single');
+    
     if (!$('#workOrderSearch').val()) {
         $('#add-error').html('Please enter a work order.');
         $('#add-error').removeClass('hidden');
@@ -231,9 +234,11 @@ function validate_single_entries() {
 // Validate moving on in workflow
 function validate_single(current_tab) {
     if (current_tab === 1) {
+        console.log('validate tech');
         return(validate_tech());
     }
     if (current_tab === 2) {
+        console.log('validate single entries');
         return(validate_single_entries());
     }
 }
