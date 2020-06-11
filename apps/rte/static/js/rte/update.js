@@ -291,3 +291,8 @@ function format_date(date) {
 
 	return(year + '-' + month + '-' + day);
 }
+
+// Validate moving on in workflow
+function validate_update() {
+    return(true);
+}

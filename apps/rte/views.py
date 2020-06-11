@@ -3,6 +3,7 @@ from django.template import loader
 from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
+from django.db import connections
 
 # Base RTE view
 def load_rte(request):
@@ -105,7 +106,7 @@ def single_submit(request):
 
             service_order = UmRteServiceOrderV.objects.get(full_prord_wo_number=request.POST.get(str(i) + '_work_order'))
             tech = UmRteTechnicianV.objects.get(labor_code=tech_id)
-            assigned_group = UmRteLaborGroupV.objects.get(wo_group_name=assigned_group, wo_group_labor_code=tech_id)
+            assigned_group_q = UmRteLaborGroupV.objects.get(wo_group_name=assigned_group, wo_group_labor_code=tech_id)
 
             new_entry = UmRteInput(
                 uniqname=request.user.username,
@@ -114,8 +115,8 @@ def single_submit(request):
                 full_prord_wo_number=service_order.full_prord_wo_number,
                 labor_id=tech.labor_id,
                 labor_code=tech.labor_code,
-                wo_group_labor_group_id=assigned_group.wo_group_labor_group_id,
-                wo_group_code=assigned_group.wo_group_code,
+                wo_group_labor_group_id=assigned_group_q.wo_group_labor_group_id,
+                wo_group_code=assigned_group_q.wo_group_code,
                 assigned_date=datetime.strptime(assigned_date, '%Y-%m-%d').date(),
                 complete_date=datetime.strptime(assigned_date + ' ' + duration, '%Y-%m-%d %H:%M'),
                 rate_number=rate_level,
@@ -126,6 +127,13 @@ def single_submit(request):
                 messages=None,
                 request_no=None)
             new_entry.save()
+
+        # Add record to Pinnacle
+        curr = connections['pinnacle'].cursor()
+        uniqname = request.user.username
+        datetime_added = date.today()
+        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, datetime_added])
+        curr.close()
 
     context = {
         'title': 'Rapid Time Entry Submit'
@@ -253,6 +261,13 @@ def multiple_submit(request):
                 request_no=None)
             new_entry.save()
 
+        # Add record to Pinnacle
+        curr = connections['pinnacle'].cursor()
+        uniqname = request.user.username
+        datetime_added = date.today()
+        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, datetime_added])
+        curr.close()
+
     context = {
         'title': 'Rapid Time Entry Submit',
     }
@@ -379,6 +394,13 @@ def update_submit(request):
                 messages=None,
                 request_no=None)
             new_entry.save()
+
+        # Add record to Pinnacle
+        curr = connections['pinnacle'].cursor()
+        uniqname = request.user.username
+        datetime_added = date.today()
+        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, datetime_added])
+        curr.close()
 
     context = {
         'title': 'Rapid Time Entry Submit',

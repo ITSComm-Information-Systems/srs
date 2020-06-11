@@ -60,7 +60,10 @@ $(document).ready(function() {
 
     // Add new row to input table
     $('#single-add').on('click', function() {
-        num_entries = add_to_table(num_entries);
+        if (validate_add()) {
+            num_entries = add_to_table(num_entries);
+            $('#add-error').addClass('hidden');
+        }
     });
 
     $('#single-input-table').on('click', '.delete_row', function() {
@@ -75,14 +78,6 @@ function validate_search() {
     }
     return true;
 }
-
-// function single_validate_next(current_page) {
-
-// }
-
-// function single_validate_prev(current_page) {
-
-// }
 
 // Transition from tech ID select to work order select
 function techid_to_wo() {
@@ -164,4 +159,81 @@ function delete_row(row_num, num_entries) {
         $('#single-input').hide();
     }
     return(num_entries);
+}
+
+// Make sure user enters tech ID
+function validate_tech() {
+    if (!$('#tech_id').val()) {
+        $('#tech-error').html('Please enter a tech ID.');
+        $('#tech-error').removeAttr('hidden');
+        return(false);
+    }
+    if (!$('#agSelect').val()) {
+        $('#tech-error').html('Please select an assigned group.');
+        $('#tech-error').removeAttr('hidden');
+        return(false);
+    } 
+    return(true);
+}
+
+// Make sure all entry fields are filled
+function validate_add() {
+    if (!$('#workOrderSearch').val()) {
+        $('#add-error').html('Please enter a work order.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if (!$('#assigned_date').val()) {
+        $('#add-error').html('Please enter an assigned date.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    var regex = new RegExp('([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))');
+    if (!regex.test($('#assigned_date').val())) {
+        $('#add-error').html('Please enter a valid date. You entered: ' + $('#assigned_date').val() + '.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if (!$('#duration-hours').val() && !$('#duration-mins').val()) {
+        $('#add-error').html('Please enter time worked.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if ($('#duration-hours').val() > 23 || $('#duration-hours').val() < 0) {
+        $('#add-error').html('Please enter a value for hours between 0 and 23.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if ($('#duration-mins').val() > 59 || $('#duration-mins').val() < 0) {
+        $('#add-error').html('Please enter a value for minutes between 0 and 59.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+    $('#entries-error').addClass('hidden');
+    return(true);
+}
+
+// Make sure user has entered time
+function validate_single_entries() {
+    if ($('#single-input-table > tbody > tr').length === 0) {
+        $('#entries-error').html('Please enter time before proceeding.');
+        $('#entries-error').removeClass('hidden');
+        return(false);
+    }
+    return(true);
+}
+
+// Validate moving on in workflow
+function validate_single(current_tab) {
+    if (current_tab === 1) {
+        return(validate_tech());
+    }
+    if (current_tab === 2) {
+        return(validate_single_entries());
+    }
 }

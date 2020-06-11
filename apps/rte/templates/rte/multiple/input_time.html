@@ -67,6 +67,8 @@
 
 <button class='btn btn-primary float-right' id='multiple-add'>Add</button><br>
 
+<div class='alert alert-danger hidden col-4' id='add-error'></div>
+
 <div id='multiple-input'>
 	<h3 id='multiple-input-title'>Time Entries</h3>
 	<table class='table mt-4' id='multiple-input-table'>
@@ -89,6 +91,8 @@
 <div class='alert alert-danger hidden col-8' id='max-entries-multiple'>
 	You may only submit 10 time entries at a time. Please submit additional entries to report time for more than 10 technicians.
 </div>
+
+<div class='alert alert-danger hidden col-4' id='entries-error'></div>
 
 
 <form action='submitted/' method='POST' id='multiple-input-form' hidden>{% csrf_token %}
