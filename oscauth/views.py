@@ -622,7 +622,7 @@ def userid(request):
     user_list=[]
 
     if request.method=='POST':
-        user_param = request.POST.get('user_param')
+        user_param = request.POST.get('user_param').strip()
 
     if user_param == '':
         context = {
@@ -637,8 +637,9 @@ def userid(request):
         user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id=user_param)
     
     for user in user_list:
-        Id = user.user_defined_id
+        user_def_id = user.user_defined_id
         chartcom = user.chartcom
+        #may not have anything
         building = user.building
         floor = user.floor
         room = user.room
@@ -648,9 +649,10 @@ def userid(request):
         local = user.local_charged
         
         deptid_list=set()
-        for x in UmOscServiceProfileV.objects.filter(service_number=user.dn, service_status_code="In Service", subscriber_status="Active"):
+        for x in UmOscServiceProfileV.objects.filter(user_defined_id=user_def_id, service_status_code="In Service", subscriber_status="Active"):
             deptid_list.add(x.deptid)
-            
+
+        #get manager information from the department id if any
         for deptid in deptid_list:
             uniqname = AuthUserDept.objects.get(dept=deptid, group = 3).user.username
             firstname=AuthUserDept.objects.get(dept=deptid, group = 3).user.first_name
@@ -658,7 +660,11 @@ def userid(request):
 
             manager= lastname+', '+firstname+" ("+uniqname+")"
 
-            data = {'Id' : Id, 'manager':manager, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
+            data = {'user_def_id' : user_def_id, 'manager':manager, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
+
+            for info in data.items():
+                if info[1]=='':
+                    data[info[0]]='None'
             rows.append(data)
 
     
