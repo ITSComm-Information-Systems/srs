@@ -631,10 +631,9 @@ def userid(request):
         }
         return  HttpResponse(template.render(context, request))
     
-    if len(user_param)==10:
-        user_list= UmOscAcctSubscribersV.objects.filter(dn=user_param)
-    else:
-        user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id=user_param)
+    if (len(user_param)==16) or (len(user_param)==10):
+        user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id__contains=user_param)
+
     
     for user in user_list:
         user_def_id = user.user_defined_id
