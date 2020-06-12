@@ -102,11 +102,14 @@ def single_submit(request):
             rate_level = UmRteRateLevelV.objects.get(labor_rate_level_name=request.POST.get(str(i) + '_rate'))
             assigned_date = request.POST.get(str(i) + '_assigned_date')
             duration = request.POST.get(str(i) + '_duration')
+            duration_hours, duration_mins = split_duration(duration)
             notes = request.POST.get(str(i) + '_notes')
 
             service_order = UmRteServiceOrderV.objects.get(full_prord_wo_number=request.POST.get(str(i) + '_work_order'))
             tech = UmRteTechnicianV.objects.get(labor_code=tech_id)
             assigned_group_q = UmRteLaborGroupV.objects.get(wo_group_name=assigned_group, wo_group_labor_code=tech_id)
+
+            formatted_date = datetime.strptime(assigned_date, '%Y-%m-%d')
 
             new_entry = UmRteInput(
                 uniqname=request.user.username,
@@ -117,8 +120,8 @@ def single_submit(request):
                 labor_code=tech.labor_code,
                 wo_group_labor_group_id=assigned_group_q.wo_group_labor_group_id,
                 wo_group_code=assigned_group_q.wo_group_code,
-                assigned_date=datetime.strptime(assigned_date, '%Y-%m-%d').date(),
-                complete_date=datetime.strptime(assigned_date + ' ' + duration, '%Y-%m-%d %H:%M'),
+                assigned_date=formatted_date.date(),
+                complete_date=formatted_date.replace(hour=duration_hours, minute=duration_mins),
                 rate_number=rate_level,
                 actual_mins_display=duration,
                 notes=notes,
@@ -237,11 +240,14 @@ def multiple_submit(request):
             rate_level = UmRteRateLevelV.objects.get(labor_rate_level_name=request.POST.get(str(i) + '_rate'))
             assigned_date = request.POST.get(str(i) + '_assigned_date')
             duration = request.POST.get(str(i) + '_duration')
+            duration_hours, duration_mins = split_duration(duration)
             notes = request.POST.get(str(i) + '_notes')
 
             service_order = UmRteServiceOrderV.objects.get(full_prord_wo_number=work_order)
             tech = UmRteTechnicianV.objects.get(labor_code=tech_id)
             assigned_group = UmRteLaborGroupV.objects.get(wo_group_name=assigned_group, wo_group_labor_code=tech_id)
+
+            formatted_date = datetime.strptime(assigned_date, '%Y-%m-%d')
 
             new_entry = UmRteInput(
                 uniqname=request.user.username,
@@ -252,8 +258,8 @@ def multiple_submit(request):
                 labor_code=tech.labor_code,
                 wo_group_labor_group_id=assigned_group.wo_group_labor_group_id,
                 wo_group_code=assigned_group.wo_group_code,
-                assigned_date=datetime.strptime(assigned_date, '%Y-%m-%d').date(),
-                complete_date=datetime.strptime(assigned_date + ' ' + duration, '%Y-%m-%d %H:%M'),
+                assigned_date=formatted_date.date(),
+                complete_date=formatted_date.replace(hour=duration_hours, minute=duration_mins),
                 rate_number=rate_level,
                 actual_mins_display=duration,
                 notes=notes,
@@ -369,6 +375,7 @@ def update_submit(request):
             rate_level = UmRteRateLevelV.objects.get(labor_rate_level_name=request.POST.get(str(i) + '_rate'))
             assigned_date = request.POST.get(str(i) + '_assigned_date')
             duration = request.POST.get(str(i) + '_duration')
+            duration_hours, duration_mins = split_duration(duration)
             assigned_group = request.POST.get(str(i) + '_assigned_group')
             notes = request.POST.get(str(i) + '_notes')
             wo_labor_id = request.POST.get(str(i) + '_wo_labor_id')
@@ -376,6 +383,8 @@ def update_submit(request):
             service_order = UmRteServiceOrderV.objects.get(full_prord_wo_number=request.POST.get(str(i) + '_work_order'))
             tech = UmRteTechnicianV.objects.get(labor_code=tech_id)
             assigned_group = UmRteLaborGroupV.objects.get(wo_group_name=assigned_group, wo_group_labor_code=tech_id)
+
+            formatted_date = datetime.strptime(assigned_date, '%Y-%m-%d')
 
             new_entry = UmRteInput(
                 uniqname=request.user.username,
@@ -386,8 +395,8 @@ def update_submit(request):
                 labor_code=tech.labor_code,
                 wo_group_labor_group_id=assigned_group.wo_group_labor_group_id,
                 wo_group_code=assigned_group.wo_group_code,
-                assigned_date=datetime.strptime(assigned_date, '%Y-%m-%d').date(),
-                complete_date=datetime.strptime(assigned_date + ' ' + duration, '%Y-%m-%d %H:%M'),
+                assigned_date=formatted_date.date(),
+                complete_date=formatted_date.replace(hour=duration_hours, minute=duration_mins),
                 rate_number=rate_level,
                 actual_mins_display=duration,
                 notes=notes,
@@ -504,3 +513,8 @@ def get_date_range(date_range):
         date_start = date_end - timedelta(days=183)
 
     return date_start, date_end
+
+# Splits duration into hours and minutes
+def split_duration(duration):
+    duration = duration.split(':')
+    return int(duration[0]), int(duration[1])
