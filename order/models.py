@@ -105,6 +105,7 @@ class ServiceGroup(Configuration):
 class Service(Configuration):
     active = models.BooleanField(default=True)
     group = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE)
+    routing = JSONField(default=dict)
 
 
 class FeatureCategory(models.Model):
@@ -323,7 +324,8 @@ class StorageInstance(models.Model):
     )
 
     name = models.CharField(max_length=100)
-    owner = models.ForeignKey(StorageOwner, on_delete=models.CASCADE, null=True)
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
+    owner_bak = models.ForeignKey(StorageOwner, on_delete=models.CASCADE, null=True)
     owner_name = models.CharField(max_length=100) # TODO Remove
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
     shortcode = models.CharField(max_length=100)
@@ -607,71 +609,72 @@ class Item(models.Model):
 
         return note
 
-    def submit_incident(self):
+    def route(self):
+        action = Action.objects.get(id=self.data['action_id'])
+        routing = action.service.routing
 
-        action_id = self.data['action_id']
-        action = Action.objects.get(id=action_id)
+        if not routing['use_cart']:  # Associate with blank order
+            o = Order()
+            o.order_reference = action.destination
+            o.chartcom = self.chartcom
+            o.service = action.service
+            o.created_by = self.created_by
+            o.save()
+            self.order = o
+            self.save()
 
-        o = Order()
-        o.order_reference = action.destination
-        o.chartcom = self.chartcom
-        o.service = action.service
-        o.created_by = self.created_by
-        o.save()
-        self.order = o
-        self.save()
+        for route in routing['routes']:
+            if route['target'] == 'tdx':
+                pass #self.submit_incident(route)
+            if route['target'] == 'database':
+                self.update_mistorage()
+                return
+                print(route['record'])
+                rec = globals()[route['record']]()
 
-        text = self.data['reviewSummary']
-        note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
+                for key, value in route['constants'].items():
+                    setattr(rec, key, value)
 
-        if action.destination == 'TDX':
-            client_id = settings.UM_API['CLIENT_ID']
-            auth_token = settings.UM_API['AUTH_TOKEN']
-            base_url = settings.UM_API['BASE_URL']
+                for key, value in route['variables'].items():
+                    if key == 'owner':
+                        rec.owner = LDAPGroup().lookup( self.data['owner'] )
+                        print('owner', rec.owner)
+                    else:
+                        print(self.data.get(value))
+                        setattr(rec, key, self.data.get(value))
 
-            headers = { 
-                'Authorization': f'Basic {auth_token}',
-                'accept': 'application/json'
-                }
+                rec.save()
 
-            url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
-            response = requests.post(url, headers=headers)
-            response_token = json.loads(response.text)
-            access_token = response_token.get('access_token')
+    def submit_incident(self, route):
+        client_id = settings.UM_API['CLIENT_ID']
+        auth_token = settings.UM_API['AUTH_TOKEN']
+        base_url = settings.UM_API['BASE_URL']
 
-            headers = {
-                'X-IBM-Client-Id': client_id,
-                'Authorization': 'Bearer ' + access_token,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json' 
-                }
-            payload = {
-                "TypeID": 57,
-                "Title": self.description,
-                "Description": f'{note}\n',
-                "ResponsibleGroupID": 104,
-                "ServiceID": 215,
-                "FormID": 20,
-                "Classification": 46,
-                "RequestorEmail": self.created_by.email,
-                }
+        headers = { 
+            'Authorization': f'Basic {auth_token}',
+            'accept': 'application/json'
+            }
 
-            cons = Constant.objects.filter(action=action_id)
-            for con in cons:  # Populate issue with constants
-                print('con', con)
-                #issue[con.field] = con.value
+        url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
+        response = requests.post(url, headers=headers)
+        response_token = json.loads(response.text)
+        access_token = response_token.get('access_token')
 
-            data_string = json.dumps(payload)
-            response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
-            #print(response.text)
-        else:
-            print('Destination not found')
+        headers = {
+            'X-IBM-Client-Id': client_id,
+            'Authorization': 'Bearer ' + access_token,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json' 
+            }
 
-        if action.service_id == 8:  # No update for MiBackup
-            self.update_mibackup()
-            return 
+        payload = route['constants']
+        payload['Title'] = self.description
+        payload['RequestorEmail'] = self.created_by.email
+        payload['Description'] = f'{note}\n'
 
-        self.update_mistorage()
+        data_string = json.dumps(payload)
+        response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
+        print(response.text)
 
     def update_mibackup(self):
         bd = BackupDomain()
@@ -704,11 +707,14 @@ class Item(models.Model):
 
         if self.data.get('action_id') == '46' or self.data.get('action_id') == '47':
             si.type = 'NFS'
-            si.owner = si.get_owner_instance(self.data.get('owner'))
+            #si.owner = si.get_owner_instance(self.data.get('owner'))
             si.name = self.data.get('storageID')
             si.uid = self.data.get('volumeAdmin')
             if self.data.get('flux') == 'yes':
+                print('yep on flux')
                 si.flux = True
+            else:
+                print('no on flux')
         else:
             si.type = 'CIFS'
             si.owner = si.get_owner_instance( self.data.get('mcommGroup') )

@@ -20,6 +20,8 @@ import json
 from django.core.files.storage import FileSystemStorage
 from django.views.decorators.csrf import csrf_exempt
 
+from oscauth.utils import get_mc_user
+
 import threading
 
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment, ChargeType, UserChartcomV
@@ -53,6 +55,16 @@ def get_phone_location(request, phone_number):
 #@permission_required('oscauth.can_order')
 def send_tab_data(request):
 
+    #print(request.POST)
+    print(request.user.username)
+    print('omg', request.user.has_perm('omg'))
+    print('can_order', request.user.has_perm('can_order'))
+    #user = get_mc_user(request.user.username)
+
+    #print(user)
+
+
+
     tab_name = request.POST.get('tab')
     action = Action.objects.get(id=request.POST.get('action_id'))
 
@@ -79,7 +91,7 @@ def send_tab_data(request):
             item.save()
             return JsonResponse({'redirect': f'/orders/cart/{item.deptid}'}, safe=False)
         else:
-            item.submit_incident()
+            item.route()
             return JsonResponse({'redirect': '/requestsent'}, safe=False)
 
     step = Step.objects.get(name=tab_name)
@@ -286,6 +298,8 @@ class Submit(PermissionRequiredMixin, View):
 @csrf_exempt
 def send_email(request):   #Pinnacle will route non prod emails to a test address
     if request.method == "POST":
+        print(request.POST)
+        return
         subject = request.POST['emailSubject'] + ' question from: ' + request.user.username
         body = request.POST['emailBody'] 
         address = request.POST.get('emailAddress', 'ITCOM.csr@umich.edu')
