@@ -9,7 +9,7 @@ from project.forms.fields import *
 
 def get_storage_options(type):
     opt_list = []
-    for opt in StorageRate.objects.filter(type=type):
+    for opt in StorageRate.objects.filter(type=type, display_seq_no__lt=100):
         label = f'{opt.label} ({opt.rate} / per GB)'
         opt_list.append((opt.id, label))
 
@@ -337,7 +337,6 @@ class DetailsNFSForm(TabForm):
             else:
                 if summary[3]['value'] == 'Yes':
                     summary[3]['label'] = '*' + summary[3]['label']
-
         return summary
 
     def __init__(self, *args, **kwargs):
@@ -351,6 +350,9 @@ class DetailsNFSForm(TabForm):
                     si = StorageInstance.objects.get(id=instance_id)
                     self.fields["sizeGigabyte"].initial = si.size
                     self.fields["storageID"].initial = si.name
+                    if si.rate.display_seq_no > 99:
+                        self.fields["selectOptionType"].choices = [(si.rate.id, si.rate.label,)]
+
                     self.fields["selectOptionType"].initial = si.rate_id
                     self.fields['flux'].initial = si.flux  
 
