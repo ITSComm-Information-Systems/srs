@@ -68,17 +68,13 @@ function prev() {
 }
 
 function validate_next(current_tab) {
-	console.log('in workflow validate function');
 	if ($('#nextBtn').hasClass('single-next')) {
-		console.log('validating single');
 		return(validate_single(current_tab));
 	}
 	if ($('#nextBtn').hasClass('multiple-next')) {
-		console.log('validating multiple');
 		return(validate_multiple(current_tab));
 	}
 	if ($('#nextBtn').hasClass('update-next')) {
-		console.log('validating update');
 		return(validate_update(current_tab));
 	}
 }

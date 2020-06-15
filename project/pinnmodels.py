@@ -1104,7 +1104,7 @@ class UmRteInput(models.Model):
   wo_group_labor_group_id = models.BigIntegerField()
   wo_group_code = models.CharField(max_length=32, blank=True, null=True)
   assigned_date = models.DateField(blank=True, null=True)
-  complete_date = models.DateField(blank=True, null=True)
+  complete_date = models.DateTimeField(blank=True, null=True)
   rate_number = models.ForeignKey('UmRteRateLevelV', db_column='rate_number', to_field='labor_rate_level_code',
                                     on_delete=models.CASCADE)
   actual_mins_display = models.CharField(max_length=10, blank=True, null=True)
