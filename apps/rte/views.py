@@ -386,6 +386,8 @@ def update_submit(request):
 
             formatted_date = datetime.strptime(assigned_date, '%Y-%m-%d')
 
+            print(formatted_date.replace(hour=duration_hours, minute=duration_mins))
+
             new_entry = UmRteInput(
                 uniqname=request.user.username,
                 wo_labor_id=wo_labor_id,

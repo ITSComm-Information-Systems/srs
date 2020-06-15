@@ -76,6 +76,7 @@ AUTHENTICATION_BACKENDS = [
     'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
     'oscauth.backends.SuBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 # mozilla-django-oidc

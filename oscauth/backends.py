@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.backends import BaseBackend
+from project.pinnmodels import UmRteTechnicianV
 
 
 class SuBackend(object):
@@ -24,3 +26,8 @@ class SuBackend(object):
                 pk=user_id)  # pylint: disable=W0212
         except get_user_model().DoesNotExist:
             return None
+
+
+class RTEBackend(BaseBackend):
+    def has_perm(self, user_obj, perm, obj=None):
+        return UmRteTechnicianV.objects.filter(uniqname=user_obj.username).exists()

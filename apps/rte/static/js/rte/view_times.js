@@ -69,6 +69,9 @@ $(document).ready(function() {
 
     // Fill pagination with correct number of pages
     for (i = 0; i < num_pages; i++) {
+        // if (i < 4 || i > num_pages - 4) {
+        //     $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
+        // }
         $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
     }
     $('<li class="page-item" id="next"><a class="page-link" id="next-tab">Next</a></li>').appendTo('#pagination');
