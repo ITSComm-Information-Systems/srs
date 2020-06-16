@@ -153,6 +153,26 @@ $(document).ready(function() {
     $('[data-tab="PhoneLocation"]').hide();
   }
 
+  $(document).on("show", "#div_nonHipaaOptions" , function() {
+    $('#div_nonHipaaOptions').hide();
+  });
+
+  $(document).on("show", "#div_hipaaOptions" , function() {
+    $('#div_hipaaOptions').hide();
+  });
+
+  $(document).on("click", "#turboSensitive_0" , function() {
+    $('#div_nonHipaaOptions').hide();
+    $('#div_hipaaOptions').show();
+    $('#div_flux').hide();
+  });
+
+  $(document).on("click", "#turboSensitive_1" , function() {
+    $('#div_nonHipaaOptions').show();
+    $('#div_hipaaOptions').hide();
+    $('#div_flux').show();
+  });
+
   $("#AdminUnique").click(function() {
     $('#PhoneNumber').show();
     $('#GroupEmailAdd').show();

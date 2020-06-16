@@ -52,18 +52,18 @@ def get_phone_location(request, phone_number):
 
     return JsonResponse(locations, safe=False)
 
+
+def querydict_to_dict(query_dict):  # Kudos to QFXC on StackOverflow
+    data = {}
+    for key in query_dict.keys():
+        v = query_dict.getlist(key)
+        if len(v) == 1:
+            v = v[0]
+        data[key] = v
+    return data
+ 
 #@permission_required('oscauth.can_order')
 def send_tab_data(request):
-
-    #print(request.POST)
-    print(request.user.username)
-    print('omg', request.user.has_perm('omg'))
-    print('can_order', request.user.has_perm('can_order'))
-    #user = get_mc_user(request.user.username)
-
-    #print(user)
-
-
 
     tab_name = request.POST.get('tab')
     action = Action.objects.get(id=request.POST.get('action_id'))
@@ -110,7 +110,7 @@ def send_tab_data(request):
         valid = True
         summary = f.get_summary(visible)
         tab = {'title': step.label, 'fields': summary}
-        data = request.POST.dict()
+        data = querydict_to_dict(request.POST)
         data['csrfmiddlewaretoken'] = ''
         action = Action.objects.get(id=request.POST.get('action_id'))
 
@@ -136,7 +136,6 @@ def send_tab_data(request):
         i.chartcom_id = request.POST.get('oneTimeCharges', 14388)
         i.data = data
         i.description = action.cart_label
-        i.data['nodes'] = request.POST.getlist('nodeNames')
         i.save()
         item_id = i.id
 
@@ -298,8 +297,6 @@ class Submit(PermissionRequiredMixin, View):
 @csrf_exempt
 def send_email(request):   #Pinnacle will route non prod emails to a test address
     if request.method == "POST":
-        print(request.POST)
-        return
         subject = request.POST['emailSubject'] + ' question from: ' + request.user.username
         body = request.POST['emailBody'] 
         address = request.POST.get('emailAddress', 'ITCOM.csr@umich.edu')

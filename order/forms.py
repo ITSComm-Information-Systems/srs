@@ -52,7 +52,10 @@ class TabForm(forms.Form):
 
                 if field.type == 'Checkbox':  
                     label = field.choices[0][1]
-                    if len(value) > 0:  #TODO handle more than one Yes/No field.
+                    if len(field.choices) > 1:  # Process list of options
+                        label = field.label
+                        value = ', '.join(value)
+                    elif len(value) > 0:  
                         value = 'Yes'
                     else:
                         value = 'No'
@@ -383,6 +386,10 @@ class DetailsNFSForm(TabForm):
         super(DetailsNFSForm, self).__init__(*args, **kwargs)
         self['flux'].field.required = False
 
+        if 'hipaaOptions' in self.fields:
+            self['hipaaOptions'].field.required = False
+            self['nonHipaaOptions'].field.required = False
+
         if self.request:
             if self.request.method == 'POST':
                 instance_id = self.request.POST.get('instance_id')
@@ -442,6 +449,7 @@ class BackupDetailsForm(TabForm):
                 self.node_list = []
                 nodes = self.data.getlist('nodeNames')
                 times = self.data.getlist('backupTime')
+
 
                 for count, node in enumerate(nodes):
                     if node:
