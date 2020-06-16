@@ -1,8 +1,8 @@
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include, url, re_path
 from django.contrib import admin
 from django.urls import path
-from django.conf.urls.static import static
+from django.conf.urls.static import static, serve
 from . import views
 
 #from django.contrib.auth.models import User
@@ -46,6 +46,11 @@ router = routers.DefaultRouter()
 router.register(r'storageinstances', StorageViewSet)
 
 urlpatterns = [
+
+    re_path(r'^media/(?P<path>.*)$', serve, {
+            'document_root': settings.MEDIA_ROOT,
+            }),
+
     path('oidc/', include('mozilla_django_oidc.urls')),
     path('orders/', include('order.urls')),
     path('pages/', include('pages.urls')),
