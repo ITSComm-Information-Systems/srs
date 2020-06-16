@@ -116,7 +116,7 @@ class LDAPGroup(models.Model):
     def lookup(self, name):
         mc = McGroup(name)  # Check name vs MCommunity
 
-        if not mc.dn:
+        if not hasattr('McGroup', 'dn'):
             return None
 
         try:

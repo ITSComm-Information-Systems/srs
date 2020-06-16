@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import path
 
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -130,6 +130,68 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     ordering = ('display_seq_no',)
 
 
+@admin.register(ArcInstance)
+class ArcInstanceAdmin(admin.ModelAdmin):
+    ordering = ('name',)
+    search_fields = ['name','owner__name']
+    list_filter = ('type','service')
+
+    def get_urls(self):
+        urls = super().get_urls()
+
+        download_url = [
+            path('download_csv/', self.download_csv),
+        ]
+        return download_url + urls
+
+    def download_csv(self, request):
+        # Create the HttpResponse object with the appropriate CSV header.
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="mistorage.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(['Name', 'Owner', 'Size', 'Type','Created Date','Shortcode','Deptid','UID','Rate','Total Cost'])
+
+        instance_list = ArcInstance.objects.all().select_related()
+        for i in instance_list:
+            writer.writerow([i.name,i.owner,i.size,i.type,i.created_date,i.shortcode,i.deptid,i.uid,i.rate,i.total_cost ])
+
+        return response
+
+    def changelist_view(self, request, extra_context=None):
+
+        q = request.META['QUERY_STRING']
+
+        if q == 'type__exact=NFS':
+            self.list_display = ['name','uid','size','rate','owner','created_date']
+        elif q == 'type__exact=CIFS':
+            self.list_display = ['name','size','rate','owner', 'created_date']
+        else:
+            self.list_display = ['name','type','size','rate','owner', 'created_date']            
+
+        return super().changelist_view(
+            request, extra_context=extra_context,
+        )
+
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+
+        instance = ArcInstance.objects.get(id=object_id)
+
+        if instance.type == 'CIFS':
+            self.exclude = ['flux','uid']
+
+        else:
+            host_list = ArcHost.objects.all().filter(storage_instance_id=object_id)
+                
+            extra_context = {
+                'host_list': host_list,
+            }
+        return super().change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
+
+
 class StorageInstanceAdmin(admin.ModelAdmin):
     ordering = ('name',)
     search_fields = ['name','owner__name']
@@ -189,6 +251,8 @@ class StorageInstanceAdmin(admin.ModelAdmin):
         return super().change_view(
             request, object_id, form_url, extra_context=extra_context,
         )
+
+
 
 
 class StorageRateAdmin(admin.ModelAdmin):

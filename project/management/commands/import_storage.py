@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 
 from oscauth.utils import get_mc_group
-from order.models import StorageInstance, StorageHost, StorageMember, StorageRate
+from oscauth.models import LDAPGroup
+from order.models import ArcInstance, ArcHost, StorageRate
 
 import datetime, csv
 
@@ -10,6 +11,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('filename',type=str)
+        parser.add_argument('type',type=str)
+        parser.add_argument('service_id',type=int)
 
     def handle(self, *args, **options):
         #print(datetime.datetime.now(), 'Add Members')
@@ -18,6 +21,8 @@ class Command(BaseCommand):
 
         print(datetime.datetime.now(), 'start')
         filename = options['filename']
+        type = options['type']
+        service_id = options['service_id']
 
         with open(f'/Users/djamison/Downloads/{filename}') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
@@ -27,49 +32,54 @@ class Command(BaseCommand):
                     #print(f'Column names are {", ".join(row)}')
                     line_count += 1
                 else:
-                    self.process_record(row)
+                    self.process_record(row, type, service_id)
                     line_count += 1
 
             print(f'Processed {line_count} lines.')
 
         print(datetime.datetime.now(), 'Add Members')
-        self.add_members()
+        #self.add_members()
 
         print(datetime.datetime.now(), 'end')
 
-    def process_record(self, row):
-        instance = StorageInstance()
+    def process_record(self, row, type, service_id):
+        instance = ArcInstance()
         instance.name = row[3].strip("'")
-        instance.owner = row[7].strip("'")
+        #instance.owner = row[7].strip("'")
+        mc_group =  row[7].strip("'")
+        print(mc_group)
+        instance.owner = LDAPGroup().lookup( mc_group )
+        LDAPGroup().lookup( mc_group )
         instance.shortcode = row[8]
         instance.size = row[4]
         instance.created_date = row[5].strip("'")
 
         options = row[6].strip("'")
 
-        if row[2] == 'nfs_storage':
+        if type=='NFS':
             instance.type = 'NFS' 
             instance.uid = row[9]
             if row[10] == 'on':
                 instance.flux = True
-            hosts = row[11].strip("'").split(' ')
+            hosts = row[14].strip("'").split(' ')
             #if row[10] == 'on':
             #    options.append('flux')
 
-        if row[2] == 'cifs_storage':
+        if type=='CIFS':
             instance.type = 'CIFS'
             hosts = None
             instance.ad_group = row[9].strip("'")
             instance.deptid = row[10]
 
-        instance.rate = StorageRate.objects.get(type=instance.type, label=options)
+        instance.service_id = service_id
+        instance.rate = StorageRate.objects.get(type=instance.type, service_id=service_id, label=options)
 
         instance.save()
 
         if hosts:
             for host in hosts:
-                h = StorageHost()
-                h.storage_instance = instance
+                h = ArcHost()
+                h.arc_instance = instance
                 h.name = host
                 h.save()
 
