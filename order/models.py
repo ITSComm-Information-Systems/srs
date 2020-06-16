@@ -317,7 +317,7 @@ class StorageMember(models.Model):
     username = models.CharField(max_length=8)
 
 
-class StorageInstance(models.Model):
+class Volume(models.Model):
     TYPE_CHOICES = (
         ('NFS', 'NFS'),
         ('CIFS', 'CIFS'),
@@ -325,19 +325,14 @@ class StorageInstance(models.Model):
 
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
-    owner_bak = models.ForeignKey(StorageOwner, on_delete=models.CASCADE, null=True)
-    owner_name = models.CharField(max_length=100) # TODO Remove
+    size = models.PositiveIntegerField()
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
+    rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)
     shortcode = models.CharField(max_length=100)
+    type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
+    created_date = models.DateTimeField('Assign Date', auto_now_add=True)
     uid = models.PositiveIntegerField(null=True)
     ad_group = models.CharField(max_length=100, null=True, blank=True)
-    deptid = models.CharField(max_length=6, null=True, blank=True)
-    size = models.PositiveIntegerField()
-    autogrow = models.BooleanField(default=False)
-    type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
-    flux = models.BooleanField(default=False)
-    rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)
-    created_date = models.DateTimeField('Assign Date', auto_now_add=True)
 
     @property
     def total_cost(self):
@@ -370,13 +365,47 @@ class StorageInstance(models.Model):
 
             return so
 
+    class Meta:
+        abstract = True 
 
-class StorageHost(models.Model):
-    storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
+
+class VolumeHost(models.Model):
+    #storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        abstract = True 
+
+
+class StorageInstance(Volume):
+
+    owner_bak = models.ForeignKey(StorageOwner, on_delete=models.CASCADE, null=True)
+    owner_name = models.CharField(max_length=100) # TODO Remove
+    deptid = models.CharField(max_length=6, null=True, blank=True)
+    autogrow = models.BooleanField(default=False)
+    flux = models.BooleanField(default=False)
+
+
+class StorageHost(VolumeHost):
+    storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
+
+
+class ArcInstance(Volume):
+    nfs_group_id = models.PositiveIntegerField(null=True)
+    sensitive_regulated = models.BooleanField(default=False)  
+    great_lakes = models.BooleanField(default=False) 
+    armis = models.BooleanField(default=False) 
+    lighthouse = models.BooleanField(default=False) 
+    globus = models.BooleanField(default=False) 
+    globus_ha = models.BooleanField(default=False) 
+    thunder_x = models.BooleanField(default=False)   
+
+
+class ArcHost(VolumeHost):
+    arc_instance = models.ForeignKey(ArcInstance, related_name='hosts', on_delete=models.CASCADE)
 
 
 class BackupDomain(models.Model):
@@ -384,6 +413,10 @@ class BackupDomain(models.Model):
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE)
     shortcode = models.CharField(max_length=100)
     total_cost = models.DecimalField(max_digits=12, decimal_places=2)
+    versions_while_exists = models.PositiveIntegerField()
+    versions_after_deleted = models.PositiveIntegerField()
+    days_extra_versions = models.PositiveIntegerField()
+    days_only_version = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name
@@ -396,6 +429,7 @@ class BackupDomain(models.Model):
 class BackupNode(models.Model):
     backup_domain = models.ForeignKey(BackupDomain, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    time = models.CharField(max_length=10)
 
     def __str__(self):
         return self.name
@@ -627,23 +661,28 @@ class Item(models.Model):
             if route['target'] == 'tdx':
                 pass #self.submit_incident(route)
             if route['target'] == 'database':
-                self.update_mistorage()
-                return
-                print(route['record'])
-                rec = globals()[route['record']]()
+                if action.type == 'A':  # For Adds instantiate a new record
+                    rec = globals()[route['record']]()
+                else: # upddate/delete get existing record
+                    rec = globals()[route['record']].objects.get(id=self.data.get('instance_id'))
+                    print(rec)
+                
+                if self.data.get('volaction') == 'Delete':
+                    rec.delete()
+                else:
+                    for key, value in route['constants'].items():
+                        setattr(rec, key, value)
 
-                for key, value in route['constants'].items():
-                    setattr(rec, key, value)
+                    for key, value in route['variables'].items():
+                        if key == 'owner':
+                            rec.owner = LDAPGroup().lookup( self.data['owner'] )
+                            print('owner', rec.owner)
+                        else:
+                            print(self.data.get(value))
+                            setattr(rec, key, self.data.get(value))
 
-                for key, value in route['variables'].items():
-                    if key == 'owner':
-                        rec.owner = LDAPGroup().lookup( self.data['owner'] )
-                        print('owner', rec.owner)
-                    else:
-                        print(self.data.get(value))
-                        setattr(rec, key, self.data.get(value))
+                    rec.save()
 
-                rec.save()
 
     def submit_incident(self, route):
         client_id = settings.UM_API['CLIENT_ID']
@@ -683,7 +722,7 @@ class Item(models.Model):
         bd.shortcode = self.data['shortcode']
         bd.total_cost = 0
         bd.save()
-
+        #TODO list name
         for node in self.data['nodes']:
             if node != '':
                 n = BackupNode()
