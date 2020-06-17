@@ -1,12 +1,17 @@
 $(document).ready(function() {
 	// Pagination for results table
 	var num_rows = $('#select-entries-table').find('tbody tr:has(td)').length;
-	var rows_per_page = 10;
+	var rows_per_page = 15;
 	var num_pages = Math.ceil(num_rows / rows_per_page);
 
 	// Fill pagination with correct number of pages
     for (i = 0; i < num_pages; i++) {
-        $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
+        if (i < 2 || i > num_pages - 3) {
+            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
+        }
+        else if (i == 2) {
+            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">...</a></li>').appendTo('#pagination');
+        }
     }
     $('<li class="page-item" id="next"><a class="page-link" id="next-tab">Next</a></li>').appendTo('#pagination');
 
@@ -292,7 +297,95 @@ function format_date(date) {
 	return(year + '-' + month + '-' + day);
 }
 
+function validate_search_update() {
+    if ($('#techSearch').val() === '') {
+        $('#error-tech-id').show();
+        return false;
+    }
+    return true;
+}
+
+// Validate selection of tech
+function validate_tech_update() {
+	if (!$('#tech_id').val()) {
+        $('#error-notice').html('Please enter a  valid tech ID.');
+        $('#error-notice').removeAttr('hidden');
+        return(false);
+    }
+    return(true);
+}
+
+function validate_selection() {
+	var num_checked = 0;
+	$('#select-entries-table tbody tr').each(function() {
+		var row = $(this);
+		var col = row.find('td:first-child input[type="checkbox"]'); // checkbox
+
+		if (col.is(':checked')) {
+			num_checked = num_checked + 1;
+		} 
+	})
+
+	if (num_checked === 0) {
+		$('#num-checked-error').html('Please select entries to update.');
+        $('#num-checked-error').removeAttr('hidden');
+        return(false);
+	}
+	else if (num_checked > 10) {
+		$('#num-checked-error').html('Please select no more 10 entries at a time.');
+        $('#num-checked-error').removeAttr('hidden');
+        return(false);
+	}
+	else {
+		return(true);
+	}
+}
+
+function validate_changes() {
+	var success = true;
+	$('#update-entries-table tbody tr').each(function() {
+		var row = $(this);
+		var assigned_date = row.find('td:nth-child(2) input').val();
+		var duration_hours = row.find('td:nth-child(3) .hours').val();
+		var duration_mins = row.find('td:nth-child(3) .mins').val();
+
+		var regex = new RegExp('([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))');
+	    if (!regex.test(assigned_date)) {
+	        $('#update-error').html('Please enter a valid date. You entered: ' + assigned_date + '.');
+	        $('#update-error').removeClass('hidden');
+	        success = false;
+	    }
+
+	    if (!duration_hours && !duration_mins) {
+	        $('#update-error').html('Please enter time worked.');
+	        $('#update-error').removeClass('hidden');
+	        success = false;
+	    }
+
+	    if (duration_hours > 23 || duration_hours < 0) {
+	        $('#update-error').html('Please enter a value for hours between 0 and 23.');
+	        $('#update-error').removeClass('hidden');
+	        success = false;
+	    }
+
+	    if (duration_mins > 59 || duration_mins < 0) {
+	        $('#update-error').html('Please enter a value for minutes between 0 and 59.');
+	        $('#update-error').removeClass('hidden');
+	        success = false;
+	    }
+	})
+	return(success);
+}
+
 // Validate moving on in workflow
 function validate_update() {
-    return(true);
+    if (current_tab === 1) {
+    	return(validate_tech_update());
+    }
+    if (current_tab === 2) {
+    	return(validate_selection());
+    }
+    if (current_tab === 3) {
+    	return(validate_changes());
+    }
 }

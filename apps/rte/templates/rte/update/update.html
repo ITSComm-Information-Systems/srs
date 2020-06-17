@@ -1,6 +1,9 @@
+{% load rte_tags %}
+
 <div class='row'>
 	<div class='col-8'>
-		<form action='' method='post'>{% csrf_token %}
+		{% if request.user|is_member:"RTE Admin" %}
+		<form action='' method='post' onsubmit='return validate_search_update()'>{% csrf_token %}
 			<div class="form-group" id="searchTech">
 		        <label for="techSearch" id="labelTechSearch">
 		            <strong>Search for a Tech Name or Tech ID</strong>
@@ -32,6 +35,23 @@
 			    </table>
 			</div>
 		</form>
+		{% else %}
+		<form action='' method='post'>{% csrf_token %}
+			<div class='form-group'>
+		        <label for="techSelect" id="labelTechSelect">
+		            <strong>Select Your Tech ID</strong>
+		        </label>
+		        <div class='form-inline'>
+		            <select id='TechSelect' class='form-control col-3' name='techSearch'>
+		                {% for tech in all_techs %}
+		                    <option>{{ tech.labor_code }}</option>
+		                {% endfor %}
+		            </select>
+		            <button class='btn btn-primary' type='submit'>Enter</button>
+		        </div>
+		    </div>
+		</form>
+		{% endif %}
 
 		{% if techid %}
 			<div class='form-group col-4 mt-4'>
@@ -42,7 +62,7 @@
 			</div>
 		{% endif %}
 
-		<div class='alert alert-danger mt-2' hidden id='error-notice'></div>
+		<div class='alert alert-danger mt-2 col-4' hidden id='error-notice'></div>
 	</div>
 
 	<div class='col-4'>

@@ -131,7 +131,8 @@ TEMPLATES = {
                 'index': 'reports.inventory.templatetags.index',
                 'tags': 'reports.soc.templatetags.tags',
                 'ccr_tags': 'project.templatetags.ccr_tags',
-                'descr': 'reports.nonteleph.templatetags.descr'
+                'descr': 'reports.nonteleph.templatetags.descr',
+                'rte_tags': 'apps.rte.templatetags.rte_tags'
             }
         },
 },
