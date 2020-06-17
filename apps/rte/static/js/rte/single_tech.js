@@ -28,7 +28,7 @@ $(document).ready(function() {
     });
 
     $('#workOrderTable tr').click(function() {
-        var work_order = $(this).find("td").eq(0).html();; 
+        var work_order = $(this).find("td").eq(0).html();
         $("#workOrderSearch").val(work_order);  
         $('#workOrderTable').hide();
     });
@@ -164,7 +164,7 @@ function delete_row(row_num, num_entries) {
 // Make sure user enters tech ID
 function validate_tech() {
     if (!$('#tech_id').val()) {
-        $('#tech-error').html('Please enter a tech ID.');
+        $('#tech-error').html('Please enter a valid tech ID.');
         $('#tech-error').removeAttr('hidden');
         return(false);
     }
@@ -230,7 +230,6 @@ function validate_single_entries() {
 
 // Validate moving on in workflow
 function validate_single(current_tab) {
-    console.log(current_tab === 1);
     if (current_tab === 1) {
         console.log('validate tech');
         return(validate_tech());

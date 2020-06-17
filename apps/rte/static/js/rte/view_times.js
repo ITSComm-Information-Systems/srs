@@ -62,17 +62,19 @@ $(document).ready(function() {
 
     // Pagination for results table
     var num_rows = $('#view-time-table').find('tbody tr:has(td)').length;
-    var rows_per_page = 10;
+    var rows_per_page = 15;
     var num_pages = Math.ceil(num_rows / rows_per_page);
 
     console.log(num_rows);
 
     // Fill pagination with correct number of pages
     for (i = 0; i < num_pages; i++) {
-        // if (i < 4 || i > num_pages - 4) {
-        //     $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
-        // }
-        $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
+        if (i < 2 || i > num_pages - 3) {
+            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
+        }
+        else if (i == 2) {
+            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">...</a></li>').appendTo('#pagination');
+        }
     }
     $('<li class="page-item" id="next"><a class="page-link" id="next-tab">Next</a></li>').appendTo('#pagination');
 
@@ -129,6 +131,7 @@ function paginate(page, rows_per_page, current_page, tr) {
 // Next/previous functionality for pagination
 function next_prev(current_page, num_pages) {
     // Disable previous
+
     if (current_page === 1) {
         $('#previous').addClass('disabled');
         $('#previous-tab').attr('tabindex', '-1');

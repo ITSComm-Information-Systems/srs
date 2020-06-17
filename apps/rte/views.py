@@ -47,8 +47,10 @@ def single_tech(request):
     }
     tab_list.append(tab3)
 
-
-    all_techs = UmRteTechnicianV.objects.all()
+    if request.user.groups.filter(name="RTE Admin").exists():
+        all_techs = UmRteTechnicianV.objects.all()
+    else:
+        all_techs = UmRteTechnicianV.objects.filter(uniqname=request.user.username)
 
     all_wos = UmRteServiceOrderV.objects.all()
 
@@ -325,7 +327,11 @@ def update(request):
     }
     tab_list.append(tab4)
 
-    all_techs = UmRteTechnicianV.objects.all()
+    if request.user.groups.filter(name="RTE Admin").exists():
+        all_techs = UmRteTechnicianV.objects.all()
+    else:
+        all_techs = UmRteTechnicianV.objects.filter(uniqname=request.user.username)
+        
     rate_levels = [rate.labor_rate_level_name for rate in UmRteRateLevelV.objects.all()]
 
     # Load after search
