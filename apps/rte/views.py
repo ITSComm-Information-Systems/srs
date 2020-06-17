@@ -4,8 +4,18 @@ from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLeve
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
 from django.db import connections
+from django.contrib.auth.decorators import user_passes_test
+from django.core.exceptions import PermissionDenied
+
+# Check if user has a tech ID
+def has_techid(user):
+    if UmRteTechnicianV.objects.filter(uniqname=user.username).exists():
+        return True
+    else:
+        raise PermissionDenied
 
 # Base RTE view
+@user_passes_test(has_techid)
 def load_rte(request):
     template = loader.get_template('rte/base_rte.html')
 
