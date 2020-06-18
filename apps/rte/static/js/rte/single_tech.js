@@ -15,6 +15,7 @@ $(document).ready(function() {
         var tech_id = $(this).find("td").eq(0).html(); 
         $("#techSearch").val(tech_id);  
         $('#techTable').hide();
+        $('#techForm').submit();
     });
 
     $("#workOrderTable").hide();
@@ -164,7 +165,7 @@ function delete_row(row_num, num_entries) {
 // Make sure user enters tech ID
 function validate_tech() {
     if (!$('#tech_id').val()) {
-        $('#tech-error').html('Please enter a valid tech ID.');
+        $('#tech-error').html('Please select a valid tech ID.');
         $('#tech-error').removeAttr('hidden');
         return(false);
     }
