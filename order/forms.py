@@ -120,6 +120,14 @@ class TabForm(forms.Form):
             field.display_condition = element.display_condition
             field.type = element.type
 
+            # Check for action specific overrides
+            if 'elements' in action.override:
+                if field.name in action.override['elements']:
+                    override = action.override['elements'][field.name]
+                    for key in override:
+                        #print(key, override[key])
+                        setattr(field, key, override[key])
+
             self.fields.update({element.name: field})
         
 

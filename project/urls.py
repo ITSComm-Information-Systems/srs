@@ -6,44 +6,70 @@ from django.conf.urls.static import static
 from . import views
 
 #from django.contrib.auth.models import User
-from order.models import StorageInstance
+from order.models import StorageInstance, ArcInstance, StorageRate
 from rest_framework import routers, serializers, viewsets
 
 
 admin.AdminSite.site_header = 'SRS Administration'
 admin.AdminSite.site_title = 'SRS Site Admin'
 
+class RateSerializer(serializers.ModelSerializer):
 
-# Serializers define the API representation.
-class StorageInstanceSerializer(serializers.HyperlinkedModelSerializer):
-    hosts = serializers.StringRelatedField(many=True)
+    class Meta:
+        fields = ['name','label','rate']
+        model = StorageRate
+
+
+class VolumeInstanceSerializer(serializers.ModelSerializer):  # Base Serializer for Storage Volumes
+
     owner = serializers.StringRelatedField()
+    service = serializers.StringRelatedField()
+    rate = RateSerializer(read_only=True)
+
+
+class StorageInstanceSerializer(VolumeInstanceSerializer):
 
     class Meta:
         model = StorageInstance
-        fields = ['id','name','owner','shortcode','uid','ad_group','deptid','size','autogrow','type','flux','created_date','hosts']
- 
+        fields = ['name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost'
+        ,'deptid','autogrow','flux']
 
-# ViewSets define the view behavior.
-class StorageViewSet(viewsets.ModelViewSet):
 
-    queryset = StorageInstance.objects.all()
-    serializer_class = StorageInstanceSerializer
+class ArcInstanceSerializer(VolumeInstanceSerializer):
+    hosts = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = ArcInstance
+        fields = ['name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost','hosts'
+        ,'nfs_group_id','sensitive_regulated','great_lakes','armis','lighthouse','globus','globus_phi','thunder_x']
+
+
+class VolumeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         name = self.request.GET.get('name')
 
         if name:
-            queryset = StorageInstance.objects.filter(name=name)
+            queryset = self.serializer_class.Meta.model.objects.filter(name=name)
         else:
-            queryset = StorageInstance.objects.all()
+            queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
 
         return queryset
 
 
+class StorageViewSet(VolumeViewSet):
+    queryset = StorageInstance.objects.all()
+    serializer_class = StorageInstanceSerializer
+
+
+class ArcViewSet(VolumeViewSet):
+    queryset = ArcInstance.objects.all()
+    serializer_class = ArcInstanceSerializer
+
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'storageinstances', StorageViewSet)
+router.register(r'arcinstances', ArcViewSet)
 
 urlpatterns = [
     path('oidc/', include('mozilla_django_oidc.urls')),
