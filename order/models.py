@@ -300,6 +300,9 @@ class StorageRate(Configuration):
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     rate = models.DecimalField(max_digits=8, decimal_places=6)
 
+    def __str__(self):
+        return self.label
+
     def get_total_cost(self, size):
         total_cost = round(self.rate * int(size), 2)
         return total_cost
@@ -327,9 +330,9 @@ class Volume(models.Model):
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
     size = models.PositiveIntegerField()
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
-    rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)
-    shortcode = models.CharField(max_length=100)
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
+    rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)    
+    shortcode = models.CharField(max_length=100)
     created_date = models.DateTimeField('Assign Date', auto_now_add=True)
     uid = models.PositiveIntegerField(null=True)
     ad_group = models.CharField(max_length=100, null=True, blank=True)
@@ -381,9 +384,8 @@ class VolumeHost(models.Model):
 
 
 class StorageInstance(Volume):
-
-    owner_bak = models.ForeignKey(StorageOwner, on_delete=models.CASCADE, null=True)
-    owner_name = models.CharField(max_length=100) # TODO Remove
+    owner_bak = models.ForeignKey(StorageOwner, on_delete=models.CASCADE, null=True, blank=True)
+    owner_name = models.CharField(max_length=100, null=True, blank=True) # TODO Remove
     deptid = models.CharField(max_length=6, null=True, blank=True)
     autogrow = models.BooleanField(default=False)
     flux = models.BooleanField(default=False)
@@ -400,12 +402,19 @@ class ArcInstance(Volume):
     armis = models.BooleanField(default=False) 
     lighthouse = models.BooleanField(default=False) 
     globus = models.BooleanField(default=False) 
-    globus_ha = models.BooleanField(default=False) 
-    thunder_x = models.BooleanField(default=False)   
+    globus_phi = models.BooleanField(default=False) 
+    thunder_x = models.BooleanField('ThunderX', default=False)
+
+    class meta:
+        verbose_name = 'ARC Storage Instance'   
+        verbose_name_plural = 'ARC Storage Instances'
 
 
 class ArcHost(VolumeHost):
     arc_instance = models.ForeignKey(ArcInstance, related_name='hosts', on_delete=models.CASCADE)
+
+    class meta:
+        verbose_name = 'Host'   
 
 
 class BackupDomain(models.Model):
