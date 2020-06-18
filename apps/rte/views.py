@@ -502,8 +502,8 @@ def view_time_display(request):
             date_start = datetime.strptime(date_start, '%Y-%m-%d')
             date_end = datetime.strptime(date_end, '%Y-%m-%d')
 
-        results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, assigned_date__gt=date_start,
-                                                           assigned_date__lt=date_end).order_by('assigned_date','work_order_display')
+        results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, assigned_date__gte=date_start,
+                                                           assigned_date__lte=date_end).order_by('assigned_date','work_order_display')
         search_topic = 'Date Range'
         search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
 
