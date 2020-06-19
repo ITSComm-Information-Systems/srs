@@ -8,15 +8,10 @@ from oscauth.models import LDAPGroupMember
 
 from project.forms.fields import *
 
-def get_storage_options(service, type):
-    if service == 7:
-        unit = 'GB'
-    else:
-        unit = 'TB'
-
+def get_storage_options(action):
     opt_list = []
-    for opt in StorageRate.objects.filter(type=type, service_id=service):
-        label = f'{opt.label} ({opt.rate} / per {unit})'
+    for opt in StorageRate.objects.filter(type=action.override['storage_type'], service=action.service):
+        label = f'{opt.label} ({opt.rate} / per {opt.unit_of_measure})'
         opt_list.append((opt.id, label))
 
     return opt_list
@@ -33,14 +28,14 @@ class TabForm(forms.Form):
 
     def set_initial(self, instance_id):
         vol = self.vol.objects.get(id=instance_id)
-        routing = self.action.service.routing
-        map = routing['routes'][1]['variables']
 
-        for field in map:
-            target = map[field]
-            if target in self.fields:
-                self.fields[target].initial = getattr(vol, field)
-        
+        for field in self.fields:
+            if hasattr(vol, field):
+                self.fields[field].initial = getattr(vol, field)
+            else:
+                print(field)
+
+
     def clean(self):
         
         for field in self.fields:
@@ -90,6 +85,13 @@ class TabForm(forms.Form):
             self.vol = BackupDomain
         else:
             self.vol = ArcInstance
+
+        if self.request:  # If modifying existing data, prepoulate the form
+            if self.request.method == 'POST':
+                instance_id = self.request.POST.get('instance_id')
+                if instance_id:
+                    self.set_initial(instance_id)
+                    #si = self.vol.objects.get(id=instance_id)
 
         self.action = action
 
@@ -421,11 +423,11 @@ class DetailsNFSForm(TabForm):
             self['flux'].field.required = False
 
         if 'hipaaOptions' in self.fields:
-            if self.request.POST['turboSensitive'] == 'nosen': 
+            if self.request.POST['sensitive_regulated'] == 'nosen': 
                 self['nonHipaaOptions'].field.required = False
                 self.fields.pop('hipaaOptions')
 
-            if self.request.POST['turboSensitive'] == 'yessen': 
+            if self.request.POST['sensitive_regulated'] == 'yessen': 
                 self['hipaaOptions'].field.required = False
                 self.fields.pop('nonHipaaOptions')
 
@@ -550,10 +552,10 @@ class BillingStorageForm(TabForm):
         else:
             option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
 
-            if self.action.service.name == 'miStorage':
-                total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
-            else:
-                total_cost = option.get_total_cost(self.request.POST['sizeTerabyte'])
+            #if self.action.service.name == 'miStorage':
+            #    total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
+            #else:
+            total_cost = option.get_total_cost(self.request.POST['size'])
 
             descr = self.fields['totalCost'].description.replace('~', str(total_cost))
 
@@ -565,20 +567,15 @@ class BillingStorageForm(TabForm):
 
         if self.action.service.name == 'miStorage':
             option = StorageRate.objects.get(id=self.data['selectOptionType'])
-            total_cost = option.get_total_cost(self.data['sizeGigabyte'])
+            total_cost = option.get_total_cost(self.data['size'])
             summary.append({'label': 'Total Cost', 'value': str(total_cost)})
 
         instance_id = self.data.get('instance_id')
         
         if instance_id:
-            if self.action.service.name == 'miStorage':
-                si = self.vol.objects.get(id=instance_id)
-                if self.data['shortcode'] != si.shortcode:
-                    summary[0]['label'] = '*' + summary[0]['label']
-            else:
-                si = BackupDomain.objects.get(id=instance_id)
-                if self.data['shortcode'] != si.shortcode:
-                    summary[0]['label'] = '*' + summary[0]['label']
+            si = self.vol.objects.get(id=instance_id)
+            if self.data['shortcode'] != si.shortcode:
+                summary[0]['label'] = '*' + summary[0]['label']
                     
         return summary
 
