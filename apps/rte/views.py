@@ -61,8 +61,12 @@ def single_tech(request):
         all_techs = UmRteTechnicianV.objects.all()
     else:
         all_techs = UmRteTechnicianV.objects.filter(uniqname=request.user.username)
+        tech_id = all_techs[0]
+
 
     all_wos = UmRteServiceOrderV.objects.all()
+    # rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
+    # assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech_id).values('wo_group_name'))
 
     # Load after search
     if request.method == 'POST':
@@ -79,9 +83,9 @@ def single_tech(request):
             'wf': 'single',
             'all_techs': all_techs,
             'all_wos': all_wos,
-            'tech_id': tech_id,
-            'tech_name': tech_name,
-            'assigned_groups': assigned_groups,
+            'tech_id': tech_id or None,
+            'tech_name': tech_name or None,
+            'assigned_groups': assigned_groups or None,
             'rate_levels': rate_levels,
             'title': 'Single Technician, Multiple Orders',
             'tab_list': tab_list,
@@ -503,7 +507,7 @@ def view_time_display(request):
             date_end = datetime.strptime(date_end, '%Y-%m-%d')
 
         results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, assigned_date__gte=date_start,
-                                                           assigned_date__lte=date_end).order_by('assigned_date','work_order_display')
+                                                           assigned_date__lte=date_end).order_by('-assigned_date','work_order_display')
         search_topic = 'Date Range'
         search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
 
@@ -521,8 +525,8 @@ def view_time_display(request):
 def get_date_range(date_range):
     date_end = datetime.date(datetime.now())
 
-    if date_range == 'Last Week':
-        date_start = date_end - timedelta(days=7)
+    if date_range == 'Last 7 Days':
+        date_start = date_end - timedelta(days=6)
 
     if date_range == 'Last 3 Months':
         date_start = date_end - timedelta(days=92)
