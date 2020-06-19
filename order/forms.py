@@ -4,13 +4,19 @@ from django.forms import ModelForm
 from .models import *
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
+from oscauth.models import LDAPGroupMember
 
 from project.forms.fields import *
 
 def get_storage_options(service, type):
+    if service == 7:
+        unit = 'GB'
+    else:
+        unit = 'TB'
+
     opt_list = []
     for opt in StorageRate.objects.filter(type=type, service_id=service):
-        label = f'{opt.label} ({opt.rate} / per GB)'
+        label = f'{opt.label} ({opt.rate} / per {unit})'
         opt_list.append((opt.id, label))
 
     return opt_list
@@ -25,6 +31,16 @@ class TabForm(forms.Form):
         next_tab = TabForm(step)
         return next_tab
 
+    def set_initial(self, instance_id):
+        vol = self.vol.objects.get(id=instance_id)
+        routing = self.action.service.routing
+        map = routing['routes'][1]['variables']
+
+        for field in map:
+            target = map[field]
+            if target in self.fields:
+                self.fields[target].initial = getattr(vol, field)
+        
     def clean(self):
         
         for field in self.fields:
@@ -67,6 +83,13 @@ class TabForm(forms.Form):
     def __init__(self, tab, action, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         super(TabForm, self).__init__(*args, **kwargs)
+
+        if action.service.id == 7:
+            self.vol = StorageInstance
+        elif action.service.id == 8:
+            self.vol = BackupDomain
+        else:
+            self.vol = ArcInstance
 
         self.action = action
 
@@ -119,6 +142,7 @@ class TabForm(forms.Form):
             field.display_seq_no = element.display_seq_no
             field.display_condition = element.display_condition
             field.type = element.type
+            field.target = element.target
 
             # Check for action specific overrides
             if 'elements' in action.override:
@@ -127,6 +151,8 @@ class TabForm(forms.Form):
                     for key in override:
                         #print(key, override[key])
                         setattr(field, key, override[key])
+
+
 
             self.fields.update({element.name: field})
         
@@ -269,7 +295,7 @@ class VolumeSelectionForm(TabForm):
     def get_summary(self, *args, **kwargs):
         #summary = super().get_summary(*args, **kwargs)
 
-        instance = StorageInstance.objects.get(id=self.data['instance_id'])
+        instance = self.vol.objects.get(id=self.data['instance_id'])
 
         if self.data.get('volaction') == 'Delete':
             summary = [{'label': 'Are you sure you want to delete this volume?', 'value': ''}
@@ -280,7 +306,6 @@ class VolumeSelectionForm(TabForm):
 
         return summary
 
-
     def is_valid(self, *args, **kwargs):
         super(VolumeSelectionForm, self).is_valid(*args, **kwargs)
         return True
@@ -289,19 +314,19 @@ class VolumeSelectionForm(TabForm):
         super(VolumeSelectionForm, self).__init__(*args, **kwargs)
 
         if not self.is_bound:
-            groups = list(StorageMember.objects.filter(username=self.request.user).values_list('storage_owner_id'))
+            groups = list(LDAPGroupMember.objects.filter(username=self.request.user).values_list('ldap_group_id'))
             action_id = int(self.request.path[11:])
-            service = Action.objects.get(id=action_id).service
+            action = Action.objects.get(id=action_id)
+            service = action.service
 
-            if action_id == 47 or action_id == 53 or action_id == 59:
-                self.volume_list = StorageInstance.objects.filter(service=service, type='NFS', owner__in=groups).order_by('name')
-            elif action_id == 49 or action_id == 55 or action_id == 60:
-                self.volume_list = StorageInstance.objects.filter(service=service, type='CIFS', owner__in=groups).order_by('name')
+            if 'storage_type' in action.override:
+                vol_type = action.override['storage_type']
+                self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name')
             else:
-                self.volume_list = StorageInstance.objects.filter(service=service, owner__in=groups).order_by('name')
-                
-                for vol in self.volume_list:
-                    self.total_cost = self.total_cost + vol.total_cost
+                self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
+
+                for volume in self.volume_list:
+                    self.total_cost = self.total_cost + volume.total_cost
                     
                 self.template = 'order/volume_review.html'
 
@@ -332,7 +357,7 @@ class AccessNFSForm(TabForm):
         instance_id = self.data.get('instance_id')
         if instance_id:
 
-            si = StorageInstance.objects.get(id=instance_id)
+            si = self.vol.objects.get(id=instance_id)
             if summary[0]['value'] != si.uid:
                 summary[0]['label'] = '*' + summary[0]['label']
             if summary[1]['value'] != si.owner:
@@ -361,7 +386,7 @@ class AccessNFSForm(TabForm):
             else:  # Load instance data if it exists.
                 instance_id = self.request.POST.get('instance_id')
                 if instance_id: # 
-                    si = StorageInstance.objects.get(id=instance_id)
+                    si = self.vol.objects.get(id=instance_id)
                     self.fields["volumeAdmin"].initial = si.uid
                     self.fields["owner"].initial = si.owner
                     self.host_list = StorageHost.objects.filter(storage_instance_id=instance_id)
@@ -374,7 +399,7 @@ class DetailsNFSForm(TabForm):
         instance_id = self.data.get('instance_id')
         
         if instance_id:
-            si = StorageInstance.objects.get(id=instance_id)
+            si = self.vol.objects.get(id=instance_id)
             if summary[0]['value'] != si.name:
                 summary[0]['label'] = '*' + summary[0]['label']
             if self.data.get('selectOptionType') != str(si.rate_id):
@@ -392,17 +417,25 @@ class DetailsNFSForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(DetailsNFSForm, self).__init__(*args, **kwargs)
-        self['flux'].field.required = False
+        if 'flux' in self:
+            self['flux'].field.required = False
 
         if 'hipaaOptions' in self.fields:
-            self['hipaaOptions'].field.required = False
-            self['nonHipaaOptions'].field.required = False
+            if self.request.POST['turboSensitive'] == 'nosen': 
+                self['nonHipaaOptions'].field.required = False
+                self.fields.pop('hipaaOptions')
+
+            if self.request.POST['turboSensitive'] == 'yessen': 
+                self['hipaaOptions'].field.required = False
+                self.fields.pop('nonHipaaOptions')
+
+            #print(self.data, self.request.POST) 
 
         if self.request:
             if self.request.method == 'POST':
                 instance_id = self.request.POST.get('instance_id')
                 if instance_id:
-                    si = StorageInstance.objects.get(id=instance_id)
+                    si = self.vol.objects.get(id=instance_id)
                     self.fields["sizeGigabyte"].initial = si.size
                     self.fields["storageID"].initial = si.name
                     self.fields["selectOptionType"].initial = si.rate_id
@@ -415,7 +448,7 @@ class DetailsCIFSForm(TabForm):
         instance_id = self.data.get('instance_id')
         
         if instance_id:
-            si = StorageInstance.objects.get(id=instance_id)
+            si = self.vol.objects.get(id=instance_id)
             if summary[0]['value'] != si.owner:
                 summary[0]['label'] = '*' + summary[0]['label']
             if summary[1]['value'] != si.ad_group:
@@ -436,12 +469,13 @@ class DetailsCIFSForm(TabForm):
             if self.request.method == 'POST':
                 instance_id = self.request.POST.get('instance_id')
                 if instance_id:
-                    si = StorageInstance.objects.get(id=instance_id)
-                    self.fields["mcommGroup"].initial = si.owner
-                    self.fields["activeDir"].initial = si.ad_group
-                    self.fields["netShare"].initial = si.name
-                    self.fields["selectOptionType"].initial = si.rate_id
-                    self.fields["sizeGigabyte"].initial = si.size
+                    self.set_initial(instance_id)
+                    #si = self.vol.objects.get(id=instance_id)
+                    #self.fields["mcommGroup"].initial = si.owner
+                    #self.fields["activeDir"].initial = si.ad_group
+                    #self.fields["netShare"].initial = si.name
+                    #self.fields["selectOptionType"].initial = si.rate_id
+                    #self.fields["sizeGigabyte"].initial = si.size
 
 
 class BackupDetailsForm(TabForm):
@@ -502,21 +536,27 @@ class BillingStorageForm(TabForm):
             instance_id = self.request.POST.get('instance_id')
 
             if instance_id:
-                if self.action.service.name == 'miStorage':
-                    si = StorageInstance.objects.get(id=instance_id)
-                else: # miBackup
-                    si = BackupDomain.objects.get(id=instance_id)
+                #if self.action.service.name == 'miStorage':
+                si = self.vol.objects.get(id=instance_id)
+                #else: # miBackup
+                #    si = self.vol.objects.get(id=instance_id)
         
                 self.fields["shortcode"].initial = si.shortcode
                 self.fields["billingAuthority"].initial = 'yes'
                 self.fields["serviceLvlAgreement"].initial = 'yes'
 
-        if self.action.service.name == 'miStorage':
-            option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
-            total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
-            descr = self.fields['totalCost'].description.replace('~', str(total_cost))
-        else:
+        if self.action.service.name == 'miBackup':
             descr = self.fields['totalCost'].description.replace('~', '47 per TB')
+        else:
+            option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
+
+            if self.action.service.name == 'miStorage':
+                total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
+            else:
+                total_cost = option.get_total_cost(self.request.POST['sizeTerabyte'])
+
+            descr = self.fields['totalCost'].description.replace('~', str(total_cost))
+
         
         self.fields['totalCost'].description = descr
 
@@ -532,7 +572,7 @@ class BillingStorageForm(TabForm):
         
         if instance_id:
             if self.action.service.name == 'miStorage':
-                si = StorageInstance.objects.get(id=instance_id)
+                si = self.vol.objects.get(id=instance_id)
                 if self.data['shortcode'] != si.shortcode:
                     summary[0]['label'] = '*' + summary[0]['label']
             else:
