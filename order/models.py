@@ -296,9 +296,15 @@ class StorageRate(Configuration):
         ('CIFS', 'CIFS'),
     )
 
+    UNIT_OF_MEASURE_CHOICES = (
+        ('GB', 'Gigabytes'),
+        ('TB', 'Terabytes'),
+    )
+
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     rate = models.DecimalField(max_digits=8, decimal_places=6)
+    unit_of_measure = models.CharField(max_length=2, default='GB', choices=UNIT_OF_MEASURE_CHOICES)
 
     def __str__(self):
         return self.label
@@ -397,6 +403,7 @@ class StorageHost(VolumeHost):
 
 class ArcInstance(Volume):
     nfs_group_id = models.PositiveIntegerField(blank=True, null=True)
+    mutli_protocol = models.BooleanField(default=False)  
     sensitive_regulated = models.BooleanField(default=False)  
     great_lakes = models.BooleanField(default=False) 
     armis = models.BooleanField(default=False) 
@@ -656,7 +663,7 @@ class Item(models.Model):
         action = Action.objects.get(id=self.data['action_id'])
         routing = action.service.routing
 
-        if not routing['use_cart']:  # Associate with blank order
+        if action.use_cart:  # Associate with blank order
             o = Order()
             o.order_reference = action.destination
             o.chartcom = self.chartcom
@@ -670,6 +677,7 @@ class Item(models.Model):
             if route['target'] == 'tdx':
                 pass #self.submit_incident(route)
             if route['target'] == 'database':
+                return  #TESTING TODO
                 if action.type == 'A':  # For Adds instantiate a new record
                     rec = globals()[route['record']]()
                 else: # upddate/delete get existing record
