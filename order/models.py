@@ -396,7 +396,7 @@ class StorageHost(VolumeHost):
 
 
 class ArcInstance(Volume):
-    nfs_group_id = models.PositiveIntegerField(null=True)
+    nfs_group_id = models.PositiveIntegerField(blank=True, null=True)
     sensitive_regulated = models.BooleanField(default=False)  
     great_lakes = models.BooleanField(default=False) 
     armis = models.BooleanField(default=False) 

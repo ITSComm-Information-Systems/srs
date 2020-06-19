@@ -31,7 +31,7 @@ class StorageInstanceSerializer(VolumeInstanceSerializer):
 
     class Meta:
         model = StorageInstance
-        fields = ['name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost'
+        fields = ['id','name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost'
         ,'deptid','autogrow','flux']
 
 
@@ -40,7 +40,7 @@ class ArcInstanceSerializer(VolumeInstanceSerializer):
 
     class Meta:
         model = ArcInstance
-        fields = ['name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost','hosts'
+        fields = ['id','name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost','hosts'
         ,'nfs_group_id','sensitive_regulated','great_lakes','armis','lighthouse','globus','globus_phi','thunder_x']
 
 
