@@ -35,7 +35,7 @@
 					<td>{{ entry.assn_wo_group_name }}</td>
 					<td>{{ entry.rate_number.labor_rate_level_name }}</td>
 					<td>{{ entry.status_name }}</td>
-					<td>{% ifequal entry.billed 'Yes' %}<i class="fas fa-check"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endifequal %}</td>
+					<td>{% ifequal entry.billed 'Yes' %}<i class="fas fa-check"></i>{% endifequal %}</td>
 				</tr>
 			{% endfor%}
 		</tbody>

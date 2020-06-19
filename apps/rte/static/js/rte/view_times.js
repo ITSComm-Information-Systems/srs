@@ -45,18 +45,29 @@ $(document).ready(function() {
         $('#selectByWorkOrderDiv').show();
         $('#selectByCalendarRangeDiv').hide();
         $('#selectByDateRangeDiv').hide();
+
+        $('#calendarRangeStart').val('');
+        $('#calendarRangeEnd').val('');
+        $('#dateRangeSelect').val('');
     });
 
     $('#selectByCalendarRange').on('change', function() {
         $('#selectByWorkOrderDiv').hide();
         $('#selectByCalendarRangeDiv').show();
         $('#selectByDateRangeDiv').hide();
+
+        $('#workOrderSearch').val('');
+        $('#dateRangeSelect').val('');
     });
 
     $('#selectByDateRange').on('change', function() {
         $('#selectByWorkOrderDiv').hide();
         $('#selectByCalendarRangeDiv').hide();
         $('#selectByDateRangeDiv').show();
+
+        $('#calendarRangeStart').val('');
+        $('#calendarRangeEnd').val('');
+        $('#workOrderSearch').val('');
     });
 
 
