@@ -28,12 +28,21 @@ class TabForm(forms.Form):
 
     def set_initial(self, instance_id):
         vol = self.vol.objects.get(id=instance_id)
-
-        for field in self.fields:
+        self.instance = vol
+        for field, value in self.fields.items():
             if hasattr(vol, field):
                 self.fields[field].initial = getattr(vol, field)
             else:
-                print(field)
+                if field == 'selectOptionType':
+                    self.fields[field].initial = vol.rate_id
+
+                print('not found ', field, value)
+            
+            if field == 'sensitive_regulated':
+                if vol.sensitive_regulated:
+                    self.fields[field].initial = 'yessen'
+                else:
+                    self.fields[field].initial = 'nosen'
 
 
     def clean(self):
@@ -71,6 +80,11 @@ class TabForm(forms.Form):
                     else:
                         value = 'No'
 
+                if field.type == 'List':  
+                    #print('list', key)
+                    list = self.data.getlist(key)
+                    value = ', '.join(list)
+                
                 summary.append({'label': label, 'value': value})
 
         return summary
@@ -81,27 +95,22 @@ class TabForm(forms.Form):
 
         if action.service.id == 7:
             self.vol = StorageInstance
+            self.host = StorageHost
         elif action.service.id == 8:
             self.vol = BackupDomain
         else:
             self.vol = ArcInstance
-
-        if self.request:  # If modifying existing data, prepoulate the form
-            if self.request.method == 'POST':
-                instance_id = self.request.POST.get('instance_id')
-                if instance_id:
-                    self.set_initial(instance_id)
-                    #si = self.vol.objects.get(id=instance_id)
+            self.host = ArcHost
 
         self.action = action
 
         self.tab_name = tab.name
 
         exclude_list = self.action.get_hidden_fields()
-
-        element_list = Element.objects.all().filter(step_id = tab.id).exclude(name__in=exclude_list).order_by('display_seq_no')
+        element_list = Element.objects.filter(step_id = tab.id).exclude(name__in=exclude_list).order_by('display_seq_no')
 
         for element in element_list:  # Bind fields based on setup data in Admin Module
+            print(element.name)
 
             if element.type == 'Radio':
                 #field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.RadioSelect(attrs={'class': 'form-control'}))
@@ -116,7 +125,7 @@ class TabForm(forms.Form):
                 field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1", 'class': 'form-control'}))
                 field.initial = element.attributes
                 field.template_name = 'project/number.html'
-            elif element.type == 'ST':
+            elif element.type == 'ST' or element.type == 'List':
                 field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
                 field.template_name = 'project/text.html'
             elif element.type == 'Checkbox':
@@ -151,13 +160,18 @@ class TabForm(forms.Form):
                 if field.name in action.override['elements']:
                     override = action.override['elements'][field.name]
                     for key in override:
-                        #print(key, override[key])
                         setattr(field, key, override[key])
 
 
 
             self.fields.update({element.name: field})
         
+        if self.request:  # If modifying existing data, prepoulate the form
+            if self.request.method == 'POST':
+                instance_id = self.request.POST.get('instance_id')
+                if instance_id:
+                    self.set_initial(instance_id)
+
 
 class BillingForm(TabForm):
 
@@ -336,36 +350,33 @@ class VolumeSelectionForm(TabForm):
 class AccessNFSForm(TabForm):
     template = 'order/nfs_access.html'
 
-    #def clean_volumeAdmin(self):
-    #    if self.data['volumeAdmin'] == '0':
-    #        raise forms.ValidationError('Root access is not allowed.  Enter a value other than 0', code='root')
-
-
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
 
-        hosts = self.data.getlist('permittedHosts')
+        #hosts = self.data.getlist('permittedHosts')
 
-        if len(hosts) > 1:
-            host_value = ''
-            for host in hosts:
-                if host_value:
-                    host_value = host_value + ',' + host
-                else:
-                    host_value = host
+        #if len(hosts) > 1:
+        #    host_value = ''
+        #    for host in hosts:
+        #        if host_value:
+        #            host_value = host_value + ',' + host
+        #        else:
+        #            host_value = host
 
-            summary[2]['value'] = host_value
+        #    summary[2]['value'] = host_value
 
         instance_id = self.data.get('instance_id')
-        if instance_id:
+        if instance_id ==2234324234 :
 
             si = self.vol.objects.get(id=instance_id)
             if summary[0]['value'] != si.uid:
                 summary[0]['label'] = '*' + summary[0]['label']
             if summary[1]['value'] != si.owner:
                 summary[1]['label'] = '*' + summary[1]['label']
-        
-            host_list = list(StorageHost.objects.filter(storage_instance=si).values('name').values_list('name', flat=True))
+            if self.host == ArcHost:
+                host_list = list(self.host.objects.filter(arc_instance=si).values('name').values_list('name', flat=True))
+            else:
+                host_list = list(self.host.objects.filter(storage_instance=si).values('name').values_list('name', flat=True))
             host_list.insert(0,'')
             if hosts != host_list:
                 if len(summary) > 2:
@@ -378,29 +389,42 @@ class AccessNFSForm(TabForm):
         self['permittedHosts'].field.required = False
 
         if self.request.method == 'POST': # Skip for initial load on Add
-            if self.is_bound:   # Reload Host list
+            if self.is_bound:   # Reload Host g
                 self.host_list = []
                 hosts = self.data.getlist('permittedHosts')
                 for host in hosts:
                     if host:
                         self.host_list.append({'name': host})
 
-            else:  # Load instance data if it exists.
-                instance_id = self.request.POST.get('instance_id')
-                if instance_id: # 
-                    si = self.vol.objects.get(id=instance_id)
-                    self.fields["volumeAdmin"].initial = si.uid
-                    self.fields["owner"].initial = si.owner
-                    self.host_list = StorageHost.objects.filter(storage_instance_id=instance_id)
+            #else:  # Load instance data if it exists.
+            #    instance_id = self.request.POST.get('instance_id')
+            #    if instance_id: # 
+            #        si = self.vol.objects.get(id=instance_id)
+            #        self.fields["volumeAdmin"].initial = si.uid
+            #        self.fields["owner"].initial = si.owner
+            #        self.host_list = StorageHost.objects.filter(storage_instance_id=instance_id)
+
 
 
 class DetailsNFSForm(TabForm):
+
+    def set_initial(self, instance_id, *args, **kwargs):
+        super().set_initial(instance_id, *args, **kwargs)
+
+        if 'multi_protocol' in self.fields:
+            if self.instance.multi_protocol:
+                self.fields['multi_protocol'].initial = 'ycifs'
+            else:
+                self.fields['multi_protocol'].initial = 'ncifs'
+
+        #TODO Set checkboxes
+        #self.fields['hipaaOptions'].initial == ['armis','globus_phi']
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
         instance_id = self.data.get('instance_id')
         
-        if instance_id:
+        if instance_id == 23234343432: #TODO TEST
             si = self.vol.objects.get(id=instance_id)
             if summary[0]['value'] != si.name:
                 summary[0]['label'] = '*' + summary[0]['label']
@@ -408,9 +432,10 @@ class DetailsNFSForm(TabForm):
                 summary[1]['label'] = '*' + summary[1]['label']
             if summary[2]['value'] != si.size:
                 summary[2]['label'] = '*' + summary[2]['label']
-            if si.flux:
-                if summary[3]['value'] == 'No':
-                    summary[3]['label'] = '*' + summary[3]['label']
+            if hasattr(si, 'flux'):
+                if si.flux:
+                    if summary[3]['value'] == 'No':
+                        summary[3]['label'] = '*' + summary[3]['label']
             else:
                 if summary[3]['value'] == 'Yes':
                     summary[3]['label'] = '*' + summary[3]['label']
@@ -433,15 +458,15 @@ class DetailsNFSForm(TabForm):
 
             #print(self.data, self.request.POST) 
 
-        if self.request:
-            if self.request.method == 'POST':
-                instance_id = self.request.POST.get('instance_id')
-                if instance_id:
-                    si = self.vol.objects.get(id=instance_id)
-                    self.fields["sizeGigabyte"].initial = si.size
-                    self.fields["storageID"].initial = si.name
-                    self.fields["selectOptionType"].initial = si.rate_id
-                    self.fields['flux'].initial = si.flux  
+        #if self.request:
+        #    if self.request.method == 'POST':
+        #        instance_id = self.request.POST.get('instance_id')
+        #        if instance_id:
+        #            si = self.vol.objects.get(id=instance_id)
+        #            self.fields["sizeGigabyte"].initial = si.size
+        #            self.fields["storageID"].initial = si.name
+        #            self.fields["selectOptionType"].initial = si.rate_id
+        #            self.fields['flux'].initial = si.flux  
 
 class DetailsCIFSForm(TabForm):
 
@@ -463,21 +488,6 @@ class DetailsCIFSForm(TabForm):
                 summary[4]['label'] = '*' + summary[4]['label']
 
         return summary
-
-    def __init__(self, *args, **kwargs):
-        super(DetailsCIFSForm, self).__init__(*args, **kwargs)
-
-        if self.request:
-            if self.request.method == 'POST':
-                instance_id = self.request.POST.get('instance_id')
-                if instance_id:
-                    self.set_initial(instance_id)
-                    #si = self.vol.objects.get(id=instance_id)
-                    #self.fields["mcommGroup"].initial = si.owner
-                    #self.fields["activeDir"].initial = si.ad_group
-                    #self.fields["netShare"].initial = si.name
-                    #self.fields["selectOptionType"].initial = si.rate_id
-                    #self.fields["sizeGigabyte"].initial = si.size
 
 
 class BackupDetailsForm(TabForm):

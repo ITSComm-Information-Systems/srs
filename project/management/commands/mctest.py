@@ -9,9 +9,13 @@ from oscauth.models import LDAPGroup
 class Command(BaseCommand):
     help = 'Add Backup Domain'
 
-    def handle(self, *args, **options):
-        gname = 'iTSComm InformatioN systems'
+    def add_arguments(self, parser):
+        parser.add_argument('item_id',type=int)
 
-        i = Item.objects.get(id=3107)
+
+    def handle(self, *args, **options):
+
+        item_id = options['item_id']
+        i = Item.objects.get(id=3333)
         i.route()
     
