@@ -13,6 +13,7 @@ class Command(BaseCommand):
         parser.add_argument('filename',type=str)
         parser.add_argument('type',type=str)
         parser.add_argument('service_id',type=int)
+        # turbo = 9, locker = 10
 
     def handle(self, *args, **options):
         #print(datetime.datetime.now(), 'Add Members')
@@ -47,29 +48,34 @@ class Command(BaseCommand):
         instance.name = row[3].strip("'")
         #instance.owner = row[7].strip("'")
         mc_group =  row[7].strip("'")
-        print(mc_group)
+        print(mc_group, LDAPGroup().lookup( mc_group ))
         instance.owner = LDAPGroup().lookup( mc_group )
-        LDAPGroup().lookup( mc_group )
+        
         instance.shortcode = row[8]
         instance.size = row[4]
         instance.created_date = row[5].strip("'")
 
-        options = row[6].strip("'")
+        options = row[6].strip("'").strip("'")
 
         if type=='NFS':
             instance.type = 'NFS' 
             instance.uid = row[9]
-            if row[10] == 'on':
-                instance.flux = True
+            if row[10].strip("'") == 'Yes':
+                instance.great_lakes = True
+            if row[11].strip("'") == 'Yes':
+                instance.sensitive_regulated = True
+            if row[13].strip("'") == 'Yes':
+                instance.mutli_protocol = True
             hosts = row[14].strip("'").split(' ')
-            #if row[10] == 'on':
-            #    options.append('flux')
+            instance.nfs_group_id = row[12].strip("'")
+
 
         if type=='CIFS':
             instance.type = 'CIFS'
             hosts = None
             instance.ad_group = row[9].strip("'")
-            instance.deptid = row[10]
+            if row[10].strip("'") == 'Yes':
+                instance.sensitive_regulated = True
 
         instance.service_id = service_id
         instance.rate = StorageRate.objects.get(type=instance.type, service_id=service_id, label=options)

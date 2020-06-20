@@ -64,6 +64,7 @@ class Element(Configuration):
         ('', ''),
         ('Radio', 'Radio'),
         ('ST', 'String'),
+        ('List', 'List'),
         ('NU', 'Number'),
         ('Chart', 'Chartcom'),
         ('Label', 'Label'),
@@ -402,8 +403,8 @@ class StorageHost(VolumeHost):
 
 
 class ArcInstance(Volume):
-    nfs_group_id = models.PositiveIntegerField(blank=True, null=True)
-    mutli_protocol = models.BooleanField(default=False)  
+    nfs_group_id = models.CharField(max_length=100, blank=True, null=True)
+    multi_protocol = models.BooleanField(default=False)  
     sensitive_regulated = models.BooleanField(default=False)  
     great_lakes = models.BooleanField(default=False) 
     armis = models.BooleanField(default=False) 
@@ -675,31 +676,38 @@ class Item(models.Model):
 
         for route in routing['routes']:
             if route['target'] == 'tdx':
-                pass #self.submit_incident(route)
+                pass #self.submit_incident(route) TODO TESTING
+
             if route['target'] == 'database':
-                return  #TESTING TODO
                 if action.type == 'A':  # For Adds instantiate a new record
                     rec = globals()[route['record']]()
+                    rec.created_date = datetime.now()
                 else: # upddate/delete get existing record
                     rec = globals()[route['record']].objects.get(id=self.data.get('instance_id'))
-                    print(rec)
                 
                 if self.data.get('volaction') == 'Delete':
                     rec.delete()
                 else:
-                    for key, value in route['constants'].items():
-                        setattr(rec, key, value)
-
-                    for key, value in route['variables'].items():
-                        if key == 'owner':
-                            rec.owner = LDAPGroup().lookup( self.data['owner'] )
-                            print('owner', rec.owner)
+                    if action.service.id == 8:
+                        self.update_mibackup(rec)
+                    else:
+                        rec.owner = LDAPGroup().lookup( self.data['owner'] )
+                        rec.service = action.service
+                        rec.name = self.data.get('name','')
+                        rec.owner = LDAPGroup().lookup( self.data['owner'] )
+                        rec.size = self.data.get('size',0)
+                        rec.service = action.service
+                        rec.type = action.override['storage_type']
+                        rec.rate_id = self.data.get('selectOptionType')
+                        rec.shortcode = self.data.get('shortcode')
+                        rec.uid = self.data.get('uid')
+                        rec.ad_group = self.data.get('ad_group')    
+                        if action.service.id == 7:
+                            self.update_mistorage(rec)
                         else:
-                            print(self.data.get(value))
-                            setattr(rec, key, self.data.get(value))
-
+                            self.update_arcts(rec)
+                    
                     rec.save()
-
 
     def submit_incident(self, route):
         client_id = settings.UM_API['CLIENT_ID']
@@ -732,7 +740,7 @@ class Item(models.Model):
         response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
         print(response.text)
 
-    def update_mibackup(self):
+    def update_mibackup(self, rec):
         bd = BackupDomain()
         bd.name = 'temp'
         bd.owner = LDAPGroup().lookup( self.data['mCommunityName'] )
@@ -747,40 +755,37 @@ class Item(models.Model):
                 n.name = node
                 n.save()
 
-    def update_mistorage(self):
+    def update_arcts(self, rec):
 
-        instance_id = self.data.get('instance_id')
+        rec.nfs_group_id = self.data.get('nfs_group_id')
 
-        if instance_id:
-            si = StorageInstance.objects.get(id=instance_id)
-        else:
-            si = StorageInstance()
-            si.service = Action.objects.get(id=self.data.get('action_id')).service
+        if self.data.get('sensitive_regulated') == 'yessen':
+            rec.sensitive_regulated = True
+            
+        if self.data.get('hipaaOptions'):
+            if 'Armis2' in self.data.get('hipaaOptions'):
+                rec.armis = True
+            if 'Globus PHI' in self.data.get('hipaaOptions'):
+                rec.globus_phi = True
 
-        if self.data.get('volaction') == 'Delete':
-            si.delete()
-            return
+        if self.data.get('nonHipaaOptions'):
+            if 'Lighthouse' in self.data.get('nonHipaaOptions'):
+                rec.lighthouse = True
+            if 'Globus' in self.data.get('nonHipaaOptions'):
+                rec.globus = True
+            if 'ThunderX' in self.data.get('nonHipaaOptions'):
+                rec.thunder_x = True
+            if 'Great Lakes' in self.data.get('nonHipaaOptions'):
+                rec.great_lakes = True
 
-        if self.data.get('action_id') == '46' or self.data.get('action_id') == '47':
-            si.type = 'NFS'
-            #si.owner = si.get_owner_instance(self.data.get('owner'))
-            si.name = self.data.get('storageID')
-            si.uid = self.data.get('volumeAdmin')
-            if self.data.get('flux') == 'yes':
-                print('yep on flux')
-                si.flux = True
-            else:
-                print('no on flux')
-        else:
-            si.type = 'CIFS'
-            si.owner = si.get_owner_instance( self.data.get('mcommGroup') )
-            si.name = self.data.get('netShare')
-            si.ad_group = self.data.get('activeDir')
+        if self.data.get('permittedHosts'):
+            print('add hots')
 
-        si.size = self.data.get('sizeGigabyte')
-        si.shortcode = self.data.get('shortcode')
-        si.rate_id = self.data.get('selectOptionType')
-        si.save()
+
+    def update_mistorage(self, rec):
+
+        if self.data.get('flux') == 'yes':
+            rec.flux = True
 
     def leppard(self):
         pour=['me']
