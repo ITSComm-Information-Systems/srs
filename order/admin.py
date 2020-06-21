@@ -204,8 +204,12 @@ class VolumeAdmin(admin.ModelAdmin):
             self.exclude = ['flux','uid']
 
         else:
-            host_list = self.child_record.objects.all().filter(arc_instance_id=object_id)
-            host_list = ['trebek']   
+            print(self.child_key)
+            if self.child_record == ArcHost:
+                host_list = self.child_record.objects.all().filter(arc_instance_id=object_id)
+            else:
+                host_list = self.child_record.objects.all().filter(storage_instance_id=object_id)
+
             extra_context = {
                 'host_list': host_list,
             }
@@ -235,6 +239,13 @@ class StorageInstanceAdmin(VolumeAdmin):
     child_key = 'storage_instance_id'
     service_list = [7]
 
+
+@admin.register(ArcHost)
+class ArcHostAdmin(admin.ModelAdmin):
+    pass
+@admin.register(StorageHost)
+class StorageHostAdmin(admin.ModelAdmin):
+    pass
 
 class StorageRateAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','name','label','type','rate','service']
@@ -271,7 +282,7 @@ admin.site.register(FeatureType)
 admin.site.register(Restriction, RestrictionAdmin)
 admin.site.register(FeatureCategory, FeatureCategoryAdmin)
 
-admin.site.register(StorageHost)
+#admin.site.register(StorageHost)
 admin.site.register(StorageRate, StorageRateAdmin)
 
 admin.site.register(BackupDomain, BackupDomainAdmin)
