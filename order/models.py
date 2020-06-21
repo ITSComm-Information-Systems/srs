@@ -397,6 +397,20 @@ class StorageInstance(Volume):
     autogrow = models.BooleanField(default=False)
     flux = models.BooleanField(default=False)
 
+    def update_hosts(self, host_list):
+        current_set = set(StorageHost.objects.filter(storage_instance=self).values_list('name', flat=True) )
+        new_set = set(host_list)
+        
+        for host in current_set.difference(new_set):
+            host = StorageHost.objects.get(storage_instance=self, name=host)
+            host.delete()
+
+        for host in new_set.difference(current_set):
+            if host != '':
+                ah = StorageHost()
+                ah.storage_instance = self
+                ah.name = host
+                ah.save()
 
 class StorageHost(VolumeHost):
     storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
@@ -417,6 +431,20 @@ class ArcInstance(Volume):
         verbose_name = 'ARC Storage Instance'   
         verbose_name_plural = 'ARC Storage Instances'
 
+    def update_hosts(self, host_list):
+        current_set = set(ArcHost.objects.filter(arc_instance=self).values_list('name', flat=True) )
+        new_set = set(host_list)
+        
+        for host in current_set.difference(new_set):
+            host = ArcHost.objects.get(arc_instance=self, name=host)
+            host.delete()
+
+        for host in new_set.difference(current_set):
+            if host != '':
+                ah = ArcHost()
+                ah.arc_instance = self
+                ah.name = host
+                ah.save()
 
 class ArcHost(VolumeHost):
     arc_instance = models.ForeignKey(ArcInstance, related_name='hosts', on_delete=models.CASCADE)
@@ -676,7 +704,7 @@ class Item(models.Model):
 
         for route in routing['routes']:
             if route['target'] == 'tdx':
-                pass #self.submit_incident(route) TODO TESTING
+                self.submit_incident(route) 
 
             if route['target'] == 'database':
                 if action.type == 'A':  # For Adds instantiate a new record
@@ -706,8 +734,11 @@ class Item(models.Model):
                             self.update_mistorage(rec)
                         else:
                             self.update_arcts(rec)
-                    
-                    rec.save()
+                                            
+                        rec.save()
+
+                        if self.data.get('permittedHosts'):
+                            rec.update_hosts(self.data.get('permittedHosts'))
 
     def submit_incident(self, route):
         client_id = settings.UM_API['CLIENT_ID']
@@ -741,17 +772,22 @@ class Item(models.Model):
         print(response.text)
 
     def update_mibackup(self, rec):
-        bd = BackupDomain()
-        bd.name = 'temp'
-        bd.owner = LDAPGroup().lookup( self.data['mCommunityName'] )
-        bd.shortcode = self.data['shortcode']
-        bd.total_cost = 0
-        bd.save()
+        #bd = BackupDomain()
+        rec.name = 'temp'
+        rec.owner = LDAPGroup().lookup( self.data['mCommunityName'] )
+        rec.shortcode = self.data['shortcode']
+        rec.total_cost = 0
+        rec.versions_while_exists = self.data['preferredOption1']
+        rec.versions_after_deleted = self.data['preferredOption2']
+        rec.days_extra_versions = self.data['preferredOption3']
+        rec.days_only_version = self.data['preferredOption4']
+        rec.save()
+        #bd.save()
         #TODO list name
-        for node in self.data['nodes']:
+        for node in self.data['nodeNames']:
             if node != '':
                 n = BackupNode()
-                n.backup_domain = bd
+                n.backup_domain = rec
                 n.name = node
                 n.save()
 
@@ -777,10 +813,6 @@ class Item(models.Model):
                 rec.thunder_x = True
             if 'Great Lakes' in self.data.get('nonHipaaOptions'):
                 rec.great_lakes = True
-
-        if self.data.get('permittedHosts'):
-            print('add hots')
-
 
     def update_mistorage(self, rec):
 

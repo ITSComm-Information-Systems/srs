@@ -35,8 +35,6 @@ class TabForm(forms.Form):
             else:
                 if field == 'selectOptionType':
                     self.fields[field].initial = vol.rate_id
-
-                print('not found ', field, value)
             
             if field == 'sensitive_regulated':
                 if vol.sensitive_regulated:
@@ -61,9 +59,12 @@ class TabForm(forms.Form):
         for key, value in self.cleaned_data.items():
             field = self.fields[key]
 
-
             if key in visible:  # Add visible fields to the review page
                 label = field.label
+
+                if self.instance:
+                    if key in self.changed_data:
+                        label = '*' + label
 
                 if field.type == 'Radio':
                     for choice in field.choices:
@@ -81,10 +82,9 @@ class TabForm(forms.Form):
                         value = 'No'
 
                 if field.type == 'List':  
-                    #print('list', key)
                     list = self.data.getlist(key)
                     value = ', '.join(list)
-                
+
                 summary.append({'label': label, 'value': value})
 
         return summary
@@ -110,7 +110,6 @@ class TabForm(forms.Form):
         element_list = Element.objects.filter(step_id = tab.id).exclude(name__in=exclude_list).order_by('display_seq_no')
 
         for element in element_list:  # Bind fields based on setup data in Admin Module
-            print(element.name)
 
             if element.type == 'Radio':
                 #field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.RadioSelect(attrs={'class': 'form-control'}))
@@ -420,28 +419,6 @@ class DetailsNFSForm(TabForm):
         #TODO Set checkboxes
         #self.fields['hipaaOptions'].initial == ['armis','globus_phi']
 
-    def get_summary(self, *args, **kwargs):
-        summary = super().get_summary(*args, **kwargs)
-        instance_id = self.data.get('instance_id')
-        
-        if instance_id == 23234343432: #TODO TEST
-            si = self.vol.objects.get(id=instance_id)
-            if summary[0]['value'] != si.name:
-                summary[0]['label'] = '*' + summary[0]['label']
-            if self.data.get('selectOptionType') != str(si.rate_id):
-                summary[1]['label'] = '*' + summary[1]['label']
-            if summary[2]['value'] != si.size:
-                summary[2]['label'] = '*' + summary[2]['label']
-            if hasattr(si, 'flux'):
-                if si.flux:
-                    if summary[3]['value'] == 'No':
-                        summary[3]['label'] = '*' + summary[3]['label']
-            else:
-                if summary[3]['value'] == 'Yes':
-                    summary[3]['label'] = '*' + summary[3]['label']
-
-        return summary
-
     def __init__(self, *args, **kwargs):
         super(DetailsNFSForm, self).__init__(*args, **kwargs)
         if 'flux' in self:
@@ -469,25 +446,7 @@ class DetailsNFSForm(TabForm):
         #            self.fields['flux'].initial = si.flux  
 
 class DetailsCIFSForm(TabForm):
-
-    def get_summary(self, *args, **kwargs):
-        summary = super().get_summary(*args, **kwargs)
-        instance_id = self.data.get('instance_id')
-        
-        if instance_id:
-            si = self.vol.objects.get(id=instance_id)
-            if summary[0]['value'] != si.owner:
-                summary[0]['label'] = '*' + summary[0]['label']
-            if summary[1]['value'] != si.ad_group:
-                summary[1]['label'] = '*' + summary[1]['label']
-            if summary[2]['value'] != si.name:
-                summary[2]['label'] = '*' + summary[2]['label']
-            if self.data['selectOptionType'] != str(si.rate_id):
-                summary[3]['label'] = '*' + summary[3]['label']
-            if summary[4]['value'] != si.size:
-                summary[4]['label'] = '*' + summary[4]['label']
-
-        return summary
+    pass
 
 
 class BackupDetailsForm(TabForm):
@@ -620,6 +579,10 @@ class ReviewForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
+
+        print('review form', self.fields)
+
+
 
         if self.request.POST.get('action_id') == '47' or self.request.POST.get('action_id') == '49':
             item_id = self.request.POST.get('item_id')
