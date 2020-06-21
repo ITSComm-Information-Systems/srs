@@ -30,6 +30,11 @@ class Command(BaseCommand):
             type = 'CIFS'
 
         print(f'Process {filename} {service_id} {type}')
+        #instance_list = ArcInstance.objects.filter(id)
+        ArcHost.objects.filter(arc_instance__service_id=service_id,arc_instance__type=type).delete()
+        ArcInstance.objects.filter(service_id=service_id,type=type).delete()
+        
+        print('open file')
 
         with open(f'/Users/djamison/Downloads/{filename}') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
