@@ -1,0 +1,77 @@
+from django.core.management.base import BaseCommand, CommandError
+import requests, json
+
+from bom.models import LegacyData
+
+class Command(BaseCommand):
+    help = 'Import BOM Data from ServiceNow'
+    tables = [
+        'u_bill_of_material',
+        'u_bill_of_material_detail',
+        'u_bom_labor_estimate'
+        ]
+
+    def handle(self, *args, **options):
+        sn = ServiceNow()
+
+        for table in self.tables:
+            sn.load_all_records(table)
+
+        
+class ServiceNow:
+    URL = 'https://umichdev.service-now.com/api/now/table/'
+    AUTH = ('soap.bom', 'magpie')
+    PAGE_SIZE = 1000
+
+    def get_page(self, table, limit, offset):
+        resp = requests.get(f'{self.URL}{table}?sysparm_limit={limit}&{offset}'
+            ,auth=self.AUTH )
+        data = json.loads(resp.text)
+
+        return data.get('result', None)
+
+    def load_all_records(self, table):
+        offset = 0
+        count = 0
+
+        while count==0:
+            data = self.get_page(table, self.PAGE_SIZE, offset)
+            for record in data:
+                count +=1 
+
+                lg = LegacyData()
+
+                if table == 'u_bill_of_material':
+                    lg.bom_id = record['sys_id'] 
+                    lg.woid = record['u_woid'] 
+                else:
+                    bom = record['u_bill_of_material']
+                    if 'value' in bom:
+                        lg.bom_id = bom['value']
+                    lg.woid = 0              
+
+                lg.data = record
+                lg.save()
+
+            offset = offset + self.PAGE_SIZE
+            print(table ,count)
+            #break
+
+
+class ServiceNowRecord:
+    name = None
+
+    def __init__(self, record):
+        self.bom = record['u_bill_of_material']['value']
+
+
+class BOM:
+
+    def create_bom(self, sys_id):
+        bom = BillOfMaterial()
+        bom.woid = snr.woid
+        bom.save()
+
+
+
+
