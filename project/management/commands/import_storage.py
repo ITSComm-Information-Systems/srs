@@ -11,19 +11,25 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('filename',type=str)
-        parser.add_argument('type',type=str)
-        parser.add_argument('service_id',type=int)
+        #parser.add_argument('type',type=str)
+        #parser.add_argument('service_id',type=int)
         # turbo = 9, locker = 10
 
     def handle(self, *args, **options):
-        #print(datetime.datetime.now(), 'Add Members')
-        #self.add_members()
-        #return
-
         print(datetime.datetime.now(), 'start')
         filename = options['filename']
-        type = options['type']
-        service_id = options['service_id']
+
+        if filename[:5] == 'turbo':
+            service_id = 9
+        else:
+            service_id = 10
+
+        if filename[-7:] == 'nfs.csv':
+            type = 'NFS'
+        else:
+            type = 'CIFS'
+
+        print(f'Process {filename} {service_id} {type}')
 
         with open(f'/Users/djamison/Downloads/{filename}') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
@@ -33,13 +39,11 @@ class Command(BaseCommand):
                     #print(f'Column names are {", ".join(row)}')
                     line_count += 1
                 else:
+                    #if row[0] == 46306:
                     self.process_record(row, type, service_id)
                     line_count += 1
 
             print(f'Processed {line_count} lines.')
-
-        print(datetime.datetime.now(), 'Add Members')
-        #self.add_members()
 
         print(datetime.datetime.now(), 'end')
 
@@ -48,7 +52,6 @@ class Command(BaseCommand):
         instance.name = row[3].strip("'")
         #instance.owner = row[7].strip("'")
         mc_group =  row[7].strip("'")
-        print(mc_group, LDAPGroup().lookup( mc_group ))
         instance.owner = LDAPGroup().lookup( mc_group )
         
         instance.shortcode = row[8]
@@ -80,14 +83,19 @@ class Command(BaseCommand):
         instance.service_id = service_id
         instance.rate = StorageRate.objects.get(type=instance.type, service_id=service_id, label=options)
 
-        instance.save()
+        try:
+            instance.save()
 
-        if hosts:
-            for host in hosts:
-                h = ArcHost()
-                h.arc_instance = instance
-                h.name = host
-                h.save()
+            if hosts:
+                for host in hosts:
+                    h = ArcHost()
+                    h.arc_instance = instance
+                    h.name = host
+                    h.save()
+        except:
+            print('error inserting', row[0])
+
+
 
     def add_members(self):
         groups = StorageInstance.objects.distinct('owner')

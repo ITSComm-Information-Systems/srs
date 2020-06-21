@@ -16,6 +16,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         item_id = options['item_id']
-        i = Item.objects.get(id=3333)
+        i = Item.objects.get(id=item_id)
         i.route()
     
