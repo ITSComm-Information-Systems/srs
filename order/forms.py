@@ -25,10 +25,12 @@ class TabForm(forms.Form):
         self.instance = vol
 
         for fieldname, field in self.fields.items():
-            if hasattr(vol, fieldname):
-                field.initial = getattr(vol,fieldname)
-            elif type(field) == forms.MultipleChoiceField:
+            if type(field) == forms.MultipleChoiceField:
                 field.initial = vol.get_checkboxes()
+
+            elif hasattr(vol, fieldname):
+                field.initial = getattr(vol,fieldname)
+
             elif fieldname == 'selectOptionType':
                 field.initial = vol.rate_id
             
@@ -39,7 +41,13 @@ class TabForm(forms.Form):
                     field.initial = 'nosen'
 
 
+
     def clean(self):
+
+        if self.action.service.id == 10:
+            if 'size' in self.cleaned_data:
+                print("locker", self.cleaned_data['size'])
+                self.add_error('size', 'Enter a size of at least 10 terabytes')
         
         for field in self.fields:
             if self.has_error(field):
@@ -404,7 +412,7 @@ class DetailsNFSForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(DetailsNFSForm, self).__init__(*args, **kwargs)
-        if 'flux' in self:
+        if 'flux' in self.fields:
             self['flux'].field.required = False
 
         if 'hipaaOptions' in self.fields:
