@@ -204,12 +204,15 @@ class VolumeAdmin(admin.ModelAdmin):
             self.exclude = ['flux','uid']
 
         else:
-            print(self.child_key)
-            if self.child_record == ArcHost:
-                host_list = self.child_record.objects.all().filter(arc_instance_id=object_id)
-            else:
-                host_list = self.child_record.objects.all().filter(storage_instance_id=object_id)
+            #print(self.child_key)
 
+            host_list = instance.get_hosts()
+
+            #if self.child_record == ArcHost:
+            #    host_list = self.child_record.objects.all().filter(arc_instance_id=object_id)
+            #else:
+            #    host_list = self.child_record.objects.all().filter(storage_instance_id=object_id)
+ 
             extra_context = {
                 'host_list': host_list,
             }

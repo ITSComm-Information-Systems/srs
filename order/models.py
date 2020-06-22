@@ -397,6 +397,9 @@ class StorageInstance(Volume):
     autogrow = models.BooleanField(default=False)
     flux = models.BooleanField(default=False)
 
+    def get_hosts(self):
+        return StorageHost.objects.filter(storage_instance=self)
+
     def update_hosts(self, host_list):
         current_set = set(StorageHost.objects.filter(storage_instance=self).values_list('name', flat=True) )
         new_set = set(host_list)
@@ -430,6 +433,9 @@ class ArcInstance(Volume):
     class meta:
         verbose_name = 'ARC Storage Instance'   
         verbose_name_plural = 'ARC Storage Instances'
+
+    def get_hosts(self):
+        return ArcHost.objects.filter(arc_instance=self)
 
     def update_hosts(self, host_list):
         current_set = set(ArcHost.objects.filter(arc_instance=self).values_list('name', flat=True) )
