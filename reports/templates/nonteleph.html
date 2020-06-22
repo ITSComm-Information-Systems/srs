@@ -51,6 +51,7 @@
 									{% elif key == 'MiBackup' %}
 										<th scope='col' class='first-col'>Policy Domain</th>
 										<th scope='col'>MCommunity Group</th>
+										<th scope='col'>Shortcode</th>
 										<th scope='col'>Transaction Type</th>
 										<th scope='col' class='total-col'>Total Charge</th>
 									{% else %}
@@ -88,6 +89,7 @@
 									{% elif key == 'MiBackup' %}
 										<td class='first-col'>{{ v.unique_id }}</td>
 										<td>{{ v.voucher_comment }}</td>
+										<td>{{ v.shortcode }}</td>
 										<td>{{ v.type }}</td>
 										<td class='total-col'>{{ v.total_charges }}</td>
 									{% else %}
@@ -132,8 +134,8 @@
 									<td></td>
 									{% endif %}
 									<td></td>
-									{% if key != 'MiBackup' %}
 									<td></td>
+									{% if key != 'MiBackup' %}
 									<td></td>
 									{% endif %}
 									{% if '-'|first in value.total %}
