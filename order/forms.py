@@ -62,7 +62,7 @@ class TabForm(forms.Form):
             if key in visible:  # Add visible fields to the review page
                 label = field.label
 
-                if self.instance:
+                if self.action.type == 'M':
                     if key in self.changed_data:
                         label = '*' + label
 
@@ -364,23 +364,6 @@ class AccessNFSForm(TabForm):
 
         #    summary[2]['value'] = host_value
 
-        instance_id = self.data.get('instance_id')
-        if instance_id ==2234324234 :
-
-            si = self.vol.objects.get(id=instance_id)
-            if summary[0]['value'] != si.uid:
-                summary[0]['label'] = '*' + summary[0]['label']
-            if summary[1]['value'] != si.owner:
-                summary[1]['label'] = '*' + summary[1]['label']
-            if self.host == ArcHost:
-                host_list = list(self.host.objects.filter(arc_instance=si).values('name').values_list('name', flat=True))
-            else:
-                host_list = list(self.host.objects.filter(storage_instance=si).values('name').values_list('name', flat=True))
-            host_list.insert(0,'')
-            if hosts != host_list:
-                if len(summary) > 2:
-                    summary[2]['label'] = '*' + summary[2]['label']
-
         return summary
 
     def __init__(self, *args, **kwargs):
@@ -579,10 +562,6 @@ class ReviewForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
-
-        print('review form', self.fields)
-
-
 
         if self.request.POST.get('action_id') == '47' or self.request.POST.get('action_id') == '49':
             item_id = self.request.POST.get('item_id')

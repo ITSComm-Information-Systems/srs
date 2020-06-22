@@ -762,6 +762,9 @@ class Item(models.Model):
             'Accept': 'application/json' 
             }
 
+        text = self.data['reviewSummary']
+        note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
+ 
         payload = route['constants']
         payload['Title'] = self.description
         payload['RequestorEmail'] = self.created_by.email
@@ -769,7 +772,7 @@ class Item(models.Model):
 
         data_string = json.dumps(payload)
         response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
-        print(response.text)
+        #print(response.text)
 
     def update_mibackup(self, rec):
         #bd = BackupDomain()
