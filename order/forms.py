@@ -365,6 +365,7 @@ class AccessNFSForm(TabForm):
         self['permittedHosts'].field.required = False
 
         if self.request.method == 'POST': # Skip for initial load on Add
+            print('cp1')
             if self.is_bound:   # Reload Host g
                 self.host_list = []
                 hosts = self.data.getlist('permittedHosts')
@@ -372,7 +373,11 @@ class AccessNFSForm(TabForm):
                     if host:
                         self.host_list.append({'name': host})
 
-            #else:  # Load instance data if it exists.
+
+            else:  # Load instance data if it exists.
+                self.host_list = self.instance.get_hosts()
+
+                #if self.
             #    instance_id = self.request.POST.get('instance_id')
             #    if instance_id: # 
             #        si = self.vol.objects.get(id=instance_id)
