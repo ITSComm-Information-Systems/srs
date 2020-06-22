@@ -352,6 +352,16 @@ class Volume(models.Model):
     def __str__(self):
         return self.name
 
+    def get_checkboxes(self):
+        checkboxes = []
+        for field in self._meta.get_fields():
+            if type(field) == models.BooleanField:
+                if getattr(self, field.name):
+                    checkboxes.append(field.name)
+
+        return checkboxes
+
+
     def get_owner_instance(self, name):
 
         mc = get_mc_group(name)
