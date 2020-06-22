@@ -23,18 +23,20 @@ class TabForm(forms.Form):
     def set_initial(self, instance_id):
         vol = self.vol.objects.get(id=instance_id)
         self.instance = vol
-        for field, value in self.fields.items():
-            if hasattr(vol, field):
-                self.fields[field].initial = getattr(vol, field)
-            else:
-                if field == 'selectOptionType':
-                    self.fields[field].initial = vol.rate_id
+
+        for fieldname, field in self.fields.items():
+            if hasattr(vol, fieldname):
+                field.initial = getattr(vol,fieldname)
+            elif type(field) == forms.MultipleChoiceField:
+                field.initial = vol.get_checkboxes()
+            elif fieldname == 'selectOptionType':
+                field.initial = vol.rate_id
             
-            if field == 'sensitive_regulated':
+            if fieldname == 'sensitive_regulated':
                 if vol.sensitive_regulated:
-                    self.fields[field].initial = 'yessen'
+                    field.initial = 'yessen'
                 else:
-                    self.fields[field].initial = 'nosen'
+                    field.initial = 'nosen'
 
 
     def clean(self):
@@ -365,7 +367,6 @@ class AccessNFSForm(TabForm):
         self['permittedHosts'].field.required = False
 
         if self.request.method == 'POST': # Skip for initial load on Add
-            print('cp1')
             if self.is_bound:   # Reload Host g
                 self.host_list = []
                 hosts = self.data.getlist('permittedHosts')
