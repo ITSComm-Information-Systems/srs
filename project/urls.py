@@ -41,7 +41,7 @@ class ArcInstanceSerializer(VolumeInstanceSerializer):
     class Meta:
         model = ArcInstance
         fields = ['id','name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost','hosts'
-        ,'nfs_group_id','sensitive_regulated','great_lakes','armis','lighthouse','globus','globus_phi','thunder_x']
+        ,'nfs_group_id','multi_protocol','sensitive_regulated','great_lakes','armis','lighthouse','globus','globus_phi','thunder_x']
 
 
 class VolumeViewSet(viewsets.ModelViewSet):
