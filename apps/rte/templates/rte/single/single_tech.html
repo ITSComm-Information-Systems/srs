@@ -33,6 +33,24 @@
         </table>
     </div>
 </form>
+<div id='chosen_techid' hidden>
+    <div class='form-group col-4 mt-4'>
+        <label for="tech_id" id="teachIdLabel">
+            <strong>Tech ID</strong>
+        </label>
+        <input readonly class='form-control' id="tech_id" value="">
+
+        <label for="tech_name" id="teachNameLabel" class='mt-2'>
+            <strong>Tech Name</strong>
+        </label>
+        <input readonly class='form-control' id="tech_name" value="">
+
+        <label for="agSelect" id="labelAGSelect" class='mt-2'>
+            <strong>Assigned Group </strong>
+        </label>
+        <select class='custom-select' id='agSelect'></select>
+    </div>
+</div>
 {% else %}
 <form id='techForm' method='post' action=''>{% csrf_token %}
     <div class='form-group'>
@@ -40,18 +58,38 @@
             <strong>Select Your Tech ID</strong>
         </label>
         <div class='form-inline'>
-            <select id='TechSelect' class='form-control col-3' name='techSearch'>
+            <select id='TechSelect' class='form-control col-3' name='techSearch' onchange='console.log("test");'>
                 {% for tech in all_techs %}
                     <option>{{ tech.labor_code }}</option>
                 {% endfor %}
             </select>
-            <button class='btn btn-primary' type='submit'>Enter</button>
         </div>
     </div>
 </form>
+
+<div class='form-group col-4 mt-4'>
+    <label for="tech_id" id="teachIdLabel">
+        <strong>Tech ID</strong>
+    </label>
+    <input readonly class='form-control' id="tech_id" value="{{ tech_id }}">
+
+    <label for="tech_name" id="teachNameLabel" class='mt-2'>
+        <strong>Tech Name</strong>
+    </label>
+    <input readonly class='form-control' id="tech_name" value="{{ tech_name }}">
+
+    <label for="agSelect" id="labelAGSelect" class='mt-2'>
+        <strong>Assigned Group </strong>
+    </label>
+    <select class='custom-select' id='agSelect'>
+        {% for group in assigned_groups %}
+            <option>{{ group.wo_group_name }}</option>
+        {% endfor %}
+    </select>
+</div>
 {% endif %}
 
-
+{% comment %}
 {% if tech_name %}
     <div class='form-group col-4 mt-4'>
         <label for="tech_id" id="teachIdLabel">
@@ -62,7 +100,7 @@
         <label for="tech_name" id="teachNameLabel" class='mt-2'>
             <strong>Tech Name</strong>
         </label>
-        <input readonly class='form-control' id="tech_name" value="{{ tech_name.labor_name_display2 }}">
+        <input readonly class='form-control' id="tech_name" value="{{ tech_name }}">
 
         <label for="agSelect" id="labelAGSelect" class='mt-2'>
             <strong>Assigned Group </strong>
@@ -74,5 +112,6 @@
         </select>
     </div>
 {% endif %}
+{% endcomment %}
 
 <div hidden class='alert alert-danger col-4' id='tech-error'></div>

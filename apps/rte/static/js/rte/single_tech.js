@@ -13,9 +13,13 @@ $(document).ready(function() {
     $('#techTable tr').click(function() {
         var tech_name = $(this).find("td").eq(1).html();   
         var tech_id = $(this).find("td").eq(0).html(); 
-        $("#techSearch").val(tech_id);  
+        //$("#techSearch").val('');  
         $('#techTable').hide();
-        $('#techForm').submit();
+        get_assigned_groups(tech_id);
+        $('#tech_name').val(tech_name);
+        $('#tech_id').val(tech_id);
+        $('#techSearch').val('');
+        $('#tech-error').attr('hidden');
     });
 
     $("#workOrderTable").hide();
@@ -238,4 +242,31 @@ function validate_single(current_tab) {
     if (current_tab === 2) {
         return(validate_single_entries());
     }
+}
+
+// Get assigned groups based on tech ID
+function get_assigned_groups(techid) {
+    $.ajax({
+        url: 'get-assigned-group/',
+        data: {
+            "techid": techid
+        },
+        dataType:'json',
+        // Reset chartfield options when department changes
+        success: function(data) {
+            console.log(data);
+            $('#agSelect').empty();
+            for (i = 0; i < data.length; ++i) {
+                var drp = document.getElementById('agSelect');
+                var option = document.createElement("OPTION");
+                option.value = data[i].wo_group_name;
+                option.text = data[i].wo_group_name;
+                drp.add(option);
+            }
+            $('#chosen_techid').removeAttr('hidden');
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+    })
 }
