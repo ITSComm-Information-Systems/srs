@@ -59,50 +59,54 @@ def single_tech(request):
 
     if request.user.groups.filter(name="RTE Admin").exists():
         all_techs = UmRteTechnicianV.objects.all()
+        tech_id = ''
+        tech_name = ''
+        assigned_groups = ''
     else:
         all_techs = UmRteTechnicianV.objects.filter(uniqname=request.user.username)
-        tech_id = all_techs[0]
+        tech_id = all_techs[0].labor_code
+        tech_name = all_techs[0].labor_name_display2
+        assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech_id).values('wo_group_name'))
 
 
     all_wos = UmRteServiceOrderV.objects.all()
-    # rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
-    # assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech_id).values('wo_group_name'))
+    rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
 
-    # Load after search
-    if request.method == 'POST':
+    # # Load after search
+    # if request.method == 'POST':
 
-        tech_id = request.POST.get('techSearch')
+    #     tech_id = request.POST.get('techSearch')
 
-        tech_name = UmRteTechnicianV.objects.get(labor_code=tech_id)
+    #     tech_name = UmRteTechnicianV.objects.get(labor_code=tech_id)
 
-        assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech_id).values('wo_group_name'))
+    #     assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech_id).values('wo_group_name'))
 
-        rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
+    #     rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
 
-        context = {
-            'wf': 'single',
-            'all_techs': all_techs,
-            'all_wos': all_wos,
-            'tech_id': tech_id or None,
-            'tech_name': tech_name or None,
-            'assigned_groups': assigned_groups or None,
-            'rate_levels': rate_levels,
-            'title': 'Single Technician, Multiple Orders',
-            'tab_list': tab_list,
-            'num_tabs': len(tab_list)
-        }
+    context = {
+        'wf': 'single',
+        'all_techs': all_techs,
+        'all_wos': all_wos,
+        'tech_id': tech_id,
+        'tech_name': tech_name,
+        'assigned_groups': assigned_groups,
+        'rate_levels': rate_levels,
+        'title': 'Single Technician, Multiple Orders',
+        'tab_list': tab_list,
+        'num_tabs': len(tab_list)
+    }
 
-        return HttpResponse(template.render(context, request))
+    return HttpResponse(template.render(context, request))
 
-    # Original load
-    else:
-        context = {
-            'wf': 'single',
-            'all_techs': all_techs,
-            'title': 'Single Technician, Multiple Orders',
-            'tab_list': tab_list
-        }
-        return HttpResponse(template.render(context, request))
+    # # Original load
+    # else:
+    #     context = {
+    #         'wf': 'single',
+    #         'all_techs': all_techs,
+    #         'title': 'Single Technician, Multiple Orders',
+    #         'tab_list': tab_list
+    #     }
+    #     return HttpResponse(template.render(context, request))
 
 # Review single tech times
 def single_submit(request):
