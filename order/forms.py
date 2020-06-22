@@ -20,12 +20,6 @@ class TabForm(forms.Form):
 
     template = 'order/base_form.html'
 
-    def get_next_tab(self, action_id):
-
-        step = Step.objects.get(name='detailsNFS')
-        next_tab = TabForm(step)
-        return next_tab
-
     def set_initial(self, instance_id):
         vol = self.vol.objects.get(id=instance_id)
         self.instance = vol
