@@ -26,7 +26,7 @@
                             </a>
                         </td>
                         <td>{{ sub.shortcode }}</td>
-                        <td style="text-align:right">{{ sub.total_cost }}</td>
+                        <td style="text-align:right">${{ sub.total_cost }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -36,7 +36,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td style="text-align:right">{{ tab.form.total_cost }}0</td>                 
+                    <td style="text-align:right">${{ tab.form.total_cost }}</td>                 
                 </tr>
             </tfoot>
         </table>
