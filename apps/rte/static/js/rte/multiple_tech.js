@@ -30,8 +30,11 @@ $(document).ready(function() {
     });
 
     $('#workOrderTableMultiple tr').click(function() {
-        var work_order = $(this).find("td").eq(0).html();; 
-        $("#workOrderSearchMultiple").val(work_order);  
+        var work_order = $(this).find("td").eq(0).html();
+        var work_order_desc = $(this).find("td").eq(1).html(); 
+        $("#workOrderSearchMultiple").val(''); 
+        $('#work_order').val(work_order);
+        $('#work_order_text').html(work_order_desc);
         $('#workOrderTableMultiple').hide();
     });
 
@@ -142,7 +145,6 @@ function techid_to_review() {
 
 // Get assigned groups for selected tech ID
 function load_assigned_groups(techid) {
-    console.log(techid);
     $.ajax({
         url: 'get-assigned-group/',
         data: {
@@ -151,7 +153,6 @@ function load_assigned_groups(techid) {
         dataType:'json',
         // Reset chartfield options when department changes
         success: function(data) {
-            console.log(data);
             $('#assignedGroupSelectMultiple').empty();
             for (i = 0; i < data.length; ++i) {
                 var drp = document.getElementById('assignedGroupSelectMultiple');
@@ -197,8 +198,6 @@ function validate_multiple_entries() {
 
 // Make sure all entry fields are filled
 function validate_add_multiple() {
-    console.log('here for some reason???');
-
     $('#entries-error').addClass('hidden');
 
     if (!$('#techSearchMultiple').val()) {

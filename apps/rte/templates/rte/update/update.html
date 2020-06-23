@@ -3,20 +3,17 @@
 <div class='row'>
 	<div class='col-8'>
 		{% if request.user|is_member:"RTE Admin" %}
-		<form action='' method='post' onsubmit='return validate_search_update()'>{% csrf_token %}
-			<div class="form-group" id="searchTech">
-		        <label for="techSearch" id="labelTechSearch">
+		<form action='' method='post' id='update-form' onsubmit='return validate_search_update()'>{% csrf_token %}
+			<div class="form-group" id="searchTechUpdate">
+		        <label for="techSearchUpdate" id="labelTechSearchUpdate">
 		            <strong>Search for a Tech Name or Tech ID</strong>
 		        </label>
 		        <small id="buildingTechBlock" class="form-text text-muted">
 		            Search for the tech name or tech ID whose time you'd like to update.
 		        </small>
 		    	<div class='form-group'>
-		    		<div class='form-inline'>
-				        <input name='techSearch' autocomplete='off' id="techSearch" class="form-control" type="text" aria-describedby="buildingTechBlock"
-				            placeholder="Search...">
-				        <button class='btn btn-primary' type='submit'>Enter</button>
-				    </div>
+			        <input name='techSearchUpdate' autocomplete='off' id="techSearchUpdate" class="form-control col-5" type="text" aria-describedby="buildingTechBlock"
+			            placeholder="Search...">
 			        <div role=”alert” class="invalid-feedback" id='error-tech-id'><i class="fas fa-exclamation-triangle"
 			            aria-label="Icon signfying that user must enter a value"></i>Please enter a tech ID.
 			        </div>
@@ -24,7 +21,7 @@
 		  	</div>
 
 		  	<div class='col-6'>
-			    <table id="techTable" class="table table-hover" aria-live=”polite”>
+			    <table id="techTableUpdate" class="table table-hover" aria-live=”polite”>
 			        {% for tech in all_techs %}
 			            <tr tabindex="0"  id="{{ tech.labor_code }}" role="button" aria-label="Select tech 
 			                {{ tech.labor_name_display2 }} with tech ID of {{ tech.labor_code }}">
@@ -36,19 +33,16 @@
 			</div>
 		</form>
 		{% else %}
-		<form action='' method='post'>{% csrf_token %}
+		<form action='' id='update-form' method='post'>{% csrf_token %}
 			<div class='form-group'>
 		        <label for="techSelect" id="labelTechSelect">
 		            <strong>Select Your Tech ID</strong>
 		        </label>
-		        <div class='form-inline'>
-		            <select id='TechSelect' class='form-control col-3' name='techSearch'>
-		                {% for tech in all_techs %}
-		                    <option>{{ tech.labor_code }}</option>
-		                {% endfor %}
-		            </select>
-		            <button class='btn btn-primary' type='submit'>Enter</button>
-		        </div>
+	            <select id='techSelectUpdate' class='form-control col-5' name='techSearchUpdate'>
+	                {% for tech in all_techs %}
+	                    <option>{{ tech.labor_code }}</option>
+	                {% endfor %}
+	            </select>
 		    </div>
 		</form>
 		{% endif %}

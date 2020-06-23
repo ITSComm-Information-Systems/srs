@@ -12,8 +12,7 @@ $(document).ready(function() {
 
     $('#techTable tr').click(function() {
         var tech_name = $(this).find("td").eq(1).html();   
-        var tech_id = $(this).find("td").eq(0).html(); 
-        //$("#techSearch").val('');  
+        var tech_id = $(this).find("td").eq(0).html();   
         $('#techTable').hide();
         get_assigned_groups(tech_id);
         $('#tech_name').val(tech_name);
@@ -74,6 +73,16 @@ $(document).ready(function() {
     $('#single-input-table').on('click', '.delete_row', function() {
         num_entries = delete_row($(this).attr('id'), num_entries);
     });
+
+    $('#techSelect').on('change', function(){
+        full_selection = $(this).val().split('(');
+        tech_id = full_selection[0].replace(' ', '');
+        tech_name = full_selection[1].replace(')', '');
+
+        $('#tech_id').val(tech_id);
+        $('#tech_name').val(tech_name);
+        get_assigned_groups(tech_id);
+    })
 });
 
 function validate_search() {
