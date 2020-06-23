@@ -474,10 +474,20 @@ class BackupDomain(models.Model):
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE)
     shortcode = models.CharField(max_length=100)
     total_cost = models.DecimalField(max_digits=12, decimal_places=2)
+    cost_calculated_date = models.DateTimeField(null=True)
     versions_while_exists = models.PositiveIntegerField()
     versions_after_deleted = models.PositiveIntegerField()
     days_extra_versions = models.PositiveIntegerField()
     days_only_version = models.PositiveIntegerField()
+
+    def save(self, *args, **kwargs):
+        if self.orig_cost != self.total_cost:
+            self.cost_calculated_date = datetime.now()
+        super(BackupDomain, self).save(*args, **kwargs)
+
+    def __init__(self, *args, **kwargs):
+        super(BackupDomain, self).__init__(*args, **kwargs)
+        self.orig_cost = self.total_cost
 
     def __str__(self):
         return self.name
@@ -491,7 +501,7 @@ class BackupDomain(models.Model):
         
 
 class BackupNode(models.Model):
-    backup_domain = models.ForeignKey(BackupDomain, on_delete=models.CASCADE)
+    backup_domain = models.ForeignKey(BackupDomain, related_name='nodes', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     time = models.CharField(max_length=8)
 

@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from . import views
 
 #from django.contrib.auth.models import User
-from order.models import StorageInstance, ArcInstance, StorageRate
+from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode
 from rest_framework import routers, serializers, viewsets
 
 
@@ -56,6 +56,32 @@ class VolumeViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+class BackupDomainSerializer(serializers.ModelSerializer):
+    owner = serializers.StringRelatedField()
+    nodes = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = BackupDomain
+        fields = ['id','name','shortcode','total_cost','cost_calculated_date','owner','days_extra_versions','days_only_version','versions_after_deleted','versions_while_exists','nodes']
+
+
+class BackupDomainViewSet(viewsets.ModelViewSet):
+
+    def get_queryset(self):
+        name = self.request.GET.get('name')
+ 
+        if name:
+            queryset = self.serializer_class.Meta.model.objects.filter(name=name)
+        else:
+            queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
+
+        return queryset
+
+
+class BackupDomainViewSet(VolumeViewSet):
+    queryset = BackupDomain.objects.all()
+    serializer_class = BackupDomainSerializer
+
 
 class StorageViewSet(VolumeViewSet):
     queryset = StorageInstance.objects.all()
@@ -70,6 +96,7 @@ class ArcViewSet(VolumeViewSet):
 router = routers.DefaultRouter()
 router.register(r'storageinstances', StorageViewSet)
 router.register(r'arcinstances', ArcViewSet)
+router.register(r'backupdomains', BackupDomainViewSet)
 
 urlpatterns = [
     path('oidc/', include('mozilla_django_oidc.urls')),
