@@ -831,21 +831,28 @@ class Item(models.Model):
 
         if self.data.get('sensitive_regulated') == 'yessen':
             rec.sensitive_regulated = True
-            
+        else:
+            rec.sensitive_regulated = False
+
+        if self.data.get('multi_protocol') == 'ycifs':
+            rec.multi_protocol = True
+        else:
+            rec.multi_protocol = False
+        
         if self.data.get('hipaaOptions'):
-            if 'Armis2' in self.data.get('hipaaOptions'):
+            if 'armis' in self.data.get('hipaaOptions'):
                 rec.armis = True
-            if 'Globus PHI' in self.data.get('hipaaOptions'):
+            if 'globus_phi' in self.data.get('hipaaOptions'):
                 rec.globus_phi = True
 
         if self.data.get('nonHipaaOptions'):
-            if 'Lighthouse' in self.data.get('nonHipaaOptions'):
+            if 'lighthouse' in self.data.get('nonHipaaOptions'):
                 rec.lighthouse = True
-            if 'Globus' in self.data.get('nonHipaaOptions'):
+            if 'globus' in self.data.get('nonHipaaOptions'):
                 rec.globus = True
-            if 'ThunderX' in self.data.get('nonHipaaOptions'):
+            if 'thunderx' in self.data.get('nonHipaaOptions'):
                 rec.thunder_x = True
-            if 'Great Lakes' in self.data.get('nonHipaaOptions'):
+            if 'great_lakes' in self.data.get('nonHipaaOptions'):
                 rec.great_lakes = True
 
     def update_mistorage(self, rec):
