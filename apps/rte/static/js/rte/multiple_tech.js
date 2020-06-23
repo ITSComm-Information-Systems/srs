@@ -35,6 +35,7 @@ $(document).ready(function() {
         $("#workOrderSearchMultiple").val(''); 
         $('#work_order').val(work_order);
         $('#work_order_text').html(work_order_desc);
+        $('#selected-wo').removeClass('hidden');
         $('#workOrderTableMultiple').hide();
     });
 
