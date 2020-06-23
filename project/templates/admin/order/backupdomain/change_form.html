@@ -8,7 +8,7 @@
         {% for node in node_list %}
             <li>
             <a class="related-widget-wrapper-link change-related" id="change_id_service"  title="Change node Address" href="/admin/order/backupnode/{{ node.id }}/change/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-changelink.svg" alt="Change"></a>
-            {{ node.name }}
+            {{ node.name }} @ {{ node.time }}
             <a class="related-widget-wrapper-link change-related" id="change_id_service"  title="Delete node Address" href="/admin/order/backupnode/{{ node.id }}/delete/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-deletelink.svg" alt="Delete"></a>
             </li>
         {% endfor %}
