@@ -340,7 +340,7 @@ class Volume(models.Model):
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)    
     shortcode = models.CharField(max_length=100)
-    created_date = models.DateTimeField('Assign Date', auto_now_add=True)
+    created_date = models.DateTimeField(default=timezone.now)
     uid = models.PositiveIntegerField(null=True)
     ad_group = models.CharField(max_length=100, null=True, blank=True)
 

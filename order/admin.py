@@ -223,17 +223,18 @@ class VolumeAdmin(admin.ModelAdmin):
 
 @admin.register(ArcInstance)
 class ArcInstanceAdmin(VolumeAdmin):
+    readonly_fields = ['created_date']
     child_record = ArcHost
     child_key = 'arc_instance_id'
     service_list = [9,10,11]
     fieldsets = (
-        (None, {'fields': ('service', 'name','owner','size','type','rate','shortcode','ad_group','nfs_group_id')
+        (None, {'fields': ('service', 'name','owner',('type','multi_protocol','ad_group'),'rate',('size','shortcode'),('uid','nfs_group_id'),'created_date','sensitive_regulated')
         }),
-        ('Regulated/Sensitive', {'fields':('armis','globus_phi')
+        ('Regulated/Sensitive', {'fields':(('armis','globus_phi'),)
         }),
-        ('No Regulated/Sensitive', {'fields':('lighthouse','globus','thunder_x')
+        ('No Regulated/Sensitive', {'fields':(('lighthouse','globus','thunder_x','great_lakes'),)
         })
-
+ 
     )
 
 @admin.register(StorageInstance)
