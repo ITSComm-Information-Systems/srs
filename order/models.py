@@ -482,6 +482,9 @@ class BackupDomain(models.Model):
     def __str__(self):
         return self.name
     
+    def get_checkboxes(self):
+        return []
+
     def get_user_subscriptions(self, username):
         groups = list(LDAPGroupMember.objects.filter(username=username).values_list('ldap_group_id'))
         return BackupDomain.objects.filter(owner__in=groups).order_by('name')
@@ -490,7 +493,7 @@ class BackupDomain(models.Model):
 class BackupNode(models.Model):
     backup_domain = models.ForeignKey(BackupDomain, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    time = models.CharField(max_length=10)
+    time = models.CharField(max_length=8)
 
     def __str__(self):
         return self.name
@@ -796,18 +799,20 @@ class Item(models.Model):
         rec.owner = LDAPGroup().lookup( self.data['mCommunityName'] )
         rec.shortcode = self.data['shortcode']
         rec.total_cost = 0
-        rec.versions_while_exists = self.data['preferredOption1']
-        rec.versions_after_deleted = self.data['preferredOption2']
-        rec.days_extra_versions = self.data['preferredOption3']
-        rec.days_only_version = self.data['preferredOption4']
+        rec.versions_while_exists = self.data['versions_while_exist']
+        rec.versions_after_deleted = self.data['versions_after_delet']
+        rec.days_extra_versions = self.data['days_extra_versions']
+        rec.days_only_version = self.data['days_only_version']
         rec.save()
-        #bd.save()
-        #TODO list name
-        for node in self.data['nodeNames']:
+
+        #for num, item in enumerate(item_list, start=2):
+        time_list = self.data['backupTime']
+        for num, node in enumerate(self.data['nodeNames']):
             if node != '':
                 n = BackupNode()
                 n.backup_domain = rec
                 n.name = node
+                n.time = time_list[num]
                 n.save()
 
     def update_arcts(self, rec):

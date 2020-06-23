@@ -46,8 +46,8 @@ class TabForm(forms.Form):
 
         if self.action.service.id == 10:
             if 'size' in self.cleaned_data:
-                print("locker", self.cleaned_data['size'])
-                self.add_error('size', 'Enter a size of at least 10 terabytes')
+                if self.cleaned_data['size'] < 10:
+                    self.add_error('size', 'Enter a size of at least 10 terabytes') 
         
         for field in self.fields:
             if self.has_error(field):
@@ -463,6 +463,11 @@ class BackupDetailsForm(TabForm):
                 if instance_id: 
                     bd = BackupDomain.objects.get(id=instance_id)
                     self.fields["mCommunityName"].initial = bd.owner
+                    self.fields["versions_while_exist"].initial = bd.versions_while_exists
+                    self.fields["versions_after_delet"].initial = bd.versions_after_deleted
+                    self.fields["days_extra_versions"].initial = bd.days_extra_versions
+                    self.fields["days_only_version"].initial = bd.days_only_version
+
                     self.node_list = BackupNode.objects.filter(backup_domain=instance_id)
         else:
             self.node_list = []
