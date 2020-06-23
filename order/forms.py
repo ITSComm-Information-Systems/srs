@@ -11,7 +11,10 @@ from project.forms.fields import *
 def get_storage_options(action):
     opt_list = []
     for opt in StorageRate.objects.filter(type=action.override['storage_type'], service=action.service):
-        label = f'{opt.label} ({opt.rate} / per {opt.unit_of_measure})'
+        rate = round(opt.rate,2)
+        if opt.rate != rate: 
+            rate = str(opt.rate).rstrip('0')
+        label = f'{opt.label} (${rate} / per {opt.unit_of_measure} per month)'
         opt_list.append((opt.id, label))
 
     return opt_list
