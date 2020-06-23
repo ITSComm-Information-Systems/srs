@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, date
 from django.db import connections
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
 
 # Check if user has a tech ID
 def has_techid(user):
@@ -15,6 +16,7 @@ def has_techid(user):
         raise PermissionDenied
 
 # Base RTE view
+@login_required
 @user_passes_test(has_techid)
 def load_rte(request):
     template = loader.get_template('rte/base_rte.html')
@@ -72,17 +74,6 @@ def single_tech(request):
     all_wos = UmRteServiceOrderV.objects.all()
     rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
 
-    # # Load after search
-    # if request.method == 'POST':
-
-    #     tech_id = request.POST.get('techSearch')
-
-    #     tech_name = UmRteTechnicianV.objects.get(labor_code=tech_id)
-
-    #     assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech_id).values('wo_group_name'))
-
-    #     rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
-
     context = {
         'wf': 'single',
         'all_techs': all_techs,
@@ -97,16 +88,6 @@ def single_tech(request):
     }
 
     return HttpResponse(template.render(context, request))
-
-    # # Original load
-    # else:
-    #     context = {
-    #         'wf': 'single',
-    #         'all_techs': all_techs,
-    #         'title': 'Single Technician, Multiple Orders',
-    #         'tab_list': tab_list
-    #     }
-    #     return HttpResponse(template.render(context, request))
 
 # Review single tech times
 def single_submit(request):
@@ -206,36 +187,17 @@ def multiple_tech(request):
     all_techs = UmRteTechnicianV.objects.all()
     rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
 
-    # Load after search
-    if request.method == 'POST':
+    context = {
+        'wf': 'multiple',
+        'title': 'Multiple Technicians, Single Work Order',
+        'tab_list': tab_list,
+        'num_tabs': len(tab_list),
+        'all_wos': all_wos,
+        'all_techs': all_techs,
+        'rate_levels': rate_levels
+    }
 
-        selected_wo = request.POST.get('workOrderSearch')
-        selected_wo_desc = all_wos.get(full_prord_wo_number=selected_wo).comment_text
-
-        context = {
-            'wf': 'multiple',
-            'title': 'Multiple Technicians, Single Work Order',
-            'tab_list': tab_list,
-            'num_tabs': len(tab_list),
-            'all_wos': all_wos,
-            'all_techs': all_techs,
-            'rate_levels': rate_levels,
-            'selected_wo': selected_wo,
-            'selected_wo_desc': selected_wo_desc
-        }
-
-        return HttpResponse(template.render(context, request))
-
-    # Original load
-    else:
-        context = {
-            'wf': 'multiple',
-            'title': 'Multiple Technicians, Single Work Order',
-            'tab_list': tab_list,
-            'num_tabs': len(tab_list),
-            'all_wos': all_wos
-        }
-        return HttpResponse(template.render(context, request))
+    return HttpResponse(template.render(context, request))
 
 
 # Find assigned group based on tech ID
@@ -347,44 +309,55 @@ def update(request):
 
     if request.user.groups.filter(name="RTE Admin").exists():
         all_techs = UmRteTechnicianV.objects.all()
+        selected_tech = ''
+        results = ''
+        assigned_groups = ''
     else:
         all_techs = UmRteTechnicianV.objects.filter(uniqname=request.user.username)
+        selected_tech = all_techs[0].labor_code
+        results = UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
+                                                       billed="No",
+                                                       labor_code=selected_tech).order_by('assigned_date',
+                                                                                           'work_order_display')
+        assigned_groups = [group.wo_group_name for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=selected_tech)]
         
     rate_levels = [rate.labor_rate_level_name for rate in UmRteRateLevelV.objects.all()]
 
     # Load after search
     if request.method == 'POST':
-        selected_tech = request.POST.get('techSearch')
+        selected_tech = request.POST.get('techSearchUpdate')
         results = UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
                                                        billed="No",
                                                        labor_code=selected_tech).order_by('assigned_date',
                                                                                            'work_order_display')
         assigned_groups = [group.wo_group_name for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=selected_tech)]
 
-        context = {
-            'wf': 'update',
-            'title': 'Update Time',
-            'tab_list': tab_list,
-            'num_tabs': len(tab_list),
-            'all_techs': all_techs,
-            'rate_levels': rate_levels,
-            'assigned_groups': assigned_groups,
-            'techid': selected_tech,
-            'entries': results
-        }
+    context = {
+        'wf': 'update',
+        'title': 'Update Time',
+        'tab_list': tab_list,
+        'num_tabs': len(tab_list),
+        'all_techs': all_techs,
+        'rate_levels': rate_levels,
+        'assigned_groups': assigned_groups,
+        'techid': selected_tech,
+        'entries': results
+    }
 
-        return HttpResponse(template.render(context, request))
+    return HttpResponse(template.render(context, request))
 
-    # Original load
-    else:
-        context = {
-            'wf': 'update',
-            'title': 'Update Time',
-            'tab_list': tab_list,
-            'num_tabs': len(tab_list),
-            'all_techs': all_techs
-        }
-        return HttpResponse(template.render(context, request))
+
+def get_update_entries(request):
+    selected_tech = request.GET.get('techid', None)
+    print(selected_tech)
+    results = list(UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
+                                                       billed="No",
+                                                       labor_code=selected_tech).order_by('assigned_date',
+                                                                                           'work_order_display').values())
+
+    print(results)
+
+    return JsonResponse(results, safe=False)
 
 # Submit updated times
 def update_submit(request):

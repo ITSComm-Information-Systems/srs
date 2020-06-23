@@ -10,11 +10,8 @@
             Search for the tech name or tech ID whose time you'd like to enter.
         </small>
         <div class='form-group'>
-            <div class='form-inline'>
-                <input name='techSearch' autocomplete='off' id="techSearch" class="form-control" type="text" aria-describedby="buildingTechBlock"
-                    placeholder="Search...">
-                
-            </div>
+            <input name='techSearch' autocomplete='off' id="techSearch" class="form-control col-5" type="text" aria-describedby="buildingTechBlock"
+                placeholder="Search...">
             <div role=”alert” class="invalid-feedback" id='error-tech-id'><i class="fas fa-exclamation-triangle"
                 aria-label="Icon signfying that user must enter a value"></i>Please enter a tech ID.
             </div>
@@ -58,9 +55,9 @@
             <strong>Select Your Tech ID</strong>
         </label>
         <div class='form-inline'>
-            <select id='TechSelect' class='form-control col-3' name='techSearch' onchange='console.log("test");'>
+            <select id='techSelect' class='form-control col-3' name='techSearch'>
                 {% for tech in all_techs %}
-                    <option>{{ tech.labor_code }}</option>
+                    <option>{{ tech.labor_code }} ({{ tech.labor_name_display2 }})</option>
                 {% endfor %}
             </select>
         </div>

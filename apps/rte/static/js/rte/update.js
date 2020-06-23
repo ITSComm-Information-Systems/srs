@@ -30,21 +30,22 @@ $(document).ready(function() {
 		next_prev(current_page, num_pages);
   	});
 
-  	$("#techTable").hide();
+  	$("#techTableUpdate").hide();
 
-    $("#techSearch").on("keyup", function() {
-        $("#techTable").show();
+    $("#techSearchUpdate").on("keyup", function() {
+        $("#techTableUpdate").show();
         var value = $(this).val().toLowerCase();
-        $("#techTable tr").filter(function() {
+        $("#techTableUpdate tr").filter(function() {
         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
         });
     });
 
-    $('#techTable tr').click(function() {
+    $('#techTableUpdate tr').click(function() {
         var tech_name = $(this).find("td").eq(1).html();   
         var tech_id = $(this).find("td").eq(0).html(); 
-        $("#techSearch").val(tech_id);  
-        $('#techTable').hide();
+        $("#techSearchUpdate").val(tech_id);  
+        $('#update-form').submit();
+        $('#techTableUpdate').hide();
     });
 
     $('.update-next').on('click', function() {
@@ -63,6 +64,11 @@ $(document).ready(function() {
         $('#update-entries-form').append(form_html);
         $('#update-entries-form').submit();
     })
+
+    $('#techSelectUpdate').on('change', function() {
+    	console.log('here');
+		$('#update-form').submit();
+	});
 })
 
 /// Validate update/search submission
@@ -246,7 +252,7 @@ function review_submit() {
                         '<input type="text" name="' + i + '_wo_labor_id" value="' + wo_labor_id + '"hidden>';
         $('#update-entries-form').append(form_html);
         i = i + 1;
-	})
+	});
 }
 
 // Split duration into hours and mins
