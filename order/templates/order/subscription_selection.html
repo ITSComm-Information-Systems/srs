@@ -27,7 +27,7 @@
                             </a>
                         </td>
                         <td>{{ sub.shortcode }}</td>
-                        <td style="text-align:right">{{ sub.total_cost }}</td>
+                        <td style="text-align:right">${{ sub.total_cost }}</td>
                         <td class="action"><a href="#" onclick="modifySubscription(0, {{ sub.id }})">Edit</a><a href="#" class="delete" onclick="modifySubscription(1, {{ sub.id }})">Delete</a></td>
                     </tr>
                 {% endfor %}
