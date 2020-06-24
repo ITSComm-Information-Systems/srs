@@ -117,6 +117,14 @@ function add_to_multiple_table(num_entries) {
         $('#duration-hours-multiple').val('');
         $('#duration-mins-multiple').val('');
         $('#notes-multiple').val('');
+
+        // Gray out inputs again
+        $('#assignedGroupSelectMultiple').attr('disabled', 'disabled');
+        $('#rateSelectMultiple').attr('disabled', 'disabled');
+        $('#assigned_date_multiple').attr('readonly', 'readonly');
+        $('#duration-hours-multiple').attr('readonly', 'readonly');
+        $('#duration-mins-multiple').attr('readonly', 'readonly');
+        $('#notes-multiple').attr('readonly', 'readonly');
     }
     else {
         $('#max-entries-multiple').removeClass('hidden');

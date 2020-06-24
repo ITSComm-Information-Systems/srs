@@ -145,6 +145,13 @@ function add_to_table(num_entries) {
         $('#duration-hours').val('');
         $('#duration-mins').val('');
         $('#notes').val('');
+
+        // Reset grayed out input fields
+        $('#rateSelect').attr('disabled', 'disabled');
+        $('#assigned_date').attr('readonly', 'readonly');
+        $('#duration-hours').attr('readonly', 'readonly');
+        $('#duration-mins').attr('readonly', 'readonly');
+        $('#notes').attr('readonly', 'readonly');
     }
     else {
         $('#max-entries').removeClass('hidden');
