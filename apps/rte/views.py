@@ -159,7 +159,7 @@ def multiple_tech(request):
     tab1 = {
         'name': 'tabSelect',
         'step': 'step1',
-        'label': 'Select Technicians',
+        'label': 'Select Work Order',
         'template': 'rte/multiple/multiple_tech.html'
     }
     tab_list.append(tab1)
@@ -275,7 +275,7 @@ def update(request):
     tab1 = {
         'name': 'techSelect',
         'step': 'step1',
-        'label': 'Select Technician',
+        'label': 'Select a Technician',
         'template': 'rte/update/update.html'
     }
     tab_list.append(tab1)
