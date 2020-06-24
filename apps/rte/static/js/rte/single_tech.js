@@ -18,7 +18,7 @@ $(document).ready(function() {
         $('#tech_name').val(tech_name);
         $('#tech_id').val(tech_id);
         $('#techSearch').val('');
-        $('#tech-error').attr('hidden');
+        $('#tech-error').addClass('hidden');
     });
 
     $("#workOrderTable").hide();
@@ -35,6 +35,12 @@ $(document).ready(function() {
         var work_order = $(this).find("td").eq(0).html();
         $("#workOrderSearch").val(work_order);  
         $('#workOrderTable').hide();
+
+        $('#rateSelect').removeAttr('disabled');
+        $('#assigned_date').removeAttr('readonly');
+        $('#duration-hours').removeAttr('readonly');
+        $('#duration-mins').removeAttr('readonly');
+        $('#notes').removeAttr('readonly');
     });
 
     // Hide input table on load

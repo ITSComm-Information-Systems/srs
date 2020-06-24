@@ -17,6 +17,13 @@ $(document).ready(function() {
         $('#techTableMultiple').hide();
 
         load_assigned_groups(tech_id);
+
+        $('#assignedGroupSelectMultiple').removeAttr('disabled');
+        $('#rateSelectMultiple').removeAttr('disabled');
+        $('#assigned_date_multiple').removeAttr('readonly');
+        $('#duration-hours-multiple').removeAttr('readonly');
+        $('#duration-mins-multiple').removeAttr('readonly');
+        $('#notes-multiple').removeAttr('readonly');
     });
 
     $("#workOrderTableMultiple").hide();
@@ -37,6 +44,8 @@ $(document).ready(function() {
         $('#work_order_text').html(work_order_desc);
         $('#selected-wo').removeClass('hidden');
         $('#workOrderTableMultiple').hide();
+
+        $('#wo-error').addClass('hidden');
     });
 
     // Hide input table on load
