@@ -517,9 +517,7 @@ class BillingStorageForm(TabForm):
                         if size != '0' or shortcodes[count]:
                             self.shortcode_list.append({'shortcode': shortcodes[count], 'size': size})
                             self.new_total_size = self.new_total_size + int(size)
-            else:
-                if self.action.type == 'M':
-                    self.total_size = self.data['size']
+
             
             if len(self.shortcode_list) == 0:
                 
@@ -533,8 +531,13 @@ class BillingStorageForm(TabForm):
                 si = self.vol.objects.get(id=instance_id)
                 #else: # miBackup
                 #    si = self.vol.objects.get(id=instance_id)
-        
-                self.fields["shortcode"].initial = si.shortcode
+                if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch':
+                    if not self.is_bound:
+                        self.shortcode_list = si.get_shortcodes()
+
+                else:
+                    self.fields["shortcode"].initial = si.shortcode
+
                 self.fields["billingAuthority"].initial = 'yes'
                 self.fields["serviceLvlAgreement"].initial = 'yes'
 
@@ -555,8 +558,6 @@ class BillingStorageForm(TabForm):
 
     def clean(self):
         super().clean()
-        print('clean', self.total_size, self.shortcode_list, self.new_total_size)
-        print(type(self.total_size), type(self.new_total_size))
 
         if int(self.total_size) != self.new_total_size:
             self.shortcode_error = f'Sizes must total {self.total_size}'
@@ -564,7 +565,7 @@ class BillingStorageForm(TabForm):
         else:
             for shortcode in self.shortcode_list:
                 sc = shortcode['shortcode']
-                print(sc, 'new')
+
                 try:
                     UmOscAllActiveAcctNbrsV.objects.get(short_code=sc)
                 except:
