@@ -1,36 +1,64 @@
-{% with fields=tab.form.fields %}
-<h2>Access & Billing</h2>
-<div class="row mb-4 mt-4">
-    <div class="col-8">
-        <div class="form-group">
-            <label for="shortcode"><strong>{{ fields.shortcode.label }}</strong></label>
-            <input type="text" class="form-control" id="shortcode" required>
+<div class="col-6">
+
+    {% for field in tab.form %}
+
+    {% if field.name == 'shortcode' %}
+
+    <div class="form-group" id="shortcode_list">
+
+        <label for="shortcode"><strong>Enter shortcode(s) for costs to be billed to</strong></label>
+
+
+        <div class="form-inline" id="shortcode_new" style="display: none;">
+            <input class="sm-1 form-control form-inline" name="terabytes" type="number" value="0" aria-describeby="terabytes", placeholder="terabytes">
+            <input class="sm-2 form-control form-inline" name="shortcode" type="text" aria-describeby="shortcode", placeholder="shortcode">  
+            &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>
         </div>
-        <div class="form-group">
-            <label for="signer"><strong>{{ fields.authorizedSigner.label }}</strong></label>
-            <input type="text" class="form-control" id="signer" required>
+
+        {% for rec in tab.form.shortcode_list %} 
+        <div class="form-inline" id="shortcodes">
+            <!---
+            <input class="sm-2 form-control form-inline" name="shortcode" type="text" value="{{ rec.shortcode }}" aria-describeby="shortcode", placeholder="shortcode">            
+            <input class="sm-2 form-control form-inline" name="terabytes" type="text" value="{{ rec.size }}" aria-describeby="terabytes", placeholder="terabytes">   -->
+
+
+            <input class="sm-1 form-control form-inline" name="terabytes" type="number" value="{{ rec.size }}" aria-describeby="terabytes", placeholder="terabytes">
+            <input class="sm-2 form-control form-inline" name="shortcode" type="text" value="{{ rec.shortcode }}" aria-describeby="shortcode", placeholder="shortcode">  
+
+            &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>
+
+            <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signifying that user must enter a value"></i></div>
+
+            {% for error in field.errors %}
+            <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                    aria-label="Icon signifying that user must enter a value"></i>{{error}}def</div>
+            {% endfor %}
+
         </div>
-        <fieldset>
-            <legend><strong>{{ fields.billingAuthority.label }}</strong></legend>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="shortcodeConfirm" value="authorized">
-                <label class="form-check-label" for="shortcodeConfirm">
-                    I confirm I have approval from an individual with the authority to use the Shortcode.
-                </label>
-            </div>
-        </fieldset>
-        <div class="mt-4 mb-4">
-            <strong>You must consult the Sensitive Data Guide to verify that your use of this service complies with those guidelines, and you must accept the terms of the Service Level Agreement. Contact the ITS Storage team before ordering if your planned use does not comply.</strong>
-        </div> 
-        <fieldset>
-            <legend><strong>{{ fields.serviceLvlAgreement.label }}</strong></legend>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="serviceAgreement" value="authorized">
-                <label class="form-check-label" for="serviceAgreement">
-                    I have read the <a href="void:javaScript(0)">Sensitive Data Guide</a>, agree that my use of this service complies with those guidelines and accept the terms of the <a href="void:javaScript(0)">Service Level Agreement</a>.
-                </label>
-            </div>
-        </fieldset>
+        {% endfor %}
+
+        
+
+
+
     </div>
+
+    <div class="form-inline" id="shortcodes">
+        <input readonly class="{% if tab.form.shortcode_error %}is-invalid{% endif %} sm-2 form-control form-inline" name="total_size" type="text" value="{{ tab.form.new_total_size }}" aria-describeby="terabytes", placeholder="0"> Total
+
+        <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+            aria-label="Icon signifying that user must enter a value"></i>{{ tab.form.shortcode_error }}</div>
+
+    </div>
+
+    <a href="javascript:addRow('shortcode')" class="d-block"><i class="fas fa-plus-circle"></i> Add another shortcode</a><hr>
+
+
+    {% else %}
+        {% include field.field.template_name %}
+    {% endif %}
+
+    {% endfor %}
+
 </div>
-{% endwith %}
