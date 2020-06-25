@@ -65,10 +65,11 @@ $(document).ready(function() {
 
     // Keep track of number of rows in table
     num_entries_multiple = 0;
+    total_entries = 0;
 
     // Submit entries
     $('.multiple-submit').on('click', function() {
-        var form_html = '<input name="num_entries" type="text" value="' + num_entries_multiple + '" hidden>';
+        var form_html = '<input name="num_entries" type="text" value="' + total_entries + '" hidden>';
         $('#multiple-input-form').append(form_html);
         $('#multiple-input-form').submit();
     })
@@ -77,6 +78,7 @@ $(document).ready(function() {
     $('#multiple-add').on('click', function() {
         if (validate_add_multiple()) {
             num_entries_multiple = add_to_multiple_table(num_entries_multiple);
+            total_entries = total_entries + 1;
             $('#add-error').addClass('hidden');
         }
     });
@@ -136,7 +138,8 @@ function add_to_multiple_table(num_entries) {
 function delete_row_multiple(row_num, num_entries) {
     $('#row-' + row_num).remove();
     num_entries = num_entries - 1;
-    $('#max-entries-multiple').addClass('hidden');
+
+    $('[name="' + row_num + '_techid"]').val('Deleted');
 
     if (num_entries == 0) {
         $('#multiple-input').hide();
