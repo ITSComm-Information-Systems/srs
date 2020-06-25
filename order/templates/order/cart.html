@@ -36,6 +36,12 @@
             </div>
         </div>
         {% endif %}
+        {% if dept_list|length == 0 %} 
+        <div style="display: inline-block; text-align: center;">
+            <i class="fas fa-shopping-cart" aria-hidden="true" style="font-size:60px;color:Gray"></i>
+            <h2 style="color:Gray"> Your Cart is Empty </h2>
+        </div>
+        {% endif %}
     </div>
 </div>
 
