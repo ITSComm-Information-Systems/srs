@@ -60,10 +60,11 @@ $(document).ready(function() {
 
     // Keep track of number of rows in table
     num_entries = 0;
+    total_entries_single = 0;
 
     // Submit entries
     $('.single-submit').on('click', function() {
-        var form_html = '<input name="num_entries" type="text" value="' + num_entries + '" hidden>';
+        var form_html = '<input name="num_entries" type="text" value="' + total_entries_single + '" hidden>';
         $('#single-input-form').append(form_html);
         $('#single-input-form').submit();
     })
@@ -72,6 +73,7 @@ $(document).ready(function() {
     $('#single-add').on('click', function() {
         if (validate_add()) {
             num_entries = add_to_table(num_entries);
+            total_entries_single = total_entries_single + 1;
             $('#add-error').addClass('hidden');
         }
     });
@@ -181,6 +183,8 @@ function delete_row(row_num, num_entries) {
     $('#row-' + row_num).remove();
     num_entries = num_entries - 1;
     $('#max-entries').addClass('hidden');
+
+    $('[name="' + row_num + '_work_order"]').val('Deleted');
 
     if (num_entries == 0) {
         $('#single-input').hide();
