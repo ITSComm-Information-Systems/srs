@@ -461,12 +461,22 @@ class ArcInstance(Volume):
                 ah.arc_instance = self
                 ah.name = host
                 ah.save()
+            
+    def get_shortcodes(self):
+        return ArcBilling.objects.filter(arc_instance=self)
+
 
 class ArcHost(VolumeHost):
     arc_instance = models.ForeignKey(ArcInstance, related_name='hosts', on_delete=models.CASCADE)
 
     class meta:
         verbose_name = 'Host'   
+
+
+class ArcBilling(models.Model):
+    arc_instance = models.ForeignKey(ArcInstance, related_name='shortcodes', on_delete=models.CASCADE)
+    size = models.IntegerField()
+    shortcode = models.CharField(max_length=100)
 
 
 class BackupDomain(models.Model):
@@ -854,6 +864,21 @@ class Item(models.Model):
                 rec.thunder_x = True
             if 'great_lakes' in self.data.get('nonHipaaOptions'):
                 rec.great_lakes = True
+
+        rec.save()
+        bill_size_list = self.data.get('terabytes') 
+
+        ArcBilling.objects.filter(arc_instance=rec).delete()
+
+        for num, shortcode in enumerate(self.data.get('shortcode')):
+            if shortcode:
+                sc = ArcBilling()
+                sc.arc_instance = rec
+                sc.size = bill_size_list[num]
+                sc.shortcode = shortcode
+                sc.save()
+
+                print(num, shortcode, bill_size_list[num], rec.id)
 
     def update_mistorage(self, rec):
 
