@@ -419,11 +419,11 @@ class DetailsNFSForm(TabForm):
             self['flux'].field.required = False
 
         if 'hipaaOptions' in self.fields:
-            if self.request.POST['sensitive_regulated'] == 'nosen': 
+            if self.request.POST.get('sensitive_regulated') == 'nosen': 
                 self['nonHipaaOptions'].field.required = False
                 self.fields.pop('hipaaOptions')
 
-            if self.request.POST['sensitive_regulated'] == 'yessen': 
+            if self.request.POST.get('sensitive_regulated') == 'yessen': 
                 self['hipaaOptions'].field.required = False
                 self.fields.pop('nonHipaaOptions')
 
