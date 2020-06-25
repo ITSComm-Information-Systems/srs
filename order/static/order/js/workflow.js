@@ -556,7 +556,27 @@ function chartcomChange(obj) {
     $(id).find('option:selected').attr('selected', false);
     
   }
+
+
+  function addRow(record) {
+    // clone source div by ID
+    console.log(record, "add")
+    if (typeof row_count == "undefined") {
+      row_count = 0;
+    } else {
+      row_count = row_count + 1;
+    }
+    
+    var row = $("#" + record + "_new").clone();
   
+    row.attr("id", record + "_" + row_count);
+    row.show();
+    $("#" + record + "_list").append(row);   // TODO Find last host
+  
+    $("#" + record + "_new").hide()
+  
+    $(".nodeName").focus(); 
+  }
 
 function addHost() {
   // clone host_new

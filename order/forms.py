@@ -502,6 +502,29 @@ class BillingStorageForm(TabForm):
         super(BillingStorageForm, self).__init__(*args, **kwargs)
         total_cost = 0
 
+        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch':
+            self.template = 'order/billing_storage.html'
+            self.shortcode_list = []
+
+            if self.request.method == 'POST': # Skip for initial load on Add
+                self.total_size = self.request.POST['size']
+                if self.is_bound:   # Reload Shortcode list
+                    shortcodes = self.data.getlist('shortcode')
+                    terabytes = self.data.getlist('terabytes')
+                    self.new_total_size = 0
+
+                    for count, size in enumerate(terabytes):
+                        if size != '0' or shortcodes[count]:
+                            self.shortcode_list.append({'shortcode': shortcodes[count], 'size': size})
+                            self.new_total_size = self.new_total_size + int(size)
+            else:
+                if self.action.type == 'M':
+                    self.total_size = self.data['size']
+            
+            if len(self.shortcode_list) == 0:
+                
+                self.shortcode_list = [{'shortcode': '', 'size': self.total_size}]
+
         if self.action.type == 'M':  # If modify then get existing data
             instance_id = self.request.POST.get('instance_id')
 
@@ -529,6 +552,24 @@ class BillingStorageForm(TabForm):
 
         
         self.fields['totalCost'].description = descr
+
+    def clean(self):
+        super().clean()
+        print('clean', self.total_size, self.shortcode_list, self.new_total_size)
+        print(type(self.total_size), type(self.new_total_size))
+
+        if int(self.total_size) != self.new_total_size:
+            self.shortcode_error = f'Sizes must total {self.total_size}'
+            self.add_error('totalCost', 'block') 
+        else:
+            for shortcode in self.shortcode_list:
+                sc = shortcode['shortcode']
+                print(sc, 'new')
+                try:
+                    UmOscAllActiveAcctNbrsV.objects.get(short_code=sc)
+                except:
+                    self.shortcode_error = f'Shortcode: {sc} not found.'
+                    self.add_error('totalCost', 'block')       
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
