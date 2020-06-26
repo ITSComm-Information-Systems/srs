@@ -10,7 +10,7 @@ from project.forms.fields import *
 
 def get_storage_options(action):
     opt_list = []
-    for opt in StorageRate.objects.filter(type=action.override['storage_type'], service=action.service):
+    for opt in StorageRate.objects.filter(type=action.override['storage_type'], service=action.service, display_seq_no__lt=100)):
         rate = round(opt.rate,2)
         if opt.rate != rate: 
             rate = str(opt.rate).rstrip('0')
