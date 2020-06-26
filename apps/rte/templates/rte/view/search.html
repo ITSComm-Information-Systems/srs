@@ -1,0 +1,111 @@
+{% extends 'baseapps.html' %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<form action='display/' method='post' id='view-times-form'>{% csrf_token %}
+	<div class="form-group" id="searchTech">
+        <label for="techSearch" id="labelTechSearch">
+            <strong>Search for a Tech Name or Tech ID</strong>
+        </label>
+        <small id="buildingTechBlock" class="form-text text-muted">
+            Select the technician whose time you would like to view.
+        </small>
+        <input name='techSearch' autocomplete='off' id="techSearch" class="form-control col-4" type="text" aria-describedby="buildingTechBlock"
+            placeholder="Search...">
+  	</div>
+
+  	<div class='col-6'>
+	    <table id="techTable" class="table table-hover" aria-live=”polite”>
+	        {% for tech in all_techs %}
+	            <tr tabindex="0"  id="{{ tech.labor_code }}" role="button" aria-label="Select tech 
+	                {{ tech.labor_name_display2 }} with tech ID of {{ tech.labor_code }}">
+	                <td >{{ tech.labor_code }}</td>
+	                <td name="techName">{{ tech.labor_name_display2 }}</td>
+	            </tr>
+	        {% endfor %}
+	    </table>
+	</div>
+
+	<p>Please select one of the following:</p>
+
+	<div class="form-group indented-form-input">
+		<input type="radio" name="secondSearchOption" id="selectByWorkOrder" aria-labelledby="selectByWorkOrderLabel" value='1' aria-describedby="form-instruction selectByWorkOrderLabel">
+		<label for="selectByWorkOrder" id="selectByWorkOrderLabel">
+			<strong>Search by Work Order</strong>
+		</label>
+
+	    <div id="selectByWorkOrderDiv" class="indented-form-input">
+	        <div class="form-group" id="searchWorkOrder">
+		        <small id="workOrderBlock" class="form-text text-muted">
+		            Select the work order for which you would like to view time.
+		        </small>
+				<input name='workOrderSearch' autocomplete='off' id="workOrderSearch" class="form-control col-4" type="text" aria-describedby="workOrderBlock"
+				    placeholder="Search...">
+		  	</div>
+
+		    <div class='col-4'>
+			    <table id="workOrderTable" class="table table-hover" aria-live=”polite”>
+			        {% for wo in all_wos %}
+			            <tr tabindex="0"  id="{{ wo.full_prord_wo_number }}" role="button" aria-label="Select work order 
+			                {{ wo.full_prord_wo_number }}">
+			                <td>{{ wo.full_prord_wo_number }}</td>
+			                <td>{{ wo.comment_text|truncatechars:200 }}</td>
+			            </tr>
+			        {% endfor %}
+			    </table>
+			</div>
+	    </div>
+	</div>
+
+	<div class="form-group indented-form-input">
+		<input type="radio" name="secondSearchOption" id="selectByCalendarRange" aria-labelledby="selectByCalendarRangeLabel" value='2' aria-describedby="form-instruction selectByCalendarRangeLabel">
+		<label for="selectByCalendarRange" id="selectByCalendarRangeLabel">
+			<strong>Search by Calendar</strong>
+		</label>
+
+	    <div id="selectByCalendarRangeDiv" class="indented-form-input">
+	        <div class="form-group" id="selectCalendarRange">
+		        <small id="dateCalendarBlock" class="form-text text-muted">
+		            Select the dates for which you would like to view time.
+		        </small>
+		        <div class='form-inline col-6'>
+					<input type='date' name='calendarRangeStart' id="calendarRangeStart" class="form-control mr-2" aria-describedby="calendarRangeBlock">
+					<input type='date' name='calendarRangeEnd' id="calendarRangeEnd" class="form-control" aria-describedby="calendarRangeBlock">
+				</div>
+		  	</div>
+	    </div>
+	</div>
+
+	<div class="form-group indented-form-input">
+		<input type="radio" name="secondSearchOption" id="selectByDateRange" aria-labelledby="selectByDateRangeLabel" value='2' aria-describedby="form-instruction selectByDateRangeLabel">
+		<label for="selectByDateRange" id="selectByDateRangeLabel">
+			<strong>Search by Date Range</strong>
+		</label>
+
+	    <div id="selectByDateRangeDiv" class="indented-form-input">
+	        <div class="form-group" id="selectDateRange">
+		        <small id="dateDateBlock" class="form-text text-muted">
+		            Select the date range for which you would like to view time.
+		        </small>
+		        <select id='dateRangeSelect' name='dateRangeSelect' id='dateRangeSelect' class='form-control col-4'>
+		        	<option></option>
+		        	<option>Last 7 Days</option>
+		        	<option>Last 3 Months</option>
+		        	<option>Last 6 Months</option>
+		        </select>
+		  	</div>
+	    </div>
+	</div>
+
+	<div class='alert alert-danger col-4' id='validate-error' hidden></div>
+</form>
+
+<button class='btn btn-primary' id='view-time-search'>Search</button>
+
+{% endblock %}
+
+{% block js %}
+<script src="/static/js/rte/view_times.js"></script>
+{% endblock %}

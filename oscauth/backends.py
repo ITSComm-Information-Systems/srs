@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth import get_user_model
+from project.pinnmodels import UmRteTechnicianV
 
 
 class SuBackend(object):

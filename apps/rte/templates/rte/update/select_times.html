@@ -1,0 +1,46 @@
+<div class='card mb-4 col-4'>
+	<div class='card-body'>
+		<strong>Tech ID:&nbsp;</strong><span class='tech_id'>{{ techid }}</span><br>
+	</div>
+</div>
+
+<strong>Please select up to 10 entries to update.</strong>
+
+<table class='table table-striped mt-2' id='select-entries-table'>
+	<thead>
+		<tr>
+			<th scope='col'></th>
+			<th scope='col'>Work Order</th>
+			<th scope='col'>Assigned Date</th>
+			<th scope='col'>Duration</th>
+			<th scope='col'>Rate Level</th>
+			<th scope='col'>Assigned Group</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for entry in entries %}
+			<tr>
+				<td><input type="checkbox" value=""></td>
+				<td>{{ entry.work_order_display }}</td>
+				<td>{{ entry.assigned_date }}</td>
+				<td>{{ entry.actual_mins_display }}</td>
+				<td>{{ entry.rate_number.labor_rate_level_name }}</td>
+				<td>{{ entry.assn_wo_group_name }}</td>
+				<td hidden>{{ entry.wo_labor_id }}</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<nav aria-label="results pagination navigation">
+  <ul class="pagination justify-content-end" id='pagination'>
+    <li class="page-item disabled" id='previous'>
+      <a class="page-link" tabindex="-1" id="previous-tab">Previous</a>
+    </li>
+  </ul>
+</nav>
+
+<div class='alert alert-danger mt-2 col-4' hidden id='num-checked-error'></div>
+
+<p hidden id='rate_levels'>{{ rate_levels|safe }}</p>
+<p hidden id='assigned_groups'>{{ assigned_groups|safe }}</p>

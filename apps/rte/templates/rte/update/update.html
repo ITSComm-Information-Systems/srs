@@ -1,0 +1,67 @@
+{% load rte_tags %}
+
+<div class='row'>
+	<div class='col-8'>
+		{% if request.user|is_member:"RTE Admin" %}
+		<form action='' method='post' id='update-form' onsubmit='return validate_search_update()'>{% csrf_token %}
+			<div class="form-group" id="searchTechUpdate">
+		        <label for="techSearchUpdate" id="labelTechSearchUpdate">
+		            <strong>Search for a Tech Name or Tech ID</strong>
+		        </label>
+		        <small id="buildingTechBlock" class="form-text text-muted">
+		            Search for the tech name or tech ID whose time you'd like to update.
+		        </small>
+		    	<div class='form-group'>
+			        <input name='techSearchUpdate' autocomplete='off' id="techSearchUpdate" class="form-control col-5" type="text" aria-describedby="buildingTechBlock"
+			            placeholder="Search...">
+			        <div role=”alert” class="invalid-feedback" id='error-tech-id'><i class="fas fa-exclamation-triangle"
+			            aria-label="Icon signfying that user must enter a value"></i>Please enter a tech ID.
+			        </div>
+			    </div>
+		  	</div>
+
+		  	<div class='col-6'>
+			    <table id="techTableUpdate" class="table table-hover" aria-live=”polite”>
+			        {% for tech in all_techs %}
+			            <tr tabindex="0"  id="{{ tech.labor_code }}" role="button" aria-label="Select tech 
+			                {{ tech.labor_name_display2 }} with tech ID of {{ tech.labor_code }}">
+			                <td >{{ tech.labor_code }}</td>
+			                <td name="techName">{{ tech.labor_name_display2 }}</td>
+			            </tr>
+			        {% endfor %}
+			    </table>
+			</div>
+		</form>
+		{% else %}
+		<form action='' id='update-form' method='post'>{% csrf_token %}
+			<div class='form-group'>
+		        <label for="techSelect" id="labelTechSelect">
+		            <strong>Select Your Tech ID</strong>
+		        </label>
+	            <select id='techSelectUpdate' class='form-control col-5' name='techSearchUpdate'>
+	                {% for tech in all_techs %}
+	                    <option>{{ tech.labor_code }}</option>
+	                {% endfor %}
+	            </select>
+		    </div>
+		</form>
+		{% endif %}
+
+		{% if techid %}
+			<div class='form-group col-4 mt-4'>
+				<label for="tech_id" id="teachIdLabel">
+		            <strong>Tech ID</strong>
+		        </label>
+		        <input readonly class='form-control' id="tech_id" value="{{ techid }}">
+			</div>
+		{% endif %}
+
+		<div class='alert alert-danger mt-2 col-4' hidden id='error-notice'></div>
+	</div>
+
+	<div class='col-4'>
+		<div class='alert alert-primary' role='alert'>
+			<p><strong>Note:</strong> You can only modify entered time, you cannot delete billed time.</p>
+		</div>
+	</div>
+</div>

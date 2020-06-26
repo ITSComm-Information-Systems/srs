@@ -1,0 +1,48 @@
+<form id='workOrderForm' method='post' action='' onsubmit='return validate_search_multiple()'>{% csrf_token %}
+    <div class="form-group" id="searchWorkOrder">
+        <label for="workOrderSearchMultiple" id="labelWorkOrderSearch">
+            <strong>Search for a Work Order</strong>
+        </label>
+        <small id="workOrderBlock" class="form-text text-muted">
+            Search for the work order for which like to enter time.
+        </small>
+        <div class='form-group'>
+            <input name='workOrderSearchMultiple' autocomplete='off' id="workOrderSearchMultiple" class="form-control col-5" type="text" aria-describedby="workOrderBlock"
+                placeholder="Search...">
+            <div role=”alert” class="invalid-feedback" id='error-work-order'><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signfying that user must enter a value"></i>Please enter a work order.
+            </div>
+        </div>
+    </div>
+
+    <div class='col-4'>
+        <table id="workOrderTableMultiple" class="table table-hover" aria-live=”polite”>
+            {% for wo in all_wos %}
+                <tr tabindex="0"  id="{{ wo.full_prord_wo_number }}" role="button" aria-label="Select work order 
+                    {{ wo.full_prord_wo_number }}">
+                    <td >{{ wo.full_prord_wo_number }}</td>
+                    <td >{{ wo.comment_text|truncatechars:200 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</form>
+
+
+<div class='form-group col-4 mt-4 hidden' id='selected-wo'>
+    <label for="work-order" id="workOrderLabel">
+        <strong>Selected Work Order</strong>
+    </label>
+    <input readonly class='form-control' id="work_order" value="">
+
+    <label for="wo_desc" id="workOrderDescLabel" class="mt-2">
+        <strong>Comment Text</strong>
+    </label>
+    <div class='card' id="wo_desc">
+        <div class='card-body' id='work_order_text'></div>
+    </div>
+
+</div>
+
+<div class='alert alert-danger col-4' id='wo-error' hidden></div>
