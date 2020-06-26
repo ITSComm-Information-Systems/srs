@@ -575,17 +575,28 @@ class BillingStorageForm(TabForm):
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
 
-        if self.action.service.name == 'miStorage':
+        if self.action.service.name != 'miBackup':
             option = StorageRate.objects.get(id=self.data['selectOptionType'])
             total_cost = option.get_total_cost(self.data['size'])
             summary.append({'label': 'Total Cost', 'value': str(total_cost)})
 
-        instance_id = self.data.get('instance_id')
+        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch':
+            shortcode_list = self.data.getlist('shortcode')
+            size_list = self.data.getlist('terabytes')
+            print(shortcode_list)
+            label = ''
+            for num, shortcode in enumerate(shortcode_list):
+                if shortcode:
+                    label = f'{label}   \n {size_list[num]}TB to {shortcode},'
+
+            summary[0]['value'] = label 
+
+        #instance_id = self.data.get('instance_id')
         
-        if instance_id:
-            si = self.vol.objects.get(id=instance_id)
-            if self.data['shortcode'] != si.shortcode:
-                summary[0]['label'] = '*' + summary[0]['label']
+        #if instance_id:
+        #    si = self.vol.objects.get(id=instance_id)
+        #    if self.data['shortcode'] != si.shortcode:
+        #        summary[0]['label'] = '*' + summary[0]['label']
                     
         return summary
 
