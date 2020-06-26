@@ -1,0 +1,31 @@
+{% extends 'baseapps.html' %}
+{% load rte_tags %}
+
+{% block content %}
+	<h1>{{ title }}</h1>
+	
+	<p><strong>Are you entering time for:</strong></p>
+	
+	<div class='row'>
+		<div class='col-8'>
+			<div class="alert alert-secondary col-8" role="alert">
+				<strong><a href='single-tech/'>Single Technician, Multiple Work Orders</a></strong>
+			</div>
+
+			{% if request.user|is_member:"RTE Admin" %}
+			<div class="alert alert-secondary col-8" role="alert">
+				<strong><a href='multiple-tech/'>Multiple Technicians, Single Work Order</a></strong>
+			</div>
+			{% endif %}
+
+			<div class="alert alert-secondary col-8" role="alert">
+				<strong><a href='update/'>Update Time</a></strong>
+			</div>
+
+			<div class="alert alert-secondary col-8" role="alert">
+				<strong><a href='view-time/'>View Time</a></strong>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
