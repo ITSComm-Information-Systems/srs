@@ -59,9 +59,6 @@ $(document).ready(function() {
       vals = []
     }
 
-
-
-
   })
 
 
@@ -86,7 +83,7 @@ $(document).ready(function() {
     }
   }
 
-  if ( $("#wfid").val() == 50 ) {  // Hide workflow for "Review Storage" (cost data) 
+  if ( $("#wfid").val() == 50  || $("#wfid").val() == 63 ) {  // Hide workflow for "Review Storage" (cost data) 
     $('#pills-step1').hide();
     $('p').hide();
     $('h2').hide();
@@ -559,7 +556,27 @@ function chartcomChange(obj) {
     $(id).find('option:selected').attr('selected', false);
     
   }
+
+
+  function addRow(record) {
+    // clone source div by ID
+    console.log(record, "add")
+    if (typeof row_count == "undefined") {
+      row_count = 0;
+    } else {
+      row_count = row_count + 1;
+    }
+    
+    var row = $("#" + record + "_new").clone();
   
+    row.attr("id", record + "_" + row_count);
+    row.show();
+    $("#" + record + "_list").append(row);   // TODO Find last host
+  
+    $("#" + record + "_new").hide()
+  
+    $(".nodeName").focus(); 
+  }
 
 function addHost() {
   // clone host_new
@@ -574,7 +591,10 @@ function addHost() {
   rec.attr("id", "host_new_" + host_count);
   rec.show();
   $("#host_list").append(rec);   // TODO Find last host
+
   $("#host_new").hide()
+
+  $(".nodeName").focus(); 
 }
 
 function modifyVolume(del_flag, volumeID) {
@@ -607,7 +627,30 @@ function modifyVolume(del_flag, volumeID) {
   
 
 
+function modifySubscription(del_flag, subscriptionID) {
+  currStep = 4;
 
+  $('#instance_id').val(subscriptionID);
+
+  if(del_flag==1) {
+    lastStep = document.getElementsByClassName("tab-pane").length;
+    $('#pills-step'+lastStep).removeClass('disabled');
+    //$('#pills-tab li:last-child a').tab('show') 
+
+    $('[data-tab="backupDetails"]').hide();
+    $('[data-tab="storageBilling"]').hide();
+
+    sendTabData({name: 'volaction', value: 'Delete'});
+  } else {
+    $('#instance_id').val(subscriptionID);
+    sendTabData();
+  }
+
+  $('[data-tab="subscriptionSelect"]').hide();
+
+  //$('#pills-step'+currStep).removeClass('disabled');
+  //$('#pills-tab li:nth-child(' + currStep + ') a').tab('show');
+}
 
 function sendTabData(field) {
   data = $('#workflowForm').serializeArray();

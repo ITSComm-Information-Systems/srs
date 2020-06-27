@@ -20,6 +20,8 @@ import json
 from django.core.files.storage import FileSystemStorage
 from django.views.decorators.csrf import csrf_exempt
 
+from oscauth.utils import get_mc_user
+
 import threading
 
 from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment, ChargeType, UserChartcomV
@@ -50,10 +52,21 @@ def get_phone_location(request, phone_number):
 
     return JsonResponse(locations, safe=False)
 
+
+def querydict_to_dict(query_dict):  # Kudos to QFXC on StackOverflow
+    data = {}
+    for key in query_dict.keys():
+        v = query_dict.getlist(key)
+        if len(v) == 1:
+            v = v[0]
+        data[key] = v
+    return data
+ 
 #@permission_required('oscauth.can_order')
 def send_tab_data(request):
 
     tab_name = request.POST.get('tab')
+    action = Action.objects.get(id=request.POST.get('action_id'))
 
     if tab_name == 'Review':
         item = Item.objects.get(id = request.POST['item_id'])
@@ -78,7 +91,7 @@ def send_tab_data(request):
             item.save()
             return JsonResponse({'redirect': f'/orders/cart/{item.deptid}'}, safe=False)
         else:
-            item.submit_incident()
+            item.route()
             return JsonResponse({'redirect': '/requestsent'}, safe=False)
 
     step = Step.objects.get(name=tab_name)
@@ -87,7 +100,7 @@ def send_tab_data(request):
     item_id = request.POST.get('item_id')
 
     #try:  TODO
-    f = globals()[step.custom_form](step
+    f = globals()[step.custom_form](step, action
         , request.POST     # Bind the form
         , request=request) # Pass entire request so user, etc is available for validation routines
     #except: 
@@ -97,7 +110,7 @@ def send_tab_data(request):
         valid = True
         summary = f.get_summary(visible)
         tab = {'title': step.label, 'fields': summary}
-        data = request.POST.dict()
+        data = querydict_to_dict(request.POST)
         data['csrfmiddlewaretoken'] = ''
         action = Action.objects.get(id=request.POST.get('action_id'))
 
@@ -140,7 +153,7 @@ def send_tab_data(request):
                     break
 
         try:
-            f = globals()[step.custom_form](step, request=request)
+            f = globals()[step.custom_form](step, action, request=request)
         except:
             print('bind form tab error')
             f = TabForm(step)
@@ -484,7 +497,14 @@ class Workflow(UserPassesTestMixin, View):
                 tab.form = forms.Form()
                 tab.form.template = 'order/static.html'
             else:
-                tab.form = globals()[tab.custom_form](tab, request=request)
+                if not action.use_ajax or index==1:
+                    tab.form = globals()[tab.custom_form](tab, action, request=request)
+                else:
+                    f = forms.Form()
+                    f.template = 'order/dynamic_form.html'
+                    tab.form = f
+
+
                 if tab.name == 'PhoneLocation':
                     js.append('phone_location')
                 elif tab.name == 'LocationNew':

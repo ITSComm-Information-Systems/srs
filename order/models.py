@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from oscauth.models import Role
+from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
@@ -51,7 +51,9 @@ class Step(Configuration):
         ('AccessCIFSForm', 'CIFS Access'),
         ('AccessNFSForm', 'NFS Access'),
         ('BillingStorageForm', 'Billing'),
+        ('BackupDetailsForm', 'Backup Details'),
         ('VolumeSelectionForm', 'Volume Selection'),
+        ('SubscriptionSelForm', 'Subscription Selection'),
     )
 
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
@@ -62,6 +64,7 @@ class Element(Configuration):
         ('', ''),
         ('Radio', 'Radio'),
         ('ST', 'String'),
+        ('List', 'List'),
         ('NU', 'Number'),
         ('Chart', 'Chartcom'),
         ('Label', 'Label'),
@@ -103,6 +106,7 @@ class ServiceGroup(Configuration):
 class Service(Configuration):
     active = models.BooleanField(default=True)
     group = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE)
+    routing = JSONField(default=dict)
 
 
 class FeatureCategory(models.Model):
@@ -173,6 +177,7 @@ class Action(Configuration):
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     charge_types = models.ManyToManyField(ChargeType)
     steps = models.ManyToManyField(Step)
+    override = JSONField(null=True, blank=True)
     route = models.CharField(max_length=1, choices=ROUTE_CHOICES, default='P')
     destination = models.CharField(max_length=40, blank=True)
 
@@ -184,6 +189,12 @@ class Action(Configuration):
         tab_list = list(Step.objects.filter(action=self.id).order_by('display_seq_no').values('name'))
 
         return tab_list
+
+    def get_hidden_fields(self):
+        try:
+            return self.override['hide']
+        except:
+            return []
 
 
 class Constant(models.Model):
@@ -286,8 +297,18 @@ class StorageRate(Configuration):
         ('CIFS', 'CIFS'),
     )
 
+    UNIT_OF_MEASURE_CHOICES = (
+        ('GB', 'Gigabytes'),
+        ('TB', 'Terabytes'),
+    )
+
+    service = models.ForeignKey(Service, on_delete=models.PROTECT)
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     rate = models.DecimalField(max_digits=8, decimal_places=6)
+    unit_of_measure = models.CharField(max_length=2, default='GB', choices=UNIT_OF_MEASURE_CHOICES)
+
+    def __str__(self):
+        return self.label
 
     def get_total_cost(self, size):
         total_cost = round(self.rate * int(size), 2)
@@ -306,25 +327,22 @@ class StorageMember(models.Model):
     username = models.CharField(max_length=8)
 
 
-class StorageInstance(models.Model):
+class Volume(models.Model):
     TYPE_CHOICES = (
         ('NFS', 'NFS'),
         ('CIFS', 'CIFS'),
     )
 
     name = models.CharField(max_length=100)
-    owner = models.ForeignKey(StorageOwner, on_delete=models.CASCADE, null=True)
-    owner_name = models.CharField(max_length=100)
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
+    size = models.PositiveIntegerField()
+    service = models.ForeignKey(Service, on_delete=models.PROTECT)
+    type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
+    rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)    
     shortcode = models.CharField(max_length=100)
+    created_date = models.DateTimeField(default=timezone.now)
     uid = models.PositiveIntegerField(null=True)
     ad_group = models.CharField(max_length=100, null=True, blank=True)
-    deptid = models.CharField(max_length=6, null=True, blank=True)
-    size = models.PositiveIntegerField()
-    autogrow = models.BooleanField(default=False)
-    type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
-    flux = models.BooleanField(default=False)
-    rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)
-    created_date = models.DateTimeField('Assign Date', auto_now_add=True)
 
     @property
     def total_cost(self):
@@ -333,6 +351,16 @@ class StorageInstance(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_checkboxes(self):
+        checkboxes = []
+        for field in self._meta.get_fields():
+            if type(field) == models.BooleanField:
+                if getattr(self, field.name):
+                    checkboxes.append(field.name)
+
+        return checkboxes
+
 
     def get_owner_instance(self, name):
 
@@ -357,10 +385,135 @@ class StorageInstance(models.Model):
 
             return so
 
+    class Meta:
+        abstract = True 
 
-class StorageHost(models.Model):
-    storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
+
+class VolumeHost(models.Model):
+    #storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True 
+
+
+class StorageInstance(Volume):
+    owner_bak = models.ForeignKey(StorageOwner, on_delete=models.CASCADE, null=True, blank=True)
+    owner_name = models.CharField(max_length=100, null=True, blank=True) # TODO Remove
+    deptid = models.CharField(max_length=6, null=True, blank=True)
+    autogrow = models.BooleanField(default=False)
+    flux = models.BooleanField(default=False)
+
+    def get_hosts(self):
+        return StorageHost.objects.filter(storage_instance=self)
+
+    def update_hosts(self, host_list):
+        current_set = set(StorageHost.objects.filter(storage_instance=self).values_list('name', flat=True) )
+        new_set = set(host_list)
+        
+        for host in current_set.difference(new_set):
+            host = StorageHost.objects.get(storage_instance=self, name=host)
+            host.delete()
+
+        for host in new_set.difference(current_set):
+            if host != '':
+                ah = StorageHost()
+                ah.storage_instance = self
+                ah.name = host
+                ah.save()
+
+class StorageHost(VolumeHost):
+    storage_instance = models.ForeignKey(StorageInstance, related_name='hosts', on_delete=models.CASCADE)
+
+
+class ArcInstance(Volume):
+    nfs_group_id = models.CharField(max_length=100, blank=True, null=True)
+    multi_protocol = models.BooleanField(default=False)  
+    sensitive_regulated = models.BooleanField(default=False)  
+    great_lakes = models.BooleanField(default=False) 
+    armis = models.BooleanField(default=False) 
+    lighthouse = models.BooleanField(default=False) 
+    globus = models.BooleanField(default=False) 
+    globus_phi = models.BooleanField(default=False) 
+    thunder_x = models.BooleanField('ThunderX', default=False)
+
+    class meta:
+        verbose_name = 'ARC Storage Instance'   
+        verbose_name_plural = 'ARC Storage Instances'
+
+    def get_hosts(self):
+        return ArcHost.objects.filter(arc_instance=self)
+
+    def update_hosts(self, host_list):
+        current_set = set(ArcHost.objects.filter(arc_instance=self).values_list('name', flat=True) )
+        new_set = set(host_list)
+        
+        for host in current_set.difference(new_set):
+            host = ArcHost.objects.get(arc_instance=self, name=host)
+            host.delete()
+
+        for host in new_set.difference(current_set):
+            if host != '':
+                ah = ArcHost()
+                ah.arc_instance = self
+                ah.name = host
+                ah.save()
+            
+    def get_shortcodes(self):
+        return ArcBilling.objects.filter(arc_instance=self)
+
+
+class ArcHost(VolumeHost):
+    arc_instance = models.ForeignKey(ArcInstance, related_name='hosts', on_delete=models.CASCADE)
+
+    class meta:
+        verbose_name = 'Host'   
+
+
+class ArcBilling(models.Model):
+    arc_instance = models.ForeignKey(ArcInstance, related_name='shortcodes', on_delete=models.CASCADE)
+    size = models.IntegerField()
+    shortcode = models.CharField(max_length=100)
+
+
+class BackupDomain(models.Model):
+    name = models.CharField(max_length=100)
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE)
+    shortcode = models.CharField(max_length=100)
+    total_cost = models.DecimalField(max_digits=12, decimal_places=2)
+    cost_calculated_date = models.DateTimeField(null=True)
+    versions_while_exists = models.PositiveIntegerField()
+    versions_after_deleted = models.PositiveIntegerField()
+    days_extra_versions = models.PositiveIntegerField()
+    days_only_version = models.PositiveIntegerField()
+
+    def save(self, *args, **kwargs):
+        if self.orig_cost != self.total_cost:
+            self.cost_calculated_date = datetime.now()
+        super(BackupDomain, self).save(*args, **kwargs)
+
+    def __init__(self, *args, **kwargs):
+        super(BackupDomain, self).__init__(*args, **kwargs)
+        self.orig_cost = self.total_cost
+
+    def __str__(self):
+        return self.name
+    
+    def get_checkboxes(self):
+        return []
+
+    def get_user_subscriptions(self, username):
+        groups = list(LDAPGroupMember.objects.filter(username=username).values_list('ldap_group_id'))
+        return BackupDomain.objects.filter(owner__in=groups).order_by('name')
+        
+
+class BackupNode(models.Model):
+    backup_domain = models.ForeignKey(BackupDomain, related_name='nodes', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    time = models.CharField(max_length=8)
 
     def __str__(self):
         return self.name
@@ -574,101 +727,163 @@ class Item(models.Model):
 
         return note
 
-    def submit_incident(self):
+    def route(self):
+        action = Action.objects.get(id=self.data['action_id'])
+        routing = action.service.routing
 
-        action_id = self.data['action_id']
-        action = Action.objects.get(id=action_id)
+        if action.use_cart:  # Associate with blank order
+            o = Order()
+            o.order_reference = action.destination
+            o.chartcom = self.chartcom
+            o.service = action.service
+            o.created_by = self.created_by
+            o.save()
+            self.order = o
+            self.save()
 
-        o = Order()
-        o.order_reference = action.destination
-        o.chartcom = self.chartcom
-        o.service = action.service
-        o.created_by = self.created_by
-        o.save()
-        self.order = o
-        self.save()
+        for route in routing['routes']:
+            if route['target'] == 'tdx':
+                self.submit_incident(route) 
+
+            if route['target'] == 'database':
+                if action.type == 'A':  # For Adds instantiate a new record
+                    rec = globals()[route['record']]()
+                    rec.created_date = datetime.now()
+                else: # upddate/delete get existing record
+                    rec = globals()[route['record']].objects.get(id=self.data.get('instance_id'))
+                
+                if self.data.get('volaction') == 'Delete':
+                    rec.delete()
+                else:
+                    if action.service.id == 8:
+                        self.update_mibackup(rec)
+                    else:
+                        rec.owner = LDAPGroup().lookup( self.data['owner'] )
+                        rec.service = action.service
+                        rec.name = self.data.get('name','')
+                        rec.owner = LDAPGroup().lookup( self.data['owner'] )
+                        rec.size = self.data.get('size',0)
+                        rec.service = action.service
+                        rec.type = action.override['storage_type']
+                        rec.rate_id = self.data.get('selectOptionType')
+                        rec.shortcode = self.data.get('shortcode')
+                        rec.uid = self.data.get('uid')
+                        rec.ad_group = self.data.get('ad_group')    
+                        if action.service.id == 7:
+                            self.update_mistorage(rec)
+                        else:
+                            self.update_arcts(rec)
+                                            
+                        rec.save()
+
+                        if self.data.get('permittedHosts'):
+                            rec.update_hosts(self.data.get('permittedHosts'))
+
+    def submit_incident(self, route):
+        client_id = settings.UM_API['CLIENT_ID']
+        auth_token = settings.UM_API['AUTH_TOKEN']
+        base_url = settings.UM_API['BASE_URL']
+
+        headers = { 
+            'Authorization': f'Basic {auth_token}',
+            'accept': 'application/json'
+            }
+
+        url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
+        response = requests.post(url, headers=headers)
+        response_token = json.loads(response.text)
+        access_token = response_token.get('access_token')
+
+        headers = {
+            'X-IBM-Client-Id': client_id,
+            'Authorization': 'Bearer ' + access_token,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json' 
+            }
 
         text = self.data['reviewSummary']
         note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
+ 
+        payload = route['constants']
+        payload['Title'] = self.description
+        payload['RequestorEmail'] = self.created_by.email
+        payload['Description'] = f'{note}\n'
 
-        if action.destination == 'TDX':
-            client_id = settings.UM_API['CLIENT_ID']
-            auth_token = settings.UM_API['AUTH_TOKEN']
-            base_url = settings.UM_API['BASE_URL']
+        data_string = json.dumps(payload)
+        response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
+        #print(response.text)
 
-            headers = { 
-                'Authorization': f'Basic {auth_token}',
-                'accept': 'application/json'
-                }
+    def update_mibackup(self, rec):
+        #bd = BackupDomain()
+        rec.name = 'temp'
+        rec.owner = LDAPGroup().lookup( self.data['mCommunityName'] )
+        rec.shortcode = self.data['shortcode']
+        rec.total_cost = 0
+        rec.versions_while_exists = self.data['versions_while_exist']
+        rec.versions_after_deleted = self.data['versions_after_delet']
+        rec.days_extra_versions = self.data['days_extra_versions']
+        rec.days_only_version = self.data['days_only_version']
+        rec.save()
 
-            url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
-            response = requests.post(url, headers=headers)
-            response_token = json.loads(response.text)
-            access_token = response_token.get('access_token')
+        #for num, item in enumerate(item_list, start=2):
+        time_list = self.data['backupTime']
+        for num, node in enumerate(self.data['nodeNames']):
+            if node != '':
+                n = BackupNode()
+                n.backup_domain = rec
+                n.name = node
+                n.time = time_list[num]
+                n.save()
 
-            headers = {
-                'X-IBM-Client-Id': client_id,
-                'Authorization': 'Bearer ' + access_token,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json' 
-                }
-            payload = {
-                "TypeID": 57,
-                "Title": self.description,
-                "Description": f'{note}\n',
-                "ResponsibleGroupID": 104,
-                "ServiceID": 215,
-                "FormID": 20,
-                "Classification": 46,
-                "RequestorEmail": self.created_by.email,
-                }
-            data_string = json.dumps(payload)
-            response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
-            #print(response.text)
+    def update_arcts(self, rec):
+
+        rec.nfs_group_id = self.data.get('nfs_group_id')
+
+        if self.data.get('sensitive_regulated') == 'yessen':
+            rec.sensitive_regulated = True
         else:
-            body = ( 'schema:SN_Incident\n'
-                    'service_provider:ITS\n'
-                    'business_service:MiStorage\n'
-                    'assignment_group:ITS Storage\n'
-                    'category:Catalog Order\n'
-                    'state:New\n'
-                    'owner_group:ITS Service Center\n'
-                    f'description:{note}\n' )
+            rec.sensitive_regulated = False
 
-            send_mail(self.description, body, self.created_by.email, [settings.SERVICENOW_EMAIL])
-
-        self.update_mistorage()
-
-    def update_mistorage(self):
-
-        instance_id = self.data.get('instance_id')
-
-        if instance_id:
-            si = StorageInstance.objects.get(id=instance_id)
+        if self.data.get('multi_protocol') == 'ycifs':
+            rec.multi_protocol = True
         else:
-            si = StorageInstance()
+            rec.multi_protocol = False
+        
+        if self.data.get('hipaaOptions'):
+            if 'armis' in self.data.get('hipaaOptions'):
+                rec.armis = True
+            if 'globus_phi' in self.data.get('hipaaOptions'):
+                rec.globus_phi = True
 
-        if self.data.get('volaction') == 'Delete':
-            si.delete()
-            return
+        if self.data.get('nonHipaaOptions'):
+            if 'lighthouse' in self.data.get('nonHipaaOptions'):
+                rec.lighthouse = True
+            if 'globus' in self.data.get('nonHipaaOptions'):
+                rec.globus = True
+            if 'thunderx' in self.data.get('nonHipaaOptions'):
+                rec.thunder_x = True
+            if 'great_lakes' in self.data.get('nonHipaaOptions'):
+                rec.great_lakes = True
 
-        if self.data.get('action_id') == '46' or self.data.get('action_id') == '47':
-            si.type = 'NFS'
-            si.owner = si.get_owner_instance(self.data.get('owner'))
-            si.name = self.data.get('storageID')
-            si.uid = self.data.get('volumeAdmin')
-            if self.data.get('flux') == 'yes':
-                si.flux = True
-        else:
-            si.type = 'CIFS'
-            si.owner = si.get_owner_instance( self.data.get('mcommGroup') )
-            si.name = self.data.get('netShare')
-            si.ad_group = self.data.get('activeDir')
+        rec.save()
+        bill_size_list = self.data.get('terabytes') 
 
-        si.size = self.data.get('sizeGigabyte')
-        si.shortcode = self.data.get('shortcode')
-        si.rate_id = self.data.get('selectOptionType')
-        si.save()
+        ArcBilling.objects.filter(arc_instance=rec).delete()
+
+        for num, shortcode in enumerate(self.data.get('shortcode')):
+            if shortcode:
+                sc = ArcBilling()
+                sc.arc_instance = rec
+                sc.size = bill_size_list[num]
+                sc.shortcode = shortcode
+                sc.save()
+
+                print(num, shortcode, bill_size_list[num], rec.id)
+
+    def update_mistorage(self, rec):
+
+        if self.data.get('flux') == 'yes':
+            rec.flux = True
 
     def leppard(self):
         pour=['me']
