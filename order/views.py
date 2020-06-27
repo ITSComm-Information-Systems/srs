@@ -299,7 +299,9 @@ def send_email(request):   #Pinnacle will route non prod emails to a test addres
     if request.method == "POST":
         subject = request.POST['emailSubject'] + ' question from: ' + request.user.username
         body = request.POST['emailBody'] 
-        address = request.POST.get('emailAddress', 'ITCOM.csr@umich.edu')
+        address = (request.POST.get('emailAddress', 'ITCOM.csr@umich.edu'))
+        print(request.POST)
+
 
         with connections['pinnacle'].cursor() as cursor:
             cursor.callproc('um_osc_util_k.um_send_email_p', [address, body, subject])

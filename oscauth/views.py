@@ -622,7 +622,7 @@ def userid(request):
     user_list=[]
 
     if request.method=='POST':
-        user_param = request.POST.get('user_param')
+        user_param = request.POST.get('user_param').strip()
 
     if user_param == '':
         context = {
@@ -631,15 +631,14 @@ def userid(request):
         }
         return  HttpResponse(template.render(context, request))
     
-    if len(user_param)==10:
-        user_list= UmOscAcctSubscribersV.objects.filter(dn=user_param)
-    else:
-        user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id=user_param)
-    extra= '' #UmCurrentDeptManagersV.objects.all()
+    if (len(user_param)==16) or (len(user_param)==10):
+        user_list= UmOscAcctSubscribersV.objects.filter(user_defined_id__contains=user_param)
+
     
     for user in user_list:
-        Id = user.user_defined_id
+        user_def_id = user.user_defined_id
         chartcom = user.chartcom
+        #may not have anything
         building = user.building
         floor = user.floor
         room = user.room
@@ -647,22 +646,31 @@ def userid(request):
         mrc = user.mrc_charged
         toll = user.toll_charged
         local = user.local_charged
+        
+        deptid_list=set()
+        for x in UmOscServiceProfileV.objects.filter(user_defined_id=user_def_id, service_status_code="In Service", subscriber_status="Active"):
+            deptid_list.add(x.deptid)
 
-        deptid=UmOscServiceProfileV.objects.get(service_number=user.dn).deptid
-        uniqname = AuthUserDept.objects.get(dept=deptid, group = 3).user.username
-        firstname=AuthUserDept.objects.get(dept=deptid, group = 3).user.first_name
-        lastname=AuthUserDept.objects.get(dept=deptid, group = 3).user.last_name
+        #get manager information from the department id if any
+        for deptid in deptid_list:
+            uniqname = AuthUserDept.objects.get(dept=deptid, group = 3).user.username
+            firstname=AuthUserDept.objects.get(dept=deptid, group = 3).user.first_name
+            lastname=AuthUserDept.objects.get(dept=deptid, group = 3).user.last_name
 
-        manager= lastname+', '+firstname+" ("+uniqname+")"
+            manager= lastname+', '+firstname+" ("+uniqname+")"
 
-        data = {'Id' : Id, 'manager':manager, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
-        rows.append(data)
+            data = {'user_def_id' : user_def_id, 'manager':manager, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
+
+            for info in data.items():
+                if info[1]=='':
+                    data[info[0]]='None'
+            rows.append(data)
+
     
     context = {
         'title' : 'User ID Look Up',
         'subtitle1': 'Results for: ' + user_param ,
         'rows': rows,
         'user_list':user_list,
-        'extra':extra
     }
     return HttpResponse(template.render(context, request))

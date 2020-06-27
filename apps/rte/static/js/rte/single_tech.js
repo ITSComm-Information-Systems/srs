@@ -12,9 +12,13 @@ $(document).ready(function() {
 
     $('#techTable tr').click(function() {
         var tech_name = $(this).find("td").eq(1).html();   
-        var tech_id = $(this).find("td").eq(0).html(); 
-        $("#techSearch").val(tech_id);  
+        var tech_id = $(this).find("td").eq(0).html();   
         $('#techTable').hide();
+        get_assigned_groups(tech_id);
+        $('#tech_name').val(tech_name);
+        $('#tech_id').val(tech_id);
+        $('#techSearch').val('');
+        $('#tech-error').addClass('hidden');
     });
 
     $("#workOrderTable").hide();
@@ -28,9 +32,15 @@ $(document).ready(function() {
     });
 
     $('#workOrderTable tr').click(function() {
-        var work_order = $(this).find("td").eq(0).html();; 
+        var work_order = $(this).find("td").eq(0).html();
         $("#workOrderSearch").val(work_order);  
         $('#workOrderTable').hide();
+
+        $('#rateSelect').removeAttr('disabled');
+        $('#assigned_date').removeAttr('readonly');
+        $('#duration-hours').removeAttr('readonly');
+        $('#duration-mins').removeAttr('readonly');
+        $('#notes').removeAttr('readonly');
     });
 
     // Hide input table on load
@@ -50,22 +60,37 @@ $(document).ready(function() {
 
     // Keep track of number of rows in table
     num_entries = 0;
+    total_entries_single = 0;
 
     // Submit entries
     $('.single-submit').on('click', function() {
-        var form_html = '<input name="num_entries" type="text" value="' + num_entries + '" hidden>';
+        var form_html = '<input name="num_entries" type="text" value="' + total_entries_single + '" hidden>';
         $('#single-input-form').append(form_html);
         $('#single-input-form').submit();
     })
 
     // Add new row to input table
     $('#single-add').on('click', function() {
-        num_entries = add_to_table(num_entries);
+        if (validate_add()) {
+            num_entries = add_to_table(num_entries);
+            total_entries_single = total_entries_single + 1;
+            $('#add-error').addClass('hidden');
+        }
     });
 
     $('#single-input-table').on('click', '.delete_row', function() {
         num_entries = delete_row($(this).attr('id'), num_entries);
     });
+
+    $('#techSelect').on('change', function(){
+        full_selection = $(this).val().split('(');
+        tech_id = full_selection[0].replace(' ', '');
+        tech_name = full_selection[1].replace(')', '');
+
+        $('#tech_id').val(tech_id);
+        $('#tech_name').val(tech_name);
+        get_assigned_groups(tech_id);
+    })
 });
 
 function validate_search() {
@@ -75,14 +100,6 @@ function validate_search() {
     }
     return true;
 }
-
-// function single_validate_next(current_page) {
-
-// }
-
-// function single_validate_prev(current_page) {
-
-// }
 
 // Transition from tech ID select to work order select
 function techid_to_wo() {
@@ -130,6 +147,13 @@ function add_to_table(num_entries) {
         $('#duration-hours').val('');
         $('#duration-mins').val('');
         $('#notes').val('');
+
+        // Reset grayed out input fields
+        $('#rateSelect').attr('disabled', 'disabled');
+        $('#assigned_date').attr('readonly', 'readonly');
+        $('#duration-hours').attr('readonly', 'readonly');
+        $('#duration-mins').attr('readonly', 'readonly');
+        $('#notes').attr('readonly', 'readonly');
     }
     else {
         $('#max-entries').removeClass('hidden');
@@ -160,8 +184,115 @@ function delete_row(row_num, num_entries) {
     num_entries = num_entries - 1;
     $('#max-entries').addClass('hidden');
 
+    $('[name="' + row_num + '_work_order"]').val('Deleted');
+
     if (num_entries == 0) {
         $('#single-input').hide();
     }
     return(num_entries);
+}
+
+// Make sure user enters tech ID
+function validate_tech() {
+    if (!$('#tech_id').val()) {
+        $('#tech-error').html('Please select a valid tech ID.');
+        $('#tech-error').removeAttr('hidden');
+        return(false);
+    }
+    if (!$('#agSelect').val()) {
+        $('#tech-error').html('Please select an assigned group.');
+        $('#tech-error').removeAttr('hidden');
+        return(false);
+    } 
+    return(true);
+}
+
+// Make sure all entry fields are filled
+function validate_add() {    
+    if (!$('#workOrderSearch').val()) {
+        $('#add-error').html('Please enter a work order.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if (!$('#assigned_date').val()) {
+        $('#add-error').html('Please enter an assigned date.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    var regex = new RegExp('([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))');
+    if (!regex.test($('#assigned_date').val())) {
+        $('#add-error').html('Please enter a valid date. You entered: ' + $('#assigned_date').val() + '.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if (!$('#duration-hours').val() && !$('#duration-mins').val()) {
+        $('#add-error').html('Please enter time worked.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if ($('#duration-hours').val() > 23 || $('#duration-hours').val() < 0) {
+        $('#add-error').html('Please enter a value for hours between 0 and 23.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if ($('#duration-mins').val() > 59 || $('#duration-mins').val() < 0) {
+        $('#add-error').html('Please enter a value for minutes between 0 and 59.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+    $('#entries-error').addClass('hidden');
+    return(true);
+}
+
+// Make sure user has entered time
+function validate_single_entries() {
+    if ($('#single-input-table > tbody > tr').length === 0) {
+        $('#entries-error').html('Please enter time before proceeding.');
+        $('#entries-error').removeClass('hidden');
+        return(false);
+    }
+    return(true);
+}
+
+// Validate moving on in workflow
+function validate_single(current_tab) {
+    if (current_tab === 1) {
+        console.log('validate tech');
+        return(validate_tech());
+    }
+    if (current_tab === 2) {
+        return(validate_single_entries());
+    }
+}
+
+// Get assigned groups based on tech ID
+function get_assigned_groups(techid) {
+    $.ajax({
+        url: 'get-assigned-group/',
+        data: {
+            "techid": techid
+        },
+        dataType:'json',
+        // Reset chartfield options when department changes
+        success: function(data) {
+            console.log(data);
+            $('#agSelect').empty();
+            for (i = 0; i < data.length; ++i) {
+                var drp = document.getElementById('agSelect');
+                var option = document.createElement("OPTION");
+                option.value = data[i].wo_group_name;
+                option.text = data[i].wo_group_name;
+                drp.add(option);
+            }
+            $('#chosen_techid').removeAttr('hidden');
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+    })
 }
