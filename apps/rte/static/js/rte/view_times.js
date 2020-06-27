@@ -1,6 +1,6 @@
 $(document).ready(function() {
     // Table searches - tech ID
-	$("#techTable").hide();
+    $("#techTable").hide();
 
     $("#techSearch").on("keyup", function() {
         $("#techTable").show();
@@ -42,34 +42,50 @@ $(document).ready(function() {
     $('#selectByDateRangeDiv').hide();
 
     $('#selectByWorkOrder').on('change', function() {
-    	$('#selectByWorkOrderDiv').show();
-	    $('#selectByCalendarRangeDiv').hide();
-	    $('#selectByDateRangeDiv').hide();
+        $('#selectByWorkOrderDiv').show();
+        $('#selectByCalendarRangeDiv').hide();
+        $('#selectByDateRangeDiv').hide();
+
+        $('#calendarRangeStart').val('');
+        $('#calendarRangeEnd').val('');
+        $('#dateRangeSelect').val('');
     });
 
     $('#selectByCalendarRange').on('change', function() {
-    	$('#selectByWorkOrderDiv').hide();
-	    $('#selectByCalendarRangeDiv').show();
-	    $('#selectByDateRangeDiv').hide();
+        $('#selectByWorkOrderDiv').hide();
+        $('#selectByCalendarRangeDiv').show();
+        $('#selectByDateRangeDiv').hide();
+
+        $('#workOrderSearch').val('');
+        $('#dateRangeSelect').val('');
     });
 
     $('#selectByDateRange').on('change', function() {
-    	$('#selectByWorkOrderDiv').hide();
-	    $('#selectByCalendarRangeDiv').hide();
-	    $('#selectByDateRangeDiv').show();
+        $('#selectByWorkOrderDiv').hide();
+        $('#selectByCalendarRangeDiv').hide();
+        $('#selectByDateRangeDiv').show();
+
+        $('#calendarRangeStart').val('');
+        $('#calendarRangeEnd').val('');
+        $('#workOrderSearch').val('');
     });
 
 
     // Pagination for results table
     var num_rows = $('#view-time-table').find('tbody tr:has(td)').length;
-    var rows_per_page = 10;
+    var rows_per_page = 15;
     var num_pages = Math.ceil(num_rows / rows_per_page);
 
     console.log(num_rows);
 
     // Fill pagination with correct number of pages
     for (i = 0; i < num_pages; i++) {
-        $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
+        if (i < 2 || i > num_pages - 3) {
+            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
+        }
+        else if (i == 2) {
+            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">...</a></li>').appendTo('#pagination');
+        }
     }
     $('<li class="page-item" id="next"><a class="page-link" id="next-tab">Next</a></li>').appendTo('#pagination');
 
@@ -126,6 +142,7 @@ function paginate(page, rows_per_page, current_page, tr) {
 // Next/previous functionality for pagination
 function next_prev(current_page, num_pages) {
     // Disable previous
+
     if (current_page === 1) {
         $('#previous').addClass('disabled');
         $('#previous-tab').attr('tabindex', '-1');

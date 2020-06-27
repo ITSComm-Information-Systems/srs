@@ -17,6 +17,13 @@ $(document).ready(function() {
         $('#techTableMultiple').hide();
 
         load_assigned_groups(tech_id);
+
+        $('#assignedGroupSelectMultiple').removeAttr('disabled');
+        $('#rateSelectMultiple').removeAttr('disabled');
+        $('#assigned_date_multiple').removeAttr('readonly');
+        $('#duration-hours-multiple').removeAttr('readonly');
+        $('#duration-mins-multiple').removeAttr('readonly');
+        $('#notes-multiple').removeAttr('readonly');
     });
 
     $("#workOrderTableMultiple").hide();
@@ -30,9 +37,15 @@ $(document).ready(function() {
     });
 
     $('#workOrderTableMultiple tr').click(function() {
-        var work_order = $(this).find("td").eq(0).html();; 
-        $("#workOrderSearchMultiple").val(work_order);  
+        var work_order = $(this).find("td").eq(0).html();
+        var work_order_desc = $(this).find("td").eq(1).html(); 
+        $("#workOrderSearchMultiple").val(''); 
+        $('#work_order').val(work_order);
+        $('#work_order_text').html(work_order_desc);
+        $('#selected-wo').removeClass('hidden');
         $('#workOrderTableMultiple').hide();
+
+        $('#wo-error').addClass('hidden');
     });
 
     // Hide input table on load
@@ -52,17 +65,22 @@ $(document).ready(function() {
 
     // Keep track of number of rows in table
     num_entries_multiple = 0;
+    total_entries = 0;
 
     // Submit entries
     $('.multiple-submit').on('click', function() {
-        var form_html = '<input name="num_entries" type="text" value="' + num_entries_multiple + '" hidden>';
+        var form_html = '<input name="num_entries" type="text" value="' + total_entries + '" hidden>';
         $('#multiple-input-form').append(form_html);
         $('#multiple-input-form').submit();
     })
 
     // Add new row to input table
     $('#multiple-add').on('click', function() {
-        num_entries_multiple = add_to_multiple_table(num_entries_multiple);
+        if (validate_add_multiple()) {
+            num_entries_multiple = add_to_multiple_table(num_entries_multiple);
+            total_entries = total_entries + 1;
+            $('#add-error').addClass('hidden');
+        }
     });
 
     $('#multiple-input-table').on('click', '.delete_row_multiple', function() {
@@ -101,6 +119,14 @@ function add_to_multiple_table(num_entries) {
         $('#duration-hours-multiple').val('');
         $('#duration-mins-multiple').val('');
         $('#notes-multiple').val('');
+
+        // Gray out inputs again
+        $('#assignedGroupSelectMultiple').attr('disabled', 'disabled');
+        $('#rateSelectMultiple').attr('disabled', 'disabled');
+        $('#assigned_date_multiple').attr('readonly', 'readonly');
+        $('#duration-hours-multiple').attr('readonly', 'readonly');
+        $('#duration-mins-multiple').attr('readonly', 'readonly');
+        $('#notes-multiple').attr('readonly', 'readonly');
     }
     else {
         $('#max-entries-multiple').removeClass('hidden');
@@ -112,7 +138,8 @@ function add_to_multiple_table(num_entries) {
 function delete_row_multiple(row_num, num_entries) {
     $('#row-' + row_num).remove();
     num_entries = num_entries - 1;
-    $('#max-entries-multiple').addClass('hidden');
+
+    $('[name="' + row_num + '_techid"]').val('Deleted');
 
     if (num_entries == 0) {
         $('#multiple-input').hide();
@@ -139,7 +166,6 @@ function techid_to_review() {
 
 // Get assigned groups for selected tech ID
 function load_assigned_groups(techid) {
-    console.log(techid);
     $.ajax({
         url: 'get-assigned-group/',
         data: {
@@ -148,7 +174,6 @@ function load_assigned_groups(techid) {
         dataType:'json',
         // Reset chartfield options when department changes
         success: function(data) {
-            console.log(data);
             $('#assignedGroupSelectMultiple').empty();
             for (i = 0; i < data.length; ++i) {
                 var drp = document.getElementById('assignedGroupSelectMultiple');
@@ -162,4 +187,93 @@ function load_assigned_groups(techid) {
             console.log(errorThrown);
         }
     })
+}
+
+function validate_search_multiple() {
+    if ($('#workOrderSearch').val() === '') {
+        $('#error-work-order').show();
+        return false;
+    }
+    return true;
+}
+
+// Validate work order before advancing
+function validate_wo() {
+    if (!$('#work_order').val()) {
+        $('#wo-error').html('Please enter a work order.');
+        $('#wo-error').removeAttr('hidden');
+        return(false);
+    }
+    return(true);
+}
+
+// Validate entries before advancing
+function validate_multiple_entries() {
+    if ($('#multiple-input-table > tbody > tr').length === 0) {
+        $('#entries-error').html('Please enter time before proceeding.');
+        $('#entries-error').removeClass('hidden');
+        return(false);
+    }
+    return(true);
+}
+
+// Make sure all entry fields are filled
+function validate_add_multiple() {
+    $('#entries-error').addClass('hidden');
+
+    if (!$('#techSearchMultiple').val()) {
+        $('#add-error').html('Please enter a tech ID.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if (!$('#assignedGroupSelectMultiple').val()) {
+        $('#add-error').html('Please select an assigned group.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if (!$('#assigned_date_multiple').val()) {
+        $('#add-error').html('Please enter an assigned date.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    var regex = new RegExp('([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))');
+    if (!regex.test($('#assigned_date_multiple').val())) {
+        $('#add-error').html('Please enter a valid date. You entered: ' + $('#assigned_date_multiple').val() + '.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if (!$('#duration-hours-multiple').val() && !$('#duration-mins-multiple').val()) {
+        $('#add-error').html('Please enter time worked.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if ($('#duration-hours-multiple').val() > 23 || $('#duration-hours-multiple').val() < 0) {
+        $('#add-error').html('Please enter a value for hours between 0 and 23.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+
+    if ($('#duration-mins-multiple').val() > 59 || $('#duration-mins-multiple').val() < 0) {
+        $('#add-error').html('Please enter a value for minutes between 0 and 59.');
+        $('#add-error').removeClass('hidden');
+        return(false);
+    }
+    $('#entries-error').addClass('hidden');
+    return(true);
+}
+
+// Validate moving on in workflow
+function validate_multiple() {
+    if (current_tab === 1) {
+        return(validate_wo());
+    }
+    if (current_tab === 2) {
+        return(validate_multiple_entries());
+    }
+    return(true);
 }

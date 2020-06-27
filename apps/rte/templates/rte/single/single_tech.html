@@ -1,3 +1,6 @@
+{% load rte_tags %}
+
+{% if request.user|is_member:"RTE Admin" %}
 <form id='techForm' method='post' action='' onsubmit='return validate_search()'>{% csrf_token %}
     <div class="form-group" id="searchTech">
         <label for="techSearch" id="labelTechSearch">
@@ -6,52 +9,106 @@
         <small id="buildingTechBlock" class="form-text text-muted">
             Search for the tech name or tech ID whose time you'd like to enter.
         </small>
-    	<div class='form-group'>
-    		<div class='form-inline'>
-		        <input name='techSearch' autocomplete='off' id="techSearch" class="form-control" type="text" aria-describedby="buildingTechBlock"
-		            placeholder="Search...">
-		        <button class='btn btn-primary' type='submit'>Search</button>
-		    </div>
-	        <div role=”alert” class="invalid-feedback" id='error-tech-id'><i class="fas fa-exclamation-triangle"
-	            aria-label="Icon signfying that user must enter a value"></i>Please enter a tech ID.
-	        </div>
-	    </div>
-  	</div>
+        <div class='form-group'>
+            <input name='techSearch' autocomplete='off' id="techSearch" class="form-control col-5" type="text" aria-describedby="buildingTechBlock"
+                placeholder="Search...">
+            <div role=”alert” class="invalid-feedback" id='error-tech-id'><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signfying that user must enter a value"></i>Please enter a tech ID.
+            </div>
+        </div>
+    </div>
 
     <div class='col-6'>
-	    <table id="techTable" class="table table-hover" aria-live=”polite”>
-	        {% for tech in all_techs %}
-	            <tr tabindex="0"  id="{{ tech.labor_code }}" role="button" aria-label="Select tech 
-	                {{ tech.labor_name_display2 }} with tech ID of {{ tech.labor_code }}">
-	                <td >{{ tech.labor_code }}</td>
-	                <td name="techName">{{ tech.labor_name_display2 }}</td>
-	            </tr>
-	        {% endfor %}
-	    </table>
-	</div>
+        <table id="techTable" class="table table-hover" aria-live=”polite”>
+            {% for tech in all_techs %}
+                <tr tabindex="0"  id="{{ tech.labor_code }}" role="button" aria-label="Select tech 
+                    {{ tech.labor_name_display2 }} with tech ID of {{ tech.labor_code }}">
+                    <td >{{ tech.labor_code }}</td>
+                    <td name="techName">{{ tech.labor_name_display2 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</form>
+<div id='chosen_techid' hidden>
+    <div class='form-group col-4 mt-4'>
+        <label for="tech_id" id="teachIdLabel">
+            <strong>Tech ID</strong>
+        </label>
+        <input readonly class='form-control' id="tech_id" value="">
 
+        <label for="tech_name" id="teachNameLabel" class='mt-2'>
+            <strong>Tech Name</strong>
+        </label>
+        <input readonly class='form-control' id="tech_name" value="">
+
+        <label for="agSelect" id="labelAGSelect" class='mt-2'>
+            <strong>Assigned Group </strong>
+        </label>
+        <select class='custom-select' id='agSelect'></select>
+    </div>
+</div>
+{% else %}
+<form id='techForm' method='post' action=''>{% csrf_token %}
+    <div class='form-group'>
+        <label for="techSelect" id="labelTechSelect">
+            <strong>Select Your Tech ID</strong>
+        </label>
+        <div class='form-inline'>
+            <select id='techSelect' class='form-control col-3' name='techSearch'>
+                {% for tech in all_techs %}
+                    <option>{{ tech.labor_code }} ({{ tech.labor_name_display2 }})</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
 </form>
 
+<div class='form-group col-4 mt-4'>
+    <label for="tech_id" id="teachIdLabel">
+        <strong>Tech ID</strong>
+    </label>
+    <input readonly class='form-control' id="tech_id" value="{{ tech_id }}">
 
+    <label for="tech_name" id="teachNameLabel" class='mt-2'>
+        <strong>Tech Name</strong>
+    </label>
+    <input readonly class='form-control' id="tech_name" value="{{ tech_name }}">
+
+    <label for="agSelect" id="labelAGSelect" class='mt-2'>
+        <strong>Assigned Group </strong>
+    </label>
+    <select class='custom-select' id='agSelect'>
+        {% for group in assigned_groups %}
+            <option>{{ group.wo_group_name }}</option>
+        {% endfor %}
+    </select>
+</div>
+{% endif %}
+
+{% comment %}
 {% if tech_name %}
-	<div class='form-group col-4 mt-4'>
-		<label for="tech_id" id="teachIdLabel">
+    <div class='form-group col-4 mt-4'>
+        <label for="tech_id" id="teachIdLabel">
             <strong>Tech ID</strong>
         </label>
         <input readonly class='form-control' id="tech_id" value="{{ tech_id }}">
 
-		<label for="tech_name" id="teachNameLabel" class='mt-2'>
+        <label for="tech_name" id="teachNameLabel" class='mt-2'>
             <strong>Tech Name</strong>
         </label>
-        <input readonly class='form-control' id="tech_name" value="{{ tech_name.labor_name_display2 }}">
+        <input readonly class='form-control' id="tech_name" value="{{ tech_name }}">
 
         <label for="agSelect" id="labelAGSelect" class='mt-2'>
             <strong>Assigned Group </strong>
         </label>
         <select class='custom-select' id='agSelect'>
-        	{% for group in assigned_groups %}
-        		<option>{{ group.wo_group_name }}</option>
-        	{% endfor %}
-		</select>
-	</div>
+            {% for group in assigned_groups %}
+                <option>{{ group.wo_group_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
 {% endif %}
+{% endcomment %}
+
+<div hidden class='alert alert-danger col-4' id='tech-error'></div>
