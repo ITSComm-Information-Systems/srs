@@ -5,19 +5,11 @@ from django.http import JsonResponse
 from datetime import datetime, timedelta, date
 from django.db import connections
 from django.contrib.auth.decorators import user_passes_test
-from django.core.exceptions import PermissionDenied
-from django.contrib.auth.decorators import login_required
-
-# Check if user has a tech ID
-def has_techid(user):
-    if UmRteTechnicianV.objects.filter(uniqname=user.username).exists():
-        return True
-    else:
-        raise PermissionDenied
+from django.contrib.auth.decorators import login_required, permission_required
 
 # Base RTE view
 @login_required
-@user_passes_test(has_techid)
+@permission_required('rte_access', raise_exception=True)
 def load_rte(request):
     template = loader.get_template('rte/base_rte.html')
 
@@ -59,7 +51,7 @@ def single_tech(request):
     }
     tab_list.append(tab3)
 
-    if request.user.groups.filter(name="RTE Admin").exists():
+    if request.user.groups.filter(name="RTE Admin").exists() or request.user.is_superuser:
         all_techs = UmRteTechnicianV.objects.all()
         tech_id = ''
         tech_name = ''
@@ -311,7 +303,7 @@ def update(request):
     }
     tab_list.append(tab4)
 
-    if request.user.groups.filter(name="RTE Admin").exists():
+    if request.user.groups.filter(name="RTE Admin").exists() or request.user.is_superuser:
         all_techs = UmRteTechnicianV.objects.all()
         selected_tech = ''
         results = ''

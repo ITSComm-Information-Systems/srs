@@ -2,7 +2,7 @@
 
 <div class='row'>
 	<div class='col-8'>
-		{% if request.user|is_member:"RTE Admin" %}
+		{% if request.user|is_member:"RTE Admin" or request.user.is_superuser %}
 		<form action='' method='post' id='update-form' onsubmit='return validate_search_update()'>{% csrf_token %}
 			<div class="form-group" id="searchTechUpdate">
 		        <label for="techSearchUpdate" id="labelTechSearchUpdate">

@@ -12,7 +12,7 @@
 				<strong><a href='single-tech/'>Single Technician, Multiple Work Orders</a></strong>
 			</div>
 
-			{% if request.user|is_member:"RTE Admin" %}
+			{% if request.user|is_member:"RTE Admin" or request.user.is_superuser %}
 			<div class="alert alert-secondary col-8" role="alert">
 				<strong><a href='multiple-tech/'>Multiple Technicians, Single Work Order</a></strong>
 			</div>
