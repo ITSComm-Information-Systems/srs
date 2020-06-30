@@ -2,7 +2,6 @@
 
 from django.contrib.auth import get_user_model
 from project.pinnmodels import UmRteTechnicianV
-from django.core.exceptions import PermissionDenied
 
 
 class SuBackend(object):
@@ -30,8 +29,5 @@ class SuBackend(object):
     def has_perm(self, user_obj, perm, obj=None):
         if perm == 'rte_access':
             return UmRteTechnicianV.objects.filter(uniqname=user_obj.username).exists()
-            #     return True
-            # else:
-            #     raise PermissionDenied
         else:
             return True
