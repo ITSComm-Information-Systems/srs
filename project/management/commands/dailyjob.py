@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management import call_command
 
 from oscauth.utils import upsert_user
+from oscauth.models import LDAPGroup
 from django.contrib.auth.models import User
 
 class Command(BaseCommand):
@@ -34,5 +35,9 @@ class Command(BaseCommand):
             cursor.execute(sql)
 
         call_command('deptmgrupdt')
-        
+
+        # Update LDAP Group membership used by storage, etc.
+        for group in LDAPGroup.objects.order_by('name'):
+            group.update_membership()
+
         print('end')
