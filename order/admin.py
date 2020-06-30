@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import path
 
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -206,7 +206,7 @@ class VolumeAdmin(admin.ModelAdmin):
         else:
             #print(self.child_key)
 
-            host_list = instance.get_hosts()
+            #host_list = instance.get_hosts()
 
             #if self.child_record == ArcHost:
             #    host_list = self.child_record.objects.all().filter(arc_instance_id=object_id)
@@ -214,7 +214,8 @@ class VolumeAdmin(admin.ModelAdmin):
             #    host_list = self.child_record.objects.all().filter(storage_instance_id=object_id)
  
             extra_context = {
-                'host_list': host_list,
+                'host_list': instance.get_hosts(),
+                'shortcode_list': instance.get_shortcodes()
             }
         return super().change_view(
             request, object_id, form_url, extra_context=extra_context,
@@ -228,7 +229,7 @@ class ArcInstanceAdmin(VolumeAdmin):
     child_key = 'arc_instance_id'
     service_list = [9,10,11]
     fieldsets = (
-        (None, {'fields': ('service', 'name','owner',('type','multi_protocol','ad_group'),'rate',('size','shortcode'),('uid','nfs_group_id'),'created_date','sensitive_regulated')
+        (None, {'fields': ('service', 'name','owner',('type','multi_protocol','ad_group'),'rate','size',('uid','nfs_group_id'),'created_date','sensitive_regulated')
         }),
         ('Regulated/Sensitive', {'fields':(('armis','globus_phi'),)
         }),
@@ -243,6 +244,9 @@ class StorageInstanceAdmin(VolumeAdmin):
     child_key = 'storage_instance_id'
     service_list = [7]
 
+@admin.register(ArcBilling)
+class ArcBillingAdmin(admin.ModelAdmin):
+    pass
 
 @admin.register(ArcHost)
 class ArcHostAdmin(admin.ModelAdmin):

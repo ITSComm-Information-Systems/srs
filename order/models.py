@@ -407,6 +407,9 @@ class StorageInstance(Volume):
     autogrow = models.BooleanField(default=False)
     flux = models.BooleanField(default=False)
 
+    def get_shortcodes(self):
+        return [{"shortcode": self.shortcode, "size": self.size}]
+
     def get_hosts(self):
         return StorageHost.objects.filter(storage_instance=self)
 
@@ -446,6 +449,9 @@ class ArcInstance(Volume):
 
     def get_hosts(self):
         return ArcHost.objects.filter(arc_instance=self)
+
+    def get_shortcodes(self):
+        return ArcBilling.objects.filter(storage_instance=self)
 
     def update_hosts(self, host_list):
         current_set = set(ArcHost.objects.filter(arc_instance=self).values_list('name', flat=True) )

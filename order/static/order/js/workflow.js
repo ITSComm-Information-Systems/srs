@@ -182,6 +182,18 @@ $(document).ready(function() {
     $('[data-tab="LocationNew"]').hide();
   });
 
+  $(document).on("click", "#multi_protocol_0" , function() {
+    $('#div_turboADgroup').show();
+  });
+
+  $(document).on("click", "#multi_protocol_1" , function() {
+    $('#div_turboADgroup').hide().prop('required',false);
+  });
+
+  $(document).on("load", "#div_turboADgroup" , function() {
+    $('#div_turboADgroup').hide();
+  });
+  
 
   var x = document.getElementsByClassName("ccsel");
   var i;

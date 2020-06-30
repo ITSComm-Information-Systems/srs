@@ -44,7 +44,6 @@ class Command(BaseCommand):
                     #print(f'Column names are {", ".join(row)}')
                     line_count += 1
                 else:
-                    #if row[0] == 46306:
                     self.process_record(row, type, service_id)
                     line_count += 1
 
@@ -72,9 +71,16 @@ class Command(BaseCommand):
                 instance.great_lakes = True
             if row[11].strip("'") == 'Yes':
                 instance.sensitive_regulated = True
-            if row[13].strip("'") == 'Yes':
-                instance.mutli_protocol = True
-            hosts = row[14].strip("'").split(' ')
+
+            
+            if service_id == 9:  #Turbo
+                if row[13].strip("'") == 'Yes':
+                    instance.mutli_protocol = True
+                instance.ad_group = row[14].strip("'")
+                hosts = row[15].strip("'").split(' ')
+            else:
+                hosts = row[13].strip("'").split(' ')
+
             instance.nfs_group_id = row[12].strip("'")
 
 
@@ -88,6 +94,7 @@ class Command(BaseCommand):
         instance.service_id = service_id
         instance.rate = StorageRate.objects.get(type=instance.type, service_id=service_id, label=options)
 
+
         try:
             instance.save()
 
@@ -98,7 +105,8 @@ class Command(BaseCommand):
                     h.name = host
                     h.save()
         except:
-            print('error inserting', row[0])
+            print('error', row[0], vars(instance))
+
 
 
 

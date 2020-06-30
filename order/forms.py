@@ -353,6 +353,7 @@ class VolumeSelectionForm(TabForm):
 
                 for volume in self.volume_list:
                     self.total_cost = self.total_cost + volume.total_cost
+                    volume.shortcode_list = volume.get_shortcodes()
                     
                 self.template = 'order/volume_review.html'
 
@@ -413,12 +414,19 @@ class DetailsNFSForm(TabForm):
                 self.fields['multi_protocol'].initial = 'ycifs'
             else:
                 self.fields['multi_protocol'].initial = 'ncifs'
+                self['turboADgroup'].field.required = False
 
         #TODO Set checkboxes
         #self.fields['hipaaOptions'].initial == ['armis','globus_phi']
 
     def __init__(self, *args, **kwargs):
         super(DetailsNFSForm, self).__init__(*args, **kwargs)
+
+        if self.is_bound:
+            if 'multi_protocol' in self.data:
+                if self.data['multi_protocol'] == 'ncifs':
+                    self['turboADgroup'].field.required = False
+
         if 'flux' in self.fields:
             self['flux'].field.required = False
 

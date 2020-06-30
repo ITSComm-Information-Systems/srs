@@ -22,7 +22,11 @@
                         <th data-id="{{volume.id}}" scope="row">{{ volume.name }}</th>
                         <td>{{ volume.type }}</td>
                         <td>{{ volume.dept }}</td>
-                        <td>{{ volume.shortcode }}</td>
+                        <td>{% for sc in volume.shortcode_list %}
+                            {{ sc.shortcode }} ({{sc.size}}TB)<br>
+                    
+                            {% endfor %}
+                        </td>
                         <td>{{ volume.size }}{{ volume.rate.unit_of_measure }}</td>
                         <td>{{ volume.rate.label }}</td>
                         <td style="text-align:right">{{ volume.total_cost }}</td>
