@@ -35,6 +35,10 @@ class TabForm(forms.Form):
                 field.initial = getattr(vol,fieldname)
 
             elif fieldname == 'selectOptionType':
+                if vol.rate.display_seq_no > 99:
+                    label = f'{vol.rate.label} (${vol.rate.rate} / per {vol.rate.unit_of_measure} per month)'
+                    self.fields["selectOptionType"].choices = [(vol.rate.id, label,)]
+
                 field.initial = vol.rate_id
             
             if fieldname == 'sensitive_regulated':
