@@ -447,6 +447,9 @@ class ArcInstance(Volume):
     def get_hosts(self):
         return ArcHost.objects.filter(arc_instance=self)
 
+    def get_shortcodes(self):
+        return ArcBilling.objects.filter(storage_instance=self)
+
     def update_hosts(self, host_list):
         current_set = set(ArcHost.objects.filter(arc_instance=self).values_list('name', flat=True) )
         new_set = set(host_list)
