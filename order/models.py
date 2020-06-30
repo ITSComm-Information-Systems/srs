@@ -407,6 +407,9 @@ class StorageInstance(Volume):
     autogrow = models.BooleanField(default=False)
     flux = models.BooleanField(default=False)
 
+    def get_shortcodes(self):
+        return [{"shortcode": self.shortcode, "size": self.size}]
+
     def get_hosts(self):
         return StorageHost.objects.filter(storage_instance=self)
 
