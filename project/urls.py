@@ -37,10 +37,11 @@ class StorageInstanceSerializer(VolumeInstanceSerializer):
 
 class ArcInstanceSerializer(VolumeInstanceSerializer):
     hosts = serializers.StringRelatedField(many=True)
+    shortcodes = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = ArcInstance
-        fields = ['id','name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost','hosts'
+        fields = ['id','name','owner','size','service','type','rate','shortcodes', 'created_date','uid','ad_group','total_cost','hosts'
         ,'nfs_group_id','multi_protocol','sensitive_regulated','great_lakes','armis','lighthouse','globus','globus_phi','thunder_x']
 
 
