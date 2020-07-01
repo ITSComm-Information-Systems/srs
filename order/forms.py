@@ -570,19 +570,20 @@ class BillingStorageForm(TabForm):
 
     def clean(self):
         super().clean()
-
-        if int(self.total_size) != self.new_total_size:
-            self.shortcode_error = f'Sizes must total {self.total_size}'
-            self.add_error('totalCost', 'block') 
-        else:
-            for shortcode in self.shortcode_list:
-                sc = shortcode['shortcode']
-
-                try:
-                    UmOscAllActiveAcctNbrsV.objects.get(short_code=sc)
-                except:
-                    self.shortcode_error = f'Shortcode: {sc} not found.'
-                    self.add_error('totalCost', 'block')       
+        
+        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch':
+            if int(self.total_size) != self.new_total_size:
+                self.shortcode_error = f'Sizes must total {self.total_size}'
+                self.add_error('totalCost', 'block') 
+            else:
+                for shortcode in self.shortcode_list:
+                    sc = shortcode['shortcode']
+    
+                    try:
+                        UmOscAllActiveAcctNbrsV.objects.get(short_code=sc)
+                    except:
+                        self.shortcode_error = f'Shortcode: {sc} not found.'
+                        self.add_error('totalCost', 'block')       
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
