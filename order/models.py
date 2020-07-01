@@ -484,6 +484,9 @@ class ArcBilling(models.Model):
     size = models.IntegerField()
     shortcode = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.shortcode
+
 
 class BackupDomain(models.Model):
     name = models.CharField(max_length=100)
