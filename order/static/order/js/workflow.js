@@ -83,7 +83,7 @@ $(document).ready(function() {
     }
   }
 
-  if ( $("#wfid").val() == 50  || $("#wfid").val() == 63 ) {  // Hide workflow for "Review Storage" (cost data) 
+  if ( $("#wfid").val() == 50  || $("#wfid").val() == 63 || $("#wfid").val() == 61 || $("#wfid").val() == 56 ) {  // Hide workflow for "Review Storage" (cost data) 
     $('#pills-step1').hide();
     $('p').hide();
     $('h2').hide();
