@@ -200,10 +200,10 @@ class VolumeAdmin(admin.ModelAdmin):
     def change_view(self, request, object_id, form_url='', extra_context=None):
 
         instance = self.model.objects.get(id=object_id)
-        if instance.type == 'CIFS':
-            self.exclude = ['flux','uid']
+        #if instance.type == 'CIFS':
+        #    self.exclude = ['flux','uid']
 
-        else:
+        #else:
             #print(self.child_key)
 
             #host_list = instance.get_hosts()
@@ -213,10 +213,10 @@ class VolumeAdmin(admin.ModelAdmin):
             #else:
             #    host_list = self.child_record.objects.all().filter(storage_instance_id=object_id)
  
-            extra_context = {
-                'host_list': instance.get_hosts(),
-                'shortcode_list': instance.get_shortcodes()
-            }
+        extra_context = {
+            'host_list': instance.get_hosts(),
+            'shortcode_list': instance.get_shortcodes()
+        }
         return super().change_view(
             request, object_id, form_url, extra_context=extra_context,
         )
@@ -246,6 +246,7 @@ class StorageInstanceAdmin(VolumeAdmin):
 
 @admin.register(ArcBilling)
 class ArcBillingAdmin(admin.ModelAdmin):
+    list_display = ['arc_instance','shortcode','size']
     pass
 
 @admin.register(ArcHost)
