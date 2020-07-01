@@ -90,13 +90,7 @@ $(document).ready(function() {
     $('#nextBtn').hide();
   }
 
-  if ( $("#wfid").val() == 59  || $("#wfid").val() == 60 || $("#wfid").val() == 53 || $("#wfid").val() == 55 ) {  // Hide workflow for "Review Storage" (cost data) 
-    $('#nextBtn').hide();
-  }
 
-  if ( $("#wfid").val() == 62  || $("#wfid").val() == 47 || $("#wfid").val() == 49  ) {  // Hide workflow for "Review Storage" (cost data) 
-    $('#nextBtn').hide();
-  }
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
