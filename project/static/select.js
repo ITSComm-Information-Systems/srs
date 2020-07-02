@@ -15,9 +15,9 @@ $(document).ready(function() {
 		placeholder: "Select a department",
 		display:"inline",
 		// width: "100%",
-  		matcher: function(params, data) {
-        	return matchStart(params, data);
-    	}
+  		// matcher: function(params, data) {
+        // 	return matchStart(params, data);
+    	// }
 	});
 
 	// Search bar placeholder text
