@@ -270,7 +270,9 @@ $(document).ready(function() {
       //if (n == 1 && !validateForm()) return false;
       nextPrev(1);
     } else {
+      $("#nextBtn").prop('disabled', true).addClass("spinner-border")
       sendTabData();
+      //$("#nextBtn").prop('disabled', false).removeClass("spinner-border")
     }
 
   });
@@ -697,7 +699,8 @@ function sendTabData(field) {
 
           if (typeof(redirect) != 'undefined') {
             window.location.replace(redirect);
-            return;
+          } else {
+            $("#nextBtn").prop('disabled', false).removeClass("spinner-border");
           }
 
           tab_name = json['tab_name'];
@@ -728,7 +731,8 @@ function sendTabData(field) {
       // handle a non-successful response
       complete: function(){
         console.log('complete');
-        $('#nextBtn').removeClass('disabled'); ;
+
+        //$('#nextBtn').removeClass('disabled'); ;
       }
 
   });

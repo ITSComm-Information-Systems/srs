@@ -91,6 +91,8 @@ def send_tab_data(request):
             item.save()
             return JsonResponse({'redirect': f'/orders/cart/{item.deptid}'}, safe=False)
         else:
+            item.description = label
+            item.save()
             item.route()
             return JsonResponse({'redirect': '/requestsent'}, safe=False)
 
