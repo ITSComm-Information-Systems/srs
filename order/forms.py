@@ -591,7 +591,7 @@ class BillingStorageForm(TabForm):
         if self.action.service.name != 'miBackup':
             option = StorageRate.objects.get(id=self.data['selectOptionType'])
             total_cost = option.get_total_cost(self.data['size'])
-            summary.append({'label': 'Total Cost', 'value': str(total_cost)})
+            summary.append({'label': 'Total Monthly Cost', 'value': str(total_cost)})
 
         if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch':
             shortcode_list = self.data.getlist('shortcode')
