@@ -819,7 +819,6 @@ class Item(models.Model):
 
         data_string = json.dumps(payload)
         response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
-        #print(response.text)
 
     def update_mibackup(self, rec):
         #bd = BackupDomain()
