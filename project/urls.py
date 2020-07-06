@@ -6,7 +6,7 @@ from django.conf.urls.static import static, serve
 from . import views
 
 #from django.contrib.auth.models import User
-from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode
+from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling
 from rest_framework import routers, serializers, viewsets
 
 
@@ -43,6 +43,15 @@ class ArcInstanceSerializer(VolumeInstanceSerializer):
         model = ArcInstance
         fields = ['id','name','owner','size','service','type','rate','shortcodes', 'created_date','uid','ad_group','total_cost','hosts'
         ,'nfs_group_id','multi_protocol','sensitive_regulated','great_lakes','armis','lighthouse','globus','globus_phi','thunder_x']
+
+class ArcBillingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArcBilling
+        fields = ['id', 'arc_instance', 'size', 'shortcode']
+
+class ArcBillingViewSet(viewsets.ModelViewSet):
+    queryset = ArcBilling.objects.all()
+    serializer_class = ArcBillingSerializer
 
 
 class VolumeViewSet(viewsets.ModelViewSet):
@@ -97,6 +106,7 @@ class ArcViewSet(VolumeViewSet):
 router = routers.DefaultRouter()
 router.register(r'storageinstances', StorageViewSet)
 router.register(r'arcinstances', ArcViewSet)
+router.register(r'arcbilling', ArcBillingViewSet)
 router.register(r'backupdomains', BackupDomainViewSet)
 
 urlpatterns = [
