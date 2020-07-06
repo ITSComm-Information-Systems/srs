@@ -12,7 +12,7 @@ $(document).ready(function() {
 	}
 
 	$("#deptf").select2({
-		placeholder: "Select a department",
+		placeholder: "Search by Department Name or ID",
 		display:"inline",
 		// width: "100%",
   		// matcher: function(params, data) {
@@ -21,9 +21,9 @@ $(document).ready(function() {
 	});
 
 	// Search bar placeholder text
-  	$("#deptf").one('select2:open', function(e) {
-    	$('input.select2-search__field').prop('placeholder', 'Search...');
-	});
+  	// $("#deptf").one('select2:open', function(e) {
+    // 	$('input.select2-search__field').prop('placeholder', 'Search by department name or ID');
+	// });
   	$("#tolls_deptids").one('select2:open', function(e) {
     	$('input.select2-search__field').prop('placeholder', 'Search...');
 	});
