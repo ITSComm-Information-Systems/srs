@@ -350,12 +350,12 @@ class VolumeSelectionForm(TabForm):
                 self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name')
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
-
-                for volume in self.volume_list:
-                    self.total_cost = self.total_cost + volume.total_cost
-                    volume.shortcode_list = volume.get_shortcodes()
                     
                 self.template = 'order/volume_review.html'
+
+            for volume in self.volume_list:
+                self.total_cost = self.total_cost + volume.total_cost
+                volume.shortcode_list = volume.get_shortcodes()
 
 
 class AccessNFSForm(TabForm):

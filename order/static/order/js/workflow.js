@@ -90,6 +90,9 @@ $(document).ready(function() {
     $('#nextBtn').hide();
   }
 
+  if ( $("#wfid").val() == 53 || $("#wfid").val() == 55 || $("#wfid").val() == 59 || $("#wfid").val() == 60 ) {
+    $('#nextBtn').hide();
+  }
 
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
