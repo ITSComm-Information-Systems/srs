@@ -10,12 +10,16 @@ class Command(BaseCommand):
     help = 'Add Backup Domain'
 
     def add_arguments(self, parser):
-        parser.add_argument('item_id',type=int)
+        parser.add_argument('id',type=int)
 
 
     def handle(self, *args, **options):
 
-        item_id = options['item_id']
-        i = Item.objects.get(id=item_id)
-        i.route()
+        id = options['id']
+        bd = BackupDomain.objects.get(id=id)
+        print(bd)
+
+        node = BackupNode.objects.get_or_create(backup_domain_id=id, name='louie', time='9:30 PM')
+        print(node)
+        
     

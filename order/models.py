@@ -872,6 +872,11 @@ class Item(models.Model):
             if 'great_lakes' in self.data.get('nonHipaaOptions'):
                 rec.great_lakes = True
 
+        if self.data.get('great_lakes') == 'yes':
+            rec.great_lakes = True
+        else:
+            rec.great_lakes = False
+
         rec.save()
         bill_size_list = self.data.get('terabytes') 
 
