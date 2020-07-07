@@ -177,6 +177,7 @@ $(document).ready(function() {
   
   $("#ExistingPhone_nophone").click(function() {
     $('[data-tab="PhoneLocation"]').hide();
+    $('[data-tab="LocationNew"]').show();
   });
 
   $("#ExistingPhone_yesphone").click(function() {
