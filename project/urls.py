@@ -17,6 +17,7 @@ class RateSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ['name','label','rate']
+        read_only_fields = ['name', 'label', 'rate']
         model = StorageRate
 
 
@@ -107,9 +108,15 @@ class ArcViewSet(VolumeViewSet):
     queryset = ArcInstance.objects.all()
     serializer_class = ArcInstanceSerializer
 
+
+class RateViewSet(VolumeViewSet):
+    queryset = StorageRate.objects.all()
+    serializer_class = RateSerializer
+
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'storageinstances', StorageViewSet)
+router.register(r'storagerates', RateViewSet)
 router.register(r'arcinstances', ArcViewSet)
 router.register(r'arcbilling', ArcBillingViewSet)
 router.register(r'backupdomains', BackupDomainViewSet)
