@@ -430,6 +430,9 @@ class DetailsNFSForm(TabForm):
         if 'flux' in self.fields:
             self['flux'].field.required = False
 
+        if 'great_lakes' in self.fields:
+            self['great_lakes'].field.required = False
+
         if 'hipaaOptions' in self.fields:
             if self.request.POST.get('sensitive_regulated') == 'nosen': 
                 self['nonHipaaOptions'].field.required = False
