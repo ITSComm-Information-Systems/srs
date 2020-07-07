@@ -34,10 +34,15 @@ class StorageInstanceSerializer(VolumeInstanceSerializer):
         fields = ['id','name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost'
         ,'deptid','autogrow','flux']
 
+class ArcBillingForInstanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArcBilling
+        fields = ['size', 'shortcode']
+
 
 class ArcInstanceSerializer(VolumeInstanceSerializer):
     hosts = serializers.StringRelatedField(many=True)
-    shortcodes = serializers.StringRelatedField(many=True)
+    shortcodes = ArcBillingForInstanceSerializer(many=True, read_only=True)
 
     class Meta:
         model = ArcInstance
