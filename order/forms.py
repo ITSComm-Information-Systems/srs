@@ -414,7 +414,7 @@ class DetailsNFSForm(TabForm):
                 self.fields['multi_protocol'].initial = 'ycifs'
             else:
                 self.fields['multi_protocol'].initial = 'ncifs'
-                self['turboADgroup'].field.required = False
+                self['ad_group'].field.required = False
 
         #TODO Set checkboxes
         #self.fields['hipaaOptions'].initial == ['armis','globus_phi']
@@ -425,10 +425,13 @@ class DetailsNFSForm(TabForm):
         if self.is_bound:
             if 'multi_protocol' in self.data:
                 if self.data['multi_protocol'] == 'ncifs':
-                    self['turboADgroup'].field.required = False
+                    self['ad_group'].field.required = False
 
         if 'flux' in self.fields:
             self['flux'].field.required = False
+
+        if 'great_lakes' in self.fields:
+            self['great_lakes'].field.required = False
 
         if 'hipaaOptions' in self.fields:
             if self.request.POST.get('sensitive_regulated') == 'nosen': 

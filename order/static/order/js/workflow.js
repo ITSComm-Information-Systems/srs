@@ -188,15 +188,15 @@ $(document).ready(function() {
   });
 
   $(document).on("click", "#multi_protocol_0" , function() {
-    $('#div_turboADgroup').show();
+    $('#div_ad_group').show();
   });
 
   $(document).on("click", "#multi_protocol_1" , function() {
-    $('#div_turboADgroup').hide().prop('required',false);
+    $('#div_ad_group').hide().prop('required',false);
   });
 
-  $(document).on("load", "#div_turboADgroup" , function() {
-    $('#div_turboADgroup').hide();
+  $(document).on("load", "#div_ad_group" , function() {
+    $('#div_ad_group').hide();
   });
   
 
