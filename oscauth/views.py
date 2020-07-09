@@ -637,15 +637,21 @@ def userid(request):
     
     for user in user_list:
         user_def_id = user.user_defined_id
-        chartcom = user.chartcom
-        #may not have anything
+        chartcom_data = user.chartcom.split('-')
+        fund=chartcom_data[0]
+        deptid=chartcom_data[1]
+        program=chartcom_data[2]
+        chartcom_class=chartcom_data[3]
+
         building = user.building
         floor = user.floor
         room = user.room
         jack = user.jack
-        mrc = user.mrc_charged
-        toll = user.toll_charged
-        local = user.local_charged
+
+        yn={'Y':'Yes','N':'No'}
+        mrc = yn[user.mrc_charged]
+        toll = yn[user.toll_charged]
+        local = yn[user.local_charged]
         
         deptid_list=set()
         for x in UmOscServiceProfileV.objects.filter(user_defined_id=user_def_id, service_status_code="In Service", subscriber_status="Active"):
@@ -659,7 +665,7 @@ def userid(request):
 
             manager= lastname+', '+firstname+" ("+uniqname+")"
 
-            data = {'user_def_id' : user_def_id, 'manager':manager, 'chartcom': chartcom, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
+            data = {'user_def_id' : user_def_id, 'manager':manager, 'fund': fund, 'deptid':deptid, 'program':program, 'chartcom_class':chartcom_class, 'building' : building, 'floor': floor, 'room': room, 'jack': jack, 'mrc': mrc, 'toll': toll, 'local': local}
 
             for info in data.items():
                 if info[1]=='':
