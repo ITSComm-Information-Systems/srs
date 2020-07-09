@@ -821,8 +821,9 @@ class Item(models.Model):
         response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
 
     def update_mibackup(self, rec):
-        #bd = BackupDomain()
-        rec.name = 'temp'
+        if rec.name == '':
+            rec.name = 'temp'
+
         rec.owner = LDAPGroup().lookup( self.data['mCommunityName'] )
         rec.shortcode = self.data['shortcode']
         rec.total_cost = 0
@@ -832,15 +833,20 @@ class Item(models.Model):
         rec.days_only_version = self.data['days_only_version']
         rec.save()
 
-        #for num, item in enumerate(item_list, start=2):
         time_list = self.data['backupTime']
         for num, node in enumerate(self.data['nodeNames']):
             if node != '':
-                n = BackupNode()
-                n.backup_domain = rec
-                n.name = node
-                n.time = time_list[num]
-                n.save()
+                time = time_list[num]
+                new_node = BackupNode.objects.get_or_create(backup_domain=rec, name=node, defaults={'time': time})
+                new_time = new_node[0].time
+                if new_time != time:
+                    new_node[0].time = time
+                    new_node[0].save()
+
+        ex = BackupNode.objects.filter(backup_domain=rec).exclude(name__in=self.data['nodeNames']).delete()
+
+
+
 
     def update_arcts(self, rec):
 
@@ -889,8 +895,6 @@ class Item(models.Model):
                 sc.size = bill_size_list[num]
                 sc.shortcode = shortcode
                 sc.save()
-
-                print(num, shortcode, bill_size_list[num], rec.id)
 
     def update_mistorage(self, rec):
 
