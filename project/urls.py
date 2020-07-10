@@ -56,8 +56,17 @@ class ArcBillingSerializer(serializers.ModelSerializer):
         fields = ['id', 'arc_instance', 'size', 'shortcode']
 
 class ArcBillingViewSet(viewsets.ModelViewSet):
-    queryset = ArcBilling.objects.all()
+    queryset = ArcBilling.objects.all() 
     serializer_class = ArcBillingSerializer
+
+    def get_queryset(self):
+        arc_instance = self.request.query_params.get('arc_instance', None)
+
+        print(arc_instance)
+
+        if arc_instance is not None:
+           self.queryset = self.queryset.filter(arc_instance__id=arc_instance)
+        return self.queryset
 
 
 class VolumeViewSet(viewsets.ModelViewSet):
