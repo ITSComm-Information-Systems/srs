@@ -3,7 +3,7 @@
 <div class='row'>
 	<div class='col-8'>
 		{% if request.user|is_member:"RTE Admin" or request.user.is_superuser %}
-		<form action='' method='post' id='update-form' onsubmit='return validate_search_update()'>{% csrf_token %}
+		<form action='' method='post' id='update-form'>{% csrf_token %}
 			<div class="form-group" id="searchTechUpdate">
 		        <label for="techSearchUpdate" id="labelTechSearchUpdate">
 		            <strong>Search for a Tech Name or Tech ID</strong>
@@ -38,7 +38,7 @@
 		        <label for="techSelect" id="labelTechSelect">
 		            <strong>Select Your Tech ID</strong>
 		        </label>
-	            <select id='techSelectUpdate' class='form-control col-5' name='techSearchUpdate'>
+	            <select id='techSearchUpdate' class='form-control col-5' name='techSearchUpdate'>
 	                {% for tech in all_techs %}
 	                    <option>{{ tech.labor_code }}</option>
 	                {% endfor %}
@@ -47,14 +47,77 @@
 		</form>
 		{% endif %}
 
-		{% if techid %}
-			<div class='form-group col-4 mt-4'>
-				<label for="tech_id" id="teachIdLabel">
-		            <strong>Tech ID</strong>
-		        </label>
-		        <input readonly class='form-control' id="tech_id" value="{{ techid }}">
-			</div>
-		{% endif %}
+		<p>Please select one of the following:</p>
+
+		<div class="form-group indented-form-input">
+			<input type="radio" name="secondSearchOptionUpdate" id="selectByWorkOrderUpdate" aria-labelledby="selectByWorkOrderUpdateLabel" aria-describedby="form-instruction selectByWorkOrderUpdateLabel">
+			<label for="selectByWorkOrderUpdate" id="selectByWorkOrderLabelUpdate">
+				<strong>Search by Work Order</strong>
+			</label>
+
+		    <div id="selectByWorkOrderUpdateDiv" class="indented-form-input">
+		        <div class="form-group" id="searchWorkOrderUpdate">
+			        <small id="workOrderUpdateBlock" class="form-text text-muted">
+			            Select the work order for which you would like to view time.
+			        </small>
+					<input name='workOrderSearchUpdate' autocomplete='off' id="workOrderSearchUpdate" class="form-control col-4" type="text" aria-describedby="workOrderUpdateBlock"
+					    placeholder="Search...">
+			  	</div>
+
+			    <div class='col-4'>
+				    <table id="workOrderTableUpdate" class="table table-hover" aria-live=”polite”>
+				        {% for wo in all_wos %}
+				            <tr tabindex="0"  id="{{ wo.full_prord_wo_number }}" role="button" aria-label="Select work order 
+				                {{ wo.full_prord_wo_number }}">
+				                <td>{{ wo.full_prord_wo_number }}</td>
+				                <td>{{ wo.comment_text|truncatechars:200 }}</td>
+				            </tr>
+				        {% endfor %}
+				    </table>
+				</div>
+		    </div>
+		</div>
+
+		<div class="form-group indented-form-input">
+			<input type="radio" name="secondSearchOptionUpdate" id="selectByCalendarRangeUpdate" aria-labelledby="selectByCalendarRangeUpdateLabel" aria-describedby="form-instruction selectByCalendarRangeUpdateLabel">
+			<label for="selectByCalendarRangeUpdate" id="selectByCalendarRangeUpdateLabel">
+				<strong>Search by Calendar</strong>
+			</label>
+
+		    <div id="selectByCalendarRangeUpdateDiv" class="indented-form-input">
+		        <div class="form-group" id="selectCalendarRangeUpdate">
+			        <small id="dateCalendarUpdateBlock" class="form-text text-muted">
+			            Select the dates for which you would like to view time.
+			        </small>
+			        <div class='form-inline'>
+						<input type='date' name='calendarRangeStartUpdate' id="calendarRangeStartUpdate" class="form-control mr-2" aria-describedby="calendarRangeUpdateBlock">
+						<input type='date' name='calendarRangeEndUpdate' id="calendarRangeEndUpdate" class="form-control" aria-describedby="calendarRangeUpdateBlock">
+					</div>
+			  	</div>
+		    </div>
+		</div>
+
+		<div class="form-group indented-form-input">
+			<input type="radio" name="secondSearchOptionUpdate" id="selectByDateRangeUpdate" aria-labelledby="selectByDateRangeUpdateLabel" value='2' aria-describedby="form-instruction
+				selectByDateRangeUpdateLabel">
+			<label for="selectByDateRangeUpdate" id="selectByDateRangeUpdateLabel">
+				<strong>Search by Date Range</strong>
+			</label>
+
+		    <div id="selectByDateRangeUpdateDiv" class="indented-form-input">
+		        <div class="form-group" id="selectDateRangeUpdate">
+			        <small id="dateDateUpdateBlock" class="form-text text-muted">
+			            Select the date range for which you would like to view time.
+			        </small>
+			        <select id='dateRangeSelectUpdate' name='dateRangeSelectUpdate' id='dateRangeSelectUpdate' class='form-control col-4'>
+			        	<option></option>
+			        	<option>Last 7 Days</option>
+			        	<option>Last 3 Months</option>
+			        	<option>Last 6 Months</option>
+			        </select>
+			  	</div>
+		    </div>
+		</div>
 
 		<div class='alert alert-danger mt-2 col-4' hidden id='error-notice'></div>
 	</div>

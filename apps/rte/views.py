@@ -305,28 +305,29 @@ def update(request):
 
     if request.user.groups.filter(name="RTE Admin").exists() or request.user.is_superuser:
         all_techs = UmRteTechnicianV.objects.all()
-        selected_tech = ''
-        results = ''
-        assigned_groups = ''
+        #selected_tech = ''
+        # results = ''
+        # assigned_groups = ''
     else:
         all_techs = UmRteTechnicianV.objects.filter(uniqname=request.user.username)
-        selected_tech = all_techs[0].labor_code
-        results = UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
-                                                       billed="No",
-                                                       labor_code=selected_tech).order_by('assigned_date',
-                                                                                           'work_order_display')
-        assigned_groups = [group.wo_group_name for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=selected_tech)]
+        #selected_tech = all_techs[0].labor_code
+        # results = UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
+        #                                                billed="No",
+        #                                                labor_code=selected_tech).order_by('assigned_date',
+        #                                                                                    'work_order_display')
+        # assigned_groups = [group.wo_group_name for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=selected_tech)]
         
-    rate_levels = [rate.labor_rate_level_name for rate in UmRteRateLevelV.objects.all()]
+    all_wos = UmRteServiceOrderV.objects.all()
+    #rate_levels = [rate.labor_rate_level_name for rate in UmRteRateLevelV.objects.all()]
 
-    # Load after search
-    if request.method == 'POST':
-        selected_tech = request.POST.get('techSearchUpdate')
-        results = UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
-                                                       billed="No",
-                                                       labor_code=selected_tech).order_by('assigned_date',
-                                                                                           'work_order_display')
-        assigned_groups = [group.wo_group_name for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=selected_tech)]
+    # # Load after search
+    # if request.method == 'POST':
+    #     selected_tech = request.POST.get('techSearchUpdate')
+    #     results = UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
+    #                                                    billed="No",
+    #                                                    labor_code=selected_tech).order_by('assigned_date',
+    #                                                                                        'work_order_display')
+    #     assigned_groups = [group.wo_group_name for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=selected_tech)]
 
     context = {
         'wf': 'update',
@@ -334,24 +335,61 @@ def update(request):
         'tab_list': tab_list,
         'num_tabs': len(tab_list),
         'all_techs': all_techs,
-        'rate_levels': rate_levels,
-        'assigned_groups': assigned_groups,
-        'techid': selected_tech,
-        'entries': results
+        'all_wos': all_wos,
+        #'rate_levels': rate_levels,
+        #'assigned_groups': assigned_groups,
+        #'techid': selected_tech,
+        #'entries': results
     }
 
     return HttpResponse(template.render(context, request))
 
 
 def get_update_entries(request):
-    selected_tech = request.GET.get('techid', None)
-    print(selected_tech)
-    results = list(UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
-                                                       billed="No",
-                                                       labor_code=selected_tech).order_by('assigned_date',
-                                                                                           'work_order_display').values())
+    # selected_tech = request.GET.get('techid', None)
+    # print(selected_tech)
+    # results = list(UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
+    #                                                    billed="No",
+    #                                                    labor_code=selected_tech).order_by('assigned_date',
+    #                                                                                        'work_order_display').select_related('rate_nubmer').values())
 
-    print(results)
+    techid = request.GET.get('techid', None)
+    work_order = request.GET.get('work_order', None)
+    date_start = request.GET.get('calendar_start', None)
+    date_end = request.GET.get('calendar_end', None)
+    date_range = request.GET.get('date_range', None)
+
+    # Search by work order
+    if work_order:
+        results = list(UmRteCurrentTimeAssignedV.objects.select_related('rate_number').filter(status_name="Open",
+                                                       billed="No",
+                                                       labor_code=techid,
+                                                       work_order_display=work_order).order_by('assigned_date',
+                                                                                           'work_order_display').values('work_order_display', 'assigned_date',
+                                                                                           'actual_mins_display', 'rate_number__labor_rate_level_name', 'assn_wo_group_name',
+                                                                                           'wo_labor_id'))
+        search_topic = 'Work Order'
+        search_criteria = work_order
+
+    # Search dates
+    else:
+        # Search by date range
+        if date_range:
+            date_start, date_end = get_date_range(date_range)
+        else:
+            date_start = datetime.strptime(date_start, '%Y-%m-%d')
+            date_end = datetime.strptime(date_end, '%Y-%m-%d')
+
+        results = list(UmRteCurrentTimeAssignedV.objects.select_related('rate_number').filter(status_name="Open",
+                                                       billed="No",
+                                                       labor_code=techid,
+                                                       assigned_date__gte=date_start,
+                                                       assigned_date__lte=date_end).order_by('assigned_date',
+                                                                                           'work_order_display').values('work_order_display', 'assigned_date',
+                                                                                           'actual_mins_display', 'rate_number__labor_rate_level_name', 'assn_wo_group_name',
+                                                                                           'wo_labor_id'))
+        search_topic = 'Date Range'
+        search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
 
     return JsonResponse(results, safe=False)
 
