@@ -391,6 +391,16 @@ def get_update_entries(request):
         search_topic = 'Date Range'
         search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
 
+    rate_levels = [rate.labor_rate_level_name for rate in UmRteRateLevelV.objects.all()]
+    assigned_groups = [group.wo_group_name for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=techid)]
+
+    results.append({
+        'rate_levels': rate_levels,
+        'search_topic': search_topic,
+        'search_criteria': search_criteria,
+        'assigned_groups': assigned_groups
+        })
+
     return JsonResponse(results, safe=False)
 
 # Submit updated times

@@ -181,7 +181,7 @@ function get_entries() {
         success: function(data) {
         	$('#select-entries-table tbody').html('');
 
-            for (i = 0; i < data.length; ++i) {
+            for (i = 0; i < data.length - 1; ++i) {
                 var new_row = "<tr>" +
 								"<td><input type='checkbox' value=''></td>" +
 								"<td>" + data[i].work_order_display + "</td>" +
@@ -193,6 +193,10 @@ function get_entries() {
 							"</tr>";
 				$('#select-entries-table tbody:last-child').append(new_row);
             }
+
+            console.log(data[data.length - 1].rate_levels);
+            $('#rate_levels').html(data[data.length - 1].rate_levels);
+            $('#assigned_groups').html(data[data.length - 1].assigned_groups);
 
             // Pagination for results table
 			var num_rows = $('#select-entries-table').find('tbody tr:has(td)').length;
@@ -243,18 +247,13 @@ function copy_selected() {
 		var assigned_group = row.find('td:nth-child(6)').text();
 		var wo_labor_id = row.find('td:nth-child(7)').text();
 
-		console.log(work_order);
-		console.log(assigned_date);
-		console.log(duration_hours);
-		console.log(duration_mins);
-		console.log(rate_level);
-		console.log(assigned_group);
-
 		var rate_levels = $('#rate_levels').text();
+		console.log(rate_levels);
 		rate_levels = rate_levels.replace('[', '').replace(']', '').replace(/'/g, "").replace(/ /g, '');
 		rate_levels = rate_levels.split(',');
 
 		var assigned_groups = $('#assigned_groups').text();
+		console.log(assigned_groups);
 		assigned_groups = assigned_groups.replace('[', '').replace(']', '').replace(/'/g, "");
 		assigned_groups = assigned_groups.split(',');
 
@@ -262,7 +261,7 @@ function copy_selected() {
 			var new_row = '<tr>' +
 						  	  '<td>' + work_order + '</td>' +
 						  	  '<td>' +
-						  	  	    '<input class="form-control" type="date" value="' + format_date(assigned_date) + '">' +
+						  	  	    '<input class="form-control" type="date" value="' + assigned_date + '">' +
 						  	  '</td>' +
 						  	  '<td>' +
 								    "<input class='form-control d-inline col-6 hours' type='text' value='" + duration_hours + "' placeholder='HH'>" +
@@ -382,6 +381,8 @@ function format_duration(hours, mins) {
 function format_date(date) {
 	months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
 	date = date.split(' ');
+
+	console.log(date);
 
 	month = months.indexOf(date[0]);
 	month = month + 1;
