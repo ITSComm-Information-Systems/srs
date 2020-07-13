@@ -4,10 +4,10 @@
 <form method="POST">{% csrf_token %}
     <div class="form-group">
         <label for="deptf">
-            <strong>Enter a User ID</strong>
+            <strong>Enter the service number to search for User ID</strong>
         </label>
         <br>
-        <input type='text' name="user_param" id="deptf" size="1" class="form-control text-field-short col-4" placeholder='Ex: PH-7347632000-01 or 7347632000'>
+        <input type='text' name="user_param" id="deptf" size="1" class="form-control text-field-short col-4" placeholder='e.g. 7347642700 or ATVRX00106'>
         <input type='submit' class='btn btn-primary'>
     </div>
 </form>
@@ -28,9 +28,12 @@
 <table class="table table-hover table-striped table-sm">
     <thead>
         <tr>
-            <th scope="col">User ID</th>
-            <th scope="col">Manager</th>
-            <th scope="col">Chartfield</th>
+            <th scope="col" style="white-space: nowrap">User ID</th>
+            <th scope="col">Department Manager</th>
+            <th scope="col">Fund</th>
+            <th scope="col">Dept.ID</th>
+            <th scope="col">Program</th>
+            <th scope="col">Class</th>
             <th scope="col">Building</th>
             <th scope="col">Floor</th>
             <th scope="col">Room</th>
@@ -43,9 +46,12 @@
     <tbody>
         {% for row in rows %}
         <tr>
-            <th scope="row"> {{ row.user_def_id }}</th>
+            <th scope="row" style="white-space: nowrap"> {{ row.user_def_id }}</th>
             <td> {{ row.manager }}</td>
-            <td> {{ row.chartcom }}</td>
+            <td> {{ row.fund }}</td>
+            <td> {{ row.deptid }}</td>
+            <td> {{ row.program }}</td>
+            <td> {{ row.chartcom_class }}</td>
             <td> {{ row.building }}</td>
             <td> {{ row.floor }}</td>
             <td> {{ row.room }}</td>
