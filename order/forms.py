@@ -155,7 +155,7 @@ class TabForm(forms.Form):
                 #field = forms.IntegerField(label=element.label, help_text=element.description)
 
             field.name = element.name
-            #field.current_user = self.request.user
+            field.current_user = self.request.user
             field.label = element.label
             field.help_text = element.help_text
             field.description = element.description
