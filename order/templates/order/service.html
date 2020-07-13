@@ -7,12 +7,13 @@
         <h2 class="service-menu-header">Category</h2>
         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
             {% for service in service_list %}
-            <a class="nav-link" id="{{ service.name }}-tab" data-toggle="pill" href="#{{ service.name }}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{ service }}</a>
+            <a class="nav-link" id="{{ service.name }}-tab" data-toggle="pill" href="#{{ service.name }}" role="tab"
+                aria-controls="v-pills-profile" aria-selected="false">{{ service }}</a>
             {% endfor %}
         </div>
         <div class="alert alert-primary large-order">
             <strong>Have a question or Feedback?</strong><br>
-             Use the form below to <strong><a href="/contact" class="alert-link">contact us.</a></strong>
+            Use the form below to <strong><a href="/contact" class="alert-link">contact us.</a></strong>
         </div>
     </div>
 
@@ -33,7 +34,8 @@
                             <p class="learn-more-link">
                                 <a tabindex="0" role="button" data-toggle="popover" data-container="body"
                                     data-trigger="focus" data-placement="bottom" title="{{action.label}}"
-                                    data-content="{{action.description}}"> Learn more <span class="sr-only"> about {{ action.label }}</span>
+                                    data-content="{{action.description}}"> Learn more <span class="sr-only"> about
+                                        {{ action.label }}</span>
                                 </a>
                             </p>
                         </div>
@@ -42,7 +44,7 @@
                 </div>
             </div>
         </div>
-        {% endfor %}  
+        {% endfor %}
     </div>
 
     <div class="col-xl-3 col-md-6 col-12 helpful-links">
@@ -67,18 +69,27 @@
 <script>
     $(document).ready(function () {
         $('[data-toggle="popover"]').popover();
-        $('#phoneData-tab').addClass(' active');
-        $('#phoneData').addClass(' active show');
 
-        $('#miBackup-tab').addClass(' active');
-        $('#miBackup').addClass(' active show');
+        if (window.location.href.indexOf('#') > 1) {
+            var url = window.location.href;
+            var hash = url.substring(url.indexOf('#'));
 
-    $('.nav-link').on('show.bs.tab', function(event) {
-        id = '#' + event.target.id.slice(0,-4);
-        $('.tab-pane').attr('tabindex', '0');        
-        $(id).attr('tabindex', '-1');
-    })
-    
+            $(hash + '-tab').addClass(' active');
+            $(hash).addClass(' active show');
+        } else {
+            $('#phoneData-tab').addClass(' active');
+            $('#phoneData').addClass(' active show');
+
+            $('#miBackup-tab').addClass(' active');
+            $('#miBackup').addClass(' active show');
+        }
+
+        $('.nav-link').on('show.bs.tab', function (event) {
+            id = '#' + event.target.id.slice(0, -4);
+            $('.tab-pane').attr('tabindex', '0');
+            $(id).attr('tabindex', '-1');
+        })
+
     });
 </script>
 {% endblock %}
