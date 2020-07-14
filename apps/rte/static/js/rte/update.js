@@ -181,51 +181,62 @@ function get_entries() {
         success: function(data) {
         	$('#select-entries-table tbody').html('');
 
-            for (i = 0; i < data.length - 1; ++i) {
-                var new_row = "<tr>" +
-								"<td><input type='checkbox' value=''></td>" +
-								"<td>" + data[i].work_order_display + "</td>" +
-								"<td>" + data[i].assigned_date + "</td>" +
-								"<td>" + data[i].actual_mins_display + "</td>" +
-								"<td>" + data[i].rate_number__labor_rate_level_name + "</td>" +
-								"<td>" + data[i].assn_wo_group_name + "</td>" +
-								"<td hidden>" + data[i].wo_labor_id + "</td>" +
-							"</tr>";
-				$('#select-entries-table tbody:last-child').append(new_row);
-            }
+        	if (data.length === 1) {
+        		$('#no-entries').removeAttr('hidden');
+        		$('#loading').hide();
 
-            $('#rate_levels').text(data[data.length - 1].rate_levels);
-            $('#assigned_groups').text(data[data.length - 1].assigned_groups);
-            $('.search_topic').html(data[data.length - 1].search_topic);
-            $('.search_criteria').html(data[data.length - 1].search_criteria);
+        		$('.search_topic').html(data[data.length - 1].search_topic);
+	            $('.search_criteria').html(data[data.length - 1].search_criteria);
+        	}
+        	else {
+        		$('#no-entries').attr('hidden', 'hidden');
 
-            // Pagination for results table
-			var num_rows = $('#select-entries-table').find('tbody tr:has(td)').length;
-			var rows_per_page = 15;
-			var num_pages = Math.ceil(num_rows / rows_per_page);
+        		for (i = 0; i < data.length - 1; ++i) {
+	                var new_row = "<tr>" +
+									"<td><input type='checkbox' value=''></td>" +
+									"<td>" + data[i].work_order_display + "</td>" +
+									"<td>" + data[i].assigned_date + "</td>" +
+									"<td>" + data[i].actual_mins_display + "</td>" +
+									"<td>" + data[i].rate_number__labor_rate_level_name + "</td>" +
+									"<td>" + data[i].assn_wo_group_name + "</td>" +
+									"<td hidden>" + data[i].wo_labor_id + "</td>" +
+								"</tr>";
+					$('#select-entries-table tbody:last-child').append(new_row);
+	            }
 
-			// Fill pagination with correct number of pages
-			$('#pagination').empty();
-			$('<li class="page-item disabled" id="previous"><a class="page-link" tabindex="-1" id="previous-tab">Previous</a></li>').appendTo('#pagination');
+	            $('#rate_levels').text(data[data.length - 1].rate_levels);
+	            $('#assigned_groups').text(data[data.length - 1].assigned_groups);
+	            $('.search_topic').html(data[data.length - 1].search_topic);
+	            $('.search_criteria').html(data[data.length - 1].search_criteria);
 
-		    for (i = 0; i < num_pages; i++) {
-		        if (i < 2 || i > num_pages - 3) {
-		            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
-		        }
-		        else if (i == 2) {
-		            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">...</a></li>').appendTo('#pagination');
-		        }
-		    }
-		    $('<li class="page-item" id="next"><a class="page-link" id="next-tab">Next</a></li>').appendTo('#pagination');
+	            // Pagination for results table
+				var num_rows = $('#select-entries-table').find('tbody tr:has(td)').length;
+				var rows_per_page = 15;
+				var num_pages = Math.ceil(num_rows / rows_per_page);
 
-		    // Fill table initially
-		    $('#select-entries-table').find('tbody tr:has(td)').hide();
-			var tr = $('#select-entries-table tbody tr:has(td)');
-			for (var i = 0; i <= rows_per_page - 1; i++) {
-			    $(tr[i]).show();
-			}
-			$('#1').addClass('active');
-			$('#loading').hide();
+				// Fill pagination with correct number of pages
+				$('#pagination').empty();
+				$('<li class="page-item disabled" id="previous"><a class="page-link" tabindex="-1" id="previous-tab">Previous</a></li>').appendTo('#pagination');
+
+			    for (i = 0; i < num_pages; i++) {
+			        if (i < 2 || i > num_pages - 3) {
+			            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
+			        }
+			        else if (i == 2) {
+			            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">...</a></li>').appendTo('#pagination');
+			        }
+			    }
+			    $('<li class="page-item" id="next"><a class="page-link" id="next-tab">Next</a></li>').appendTo('#pagination');
+
+			    // Fill table initially
+			    $('#select-entries-table').find('tbody tr:has(td)').hide();
+				var tr = $('#select-entries-table tbody tr:has(td)');
+				for (var i = 0; i <= rows_per_page - 1; i++) {
+				    $(tr[i]).show();
+				}
+				$('#1').addClass('active');
+				$('#loading').hide();
+        	}
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             console.log(errorThrown);

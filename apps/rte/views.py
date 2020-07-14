@@ -334,7 +334,7 @@ def get_update_entries(request):
         results = list(UmRteCurrentTimeAssignedV.objects.select_related('rate_number').filter(status_name="Open",
                                                        billed="No",
                                                        labor_code=techid,
-                                                       work_order_display=work_order).order_by('assigned_date',
+                                                       work_order_display=work_order).order_by('-assigned_date',
                                                                                            'work_order_display').values('work_order_display', 'assigned_date',
                                                                                            'actual_mins_display', 'rate_number__labor_rate_level_name', 'assn_wo_group_name',
                                                                                            'wo_labor_id'))
@@ -354,7 +354,7 @@ def get_update_entries(request):
                                                        billed="No",
                                                        labor_code=techid,
                                                        assigned_date__gte=date_start,
-                                                       assigned_date__lte=date_end).order_by('assigned_date',
+                                                       assigned_date__lte=date_end).order_by('-assigned_date',
                                                                                            'work_order_display').values('work_order_display', 'assigned_date',
                                                                                            'actual_mins_display', 'rate_number__labor_rate_level_name', 'assn_wo_group_name',
                                                                                            'wo_labor_id'))
@@ -484,7 +484,7 @@ def view_time_display(request):
 
     # Search by work order
     if work_order:
-        results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, work_order_display=work_order).order_by('assigned_date','work_order_display')
+        results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, work_order_display=work_order).order_by('-assigned_date','work_order_display')
         search_topic = 'Work Order'
         search_criteria = work_order
 
