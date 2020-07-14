@@ -166,6 +166,8 @@ function get_entries() {
 	var date_range = $('#dateRangeSelectUpdate').val();
 
 	$('.tech_id').html(techid);
+	var form_html = '<input name="tech_id" type="text" value="' + techid +'" hidden>';
+	$('#update-entries-form').append(form_html);
 
 	$.ajax({
         url: 'get-update-entries/',
