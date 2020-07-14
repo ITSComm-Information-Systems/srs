@@ -305,29 +305,10 @@ def update(request):
 
     if request.user.groups.filter(name="RTE Admin").exists() or request.user.is_superuser:
         all_techs = UmRteTechnicianV.objects.all()
-        #selected_tech = ''
-        # results = ''
-        # assigned_groups = ''
     else:
         all_techs = UmRteTechnicianV.objects.filter(uniqname=request.user.username)
-        #selected_tech = all_techs[0].labor_code
-        # results = UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
-        #                                                billed="No",
-        #                                                labor_code=selected_tech).order_by('assigned_date',
-        #                                                                                    'work_order_display')
-        # assigned_groups = [group.wo_group_name for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=selected_tech)]
         
     all_wos = UmRteServiceOrderV.objects.all()
-    #rate_levels = [rate.labor_rate_level_name for rate in UmRteRateLevelV.objects.all()]
-
-    # # Load after search
-    # if request.method == 'POST':
-    #     selected_tech = request.POST.get('techSearchUpdate')
-    #     results = UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
-    #                                                    billed="No",
-    #                                                    labor_code=selected_tech).order_by('assigned_date',
-    #                                                                                        'work_order_display')
-    #     assigned_groups = [group.wo_group_name for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=selected_tech)]
 
     context = {
         'wf': 'update',
@@ -336,23 +317,12 @@ def update(request):
         'num_tabs': len(tab_list),
         'all_techs': all_techs,
         'all_wos': all_wos,
-        #'rate_levels': rate_levels,
-        #'assigned_groups': assigned_groups,
-        #'techid': selected_tech,
-        #'entries': results
     }
 
     return HttpResponse(template.render(context, request))
 
 
 def get_update_entries(request):
-    # selected_tech = request.GET.get('techid', None)
-    # print(selected_tech)
-    # results = list(UmRteCurrentTimeAssignedV.objects.filter(status_name="Open",
-    #                                                    billed="No",
-    #                                                    labor_code=selected_tech).order_by('assigned_date',
-    #                                                                                        'work_order_display').select_related('rate_nubmer').values())
-
     techid = request.GET.get('techid', None)
     work_order = request.GET.get('work_order', None)
     date_start = request.GET.get('calendar_start', None)

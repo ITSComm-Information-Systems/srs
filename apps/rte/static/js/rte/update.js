@@ -194,9 +194,10 @@ function get_entries() {
 				$('#select-entries-table tbody:last-child').append(new_row);
             }
 
-            console.log(data[data.length - 1].rate_levels);
-            $('#rate_levels').html(data[data.length - 1].rate_levels);
-            $('#assigned_groups').html(data[data.length - 1].assigned_groups);
+            $('#rate_levels').text(data[data.length - 1].rate_levels);
+            $('#assigned_groups').text(data[data.length - 1].assigned_groups);
+            $('.search_topic').html(data[data.length - 1].search_topic);
+            $('.search_criteria').html(data[data.length - 1].search_criteria);
 
             // Pagination for results table
 			var num_rows = $('#select-entries-table').find('tbody tr:has(td)').length;
@@ -224,6 +225,7 @@ function get_entries() {
 			    $(tr[i]).show();
 			}
 			$('#1').addClass('active');
+			$('#loading').hide();
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             console.log(errorThrown);
