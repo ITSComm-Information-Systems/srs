@@ -178,11 +178,15 @@ $(document).ready(function() {
   $("#ExistingPhone_nophone").click(function() {
     $('[data-tab="PhoneLocation"]').hide();
     $('[data-tab="LocationNew"]').show();
+    $('[data-tab="SelectFeatures"]').show();
+    $('[data-tab="Restrictions"]').show();
   });
 
   $("#ExistingPhone_yesphone").click(function() {
     $('[data-tab="PhoneLocation"]').show();
     $('[data-tab="LocationNew"]').hide();
+    $('[data-tab="SelectFeatures"]').hide();
+    $('[data-tab="Restrictions"]').hide();
   });
 
   $(document).on("click", "#multi_protocol_0" , function() {
