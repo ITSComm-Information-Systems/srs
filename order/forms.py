@@ -76,7 +76,7 @@ class TabForm(forms.Form):
                 if self.action.type == 'M':
                     if key in self.changed_data:
                         label = '*' + label
-
+ 
                 if field.type == 'Radio':
                     for choice in field.choices:
                         if str(choice[0]) == value:
