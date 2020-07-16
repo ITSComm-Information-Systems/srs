@@ -488,20 +488,28 @@ class ArcBilling(models.Model):
         return self.shortcode
 
 class BackupDomain(models.Model):
+    RATE_NAME = 'MB-MCOMM'
+
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE)
     shortcode = models.CharField(max_length=100)
-    total_cost = models.DecimalField(max_digits=12, decimal_places=2)
+    size = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     cost_calculated_date = models.DateTimeField(null=True)
     versions_while_exists = models.PositiveIntegerField()
     versions_after_deleted = models.PositiveIntegerField()
     days_extra_versions = models.PositiveIntegerField()
     days_only_version = models.PositiveIntegerField()
 
-    def save(self, *args, **kwargs):
-        if self.orig_cost != self.total_cost:
-            self.cost_calculated_date = datetime.now()
-        super(BackupDomain, self).save(*args, **kwargs)
+    #def save(self, *args, **kwargs):
+    #    if self.orig_cost != self.total_cost:
+    #        self.cost_calculated_date = datetime.now()
+    #    super(BackupDomain, self).save(*args, **kwargs)
+
+    @property
+    def total_cost(self):
+        rate = StorageRate.objects.get(name=self.RATE_NAME)
+        total_cost = round(rate.rate * self.size, 2)
+        return total_cost
 
     def __init__(self, *args, **kwargs):
         super(BackupDomain, self).__init__(*args, **kwargs)
@@ -516,7 +524,7 @@ class BackupDomain(models.Model):
     def get_user_subscriptions(self, username):
         groups = list(LDAPGroupMember.objects.filter(username=username).values_list('ldap_group_id'))
         return BackupDomain.objects.filter(owner__in=groups).order_by('name')
-        
+
 
 class BackupNode(models.Model):
     backup_domain = models.ForeignKey(BackupDomain, related_name='nodes', on_delete=models.CASCADE)
@@ -826,7 +834,7 @@ class Item(models.Model):
 
         rec.owner = LDAPGroup().lookup( self.data['mCommunityName'] )
         rec.shortcode = self.data['shortcode']
-        rec.total_cost = 0
+        rec.size = 0
         rec.versions_while_exists = self.data['versions_while_exist']
         rec.versions_after_deleted = self.data['versions_after_delet']
         rec.days_extra_versions = self.data['days_extra_versions']

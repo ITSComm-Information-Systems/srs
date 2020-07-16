@@ -263,7 +263,7 @@ class StorageRateAdmin(admin.ModelAdmin):
 
 
 class BackupDomainAdmin(admin.ModelAdmin):
-    list_display = ['name','owner','shortcode','total_cost']
+    list_display = ['name','owner','shortcode','size']
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
 
