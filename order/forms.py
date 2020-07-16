@@ -557,7 +557,8 @@ class BillingStorageForm(TabForm):
                 self.fields["serviceLvlAgreement"].initial = 'yes'
 
         if self.action.service.name == 'miBackup':
-            descr = self.fields['totalCost'].description.replace('~', '47 per TB')
+            rate = StorageRate.objects.get(name=BackupDomain.RATE_NAME)
+            descr = self.fields['totalCost'].description.replace('~', f'{round(rate.rate,2)} per {rate.unit_of_measure}')
         else:
             option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
 
