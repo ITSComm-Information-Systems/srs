@@ -834,7 +834,7 @@ class Item(models.Model):
 
         rec.owner = LDAPGroup().lookup( self.data['mCommunityName'] )
         rec.shortcode = self.data['shortcode']
-        rec.total_cost = 0
+        rec.size = 0
         rec.versions_while_exists = self.data['versions_while_exist']
         rec.versions_after_deleted = self.data['versions_after_delet']
         rec.days_extra_versions = self.data['days_extra_versions']
