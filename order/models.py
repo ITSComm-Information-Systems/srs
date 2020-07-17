@@ -487,7 +487,6 @@ class ArcBilling(models.Model):
     def __str__(self):
         return self.shortcode
 
-
 class BackupDomain(models.Model):
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE)
