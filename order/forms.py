@@ -30,8 +30,8 @@ class TabForm(forms.Form):
         for fieldname, field in self.fields.items():
             if type(field) == forms.MultipleChoiceField:
                 cb = vol.get_checkboxes()
-
-                cb.remove('multi_protocol')
+                if 'multi_protocol' in cb:
+                    cb.remove('multi_protocol')
                 field.initial = cb # vol.get_checkboxes()
 
 
@@ -106,6 +106,20 @@ class TabForm(forms.Form):
 
                     if key in ['billingAuthority', 'serviceLvlAgreement']:
                         pass
+
+                    elif key == 'nodeNames' or key == 'backuupTimes':
+                        new = set()
+                        for node in self.node_list:
+                            tup = (node['name'], node['time'])
+                            new.add(tup)
+
+                        old = set()
+                        for node in BackupNode.objects.filter(backup_domain=self.instance.id):
+                            old.add((node.name, node.time))
+                        
+                        if old != new:
+                            label = '*' + label
+
                     elif key == 'permittedHosts':
                         new = set(self.request.POST.getlist('permittedHosts'))
                         old = set()
@@ -128,6 +142,12 @@ class TabForm(forms.Form):
 
                         if old != new:
                             label = '*' + label
+
+                    elif key == 'versions_after_delet' or key == 'versions_while_exist':
+                        old = int(self.fields[key].initial)
+                        new = self.cleaned_data[key]
+                        if old != new:
+                            label = '*' + label                            
 
                     elif key in self.changed_data:
                         label = '*' + label
@@ -636,7 +656,6 @@ class BillingStorageForm(TabForm):
         if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch':
             shortcode_list = self.data.getlist('shortcode')
             size_list = self.data.getlist('terabytes')
-            #print(shortcode_list)
             label = ''
             for num, shortcode in enumerate(shortcode_list):
                 if shortcode:
