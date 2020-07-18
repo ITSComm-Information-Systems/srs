@@ -98,6 +98,6 @@ class Command(BaseCommand):
                                    , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'{self.service}',{today}"] )
         
         print(datetime.now(), result)
-        send_mail('MiStorage Billing Records Uploaded', body, 'srs-otto@umich.edu', ['itscomm.information.systems@umich.edu'])
+        send_mail(f'{self.service} Billing Records Uploaded', body, 'srs-otto@umich.edu', ['itscomm.information.systems@umich.edu'])
         print(datetime.now(), 'Process Complete')
 
