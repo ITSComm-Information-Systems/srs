@@ -6,7 +6,7 @@ from django.conf.urls.static import static, serve
 from . import views
 
 #from django.contrib.auth.models import User
-from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode
+from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain
 from rest_framework import routers, serializers, viewsets
 
 
@@ -17,6 +17,7 @@ class RateSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ['name','label','rate']
+        read_only_fields = ['name', 'label', 'rate']
         model = StorageRate
 
 
@@ -34,14 +35,40 @@ class StorageInstanceSerializer(VolumeInstanceSerializer):
         fields = ['id','name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost'
         ,'deptid','autogrow','flux']
 
+class ArcBillingForInstanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArcBilling
+        fields = ['size', 'shortcode']
+
 
 class ArcInstanceSerializer(VolumeInstanceSerializer):
     hosts = serializers.StringRelatedField(many=True)
+    shortcodes = ArcBillingForInstanceSerializer(many=True, read_only=True)
 
     class Meta:
         model = ArcInstance
-        fields = ['id','name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost','hosts'
+        fields = ['id','name','owner','size','service','type','rate','shortcodes', 'created_date','uid','ad_group','total_cost','hosts'
         ,'nfs_group_id','multi_protocol','sensitive_regulated','great_lakes','armis','lighthouse','globus','globus_phi','thunder_x']
+
+
+class ArcBillingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArcBilling
+        fields = ['id', 'arc_instance', 'size', 'shortcode']
+
+
+class ArcBillingViewSet(viewsets.ModelViewSet):
+    queryset = ArcBilling.objects.all() 
+    serializer_class = ArcBillingSerializer
+
+    def get_queryset(self):
+        arc_instance = self.request.query_params.get('arc_instance', None)
+
+        print(arc_instance)
+
+        if arc_instance is not None:
+           self.queryset = self.queryset.filter(arc_instance__id=arc_instance)
+        return self.queryset
 
 
 class VolumeViewSet(viewsets.ModelViewSet):
@@ -92,10 +119,17 @@ class ArcViewSet(VolumeViewSet):
     queryset = ArcInstance.objects.all()
     serializer_class = ArcInstanceSerializer
 
+
+class RateViewSet(VolumeViewSet):
+    queryset = StorageRate.objects.all()
+    serializer_class = RateSerializer
+
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'storageinstances', StorageViewSet)
+router.register(r'storagerates', RateViewSet)
 router.register(r'arcinstances', ArcViewSet)
+router.register(r'arcbilling', ArcBillingViewSet)
 router.register(r'backupdomains', BackupDomainViewSet)
 
 urlpatterns = [
