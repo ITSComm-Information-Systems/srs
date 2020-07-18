@@ -25,3 +25,9 @@ class SuBackend(object):
                 pk=user_id)  # pylint: disable=W0212
         except get_user_model().DoesNotExist:
             return None
+
+    def has_perm(self, user_obj, perm, obj=None):
+        if perm == 'rte_access':
+            return UmRteTechnicianV.objects.filter(uniqname=user_obj.username).exists()
+        else:
+            return True

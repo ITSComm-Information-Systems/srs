@@ -1,31 +1,20 @@
 $(document).ready(function() {
 	// Pagination for results table
-	var num_rows = $('#select-entries-table').find('tbody tr:has(td)').length;
-	var rows_per_page = 15;
-	var num_pages = Math.ceil(num_rows / rows_per_page);
-
-	// Fill pagination with correct number of pages
-    for (i = 0; i < num_pages; i++) {
-        if (i < 2 || i > num_pages - 3) {
-            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
-        }
-        else if (i == 2) {
-            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">...</a></li>').appendTo('#pagination');
-        }
-    }
-    $('<li class="page-item" id="next"><a class="page-link" id="next-tab">Next</a></li>').appendTo('#pagination');
-
-    // Fill table initially
-    $('#select-entries-table').find('tbody tr:has(td)').hide();
-	var tr = $('#select-entries-table tbody tr:has(td)');
-	for (var i = 0; i <= rows_per_page - 1; i++) {
-	    $(tr[i]).show();
-	}
 	var current_page = 1;
-	$('#1').addClass('active');
+	var rows_per_page = 15;
+
+	$(document).on('click', '.page-link', function(event) {
+		current_page = paginate($(this).text(), rows_per_page, current_page, $('#select-entries-table tbody tr'));
+
+		var num_rows = $('#select-entries-table').find('tbody tr:has(td)').length;
+		var num_pages = Math.ceil(num_rows / rows_per_page);
+
+		next_prev(current_page, num_pages);
+	});
 
 	// Enable pagination
 	$('.page-link').click(function(event) {
+		console.log('clicked');
 		current_page = paginate($(this).text(), rows_per_page, current_page, tr);
 		next_prev(current_page, num_pages);
   	});
@@ -44,11 +33,65 @@ $(document).ready(function() {
         var tech_name = $(this).find("td").eq(1).html();   
         var tech_id = $(this).find("td").eq(0).html(); 
         $("#techSearchUpdate").val(tech_id);  
-        $('#update-form').submit();
         $('#techTableUpdate').hide();
     });
 
+    // Table searches - work order
+    $("#workOrderTableUpdate").hide();
+
+    $("#workOrderSearchUpdate").on("keyup", function() {
+        $("#workOrderTableUpdate").show();
+        var value = $(this).val().toLowerCase();
+        $("#workOrderTableUpdate tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    $('#workOrderTableUpdate tr').click(function() {
+        var work_order = $(this).find("td").eq(0).html();
+        $("#workOrderSearchUpdate").val(work_order);  
+        $('#workOrderTableUpdate').hide();
+    });
+
+    
+    // Radio button functionality
+    $('#selectByWorkOrderUpdateDiv').hide();
+    $('#selectByCalendarRangeUpdateDiv').hide();
+    $('#selectByDateRangeUpdateDiv').hide();
+
+    $('#selectByWorkOrderUpdate').on('change', function() {
+        $('#selectByWorkOrderUpdateDiv').show();
+        $('#selectByCalendarRangeUpdateDiv').hide();
+        $('#selectByDateRangeUpdateDiv').hide();
+
+        $('#calendarRangeStartUpdate').val('');
+        $('#calendarRangeEndUpdate').val('');
+        $('#dateRangeSelectUpdate').val('');
+    });
+
+    $('#selectByCalendarRangeUpdate').on('change', function() {
+        $('#selectByWorkOrderUpdateDiv').hide();
+        $('#selectByCalendarRangeUpdateDiv').show();
+        $('#selectByDateRangeUpdateDiv').hide();
+
+        $('#workOrderSearchUpdate').val('');
+        $('#dateRangeSelectUpdate').val('');
+    });
+
+    $('#selectByDateRangeUpdate').on('change', function() {
+        $('#selectByWorkOrderUpdateDiv').hide();
+        $('#selectByCalendarRangeUpdateDiv').hide();
+        $('#selectByDateRangeUpdateDiv').show();
+
+        $('#calendarRangeStartUpdate').val('');
+        $('#calendarRangeEndUpdate').val('');
+        $('#workOrderSearchUpdate').val('');
+    });
+
     $('.update-next').on('click', function() {
+    	if (current_tab === 2) {
+    		get_entries();
+    	}
     	if (current_tab === 3) {
     		copy_selected();
     	}
@@ -60,36 +103,12 @@ $(document).ready(function() {
 
     // Submit entries
     $('.update-submit').on('click', function() {
-        var form_html = '<input name="num_entries" type="text" value="' +$('#review-update-table').find('tbody tr:has(td)').length + '" hidden>';
+        var form_html = '<input name="num_entries" type="text" value="' +
+        	$('#review-update-table').find('tbody tr:has(td)').length + '" hidden>';
         $('#update-entries-form').append(form_html);
         $('#update-entries-form').submit();
     })
-
-    $('#techSelectUpdate').on('change', function() {
-    	console.log('here');
-		$('#update-form').submit();
-	});
 })
-
-/// Validate update/search submission
-function validate() {
-	if ($('#techid').val() === "") {
-		$('#error-notice').html('Please enter a tech ID.');
-		$('#error-notice').removeAttr('hidden');
-		return false;
-	}
-	if ($('#date-start').val() === "" || $('#date-end').val() === "") {
-		$('#error-notice').html("Please select a start and end date.");
-		$('#error-notice').removeAttr('hidden');
-		return false;
-	}
-	if ($('#date-start').val() > $('#date-end').val()) {
-		$('#error-notice').html("Please select an end date after your selected start date.");
-		$('#error-notice').removeAttr('hidden');
-		return false;
-	}
-	return true;
-}
 
 // Pagination
 function paginate(page, rows_per_page, current_page, tr) {
@@ -139,6 +158,94 @@ function next_prev(current_page, num_pages) {
 	}
 }
 
+function get_entries() {
+	var techid = $('#techSearchUpdate').val();
+	var work_order = $('#workOrderSearchUpdate').val();
+	var calendar_start = $('#calendarRangeStartUpdate').val();
+	var calendar_end = $('#calendarRangeEndUpdate').val();
+	var date_range = $('#dateRangeSelectUpdate').val();
+
+	$('.tech_id').html(techid);
+	var form_html = '<input name="tech_id" type="text" value="' + techid +'" hidden>';
+	$('#update-entries-form').append(form_html);
+
+	$.ajax({
+        url: 'get-update-entries/',
+        data: {
+            "techid": techid,
+            "work_order": work_order,
+            "calendar_start": calendar_start,
+            "calendar_end": calendar_end,
+            "date_range": date_range
+        },
+        dataType:'json',
+        // Reset chartfield options when department changes
+        success: function(data) {
+        	$('#select-entries-table tbody').html('');
+
+        	if (data.length === 1) {
+        		$('#no-entries').removeAttr('hidden');
+        		$('#loading').hide();
+
+        		$('.search_topic').html(data[data.length - 1].search_topic);
+	            $('.search_criteria').html(data[data.length - 1].search_criteria);
+        	}
+        	else {
+        		$('#no-entries').attr('hidden', 'hidden');
+
+        		for (i = 0; i < data.length - 1; ++i) {
+	                var new_row = "<tr>" +
+									"<td><input type='checkbox' value=''></td>" +
+									"<td>" + data[i].work_order_display + "</td>" +
+									"<td>" + data[i].assigned_date + "</td>" +
+									"<td>" + data[i].actual_mins_display + "</td>" +
+									"<td>" + data[i].rate_number__labor_rate_level_name + "</td>" +
+									"<td>" + data[i].assn_wo_group_name + "</td>" +
+									"<td hidden>" + data[i].wo_labor_id + "</td>" +
+								"</tr>";
+					$('#select-entries-table tbody:last-child').append(new_row);
+	            }
+
+	            $('#rate_levels').text(data[data.length - 1].rate_levels);
+	            $('#assigned_groups').text(data[data.length - 1].assigned_groups);
+	            $('.search_topic').html(data[data.length - 1].search_topic);
+	            $('.search_criteria').html(data[data.length - 1].search_criteria);
+
+	            // Pagination for results table
+				var num_rows = $('#select-entries-table').find('tbody tr:has(td)').length;
+				var rows_per_page = 15;
+				var num_pages = Math.ceil(num_rows / rows_per_page);
+
+				// Fill pagination with correct number of pages
+				$('#pagination').empty();
+				$('<li class="page-item disabled" id="previous"><a class="page-link" tabindex="-1" id="previous-tab">Previous</a></li>').appendTo('#pagination');
+
+			    for (i = 0; i < num_pages; i++) {
+			        if (i < 2 || i > num_pages - 3) {
+			            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">' + (i + 1) + '</a></li>').appendTo('#pagination');
+			        }
+			        else if (i == 2) {
+			            $('<li class="page-item" id="' + (i + 1) +'"><a class="page-link">...</a></li>').appendTo('#pagination');
+			        }
+			    }
+			    $('<li class="page-item" id="next"><a class="page-link" id="next-tab">Next</a></li>').appendTo('#pagination');
+
+			    // Fill table initially
+			    $('#select-entries-table').find('tbody tr:has(td)').hide();
+				var tr = $('#select-entries-table tbody tr:has(td)');
+				for (var i = 0; i <= rows_per_page - 1; i++) {
+				    $(tr[i]).show();
+				}
+				$('#1').addClass('active');
+				$('#loading').hide();
+        	}
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+    })
+}
+
 // Copy selected rows for update
 function copy_selected() {
 	var num_checked = 0;
@@ -156,10 +263,12 @@ function copy_selected() {
 		var wo_labor_id = row.find('td:nth-child(7)').text();
 
 		var rate_levels = $('#rate_levels').text();
+		console.log(rate_levels);
 		rate_levels = rate_levels.replace('[', '').replace(']', '').replace(/'/g, "").replace(/ /g, '');
 		rate_levels = rate_levels.split(',');
 
 		var assigned_groups = $('#assigned_groups').text();
+		console.log(assigned_groups);
 		assigned_groups = assigned_groups.replace('[', '').replace(']', '').replace(/'/g, "");
 		assigned_groups = assigned_groups.split(',');
 
@@ -167,7 +276,7 @@ function copy_selected() {
 			var new_row = '<tr>' +
 						  	  '<td>' + work_order + '</td>' +
 						  	  '<td>' +
-						  	  	    '<input class="form-control" type="date" value="' + format_date(assigned_date) + '">' +
+						  	  	    '<input class="form-control" type="date" value="' + assigned_date + '">' +
 						  	  '</td>' +
 						  	  '<td>' +
 								    "<input class='form-control d-inline col-6 hours' type='text' value='" + duration_hours + "' placeholder='HH'>" +
@@ -288,6 +397,8 @@ function format_date(date) {
 	months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
 	date = date.split(' ');
 
+	console.log(date);
+
 	month = months.indexOf(date[0]);
 	month = month + 1;
 	if (month < 10) {
@@ -303,22 +414,58 @@ function format_date(date) {
 	return(year + '-' + month + '-' + day);
 }
 
-function validate_search_update() {
-    if ($('#techSearch').val() === '') {
-        $('#error-tech-id').show();
-        return false;
-    }
-    return true;
-}
-
 // Validate selection of tech
 function validate_tech_update() {
-	if (!$('#tech_id').val()) {
-        $('#error-notice').html('Please enter a  valid tech ID.');
+ 	var regex = new RegExp('([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))');
+ 	if ($('#techSearchUpdate').val() === '') {
+ 		$('#error-notice').html('Please select a  valid tech ID.');
         $('#error-notice').removeAttr('hidden');
         return(false);
-    }
-    return(true);
+ 	}
+ 	if (!$('#selectByWorkOrderUpdate').is(':checked') && !$('#selectByCalendarRangeUpdate').is(':checked') 
+ 		&& !$('#selectByDateRangeUpdate').is(':checked')) {
+ 		$('#error-notice').html('Please select another search category.');
+        $('#error-notice').removeAttr('hidden');
+        return(false);
+ 	}
+ 	if ($('#selectByWorkOrderUpdate').is(':checked') && $('#workOrderSearchUpdate').val() === '') {
+ 		$('#error-notice').html('Please select a work order.');
+        $('#error-notice').removeAttr('hidden');
+        return(false);
+ 	}
+ 	if ($('#selectByCalendarRangeUpdate').is(':checked')) {
+ 		if ($('#calendarRangeStartUpdate').val() === '') {
+ 			$('#error-notice').html('Please enter a start date.');
+	        $('#error-notice').removeAttr('hidden');
+	        return(false);
+ 		}
+ 		if ($('#calendarRangeEndUpdate').val() === '') {
+			$('#error-notice').html('Please enter an end date.');
+	        $('#error-notice').removeAttr('hidden');
+	        return(false);
+ 		}
+ 		if (!regex.test($('#calendarRangeStartUpdate').val())) {
+ 			$('#error-notice').html('Please enter a valid start date.');
+	        $('#error-notice').removeAttr('hidden');
+	        return(false);
+ 		}
+ 		if (!regex.test($('#calendarRangeEndUpdate').val())) {
+ 			$('#error-notice').html('Please select a valid end date.');
+	        $('#error-notice').removeAttr('hidden');
+	        return(false);
+ 		}
+ 		if ($('#calendarRangeStartUpdate').val() > $('#calendarRangeEndUpdate').val()) {
+ 			$('#error-notice').html('Please enter an end date after the start date.');
+	        $('#error-notice').removeAttr('hidden');
+	        return(false);
+ 		}
+ 	}
+ 	if ($('#selectByDateRangeUpdate').is(':checked') && $('#dateRangeSelectUpdate').val() === '') {
+ 		$('#error-notice').html('Please select a date range.');
+        $('#error-notice').removeAttr('hidden');
+        return(false);
+ 	}
+ 	return(true);
 }
 
 function validate_selection() {
