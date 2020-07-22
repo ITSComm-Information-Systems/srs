@@ -894,7 +894,7 @@ class Item(models.Model):
             else:
                 rec.globus = False
 
-            if 'thunderx' in self.data.get('nonHipaaOptions'):
+            if 'thunder_x' in self.data.get('nonHipaaOptions'):
                 rec.thunder_x = True
             else:
                 rec.thunder_x = False
