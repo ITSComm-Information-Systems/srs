@@ -441,7 +441,7 @@ class ArcInstance(Volume):
     lighthouse = models.BooleanField(default=False) 
     globus = models.BooleanField(default=False) 
     globus_phi = models.BooleanField(default=False) 
-    thunder_x = models.BooleanField('ThunderX', default=False)
+    thunder_x = models.BooleanField(default=False)
 
     class meta:
         verbose_name = 'ARC Storage Instance'   
@@ -872,37 +872,32 @@ class Item(models.Model):
         else:
             rec.multi_protocol = False
         
+        rec.armis = False
+        rec.globus_phi = False
+        rec.lighthouse = False
+        rec.globus = False
+        rec.thunder_x = False
+        rec.great_lakes = False
+
         if self.data.get('hipaaOptions'):
             if 'armis' in self.data.get('hipaaOptions'):
                 rec.armis = True
-            else:
-                rec.armis = False
-
             if 'globus_phi' in self.data.get('hipaaOptions'):
                 rec.globus_phi = True
-            else:
-                rec.globus_phi = False
+
 
         if self.data.get('nonHipaaOptions'):
             if 'lighthouse' in self.data.get('nonHipaaOptions'):
                 rec.lighthouse = True
-            else:
-                rec.lighthouse = False
 
             if 'globus' in self.data.get('nonHipaaOptions'):
                 rec.globus = True
-            else:
-                rec.globus = False
 
             if 'thunder_x' in self.data.get('nonHipaaOptions'):
                 rec.thunder_x = True
-            else:
-                rec.thunder_x = False
 
             if 'great_lakes' in self.data.get('nonHipaaOptions'):
                 rec.great_lakes = True
-            else:
-                rec.great_lakes = False
 
         #if self.data.get('great_lakes') == 'yes':
         #    rec.great_lakes = True
