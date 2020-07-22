@@ -722,6 +722,8 @@ class Item(models.Model):
     chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True)
     data = JSONField()
+    external_reference_id = models.PositiveIntegerField(null=True)
+    internal_reference_id = models.PositiveIntegerField(null=True)
 
     def __str__(self):
         return self.description
@@ -827,6 +829,9 @@ class Item(models.Model):
 
         data_string = json.dumps(payload)
         response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
+ 
+        self.external_reference_id = json.loads(response.text)['ID']
+        self.save()   # Save incident number to item
 
     def update_mibackup(self, rec):
         if rec.name == '':
@@ -852,9 +857,6 @@ class Item(models.Model):
                     new_node[0].save()
 
         ex = BackupNode.objects.filter(backup_domain=rec).exclude(name__in=self.data['nodeNames']).delete()
-
-
-
 
     def update_arcts(self, rec):
 
@@ -886,12 +888,14 @@ class Item(models.Model):
             if 'great_lakes' in self.data.get('nonHipaaOptions'):
                 rec.great_lakes = True
 
-        if self.data.get('great_lakes') == 'yes':
-            rec.great_lakes = True
-        else:
-            rec.great_lakes = False
+        #if self.data.get('great_lakes') == 'yes':
+        #    rec.great_lakes = True
+        #else:
+        #    rec.great_lakes = False
 
         rec.save()
+        self.internal_reference_id = rec.id
+        self.save() # Save the instance ID on the item 
         bill_size_list = self.data.get('terabytes') 
 
         ArcBilling.objects.filter(arc_instance=rec).delete()
