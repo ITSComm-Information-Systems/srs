@@ -875,18 +875,34 @@ class Item(models.Model):
         if self.data.get('hipaaOptions'):
             if 'armis' in self.data.get('hipaaOptions'):
                 rec.armis = True
+            else:
+                rec.armis = False
+
             if 'globus_phi' in self.data.get('hipaaOptions'):
                 rec.globus_phi = True
+            else:
+                rec.globus_phi = False
 
         if self.data.get('nonHipaaOptions'):
             if 'lighthouse' in self.data.get('nonHipaaOptions'):
                 rec.lighthouse = True
+            else:
+                rec.lighthouse = False
+
             if 'globus' in self.data.get('nonHipaaOptions'):
                 rec.globus = True
+            else:
+                rec.globus = False
+
             if 'thunderx' in self.data.get('nonHipaaOptions'):
                 rec.thunder_x = True
+            else:
+                rec.thunder_x = False
+
             if 'great_lakes' in self.data.get('nonHipaaOptions'):
                 rec.great_lakes = True
+            else:
+                rec.great_lakes = False
 
         #if self.data.get('great_lakes') == 'yes':
         #    rec.great_lakes = True
