@@ -4,12 +4,10 @@
 {% block content %}
 	<h1>{{ title }}</h1>
 	
-	<p><strong>Are you entering time for:</strong></p>
-	
 	<div class='row'>
 		<div class='col-8'>
 			<div class="alert alert-secondary col-8" role="alert">
-				<strong><a href='single-tech/'>Single Technician, Multiple Work Orders</a></strong>
+				<strong><a href='single-tech/'>Single Technician, Multiple Orders/Entries</a></strong>
 			</div>
 
 			{% if request.user|is_member:"RTE Admin" or request.user.is_superuser %}
