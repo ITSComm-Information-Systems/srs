@@ -441,7 +441,7 @@ class ArcInstance(Volume):
     lighthouse = models.BooleanField(default=False) 
     globus = models.BooleanField(default=False) 
     globus_phi = models.BooleanField(default=False) 
-    thunder_x = models.BooleanField('ThunderX', default=False)
+    thunder_x = models.BooleanField(default=False)
 
     class meta:
         verbose_name = 'ARC Storage Instance'   
@@ -722,6 +722,8 @@ class Item(models.Model):
     chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True)
     data = JSONField()
+    external_reference_id = models.PositiveIntegerField(null=True)
+    internal_reference_id = models.PositiveIntegerField(null=True)
 
     def __str__(self):
         return self.description
@@ -827,6 +829,9 @@ class Item(models.Model):
 
         data_string = json.dumps(payload)
         response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
+ 
+        self.external_reference_id = json.loads(response.text)['ID']
+        self.save()   # Save incident number to item
 
     def update_mibackup(self, rec):
         if rec.name == '':
@@ -853,9 +858,6 @@ class Item(models.Model):
 
         ex = BackupNode.objects.filter(backup_domain=rec).exclude(name__in=self.data['nodeNames']).delete()
 
-
-
-
     def update_arcts(self, rec):
 
         rec.nfs_group_id = self.data.get('nfs_group_id')
@@ -870,28 +872,41 @@ class Item(models.Model):
         else:
             rec.multi_protocol = False
         
+        rec.armis = False
+        rec.globus_phi = False
+        rec.lighthouse = False
+        rec.globus = False
+        rec.thunder_x = False
+        rec.great_lakes = False
+
         if self.data.get('hipaaOptions'):
             if 'armis' in self.data.get('hipaaOptions'):
                 rec.armis = True
             if 'globus_phi' in self.data.get('hipaaOptions'):
                 rec.globus_phi = True
 
+
         if self.data.get('nonHipaaOptions'):
             if 'lighthouse' in self.data.get('nonHipaaOptions'):
                 rec.lighthouse = True
+
             if 'globus' in self.data.get('nonHipaaOptions'):
                 rec.globus = True
-            if 'thunderx' in self.data.get('nonHipaaOptions'):
+
+            if 'thunder_x' in self.data.get('nonHipaaOptions'):
                 rec.thunder_x = True
+
             if 'great_lakes' in self.data.get('nonHipaaOptions'):
                 rec.great_lakes = True
 
-        if self.data.get('great_lakes') == 'yes':
-            rec.great_lakes = True
-        else:
-            rec.great_lakes = False
+        #if self.data.get('great_lakes') == 'yes':
+        #    rec.great_lakes = True
+        #else:
+        #    rec.great_lakes = False
 
         rec.save()
+        self.internal_reference_id = rec.id
+        self.save() # Save the instance ID on the item 
         bill_size_list = self.data.get('terabytes') 
 
         ArcBilling.objects.filter(arc_instance=rec).delete()
