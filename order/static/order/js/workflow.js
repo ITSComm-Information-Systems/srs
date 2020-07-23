@@ -180,11 +180,26 @@ $(document).ready(function() {
   
   $("#ExistingPhone_nophone").click(function() {
     $('[data-tab="PhoneLocation"]').hide();
+    $('[data-tab="LocationNew"]').show();
+    $('[data-tab="SelectFeatures"]').show();
+    $('[data-tab="Restrictions"]').show();
+    
+    $('[data-phoneset="advanced"]').hide();
+    $('[data-phoneset="basic"]').hide();
+    $('[data-phoneset="voip"]').show();
+
   });
 
   $("#ExistingPhone_yesphone").click(function() {
     $('[data-tab="PhoneLocation"]').show();
     $('[data-tab="LocationNew"]').hide();
+    $('[data-tab="SelectFeatures"]').hide();
+    $('[data-tab="Restrictions"]').hide();
+    
+    $('[data-phoneset="advanced"]').hide();
+    $('[data-phoneset="basic"]').hide();
+    $('[data-phoneset="voip"]').show();
+
   });
 
   $(document).on("click", "#multi_protocol_0" , function() {
