@@ -74,7 +74,7 @@ def single_tech(request):
         'tech_name': tech_name,
         'assigned_groups': assigned_groups,
         'rate_levels': rate_levels,
-        'title': 'Single Technician, Multiple Orders',
+        'title': 'Single Technician, Multiple Orders/Entries',
         'tab_list': tab_list,
         'num_tabs': len(tab_list)
     }
