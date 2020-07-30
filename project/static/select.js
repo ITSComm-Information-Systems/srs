@@ -19,6 +19,11 @@ $(document).ready(function() {
         // 	return matchStart(params, data);
     	// }
 	});
+	
+	$("#id_user").select2({
+		placeholder: "Select a User",
+		display:"inline",
+	});
 
 	// Search bar placeholder text
   	// $("#deptf").one('select2:open', function(e) {
