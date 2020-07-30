@@ -138,7 +138,8 @@ class LDAPGroup(models.Model):
     def update_membership(self):
         mc = McGroup(self.name)
 
-        if not mc.dn:
+        #if not mc.dn:
+        if not hasattr(mc, 'dn'):
             self.active = False
             self.save()
             return None

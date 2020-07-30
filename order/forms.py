@@ -573,7 +573,7 @@ class BillingStorageForm(TabForm):
         super(BillingStorageForm, self).__init__(*args, **kwargs)
         total_cost = 0
 
-        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch':
+        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':
             self.template = 'order/billing_storage.html'
             self.shortcode_list = []
 
@@ -602,7 +602,7 @@ class BillingStorageForm(TabForm):
                 si = self.vol.objects.get(id=instance_id)
                 #else: # miBackup
                 #    si = self.vol.objects.get(id=instance_id)
-                if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch':
+                if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':
                     if not self.is_bound:
                         self.shortcode_list = si.get_shortcodes()
 
@@ -615,6 +615,10 @@ class BillingStorageForm(TabForm):
         if self.action.service.name == 'miBackup':
             rate = StorageRate.objects.get(name=BackupDomain.RATE_NAME)
             descr = self.fields['totalCost'].description.replace('~', f'{round(rate.rate,2)} per {rate.unit_of_measure}')
+        elif self.action.service.name == 'dataDen':
+            option = StorageRate.objects.get(id=28)
+            total_cost = option.get_total_cost(self.request.POST['size'])
+            descr = self.fields['totalCost'].description.replace('~', str(total_cost))
         else:
             option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
 
@@ -631,7 +635,7 @@ class BillingStorageForm(TabForm):
     def clean(self):
         super().clean()
         
-        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch':
+        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':
             if int(self.total_size) != self.new_total_size:
                 self.shortcode_error = f'Sizes must total {self.total_size}'
                 self.add_error('totalCost', 'block') 
@@ -649,11 +653,15 @@ class BillingStorageForm(TabForm):
         summary = super().get_summary(*args, **kwargs)
 
         if self.action.service.name != 'miBackup':
-            option = StorageRate.objects.get(id=self.data['selectOptionType'])
+            if self.action.service.name == 'dataDen':
+                option = StorageRate.objects.get(id=28)
+            else:
+                option = StorageRate.objects.get(id=self.data['selectOptionType'])
+
             total_cost = option.get_total_cost(self.data['size'])
             summary.append({'label': 'Total Monthly Cost', 'value': str(total_cost)})
 
-        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch':
+        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':
             shortcode_list = self.data.getlist('shortcode')
             size_list = self.data.getlist('terabytes')
             label = ''
