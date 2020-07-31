@@ -65,7 +65,12 @@ class TabForm(forms.Form):
             if 'size' in self.cleaned_data:
                 if self.cleaned_data['size'] < 10:
                     self.add_error('size', 'Enter a size of at least 10 terabytes') 
-        
+
+        if self.action.service.id == 11:
+            if 'size' in self.cleaned_data:
+                if self.cleaned_data['size'] < 5:
+                    self.add_error('size', 'Enter a size of at least 5 terabytes') 
+
         for field in self.fields:
             if self.has_error(field):
                 if self.fields[field].type == 'Radio' or self.fields[field].type == 'Checkbox':
