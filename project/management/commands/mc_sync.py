@@ -13,4 +13,5 @@ class Command(BaseCommand):
 
         # Update LDAP Group membership used by storage, etc.
         for group in LDAPGroup.objects.order_by('name'):
+            print('update', group)
             group.update_membership()

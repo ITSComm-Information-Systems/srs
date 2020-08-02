@@ -83,14 +83,14 @@ $(document).ready(function() {
     }
   }
 
-  if ( $("#wfid").val() == 50  || $("#wfid").val() == 63 || $("#wfid").val() == 61 || $("#wfid").val() == 56 ) {  // Hide workflow for "Review Storage" (cost data) 
+  if ( $("#wfid").val() == 50  || $("#wfid").val() == 63 || $("#wfid").val() == 61 || $("#wfid").val() == 56 || $("#wfid").val() == 66 ) {  // Hide workflow for "Review Storage" (cost data) 
     $('#pills-step1').hide();
     $('p').hide();
     $('h2').hide();
     $('#nextBtn').hide();
   }
 
-  if ( $("#wfid").val() == 53 || $("#wfid").val() == 55 || $("#wfid").val() == 59 || $("#wfid").val() == 60 ) {
+  if ( $("#wfid").val() == 53 || $("#wfid").val() == 55 || $("#wfid").val() == 59 || $("#wfid").val() == 60 || $("#wfid").val() == 66 ) {
     $('#nextBtn').hide();
   }
 

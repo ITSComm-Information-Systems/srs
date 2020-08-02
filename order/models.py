@@ -782,8 +782,15 @@ class Item(models.Model):
                         rec.owner = LDAPGroup().lookup( self.data['owner'] )
                         rec.size = self.data.get('size',0)
                         rec.service = action.service
+
+                        print('rate for ', action.service.id)
+                        if action.service.id == 11:
+                            rec.rate_id = 28
+                            print(rec.rate_id, 'set for dd')
+                        else:
+                            rec.rate_id = self.data.get('selectOptionType')
+
                         rec.type = action.override['storage_type']
-                        rec.rate_id = self.data.get('selectOptionType')
                         rec.shortcode = self.data.get('shortcode')
                         rec.uid = self.data.get('uid')
                         rec.ad_group = self.data.get('ad_group')    

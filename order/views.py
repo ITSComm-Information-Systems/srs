@@ -79,7 +79,7 @@ def send_tab_data(request):
 
         while x > 0:
             tag = label[x+1:y]
-            element = request.POST[tag]
+            element = request.POST.get(tag, '')
             label = label.replace('['+tag+']', element)
             x = label.find('[', x)
             y = label.find(']', x)

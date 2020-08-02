@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from oscauth.utils import get_mc_group
 from oscauth.models import LDAPGroup
-from order.models import ArcInstance, ArcHost, StorageRate
+from order.models import ArcInstance, ArcHost, StorageRate, ArcBilling
 
 import datetime, csv
 
@@ -19,20 +19,11 @@ class Command(BaseCommand):
         print(datetime.datetime.now(), 'start')
         filename = options['filename']
 
-        if filename[:5] == 'turbo':
-            service_id = 9
-        else:
-            service_id = 10
-
-        if filename[-7:] == 'nfs.csv':
-            type = 'NFS'
-        else:
-            type = 'CIFS'
+        service_id = 11
+        type = 'NFS'
 
         print(f'Process {filename} {service_id} {type}')
-        #instance_list = ArcInstance.objects.filter(id)
-        ArcHost.objects.filter(arc_instance__service_id=service_id,arc_instance__type=type).delete()
-        ArcInstance.objects.filter(service_id=service_id,type=type).delete()
+        ArcInstance.objects.filter(service_id=11,type=type).delete()
         
         print('open file')
 
@@ -53,60 +44,31 @@ class Command(BaseCommand):
 
     def process_record(self, row, type, service_id):
         instance = ArcInstance()
-        instance.name = row[3].strip("'")
-        #instance.owner = row[7].strip("'")
-        mc_group =  row[7].strip("'")
+        instance.uid = row[0]
+        mc_group =  row[1].strip("'")
         instance.owner = LDAPGroup().lookup( mc_group )
-        
-        instance.shortcode = row[8]
+        instance.nfs_group_id = row[2]
+        instance.name = row[3].strip("'")
         instance.size = row[4]
-        instance.created_date = row[5].strip("'")
 
-        options = row[6].strip("'").strip("'")
+        shortcode = row[5]
+        instance.signer = [6]
+        instance.rate_id = 28
+        instance.service_id = 11
 
-        if type=='NFS':
-            instance.type = 'NFS' 
-            instance.uid = row[9]
-            if row[10].strip("'") == 'Yes':
-                instance.great_lakes = True
-            if row[11].strip("'") == 'Yes':
-                instance.sensitive_regulated = True
+        #try:
+        instance.save()
+        print('saved instance')
 
-            
-            if service_id == 9:  #Turbo
-                if row[13].strip("'") == 'Yes':
-                    instance.mutli_protocol = True
-                instance.ad_group = row[14].strip("'")
-                hosts = row[15].strip("'").split(' ')
-            else:
-                hosts = row[13].strip("'").split(' ')
+        sc = ArcBilling()
+        sc.size = instance.size
+        sc.shortcode = shortcode
+        sc.arc_instance_id = instance.id 
+        sc.save()
+        print('saved shortcode')
 
-            instance.nfs_group_id = row[12].strip("'")
-
-
-        if type=='CIFS':
-            instance.type = 'CIFS'
-            hosts = None
-            instance.ad_group = row[9].strip("'")
-            if row[10].strip("'") == 'Yes':
-                instance.sensitive_regulated = True
-
-        instance.service_id = service_id
-        instance.rate = StorageRate.objects.get(type=instance.type, service_id=service_id, label=options)
-
-
-        try:
-            instance.save()
-
-            if hosts:
-                for host in hosts:
-                    h = ArcHost()
-                    h.arc_instance = instance
-                    h.name = host
-                    h.save()
-        except:
-            print('error', row[0], vars(instance))
-
+        #except:
+        #    print('error', row[0], vars(instance))
 
 
 
