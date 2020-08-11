@@ -1,42 +1,52 @@
-<div class="col-6">
-
-    {% for field in tab.form %}
-
-
-        {% if field.name == 'permittedHosts' %}
-
-
-            {% with field=tab.form.permittedHosts %}
-            <div id="host_list" class="form-group">
-                <label for="hosts">
-                    <strong>{{ field.label }}</strong>
-                </label>
-
-                <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
-
-                <div class="form-inline" id="host_new" style="display: none;">
-                    <input class="form-control form-inline" name="permittedHosts" type="text" value="{{ host.name }}" aria-describedy="hostsText">
-                    &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>
-                </div>
-
-                {% for host in tab.form.host_list %}
-                <div class="form-inline" id="host_{{ host.id }}">
-                    <input class="form-control form-inline" name="permittedHosts" type="text" value="{{ host.name }}" aria-describedy="hostsText">
-                    &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0);"><i class="fas fa-minus-circle"></i></a>
-                </div>
-                {% endfor %}
-            </div>
-            <a href="javascript:addHost()" class="d-block"><i class="fas fa-plus-circle"></i> Add another host</a>
-            {% endwith %}
-
-        {% else %}
-            {% include field.field.template_name %}
-        {% endif %}
-
-
-
-    {% endfor %}
-
-
-
-</div>
+<div class="row">
+    ​
+        <div class="col-lg-6">
+    ​
+            {% for field in tab.form %}
+    ​
+                {% if field.name == 'permittedHosts' %}
+    ​
+                    {% with field=tab.form.permittedHosts %}
+                    <div id="host_list" class="form-group">
+                        <label for="hosts">
+                            <strong>{{ field.label }}</strong>
+                        </label>
+    ​
+                        <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
+    ​
+                        <div class="form-inline" id="host_new" style="display: none;">
+                            <input class="form-control form-inline" name="permittedHosts" type="text" value="{{ host.name }}" aria-describedy="hostsText">
+                            &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>
+                        </div>
+    ​
+                        {% for host in tab.form.host_list %}
+                        <div class="form-inline" id="host_{{ host.id }}">
+                            <input class="form-control form-inline" name="permittedHosts" type="text" value="{{ host.name }}" aria-describedy="hostsText">
+                            &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0);"><i class="fas fa-minus-circle"></i></a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="javascript:addHost()" class="d-block"><i class="fas fa-plus-circle"></i> Add another host</a>
+                    {% endwith %}
+    ​
+                {% else %}
+                    {% include field.field.template_name %}
+                {% endif %}
+    ​
+            {% endfor %}
+    ​
+        </div><!--/col-lg-6-->
+    
+        <div class="col-sm">
+        </div><!--/col-sm-->
+    ​
+        <div class="col-lg-5">
+        
+                {% autoescape off %}
+                {{tab.form.notice3.bodytext}}
+                {% endautoescape %}
+            
+        </div><!--/col-lg-5-->
+        
+    </div><!--/row-->
+    

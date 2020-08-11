@@ -1,0 +1,18 @@
+<div class="row">	
+	<div class="col-lg-6">
+		{% for field in tab.form %}
+		{% include field.field.template_name %}
+		{% endfor %}
+	</div>
+	<div class="col-sm">
+    </div><!--/col-sm-->
+​
+    <div class="col-lg-5">
+    	
+            {% autoescape off %}
+            {{tab.form.notice3.bodytext}}
+            {% endautoescape %}
+        
+    </div><!--/col-lg-5-->
+    
+</div><!--/row-->
