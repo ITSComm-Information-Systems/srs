@@ -422,6 +422,8 @@ class VolumeSelectionForm(TabForm):
 class AccessNFSForm(TabForm):
     template = 'order/nfs_access.html'
 
+    notice3 = Page.objects.get(permalink='/notice/3')
+ 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
 
@@ -515,12 +517,20 @@ class DetailsNFSForm(TabForm):
         #            self.fields["selectOptionType"].initial = si.rate_id
         #            self.fields['flux'].initial = si.flux  
 
+
+class DataDenForm(TabForm):
+    template = 'order/accessCIFS.html'
+    notice3 = Page.objects.get(permalink='/notice/3')
+
+
 class DetailsCIFSForm(TabForm):
-    pass
+    template = 'order/accessCIFS.html'
+    notice3 = Page.objects.get(permalink='/notice/3')
 
 
 class BackupDetailsForm(TabForm):
     template = 'order/backup_details.html'
+    notice3 = Page.objects.get(permalink='/notice/3')
 
     def __init__(self, *args, **kwargs):
         super(BackupDetailsForm, self).__init__(*args, **kwargs)
