@@ -54,6 +54,7 @@ class Step(Configuration):
         ('BackupDetailsForm', 'Backup Details'),
         ('VolumeSelectionForm', 'Volume Selection'),
         ('SubscriptionSelForm', 'Subscription Selection'),
+        ('DataDenForm', 'Data Den Form')
     )
 
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
