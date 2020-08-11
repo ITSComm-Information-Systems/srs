@@ -41,6 +41,8 @@ class Command(BaseCommand):
             sql = arc_ts_query + ' and a.service_id = 9'
         elif self.service == 'Locker-Storage':
             sql = arc_ts_query + ' and a.service_id = 10'
+        elif self.service == 'Data-Den':
+            sql = arc_ts_query + ' and a.service_id = 11'
         elif self.service == 'MiBackup':
             sql = mibackup_query
         else:
