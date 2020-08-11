@@ -48,7 +48,14 @@
 										<th scope='col'>Shortcode</th>
 										<th scope='col'>Protocol</th>
 										<th scope='col' class='total-col'>Bill Amount</th>
-									{% elif key == 'MiBackup' or key == 'Data Den Research Storage' %}
+									{% elif key == 'Data Den Research Storage' %}
+										<th scope='col' class='first-col'>Share</th>
+										<th scope='col'>MCommunity Group</th>
+										<th scope='col'>Size</th>
+										<th scope='col'>Date</th>
+										<th scope='col'>Shortcode</th>
+										<th scope='col' class='total-col'>Bill Amount</th>
+									{% elif key == 'MiBackup' %}
 										<th scope='col' class='first-col'>Policy Domain</th>
 										<th scope='col'>MCommunity Group</th>
 										<th scope='col'>Shortcode</th>
@@ -86,7 +93,13 @@
 										<td>{{ v.shortcode }}</td>
 										<td>{{ v.descr|protocol }}</td>
 										<td class='total-col'>{{ v.total_charges }}</td>
-									{% elif key == 'MiBackup' or key == 'Data Den Research Storage' %}
+									{% elif key == 'Data Den Research Storage' %}
+										<td class='first-col'>{{ v.unique_id }}</td>
+										<td>{{ v.voucher_comment }}</td>
+										<td>{{ v.quantity_vouchered }}</td>
+										<td>{{ v.date }}</td>
+										<td>{{ v.shortcode }}</td>
+									{% elif key == 'MiBackup' %}
 										<td class='first-col'>{{ v.unique_id }}</td>
 										<td>{{ v.voucher_comment }}</td>
 										<td>{{ v.shortcode }}</td>
@@ -135,7 +148,7 @@
 									{% endif %}
 									<td></td>
 									<td></td>
-									{% if key != 'MiBackup' and key != 'Data Den Research Storage' %}
+									{% if key != 'MiBackup' %}
 									<td></td>
 									{% endif %}
 									{% if '-'|first in value.total %}
