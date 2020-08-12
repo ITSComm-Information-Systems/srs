@@ -39,7 +39,7 @@
 						<table class="doc table table-sm table-striped mt-2" id='charge_table'>
 							<thead>
 								<tr class="thead-dark">
-									{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' or key == 'Data Den Research Storage' %}
+									{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' %}
 										<th scope='col' class='first-col'>Share</th>
 										<th scope='col'>MCommunity Group</th>
 										<th scope='col'>Size</th>
@@ -47,6 +47,13 @@
 										<th scope='col'>Date</th>
 										<th scope='col'>Shortcode</th>
 										<th scope='col'>Protocol</th>
+										<th scope='col' class='total-col'>Bill Amount</th>
+									{% elif key == 'Data Den Research Storage' %}
+										<th scope='col' class='first-col'>Share</th>
+										<th scope='col'>MCommunity Group</th>
+										<th scope='col'>Size</th>
+										<th scope='col'>Date</th>
+										<th scope='col'>Shortcode</th>
 										<th scope='col' class='total-col'>Bill Amount</th>
 									{% elif key == 'MiBackup' %}
 										<th scope='col' class='first-col'>Policy Domain</th>
@@ -77,7 +84,7 @@
 							<tbody>
 								{% for v in value.rows %}
 								<tr>
-									{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' or key == 'Data Den Research Storage' %}
+									{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' %}
 										<td class='first-col'>{{ v.unique_id }}</td>
 										<td>{{ v.voucher_comment }}</td>
 										<td>{{ v.quantity_vouchered }}</td>
@@ -85,6 +92,13 @@
 										<td>{{ v.date }}</td>
 										<td>{{ v.shortcode }}</td>
 										<td>{{ v.descr|protocol }}</td>
+										<td class='total-col'>{{ v.total_charges }}</td>
+									{% elif key == 'Data Den Research Storage' %}
+										<td class='first-col'>{{ v.unique_id }}</td>
+										<td>{{ v.voucher_comment }}</td>
+										<td>{{ v.quantity_vouchered }}</td>
+										<td>{{ v.date }}</td>
+										<td>{{ v.shortcode }}</td>
 										<td class='total-col'>{{ v.total_charges }}</td>
 									{% elif key == 'MiBackup' %}
 										<td class='first-col'>{{ v.unique_id }}</td>
@@ -129,7 +143,7 @@
 									{% if key == 'Container Services' %}
 									<td></td>
 									{% endif %}
-									{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' or key == 'Data Den Research Storage' %}
+									{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' %}
 									<td></td>
 									<td></td>
 									{% endif %}
