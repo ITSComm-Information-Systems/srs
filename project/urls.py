@@ -7,6 +7,7 @@ from . import views
 
 #from django.contrib.auth.models import User
 from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain
+from oscauth.models import LDAPGroup, LDAPGroupMember
 from rest_framework import routers, serializers, viewsets
 
 
@@ -57,6 +58,20 @@ class ArcBillingSerializer(serializers.ModelSerializer):
         fields = ['id', 'arc_instance', 'size', 'shortcode']
 
 
+class LDAPGroupMemberSerializer(serializers.ModelSerializer):
+    ldap_group = serializers.StringRelatedField()
+
+    class Meta:
+        model = LDAPGroupMember
+        fields = ['id', 'ldap_group', 'username']
+
+
+class LDAPGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LDAPGroup
+        fields = ['id', 'name', 'active']
+
+
 class ArcBillingViewSet(viewsets.ModelViewSet):
     queryset = ArcBilling.objects.all() 
     serializer_class = ArcBillingSerializer
@@ -89,7 +104,7 @@ class BackupDomainSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BackupDomain
-        fields = ['id','name','shortcode','total_cost','cost_calculated_date','owner','days_extra_versions','days_only_version','versions_after_deleted','versions_while_exists','nodes']
+        fields = ['id','name','shortcode','size','cost_calculated_date','owner','days_extra_versions','days_only_version','versions_after_deleted','versions_while_exists','nodes']
 
 
 class BackupDomainViewSet(viewsets.ModelViewSet):
@@ -99,6 +114,27 @@ class BackupDomainViewSet(viewsets.ModelViewSet):
  
         if name:
             queryset = self.serializer_class.Meta.model.objects.filter(name=name)
+        else:
+            queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
+
+        return queryset
+
+
+class LDAPViewSet(viewsets.ModelViewSet):
+    def get_queryset(self):
+        username = self.request.GET.get('username')
+        ldap_group = self.request.GET.get('ldap_group')
+        name = self.request.GET.get('name')
+        active = self.request.GET.get('active')
+
+        if username:
+            queryset = self.serializer_class.Meta.model.objects.filter(username=username)
+        elif ldap_group:
+            queryset = self.serializer_class.Meta.model.objects.filter(ldap_group__name=ldap_group)
+        elif name:
+            queryset = self.serializer_class.Meta.model.objects.filter(name=name)
+        elif active:
+            queryset = self.serializer_class.Meta.model.objects.filter(active=active)
         else:
             queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
 
@@ -124,6 +160,16 @@ class RateViewSet(VolumeViewSet):
     queryset = StorageRate.objects.all()
     serializer_class = RateSerializer
 
+
+class LDAPGroupViewSet(LDAPViewSet):
+    queryset = LDAPGroup.objects.all()
+    serializer_class = LDAPGroupSerializer
+
+class LDAPGroupMemberViewSet(LDAPViewSet):
+    queryset = LDAPGroupMember.objects.all()
+    serializer_class = LDAPGroupMemberSerializer
+
+
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'storageinstances', StorageViewSet)
@@ -131,6 +177,9 @@ router.register(r'storagerates', RateViewSet)
 router.register(r'arcinstances', ArcViewSet)
 router.register(r'arcbilling', ArcBillingViewSet)
 router.register(r'backupdomains', BackupDomainViewSet)
+router.register(r'ldapgroups', LDAPGroupViewSet)
+router.register(r'ldapgroupmembers', LDAPGroupMemberViewSet)
+
 
 urlpatterns = [
 
