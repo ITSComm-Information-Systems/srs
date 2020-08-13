@@ -12,6 +12,7 @@ $(document).ready(function() {
 		next_prev(current_page, num_pages);
 	});
 
+
 	// Enable pagination
 	$('.page-link').click(function(event) {
 		console.log('clicked');
@@ -210,6 +211,7 @@ function get_entries() {
 	            $('#assigned_groups').text(data[data.length - 1].assigned_groups);
 	            $('.search_topic').html(data[data.length - 1].search_topic);
 	            $('.search_criteria').html(data[data.length - 1].search_criteria);
+	            $('.total_hours').html(data[data.length - 1].total_hours);
 
 	            // Pagination for results table
 				var num_rows = $('#select-entries-table').find('tbody tr:has(td)').length;
@@ -279,8 +281,8 @@ function copy_selected() {
 						  	  	    '<input class="form-control" type="date" value="' + assigned_date + '">' +
 						  	  '</td>' +
 						  	  '<td>' +
-								    "<input class='form-control d-inline col-6 hours' type='text' value='" + duration_hours + "' placeholder='HH'>" +
-								    "<input class='form-control d-inline col-6 mins' type='text' value='" + duration_mins + "' placeholder='MM'>" +
+								    "<input class='form-control d-inline col-6 hours' type='text' id='hours' value='" + duration_hours + "' placeholder='HH'>" +
+								    "<input class='form-control d-inline col-6 mins' type='text' id='mins' value='" + duration_mins + "' placeholder='MM'>" +
 						  	  '</td>' +
 						  	  '<td>' +
 						  	      '<select class="form-control">';
