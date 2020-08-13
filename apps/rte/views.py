@@ -4,6 +4,7 @@ from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLeve
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
 from django.db import connections
+from django.db.models import Sum
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -484,7 +485,8 @@ def view_time_display(request):
 
     # Search by work order
     if work_order:
-        results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, work_order_display=work_order).order_by('-assigned_date','work_order_display')
+        results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, work_order_display=
+            work_order).order_by('-assigned_date','work_order_display')
         search_topic = 'Work Order'
         search_criteria = work_order
 
@@ -502,12 +504,23 @@ def view_time_display(request):
         search_topic = 'Date Range'
         search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
 
+    total_hours = results.aggregate(Sum('actual_mins'))['actual_mins__sum'] or 0
+    # hours = int(total_hours) / int(60)
+    # mins = int(total_hours) % int(60)
+    hours, mins = divmod(total_hours, 60)
+    if hours < 10:
+        hours = '0' + str(hours)
+    if mins < 10:
+        mins = '0' + str(mins)
+    total_hours = str(hours) + ':' + str(mins)
+
     context = {
         'title': 'View Time',
         'techid': techid,
         'search_topic': search_topic,
         'search_criteria': search_criteria,
-        'entries': results
+        'entries': results,
+        'total_hours': total_hours
     }
     return HttpResponse(template.render(context, request))
 
