@@ -124,12 +124,12 @@ function add_to_table(num_entries) {
     if (num_entries < 10) {
         num_entries = num_entries + 1; 
         var html = '<tr id="row-' + num_entries + '">' + 
-                        '<th>' + $('#workOrderSearch').val() + '</th>' +
-                        '<th>' + $('#rateSelect').val() + '</th>' +
-                        '<th>' + $('#assigned_date').val() + '</th>' +
-                        '<th>' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</th>' +
-                        '<th>' + $('#notes').val() + '</th>' +
-                        '<th class="delete-col"><button class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button>' +
+                        '<td>' + $('#workOrderSearch').val() + '</td>' +
+                        '<td>' + $('#rateSelect').val() + '</td>' +
+                        '<td>' + $('#assigned_date').val() + '</td>' +
+                        '<td>' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</td>' +
+                        '<td>' + $('#notes').val() + '</td>' +
+                        '<td class="delete-col"><button class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></td>' +
                     '</tr>';
         var form_html = '<input type="text" name="' + num_entries + '_work_order" value="' + $('#workOrderSearch').val() + '" hidden>' +
                         '<input type="text" name="' + num_entries + '_rate" value="' + $('#rateSelect').val() + '" hidden>' +
@@ -139,6 +139,8 @@ function add_to_table(num_entries) {
         $('#single-input-form').append(form_html);
         $('#single-input-table > tbody:last-child').append(html);
         $("#single-input").show();
+
+        $('#total-hours').text(calculate_duration());
 
         // Reset all input values
         $('#workOrderSearch').val('');
@@ -189,6 +191,7 @@ function delete_row(row_num, num_entries) {
     if (num_entries == 0) {
         $('#single-input').hide();
     }
+    $('#total-hours').text(calculate_duration());
     return(num_entries);
 }
 
@@ -262,7 +265,6 @@ function validate_single_entries() {
 // Validate moving on in workflow
 function validate_single(current_tab) {
     if (current_tab === 1) {
-        console.log('validate tech');
         return(validate_tech());
     }
     if (current_tab === 2) {
@@ -280,7 +282,6 @@ function get_assigned_groups(techid) {
         dataType:'json',
         // Reset chartfield options when department changes
         success: function(data) {
-            console.log(data);
             $('#agSelect').empty();
             for (i = 0; i < data.length; ++i) {
                 var drp = document.getElementById('agSelect');
@@ -296,3 +297,25 @@ function get_assigned_groups(techid) {
         }
     })
 }
+
+// Calculate total hours worked
+function calculate_duration() {
+    var hours = 0;
+    var mins = 0;
+
+    $('#single-input-table tbody tr').each(function() {
+        var row = $(this);
+        var duration = row.find('td:nth-child(4)').text();
+        row_hours = split_duration(duration, 'hours');
+        row_mins = split_duration(duration, 'mins');
+
+        hours = hours + parseInt(row_hours);
+        mins = mins + parseInt(row_mins);
+    })
+
+    hours = hours + Math.floor(mins / 60);
+    mins = mins % 60;
+
+    return format_duration(hours.toString(), mins.toString()); 
+}
+
