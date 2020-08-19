@@ -28,21 +28,21 @@ class Command(BaseCommand):
         mistorage_query = 'select a.shortcode, a.size, a.name, a.created_date, c.name as rate_name, round(c.rate * a.size,2) as total_cost, d.name as owner ' \
                 'from order_storageinstance a, order_storagerate c, oscauth_ldapgroup d ' \
                 'where  a.rate_id = c.id ' \
-                '  and a.owner_id = d.id ' \
+                '  and a.owner_id = d.id order by a.name, a.created_date ' \
 
         mibackup_query = "select a.shortcode, ceil(a.size) as size, a.name, to_date('20200701','YYYYMMDD') as created_date, c.name as rate_name, round(c.rate * a.size,2) as total_cost, d.name as owner " \
                 "from order_backupdomain a, oscauth_ldapgroup d, order_storagerate c " \
                 "where  c.name = 'MB-MCOMM' " \
-                "  and a.owner_id = d.id "
+                "  and a.owner_id = d.id  order by a.name  "
 
         if self.service == 'MiStorage':
             sql = mistorage_query
         elif self.service == 'Turbo':
-            sql = arc_ts_query + ' and a.service_id = 9'
+            sql = arc_ts_query + ' and a.service_id = 9 order by a.name, a.created_date'
         elif self.service == 'Locker-Storage':
-            sql = arc_ts_query + ' and a.service_id = 10'
+            sql = arc_ts_query + ' and a.service_id = 10 order by a.name, a.created_date'
         elif self.service == 'Data-Den':
-            sql = arc_ts_query + ' and a.service_id = 11'
+            sql = arc_ts_query + ' and a.service_id = 11 order by a.name, a.created_date'
         elif self.service == 'MiBackup':
             sql = mibackup_query
         else:
@@ -91,7 +91,7 @@ class Command(BaseCommand):
         print(datetime.now(), x, 'Records Loaded')
         print(datetime.now(), total_cost, 'Total Cost')
 
-        body = f'Records Loaded: {x} \nTotal Cost: {total_cost}'
+        body = f'Records Loaded: {x} \nTotal Cost: {total_cost:,}'
 
         print(datetime.now(), 'Load Infrastructure Billing')
 
