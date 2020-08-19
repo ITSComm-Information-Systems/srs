@@ -855,9 +855,11 @@ class Item(models.Model):
         rec.save()
 
         time_list = self.data['backupTime']
+        ampm_list=self.data['backupTimeampm']
+
         for num, node in enumerate(self.data['nodeNames']):
             if node != '':
-                time = time_list[num]
+                time = time_list[num]+' '+ampm_list[num]
                 new_node = BackupNode.objects.get_or_create(backup_domain=rec, name=node, defaults={'time': time})
                 new_time = new_node[0].time
                 if new_time != time:
