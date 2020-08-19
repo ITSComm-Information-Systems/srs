@@ -2,7 +2,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: production-monthly
+  name: production-dataden
 spec:
   schedule: '0 5 15 * *'
   ConcurrencyPolicy: Forbid
