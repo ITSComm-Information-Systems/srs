@@ -568,9 +568,11 @@ class BackupDetailsForm(TabForm):
         nodes = self.data.getlist('nodeNames')
         times = self.data.getlist('backupTime')
         ampm = self.data.getlist('backupTimeampm')
+
         old = set()
-        for node in BackupNode.objects.filter(backup_domain=self.instance.id):
-            old.add((node.name, node.time))
+        if hasattr(self, 'instance'):
+            for node in BackupNode.objects.filter(backup_domain=self.instance.id):
+                old.add((node.name, node.time))
             
         if len(nodes) > 1:
             node_value = ''
