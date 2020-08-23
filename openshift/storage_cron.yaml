@@ -2,7 +2,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: production-monthly
+  name: production-mistorage
 spec:
   schedule: '0 1 15 * *'
   ConcurrencyPolicy: Forbid
