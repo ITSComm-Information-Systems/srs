@@ -1,10 +1,6 @@
 <div class="row">
     <div class="col-6">
-
-
         {% for field in tab.form %}
-
-
         {% if field.name == 'nodeNames' %}
         <div id="host_list" class="form-group">
             <label for="hosts">
@@ -20,6 +16,11 @@
                     {% for opt in tab.form.time_list %}
                     <option value="{{opt}}">{{opt}}</option>
                     {% endfor %}
+                    
+                </select>
+                <select name="backupTimeampm" id="backupTimeampm" class="form-control">
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
                 </select>
                 &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i
                         class="fas fa-minus-circle"></i></a>
@@ -31,7 +32,16 @@
                     aria-describedy="hostsText">
                 <select name="backupTime" class="form-control">
                     {% for opt in tab.form.time_list %}
-                    {% if opt == node.time %}
+                    {% if opt ==  node.time|slice:":-3"  %}
+                    <option selected value="{{opt}}">{{opt}}</option>
+                    {% else %}
+                    <option value="{{opt}}">{{opt}}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+                <select name="backupTimeampm" id="backupTimeampm" class="form-control">
+                    {% for opt in tab.form.ampm_list %}
+                    {% if opt ==  node.time|slice:"-2:"  %}
                     <option selected value="{{opt}}">{{opt}}</option>
                     {% else %}
                     <option value="{{opt}}">{{opt}}</option>
@@ -49,21 +59,13 @@
         {% else %}
         {% include field.field.template_name %}
         {% endif %}
-
-
-
         {% endfor %}
-
-
     </div>
     <div class="col-sm">
     </div>
-    <!--/col-sm-->
-    ​
     <div class="col-lg-5">
         {% autoescape off %}
         {{tab.form.notice3.bodytext}}
         {% endautoescape %}
     </div>
-    <!--/col-lg-5-->
 </div>

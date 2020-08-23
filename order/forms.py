@@ -112,10 +112,10 @@ class TabForm(forms.Form):
                     if key in ['billingAuthority', 'serviceLvlAgreement']:
                         pass
 
-                    elif key == 'nodeNames' or key == 'backuupTimes':
+                    elif key == 'nodeNames' or key == 'backupTimes':
                         new = set()
                         for node in self.node_list:
-                            tup = (node['name'], node['time'])
+                            tup = (node['name'], node['time']+' '+node['ampm'])
                             new.add(tup)
 
                         old = set()
@@ -536,17 +536,18 @@ class BackupDetailsForm(TabForm):
         super(BackupDetailsForm, self).__init__(*args, **kwargs)
 
         self.time_list = eval(self.fields['backupTime'].attributes)
-
+        self.ampm_list = ['AM','PM']
+        
         if self.request.method == 'POST': # Skip for initial load on Add
             if self.is_bound:   # Reload Host list
                 self.node_list = []
                 nodes = self.data.getlist('nodeNames')
                 times = self.data.getlist('backupTime')
-
+                ampm = self.data.getlist('backupTimeampm')
 
                 for count, node in enumerate(nodes):
                     if node:
-                        self.node_list.append({'name': node, 'time': times[count]})
+                        self.node_list.append({'name': node, 'time': times[count], 'ampm':ampm[count]})
             else:
                 instance_id = self.request.POST.get('instance_id')
                 if instance_id: 
@@ -566,20 +567,31 @@ class BackupDetailsForm(TabForm):
         summary = super().get_summary(*args, **kwargs)
         nodes = self.data.getlist('nodeNames')
         times = self.data.getlist('backupTime')
+        ampm = self.data.getlist('backupTimeampm')
+        old = set()
+        for node in BackupNode.objects.filter(backup_domain=self.instance.id):
+            old.add((node.name, node.time))
+            
         if len(nodes) > 1:
             node_value = ''
             times[0] = ''
+            newnodes=[]
+            oldnodes=[]
             for count, node in enumerate(nodes):
-
-                if node_value:
-                    node_value = node_value + ', ' + node + '@' + times[count]
-                else:
-                    if node:
-                        node_value = node + '@' + times[count]
+                if (node!=''):
+                    new=(node, times[count] +' '+ ampm[count])
+                    if new not in old:
+                        newnodes.append('['+new[0]+ '@' +new[1]+']')
+                    else:
+                        oldnodes.append(new[0]+ '@' +new[1])
+            
+            for node in oldnodes:
+                node_value=node_value+node+', '
+            for node in newnodes:
+                node_value=node_value+node+', '
 
             summary[1]['value'] = node_value
             summary.pop(2) # Remove backupTime field from summary
-            
         return summary
 
 class BillingStorageForm(TabForm):
