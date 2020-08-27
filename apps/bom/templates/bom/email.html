@@ -1,0 +1,30 @@
+{% for name in distribution %}
+{{ name }}<br>
+{% endfor %}
+
+<div>
+    <strong>Estimate</strong> <a href="{{ base_url }}{% url 'estimate' estimate.id %}">{{ estimate.id }} - {{ estimate.label }}</a><br><br>
+
+    <strong>Project:</strong>{{ estimate.workorder.project_display }}<br>
+    <strong>Project Manager:</strong>{{ estimate.workorder.add_info_list_value_name_2 }}<br>
+    <strong>Project Engineer:</strong>{{ estimate.assigned_engineer }}<br><br>
+
+    <strong>Preorder Number:</strong>{{ estimate.workorder.pre_order_number }}<br>
+    <strong>Workorder:</strong>{{ estimate.workorder.wo_number_display }}<br><br>
+
+    <b><u>NetOps</u></b><br>
+    <strong>Assgined Date:</strong>{{ estimate.project.assigned_date|date:"SHORT_DATE_FORMAT" }}<br>
+    <strong>Due Date:</strong>{{ estimate.project.due_date|date:"SHORT_DATE_FORMAT" }}<br>
+    <strong>Completed Date:</strong>{{ estimate.project.completed_date|date:"SHORT_DATE_FORMAT" }}<br>
+</div>
+<hr>
+<div>
+
+    {% for note in note_list %}
+        <strong>Created:</strong>{{ note.note_creation_date }}&nbsp;&nbsp;
+        <strong>Subject:</strong>{{ note.note_subject }}&nbsp;&nbsp;
+        <strong>Author:</strong>{{ note.note_author }}<br><br>
+        {% autoescape off %} {{ note.note_body }} {% endautoescape %} <hr>
+    {% endfor %}
+
+</div>

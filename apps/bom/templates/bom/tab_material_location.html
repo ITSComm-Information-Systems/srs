@@ -1,0 +1,305 @@
+{% load humanize %}
+<table class="table table-hover table-striped table-sm">
+
+    <thead>
+        <tr>
+            <th></th>
+            <th scope="col">Item</th>
+            <th scope="col">Description</th>
+            <th scope="col">Status</th>
+            <th class="text-center" style="width: 10%">Quantity</th>
+            <th class="text-right">Unit Price</th>
+            <th class="text-right">Extended Price</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for form in material_formset %}
+        {% with record=form.instance %}
+        {% ifchanged record.material_location %}
+        <tr>
+            <td colspan=7><a href="$" i class="fas fa-edit" aria-hidden="true"
+                data-toggle="modal" data-material_location_id="{{ record.material_location.id }}" data-material_location="{{ record.material_location }}" data-material_location_description="{{ record.material_location.description }}" data-target="#matLocation"></a></i>&nbsp {{ record.material_location }}
+            {% if record.material_location.description %}
+               ( {{ record.material_location.description }} )        
+            {% endif %}
+            </td>
+        </tr>
+        {% endifchanged %}
+        <tr>
+            {{ form.id }}
+            <td class="text-right">{% include "bom/audit_info.html" %}</td>
+            <td>{{ record.item_code }}</td>
+            <td>{{ record.item_description }}<br>
+                <em>{{ record.manufacturer }} - {{ record.manufacturer_part_number }}</em>
+            </td>
+            <td>{{ record.get_status_display }}</td>
+            <td class="text-center">{{ form.quantity }}</td>
+            <td class="text-right">{{ record.price }}</td>
+            <td class="text-right">{{ form.extended_price|intcomma }}</td>
+        </tr>
+
+        {% if form.errors %} 
+        <tr>
+            <td colspan="9">
+                {% for field in form %} 
+                    {% for error in field.errors %}
+                        <div class="alert alert-danger">
+                        <strong>{{field.label}}: {{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </td>
+        </tr>
+        {% endif %}
+        
+        {% endwith %}
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>
+
+                <!-- Example split danger button -->
+                <div class="btn-group">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="addMaterial"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Add
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/apps/bom/add_item/{{ estimate.id }}">Add Existing Part</a>
+                        <a image="fas fa-star" class="dropdown-item" data-toggle="modal" href="#"
+                            data-target="#addNewItem">Add New Part</a>
+                        <a class="dropdown-item" data-toggle="modal" href="#" data-target="#csvImport">Import from
+                            CSV</a>
+                    </div>
+                </div>
+
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <th class="text-right">Total Cost</th>
+            <td class="text-right">${{ estimate.material_total|intcomma }}</td>
+        </tr>
+    </tfoot>
+</table>
+
+<div class="modal" tabindex="-1" role="dialog" id="parttemplate">
+    <div class="modal-dialog  modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Part</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!----TODO Debug deleting-->
+            <form method="POST" action="none">
+                {% if form.errors %}
+                {% for field in form %}
+                {% for error in field.errors %}
+                <div class="alert alert-danger">
+                    <strong>{{field.label}}: {{ error|escape }}</strong>
+                </div>
+                {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                {% csrf_token %}
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="formGroupExampleInput">Location</label>
+                        <input type="text" class="form-control" name="item_location">
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Manufacturer</label>
+                        <input type="text" class="form-control" name="item_manufacturer">
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Manufacturer Part Number</label>
+                        <input type="text" class="form-control" name="item_manufacturer_part_number">
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Price</label>
+                        <input type="decimal" class="form-control" name="item_price">
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Quantity</label>
+                        <input type="number" class="form-control" name="item_quantity">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" tabindex="-1" role="dialog" id="addNewItem">
+    <div class="modal-dialog  modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Part</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form method="POST" action="/apps/bom/add_new_part/">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="estimate_id" value="{{ estimate.id }}">
+
+                    <div class="form-group">
+                        <label for="formGroupExampleInput">Location</label>
+                        <input list="material-locations" type="text" class="form-control" name="item_location">
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Manufacturer</label>
+                        <input type="text" class="form-control" name="item_manufacturer">
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Manufacturer Part Number</label>
+                        <input type="text" class="form-control" name="item_manufacturer_part_number">
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Item Description</label>
+                        <input type="text" class="form-control" name="item_description">
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Price</label>
+                        <input type="decimal" class="form-control" name="item_price">
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Quantity</label>
+                        <input type="number" class="form-control" name="item_quantity">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<datalist id="material-locations">
+    {% for location in estimate.location_list %}
+        <option value="{{ location }}">
+    {% endfor %}
+</datalist>
+
+<div class="modal" tabindex="-1" role="dialog" id="addMaterialZ">
+    <div class="modal-dialog  modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Material By Z-Code</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form method="POST" action="/apps/bom/add_material_z/">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="estimate_id" value="{{ estimate.id }}">
+
+                    <div class="form-group">
+                        <label for="formGroupExampleInput">Location</label>
+                        <input list="material-locations" class="form-control" name="item_location" value="Main">
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Z-Code</label>
+                        <input type="text" class="form-control" name="item_code">
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Quantity</label>
+                        <input type="number" class="form-control" name="item_quantity">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal" tabindex="-1" role="dialog" id="matLocation">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Material Location</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form method="POST" action="/apps/bom/edit_material_location/" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" id="material_location_id" name="material_location_id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="formGroupExampleInput">Location</label>
+                        <input list="material-locations" class="form-control" id="material_location" name="material_location" value="Main">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formGroupExampleInput">Description</label>
+                        <input class="form-control" id="material_location_description" name="material_location_description" value="Main">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="csvImport">
+    <div class="modal-dialog  modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import from CSV</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form method="POST" action="/apps/bom/upload_csv/" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="estimate_id" value="{{ estimate.id }}">
+                <div class="modal-body">
+
+                    <label for="id_file">Attach a CSV (location,z-code,quantity):</label><br>
+                    <input type="file" name="file" multiple id="id_file">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

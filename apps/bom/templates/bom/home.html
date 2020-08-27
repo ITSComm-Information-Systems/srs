@@ -1,0 +1,60 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            /* Create three equal columns that floats next to each other */
+            .row {
+                padding: 4%
+            }
+            .column{
+                width: 25%;
+                height: 200px;
+                padding: 30px;
+                vertical-align: middle;
+                text-align: center;
+                margin: auto;
+                border: 1px solid #D6D6D6;
+                border-radius: 1.25rem;
+                display: table-cell;
+                vertical-align: middle;
+                background-color: #E6E9EC;
+                border-radius: 1.25rem;
+                outline:none;
+            }
+            .column:focus, .column:hover{
+                outline:none;
+                background-color: #C2C5C7;
+            }
+
+
+        </style>
+    </head>
+
+    <body>
+        <h3>What do you want to do?</h3>
+        <div class="row">
+            <button class="column" onclick="window.location.href='search/';">
+                <h2>Find a Preorder or Workorder</h2>
+            </button>
+            <button class="column" onclick="window.location.href='search?filter=assigned_to_me';">
+                <h2>Show my Assignments</h2>
+            </button>
+        </div>
+    </body>
+</html>
+
+
+
+{% endblock %}
+
+
+{% block js %}
+    <script>
+        $('.collapse').collapse();
+    </script>
+{% endblock js %}

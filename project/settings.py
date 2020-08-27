@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'pages',
     'reports',
     'tools',
-    'apps.rte'
+    'apps.rte',
+    'apps.bom'
 ]
 
 REST_FRAMEWORK = {

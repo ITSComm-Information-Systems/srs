@@ -1,0 +1,13 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+<h2>Import Material from CSV</h2>
+
+<ul>
+{% for entry in result %}
+    <li>{{ entry }}</li>
+{% endfor %}
+</ul>
+
+<a href='/apps/bom/estimate/{{ estimate.id }}'>Return to Estimate</a>
+
+{% endblock content %}

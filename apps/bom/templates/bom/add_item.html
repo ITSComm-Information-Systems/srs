@@ -1,0 +1,88 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+
+<h2>{{ title }}</h2>
+
+<form method="post">{% csrf_token %}
+    <input type="hidden" name="estimate_id" value="{{ estimate.id }}">
+    <input type="hidden" id="item_id" name="item_id">
+
+    <div class="form-group col-md-3">
+        <label for="formGroupExampleInput">Location</label>
+        <input list="material-locations" class="form-control" name="item_location" required>
+    </div>
+
+    <div class="form-group col-md-3">
+        <label for="formGroupExampleInput">Z-Code</label>
+        <input type="text" class="form-control" id="item_code" name="item_code" placeholder="Search" required>
+    </div>
+
+    <table style="display:none" id="item_table" class="table table-hover table-striped" aria-live=”polite”>
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Subclass</th>
+                <th>Manufacturer</th>
+                <th>Manufacturer#</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody id="itemTableBody">
+            {% for item in item_list %}
+            <tr data-item_id="{{ item.id }}" data-item_code="{{ item.code }}">
+                <td>{{ item.code }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.class_code }}</td>
+                <td>{{ item.subclass }}</td>
+                <td>{{ item.manufacturer }}</td>
+                <td>{{ item.manufacturer_part_number }}</td>
+                <td>{{ item.price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="form-group col-md-3">
+        <label for="formGroupExampleInput">Quantity</label>
+        <input type="number" class="form-control" name="item_quantity" required min="1">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</form>
+
+
+<datalist id="material-locations">
+    {% for location in location_list %}
+    <option value="{{ location }}">
+        {% endfor %}
+</datalist>
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+
+    $(document).ready(function () {
+        $("#item_table").hide();
+    });
+
+    $("#item_code").on("keyup", function () {
+        $("#item_table").show();
+        var value = $(this).val().toLowerCase();
+        $("#itemTableBody tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    $('#itemTableBody tr').click(function () {
+        $('#item_id').val(this.getAttribute('data-item_id'));
+        $('#item_code').val(this.getAttribute('data-item_code'));
+        $("#item_table").hide();;
+    });
+
+</script>
+{% endblock js %}

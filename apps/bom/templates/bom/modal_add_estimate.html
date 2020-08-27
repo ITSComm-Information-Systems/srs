@@ -1,0 +1,28 @@
+<div class="modal" tabindex="-1" role="dialog" id="addEstimate">
+    <div class="modal-dialog  modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Estimate</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form method="POST" action="/apps/bom/create_estimate/">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="pre_order_id" id="pre_order_id" value="{{ workorder.pre_order_id }}">
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Estimate Label</label>
+                        <input type="text" class="form-control" name="estimate_label">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
