@@ -1,0 +1,146 @@
+<div class="accordion" id="ordersAccordian">
+
+  <!-- {{ forloop.counter }} -->
+  <div class="card">
+    <div class="card-header" id="heading-1">
+      <h2 class="mb-0">
+        {{ workorder.wo_number_display }} &nbsp&nbsp Preorder: {{ workorder.pre_order_number }} &nbsp&nbsp Status:
+        {{ workorder.status_name }}
+        <button id="addEstimateBtn" type="button" class="btn btn-primary float-right" <a class="delete" href="#" data-toggle="modal"
+          data-target="#addEstimate">Add Estimate</button>
+        <br>
+        <button class="btn btn-link always-enabled" type="button" data-toggle="collapse" data-target="#collapse-1" aria-expanded="true"
+          aria-controls="collapse-{{ forloop.counter }}">
+          {{ workorder.project_display }} more...
+        </button>
+      </h2>
+    </div>
+
+    {% include 'bom/modal_add_estimate.html' %}
+
+    <div id="collapse-1" class="collapse show" aria-labelledby="heading-1" data-parent="#ordersAccordian">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm">
+            <p class="h4" id="tabTitle">Project</p>
+            <strong>Project</strong>
+            <p class="font-weight-normal">{{ workorder.project_code_display }}</p>
+            <strong>Project Manager</strong>
+            <p class="font-weight-normal">{{ workorder.add_info_list_value_name_2 }}</p>
+            <strong>Due Date</strong>
+            <p class="font-weight-normal">{{ workorder.due_date }}</p>
+          </div>
+          <div class="col-sm">
+            <p class="h4" id="tabTitle">Location</p>
+
+            <strong>Building Name</strong>
+            <p class="font-weight-normal">{{ workorder.add_info_list_value_name_1 }}</p>
+            <strong>Building Number</strong>
+            <p class="font-weight-normal">{{ workorder.add_info_list_value_code_1 }}</p>
+            <strong>Department Name</strong>
+            <p class="font-weight-normal">{{ workorder.department_name }}</p>
+          </div>
+          <div class="col-sm">
+            <p class="h4" id="tabTitle">Contact</p>
+            <strong>Contact Name</strong>
+            <p class="font-weight-normal">{{ workorder.form_display_contact_name }}</p>
+            <strong>Contact Number</strong>
+            <p class="font-weight-normal">{{ workorder.contact_phone_number }}</p>
+            <strong>Contact Number</strong>
+            <p class="font-weight-normal">{{ workorder.contact_email_address }}</p>
+          </div>
+
+          <div class="col-sm">
+            <p class="h4" id="tabTitle">As Builts</p>
+
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="asbuilt1" disabled
+                {% if workorder.add_info_checkbox_1 %}checked{% endif %}>
+              <label class="form-check-label" for="exampleCheck1">Draft Comp-D</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="asbuilt2" disabled
+                {% if workorder.add_info_checkbox_2 %}checked{% endif %}>
+              <label class="form-check-label" for="exampleCheck1">Asbuilt Recv'd-D</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="asbuilt3" disabled
+                {% if workorder.add_info_checkbox_3 %}checked{% endif %}>
+              <label class="form-check-label" for="exampleCheck1">Asbuilt Compl-D</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="asbuilt5" disabled
+                {% if workorder.add_info_checkbox_5 %}checked{% endif %}>
+              <label class="form-check-label" for="exampleCheck1">Asbuilt/Prints-F</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="asbuilt6" disabled
+                {% if workorder.add_info_checkbox_6 %}checked{% endif %}>
+              <label class="form-check-label" for="exampleCheck1">Closeout Compl-F</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="asbuilt4" disabled
+                {% if workorder.add_info_checkbox_4 %}checked{% endif %}>
+              <label class="form-check-label" for="exampleCheck1">Assign Eng FYI-A</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="asbuilt7" disabled
+                {% if workorder.add_info_checkbox_7 %}checked{% endif %}>
+              <label class="form-check-label" for="exampleCheck1">Asbuilt/Prints Received-A</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="asbuilt8" disabled
+                {% if workorder.add_info_checkbox_8 %}checked{% endif %}>
+              <label class="form-check-label" for="exampleCheck1">Assignments Complete-A</label>
+            </div>
+          </div>
+
+          <div class="col-sm">
+            <p class="h4" id="tabTitle">NetOps&nbsp<a href="$" i class="fas fa-edit" aria-hidden="true"
+                data-toggle="modal" data-target="#modalUMNET"></a></p>
+            <strong>NetOps:</strong><br>{{ estimate.project.netops_engineer }}<br>
+            <strong>Assgined Date:</strong>{{ estimate.project.assigned_date|date:"SHORT_DATE_FORMAT" }}<br>
+            <strong>Due Date:</strong>{{ estimate.project.due_date|date:"SHORT_DATE_FORMAT" }}<br>
+            <strong>Completed Date:</strong>{{ estimate.project.completed_date|date:"SHORT_DATE_FORMAT" }}<br>
+            <strong>Project Status:</strong>{{ estimate.project.get_status_display }}<br>
+            <strong>% Completed:</strong>{{ estimate.project.percent_completed }}<br>
+            <strong>Project Health:</strong>{{ estimate.project.get_health_display }}<br>
+          </div>
+
+
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="modalUMNET">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">NetOps Project Information</h5>
+        <button type="button" class="close always-enabled" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form method="POST" action="/apps/bom/edit_project/">
+        {% csrf_token %}
+        <div class="modal-body">
+          <input type="hidden" name="estimate_id" value="{{ estimate.id }}">
+          <input type="hidden" name="woid" value="{{ estimate.woid }}">
+          <input type="hidden" name="project_id" value="{{ estimate.project.id }}">
+
+          {{ project_form.as_p }}
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn btn-secondary always-enabled" data-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

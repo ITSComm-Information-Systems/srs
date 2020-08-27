@@ -25,3 +25,11 @@ class SuBackend(object):
                 pk=user_id)  # pylint: disable=W0212
         except get_user_model().DoesNotExist:
             return None
+
+    def has_perm(self, user_obj, perm, obj=None):
+        if perm == 'bom.can_access_bom':
+            return UmRteTechnicianV.objects.filter(uniqname=user_obj.username).exists()
+        elif perm == 'bom.can_update_bom_ordered':
+            return UmBomProcurementUsersV.objects.filter(username=user_obj.username.upper(), security_role_code='UM Procurement').exists()
+        else:
+            return None
