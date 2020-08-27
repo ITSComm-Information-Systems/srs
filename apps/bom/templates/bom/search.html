@@ -1,0 +1,208 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+
+
+<h2>Project Estimates</h2>
+
+
+<div class="accordion" id="ordersAccordian">
+
+    <!-- {{ forloop.counter }} -->
+    <div class="card">
+        <div class="card-header" id="heading-1">
+            <div class="form-inline">
+                <input type="search" id="workorder_search" class="form-control form-inline""
+                aria-label=" Search through site content"><i class="fa fa-filter" aria-hidden="true"></i>
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-1"
+                    aria-expanded="true" aria-controls="collapse-{{ forloop.counter }}">
+                    Advanced Search
+                </button>
+            </div>
+        </div>
+
+
+
+
+        <div class="container">
+
+            <div id="collapse-1" class="collapse show" aria-labelledby="heading-1" data-parent="#ordersAccordian">
+                <h5>Query</h5>
+                <form>
+                <div id="criterion_list">
+
+
+                    <div class="form-inline" >
+                        <input disabled class="form-control form-inline" type="text"
+                            value="Pinnacle Status" aria-describedy="hostsText">
+                        <input disabled class="form-control form-inline" type="text" value="Equals"
+                            aria-describedy="hostsText">
+                        <select name="status_name" class="form-control">
+                            <option value="Any">Any</option>
+                            <option selected value="Open">Open</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-inline" id="criterion_new" style="display: none;">
+                    <p><br>AND</p>
+                    <select id="search_field" class="form-control search-field">
+                        <option value="">Select a field</option>
+                        {% for search_field in field_list %}
+                            <option data-type="{{ search_field.type }}" value="{{ search_field.name }}">{{ search_field.label }}</option>
+                        {% endfor %}
+                    </select>
+                    <select id="search_operator" class="form-control search-operator" style="display: none;">
+                        <option></option>
+                        {% for key, values in field_types.items %}
+                            {% for value in values %}
+                            <option data-type="{{ key }}" value="{{ value }}">{{ value }}</option>
+                            {% endfor %}
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="tbd" class="form-control search-value" style="display: none;">
+                    <select class="form-control search-value" style="display: none;">
+                        <option selected value="Open">All</option>
+                        <option selected value="Open">Open</option>
+                        <option selected value="Open">Closed</option>
+                    </select>
+                    &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i
+                            class="fas fa-minus-circle"></i></a>
+                </div>
+
+                <a href="javascript:addRow('criterion')" class="d-inline"><i class="fas fa-plus-circle"></i> Add another
+                    criterion</a>
+
+                <hr>
+                <input type="submit" value="Run Query" class="btn btn-primary">
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+<div>
+
+
+    <table id="workorder_table" class="table table-hover table-striped" aria-live=”polite”>
+        <thead>
+            <tr>
+                <th>Create Date</th>
+                <th>Created By</th>
+                <th>Estimate Label</th>
+                <th>Preorder</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody id="workOrderTableBody">
+            {% for obj in page_obj %}
+            <tr data-estimate_id="{{ obj.id }}">
+                <td>{{ obj.create_date|date:"SHORT_DATE_FORMAT" }}</td>
+                <td>{{ obj.created_by }}</td>
+                <td>{{ obj.label }}</td>
+                <td>{{ obj.pre_order_number }}</td>
+                <td>{{ obj.workorder }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+
+</div>
+{% endblock content %}
+
+
+{% block js %}
+<script>
+    $('.collapse').collapse();
+    $(document).on("change", ".search-field" , function() {
+        value = $(this).val();
+        console.log(value); 
+
+        type = $(this).find(':selected').data('type')
+        console.log('4' + type);
+        $(this).next(".search-operator").show();
+        $(this).next(".search-operator").find("[data-type!=" + type + "]").hide(); 
+    
+    });
+
+    $(document).on("change", ".search-operator" , function() {
+        //value = $(this).val();
+        //console.log(value); 
+
+        //type = $(this).find(':selected').data('type')
+        //console.log('4' + type);
+        $(this).next(".search-value").show();
+        //$(this).next(".search-operator").find("[data-type!=" + type + "]").hide(); 
+    
+    });
+
+    function addRow(record) {
+        // clone source div by ID
+        if (typeof row_count == "undefined") {
+            row_count = 0;
+        } else {
+            row_count = row_count + 1;
+        }
+
+        var row = $("#" + record + "_new").clone();
+
+        row.attr("id", record + "_" + row_count);
+        row.show();
+        $("#" + record + "_list").append(row);   // TODO Find last host
+
+        $("#" + record + "_new").hide()
+
+        $(".nodeName").focus();
+    }
+
+    $("#div_workorder_table").hide();
+
+    $("#workorder_search").on("keyup", function () {
+        $("#div_workorder_table").show();
+        var value = $(this).val().toLowerCase();
+        $("#workOrderTableBody tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    $('#workOrderTableBody tr').click(function () {
+        //var estimate = $(this).dataset.estimate_id
+        var estimate_id = this.getAttribute('data-estimate_id');
+        //console.log('estimate', estimate)
+        window.location.replace("/apps/bom/estimate/" + estimate_id + "/");
+    });
+
+
+</script>
+
+
+
+
+
+
+{% endblock js %}

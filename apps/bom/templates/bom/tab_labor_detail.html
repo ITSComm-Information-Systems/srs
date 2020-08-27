@@ -1,0 +1,57 @@
+{% load humanize %}
+<table class="table table-hover table-striped table-sm">
+    <thead>
+        <tr>
+            <th>Group</th>
+            <th>Description</th>
+            <th class="text-center">Hours</th>
+            <th>Rate Type</th>
+            <th class="text-right">Rate</th>
+            <th class="text-right">Extended Cost</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    {% for form in labor_formset %}
+    <tbody>
+        <tr>
+            {{ form.id }}
+            <td>{{ form.group }}</td>
+            <td>{{ form.description }}</td>
+            <td class="text-right">{{ form.hours }}</td>
+            <td>{{ form.rate_type }}</td>
+            <td class="text-right">{{ form.rate.value }}</td>
+            <td class="text-right">{{ form.extended_cost|intcomma }}</td>
+            <!----          <td><select class="custom-select" name="{{ form.item.html_name }}" id="{{ form.item.auto_id }}" list="items"></td>  -->
+            <td class="text-center">{{ form.DELETE }}</td>
+        </tr>
+
+        {% if form.errors %} 
+        <tr>
+            <td colspan="9">
+                {% for field in form %} 
+                    {% for error in field.errors %}
+                        <div class="alert alert-danger">
+                        <strong>{{field.label}}: {{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </td>
+        </tr>
+        {% endif %}
+
+    </tbody>
+    {% endfor %}
+
+    <tfoot>
+        <tr>
+            <td></td>
+            <th class="text-right">Total Hours</th>
+            <th class="text-right">{{ estimate.labor_hours|intcomma }}</th>
+            <td></td>
+            <th class="text-right">Total Cost</th>
+            <td class="text-right">${{ estimate.labor_total|intcomma }}</td> </td>
+        </tr>
+    </tfoot>
+
+</table>
+<button type="submit" class="btn btn-primary">Save</button>

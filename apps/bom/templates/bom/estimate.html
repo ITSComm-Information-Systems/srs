@@ -1,0 +1,375 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+
+{% load humanize %}
+
+{% include "bom/preorder.html" %}
+<br>
+<nav>
+  <div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+    {% for est in estimate.list %}
+    <a class="nav-item nav-link {% if est.id == estimate.id %} active {% endif %}" id="nav-estimate-tab"
+      href="/apps/bom/estimate/{{ est.id }}/" role="tab" aria-controls="nav-estimate"
+      aria-selected="false">{{ est.label }}
+    </a>
+    {% endfor %}
+  </div>
+</nav>
+<div class="tab-pane fade show active bg-white border-left border-right" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+  <br>
+  <form method="post">
+    {{ material_formset.management_form }}
+    {{ labor_formset.management_form }}
+
+    <input type="hidden" id="current_tab" name="current_tab" value="{{ current_tab }}">
+    <input type="hidden" id="element" value="{{ element }}">
+
+    {% if form.errors %}
+    {% for field in form %}
+    {% for error in field.errors %}
+    <div class="alert alert-danger">
+      <strong>{{field.label}}: {{ error|escape }}</strong>
+    </div>
+    {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+    <div class="alert alert-danger">
+      <strong>{{ error|escape }}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if formset.errors %}
+    {% for field in formset %}
+    {% for error in field.errors %}
+    <div class="alert alert-danger">
+      <strong>{{field.label}}: {{ error|escape }}</strong>
+    </div>
+    {% endfor %}
+    {% endfor %}
+    {% for error in formset.non_field_errors %}
+    <div class="alert alert-danger">
+      <strong>{{ error|escape }}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="row">
+      <div class="col-sm">
+
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="estimate-label">Label</span>
+          </div>
+
+          <input type="text" class="form-control" name="label" value="{{ estimate.label }}" id="estimte-label"
+            aria-describedby="basic-addon3">
+        </div>
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon3">{{ form.status.label }}</span>
+          </div>
+          {{ form.status }}
+        </div>
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="estimate-label">Project Engineer</span>
+          </div>
+          {{ form.assigned_engineer }}
+        </div>
+
+        <a href="{{ estimate.folder }}" target="_blank"><i class="fas fa-link"></i>&nbsp; Drive Folder</a> 
+        {{ form.folder }}
+
+        <br>
+        <a href="https://umichprod.service-now.com/nav_to.do?uri=u_bill_of_material.do?sys_id={{ estimate.legacy_id }}"
+          target="_blank">**PRODUCTION BOM***</a>
+
+      </div>
+
+      <div class="col-sm">
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon3">Estimated Material</span>
+          </div>
+
+          <input disabled type="text" value="{{ estimate.material_total|intcomma }}" class="form-control text-right"
+            aria-describedby="basic-addon3">
+        </div>
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon3">Estimated Labor</span>
+          </div>
+          <input disabled type="text" value="{{ estimate.labor_total|intcomma }}" class="form-control text-right"
+            aria-describedby="basic-addon3">
+        </div>
+
+        <div class="form-row" id="contingency">
+          <div class="form-group col-md-6">
+            <label for="contingency_amount">Contingency Amount</label>
+            <input type="number" class="form-control" value="{{ estimate.contingency_amount|intcomma }}"
+              name="contingency_amount" id="contingency_amount" placeholder="$ Amount">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="contingency_percentage">Contingency Percentage</label>
+            <input type="number" min="0" class="form-control" value="{{ estimate.contingency_percentage }}"
+              id="contingency_percentage" name="contingency_percentage" placeholder="%">
+          </div>
+        </div>
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon3">Contingency Total</span>
+          </div>
+          <input disabled type="text" value="{{ estimate.contingency_total }}" name="contingency_amount"
+            class="form-control text-right" aria-describedby="basic-addon3">
+        </div>
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon3">Estimated Total</span>
+          </div>
+          <input disabled type="text" value="${{ estimate.total|intcomma }}" class="form-control text-right"
+            id="basic-url" aria-describedby="basic-addon3">
+        </div>
+
+      </div>
+
+      <div class="col-sm">
+
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split always-enabled" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">Actions
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="#" id="notifyWarehouse">Notify Warehouse</a>
+            <a class="dropdown-item" href="#" id="routeToProjectManager">Route to Project Manager</a>
+            <a class="dropdown-item" data-toggle="modal" data-target="#pinNote" href="#">Create Pinnacle Note</a>
+          </div>
+        </div>
+
+        <div id="routeToPmAlert" class="alert alert-success" style="display:none" role="alert">
+          Routing to Project Manager...
+        </div>
+        <div id="notifyWarehouseAlert" class="alert alert-success" style="display:none" role="alert">
+          Submitting to Warehouse...
+        </div>
+        <br>
+        <div>
+          <p>
+            <strong>Created on</strong>&nbsp{{ estimate.create_date|date:"SHORT_DATETIME_FORMAT" }}<br>
+            <strong>Created by</strong>&nbsp;{{ estimate.created_by }}<br><br>
+            <strong>Updated on</strong>&nbsp;{{ estimate.update_date|date:"SHORT_DATETIME_FORMAT" }}<br>
+            <strong>Updated by</strong>&nbsp;{{ estimate.updated_by }}
+            <br><br>
+            <a href="/apps/bom/summary-report/{{ estimate.id }}" target="_blank">Summary Report</a><br>
+            <a href="/apps/bom/by-location-report/{{ estimate.id }}" target="_blank">Material by Location Report</a><br>
+            <a href="/apps/bom/checkout-list-report/{{ estimate.id }}" target="_blank">Checkout Report</a><br>
+
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+
+    <nav>
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a class="nav-item nav-link" id="nav-location-tab" data-toggle="tab" href="#nav-location" role="tab"
+          aria-controls="nav-location" aria-selected="true">Material By Location</a>
+        <a class="nav-item nav-link" id="nav-parts-tab" data-toggle="tab" href="#nav-parts" role="tab"
+          aria-controls="nav-parts" aria-selected="false">Material By Item</a>
+        <a class="nav-item nav-link" id="nav-labor-tab" data-toggle="tab" href="#nav-labor" role="tab"
+          aria-controls="nav-labor" aria-selected="false">Labor Estimate
+          {% if labor_formset.errors %} <i class="fas fa-exclamation-triangle"></i> {% endif %}
+        </a>
+        <a class="nav-item nav-link" id="nav-notes-tab" data-toggle="tab" href="#nav-notes" role="tab"
+          aria-controls="nav-notes" aria-selected="false">Pinnacle Notes</a>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade" id="nav-location" role="tabpanel" aria-labelledby="nav-location-tab">
+        {% include "bom/tab_material_location.html" %}</div>
+      <div class="tab-pane fade" id="nav-parts" role="tabpanel" aria-labelledby="nav-parts-tab">
+        {% include "bom/tab_material_parts.html" %}</div>
+      <div class="tab-pane fade" id="nav-labor" role="tabpanel" aria-labelledby="nav-labor-tab">
+        {% include "bom/tab_labor_detail.html" %}</div>
+      <div class="tab-pane fade" id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab">
+       {% include "bom/tab_notes.html" %}</div>   
+    </div>
+  </form>
+</div>
+
+<form method="POST" action="/apps/bom/notify_warehouse/" id="notifyWarehouseForm">
+  {% csrf_token %}
+  <input type="hidden" value="{{ estimate.id }}" name="estimate_id">
+</form>
+
+<form method="POST" action="/apps/bom/add_pinnacle_note/" id="routeToPmForm">
+  {% csrf_token %}
+  <input type="hidden" name="note_estimate_id" value="{{ estimate.id }}">
+  <input type="hidden" name="note_woid" value="{{ estimate.woid }}">
+  <input type="hidden" name="note_subject" value="Route to Project Manager">
+  <input type="hidden" name="note_body" value="Route to Project Manager">
+</form>
+
+<datalist id="note-subjects">
+  <option value="Notify Warehouse">
+  <option value="Route to Project Manager">
+  <option value="Material Ordered">
+</datalist>
+
+<div class="modal" tabindex="-1" role="dialog" id="pinNote">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Add Pinnacle Note</h5>
+              <button type="button" class="close always-enabled" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+
+          <form method="POST" action="/apps/bom/add_pinnacle_note/" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input class="always-enabled" type="hidden" id="note_estimate_id" name="note_estimate_id" value="{{ estimate.id }}">
+              <input class="always-enabled" type="hidden" id="note_woid" name="note_woid" value="{{ estimate.woid }}">
+              <div class="modal-body">
+                  <div class="form-group">
+                      <label for="formGroupExampleInput">Subject</label>
+                      <select required class="form-control always-enabled" id="note_subject" name="note_subject">
+                        <option value="" disabled selected>---</option>
+                        {% for note_type in form.note_type_list %}
+                          <option>{{ note_type|last }}</option>
+                        {% endfor %}
+                      </select>
+                  </div>
+
+                  <div class="form-group">
+                      <label for="formGroupExampleInput">Body</label>
+                      <textarea required class="form-control always-enabled" id="note_body" name="note_body"></textarea>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary always-enabled">Submit</button>
+                  <button type="button" class="btn btn-secondary always-enabled" data-dismiss="modal">Cancel</button>
+              </div>
+          </form>
+      </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+  // Add accordian js
+  $('.collapse').collapse();
+
+  // Popovers for record timestamps
+  $(document).ready(function () {
+    $('[data-toggle="popover"]').popover();
+
+    // Only allow a % or an amount not both
+    $("#contingency_amount").change(function () {
+      $("#contingency_percentage").val('');
+    });
+
+    $("#contingency_percentage").change(function () {
+      $("#contingency_amount").val('');
+    });
+
+    $("form").submit(function () {
+      // submit more than once return false
+      $(this).submit(function () {
+        return false;
+      });
+      // submit once return true
+      return true;
+    });
+
+    $("#notifyWarehouse").click(function () {
+      $("#notifyWarehouseForm").submit();
+      $("#notifyWarehouseAlert").show();
+    });
+
+    $("#routeToProjectManager").click(function () {
+      $("#routeToPmForm").submit();
+      $("#routeToPmAlert").show();
+    });
+
+    // Class form up with bootstrap
+    $("select").addClass("form-control custom-select");
+    $('input:not(:checkbox)').addClass("form-control");
+
+    status = $("#id_status").val()
+    element = $("#element").val()
+    // Lockdown all fields once rejected, completed or cancelled
+    if (status == 0 || status > 3) {
+      $(':input').not('.always-enabled').prop("disabled", true);
+      $("#pinNote :input").prop("disabled", false)
+      $('#notifyWarehouse').hide();
+      $('#routeToProjectManager').hide();
+    }
+    // One ITS
+    if (status != 1) {
+      $("#nav-location :input").prop("readonly", true);
+    }
+
+
+
+    // Set initial Tab
+    var tab = getUrlVars()["tab"];
+
+    if (tab) {
+      $('#nav-' + tab + '-tab').addClass(' active');
+      $('#nav-' + tab).addClass(' active show');
+    } else {
+      $('#nav-location-tab').addClass(' active');
+      $('#nav-location').addClass(' active show');
+    }
+
+
+  });
+
+  function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+      vars[key] = value;
+    });
+    return vars;
+  }
+
+  // Save current tab ffr on post/get
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    target = e.target.id
+    pane = target.substring(4, target.length - 4);
+    $("#current_tab").val(pane);
+  });
+
+
+  $('#matLocation').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var id = button.data('material_location_id') // Extract info from data-* attributes
+    var location = button.data('material_location') // Extract info from data-* attributes
+    var description = button.data('material_location_description') // Extract info from data-* attributes
+    console.log(id, location, description)
+    $('#material_location_id').val(button.data('material_location_id'))
+    $('#material_location').val(button.data('material_location'))
+    $('#material_location_description').val(button.data('material_location_description'))
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this)
+    //modal.find('.modal-title').text('New message to ' + recipient)
+    //modal.find('.modal-body input').val(recipient)
+  })
+
+</script>
+{% endblock js %}
