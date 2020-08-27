@@ -1,0 +1,61 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+
+<h2>Search for Workorder/Preorder</h2>
+
+<div class="col-md-6">
+    <h5>Start typing a number or description</h5>
+    <input class="form-control col-md-6" id="workorder_search" placeholder="Search for workorder...">
+</div>
+
+<div id="div_workorder_table">
+    <hr>
+    <table id="workorder_table" class="table table-hover table-striped" aria-live=”polite”>
+        <thead>
+            <tr>
+                <th>Preorder</th>
+                <th>Workorder</th>
+                <th>Project Description</th>
+                <th>Estimates</th>
+            </tr>
+        </thead>
+        <tbody id="workOrderTableBody">
+            {% for workorder in workorder_list %}
+            <tr>
+                <td>{{ workorder.pre_order_number }}</td>
+                <td>{{ workorder.display }}</td>
+                <td>{{ workorder.project_display }}</td>
+                <td>{{ workorder.multi_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+
+    $(document).ready(function () {
+
+        $("#div_workorder_table").hide();
+
+        $("#workorder_search").on("keyup", function () {
+            $("#div_workorder_table").show();
+            var value = $(this).val().toLowerCase();
+            $("#workOrderTableBody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        $('#workOrderTableBody tr').click(function () {
+            var building = $(this).find("td").eq(1).html();
+            window.location.replace("/apps/bom/workorder/33/");
+        });
+
+    });
+</script>
+{% endblock js %}

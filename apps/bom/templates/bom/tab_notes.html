@@ -1,0 +1,22 @@
+<table class="table table-hover table-striped table-sm">
+
+    <thead>
+        <tr>
+            <th scope="col">Created</th>
+            <th scope="col">Subject</th>
+            <th scope="col">Author</th>
+            <th scope="col">Body</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in estimate.note_list %}
+        <tr>
+            <td>{{ record.note_creation_date }}</td>
+            <td>{{ record.note_subject }}</td>
+            <td>{{ record.note_author }}</td>
+            <td>{% autoescape off %} {{ record.note_body }} {% endautoescape %}</pre></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
