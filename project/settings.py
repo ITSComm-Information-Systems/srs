@@ -176,24 +176,29 @@ DATABASES = {
 
 DATABASE_ROUTERS = ['project.settings.DBRouter']
 
+
 class DBRouter(object):
   def db_for_read(self, model, **hints):
 
-    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING'):
+    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING') or model._meta.db_table.startswith('um_bom'):
       return 'pinnacle'
     return 'default'
 
   def db_for_write(self, model, **hints):
    
-    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING'):
+    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING') or model._meta.db_table.startswith('um_bom'):
       return 'pinnacle'
     return 'default'
 
   def allow_migrate(self, db, app_label, **hints):
+    if app_label == "bom":
+        return True
+
     if db == "pinnacle":
       return False
     else:
       return True
+
 
 
 # Password validation
