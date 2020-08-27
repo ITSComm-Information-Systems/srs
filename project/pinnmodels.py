@@ -462,7 +462,7 @@ class UmCurrentDeptManagersV(models.Model):
         db_table = 'PINN_CUSTOM\".\"um_current_dept_managers_v'
 
 class UmOscNoteProfileV(models.Model):
-   note_id =  models.IntegerField(9, null=False)
+   note_id =  models.IntegerField(9, null=False, primary_key=True)
    note_type_id =  models.IntegerField(9, null=False)
    note_type_code =  models.CharField(max_length=120, blank=True, null=True)
    note_type_subcode =  models.CharField(max_length=120, blank=True, null=True)
