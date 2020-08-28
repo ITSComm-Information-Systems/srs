@@ -185,6 +185,21 @@ class TestOther(unittest.TestCase):
         print('Not tested in anything else:')
         print([e for e in exceptions])
 
+class TestImpersonate(unittest.TestCase):
+    def test_public(self):
+        c = Client()
+        # print('Not logged in: ' +str(c.get('/auth/su_login/',follow=True).status_code)+" "+ str(c.get('/auth/su_login/').status_code))
+        self.assertNotEqual(c.get('/auth/su_login/',follow=True).status_code,200)
+    def test_loggedin(self):
+        c = Client()
+        c.force_login(User.objects.get(username='testvendor'))
+        # print('simply logged in: '+str(c.get('/auth/su_login/',follow=True).status_code)+" "+ str(c.get('/auth/su_login/').status_code))
+        self.assertNotEqual(c.get('/auth/su_login',follow=True).status_code, 200)
+    def test_canImpersonate(self):
+        c = Client()
+        c.force_login(User.objects.get(username='admin'))
+        # print('Following impersonate: '+ str(c.get('/auth/su_login/',follow=True).status_code)+" "+ str(c.get('/auth/su_login/').status_code))
+        self.assertEqual(c.get('/auth/su_login',follow=True).status_code, 200)
 # Run to print all url results
 # Update exclusion lists as needed
 # Urls that Forms POST to should be excluded
