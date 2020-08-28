@@ -7,6 +7,7 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name="bom/home.html")),
     path('favorites/', views.Favorites.as_view()),
     path('search/', views.Search.as_view()),
+    path('search_ajax/', views.search_ajax),
     path('create_estimate/', views.create_estimate),
     path('add_new_part/', views.add_new_part),
     path('edit_material_location/', views.edit_material_location),
