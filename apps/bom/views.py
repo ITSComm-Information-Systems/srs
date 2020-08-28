@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse 
 from django.template import loader
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
@@ -76,6 +76,10 @@ class Search(PermissionRequiredMixin, View):
             title = 'Warehouse/Ordered'
             search_list = EstimateView.objects.filter(status__in=['Warehouse','Ordered']).order_by('-status')
             template = 'bom/search_warehouse.html'
+        elif filter == 'quick':
+            title = 'Search by Preorder'
+            search_list = [] #EstimateView.objects.filter(status__in=['Warehouse','Ordered']).order_by('-status')
+            template = 'bom/search_quick.html'
         elif filter == 'all_estimates':
             title = 'All Preorders/Workorder w/Estimates'
             search_list = EstimateView.objects.all()
@@ -95,6 +99,18 @@ class Search(PermissionRequiredMixin, View):
                       {'title': title,
                        'search_list': search_list, })
 
+
+@permission_required('bom.can_access_bom')
+def search_ajax(request):
+
+    q = request.GET.get('q', all)
+    estimates = []
+
+    for est in EstimateView.objects.filter(pre_order_number=q) | EstimateView.objects.filter(wo_number_display=q):
+        text = f'{est.wo_number_display} ({est.pre_order_number})  Label:{est.label}'
+        estimates.append({"id": est.id, "text": text})
+
+    return JsonResponse({'results': estimates}, safe=False)
 
 @permission_required('bom.can_access_bom')
 def edit_project(request):
