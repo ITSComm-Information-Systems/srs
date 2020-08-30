@@ -12,9 +12,9 @@ $(document).ready(function() {
 		next_prev(current_page, num_pages);
 	});
 
+
 	// Enable pagination
 	$('.page-link').click(function(event) {
-		console.log('clicked');
 		current_page = paginate($(this).text(), rows_per_page, current_page, tr);
 		next_prev(current_page, num_pages);
   	});
@@ -210,6 +210,7 @@ function get_entries() {
 	            $('#assigned_groups').text(data[data.length - 1].assigned_groups);
 	            $('.search_topic').html(data[data.length - 1].search_topic);
 	            $('.search_criteria').html(data[data.length - 1].search_criteria);
+	            $('.total_hours').html(data[data.length - 1].total_hours);
 
 	            // Pagination for results table
 				var num_rows = $('#select-entries-table').find('tbody tr:has(td)').length;
@@ -263,12 +264,10 @@ function copy_selected() {
 		var wo_labor_id = row.find('td:nth-child(7)').text();
 
 		var rate_levels = $('#rate_levels').text();
-		console.log(rate_levels);
 		rate_levels = rate_levels.replace('[', '').replace(']', '').replace(/'/g, "").replace(/ /g, '');
 		rate_levels = rate_levels.split(',');
 
 		var assigned_groups = $('#assigned_groups').text();
-		console.log(assigned_groups);
 		assigned_groups = assigned_groups.replace('[', '').replace(']', '').replace(/'/g, "");
 		assigned_groups = assigned_groups.split(',');
 
@@ -279,8 +278,8 @@ function copy_selected() {
 						  	  	    '<input class="form-control" type="date" value="' + assigned_date + '">' +
 						  	  '</td>' +
 						  	  '<td>' +
-								    "<input class='form-control d-inline col-6 hours' type='text' value='" + duration_hours + "' placeholder='HH'>" +
-								    "<input class='form-control d-inline col-6 mins' type='text' value='" + duration_mins + "' placeholder='MM'>" +
+								    "<input class='form-control d-inline col-6 hours' type='text' id='hours' value='" + duration_hours + "' placeholder='HH'>" +
+								    "<input class='form-control d-inline col-6 mins' type='text' id='mins' value='" + duration_mins + "' placeholder='MM'>" +
 						  	  '</td>' +
 						  	  '<td>' +
 						  	      '<select class="form-control">';
@@ -330,6 +329,8 @@ function review_submit() {
 
 	$('#review-update-table tbody').html('');
 
+	$('.total_hours').text(calculate_hours());
+
 	var i = 1;
 	$('#update-entries-table tbody tr').each (function() {
 		var row = $(this);
@@ -375,7 +376,7 @@ function split_duration(duration, part) {
 	}
 }
 
-// Format input date to HH:MM
+// Format input duration to HH:MM
 function format_duration(hours, mins) {
     if (hours.length == 0) {
         hours = '00';
@@ -396,8 +397,6 @@ function format_duration(hours, mins) {
 function format_date(date) {
 	months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
 	date = date.split(' ');
-
-	console.log(date);
 
 	month = months.indexOf(date[0]);
 	month = month + 1;
@@ -541,4 +540,23 @@ function validate_update() {
     if (current_tab === 3) {
     	return(validate_changes());
     }
+}
+
+// Calculate total hours worked
+function calculate_hours() {
+	var hours = 0;
+	var mins = 0;
+	$('#update-entries-table tbody tr').each(function() {
+		var row = $(this);
+		var duration_hours = row.find('td:nth-child(3) .hours').val();
+		var duration_mins = row.find('td:nth-child(3) .mins').val();
+
+		hours = hours + parseInt(duration_hours);
+		mins = mins + parseInt(duration_mins);
+	})
+
+	hours = hours + Math.floor(mins / 60);
+	mins = mins % 60;
+
+	return format_duration(hours.toString(), mins.toString()); 
 }
