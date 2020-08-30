@@ -93,13 +93,13 @@ function add_to_multiple_table(num_entries) {
     if (num_entries < 10) {
         num_entries = num_entries + 1; 
         var html = '<tr id="row-' + num_entries + '">' + 
-                        '<th>' + $('#techSearchMultiple').val() + '</th>' +
-                        '<th>' + $('#assignedGroupSelectMultiple').val() + '</th>' +
-                        '<th>' + $('#rateSelectMultiple').val() + '</th>' +
-                        '<th>' + $('#assigned_date_multiple').val() + '</th>' +
-                        '<th>' + format_duration($('#duration-hours-multiple').val(), $('#duration-mins-multiple').val()) + '</th>' +
-                        '<th>' + $('#notes-multiple').val() + '</th>' +
-                        '<th class="delete-col"><button class="btn btn-danger delete_row_multiple" id="' + num_entries + '">Delete</button>' +
+                        '<td>' + $('#techSearchMultiple').val() + '</td>' +
+                        '<td>' + $('#assignedGroupSelectMultiple').val() + '</td>' +
+                        '<td>' + $('#rateSelectMultiple').val() + '</td>' +
+                        '<td>' + $('#assigned_date_multiple').val() + '</td>' +
+                        '<td>' + format_duration($('#duration-hours-multiple').val(), $('#duration-mins-multiple').val()) + '</td>' +
+                        '<td>' + $('#notes-multiple').val() + '</td>' +
+                        '<td class="delete-col"><button class="btn btn-danger delete_row_multiple" id="' + num_entries + '">Delete</button></td>' +
                     '</tr>';
         var form_html = '<input type="text" name="' + num_entries + '_techid" value="' + $('#techSearchMultiple').val() + '" hidden>' +
                         '<input type="text" name="' + num_entries + '_assigned_group" value="' + $('#assignedGroupSelectMultiple').val() + '" hidden>' +
@@ -110,6 +110,8 @@ function add_to_multiple_table(num_entries) {
         $('#multiple-input-form').append(form_html);
         $('#multiple-input-table > tbody:last-child').append(html);
         $("#multiple-input").show();
+
+        $('#total-hours').text(calculate_duration_multiple());
 
         // Reset all input values
         $('#techSearchMultiple').val('');
@@ -144,6 +146,8 @@ function delete_row_multiple(row_num, num_entries) {
     if (num_entries == 0) {
         $('#multiple-input').hide();
     }
+
+    $('#total-hours').text(calculate_duration_multiple());
     return(num_entries);
 }
 
@@ -276,4 +280,25 @@ function validate_multiple() {
         return(validate_multiple_entries());
     }
     return(true);
+}
+
+// Calculate total hours worked
+function calculate_duration_multiple() {
+    var hours = 0;
+    var mins = 0;
+
+    $('#multiple-input-table tbody tr').each(function() {
+        var row = $(this);
+        var duration = row.find('td:nth-child(5)').text();
+        row_hours = split_duration(duration, 'hours');
+        row_mins = split_duration(duration, 'mins');
+
+        hours = hours + parseInt(row_hours);
+        mins = mins + parseInt(row_mins);
+    })
+
+    hours = hours + Math.floor(mins / 60);
+    mins = mins % 60;
+
+    return format_duration(hours.toString(), mins.toString()); 
 }

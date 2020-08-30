@@ -4,6 +4,7 @@ from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLeve
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
 from django.db import connections
+from django.db.models import Sum
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -331,13 +332,13 @@ def get_update_entries(request):
 
     # Search by work order
     if work_order:
-        results = list(UmRteCurrentTimeAssignedV.objects.select_related('rate_number').filter(status_name="Open",
+        results = UmRteCurrentTimeAssignedV.objects.select_related('rate_number').filter(status_name="Open",
                                                        billed="No",
                                                        labor_code=techid,
                                                        work_order_display=work_order).order_by('-assigned_date',
                                                                                            'work_order_display').values('work_order_display', 'assigned_date',
                                                                                            'actual_mins_display', 'rate_number__labor_rate_level_name', 'assn_wo_group_name',
-                                                                                           'wo_labor_id'))
+                                                                                           'wo_labor_id')
         search_topic = 'Work Order'
         search_criteria = work_order
 
@@ -350,25 +351,28 @@ def get_update_entries(request):
             date_start = datetime.strptime(date_start, '%Y-%m-%d')
             date_end = datetime.strptime(date_end, '%Y-%m-%d')
 
-        results = list(UmRteCurrentTimeAssignedV.objects.select_related('rate_number').filter(status_name="Open",
+        results = UmRteCurrentTimeAssignedV.objects.select_related('rate_number').filter(status_name="Open",
                                                        billed="No",
                                                        labor_code=techid,
                                                        assigned_date__gte=date_start,
                                                        assigned_date__lte=date_end).order_by('-assigned_date',
                                                                                            'work_order_display').values('work_order_display', 'assigned_date',
                                                                                            'actual_mins_display', 'rate_number__labor_rate_level_name', 'assn_wo_group_name',
-                                                                                           'wo_labor_id'))
+                                                                                           'wo_labor_id')
         search_topic = 'Date Range'
         search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
 
     rate_levels = [rate.labor_rate_level_name for rate in UmRteRateLevelV.objects.all()]
     assigned_groups = [group.wo_group_name for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=techid)]
+    total_hours = format_time(results.aggregate(Sum('actual_mins'))['actual_mins__sum'] or 0)
+    results = list(results)
 
     results.append({
         'rate_levels': rate_levels,
         'search_topic': search_topic,
         'search_criteria': search_criteria,
-        'assigned_groups': assigned_groups
+        'assigned_groups': assigned_groups,
+        'total_hours': total_hours
         })
 
     return JsonResponse(results, safe=False)
@@ -484,7 +488,8 @@ def view_time_display(request):
 
     # Search by work order
     if work_order:
-        results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, work_order_display=work_order).order_by('-assigned_date','work_order_display')
+        results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, work_order_display=
+            work_order).order_by('-assigned_date','work_order_display')
         search_topic = 'Work Order'
         search_criteria = work_order
 
@@ -502,12 +507,15 @@ def view_time_display(request):
         search_topic = 'Date Range'
         search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
 
+    total_hours = format_time(results.aggregate(Sum('actual_mins'))['actual_mins__sum'] or 0)
+
     context = {
         'title': 'View Time',
         'techid': techid,
         'search_topic': search_topic,
         'search_criteria': search_criteria,
-        'entries': results
+        'entries': results,
+        'total_hours': total_hours
     }
     return HttpResponse(template.render(context, request))
 
@@ -527,7 +535,18 @@ def get_date_range(date_range):
 
     return date_start, date_end
 
+
 # Splits duration into hours and minutes
 def split_duration(duration):
     duration = duration.split(':')
     return int(duration[0]), int(duration[1])
+
+
+def format_time(total_hours):
+    hours, mins = divmod(total_hours, 60)
+    if hours < 10:
+        hours = '0' + str(hours)
+    if mins < 10:
+        mins = '0' + str(mins)
+    total_hours = str(hours) + ':' + str(mins)
+    return total_hours
