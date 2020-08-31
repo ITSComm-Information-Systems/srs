@@ -31,5 +31,7 @@ class SuBackend(object):
             return UmRteTechnicianV.objects.filter(uniqname=user_obj.username).exists()
         elif perm == 'bom.can_update_bom_ordered':
             return UmBomProcurementUsersV.objects.filter(username=user_obj.username.upper(), security_role_code='UM Procurement').exists()
+        elif perm == 'rte.add_umrteinput':
+            return UmRteTechnicianV.objects.filter(uniqname=user_obj.username).exists()
         else:
             return None
