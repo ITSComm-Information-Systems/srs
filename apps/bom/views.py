@@ -449,7 +449,7 @@ class Warehouse(PermissionRequiredMixin, View):
             project_form = ProjectForm()
 
         MaterialFormSet = modelformset_factory(
-            Material, form=MaterialLocationForm, exclude=('id',), extra=0)
+            Material, form=MaterialForm, exclude=('id',), extra=0)
         material_formset = MaterialFormSet(
             queryset=estimate.material_list, prefix='material')
         form = EstimateForm(instance=estimate)
