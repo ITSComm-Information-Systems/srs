@@ -51,7 +51,7 @@
 		<nav class="navbar navbar-expand-lg" id="aux-nav" aria-label="Auxiliary Navigation">
 			<div class="container">
 				<div class="navbar-brand">
-					<a class="logo" href="/">Online Service Center</a>
+					<a href="/apps">Infrastructure Apps</a>
 				</div>
 				<button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target=".navbars" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<i class="fas fa-bars text-light"></i>
@@ -59,9 +59,6 @@
 				<div class="collapse navbar-collapse navbars" aria-labelledby="aux-nav" role="navigation">
 					<ul class="navbar-nav ml-auto">
 						
-						<li class="nav-item">
-							<a class="nav-link {% if title == 'Help' %}active {% endif %}" href="/help">Help</a>
-						</li>
 						{% if user.is_authenticated %}
 						<li class="nav-item dropdown ">
 							<a class="nav-link dropdown-toggle {% if title == 'View My System Privileges' %}active{% endif %}" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -81,7 +78,6 @@
 								{% if request.session.exit_users_pk %}
 									<a class="dropdown-item" href="/auth/su/">Exit Impersonate</a>
 								{% endif %}
-								<a class="dropdown-item" href="/auth/mypriv/">View System Privileges</a>
 								<a class="dropdown-item"  href="/auth/logout/">Logout</a>
 							</div>
 						</li>
@@ -106,17 +102,19 @@
 					</li>
 					<li class="nav-item dropdown">
 						<b>
-						<a class="nav-link"><i class="fas fa-file-invoice"></i> Bill of Materials</a>
+						<a href="/apps/bom/" class="nav-link"><i class="fas fa-file-invoice"></i> Bill of Materials</a>
 						<b/>
 						
 						
 					</li>
+					<!----
 					<li class="nav-item dropdown">
 						<b>
-						<a class="nav-link"><i class="fas fa-warehouse"></i> MBid</a>
+						<a href="/apps/mbid/" class="nav-link"><i class="fas fa-warehouse"></i> MBid</a>
 						</b>
 						
 					</li>
+					-->
 				</ul>
 		</div>
 		</nav>
@@ -152,7 +150,7 @@
 			<a href="https://twitter.com/umichTECH"><span class="fab fa-twitter"><span class="sr-only">Twitter</span></span></a>
 			<a href="https://www.youtube.com/user/UMITSCommunications"><span class="fab fa-youtube"><span class="sr-only">YouTube</span></span></a>
 			</div>
-			<p><a href="/help">Contact ITS</a></p>
+			<p><a href="/help">Contact ITS</a></p> 
 		</div>
 
 		<div class="links right">
