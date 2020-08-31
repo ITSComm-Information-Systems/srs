@@ -74,7 +74,7 @@ class Search(PermissionRequiredMixin, View):
             template = 'bom/search_estimates.html'
         elif filter == 'warehouse':
             title = 'Warehouse/Ordered'
-            search_list = EstimateView.objects.filter(status__in=['Warehouse','Ordered']).order_by('-status')
+            search_list = EstimateView.objects.filter(status__in=['Warehouse','Ordered']).order_by('-status','-pre_order_number')
             template = 'bom/search_warehouse.html'
         elif filter == 'quick':
             title = 'Search by Preorder'
