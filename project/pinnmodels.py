@@ -1118,3 +1118,12 @@ class UmRteInput(models.Model):
         managed = False
         db_table = 'PINN_CUSTOM\".\"UM_RTE_INPUT'
 
+# Used for checking permissions on MBid and BOM
+class UmBomProcurementUsersV(models.Model):
+    username = models.CharField(max_length=100, null=False, primary_key=True)
+    security_role_code = models.CharField(max_length=50, null=False)
+    
+    class Meta:
+        managed = False
+        db_table = 'PINN_CUSTOM\".\"UM_BOM_PROCUREMENT_USERS_V'
+
