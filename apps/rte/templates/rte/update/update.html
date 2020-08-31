@@ -2,7 +2,7 @@
 
 <div class='row'>
 	<div class='col-8'>
-		{% if request.user|is_member:"RTE Admin" or request.user.is_superuser %}
+		{% if perms.rte.add_umrtetechnician %}
 		<form action='' method='post' id='update-form'>{% csrf_token %}
 			<div class="form-group" id="searchTechUpdate">
 		        <label for="techSearchUpdate" id="labelTechSearchUpdate">

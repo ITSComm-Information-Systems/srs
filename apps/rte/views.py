@@ -9,8 +9,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required, permission_required
 
 # Base RTE view
-@login_required
-@permission_required('rte_access', raise_exception=True)
+@permission_required('rte.add_umrteinput', raise_exception=True)
 def load_rte(request):
     template = loader.get_template('rte/base_rte.html')
 
@@ -20,6 +19,7 @@ def load_rte(request):
     return HttpResponse(template.render(context, request))
 
 # Single technician, multiple orders
+@permission_required('rte.add_umrteinput', raise_exception=True)
 def single_tech(request):
     template = loader.get_template('rte/workflow.html')
 
@@ -52,7 +52,7 @@ def single_tech(request):
     }
     tab_list.append(tab3)
 
-    if request.user.groups.filter(name="RTE Admin").exists() or request.user.is_superuser:
+    if request.user.has_perm('rte.add_umrtetechnicianv'):
         all_techs = UmRteTechnicianV.objects.all()
         tech_id = ''
         tech_name = ''
@@ -83,6 +83,7 @@ def single_tech(request):
     return HttpResponse(template.render(context, request))
 
 # Review single tech times
+@permission_required('rte.add_umrteinput', raise_exception=True)
 def single_submit(request):
     template = loader.get_template('rte/submitted.html')
 
@@ -145,6 +146,7 @@ def single_submit(request):
 
 
 # Multiple technicians, single order
+@permission_required('rte.add_umrtetechnicianv', raise_exception=True)
 def multiple_tech(request):
     template = loader.get_template('rte/workflow.html')
 
@@ -204,6 +206,7 @@ def get_assigned_group(request):
 
 
 # Submit multiple tech times
+@permission_required('rte.add_umrtetechnicianv', raise_exception=True)
 def multiple_submit(request):
     template = loader.get_template('rte/submitted.html')
 
@@ -263,6 +266,7 @@ def multiple_submit(request):
 
 
 # Modify time
+@permission_required('rte.add_umrteinput', raise_exception=True)
 def update(request):
     template = loader.get_template('rte/workflow.html')
 
@@ -304,7 +308,7 @@ def update(request):
     }
     tab_list.append(tab4)
 
-    if request.user.groups.filter(name="RTE Admin").exists() or request.user.is_superuser:
+    if request.user.has_perm('rte.add_umrtetechnicianv'):
         all_techs = UmRteTechnicianV.objects.all()
     else:
         all_techs = UmRteTechnicianV.objects.filter(uniqname=request.user.username)
@@ -378,6 +382,7 @@ def get_update_entries(request):
     return JsonResponse(results, safe=False)
 
 # Submit updated times
+@permission_required('rte.add_umrteinput', raise_exception=True)
 def update_submit(request):
     template = loader.get_template('rte/submitted.html')
 
@@ -438,6 +443,7 @@ def update_submit(request):
 
 
 # Find open, unbilled entries based on tech ID
+@permission_required('rte.add_umrteinput', raise_exception=True)
 def select_times(request):
     template = loader.get_template('rte/update/select_times.html')
 
@@ -463,6 +469,7 @@ def select_times(request):
 
 
 # View times
+@permission_required('rte.add_umrteinput', raise_exception=True)
 def view_time_load(request):
     template = loader.get_template('rte/view/search.html')
 
@@ -477,6 +484,7 @@ def view_time_load(request):
     return HttpResponse(template.render(context, request))
 
 
+@permission_required('rte.add_umrteinput', raise_exception=True)
 def view_time_display(request):
     template = loader.get_template('rte/view/display.html')
 
