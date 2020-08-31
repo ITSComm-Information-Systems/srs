@@ -1,6 +1,6 @@
 {% load rte_tags %}
 
-{% if request.user|is_member:"RTE Admin" or request.user.is_superuser %}
+{% if perms.rte.add_umrtetechnicianv %}
 <form id='techForm' method='post' action='' onsubmit='return validate_search()'>{% csrf_token %}
     <div class="form-group" id="searchTech">
         <label for="techSearch" id="labelTechSearch">
