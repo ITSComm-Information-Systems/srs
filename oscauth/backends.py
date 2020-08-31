@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth import get_user_model
-from project.pinnmodels import UmRteTechnicianV
+from project.pinnmodels import UmRteTechnicianV, UmBomProcurementUsersV
 
 
 class SuBackend(object):

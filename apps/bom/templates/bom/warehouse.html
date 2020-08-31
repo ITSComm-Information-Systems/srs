@@ -33,7 +33,7 @@
     </div>
 
     <a style="float:right;" href="/apps/bom/estimate/{{ estimate.id }}">Return to Main</a>
-    
+
     <table class="table table-hover table-striped table-sm">
         <thead>
             <tr>
@@ -50,9 +50,8 @@
         {% with rec=form.instance %}
         <tbody>
             <tr>
-                <td colspan="4"><b>{{rec.material_location}}:</b> {{ rec.item_code }} - {{ rec.item_description }} </td>
-                <td colspan="3"><i>{{rec.manufacturer}} {{rec.manufacturer_part_number}}</i></td>
-            
+                <td colspan="7"><b>{{rec.material_location}}:</b> {{ rec.item_code }} - {{ rec.item_description }} &emsp;
+                    <i>({{rec.manufacturer}} - {{rec.manufacturer_part_number}})</i></td>
             </tr>
             <tr>
                 {{ form.id }}
@@ -104,6 +103,12 @@
         $('input:not(:checkbox)').addClass("form-control");
 
         $('#addEstimateBtn').hide();
+
+        status = $("#id_status").val()
+        if (status == 0 || status > 3) {
+            $(':input').not('.always-enabled').prop("disabled", true);
+        }
+
 
     });
 

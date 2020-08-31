@@ -81,6 +81,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # mozilla-django-oidc
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'DEV')
 SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')
 OIDC_RP_CLIENT_ID = os.getenv('OIDC_RP_CLIENT_ID', 'N/A')
 OIDC_RP_CLIENT_SECRET = os.getenv('OIDC_RP_CLIENT_SECRET','N/A')
