@@ -50,9 +50,8 @@
         {% with rec=form.instance %}
         <tbody>
             <tr>
-                <td colspan="4"><b>{{rec.material_location}}:</b> {{ rec.item_code }} - {{ rec.item_description }} </td>
-                <td colspan="3"><i>{{rec.manufacturer}} {{rec.manufacturer_part_number}}</i></td>
-
+                <td colspan="7"><b>{{rec.material_location}}:</b> {{ rec.item_code }} - {{ rec.item_description }} &emsp;
+                    <i>({{rec.manufacturer}} - {{rec.manufacturer_part_number}})</i></td>
             </tr>
             <tr>
                 {{ form.id }}
