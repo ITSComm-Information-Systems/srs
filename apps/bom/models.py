@@ -551,7 +551,12 @@ class NotificationManager(models.Manager):
             distribution = email_list
             email_list = ['its-infrastructure-bom@umich.edu'] # Let's not spam from dev/qa
 
-        note_list = UmOscNoteProfileV.objects.filter(note_keyid_value=estimate.woid,note_subject__startswith='BOM').order_by('-note_id')
+        if estimate.status == estimate.ORDERED:
+            note_list = UmOscNoteProfileV.objects.filter(note_keyid_value=estimate.woid,note_subject='BOM - Notify Warehouse').order_by('-note_id')
+        elif estimate.status == estimate.WAREHOUSE:
+            note_list = UmOscNoteProfileV.objects.filter(note_keyid_value=estimate.woid,note_subject='BOM - Material Ordered').order_by('-note_id')
+        else:
+            note_list = []
 
         base_url = settings.SITE_URL
         msg_html = render_to_string('bom/email.html', {'estimate': estimate, 'base_url': base_url, 'note_list': note_list, 'distribution': distribution})
