@@ -389,7 +389,7 @@ class AddItem(PermissionRequiredMixin, View):
 
 class Warehouse(PermissionRequiredMixin, View):
     permission_required = 'bom.can_update_bom_ordered'
-    MaterialFormSet = modelformset_factory(Material,  fields=('status','quantity','vendor','release_number','staged','estimated_receive_date','order_date')
+    MaterialFormSet = modelformset_factory(Material,  fields=('status','quantity','vendor','release_number','staged','estimated_receive_date','order_date','reel_number')
         , can_delete=True)
 
     def post(self, request, estimate_id):
