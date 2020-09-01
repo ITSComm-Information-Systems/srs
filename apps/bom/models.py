@@ -495,7 +495,7 @@ class Labor(BOM):
     
     @property
     def extended_cost(self):
-        return self.hours * self.rate
+        return round(self.hours * self.rate, 2)
 
     class Meta: 
         db_table = 'um_bom_labor'
