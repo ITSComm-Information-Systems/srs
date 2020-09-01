@@ -44,6 +44,7 @@
                 <th>Est Receive Date</th>
                 <th>Release Number</th>
                 <th>Vendor</th>
+                <th style="width: 7%">Reel</th>
             </tr>
         </thead>
         {% for form in material_formset %}
@@ -62,6 +63,7 @@
                 <td>{{ form.estimated_receive_date }}</td>
                 <td>{{ form.release_number }}</td>
                 <td>{{ form.vendor }}</td>
+                <td>{{ form.reel_number }}</td>
             </tr>
             {% if form.errors %}
             <tr>
