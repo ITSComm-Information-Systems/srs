@@ -8,7 +8,7 @@ ENV GUNICORN_THREADS=4
 ENV PYTHONUNBUFFERED=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
-RUN apt-get -y update && apt-get install -y libpq-dev gcc python-dev && pip install psycopg2 && pip install cx-Oracle
+RUN apt-get -y update && apt-get install -y libpq-dev gcc
 
 #Oracle Instant Client
 RUN apt-get install -y curl unzip libaio1 \
@@ -39,6 +39,6 @@ EXPOSE 8000
 
 ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
 
-CMD ["sh", "-c", "gunicorn --bind=0.0.0.0:8000 --workers=${GUNICORN_WORKERS} --threads=${GUNICORN_THREADS} --access-logfile=- --log-file=- project.wsgi"]
+CMD ["sh", "-c", "gunicorn --bind=0.0.0.0:8000 --workers=${GUNICORN_WORKERS} --threads=${GUNICORN_THREADS} --access-logfile=- --log-file=- wsgi"]
 
 USER 1001
