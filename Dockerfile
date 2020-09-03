@@ -39,6 +39,5 @@ EXPOSE 8000
 
 ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
 
-CMD ["sh", "-c", "gunicorn --bind=0.0.0.0:8000 --workers=${GUNICORN_WORKERS} --threads=${GUNICORN_THREADS} --access-logfile=- --log-file=- wsgi"]
+CMD ["sh", "-c", "gunicorn --bind=0.0.0.0:8000 --workers=${GUNICORN_WORKERS} --threads=${GUNICORN_THREADS} --access-logfile=- --log-file=- project.wsgi"]
 
-USER 1001
