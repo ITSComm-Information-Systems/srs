@@ -24,18 +24,18 @@ RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
 
 
 # install the Oracle dependencies./tmp/oracle_fdw-ORACLE_FDW_2_0_0/oracle_fdw.control
-COPY oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm /tmp/oraclelibs/oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm
-COPY oracle-instantclient12.2-devel-12.2.0.1.0-1.x86_64.rpm /tmp/oraclelibs/oracle-instantclient12.2-devel-12.2.0.1.0-1.x86_64.rpm
+#COPY oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm /tmp/oraclelibs/oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm
+#COPY oracle-instantclient12.2-devel-12.2.0.1.0-1.x86_64.rpm /tmp/oraclelibs/oracle-instantclient12.2-devel-12.2.0.1.0-1.x86_64.rpm
 
 
-RUN cd /tmp/oraclelibs && \
-    rpm -Uvh oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm && \
-    rpm -Uvh oracle-instantclient12.2-devel-12.2.0.1.0-1.x86_64.rpm 
+#RUN cd /tmp/oraclelibs && \
+#    rpm -Uvh oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm && \
+#    rpm -Uvh oracle-instantclient12.2-devel-12.2.0.1.0-1.x86_64.rpm 
 
 # change back to the regular user
-ENV ORACLE_HOME /usr/lib/oracle/12.2/client64/lib
+#ENV ORACLE_HOME /usr/lib/oracle/12.2/client64/lib
 
 # set the oracle library path
-ENV LD_LIBRARY_PATH /usr/lib/oracle/12.2/client64/lib:${LD_LIBRARY_PATH}
+#ENV LD_LIBRARY_PATH /usr/lib/oracle/12.2/client64/lib:${LD_LIBRARY_PATH}
 
 USER 1001
