@@ -17,6 +17,8 @@ RUN apt-get install -y curl unzip libaio1 \
     && unzip instantclient.zip && rm instantclient.zip
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
 
+RUN pip install cx_Oracle
+
 WORKDIR /usr/src/app
 
 COPY . /usr/src/app
