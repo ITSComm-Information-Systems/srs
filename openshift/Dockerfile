@@ -15,6 +15,8 @@ RUN apt-get install -y curl unzip libaio1 \
     && unzip instantclient.zip && rm instantclient.zip
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
 
+#RUN ls -l /usr/src/app
+RUN ls -l ./usr
 
 # install the Oracle dependencies./tmp/oracle_fdw-ORACLE_FDW_2_0_0/oracle_fdw.control
 #COPY oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm /tmp/oraclelibs/oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm
