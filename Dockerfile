@@ -20,3 +20,4 @@ ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
+USER 1001
