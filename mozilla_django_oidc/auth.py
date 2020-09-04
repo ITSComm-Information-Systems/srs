@@ -16,7 +16,7 @@ except ImportError:
     from django.core.urlresolvers import reverse
 from django.utils.encoding import force_bytes, smart_text, smart_bytes
 from django.utils.module_loading import import_string
-from django.utils import six
+#from django.utils import six
 
 from josepy.b64 import b64decode
 from josepy.jwk import JWK
@@ -101,10 +101,10 @@ class OIDCAuthenticationBackend(ModelBackend):
         # https://github.com/mozilla/django-browserid/blob/master/django_browserid/auth.py
         username_algo = import_from_settings('OIDC_USERNAME_ALGO', None)
 
-        if username_algo:
-            if isinstance(username_algo, six.string_types):
-                username_algo = import_string(username_algo)
-            return username_algo(claims.get('email'))
+        #if username_algo:
+        #    if isinstance(username_algo, six.string_types):
+        #        username_algo = import_string(username_algo)
+        #    return username_algo(claims.get('email'))
 
         return default_username_algo(claims.get('email'))
 
@@ -127,12 +127,12 @@ class OIDCAuthenticationBackend(ModelBackend):
                   "OIDC_RP_SIGN_ALGO.".format(alg)
             raise SuspiciousOperation(msg)
 
-        if isinstance(key, six.string_types):
+        #if isinstance(key, six.string_types):
             # Use smart_bytes here since the key string comes from settings.
-            jwk = JWK.load(smart_bytes(key))
-        else:
+        #    jwk = JWK.load(smart_bytes(key))
+        #else:
             # The key is a json returned from the IDP JWKS endpoint.
-            jwk = JWK.from_json(key)
+        jwk = JWK.from_json(key)
 
         if not jws.verify(jwk):
             msg = 'JWS token verification failed.'
