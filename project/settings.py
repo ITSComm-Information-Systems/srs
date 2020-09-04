@@ -28,6 +28,8 @@ SECRET_KEY = os.getenv(
 ALLOWED_HOSTS = [os.getenv('ALLOWED_HOST')]
 DEBUG = os.getenv('DEBUG', False)
 
+ADMINS = [('David', 'djamison@umich.edu')]
+
 # Application definition
 
 INSTALLED_APPS = [
