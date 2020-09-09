@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv(
 ALLOWED_HOSTS = [os.getenv('ALLOWED_HOST')]
 DEBUG = os.getenv('DEBUG', False)
 
-ADMINS = [('David', 'djamison@umich.edu')]
+ADMINS = [('Admins', 'srs-exception@umich.edu')]
 
 # Application definition
 

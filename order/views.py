@@ -686,7 +686,6 @@ class Status(PermissionRequiredMixin, View):
 
         for order in order_list:
             order.deptid = order.chartcom.dept
-            dept_list = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('deptid')
 
             #datetime filter
             result=datetime.date.today()-order.create_date.date()
@@ -721,13 +720,9 @@ class Status(PermissionRequiredMixin, View):
             depts.add(order.chartcom.dept)
             dates_list.add((order.timeDiff, order.deptid))
 
-        
+        dept_list = UmOscDeptProfileV.objects.filter(deptid__in=depts).order_by('deptid')
         people_list=sorted(people_list)
         dates_list=sorted(dates_list, key=lambda x:x[0][0])
-
-        if deptid == 0:
-            department = {'id': dept_list[0].deptid, 'name':dept_list[0].dept_name}
-            deptid = dept_list[0].deptid 
          
         template = loader.get_template('order/status.html')
         context = {
