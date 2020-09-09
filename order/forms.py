@@ -130,10 +130,21 @@ class TabForm(forms.Form):
                         old = set()
                         for host in self.instance.get_hosts():                        
                             old.add(host.name)
-                        old.add('')
-
-                        if old != new: 
-                            label = '*' + label
+                        new.remove('')
+                        if old != new:
+                            label = '*' + label 
+                            existing=[]
+                            toadd=[]
+                            removed=[]
+                            for r in old:
+                                if r not in new:
+                                    removed.append(r)
+                            for x in new:
+                                if x not in old:
+                                    toadd.append('['+x+']')
+                                else:
+                                    existing.append(x)
+                            value=', '.join(existing)+', '+', '.join(toadd)+' (REMOVED:'+', '.join(removed)+')'
 
                     elif key == 'shortcode' and hasattr(self, 'shortcode_list'):
                         new = set()
@@ -587,12 +598,7 @@ class BackupDetailsForm(TabForm):
                     else:
                         oldnodes.append(new[0]+ '@' +new[1])
             
-            for node in oldnodes:
-                node_value=node_value+node+', '
-            for node in newnodes:
-                node_value=node_value+node+', '
-
-            summary[1]['value'] = node_value
+            summary[1]['value'] = ', '.join(oldnodes)+'  '+', '.join(newnodes)
             summary.pop(2) # Remove backupTime field from summary
         return summary
 
