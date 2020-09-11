@@ -256,13 +256,16 @@ function validate_add_multiple() {
         return(false);
     }
 
-    if ($('#duration-hours-multiple').val() > 23 || $('#duration-hours-multiple').val() < 0) {
+    if ($('#duration-hours-multiple').val() > 23 || $('#duration-hours-multiple').val() < 0 || $('#duration-hours-multiple').val() % 1 !=0) {
         $('#add-error').html('Please enter a value for hours between 0 and 23.');
         $('#add-error').removeClass('hidden');
         return(false);
     }
 
-    if ($('#duration-mins-multiple').val() > 59 || $('#duration-mins-multiple').val() < 0) {
+    mins = $('#duration-mins').val()
+    console.log(mins, mins % 1)
+
+    if ($('#duration-mins-multiple').val() > 59 || $('#duration-mins-multiple').val() < 0 ||  $('#duration-mins-multiple').val() % 1 !=0 ) {
         $('#add-error').html('Please enter a value for minutes between 0 and 59.');
         $('#add-error').removeClass('hidden');
         return(false);
