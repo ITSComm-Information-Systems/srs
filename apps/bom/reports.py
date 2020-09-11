@@ -299,8 +299,9 @@ class PdfCreator:
 		flowables.append(Spacer(1, 0.4 * inch))
 
 		# Add item list
-		data = [[Paragraph('<b>Item Number</b>', normal), Paragraph('<b>Estimated Quantity</b>', normal),
-				Paragraph('<b>Quantity</b>', normal), Paragraph('<b>Manufacturer Number</b>', normal),
+		data = [[Paragraph('<b>Item Number</b>', normal), Paragraph('<b>Est Qty</b>', normal),
+				Paragraph('<b>Qty</b>', normal), Paragraph('<b>Item Description</b>', normal),
+				Paragraph('<b>Manufacturer Number</b>', normal),
 				Paragraph('<b>Release Number</b>', normal), Paragraph('<b>Reel Number</b>', normal),
 				Paragraph('<b>Staged</b>', normal), Paragraph('<b>Status</b>', normal)]]
 
@@ -308,12 +309,13 @@ class PdfCreator:
 			data.append([Paragraph(str(record.item_code), normal),
 						Paragraph(str(record.quantity), normal),
 						Paragraph('', normal),
+						Paragraph(str(record.item_description), normal),
 						Paragraph(str(record.manufacturer_part_number), normal),
 						Paragraph(str(record.release_number), normal),
 						Paragraph(str(record.reel_number), normal),
 						Paragraph(human_bool(record.staged), normal),
 						Paragraph(str(record.get_status_display()), normal)])
-		col_widths = [0.8 * inch, 0.9 * inch, 0.8 * inch, 2 * inch, 0.7 * inch, 0.7 * inch, 0.7 * inch, 0.7 * inch]
+		col_widths = [0.8 * inch, 0.4 * inch, 0.4 * inch, 2 * inch, 1.7 * inch, 0.7 * inch, 0.7 * inch, 0.65 * inch, 0.7 * inch]
 		table = Table(data, colWidths=col_widths)
 		table.setStyle(TableStyle([('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
 									('BOX', (0,0), (-1,-1), 0.25, colors.black),]))
