@@ -93,7 +93,7 @@ def single_submit(request):
         assigned_group = request.POST.get('assigned_group')
 
         for i in range(1, int(num_entries) + 1):
-            work_order = request.POST.get(str(i) + '_work_order')
+            work_order = request.POST.get(str(i) + '_work_order', 'Deleted')
 
             if work_order != 'Deleted':
                 rate_level = UmRteRateLevelV.objects.get(labor_rate_level_name=request.POST.get(str(i) + '_rate'))
@@ -215,7 +215,7 @@ def multiple_submit(request):
         work_order = request.POST.get('work_order')
 
         for i in range(1, int(num_entries) + 1):
-            tech_id = request.POST.get(str(i) + '_techid')
+            tech_id = request.POST.get(str(i) + '_techid', 'Deleted')
 
             if tech_id != 'Deleted':
                 assigned_group = request.POST.get(str(i) + '_assigned_group')
