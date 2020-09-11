@@ -161,7 +161,7 @@ class PdfCreator:
 						Paragraph(str(record.price), RIGHT),
 						Paragraph(f'{record.extended_price:,}', RIGHT)])
 
-		col_widths = [0.8 * inch, 2 * inch, 1.5 * inch, 0.8 * inch, 0.7 * inch, 1 * inch]
+		col_widths = [1 * inch, 2 * inch, 2 * inch, 0.8 * inch, 0.7 * inch, 1 * inch]
 		flowables.append(self.build_table(data, col_widths))
 		flowables.append(Spacer(1, 0.2 * inch))
 		return flowables
@@ -229,7 +229,7 @@ class PdfCreator:
 			# Create new table if location switches
 			if record.material_location != prev_loc:
 				# Append table to pdf
-				col_widths = [0.8 * inch, 2 * inch, 1.5 * inch, 0.7 * inch, 0.7 * inch, 0.7 * inch, 1 * inch]
+				col_widths = [0.8 * inch, 2 * inch, 1.7 * inch, 1 * inch, 0.7 * inch, 0.7 * inch, 1 * inch]
 				flowables.append(self.build_table(data, col_widths))
 				flowables.append(Spacer(1, 0.2 * inch))
 
@@ -249,7 +249,7 @@ class PdfCreator:
 			prev_loc = record.material_location
 
 		# Append final table to page
-		col_widths = [0.8 * inch, 2 * inch, 1.5 * inch, 0.7 * inch, 0.7 * inch, 0.7 * inch, 1 * inch]
+		col_widths = [0.8 * inch, 2 * inch, 1.7 * inch, 1 * inch, 0.7 * inch, 0.7 * inch, 1 * inch]
 		flowables.append(self.build_table(data,col_widths))
 		flowables.append(Spacer(1, 0.2 * inch))
 
