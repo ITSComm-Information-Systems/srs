@@ -237,13 +237,13 @@ function validate_add() {
         return(false);
     }
 
-    if ($('#duration-hours').val() > 23 || $('#duration-hours').val() < 0) {
+    if ($('#duration-hours').val() > 23 || $('#duration-hours').val() < 0 || $('#duration-hours').val() % 1 != 0) {
         $('#add-error').html('Please enter a value for hours between 0 and 23.');
         $('#add-error').removeClass('hidden');
         return(false);
     }
 
-    if ($('#duration-mins').val() > 59 || $('#duration-mins').val() < 0) {
+    if ($('#duration-mins').val() > 59 || $('#duration-mins').val() < 0 || $('#duration-mins').val() % 1 != 0) {
         $('#add-error').html('Please enter a value for minutes between 0 and 59.');
         $('#add-error').removeClass('hidden');
         return(false);
