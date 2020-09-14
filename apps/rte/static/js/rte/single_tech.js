@@ -183,7 +183,7 @@ function format_duration(hours, mins) {
 // Delete row in table
 function delete_row(row_num, num_entries) {
     $('#row-' + row_num).remove();
-    num_entries = num_entries - 1;
+    //num_entries = num_entries - 1;
     $('#max-entries').addClass('hidden');
 
     $('[name="' + row_num + '_work_order"]').val('Deleted');
