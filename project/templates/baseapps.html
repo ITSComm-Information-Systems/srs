@@ -60,6 +60,9 @@
 					<ul class="navbar-nav ml-auto">
 						
 						{% if user.is_authenticated %}
+						<li class="nav-item">
+							<a class="nav-link {% if title == 'Apps Help' %}active {% endif %}" href="/apps/appshelp">Help</a>
+						</li>
 						<li class="nav-item dropdown ">
 							<a class="nav-link dropdown-toggle {% if title == 'View My System Privileges' %}active{% endif %}" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									{{ user.get_full_name }}
