@@ -173,6 +173,12 @@ class VolumeAdmin(admin.ModelAdmin):
         if obj:
             self.service_id = obj.service_id
             self.type = obj.type
+        else:
+            type = request.GET.get('type', '')
+            if type:
+                self.type = type
+                self.service_id = 7
+                
         return super(VolumeAdmin, self).get_form(request, obj, **kwargs)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
