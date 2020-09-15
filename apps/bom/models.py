@@ -319,6 +319,7 @@ class Estimate(BOM):
             self.status = self.WAREHOUSE
             self.save()
         elif self.status == self.WAREHOUSE:
+            self.get_workorder()
             NotificationManager().send_email('BOM - Notify Warehouse', self, ['itcom.warehouse@umich.edu'])
 
 
