@@ -315,9 +315,13 @@ class Estimate(BOM):
         return Labor.objects.filter(estimate=self)
 
     def notify_warehouse(self):
-        if self.status == self.ESTIMATE:
+        if self.status == self.ESTIMATE or self.status == self.ORDERED:
             self.status = self.WAREHOUSE
             self.save()
+        elif self.status == self.WAREHOUSE:
+            self.get_workorder()
+            NotificationManager().send_email('BOM - Notify Warehouse', self, ['itcom.warehouse@umich.edu'])
+
 
 class Project(BOM):
     COMPLETE = 1

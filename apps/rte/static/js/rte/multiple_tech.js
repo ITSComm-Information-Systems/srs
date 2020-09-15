@@ -139,7 +139,7 @@ function add_to_multiple_table(num_entries) {
 // Delete row in table
 function delete_row_multiple(row_num, num_entries) {
     $('#row-' + row_num).remove();
-    num_entries = num_entries - 1;
+    //num_entries = num_entries - 1;  
 
     $('[name="' + row_num + '_techid"]').val('Deleted');
 
