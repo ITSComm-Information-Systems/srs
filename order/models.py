@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.postgres.fields import JSONField
+from django.contrib.admin.models import LogEntry, ADDITION
 from django.db import models
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
@@ -363,6 +364,15 @@ class Volume(models.Model):
         return checkboxes
 
     def get_tickets(self):
+
+        #LogEntry.objects.log_action(
+        #    user_id         = 6161, 
+        #    content_type_id = 77, #ContentType.objects.get_for_model(StorageInstance).pk,
+        #    object_id       = 625, #self.id, #object.pk,
+        #    object_repr     = 'maccwhrpl1', 
+       #    action_flag     = ADDITION,
+        #    change_message = 'SRS Update - New Host'
+        #)
 
         cur = connections['default'].cursor()
         cur.execute("select external_reference_id from order_item "
