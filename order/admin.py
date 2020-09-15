@@ -215,7 +215,8 @@ class VolumeAdmin(admin.ModelAdmin):
  
         extra_context = {
             'host_list': instance.get_hosts(),
-            'shortcode_list': instance.get_shortcodes()
+            'shortcode_list': instance.get_shortcodes(),
+            'ticket_list': instance.get_tickets() 
         }
         return super().change_view(
             request, object_id, form_url, extra_context=extra_context,
