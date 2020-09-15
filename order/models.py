@@ -362,6 +362,20 @@ class Volume(models.Model):
 
         return checkboxes
 
+    def get_tickets(self):
+
+        cur = connections['default'].cursor()
+        cur.execute("select external_reference_id from order_item "
+                    "where cast(data->>'action_id' as INTEGER) in (select id from order_action where service_id = %s) "
+                    "  and cast(data->>'instance_id' as INTEGER) = %s "
+                    "  and external_reference_id is not null "
+                    ,[self.service_id, self.id])
+
+        ticket_list = []
+        for row in cur.fetchall():
+            ticket_list.append(row[0])
+
+        return ticket_list
 
     def get_owner_instance(self, name):
 
