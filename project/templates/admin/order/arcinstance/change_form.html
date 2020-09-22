@@ -36,7 +36,7 @@
     <ul>
         {% for ticket in ticket_list %}
             <li>
-            <a target=”_blank” href="https://teamdynamix.umich.edu/TDNext/Apps/31/Tickets/TicketDet.aspx?TicketID={{ ticket }}">{{ ticket }}</a>
+                <a target=”_blank” href="{{ ticket.url }}">{{ ticket.id }}</a>
             </li>
         {% endfor %}
     </ul>

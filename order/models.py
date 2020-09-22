@@ -381,9 +381,14 @@ class Volume(models.Model):
                     "  and external_reference_id is not null "
                     ,[self.service_id, self.id])
 
+        if settings.ENVIRONMENT == 'Production':
+            tdx_url = 'https://teamdynamix.umich.edu/TDNext/Apps/31/Tickets/TicketDet.aspx?TicketID='
+        else:
+            tdx_url = 'https://teamdynamix.umich.edu/SBTDNext/Apps/31/Tickets/TicketDet?TicketID='
+
         ticket_list = []
         for row in cur.fetchall():
-            ticket_list.append(row[0])
+            ticket_list.append({'id': row[0], 'url': f'{tdx_url}{row[0]}'})
 
         return ticket_list
 
