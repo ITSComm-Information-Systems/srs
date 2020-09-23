@@ -365,15 +365,6 @@ class Volume(models.Model):
 
     def get_tickets(self):
 
-        LogEntry.objects.log_action(
-            user_id         = 6161, 
-            content_type_id = 77, #ContentType.objects.get_for_model(StorageInstance).pk,
-            object_id       = 625, #self.id, #object.pk,
-            object_repr     = 'maccwhrpl1', 
-            action_flag     = ADDITION,
-            change_message = 'SRS Update - New Host'
-        )
-
         cur = connections['default'].cursor()
         cur.execute("select external_reference_id, create_date, data from order_item "
                     "where cast(data->>'action_id' as INTEGER) in (select id from order_action where service_id = %s) "
