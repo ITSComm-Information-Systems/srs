@@ -133,7 +133,7 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 @admin.register(LDAPGroup)
 class LDAPGroupAdmin(admin.ModelAdmin):
     search_fields = ['name']
-    
+
 
 class VolumeAdmin(admin.ModelAdmin):
     ordering = ('name',)
@@ -250,6 +250,8 @@ class StorageInstanceAdmin(VolumeAdmin):
     child_record = StorageHost
     child_key = 'storage_instance_id'
     service_list = [7]
+    exclude = ['owner_name', 'owner_bak']
+
 
 @admin.register(ArcBilling)
 class ArcBillingAdmin(admin.ModelAdmin):
