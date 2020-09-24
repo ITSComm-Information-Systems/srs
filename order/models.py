@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.postgres.fields import JSONField
+from django.contrib.admin.models import LogEntry, ADDITION
 from django.db import models
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
@@ -342,7 +343,7 @@ class Volume(models.Model):
     rate = models.ForeignKey(StorageRate, on_delete=models.CASCADE)    
     shortcode = models.CharField(max_length=100)
     created_date = models.DateTimeField(default=timezone.now)
-    uid = models.PositiveIntegerField(null=True)
+    uid = models.PositiveIntegerField(blank=True, null=True)
     ad_group = models.CharField(max_length=100, null=True, blank=True)
 
     @property
@@ -362,6 +363,30 @@ class Volume(models.Model):
 
         return checkboxes
 
+    def get_tickets(self):
+
+        cur = connections['default'].cursor()
+        cur.execute("select external_reference_id, create_date, data from order_item "
+                    "where cast(data->>'action_id' as INTEGER) in (select id from order_action where service_id = %s) "
+                    "  and cast(data->>'instance_id' as INTEGER) = %s "
+                    "  and external_reference_id is not null "
+                    ,[self.service_id, self.id])
+
+        if settings.ENVIRONMENT == 'Production':
+            tdx_url = 'https://teamdynamix.umich.edu/TDNext/Apps/31/Tickets/TicketDet.aspx?TicketID='
+        else:
+            tdx_url = 'https://teamdynamix.umich.edu/SBTDNext/Apps/31/Tickets/TicketDet?TicketID='
+
+        ticket_list = []
+        for row in cur.fetchall():
+            note = render_to_string('order/pinnacle_note.html', {'text': row[2]['reviewSummary'], 'description': 'Review Summary'})
+
+            ticket_list.append({'id': row[0]
+                              , 'url': f'{tdx_url}{row[0]}'
+                              , 'create_date': row[1]
+                              , 'note': note})
+
+        return ticket_list
 
     def get_owner_instance(self, name):
 
