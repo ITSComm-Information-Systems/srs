@@ -15,4 +15,17 @@
     </ul>
 </fieldset>
 {% endif %}
+{% if ticket_list %}                                                           
+<fieldset class="module aligned {{ fieldset.classes }}">
+    <h4>Tickets</h4>
+    <ul>
+        {% for ticket in ticket_list %}
+            <li>
+            <a target=”_blank” href="{{ ticket.url }}">{{ ticket.id }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</fieldset>
+{% endif %}
+
 {% endblock %}

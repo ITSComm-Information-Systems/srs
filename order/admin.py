@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import path
 
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -130,12 +130,18 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     ordering = ('display_seq_no',)
 
 
+@admin.register(LDAPGroup)
+class LDAPGroupAdmin(admin.ModelAdmin):
+    search_fields = ['name']
+
+
 class VolumeAdmin(admin.ModelAdmin):
     ordering = ('name',)
     search_fields = ['name','owner__name']
     list_filter = ('type',('service', admin.RelatedOnlyFieldListFilter),)
     child_record = 'TBD'
     service_list = []
+    autocomplete_fields = ['owner']
 
     def get_urls(self):
         urls = super().get_urls()
@@ -221,7 +227,8 @@ class VolumeAdmin(admin.ModelAdmin):
  
         extra_context = {
             'host_list': instance.get_hosts(),
-            'shortcode_list': instance.get_shortcodes()
+            'shortcode_list': instance.get_shortcodes(),
+            'ticket_list': instance.get_tickets() 
         }
         return super().change_view(
             request, object_id, form_url, extra_context=extra_context,
@@ -249,6 +256,8 @@ class StorageInstanceAdmin(VolumeAdmin):
     child_record = StorageHost
     child_key = 'storage_instance_id'
     service_list = [7]
+    exclude = ['owner_name', 'owner_bak']
+
 
 @admin.register(ArcBilling)
 class ArcBillingAdmin(admin.ModelAdmin):
