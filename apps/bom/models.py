@@ -359,7 +359,9 @@ class Project(BOM):
     def notify_engineer(self, estimate_id):
         estimate = Estimate.objects.get(id=estimate_id)
         estimate.get_workorder()
-        NotificationManager().send_email('Project assigned to you', estimate, [self.netops_engineer.user_name])
+        addr = f'{self.netops_engineer.user_name}@umich.edu'
+        print(f'send to: {addr}')
+        NotificationManager().send_email('Project assigned to you', estimate, [addr])
 
 
 class ItemManager(models.Manager):
@@ -540,7 +542,9 @@ class NotificationManager(models.Manager):
         email_list = []
         for notification in notification_list:
             if notification.recipient == 'project_manager':
-                email_list.append(estimate.workorder.add_info_list_value_code_2)
+                addr = f'{estimate.workorder.add_info_list_value_code_2}@umich.edu'
+                print(f'send to: {addr}')
+                email_list.append(addr)
             else:
                 email_list.append(notification.recipient)
 
