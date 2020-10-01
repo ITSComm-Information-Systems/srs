@@ -13,7 +13,7 @@ from datetime import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
 
-from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, EstimateView, UmOscNoteProfileV, NotificationManager
+from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, EstimateView, UmOscNoteProfileV, NotificationManager, Notification
 from .forms import FavoriteForm, EstimateForm, ProjectForm, MaterialForm, MaterialLocationForm, LaborForm
 
 
@@ -209,7 +209,7 @@ def add_pinnacle_note(request):
         estimate.get_workorder()
         addr = f'{estimate.workorder.add_info_list_value_code_2}@umich.edu'
         print(f'notify PM: {addr}')
-        NotificationManager().send_email('Route to Project Manager', estimate, [addr])
+        NotificationManager().send_email(Notification.ROUTE_PM, estimate, [addr])
 
     note = UmOscNoteProfileV()
     note.note_type_code = 'Work Order'
