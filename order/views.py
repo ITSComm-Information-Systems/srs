@@ -223,7 +223,7 @@ class ManageChartcom(PermissionRequiredMixin, View):
         return HttpResponseRedirect('/orders/chartcom/' + deptid)
 
     def get(self, request, deptid):
-        dept_list = AuthUserDept.get_order_departments(request.user.id)
+        dept_list = AuthUserDept.get_order_departments(request.user.id).order_by('dept')
 
         for dept in dept_list:
             deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.dept)
