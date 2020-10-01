@@ -548,7 +548,7 @@ class NotificationManager(models.Manager):
             else:
                 email_list.append(notification.recipient)
 
-        self.send_email(notification, estimate, email_list)
+        self.send_email(str(notification), estimate, email_list)
   
     def send_email(self, subject, estimate, email_list):
         if settings.ENVIRONMENT == 'Production':
@@ -559,10 +559,8 @@ class NotificationManager(models.Manager):
             distribution = email_list
             email_list = ['its-infrastructure-bom@umich.edu'] # Let's not spam from dev/qa
 
-        if estimate.status == estimate.ORDERED:
-            note_list = UmOscNoteProfileV.objects.filter(note_keyid_value=estimate.woid,note_subject='BOM - Notify Warehouse').order_by('-note_id')
-        elif estimate.status == estimate.WAREHOUSE:
-            note_list = UmOscNoteProfileV.objects.filter(note_keyid_value=estimate.woid,note_subject='BOM - Material Ordered').order_by('-note_id')
+        if subject in Notification.NOTE_SUBJECTS: 
+            note_list = UmOscNoteProfileV.objects.filter(note_keyid_value=estimate.woid,note_subject=subject).order_by('-note_id')
         else:
             note_list = []
 
@@ -590,14 +588,22 @@ class PreDefinedNote(models.Model):
 
 
 class Notification(models.Model):
+
+    WAREHOUSE = 'BOM - Notify Warehouse'
+    ROUTE_PM = 'BOM - Route to Project Manager'
+    ORDERED = 'BOM - Material Ordered'
+
+    NOTE_SUBJECTS = [WAREHOUSE, ROUTE_PM, ORDERED]
+ 
     EVENT_CHOICES = [
         (Estimate.ESTIMATE, 'BOM Created'),
-        (Estimate.WAREHOUSE, 'BOM Warehouse'),
-        (Estimate.ORDERED, 'BOM Ordered'),
+        (Estimate.WAREHOUSE, WAREHOUSE),
+        (Estimate.ORDERED, ORDERED),
         (Estimate.COMPLETED, 'BOM Completed'),
         (Estimate.CANCELLED, 'BOM Cancelled'),
         (Estimate.REJECTED, 'BOM Rejected'),
-        (11, 'NetOps Created')
+        (11, 'NetOps Created'),
+        (12, ROUTE_PM)
     ]
 
     event = models.PositiveSmallIntegerField(choices=EVENT_CHOICES)
