@@ -483,8 +483,8 @@ function validate_selection() {
         $('#num-checked-error').removeAttr('hidden');
         return(false);
 	}
-	else if (num_checked > 10) {
-		$('#num-checked-error').html('Please select no more 10 entries at a time.');
+	else if (num_checked > 15) {
+		$('#num-checked-error').html('Please select no more 15 entries at a time.');
         $('#num-checked-error').removeAttr('hidden');
         return(false);
 	}
