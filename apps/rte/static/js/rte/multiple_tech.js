@@ -90,7 +90,7 @@ $(document).ready(function() {
 
 // Add row to input table
 function add_to_multiple_table(num_entries) {
-    if (num_entries < 10) {
+    if (num_entries < 15) {
         num_entries = num_entries + 1; 
         var html = '<tr id="row-' + num_entries + '">' + 
                         '<td>' + $('#techSearchMultiple').val() + '</td>' +

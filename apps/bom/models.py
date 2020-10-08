@@ -235,7 +235,7 @@ class Estimate(BOM):
         for line in file:  #TODO base field location on headings
             fields = line.decode('utf-8').split(',')
             location = fields[0].strip()
-            item_code = fields[1].strip()
+            item_code = fields[1].strip().upper()
             quantity = fields[2].strip()
 
             mat = Material()
@@ -250,7 +250,7 @@ class Estimate(BOM):
                 result.append(f'{item_code} Imported')
                 inserts += 1
             except:
-                result.append(f'{item_code} not found')
+                result.append(f'*****Error: {item_code} not found*****')
                 errors += 1
         
         result.append(f'{inserts} inserted, {errors} errors')
