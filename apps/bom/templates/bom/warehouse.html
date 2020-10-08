@@ -34,7 +34,7 @@
 
     <a style="float:right;" href="/apps/bom/estimate/{{ estimate.id }}">Return to Main</a>
 
-    <table class="table table-hover table-striped table-sm">
+    <table class="table-borderless table-hover table-striped table-sm">
         <thead>
             <tr>
                 <th style="width: 10%">Quantity</th>
@@ -54,7 +54,7 @@
                 <td colspan="7"><b>{{rec.material_location}}:</b> {{ rec.item_code }} - {{ rec.item_description }} &emsp;
                     <i>({{rec.manufacturer}} - {{rec.manufacturer_part_number}})</i></td>
             </tr>
-            <tr>
+            <tr class="border-bottom">
                 {{ form.id }}
                 <td>{{ form.quantity }}</td>
                 <td>{{ form.status }}</td>
