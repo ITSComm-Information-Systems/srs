@@ -144,7 +144,10 @@ class TabForm(forms.Form):
                                     toadd.append('['+x+']')
                                 else:
                                     existing.append(x)
-                            value=', '.join(existing)+', '+', '.join(toadd)+' (REMOVED:'+', '.join(removed)+')'
+                            value=', '.join(existing)+', '+', '.join(toadd)
+
+                            if removed:
+                                value = value + ' (REMOVED:'+', '.join(removed)+')'
 
                     elif key == 'shortcode' and hasattr(self, 'shortcode_list'):
                         new = set()
