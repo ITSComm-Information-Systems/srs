@@ -300,22 +300,21 @@ class PdfCreator:
 
 		# Add item list
 		data = [[Paragraph('<b>Item Number</b>', normal), Paragraph('<b>Est Qty</b>', normal),
-				Paragraph('<b>Qty</b>', normal), Paragraph('<b>Item Description</b>', normal),
-				Paragraph('<b>Manufacturer Number</b>', normal),
-				Paragraph('<b>Release Number</b>', normal), Paragraph('<b>Reel Number</b>', normal),
-				Paragraph('<b>Staged</b>', normal), Paragraph('<b>Status</b>', normal)]]
+				Paragraph('<b>Qty</b>', normal),
+				Paragraph('<b>Manufacturer Number</b>', normal), Paragraph('<b>Item Description</b>', normal),
+				#Paragraph('<b>Release Number</b>', normal), Paragraph('<b>Reel Number</b>', normal),
+				#Paragraph('<b>Staged</b>', normal), Paragraph('<b>Status</b>', normal)
+				]]
 
-		for record in self.estimate.material_list:
-			data.append([Paragraph(str(record.item_code), normal),
-						Paragraph(str(record.quantity), normal),
+		for record in self.estimate.part_list:
+			data.append([Paragraph(str(record['item__code']), normal),
+						Paragraph(str(record['quantity__sum']), CENTER),
 						Paragraph('', normal),
-						Paragraph(str(record.item_description), normal),
-						Paragraph(str(record.manufacturer_part_number), normal),
-						Paragraph(str(record.release_number), normal),
-						Paragraph(str(record.reel_number), normal),
-						Paragraph(human_bool(record.staged), normal),
-						Paragraph(str(record.get_status_display()), normal)])
-		col_widths = [0.8 * inch, 0.4 * inch, 0.4 * inch, 2 * inch, 1.7 * inch, 0.7 * inch, 0.7 * inch, 0.65 * inch, 0.7 * inch]
+						Paragraph(str(record['item__manufacturer_part_number']), normal),
+						Paragraph(str(record['item__name']), normal)
+						])
+
+		col_widths = [1 * inch, .9 * inch, .9 * inch, 1.5 * inch , 3.2 * inch]
 		table = Table(data, colWidths=col_widths)
 		table.setStyle(TableStyle([('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
 									('BOX', (0,0), (-1,-1), 0.25, colors.black),]))
