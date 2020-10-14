@@ -113,17 +113,33 @@ class TabForm(forms.Form):
                         pass
 
                     elif key == 'nodeNames' or key == 'backupTimes':
-                        new = set()
-                        for node in self.node_list:
-                            tup = (node['name'], node['time']+' '+node['ampm'])
-                            new.add(tup)
 
-                        old = set()
+                        new = {}
+                        for node in self.node_list:
+                            new[node['name']] = node['time']+' '+node['ampm']
+
+                        old = {}
+                        removed = []
                         for node in BackupNode.objects.filter(backup_domain=self.instance.id):
-                            old.add((node.name, node.time))
+                            old[node.name] = node.time
+                            if node.name not in new:
+                                removed.append(node.name)
                         
                         if old != new:
                             label = '*' + label
+
+                        value = ''
+                        for node, time in new.items():
+                            if node in old:
+                                if time == old[node]:
+                                    value = value + f'{node}@{time}, '
+                                else:
+                                    value = value + f'{node}@{time}*, '
+                            else:
+                                value = value + f'[{node}@{time}], '
+
+                        if removed:
+                            value = value + ' (REMOVED:'+', '.join(removed)+')'
 
                     elif key == 'permittedHosts':
                         new = set(self.request.POST.getlist('permittedHosts'))
@@ -144,7 +160,10 @@ class TabForm(forms.Form):
                                     toadd.append('['+x+']')
                                 else:
                                     existing.append(x)
-                            value=', '.join(existing)+', '+', '.join(toadd)+' (REMOVED:'+', '.join(removed)+')'
+                            value=', '.join(existing)+', '+', '.join(toadd)
+
+                            if removed:
+                                value = value + ' (REMOVED:'+', '.join(removed)+')'
 
                     elif key == 'shortcode' and hasattr(self, 'shortcode_list'):
                         new = set()
@@ -576,30 +595,7 @@ class BackupDetailsForm(TabForm):
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
-        nodes = self.data.getlist('nodeNames')
-        times = self.data.getlist('backupTime')
-        ampm = self.data.getlist('backupTimeampm')
-
-        old = set()
-        if hasattr(self, 'instance'):
-            for node in BackupNode.objects.filter(backup_domain=self.instance.id):
-                old.add((node.name, node.time))
-            
-        if len(nodes) > 1:
-            node_value = ''
-            times[0] = ''
-            newnodes=[]
-            oldnodes=[]
-            for count, node in enumerate(nodes):
-                if (node!=''):
-                    new=(node, times[count] +' '+ ampm[count])
-                    if new not in old:
-                        newnodes.append('['+new[0]+ '@' +new[1]+']')
-                    else:
-                        oldnodes.append(new[0]+ '@' +new[1])
-            
-            summary[1]['value'] = ', '.join(oldnodes)+'  '+', '.join(newnodes)
-            summary.pop(2) # Remove backupTime field from summary
+        summary.pop(2) # Remove backupTime field from summary
         return summary
 
 class BillingStorageForm(TabForm):
