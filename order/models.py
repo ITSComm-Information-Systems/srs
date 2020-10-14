@@ -329,6 +329,20 @@ class StorageMember(models.Model):
     username = models.CharField(max_length=8)
 
 
+class Ticket(models.Model):
+    id = models.PositiveIntegerField(primary_key=True)
+    service_id = models.PositiveIntegerField()
+    instance_id = models.PositiveIntegerField()
+    ticket_id = models.PositiveIntegerField()
+    data = JSONField()
+
+    class Meta:
+        db_table = 'order_item_ticket_v'
+        managed = False
+
+    def __str__(self):
+        return self.external_reference_id
+
 class Volume(models.Model):
     TYPE_CHOICES = (
         ('NFS', 'NFS'),
