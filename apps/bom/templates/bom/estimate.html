@@ -322,7 +322,8 @@
     }
     // One ITS
     if (status != 1) {
-      $("#nav-location :input").prop("readonly", true);
+      $("#nav-location :input[name^='material-']").prop("readonly", true);
+      $('#addEstimateBtn').hide();
     }
 
 

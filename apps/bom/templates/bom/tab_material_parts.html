@@ -4,6 +4,7 @@
         <tr>
             <th scope="col">Item</th>
             <th scope="col">Description</th>
+            <th scope="col">Manufacturer Part Number</th>
             <th class="text-center">Quantity</th>
         </tr>
     </thead>
@@ -13,6 +14,7 @@
         <tr>
             <td>{{ record.item__code }}</td>
             <td>{{ record.item__name }}</td>
+            <td>{{ record.item__manufacturer_part_number }}</td>
             <td class="text-center">{{ record.quantity__sum }}</td>
         </tr>
         {% endfor %}
