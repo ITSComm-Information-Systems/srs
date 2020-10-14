@@ -3,19 +3,23 @@
 
 <h2>{{ title }}</h2>
 
-<form method="post">{% csrf_token %}
+<form id="addPart" method="post">{% csrf_token %}
     <input type="hidden" name="estimate_id" value="{{ estimate.id }}">
     <input type="hidden" id="item_id" name="item_id">
 
     <div class="form-group col-md-3">
         <label for="formGroupExampleInput">Location</label>
-        <input list="material-locations" class="form-control" name="item_location" required>
+        <input list="material-locations" class="form-control" name="item_location" required maxlength="30">
     </div>
 
     <div class="form-group col-md-3">
-        <label for="formGroupExampleInput">Z-Code</label>
-        <input type="text" class="form-control" id="item_code" name="item_code" placeholder="Search" required>
+        <label for="formGroupExampleInput">Item Lookup Search</label>
+        <input type="text" class="form-control" id="item_code" name="item_code" placeholder="Search by Z-Code, Manu#, etc." required>
+        <div role=”alert” class="invalid-feedback" id='error-item-code'><i class="fas fa-exclamation-triangle"
+            aria-label="Icon signfying that user must enter a value"></i>Please select a valid part from the list.
+        </div>
     </div>
+
 
     <table style="display:none" id="item_table" class="table table-hover table-striped" aria-live=”polite”>
         <thead>
@@ -35,7 +39,7 @@
                 <td>{{ item.code }}</td>
                 <td>{{ item.name }}</td>
                 <td>{{ item.class_code }}</td>
-                <td>{{ item.subclass }}</td>
+                <td>{{ item.subclass_name }}</td>
                 <td>{{ item.manufacturer }}</td>
                 <td>{{ item.manufacturer_part_number }}</td>
                 <td>{{ item.price }}</td>
@@ -66,6 +70,15 @@
 {% block js %}
 <script>
 
+
+    $('#addPart').submit(function() {
+        if ($('#item_id').val().length < 1) {
+                $('#error').html('My Error Message').show();
+                $("#item_code").addClass('is-invalid');
+                return false;
+        }
+    });
+
     $(document).ready(function () {
         $("#item_table").hide();
     });
@@ -82,6 +95,7 @@
         $('#item_id').val(this.getAttribute('data-item_id'));
         $('#item_code').val(this.getAttribute('data-item_code'));
         $("#item_table").hide();;
+        $("#item_code").removeClass('is-invalid');
     });
 
 </script>
