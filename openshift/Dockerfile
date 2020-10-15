@@ -1,5 +1,7 @@
 FROM python:3.8-slim
 
+ARG ENVIRONMENT="DEVELOPMENT"
+
 ENV GUNICORN_WORKERS=2
 ENV GUNICORN_THREADS=4
 
@@ -15,22 +17,7 @@ RUN apt-get install -y curl unzip libaio1 \
     && unzip instantclient.zip && rm instantclient.zip
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
 
-COPY requirements.txt /tmp
+COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-WORKDIR /usr/src/app
-
-COPY . /usr/src/app
-
-RUN apt-get purge -y --auto-remove gcc
-
-# Workaround for permission issue on OpenShift
-RUN chmod -R g+rw /usr/src/app
-
-RUN chmod g+x /usr/src/app/docker-entrypoint.sh
-
-EXPOSE 8000
-
-ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
-
-CMD ["sh", "-c", "gunicorn --bind=0.0.0.0:8000 --workers=${GUNICORN_WORKERS} --threads=${GUNICORN_THREADS} --access-logfile=- --log-file=- project.wsgi"]
+USER 1001
