@@ -233,8 +233,12 @@ class ManageChartcom(PermissionRequiredMixin, View):
                 department = {'id': dept.dept, 'name': deptinfo.dept_name}
 
         if deptid == 0:
-            department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
-            deptid = dept_list[0].dept
+            try:
+                department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
+                deptid = dept_list[0].dept
+            except:
+                department = ''
+                deptid = 0
 
         chartcoms = Chartcom.objects.filter(dept=deptid)
         add_chartcoms = UmOscChartfieldV.objects.filter(deptid=deptid)
