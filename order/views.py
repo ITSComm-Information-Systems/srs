@@ -233,8 +233,12 @@ class ManageChartcom(PermissionRequiredMixin, View):
                 department = {'id': dept.dept, 'name': deptinfo.dept_name}
 
         if deptid == 0:
-            department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
-            deptid = dept_list[0].dept
+            try:
+                department = {'id': dept_list[0].dept, 'name':dept_list[0].name}
+                deptid = dept_list[0].dept
+            except:
+                department = ''
+                deptid = 0
 
         chartcoms = Chartcom.objects.filter(dept=deptid)
         add_chartcoms = UmOscChartfieldV.objects.filter(deptid=deptid)
@@ -671,7 +675,9 @@ class Status(PermissionRequiredMixin, View):
         auth_depts = AuthUserDept.get_order_departments(request.user.id)
         auth_dept_list = list(dept.dept for dept in auth_depts)
      
-        order_list = Order.objects.filter(chartcom__dept__in=auth_dept_list).order_by('-create_date', 'id').select_related()
+        year_old = datetime.date.today() - datetime.timedelta(366)
+
+        order_list = Order.objects.filter(chartcom__dept__in=auth_dept_list,create_date__gte=year_old).order_by('-create_date', 'id').select_related()
         item_list = Item.objects.filter(order__in=order_list).order_by('-order__create_date', 'order_id')
 
         order_id_list = list(str(order.id) for order in order_list)
@@ -697,6 +703,8 @@ class Status(PermissionRequiredMixin, View):
                 order.timeDiff = (3,"91-180 days")
             elif result<datetime.timedelta(366):
                 order.timeDiff = (4,"181-365 days")
+            else:
+                order.timeDiff = (5,"More than 365 days")
    
                        
             pin = next((x for x in pins if x.add_info_text_3 == str(order.id)), None)
