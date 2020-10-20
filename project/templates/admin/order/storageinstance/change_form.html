@@ -1,5 +1,66 @@
+
+<style>
+    /* Remove default bullets */
+    ul, #myUL {
+      list-style-type: none;
+    }
+    
+    /* Remove margins and padding from the parent ul */
+    #myUL {
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Style the caret/arrow */
+    .caret {
+      cursor: pointer; 
+      user-select: none; /* Prevent text selection */
+    }
+    
+    /* Create the caret/arrow with a unicode, and style it */
+    .caret::before {
+      content: "\25B6";
+      color: black;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    
+    /* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+    .caret-down::before {
+      transform: rotate(90deg); 
+    }
+    
+    /* Hide the nested list */
+    .nested {
+      display: none;
+    }
+    
+    /* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+    .active {
+      display: block;
+    }
+    </style>
+
 {% extends "admin/change_form.html" %}
 {% load i18n admin_urls %}
+
+
+{% block admin_change_form_document_ready %}
+{{ block.super }}
+<script>
+    
+    var toggler = document.getElementsByClassName("caret");
+    var i;
+
+    for (i = 0; i < toggler.length; i++) {
+    toggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".nested").classList.toggle("active");
+        this.classList.toggle("caret-down");
+    });
+    }
+
+</script>
+{% endblock %}
 {% block after_field_sets %}
 {% if host_list %}                                                           
 <fieldset class="module aligned {{ fieldset.classes }}">
@@ -17,12 +78,22 @@
 {% endif %}
 {% if ticket_list %}                                                           
 <fieldset class="module aligned {{ fieldset.classes }}">
-    <h4>Tickets</h4>
+    <h4>Recent Tickets</h4>
     <ul>
         {% for ticket in ticket_list %}
-            <li>
-            <a target=”_blank” href="{{ ticket.url }}">{{ ticket.id }}</a>
-            </li>
+            <li><span class="caret">
+                {{ ticket.id }} -  
+                {{ ticket.create_date|date:"SHORT_DATETIME_FORMAT" }} - &nbsp;
+
+                <a target=”_blank” href="{{ ticket.url }}">Open in TDx</a>
+            </span>
+
+                <ul class="nested">
+                        <pre id="{{order.id}}">{{order.sent}}</pre>
+                        <pre>{{ ticket.note }}</pre>
+            
+                </ul>
+              </li>
         {% endfor %}
     </ul>
 </fieldset>

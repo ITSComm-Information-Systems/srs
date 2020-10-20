@@ -379,7 +379,12 @@ class Volume(models.Model):
 
         ticket_list = []
         for row in cur.fetchall():
-            note = render_to_string('order/pinnacle_note.html', {'text': row[2]['reviewSummary'], 'description': 'Review Summary'})
+
+            try:
+                data = json.loads(row[2])
+                note = render_to_string('order/pinnacle_note.html', {'text': data['reviewSummary'], 'description': 'Review Summary'})
+            except:
+                note = ''
 
             ticket_list.append({'id': row[0]
                               , 'url': f'{tdx_url}{row[0]}'
