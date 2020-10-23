@@ -150,14 +150,14 @@ DATABASES = {
         'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
         'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
         'USER': os.getenv('DATABASE_USER','pgoscdevweb'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD','4zWV4bpup350'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD','N/A'),
         'HOST': os.getenv('DATABASE_SERVICE_NAME','containernp-pg.aws.vdc.it.umich.edu'),
         'TEST':
         {
         'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
         'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
         'USER': os.getenv('DATABASE_USER','pgoscdevweb'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD','4zWV4bpup350'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD','N/A'),
         'HOST': os.getenv('DATABASE_SERVICE_NAME','containernp-pg.aws.vdc.it.umich.edu'),
         },
     },
@@ -165,13 +165,13 @@ DATABASES = {
         'NAME': os.getenv('ORACLE_DATABASE','pinntst.dsc.umich.edu:1521/pinndev.world'),
         'ENGINE': 'django.db.backends.oracle',
         'USER': os.getenv('ORACLE_USER','PINN_CUSTOM'),
-        'PASSWORD': os.getenv('ORACLE_PASSWORD','wpfx8rea'),
+        'PASSWORD': os.getenv('ORACLE_PASSWORD','N/A'),
         'TEST': {
           'NAME': 'pinntst.dsc.umich.edu:1521/pinndev.world',
           'CREATE_DB': False,
           'CREATE_USER': False,
           'USER': os.getenv('ORACLE_USER','PINN_CUSTOM'),
-          'PASSWORD': os.getenv('ORACLE_PASSWORD','wpfx8rea'),
+          'PASSWORD': os.getenv('ORACLE_PASSWORD','N/A'),
         }
     },
 }
