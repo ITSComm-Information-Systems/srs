@@ -2,9 +2,10 @@
 {% block content %}
 <h2>{{ title }}</h2>
 
+
 <div class="form-group col-md-6">
-    <label for="search">Search by preorder number</label>
-    <select class="form-control estimate-search-ajax" id="estimate_search"></select>
+    <label for="estimate_search">Search</label>
+    <select class="estimate-search-ajax" id="estimate_search" multiple="multiple"></select>
 </div>
 
 {% include 'bom/modal_add_estimate.html' %}
@@ -14,27 +15,48 @@
 {% block js %}
 <script>
 
-    $(".estimate-search-ajax").select2({
-        ajax: {
-            url: "/apps/bom/search_ajax/",
-            dataType: 'json',
-            delay: 250,
+    $(document).ready(function () {
+        //Set bootstrap theme
+        $.fn.select2.defaults.set("theme", "bootstrap4");
 
-            cache: true
-        },
-        placeholder: 'Search for an estimate',
-        minimumInputLength: 3,
-        display: "inline",
-        //templateResult: formatRepo,
-        //templateSelection: formatRepoSelection
+        function formatEstimate(estimate) {
+            console.log(estimate, estimate.id)
+            if (!estimate.id) {
+                return estimate.text;
+            }
+            //var baseUrl = "/user/pages/images/flags";
+            var $estimate = $(
+                '<span><b>' + estimate.wo_number_display + '&nbsp(' + estimate.pre_order_number + ')</b>' 
+                    + '&nbsp; &middot; <em>' + estimate.building_number + '&middot;' + estimate.building_name + '</em>'
+                    + '<br>' + estimate.comment + '</span>'
+            );
+            return $estimate;
+        };
+
+        $(".estimate-search-ajax").select2({
+            ajax: {
+                url: "/apps/bom/search_ajax/",
+                dataType: 'json',
+                delay: 250,
+
+                cache: true
+            },
+            placeholder: 'Search for an estimate',
+            minimumInputLength: 4,
+            display: "inline",
+            templateResult: formatEstimate,
+            tags: true,
+            tokenSeparators: [",", " "]
+            //templateSelection: formatRepoSelection
+        });
+
+        $('#estimate_search').on('select2:select', function (e) {
+            console.log('selected', e.params.data.id)
+            //window.location.replace("/apps/bom/estimate/" + e.params.data.id + "/");
+            // Do something
+        });
+
     });
-
-    $('#estimate_search').on('select2:select', function (e) {
-        console.log('selected',e.params.data.id)
-        window.location.replace("/apps/bom/estimate/" + e.params.data.id + "/");
-        // Do something
-    });
-
 
 </script>
 
