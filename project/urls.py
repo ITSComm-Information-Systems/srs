@@ -205,6 +205,16 @@ urlpatterns = [
     path('', include('pages.urls')),
     path('tools/',include('tools.urls'))
 ]
+
+if settings.SRS_OUTAGE:
+    from django.views.generic import TemplateView 
+    urlpatterns = [
+        #re_path(r'^', views.homepage, name='bio')
+
+        re_path(r'^', TemplateView.as_view(template_name="outage.html"))
+        #re_path('<str:pagename>', views.index, name='index'),
+    ]
+
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [
