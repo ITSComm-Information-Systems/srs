@@ -125,14 +125,14 @@ class PreOrder(models.Model):
     contact_email_address = models.CharField(max_length=50)
     comment_text = models.CharField(max_length=200)
 
-    add_info_checkbox_1 = models.NullBooleanField(verbose_name="Draft Comp-D")
-    add_info_checkbox_2 = models.NullBooleanField(verbose_name="Asbuilt Recv'd-D")
-    add_info_checkbox_3 = models.NullBooleanField(verbose_name="Asbuilt Compl-D")
-    add_info_checkbox_4 = models.NullBooleanField()
-    add_info_checkbox_5 = models.NullBooleanField(verbose_name="Asbuilt/Prints-F")
-    add_info_checkbox_6 = models.NullBooleanField(verbose_name="Closeout Compl-F")
-    add_info_checkbox_7 = models.NullBooleanField(verbose_name="Asbuilt/Prints Received-A")
-    add_info_checkbox_8 = models.NullBooleanField(verbose_name="Assignments Complete-A")
+    add_info_checkbox_1 = models.BooleanField(null=True, verbose_name="Draft Comp-D")
+    add_info_checkbox_2 = models.BooleanField(null=True, verbose_name="Asbuilt Recv'd-D")
+    add_info_checkbox_3 = models.BooleanField(null=True, verbose_name="Asbuilt Compl-D")
+    add_info_checkbox_4 = models.BooleanField(null=True)
+    add_info_checkbox_5 = models.BooleanField(null=True, verbose_name="Asbuilt/Prints-F")
+    add_info_checkbox_6 = models.BooleanField(null=True, verbose_name="Closeout Compl-F")
+    add_info_checkbox_7 = models.BooleanField(null=True, verbose_name="Asbuilt/Prints Received-A")
+    add_info_checkbox_8 = models.BooleanField(null=True, verbose_name="Assignments Complete-A")
 
     class Meta: 
         db_table = 'um_bom_preorder_v'
