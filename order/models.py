@@ -384,6 +384,7 @@ class Volume(models.Model):
                     "where cast(data->>'action_id' as INTEGER) in (select id from order_action where service_id = %s) "
                     "  and cast(data->>'instance_id' as INTEGER) = %s "
                     "  and external_reference_id is not null "
+                    "order by create_date desc"
                     ,[self.service_id, self.id])
 
         if settings.ENVIRONMENT == 'Production':
@@ -394,15 +395,21 @@ class Volume(models.Model):
         ticket_list = []
         for row in cur.fetchall():
 
+            fulfill = ''
+
             try:
                 data = json.loads(row[2])
                 note = render_to_string('order/pinnacle_note.html', {'text': data['reviewSummary'], 'description': 'Review Summary'})
+                if 'fulfill' in data:
+                    fulfill = data['fulfill']
             except:
                 note = ''
+
 
             ticket_list.append({'id': row[0]
                               , 'url': f'{tdx_url}{row[0]}'
                               , 'create_date': row[1]
+                              , 'fulfill': fulfill
                               , 'note': note})
 
         return ticket_list
@@ -791,7 +798,7 @@ class Item(models.Model):
         return note
 
     def route(self):
-        action = Action.objects.get(id=self.data['action_id'])
+        #action = Action.objects.get(id=self.data['action_id'])
         routing = action.service.routing
 
         if action.use_cart:  # Associate with blank order
@@ -809,45 +816,56 @@ class Item(models.Model):
                 self.submit_incident(route) 
 
             if route['target'] == 'database':
-                if action.type == 'A':  # For Adds instantiate a new record
-                    rec = globals()[route['record']]()
-                    rec.created_date = datetime.now()
-                else: # upddate/delete get existing record
-                    rec = globals()[route['record']].objects.get(id=self.data.get('instance_id'))
-                
-                if self.data.get('volaction') == 'Delete':
-                    rec.delete()
+                if 'fulfill' in route:
+                    if route['fulfill'] == 'manual':
+                        self.data['fulfill'] = 'Pending'
+                        self.save()
+                        continue
+
+                self.update_database(route)
+
+    def update_database(self, route):
+        action = Action.objects.get(id=self.data['action_id'])
+
+        if action.type == 'A':  # For Adds instantiate a new record
+            rec = globals()[route['record']]()
+            rec.created_date = datetime.now()
+        else: # upddate/delete get existing record
+            rec = globals()[route['record']].objects.get(id=self.data.get('instance_id'))
+        
+        if self.data.get('volaction') == 'Delete':
+            rec.delete()
+        else:
+            if action.service.id == 8:
+                self.update_mibackup(rec)
+            else:
+                rec.owner = LDAPGroup().lookup( self.data['owner'] )
+                rec.service = action.service
+                rec.name = self.data.get('name','')
+                rec.owner = LDAPGroup().lookup( self.data['owner'] )
+                rec.size = self.data.get('size',0)
+                rec.service = action.service
+
+                print('rate for ', action.service.id)
+                if action.service.id == 11:
+                    rec.rate_id = 28
+                    print(rec.rate_id, 'set for dd')
                 else:
-                    if action.service.id == 8:
-                        self.update_mibackup(rec)
-                    else:
-                        rec.owner = LDAPGroup().lookup( self.data['owner'] )
-                        rec.service = action.service
-                        rec.name = self.data.get('name','')
-                        rec.owner = LDAPGroup().lookup( self.data['owner'] )
-                        rec.size = self.data.get('size',0)
-                        rec.service = action.service
+                    rec.rate_id = self.data.get('selectOptionType')
 
-                        print('rate for ', action.service.id)
-                        if action.service.id == 11:
-                            rec.rate_id = 28
-                            print(rec.rate_id, 'set for dd')
-                        else:
-                            rec.rate_id = self.data.get('selectOptionType')
+                rec.type = action.override['storage_type']
+                rec.shortcode = self.data.get('shortcode')
+                rec.uid = self.data.get('uid')
+                rec.ad_group = self.data.get('ad_group')    
+                if action.service.id == 7:
+                    self.update_mistorage(rec)
+                else:
+                    self.update_arcts(rec)
+                                    
+                rec.save()
 
-                        rec.type = action.override['storage_type']
-                        rec.shortcode = self.data.get('shortcode')
-                        rec.uid = self.data.get('uid')
-                        rec.ad_group = self.data.get('ad_group')    
-                        if action.service.id == 7:
-                            self.update_mistorage(rec)
-                        else:
-                            self.update_arcts(rec)
-                                            
-                        rec.save()
-
-                        if self.data.get('permittedHosts'):
-                            rec.update_hosts(self.data.get('permittedHosts'))
+                if self.data.get('permittedHosts'):
+                    rec.update_hosts(self.data.get('permittedHosts'))
 
     def submit_incident(self, route):
         client_id = settings.UM_API['CLIENT_ID']

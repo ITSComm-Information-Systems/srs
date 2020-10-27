@@ -1,13 +1,13 @@
 import csv, json
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import path
 
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -151,10 +151,26 @@ class VolumeAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
 
+        fulfill_url = [
+            path('fulfill_order/', self.fulfill_order),
+        ]
+
         download_url = [
             path('download_csv/', self.download_csv),
         ]
-        return download_url + urls
+        return fulfill_url + download_url + urls
+
+    def fulfill_order(self, request):
+        item = Item.objects.get(external_reference_id=request.POST['ticket'])
+        instance_id = item.data['instance_id']
+
+        item.update_database({'record': 'ArcInstance'})
+        item.data['fulfill'] = 'Complete'
+        item.save()
+
+        return HttpResponseRedirect(f'/admin/order/arcinstance/{instance_id}/change/')
+
+
 
     def download_csv(self, request):
         # Create the HttpResponse object with the appropriate CSV header.

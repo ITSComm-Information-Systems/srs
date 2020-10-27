@@ -15,10 +15,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        #id = options['id']
-        #item = Item.objects.get(id=id)
+        id = options['id']
+        item = Item.objects.get(id=id)
 
-        ticket_list = Ticket.objects.all()
+        #ticket_list = Ticket.objects.all()
 
-        for ticket in ticket_list
-        #item.route()
+        #for ticket in ticket_list
+        item.route()
