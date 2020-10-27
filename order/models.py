@@ -798,7 +798,7 @@ class Item(models.Model):
         return note
 
     def route(self):
-        #action = Action.objects.get(id=self.data['action_id'])
+        action = Action.objects.get(id=self.data['action_id'])
         routing = action.service.routing
 
         if action.use_cart:  # Associate with blank order
