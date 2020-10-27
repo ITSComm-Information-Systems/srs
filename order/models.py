@@ -803,7 +803,7 @@ class Item(models.Model):
 
             if route['target'] == 'database':
                 if 'fulfill' in route:
-                    if route['fulfill'] == 'manual':
+                    if route['fulfill'] == 'manual' and action.type != 'A':
                         self.data['fulfill'] = 'Pending'
                         self.save()
                         continue
