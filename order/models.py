@@ -329,20 +329,6 @@ class StorageMember(models.Model):
     username = models.CharField(max_length=8)
 
 
-class Ticket(models.Model):
-    id = models.PositiveIntegerField(primary_key=True)
-    service_id = models.PositiveIntegerField()
-    instance_id = models.PositiveIntegerField()
-    ticket_id = models.PositiveIntegerField()
-    data = JSONField()
-
-    class Meta:
-        db_table = 'order_item_ticket_v'
-        managed = False
-
-    def __str__(self):
-        return self.external_reference_id
-
 class Volume(models.Model):
     TYPE_CHOICES = (
         ('NFS', 'NFS'),
@@ -1003,3 +989,19 @@ class Item(models.Model):
 class Attachment(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     file = models.FileField(upload_to='attachments',blank=True, null=True)
+
+
+class Ticket(models.Model):
+    id = models.PositiveIntegerField(primary_key=True)
+    service = models.ForeignKey(Service, on_delete=models.PROTECT)
+    instance = models.ForeignKey(ArcInstance, on_delete=models.PROTECT)
+    ticket_id = models.PositiveIntegerField()
+    status = models.CharField(max_length=10)
+    data = JSONField()
+
+    class Meta:
+        db_table = 'order_item_ticket_v'
+        managed = False
+
+    def __str__(self):
+        return str(self.ticket_id)

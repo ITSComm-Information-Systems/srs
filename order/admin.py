@@ -132,8 +132,15 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ['ticket_id', 'service_id',  ]
+    title = 'Select an instance'
+    list_display = ['ticket_id', 'service', 'instance','status']
+    list_display_links = ('ticket_id', 'instance',)
+    ordering = ('-ticket_id',)
 
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        item = Item.objects.get(id=object_id)
+        instance_id = item.data['instance_id']
+        return HttpResponseRedirect(f'/admin/order/arcinstance/{instance_id}/change/')
 
 @admin.register(LDAPGroup)
 class LDAPGroupAdmin(admin.ModelAdmin):
