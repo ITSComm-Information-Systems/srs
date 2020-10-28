@@ -50,6 +50,13 @@
         </select>
 
     <input data-label="{{ field.label }}" class='col-8 ccval' name="cc_{{ field.name }}" id="{{ field.name }}" value="{{ chartcom }}" readonly>
+    {% for error in tab.form.oneTimeCharges.errors %}
+    <div>
+    <i class="fas fa-exclamation-triangle"
+        aria-label="Icon signfying that user must enter a value"></i>{{ error }}
+    </div>
+    {% endfor %}
+
 
 </div>
 
