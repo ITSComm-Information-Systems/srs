@@ -48,8 +48,10 @@
             <option data-dept="{{ chartcom.dept }}" data-chartcom="{{ chartcom.account_number }}" data-chartcom-id="{{ chartcom.chartcom_id }}">{{ chartcom.name }}</option>
             {% endfor %}
         </select>
-
-    <input data-label="{{ field.label }}" class='col-8 ccval' name="cc_{{ field.name }}" id="{{ field.name }}" value="{{ chartcom }}" readonly>
+    
+    {% with first_chartcom=tab.form.chartcom_list|first %}
+    <input data-label="{{ field.label }}" class='col-8 ccval' name="cc_{{ field.name }}" id="{{ field.name }}" value="{{ first_chartcom.account_number }}" readonly>
+    {% endwith %}
     {% for error in tab.form.oneTimeCharges.errors %}
     <div>
     <i class="fas fa-exclamation-triangle"
