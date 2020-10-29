@@ -62,7 +62,7 @@ class TabForm(forms.Form):
     def clean(self):
         if 'oneTimeCharges' in self.cleaned_data:
             if self.cleaned_data['oneTimeCharges'] == '11':                    
-                self.add_error('oneTimeCharges', 'You must select a shortcode')
+                self.add_error('oneTimeCharges', 'You must select a chartcom')
 
         if self.action.service.id == 10:
             if 'size' in self.cleaned_data:

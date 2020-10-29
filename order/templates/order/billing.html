@@ -63,4 +63,6 @@
 </fieldset>
 {% endfor %}
 
-<input type="hidden" name="oneTimeCharges" id="occ_key" value="11">
+{% with first_chartcom=tab.form.chartcom_list|first %}
+<input type="hidden" name="oneTimeCharges" id="occ_key" value="{{first_chartcom.chartcom.id}}">
+{% endwith %}
