@@ -285,7 +285,7 @@ def get_rows(unit, grouping, period, drange, request):
 
     if (grouping == 'Department ID'): 
         if unit == "All":
-            if request.user.has_perm("can_order_all"):
+            if request.user.has_perm("oscauth.can_report_all"):
                 dept_sql = ''
             else:
                 depts = [d['deptid'] for d in AuthUserDept.get_report_departments(request)]
