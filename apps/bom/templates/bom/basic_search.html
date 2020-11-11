@@ -18,6 +18,8 @@
                 <th>Workorder</th>
                 <th>Preorder</th>
                 <th>Description</th>
+                <th>Comment</th>
+                <th>Building</th>
                 <th>Estimates</th>
             </tr>
         </thead>
@@ -27,6 +29,8 @@
                 <td>{{ record.wo_number_display }}</td>
                 <td>{{ record.pre_order_number }}</td>
                 <td>{{ record.project_display }}</td>
+                <td>{{ record.comment }}</td>
+                <td>{{ record.building }}</td>
                 <td>{{ record.multi_count }}</td>
             </tr>
             {% endfor %}
