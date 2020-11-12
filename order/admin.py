@@ -171,12 +171,15 @@ class VolumeAdmin(admin.ModelAdmin):
         item = Item.objects.get(external_reference_id=request.POST['ticket'])
         instance_id = item.data['instance_id']
 
-        item.update_database({'record': 'ArcInstance'})
-        item.data['fulfill'] = 'Complete'
+        if request.POST['action'] == 'Cancel':
+            item.data['fulfill'] = 'Cancelled'
+        else:
+            item.update_database({'record': 'ArcInstance'})
+            item.data['fulfill'] = 'Complete'
+        
         item.save()
 
         return HttpResponseRedirect(f'/admin/order/arcinstance/{instance_id}/change/')
-
 
 
     def download_csv(self, request):

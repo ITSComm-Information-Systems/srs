@@ -60,8 +60,15 @@
     });
     }
 
-    document.getElementById("fulfillButton").addEventListener("click", function() {
-        console.log('click', this.dataset.ticket)
+
+    button = document.getElementsByClassName("action");
+
+    for (var i = 0 ; i < button.length; i++) {
+      button[i].addEventListener('click' , postAction , false ) ; 
+    }
+
+    function postAction() {
+     
         const form = document.createElement('form');
         form.method = 'POST'
         form.action = '/admin/order/arcinstance/fulfill_order/'
@@ -78,9 +85,15 @@
         hiddenField2.value = this.dataset.ticket;
         form.appendChild(hiddenField2);
 
+        const hiddenField3 = document.createElement('input');
+        hiddenField3.type = 'hidden';
+        hiddenField3.name = 'action';
+        hiddenField3.value = this.value;
+        form.appendChild(hiddenField3);
+
         document.body.appendChild(form);
         form.submit();
-    });
+    };
 
 </script>
 {% endblock %}
@@ -100,7 +113,6 @@
     </ul>
 </fieldset>
 {% endif %}
-{% if host_list %}                                                           
 <fieldset class="module aligned {{ fieldset.classes }}">
     <h4>Allowed Hosts <a id="add_host_id" class="related-widget-wrapper-link add-related"  href="/admin/order/archost/add/?arc_instance={{object_id}}&amp;_popup=1" title="Add Host"><img src="/static/admin/img/icon-addlink.svg" alt="Add"></a> </h4>
     <ul>
@@ -113,7 +125,6 @@
         {% endfor %}
     </ul>
 </fieldset>
-{% endif %}
 
 {% if ticket_list %}                                                           
 <fieldset class="module aligned {{ fieldset.classes }}">
@@ -134,7 +145,10 @@
             </span>
 
             {% if ticket.fulfill == 'Pending' %}
-              &nbsp;&nbsp;<input id="fulfillButton" data-ticket="{{ ticket.id }}" type="button" name="fullfill" value="Fulfill" >
+              &nbsp;&nbsp;<input class="action" id="fulfillButton" data-ticket="{{ ticket.id }}" type="button" name="action" value="Fulfill" >
+              &nbsp;&nbsp;<input class="action" style="background-color: red" id="cancelButton" data-ticket="{{ ticket.id }}" type="button" name="action" value="Cancel" >
+            {% else %}
+              &nbsp;&nbsp; {{ ticket.fulfill }}
             {% endif %}
 
                 <ul class="nested">
