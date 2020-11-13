@@ -93,6 +93,16 @@ class Search(PermissionRequiredMixin, View):
         else:  # open_workorder
             title = 'Search Open Preorders/Workorders'
             search_list = Workorder.objects.filter(status_name='Open')
+
+            for workorder in search_list:
+                if workorder.building_number:
+                    workorder.building = str(workorder.building_number) + ' - ' + workorder.building_name
+                
+                if len(workorder.comment_text) > 80:
+                    workorder.comment = workorder.comment_text[0:80] + '...'
+                else:
+                    workorder.comment = workorder.comment_text
+
             template = 'bom/basic_search.html'
 
         return render(request, template,

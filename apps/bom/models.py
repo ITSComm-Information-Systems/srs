@@ -92,12 +92,15 @@ class EstimateManager(models.Manager):
 
 class Workorder(models.Model):
     pre_order_id = models.IntegerField(primary_key=True)
-    pre_order_number = models.IntegerField()
     wo_number_display = models.CharField(max_length=20)
+    pre_order_number = models.IntegerField()
     project_display = models.CharField(max_length=200)
+    status_name = models.CharField(max_length=10)
+    comment_text = models.TextField()
+    building_number = models.IntegerField(blank=True, null=True)
+    building_name = models.CharField(max_length=100)
     multi_count = models.IntegerField()
     estimate_id = models.IntegerField()
-    status_name = models.CharField(max_length=10)
 
     class Meta: 
         db_table = 'um_bom_search_v'
