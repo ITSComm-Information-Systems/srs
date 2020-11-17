@@ -29,7 +29,21 @@
         <tr>
             {{ form.id }}
             <td class="text-right">{% include "bom/audit_info.html" %}</td>
-            <td>{{ record.item_code }}</td>
+            <td>{{ record.item_code }}
+                {% if record.item_code == 'New' %}
+                <a href="$" i class="fas fa-edit" aria-hidden="true" data-toggle="modal" 
+                data-new_id="{{ record.id }}"
+                data-new_location="{{ record.material_location.name }}" 
+                data-new_item_description="{{ record.item_description }}" 
+                data-new_material_location="{{ record.material_location }}" 
+                data-new_manufacturer="{{ record.manufacturer }}" 
+                data-new_manufacturer_part_number="{{ record.manufacturer_part_number }}" 
+                data-new_price="{{ record.price }}" 
+                data-new_quantity="{{ record.quantity }}" 
+                data-target="#addNewItem">
+                </a></i>
+                {% endif %}
+            </td>
             <td>{{ record.item_description }}<br>
                 <em>{{ record.manufacturer }} - {{ record.manufacturer_part_number }}</em>
             </td>
@@ -151,7 +165,7 @@
     <div class="modal-dialog  modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add New Part</h5>
+                <h5 id="newPartTitle" class="modal-title">Add New Part</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -159,32 +173,33 @@
 
             <form method="POST" action="/apps/bom/add_new_part/">
                 {% csrf_token %}
+                <input type="hidden" id="new_id" name="new_id" value="0">
                 <div class="modal-body">
                     <input type="hidden" name="estimate_id" value="{{ estimate.id }}">
 
                     <div class="form-group">
                         <label for="formGroupExampleInput">Location</label>
-                        <input list="material-locations" type="text" class="form-control" name="item_location">
+                        <input id="new_location" list="material-locations" type="text" class="form-control" name="item_location">
                     </div>
                     <div class="form-group">
                         <label for="formGroupExampleInput2">Manufacturer</label>
-                        <input type="text" class="form-control" name="item_manufacturer">
+                        <input id="new_manufacturer" type="text" class="form-control" name="item_manufacturer">
                     </div>
                     <div class="form-group">
                         <label for="formGroupExampleInput2">Manufacturer Part Number</label>
-                        <input type="text" class="form-control" name="item_manufacturer_part_number">
+                        <input id="new_manufacturer_part_number" type="text" class="form-control" name="item_manufacturer_part_number">
                     </div>
                     <div class="form-group">
                         <label for="formGroupExampleInput2">Item Description</label>
-                        <input type="text" class="form-control" name="item_description">
+                        <input id="new_item_description" type="text" class="form-control" name="item_description">
                     </div>
                     <div class="form-group">
                         <label for="formGroupExampleInput2">Price</label>
-                        <input type="number" step="any" class="form-control" name="item_price">
+                        <input id="new_price" type="number" step="any" class="form-control" name="item_price">
                     </div>
                     <div class="form-group">
                         <label for="formGroupExampleInput2">Quantity</label>
-                        <input type="number" class="form-control" name="item_quantity">
+                        <input id="new_quantity" type="number" class="form-control" name="item_quantity">
                     </div>
 
                 </div>
