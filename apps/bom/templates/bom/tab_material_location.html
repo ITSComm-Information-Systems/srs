@@ -30,7 +30,7 @@
             {{ form.id }}
             <td class="text-right">{% include "bom/audit_info.html" %}</td>
             <td>{{ record.item_code }}
-                {% if record.item_code == 'New' %}
+                {% if record.item_code == 'New' and estimate.status == 1 %}
                 <a href="$" i class="fas fa-edit" aria-hidden="true" data-toggle="modal" 
                 data-new_id="{{ record.id }}"
                 data-new_location="{{ record.material_location.name }}" 
