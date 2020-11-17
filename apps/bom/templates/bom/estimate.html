@@ -374,5 +374,29 @@
     //modal.find('.modal-body input').val(recipient)
   })
 
+
+  $('#addNewItem').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    if (button.data('new_id')) {
+      $('#newPartTitle').html('Edit New Part');
+      $('#new_id').val(button.data('new_id'))
+      $('#new_location').val(button.data('new_location'))
+      $('#new_manufacturer').val(button.data('new_manufacturer'))
+      $('#new_manufacturer_part_number').val(button.data('new_manufacturer_part_number'))
+      $('#new_item_description').val(button.data('new_item_description'))
+      $('#new_price').val(button.data('new_price'))
+      $('#new_quantity').val(button.data('new_quantity'))
+    } else {
+      $('#newPartTitle').html('Add New Part');
+      $('#new_location').val('')
+      $('#new_manufacturer').val('')
+      $('#new_manufacturer_part_number').val('')
+      $('#new_item_description').val('')
+      $('#new_price').val('')
+      $('#new_quantity').val('')
+    }
+
+  })
+
 </script>
 {% endblock js %}

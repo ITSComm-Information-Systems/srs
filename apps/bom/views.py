@@ -191,7 +191,11 @@ def add_new_part(request):
 
     estimate_id = request.POST['estimate_id']
 
-    mat = Material()
+    if request.POST['new_id'] == '0':
+        mat = Material()
+    else:
+        mat = Material.objects.get(id=request.POST['new_id'])
+
     mat.set_create_audit_fields(request.user.username)
     location = request.POST.get('item_location')
     new_location = MaterialLocation.objects.get_or_create(estimate_id=estimate_id, name=location)
