@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.views.generic import View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from django.forms import modelformset_factory, inlineformset_factory
+from django.forms import modelform_factory, modelformset_factory, inlineformset_factory
 from project.pinnmodels import UmOscPreorderApiV
 from django.db.models import Q
 from datetime import datetime
@@ -408,6 +408,7 @@ class Warehouse(PermissionRequiredMixin, View):
     permission_required = 'bom.can_update_bom_ordered'
     MaterialFormSet = modelformset_factory(Material,  fields=('status','quantity','vendor','release_number','staged','estimated_receive_date','order_date','reel_number')
         , can_delete=True)
+    WarehouseForm = modelform_factory(Estimate, fields=("label", "status"))
 
     def post(self, request, estimate_id):
         estimate = Estimate.objects.get(id=estimate_id)
@@ -416,7 +417,7 @@ class Warehouse(PermissionRequiredMixin, View):
         material_formset = self.MaterialFormSet(
             request.POST, queryset=estimate.get_material(), prefix='material')
 
-        form = EstimateForm(request.POST, instance=estimate)
+        form = self.WarehouseForm(request.POST, instance=estimate)
 
         if form.is_valid() and material_formset.is_valid():
 
@@ -468,8 +469,8 @@ class Warehouse(PermissionRequiredMixin, View):
         MaterialFormSet = modelformset_factory(
             Material, form=MaterialForm, exclude=('id',), extra=0)
         material_formset = MaterialFormSet(
-            queryset=estimate.material_list, prefix='material')
-        form = EstimateForm(instance=estimate)
+            queryset=estimate.material_list.order_by('item'), prefix='material')
+        form = self.WarehouseForm(instance=estimate)
 
         return render(request, 'bom/warehouse.html',
                       {'title': title,
