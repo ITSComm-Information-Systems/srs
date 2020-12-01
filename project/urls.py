@@ -8,116 +8,11 @@ from . import views
 #from django.contrib.auth.models import User
 from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain
 from oscauth.models import LDAPGroup, LDAPGroupMember
-from rest_framework import routers, serializers, viewsets
-
+from rest_framework import routers, viewsets
+from . import serializers
 
 admin.AdminSite.site_header = 'SRS Administration'
 admin.AdminSite.site_title = 'SRS Site Admin'
-
-class RateSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = ['name','label','rate']
-        read_only_fields = ['name', 'label', 'rate']
-        model = StorageRate
-
-
-class VolumeInstanceSerializer(serializers.ModelSerializer):  # Base Serializer for Storage Volumes
-
-    owner = serializers.StringRelatedField()
-    service = serializers.StringRelatedField()
-    rate = RateSerializer(read_only=True)
-
-
-class StorageInstanceSerializer(VolumeInstanceSerializer):
-
-    class Meta:
-        model = StorageInstance
-        fields = ['id','name','owner','size','service','type','rate','shortcode','created_date','uid','ad_group','total_cost'
-        ,'deptid','autogrow','flux']
-
-class ArcBillingForInstanceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ArcBilling
-        fields = ['size', 'shortcode']
-
-
-class ArcInstanceSerializer(VolumeInstanceSerializer):
-    hosts = serializers.StringRelatedField(many=True)
-    shortcodes = ArcBillingForInstanceSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = ArcInstance
-        fields = ['id','name','owner','size','service','type','rate','shortcodes', 'created_date','uid','ad_group','total_cost','hosts'
-        ,'nfs_group_id','multi_protocol','sensitive_regulated','great_lakes','armis','lighthouse','globus','globus_phi','thunder_x']
-
-
-class ArcBillingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ArcBilling
-        fields = ['id', 'arc_instance', 'size', 'shortcode']
-
-
-class LDAPGroupMemberSerializer(serializers.ModelSerializer):
-    ldap_group = serializers.StringRelatedField()
-
-    class Meta:
-        model = LDAPGroupMember
-        fields = ['id', 'ldap_group', 'username']
-
-
-class LDAPGroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LDAPGroup
-        fields = ['id', 'name', 'active']
-
-
-class ArcBillingViewSet(viewsets.ModelViewSet):
-    queryset = ArcBilling.objects.all() 
-    serializer_class = ArcBillingSerializer
-
-    def get_queryset(self):
-        arc_instance = self.request.query_params.get('arc_instance', None)
-
-        print(arc_instance)
-
-        if arc_instance is not None:
-           self.queryset = self.queryset.filter(arc_instance__id=arc_instance)
-        return self.queryset
-
-
-class VolumeViewSet(viewsets.ModelViewSet):
-
-    def get_queryset(self):
-        name = self.request.GET.get('name')
-
-        if name:
-            queryset = self.serializer_class.Meta.model.objects.filter(name=name)
-        else:
-            queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
-
-        return queryset
-
-class BackupDomainSerializer(serializers.ModelSerializer):
-    owner = serializers.StringRelatedField()
-    nodes = serializers.StringRelatedField(many=True)
-
-    class Meta:
-        model = BackupDomain
-        fields = ['id','name','shortcode','size','cost_calculated_date','owner','days_extra_versions','days_only_version','versions_after_deleted','versions_while_exists','nodes']
-
-
-class BackupDomainViewSet(viewsets.ModelViewSet):
-
-    def get_queryset(self):
-        name = self.request.GET.get('name')
- 
-        if name:
-            queryset = self.serializer_class.Meta.model.objects.filter(name=name)
-        else:
-            queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
-
-        return queryset
 
 
 class LDAPViewSet(viewsets.ModelViewSet):
@@ -140,45 +35,59 @@ class LDAPViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-
-class BackupDomainViewSet(VolumeViewSet):
-    queryset = BackupDomain.objects.all()
-    serializer_class = BackupDomainSerializer
-
-
-class StorageViewSet(VolumeViewSet):
-    queryset = StorageInstance.objects.all()
-    serializer_class = StorageInstanceSerializer
-
-
-class ArcViewSet(VolumeViewSet):
-    queryset = ArcInstance.objects.all()
-    serializer_class = ArcInstanceSerializer
-
-
-class RateViewSet(VolumeViewSet):
-    queryset = StorageRate.objects.all()
-    serializer_class = RateSerializer
-
-
 class LDAPGroupViewSet(LDAPViewSet):
     queryset = LDAPGroup.objects.all()
-    serializer_class = LDAPGroupSerializer
+    serializer_class = serializers.LDAPGroupSerializer
 
 class LDAPGroupMemberViewSet(LDAPViewSet):
     queryset = LDAPGroupMember.objects.all()
-    serializer_class = LDAPGroupMemberSerializer
+    serializer_class = serializers.LDAPGroupMemberSerializer
 
+class DefaultViewSet(viewsets.ModelViewSet):
+    queryset = StorageRate.objects.all()
 
-# Routers provide an easy way of automatically determining the URL conf.
+    def get_queryset(self):
+        queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
+
+        kwargs = {}
+
+        for parm, val in self.request.GET.items():
+            if parm != 'page':
+                kwargs[parm] = val
+
+        queryset = queryset.filter(**kwargs)
+        
+        return queryset
+
+class StorageInstanceViewSet(DefaultViewSet):
+    queryset = StorageInstance.objects.all()
+    serializer_class = serializers.StorageInstanceSerializer
+
+class ArcInstanceViewSet(DefaultViewSet):
+    serializer_class = serializers.ArcInstanceSerializer
+    queryset = ArcInstance.objects.all()
+
+class RateViewSet(DefaultViewSet):
+    serializer_class = serializers.RateSerializer
+    queryset = StorageRate.objects.all()
+
+class ArcBillingViewSet(DefaultViewSet):
+    serializer_class = serializers.ArcBillingSerializer
+    queryset = ArcBilling.objects.all()
+
+class BackupDomainViewSet(DefaultViewSet):
+    serializer_class = serializers.BackupDomainSerializer
+    queryset = BackupDomain.objects.all()
+
+# Register URLs for API
 router = routers.DefaultRouter()
-router.register(r'storageinstances', StorageViewSet)
-router.register(r'storagerates', RateViewSet)
-router.register(r'arcinstances', ArcViewSet)
-router.register(r'arcbilling', ArcBillingViewSet)
-router.register(r'backupdomains', BackupDomainViewSet)
-router.register(r'ldapgroups', LDAPGroupViewSet)
-router.register(r'ldapgroupmembers', LDAPGroupMemberViewSet)
+router.register('storageinstances', StorageInstanceViewSet)
+router.register('storagerates', RateViewSet)
+router.register('arcinstances', ArcInstanceViewSet)
+router.register('arcbilling', ArcBillingViewSet)
+router.register('backupdomains', BackupDomainViewSet)
+router.register('ldapgroups', LDAPGroupViewSet)
+router.register('ldapgroupmembers', LDAPGroupMemberViewSet)
 
 
 urlpatterns = [
@@ -192,7 +101,6 @@ urlpatterns = [
     path('pages/', include('pages.urls')),
     path('auth/', include('oscauth.urls')),
     path('apps/', include('apps.urls')),
-    #path('auth-api/', include('rest_framework.urls')),
     path('api/', include(router.urls)),
     path('admin/', admin.site.urls),
     path('reports/',include('reports.urls')),
