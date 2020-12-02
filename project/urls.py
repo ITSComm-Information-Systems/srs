@@ -59,33 +59,20 @@ class DefaultViewSet(viewsets.ModelViewSet):
         
         return queryset
 
-class StorageInstanceViewSet(DefaultViewSet):
-    queryset = StorageInstance.objects.all()
-    serializer_class = serializers.StorageInstanceSerializer
-
-class ArcInstanceViewSet(DefaultViewSet):
-    serializer_class = serializers.ArcInstanceSerializer
-    queryset = ArcInstance.objects.all()
-
-class RateViewSet(DefaultViewSet):
-    serializer_class = serializers.RateSerializer
-    queryset = StorageRate.objects.all()
-
-class ArcBillingViewSet(DefaultViewSet):
-    serializer_class = serializers.ArcBillingSerializer
-    queryset = ArcBilling.objects.all()
-
-class BackupDomainViewSet(DefaultViewSet):
-    serializer_class = serializers.BackupDomainSerializer
-    queryset = BackupDomain.objects.all()
+def get_view_class(model, serializer_class):
+    name = model.__name__
+    x = type(f'{name}ViewSet', (DefaultViewSet,), {})
+    x.queryset = model.objects.all().order_by('id')
+    x.serializer_class = serializer_class
+    return x
 
 # Register URLs for API
 router = routers.DefaultRouter()
-router.register('storageinstances', StorageInstanceViewSet)
-router.register('storagerates', RateViewSet)
-router.register('arcinstances', ArcInstanceViewSet)
-router.register('arcbilling', ArcBillingViewSet)
-router.register('backupdomains', BackupDomainViewSet)
+router.register('storageinstances', get_view_class(StorageInstance, serializers.StorageInstanceSerializer))
+router.register('storagerates', get_view_class(StorageRate, serializers.RateSerializer))
+router.register('arcinstances', get_view_class(ArcInstance, serializers.ArcInstanceSerializer))
+router.register('arcbilling', get_view_class(ArcBilling, serializers.ArcBillingSerializer))
+router.register('backupdomains', get_view_class(BackupDomain, serializers.BackupDomainSerializer))
 router.register('ldapgroups', LDAPGroupViewSet)
 router.register('ldapgroupmembers', LDAPGroupMemberViewSet)
 
