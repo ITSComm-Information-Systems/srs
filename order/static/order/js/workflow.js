@@ -370,6 +370,9 @@ $(document).ready(function() {
         if($("#" + id).hasClass('selected')) { 
           label = $("label[for='" + id + "']").text();
           value = $("#" + inp[i].id).val();
+          if (name=="product") {
+            value = value + "(" + obj.dataset.zcode + ")";
+          }
           tab.push({'label': label, 'value': value})
         }
       } else {

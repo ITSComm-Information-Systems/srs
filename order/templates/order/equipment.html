@@ -14,7 +14,7 @@
             <p class="card-title h5" id="card-title-of-{{ field }}">{{ field }}</p>
             <p class="card-text">{{ field.description }}</p>
             <p class="card-text"><strong>Price: ${{ field.price }}</strong></p>
-            <button id="product{{field.id}}" name="product" type="button" class="btn btn-outline-success select-button product-button" value="{{ field }}" onclick="selectProductCard(this)" aria-describedby="card-title-of-{{ field }}">Select <span class="sr-only"> {{ field }}</span></button>
+            <button data-zcode="{{ field.name }}" id="product{{field.id}}" name="product" type="button" class="btn btn-outline-success select-button product-button" value="{{ field }}" onclick="selectProductCard(this)" aria-describedby="card-title-of-{{ field }}">Select <span class="sr-only"> {{ field }}</span></button>
             
           </div>
       </div>
