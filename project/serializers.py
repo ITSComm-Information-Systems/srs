@@ -28,6 +28,18 @@ class VolumeInstanceSerializer(serializers.ModelSerializer):  # Base Serializer 
     rate = RateSerializer(read_only=True)
 
 
+    def update(self, instance, validated_data):
+
+        try:   # If an option is passed look up by label and update rate
+            request = self.context['request']
+            instance.rate = StorageRate.objects.get(label=request.POST['option'],service=instance.service,type=instance.type)
+        except:
+            pass
+
+        return super().update(instance, validated_data)
+
+
+
 class StorageInstanceSerializer(VolumeInstanceSerializer):
 
     class Meta:
