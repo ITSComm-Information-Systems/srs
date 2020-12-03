@@ -180,6 +180,8 @@ def edit_material_location(request):
     
     if descr:
         mat.description = descr
+    else:
+        mat.description = ''
 
     mat.save()
 
