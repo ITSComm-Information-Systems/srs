@@ -3,6 +3,18 @@ from rest_framework import serializers
 from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain
 from oscauth.models import LDAPGroup, LDAPGroupMember
 
+def serializer_factory(model):
+    name = model.__name__
+
+    meta_attrs = {
+        'model': model,
+        'fields': '__all__'
+    }
+    meta = type('Meta', (), meta_attrs)
+    #TODO string related fields
+
+    return type(f'{name}Serializer', (serializers.ModelSerializer,), {'Meta': meta})
+
 
 class RateSerializer(serializers.ModelSerializer):
 
