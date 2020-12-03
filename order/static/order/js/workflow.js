@@ -370,7 +370,7 @@ $(document).ready(function() {
         if($("#" + id).hasClass('selected')) { 
           label = $("label[for='" + id + "']").text();
           value = $("#" + inp[i].id).val();
-          if (name=="product") {
+          if (name=="product" && obj.dataset.zcode ) {
             value = value + "(" + obj.dataset.zcode + ")";
           }
           tab.push({'label': label, 'value': value})
@@ -386,7 +386,9 @@ $(document).ready(function() {
         }
         value = $("#" + inp[i].id).val();
         if(name != 'product' || value != 0) { // don't show 0 product
-          label = label + "(" + obj.dataset.zcode + ")";
+          if (name=='product') {
+            label = label + "(" + obj.dataset.zcode + ")";
+          }
           tab.push({'label': label, 'value': value})
         }
 
