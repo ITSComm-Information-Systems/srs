@@ -2,6 +2,7 @@
 from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from rest_framework import routers, viewsets
+import rest_framework
 from . import serializers
 
 class LDAPViewSet(viewsets.ModelViewSet):
@@ -52,8 +53,23 @@ def get_view_class(model, serializer_class):
     name = model.__name__
     x = type(f'{name}ViewSet', (DefaultViewSet,), {})
     x.queryset = model.objects.all().order_by('id')
-    x.serializer_class = serializer_class
+    if name == 'StorageRate':
+        x.serializer_class = serializer_factory(model)
+    else:
+        x.serializer_class = serializer_class
+
     return x
+
+def serializer_factory(model):
+    name = model.__name__
+
+    meta_attrs = {
+        'model': model,
+        'fields': '__all__'
+    }
+    meta = type('Meta', (), meta_attrs)
+
+    return type(f'{name}Serializer', (rest_framework.serializers.ModelSerializer,), {'Meta': meta})
 
 # Register URLs for API
 router = routers.DefaultRouter()
