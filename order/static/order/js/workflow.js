@@ -383,6 +383,7 @@ $(document).ready(function() {
         }
         value = $("#" + inp[i].id).val();
         if(name != 'product' || value != 0) { // don't show 0 product
+          label = label + "(" + obj.dataset.zcode + ")";
           tab.push({'label': label, 'value': value})
         }
 
