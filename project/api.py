@@ -2,7 +2,6 @@
 from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from rest_framework import routers, viewsets
-import rest_framework
 from . import serializers
 
 class LDAPViewSet(viewsets.ModelViewSet):
@@ -49,34 +48,25 @@ class DefaultViewSet(viewsets.ModelViewSet):
         
         return queryset
 
-def get_view_class(model, serializer_class):
+def viewset_factory(model, serializer_class=None):
     name = model.__name__
     x = type(f'{name}ViewSet', (DefaultViewSet,), {})
     x.queryset = model.objects.all().order_by('id')
-    if name == 'StorageRate':
-        x.serializer_class = serializer_factory(model)
-    else:
+
+    if serializer_class:
         x.serializer_class = serializer_class
+    else:
+        x.serializer_class = serializers.serializer_factory(model)
 
     return x
 
-def serializer_factory(model):
-    name = model.__name__
-
-    meta_attrs = {
-        'model': model,
-        'fields': '__all__'
-    }
-    meta = type('Meta', (), meta_attrs)
-
-    return type(f'{name}Serializer', (rest_framework.serializers.ModelSerializer,), {'Meta': meta})
 
 # Register URLs for API
 router = routers.DefaultRouter()
-router.register('storageinstances', get_view_class(StorageInstance, serializers.StorageInstanceSerializer))
-router.register('storagerates', get_view_class(StorageRate, serializers.RateSerializer))
-router.register('arcinstances', get_view_class(ArcInstance, serializers.ArcInstanceSerializer))
-router.register('arcbilling', get_view_class(ArcBilling, serializers.ArcBillingSerializer))
-router.register('backupdomains', get_view_class(BackupDomain, serializers.BackupDomainSerializer))
+router.register('storageinstances', viewset_factory(StorageInstance, serializers.StorageInstanceSerializer))
+router.register('storagerates', viewset_factory(StorageRate))
+router.register('arcinstances', viewset_factory(ArcInstance, serializers.ArcInstanceSerializer))
+router.register('arcbilling', viewset_factory(ArcBilling, serializers.ArcBillingSerializer))
+router.register('backupdomains', viewset_factory(BackupDomain, serializers.BackupDomainSerializer))
 router.register('ldapgroups', LDAPGroupViewSet)
 router.register('ldapgroupmembers', LDAPGroupMemberViewSet)
