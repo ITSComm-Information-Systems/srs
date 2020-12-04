@@ -370,6 +370,9 @@ $(document).ready(function() {
         if($("#" + id).hasClass('selected')) { 
           label = $("label[for='" + id + "']").text();
           value = $("#" + inp[i].id).val();
+          if (name=="product" && obj.dataset.zcode ) {
+            value = value + "(" + obj.dataset.zcode + ")";
+          }
           tab.push({'label': label, 'value': value})
         }
       } else {
@@ -383,6 +386,9 @@ $(document).ready(function() {
         }
         value = $("#" + inp[i].id).val();
         if(name != 'product' || value != 0) { // don't show 0 product
+          if (name=='product') {
+            label = label + "(" + obj.dataset.zcode + ")";
+          }
           tab.push({'label': label, 'value': value})
         }
 

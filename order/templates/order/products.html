@@ -32,7 +32,7 @@
             <div class="row" style="float-bottom">
                 <label class="col-6">Quantity</label>
                 <label hidden for="product{{field.id}}">{{ field }}</label>
-                <input  onchange="selectProductCard(this,'{{field}}' )" name="product" id="product{{field.id}}" class="col-3 product-input" type="number " min="0" value="0">
+                <input data-zcode="{{ field.name }}" onchange="selectProductCard(this,'{{field}}' )" name="product" id="product{{field.id}}" class="col-3 product-input" type="number " min="0" value="0">
             </div>
 
           </div>
