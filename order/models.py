@@ -573,6 +573,73 @@ class BackupNode(models.Model):
         return self.name
 
 
+class Server(models.Model):
+
+    ON_CALL_CHOICES = [
+        (0, 'Business Hours'),
+        (1, '24/7'),
+    ]
+
+    DAY_CHOICES = [
+        (0, 'Sunday'),
+        (1, 'Monday'),
+        (2, 'Tuesday'),
+        (3, 'Wednesday'),
+        (4, 'Thursday'),
+        (5, 'Friday'),
+        (6, 'Saturday'),
+    ]
+
+    name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
+    shortcode = models.CharField(max_length=100) 
+    managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
+    os = models.CharField(max_length=100)     #  <os>Windows2008R2managed</os>
+    cpu = models.IntegerField()   #  <cpu>4</cpu>
+    ram = models.IntegerField()    #  <ram>8</ram>
+    disk_space = models.CharField(max_length=100)  #  <diskspace>disk0=100 GB ;</diskspace>
+    regulated_data = models.BooleanField(default=False)    #  <MWregulateddata></MWregulateddata>
+    non_regulated_data = models.BooleanField(default=False)   #   <MWnonregulateddata></MWnonregulateddata>
+    replicated = models.BooleanField(default=True)
+
+    on_call = models.PositiveSmallIntegerField(null=True, choices=ON_CALL_CHOICES)   #<monitoringsystem>businesshours</monitoringsystem>
+
+    firewall = models.CharField(max_length=100)
+    backup = models.BooleanField(default=False)
+    support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
+    support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
+    backup_time = models.TimeField('Daily Backup Time', null=True)   #  <dailybackuptime>06:00 PM</dailybackuptime>
+    patch_time = models.TimeField(null=True)    #  <patchingScheduleTime>01:00 AM</patchingScheduleTime>
+    patch_day = models.PositiveSmallIntegerField(choices=DAY_CHOICES, default=0) #  <patchingScheduleDate>Sunday</patchingScheduleDate>
+    reboot_time = models.TimeField(null=True)    #  <rebootScheduleTime>04:00 AM</rebootScheduleTime>
+    reboot_day = models.PositiveSmallIntegerField(null=True, choices=DAY_CHOICES) #   <rebootScheduleDate>Sunday</rebootScheduleDate>
+    domain = models.CharField(max_length=100)
+    datacenter = models.CharField(max_length=100)
+    firewall_requests = models.CharField(max_length=100)
+    legacy_data = models.TextField()
+
+
+  #<diskspaceEnd>disk0=100 GB ;</diskspaceEnd>
+  #<mcommGroup>DPSS Technology Management</mcommGroup>
+  #<servicestatus>Ended</servicestatus>
+  #<recovery>delayed</recovery>
+  #<MWregulateddatacheckboxe1>[[]]</MWregulateddatacheckboxe1>
+  #<recoveryoptions>Yes</recoveryoptions>
+  #<servicestatusdate></servicestatusdate>
+  #<xmlSubscriptionKey>PS-VD-DIRECTORY-1</xmlSubscriptionKey>
+  #<additionalneedspage4></additionalneedspage4>
+  #<afterhourssupportpage4>No. dpss-technology-management@umich.edu 7346470657</afterhourssupportpage4>
+  #<updateByRequest>85605</updateByRequest>
+  #<nonregulateddataDetail>[[]]</nonregulateddataDetail>
+  #<subscribedDate>2012-11-01T14:56:40-04:00</subscribedDate>
+  #<ipsubnet>secure</ipsubnet>
+  #<service>MiServer</service>
+  #<processing>CPU=4 ;RAM=8 GB ;</processing>
+
+    def __str__(self):
+        return self.name
+
+
 class Order(models.Model):
     PRIORITY_CHOICES = (
         ('High', 'Expedited'),
