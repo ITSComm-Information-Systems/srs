@@ -198,6 +198,9 @@ class TabForm(forms.Form):
         self.request = kwargs.pop('request', None)
         super(TabForm, self).__init__(*args, **kwargs)
 
+
+
+
         if action.service.id == 7:
             self.vol = StorageInstance
             self.host = StorageHost
@@ -275,6 +278,17 @@ class TabForm(forms.Form):
                 instance_id = self.request.POST.get('instance_id')
                 if instance_id:
                     self.set_initial(instance_id)
+
+        if self.is_bound:
+            try:
+                visible = self.request.POST['visible']
+                for field in self.fields:
+                    if field not in visible:
+                        print(field, 'not required')
+                        self[field].field.required = False
+            except:
+                print('error checking visible')
+
 
 
 class BillingForm(TabForm):
@@ -653,8 +667,13 @@ class BillingStorageForm(TabForm):
             option = StorageRate.objects.get(id=28)
             total_cost = option.get_total_cost(self.request.POST['size'])
             descr = self.fields['totalCost'].description.replace('~', str(total_cost))
+        elif self.action.service.name == 'miServer':
+            option = 1
+            total_cost = '420'
+            descr = self.fields['totalCost'].description.replace('~', str(total_cost))
         else:
-            option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
+            option = 1
+            #option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
 
             #if self.action.service.name == 'miStorage':
             #    total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
@@ -689,10 +708,16 @@ class BillingStorageForm(TabForm):
         if self.action.service.name != 'miBackup':
             if self.action.service.name == 'dataDen':
                 option = StorageRate.objects.get(id=28)
+            elif self.action.service.name == 'miServer':
+                option = StorageRate.objects.get(id=1)
             else:
                 option = StorageRate.objects.get(id=self.data['selectOptionType'])
 
-            total_cost = option.get_total_cost(self.data['size'])
+            if self.action.service.name == 'miServer':
+                total_cost = 420
+            else:
+                total_cost = option.get_total_cost(self.data['size'])
+
             summary.append({'label': 'Total Monthly Cost', 'value': str(total_cost)})
 
         if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':

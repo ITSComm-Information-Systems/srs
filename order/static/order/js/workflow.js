@@ -213,7 +213,45 @@ $(document).ready(function() {
   $(document).on("load", "#div_ad_group" , function() {
     $('#div_ad_group').hide();
   });
-  
+
+
+  //MiServer
+  $(document).on("load", "#div_misernonmang" , function() {
+    $('#div_misernonmang').hide();
+    $('#div_misevos').hide();
+  });
+
+  $(document).on("click", "#manageunman_0" , function() {
+    $('#div_misevos').show().prop('required',true);
+    $('#div_misernonmang').hide().prop('required',false);
+  });
+
+  $(document).on("click", "#manageunman_1" , function() {
+    $('#div_misevos').hide().prop('required',false);
+    $('#div_misernonmang').show().prop('required',true);
+  });
+
+  $(document).on("load", "#div_misevregulist" , function() {
+    $('#div_misevregulist').hide();
+    $('#div_misevyesnon').hide();
+  });
+
+  $(document).on("click", "#misevregu_0" , function() {
+    $('#div_misevregulist').show().prop('required',true);
+  });
+
+  $(document).on("click", "#misevregu_1" , function() {
+    $('#div_misevregulist').hide().prop('required',false);
+  });
+
+  $(document).on("click", "#misevnonregu_0" , function() {
+    $('#div_misevyesnon').show().prop('required',true);
+  });
+
+  $(document).on("click", "#misevnonregu_1" , function() {
+    $('#div_misevyesnon').hide().prop('required',false);
+  });
+
 
   var x = document.getElementsByClassName("ccsel");
   var i;
