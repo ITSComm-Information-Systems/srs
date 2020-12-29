@@ -595,14 +595,15 @@ class Server(models.Model):
     shortcode = models.CharField(max_length=100) 
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
     os = models.CharField(max_length=100)     #  <os>Windows2008R2managed</os>
-    cpu = models.IntegerField()   #  <cpu>4</cpu>
-    ram = models.IntegerField()    #  <ram>8</ram>
-    disk_space = models.CharField(max_length=100)  #  <diskspace>disk0=100 GB ;</diskspace>
+    cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
+    ram = models.IntegerField('RAM')    #  <ram>8</ram>
+    #disk_space = models.CharField(max_length=100)  #  <diskspace>disk0=100 GB ;</diskspace>
     regulated_data = models.BooleanField(default=False)    #  <MWregulateddata></MWregulateddata>
     non_regulated_data = models.BooleanField(default=False)   #   <MWnonregulateddata></MWnonregulateddata>
     replicated = models.BooleanField(default=True)
 
     on_call = models.PositiveSmallIntegerField(null=True, choices=ON_CALL_CHOICES)   #<monitoringsystem>businesshours</monitoringsystem>
+    in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
 
     firewall = models.CharField(max_length=100)
     backup = models.BooleanField(default=False)
@@ -618,10 +619,7 @@ class Server(models.Model):
     firewall_requests = models.CharField(max_length=100)
     legacy_data = models.TextField()
 
-
   #<diskspaceEnd>disk0=100 GB ;</diskspaceEnd>
-  #<mcommGroup>DPSS Technology Management</mcommGroup>
-  #<servicestatus>Ended</servicestatus>
   #<recovery>delayed</recovery>
   #<MWregulateddatacheckboxe1>[[]]</MWregulateddatacheckboxe1>
   #<recoveryoptions>Yes</recoveryoptions>
@@ -638,6 +636,19 @@ class Server(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ServerDisk(models.Model):
+    server = models.ForeignKey(Server, related_name='disks', on_delete=models.CASCADE)
+    name = models.CharField(max_length=10)
+    size = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+
+class ServerData(models.Model):
+    server = models.ForeignKey(Server, related_name='data', on_delete=models.CASCADE)
+    code = models.CharField(max_length=5)
 
 
 class Order(models.Model):
