@@ -2,9 +2,10 @@ from django.core.management.base import BaseCommand, CommandError
 
 from oscauth.utils import get_mc_group
 from oscauth.models import LDAPGroup
-from order.models import Server
+from order.models import Server, ServerDisk
 
-import datetime, csv
+
+import datetime, csv, sys
 import xml.etree.ElementTree as ET
 
 DAYS = {
@@ -48,11 +49,12 @@ class Command(BaseCommand):
                 if line_count == 0:
                     #print(f'Column names are {", ".join(row)}')
                     line_count += 1
-                elif line_count > 1180:
+                #elif line_count < 20:
+                else:
                     self.process_record(row, type, service_id)
                     line_count += 1
-                else:
-                    line_count += 1
+                #else:
+                #    break
 
             print(f'Processed {line_count} lines.')
 
@@ -68,6 +70,43 @@ class Command(BaseCommand):
                 return default 
         except:
             return default
+
+    def add_disks(self, xml, server_id):
+        disks = self.get_text(xml, 'diskspace', None)
+
+        if not disks:
+            return
+        
+        disk_list = disks.split(';')
+
+        for disk in disk_list:
+            if len(disk_list) > 9:
+                print('extra disks', server_id)
+                sys.exit()
+
+            if disk:
+                equal = disk.find('=')
+                space = disk.find(' ')
+                name = disk[0:equal]
+                size = int(disk[equal+1:space])
+
+                sd = ServerDisk()
+                sd.server_id = server_id
+                sd.name = name
+                sd.size = size
+                sd.save()
+
+            
+        print('-----')
+
+    def add_data(self, xml, server):
+        x = self.get_text(xml, 'MWregulateddatacheckboxe1', None)
+        if x:
+            print(x)
+
+        x = self.get_text(xml, 'nonregulateddataDetail', None)
+        if x:
+            print(x)
 
 
 
@@ -93,7 +132,7 @@ class Command(BaseCommand):
         s.os = self.get_text(xml, 'os', 'n/a')
         s.cpu = self.get_text(xml, 'cpu', 0)
         s.ram = self.get_text(xml, 'ram', 0)
-        s.disk_space = self.get_text(xml, 'diskspace', '')
+        #s.disk_space = self.get_text(xml, 'diskspace', '')
         s.firewall = ' ' 
         s.support_email = self.get_text(xml, 'afterhoursemail', 'n/a')
         s.support_phone = self.get_text(xml, 'afterhoursphone', 'n/a')
@@ -108,17 +147,17 @@ class Command(BaseCommand):
         elif on_call == '247':
             s.on_call = 1
 
-        x = self.get_text(xml, 'MWregulateddatacheckboxe1', None)
-        if x:
-            print(x)
-
-        x = self.get_text(xml, 'nonregulateddataDetail', None)
-        if x:
-            print(x)
+        service_status = self.get_text(xml, 'servicestatus', None)
+        if service_status == 'Ended':
+            s.in_service = False
+        else:
+            print('service status', service_status)
 
         try:
             s.save()
             self.LOADS +=1
+            self.add_disks(xml, s.id)
+            #self.add_data(xml)
         except Exception as ex:
             print('insert error', ex)
             print(data)

@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import path
 
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -130,27 +130,47 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     ordering = ('display_seq_no',)
 
 
+class ServerDiskInline(admin.TabularInline):
+    model = ServerDisk
+    ordering = ('name',)
+
+
 @admin.register(Server)
 class ServerAdmin(admin.ModelAdmin):
     list_display = ['name', 'owner', 'os']
-    list_filter = ('os',)
+    list_filter = ('os','in_service')
     ordering = ('name',)
-    fields = ('name','owner','shortcode', ('managed', 'os'), ('cpu','ram','disk_space'),
-    ('backup', 'backup_time'),
-    ('patch_day','patch_time'),
-    ('reboot_day', 'reboot_time'),
-    ('on_call', 'support_email', 'support_phone'),
-    'domain', 'datacenter', 'firewall_requests',
-    'legacy_data')
+    #fields = (('name','in_service'),'owner','shortcode', ('managed', 'os'), ('cpu','ram'),
+    #('backup', 'backup_time'),
+    #('patch_day','patch_time'),
+    #('reboot_day', 'reboot_time'),
+    #('on_call', 'support_email', 'support_phone'),
+    #'domain', 'datacenter', 'firewall_requests',
+    
+    #'legacy_data')
+
+    inlines = [ServerDiskInline,]
 
     readonly_fields = ('legacy_data',)
-    #fieldsets = (
-    #    (None, {'fields': ('service', 'name','owner',('type','multi_protocol','ad_group'),'rate','size',('uid','nfs_group_id'),'created_date','sensitive_regulated')
-    #    }),
-    #    ('Regulated Data', {'fields':(('armis','globus_phi'),)
-    #    }),
-    #    ('Non Regulated Data', {'fields':(('lighthouse','globus','thunder_x','great_lakes'),)
-    #    })
+
+    fieldsets = (
+        (None, {
+            'fields': (('name', 'in_service'), 'owner', 'shortcode', ('os','cpu','ram'),
+                        ('backup','backup_time'),
+                        'managed' )
+        }),
+        ('Managed', {
+            'fields': (('patch_day','patch_time'),
+                    ('reboot_day', 'reboot_time'),),
+        }),
+        ('Legacy Data', {
+            'classes': ('collapse',),
+            'fields': ('legacy_data',),
+        }),
+    )
+
+
+
 
 
 @admin.register(Ticket)
