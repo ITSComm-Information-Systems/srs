@@ -28,6 +28,7 @@ from pages.models import Page
 # Load selection page
 @permission_required('oscauth.can_report', raise_exception=True)
 def get_inventory(request):
+    print('here')
     # Find all departments user has reporting access to
     names = AuthUserDept.get_report_departments(request)
 
@@ -58,6 +59,10 @@ def make_report(request):
     
     # Get user-selected department ID and name
     total =  request.POST.get('dept_id')
+
+    if total is None:
+        return HttpResponseRedirect('/reports/inventory')
+
     array = total.split('-')
     dept_id = array[0]
     dept_name = array[1]

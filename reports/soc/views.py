@@ -81,6 +81,10 @@ def generate(request):
     display_type = request.POST.get("unitGroupingGroup",None)
     grouping = ''
     unit = ''
+
+    if not display_type:
+        return HttpResponseRedirect('/reports/soc')
+
     # If they selected by Department ID
     if display_type in ['1']:
         grouping = 'Department ID'

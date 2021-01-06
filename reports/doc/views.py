@@ -73,6 +73,9 @@ def generate_report(request):
 	bill_date = request.POST.get('billing_date')
 	chartcoms = request.POST.getlist('chartcoms[]')
 
+	if not chartcoms:
+		return HttpResponseRedirect('/reports/doc')
+
 	# Formatting
 	name = UmOscDeptProfileV.objects.filter(deptid=selected_dept)
 	selected_dept = selected_dept + ' - ' + name[0].dept_name
