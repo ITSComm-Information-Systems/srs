@@ -28,7 +28,6 @@ from pages.models import Page
 # Load selection page
 @permission_required('oscauth.can_report', raise_exception=True)
 def get_inventory(request):
-    print('here')
     # Find all departments user has reporting access to
     names = AuthUserDept.get_report_departments(request)
 
