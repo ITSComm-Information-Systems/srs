@@ -64,8 +64,11 @@ def generate(request):
 	submit = True
 	
 	bill_period = request.POST.get('bill_period')
-	dept_id = request.POST.get('dept_id').split('-')[0]
 
+	if not bill_period:
+		return HttpResponseRedirect('/reports/tolls')
+		
+	dept_id = request.POST.get('dept_id').split('-')[0]
 
 	dept = UmOscDeptProfileV.objects.filter(deptid=dept_id)
 	dept_name = dept[0].dept_name
