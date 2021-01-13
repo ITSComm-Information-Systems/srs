@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import path
 
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -133,6 +133,11 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 class ServerDiskInline(admin.TabularInline):
     model = ServerDisk
     ordering = ('name',)
+
+
+@admin.register(Database)
+class DatabaseAdmin(admin.ModelAdmin):
+    readonly_fields = ('legacy_data',)
 
 
 @admin.register(Server)

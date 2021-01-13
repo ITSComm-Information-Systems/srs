@@ -651,6 +651,48 @@ class ServerData(models.Model):
     code = models.CharField(max_length=5)
 
 
+class Database(models.Model):
+    name = models.CharField(max_length=80)
+    legacy_data = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+  #<SRVmanaged>Non-Managed</SRVmanaged>
+  #<monitoringsystem>businesshours</monitoringsystem>
+  #<afterhoursphone>8675309</afterhoursphone>
+  #<regulatedData>No, the user does not store any regulated sensitive data. </regulatedData>
+  #<purpose>purpose of testing</purpose>
+  #<nonregulatedData>I do not know, the user does not know if they will store non-regulated sensitive data on their workstation or network file servers </nonregulatedData>
+  #<replicationopt>Yes</replicationopt>
+  #<MDsharedordedicated>shared</MDsharedordedicated>
+  #<servicestatus>Ended</servicestatus>
+  #<MDauthmode>Windows only</MDauthmode>
+  #<datatransfer>no</datatransfer>
+  #<readOnlyAccessGrp></readOnlyAccessGrp>
+  #<servicestatusdate>03/21/2013</servicestatusdate>
+  #<xmlSubscriptionKey>mgohsmantest</xmlSubscriptionKey>
+  #<devAccessGrp>STSTVII</devAccessGrp>
+  #<applAccountName>appmgohsmantest</applAccountName>
+  #<MDdedicateddatabaseconnectioninformation>test</MDdedicateddatabaseconnectioninformation>
+  #<ram>2</ram>
+  #<MDsharedreadonlyaccess></MDsharedreadonlyaccess>
+  #<applAccountType>windows</applAccountType>
+  #<cpu>1</cpu>
+  #<afterhourssupportpage4>No. test@umich.edu</afterhourssupportpage4>
+  #<updateByRequest>2200</updateByRequest>
+  #<subscribedDate>2012-10-19T18:26:45-04:00</subscribedDate>
+  #<instancename></instancename>
+  #<compatability>2008</compatability>
+  #<afterhoursemail>test@umich.edu</afterhoursemail>
+  #<service>MiDatabase</service>
+  #<name>mgohsmantest</name>
+  #<databaseSize>25GB</databaseSize>
+  #<MDdbcompatibility>2012</MDdbcompatibility>
+  #<MDdevelopergroupname></MDdevelopergroupname>
+
+
+
 class Order(models.Model):
     PRIORITY_CHOICES = (
         ('High', 'Expedited'),
