@@ -108,7 +108,7 @@ class ServiceGroup(Configuration):
 class Service(Configuration):
     active = models.BooleanField(default=True)
     group = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE)
-    routing = JSONField(default=dict)
+    routing = models.JSONField(default=dict)
 
 
 class FeatureCategory(models.Model):
@@ -179,7 +179,7 @@ class Action(Configuration):
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     charge_types = models.ManyToManyField(ChargeType)
     steps = models.ManyToManyField(Step)
-    override = JSONField(null=True, blank=True)
+    override = models.JSONField(null=True, blank=True)
     route = models.CharField(max_length=1, choices=ROUTE_CHOICES, default='P')
     destination = models.CharField(max_length=40, blank=True)
 
@@ -759,7 +759,7 @@ class Item(models.Model):
     deptid = models.CharField(max_length=8)
     chartcom = models.ForeignKey(Chartcom, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True)
-    data = JSONField()
+    data = models.JSONField()
     external_reference_id = models.PositiveIntegerField(null=True)
     internal_reference_id = models.PositiveIntegerField(null=True)
 
@@ -997,7 +997,7 @@ class Ticket(models.Model):
     instance = models.ForeignKey(ArcInstance, on_delete=models.PROTECT)
     ticket_id = models.PositiveIntegerField()
     status = models.CharField(max_length=10)
-    data = JSONField()
+    data = models.JSONField()
 
     class Meta:
         db_table = 'order_item_ticket_v'
