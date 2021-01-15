@@ -671,7 +671,8 @@ class Database(models.Model):
     cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
     ram = models.IntegerField('RAM')    #  <ram>8</ram>
     type = models.PositiveSmallIntegerField(null=True, choices=TYPE_CHOICES)
-    type_name = models.CharField(max_length=10)
+    support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
+    support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
     legacy_data = models.TextField()
 
     def __str__(self):
