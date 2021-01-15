@@ -58,6 +58,10 @@ def make_report(request):
     
     # Get user-selected department ID and name
     total =  request.POST.get('dept_id')
+
+    if total is None:
+        return HttpResponseRedirect('/reports/inventory')
+
     array = total.split('-')
     dept_id = array[0]
     dept_name = array[1]
