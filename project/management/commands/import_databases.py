@@ -25,13 +25,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('filename',type=str)
-        #parser.add_argument('type',type=str)
-        #parser.add_argument('service_id',type=int)
-        # turbo = 9, locker = 10
+        parser.add_argument('number_of_records', nargs='?', type=int, default=99999)
+
 
     def handle(self, *args, **options):
         print(datetime.datetime.now(), 'start')
         filename = options['filename']
+        number_of_records = options['number_of_records']
 
         service_id = 11
         type = 'NFS'
@@ -48,12 +48,11 @@ class Command(BaseCommand):
                 if line_count == 0:
                     #print(f'Column names are {", ".join(row)}')
                     line_count += 1
-                #elif line_count < 20:
-                else:
+                elif line_count < number_of_records:
                     self.process_record(row, type, service_id)
                     line_count += 1
-                #else:
-                #    break
+                else:
+                    break
 
             print(f'Processed {line_count} lines.')
 

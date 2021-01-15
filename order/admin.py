@@ -144,7 +144,9 @@ class DatabaseAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': (('name', 'in_service'), 'owner', 'shortcode', ('type','cpu','ram'))
+            'fields': (('name', 'in_service'), 'owner', 'shortcode', ('type','cpu','ram')
+            ,'support_email'
+            ,'support_phone')
 
         }),
         ('Legacy Data', {
