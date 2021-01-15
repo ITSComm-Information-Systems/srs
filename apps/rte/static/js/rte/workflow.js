@@ -11,10 +11,13 @@ $(document).ready(function() {
     $('#submitBtn').hide();
 
     $('.nav-link').on('click', function() {
-    	console.log('num tabs:' + $('ul.nav-pills>li').length);
-    	current_tab = parseInt($(this).attr('id').substr(-1));
+		disabled = $(this).hasClass('disabled');
+		if (disabled) {
+			return false;
+		}
+		current_tab = parseInt($(this).attr('id').substr(-1));
 
-    	// First tab
+		// First tab
     	if (current_tab === 1) {
     		$('#prevBtn').addClass('disabled');
     	}
