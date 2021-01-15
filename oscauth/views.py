@@ -188,7 +188,7 @@ def get_uniqname(request, uniqname_parm=''):
     template = loader.get_template('oscauth/setpriv.html')
 
     if request.method == 'POST':  #big work here
-        uniqname_parm = request.POST['uniqname_parm']
+        uniqname_parm = request.POST['uniqname_parm'].lower()
 
     # Initial page - no uniqname provided yet
     if uniqname_parm == '':
