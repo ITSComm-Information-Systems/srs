@@ -574,10 +574,12 @@ class BackupNode(models.Model):
 
 
 class Server(models.Model):
+    BUSINESS_HOURS = 0
+    ALL_HOURS = 1
 
     ON_CALL_CHOICES = [
-        (0, 'Business Hours'),
-        (1, '24/7'),
+        (BUSINESS_HOURS, 'Business Hours'),
+        (ALL_HOURS, '24/7'),
     ]
 
     DAY_CHOICES = [
@@ -652,7 +654,24 @@ class ServerData(models.Model):
 
 
 class Database(models.Model):
-    name = models.CharField(max_length=80)
+    MYSQL = 0
+    MSSQL = 1
+    ORACLE = 2
+
+    TYPE_CHOICES = [
+        (MYSQL, 'MYSQL'),
+        (MSSQL, 'MSSQL'),
+        (ORACLE, 'Oracle'),
+    ]
+
+    name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
+    in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
+    shortcode = models.CharField(max_length=100) 
+    cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
+    ram = models.IntegerField('RAM')    #  <ram>8</ram>
+    type = models.PositiveSmallIntegerField(null=True, choices=TYPE_CHOICES)
+    type_name = models.CharField(max_length=10)
     legacy_data = models.TextField()
 
     def __str__(self):

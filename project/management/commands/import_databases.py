@@ -4,7 +4,6 @@ from oscauth.utils import get_mc_group
 from oscauth.models import LDAPGroup
 from order.models import Database, ServerDisk
 
-
 import datetime, csv, sys
 import xml.etree.ElementTree as ET
 
@@ -108,9 +107,6 @@ class Command(BaseCommand):
         if x:
             print(x)
 
-
-
-
     def process_record(self, row, type, service_id):
 
         d = Database()
@@ -126,7 +122,27 @@ class Command(BaseCommand):
             return
     
         d.legacy_data = data
-        d.name = self.get_text(xml, 'xmlSubscriptionKey', None)
+        d.name = self.get_text(xml, 'xmlSubscriptionKey', None)   #instancename?
+        d.owner = LDAPGroup().lookup( mc_group )
+        d.support_email = self.get_text(xml, 'afterhoursemail', 'n/a')
+        d.support_phone = self.get_text(xml, 'afterhoursphone', 'n/a')
+        d.cpu = self.get_text(xml, 'cpu', 0)
+        d.ram = self.get_text(xml, 'ram', 0)
+        d.type_name = self.get_text(xml, 'MDDBType', 'n/a')
+
+        service_status = self.get_text(xml, 'servicestatus', None)
+        if service_status == 'Ended':
+            d.in_service = False
+        else:
+            print('service status', service_status)
+
+        type = self.get_text(xml, 'MDDBType', None)
+        if type == 'MYSQL':
+            d.type = Database.MYSQL
+        elif type == 'MSSQL':
+            d.type = Database.MSSQL
+        elif type == 'Oralce':
+            d.type = Database.ORACLE
 
         try:
             d.save()
@@ -139,37 +155,6 @@ class Command(BaseCommand):
             self.ERRORS +=1
 
         print(f'{self.LOADS} records Loaded, {self.ERRORS} errors')
-
-        return
-
-        s.owner = LDAPGroup().lookup( mc_group )
-        s.name = self.get_text(xml, 'name', None)
-        s.managed = self.get_text(xml, 'managed', False)
-        s.os = self.get_text(xml, 'os', 'n/a')
-        s.cpu = self.get_text(xml, 'cpu', 0)
-        s.ram = self.get_text(xml, 'ram', 0)
-        #s.disk_space = self.get_text(xml, 'diskspace', '')
-        s.firewall = ' ' 
-        s.support_email = self.get_text(xml, 'afterhoursemail', 'n/a')
-        s.support_phone = self.get_text(xml, 'afterhoursphone', 'n/a')
-        s.backup_time = self.get_text(xml, 'dailybackuptime', None)
-        s.patch_time = self.get_text(xml, 'patchingScheduleTime', None)
-        s.reboot_time = self.get_text(xml, 'rebootScheduleTime', None)
-        s.reboot_day = DAYS.get(self.get_text(xml, 'rebootScheduleTime', None), None)
-
-        on_call = self.get_text(xml, 'monitoringsystem', None)
-        if on_call == 'businesshours':
-            s.on_call = 0
-        elif on_call == '247':
-            s.on_call = 1
-
-        service_status = self.get_text(xml, 'servicestatus', None)
-        if service_status == 'Ended':
-            s.in_service = False
-        else:
-            print('service status', service_status)
-
-
 
 
     def add_members(self):

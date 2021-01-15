@@ -137,8 +137,21 @@ class ServerDiskInline(admin.TabularInline):
 
 @admin.register(Database)
 class DatabaseAdmin(admin.ModelAdmin):
+    list_display = ['name', 'owner','type']
+    list_filter = ('in_service','type')
+    ordering = ('name',)
     readonly_fields = ('legacy_data',)
 
+    fieldsets = (
+        (None, {
+            'fields': (('name', 'in_service'), 'owner', 'shortcode', ('type','cpu','ram'))
+
+        }),
+        ('Legacy Data', {
+            'classes': ('collapse',),
+            'fields': ('legacy_data',),
+        }),
+    )
 
 @admin.register(Server)
 class ServerAdmin(admin.ModelAdmin):
