@@ -42,7 +42,7 @@ class Command(BaseCommand):
         
         print('open file')
 
-        with open(f'/Users/djamison/Downloads/{filename}', encoding='mac_roman') as csv_file:
+        with open(f'/home/djamison/Downloads/{filename}', encoding='mac_roman') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             line_count = 0
             for row in csv_reader:
@@ -128,7 +128,7 @@ class Command(BaseCommand):
         s.legacy_data = data
         s.owner = LDAPGroup().lookup( mc_group )
         s.name = self.get_text(xml, 'name', None)
-        s.managed = self.get_text(xml, 'managed', False)
+        s.managed = self.get_text(xml, 'SRVmanaged', False)
         s.os = self.get_text(xml, 'os', 'n/a')
         s.cpu = self.get_text(xml, 'cpu', 0)
         s.ram = self.get_text(xml, 'ram', 0)
@@ -136,6 +136,7 @@ class Command(BaseCommand):
         s.firewall = ' ' 
         s.support_email = self.get_text(xml, 'afterhoursemail', 'n/a')
         s.support_phone = self.get_text(xml, 'afterhoursphone', 'n/a')
+        s.backup = self.get_text(xml, 'diskBackup', False)
         s.backup_time = self.get_text(xml, 'dailybackuptime', None)
         s.patch_time = self.get_text(xml, 'patchingScheduleTime', None)
         s.reboot_time = self.get_text(xml, 'rebootScheduleTime', None)
