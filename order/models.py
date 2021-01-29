@@ -994,7 +994,7 @@ class Attachment(models.Model):
 class Ticket(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
-    instance = models.ForeignKey(ArcInstance, on_delete=models.PROTECT)
+    instance = models.ForeignKey(ArcInstance, null=True, on_delete=models.DO_NOTHING)
     ticket_id = models.PositiveIntegerField()
     status = models.CharField(max_length=10)
     data = models.JSONField()
