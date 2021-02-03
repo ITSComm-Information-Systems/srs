@@ -52,7 +52,7 @@ def single_tech(request):
     }
     tab_list.append(tab3)
 
-    if request.user.has_perm('rte.add_umrtetechnicianv'):
+    if request.user.has_perm('rte.add_submitalltechs'):
         all_techs = UmRteTechnicianV.objects.all()
         tech_id = ''
         tech_name = ''
@@ -146,7 +146,7 @@ def single_submit(request):
 
 
 # Multiple technicians, single order
-@permission_required('rte.add_umrtetechnicianv', raise_exception=True)
+@permission_required('rte.add_submitalltechs', raise_exception=True)
 def multiple_tech(request):
     template = loader.get_template('rte/workflow.html')
 
@@ -206,7 +206,7 @@ def get_assigned_group(request):
 
 
 # Submit multiple tech times
-@permission_required('rte.add_umrtetechnicianv', raise_exception=True)
+@permission_required('rte.add_submitalltechs', raise_exception=True)
 def multiple_submit(request):
     template = loader.get_template('rte/submitted.html')
 
@@ -308,7 +308,7 @@ def update(request):
     }
     tab_list.append(tab4)
 
-    if request.user.has_perm('rte.add_umrtetechnicianv'):
+    if request.user.has_perm('rte.add_submitalltechs'):
         all_techs = UmRteTechnicianV.objects.all()
     else:
         all_techs = UmRteTechnicianV.objects.filter(uniqname=request.user.username)
