@@ -1,5 +1,6 @@
 import csv, json
 
+from django.utils.html import format_html
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.contrib import admin
@@ -133,9 +134,17 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
     title = 'Select an instance'
-    list_display = ['ticket_id', 'service', 'instance','status']
-    list_display_links = ('ticket_id', 'instance',)
+    list_display = ['ticket','service','volume','status',]
     ordering = ('-ticket_id',)
+
+    def ticket(self,obj): 
+        return format_html(f"<a target=”_blank” href='{obj.ticket_link}'>{obj.ticket_id}</a>")
+
+    def volume(self,obj): 
+        if obj.instance_id:
+            return format_html(f"<a href='/admin/order/arcinstance/{obj.instance.id }'>{obj.instance}</a>")
+        else:
+            return '-'
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         item = Item.objects.get(id=object_id)
