@@ -22,7 +22,7 @@ class BulkUpdateForm(forms.Form):
 
     department_group = forms.ChoiceField(choices=groups_descr)
     uniqname = Uniqname(max_length=8)
-    role = forms.ChoiceField(choices=[('','----'),('4','Orderer'),('5','Reporter')])
+    role = forms.ChoiceField(choices=[('','----'),('5','Orderer'),('6','Reporter')])
     action = forms.ChoiceField(choices=[('','----'),('Add','Add'),('Delet','Delete')])
 
 
