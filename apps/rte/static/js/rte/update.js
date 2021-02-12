@@ -514,13 +514,16 @@ function validate_changes() {
 	        success = false;
 	    }
 
-	    if (duration_hours > 23 || duration_hours < 0) {
+		var regex = new RegExp('^([01]?[0-9]|2[0-3])$');
+		console.log(duration_hours);
+    	if (!regex.test(duration_hours) && duration_hours != '') {
 	        $('#update-error').html('Please enter a value for hours between 0 and 23.');
 	        $('#update-error').removeClass('hidden');
 	        success = false;
 	    }
 
-	    if (duration_mins > 59 || duration_mins < 0) {
+		var regex = new RegExp('^([01]?[0-9]|[2-5][0-9])$');
+    	if (!regex.test(duration_mins) && duration_mins != '') {
 	        $('#update-error').html('Please enter a value for minutes between 0 and 59.');
 	        $('#update-error').removeClass('hidden');
 	        success = false;
