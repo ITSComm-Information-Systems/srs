@@ -70,7 +70,7 @@ class AuthUserDeptAdmin(admin.ModelAdmin):
                     else:
                         AuthUserDept.objects.filter(dept=dept['deptid'], user=user, group_id=group_id).delete()
 
-                context['message'] = f'{count} records {action}ED'
+                context['message'] = f'{count} records {action}ed'
           
             else:
                 context['form'] = form
