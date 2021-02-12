@@ -26,13 +26,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('filename',type=str)
-        #parser.add_argument('type',type=str)
-        #parser.add_argument('service_id',type=int)
-        # turbo = 9, locker = 10
+        parser.add_argument('number_of_records', nargs='?', type=int, default=99999)
 
     def handle(self, *args, **options):
         print(datetime.datetime.now(), 'start')
         filename = options['filename']
+        number_of_records = options['number_of_records']
 
         service_id = 11
         type = 'NFS'
@@ -42,19 +41,18 @@ class Command(BaseCommand):
         
         print('open file')
 
-        with open(f'/home/djamison/Downloads/{filename}', encoding='mac_roman') as csv_file:
+        with open(f'/Users/djamison/Downloads/{filename}', encoding='mac_roman') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             line_count = 0
             for row in csv_reader:
                 if line_count == 0:
                     #print(f'Column names are {", ".join(row)}')
                     line_count += 1
-                #elif line_count < 20:
-                else:
+                elif line_count < number_of_records:
                     self.process_record(row, type, service_id)
                     line_count += 1
-                #else:
-                #    break
+                else:
+                    break
 
             print(f'Processed {line_count} lines.')
 
@@ -128,7 +126,10 @@ class Command(BaseCommand):
         s.legacy_data = data
         s.owner = LDAPGroup().lookup( mc_group )
         s.name = self.get_text(xml, 'name', None)
-        s.managed = self.get_text(xml, 'SRVmanaged', False)
+        if self.get_text(xml, 'SRVmanaged', '') == 'Managed':
+            s.managed = True
+        else:
+            s.managed = False
         s.os = self.get_text(xml, 'os', 'n/a')
         s.cpu = self.get_text(xml, 'cpu', 0)
         s.ram = self.get_text(xml, 'ram', 0)
@@ -136,7 +137,32 @@ class Command(BaseCommand):
         s.firewall = ' ' 
         s.support_email = self.get_text(xml, 'afterhoursemail', 'n/a')
         s.support_phone = self.get_text(xml, 'afterhoursphone', 'n/a')
-        s.backup = self.get_text(xml, 'diskBackup', False)
+        if self.get_text(xml, 'diskBackup', '') == 'Yes':
+            s.backup = True
+        else:
+            s.backup = False
+            
+        if self.get_text(xml, 'diskBackup', '') == 'Yes':
+            s.backup = True
+        else:
+            s.backup = False
+
+        if self.get_text(xml, 'MWregulateddata', '') == 'Yes':
+            s.regulated_data = True
+        else:
+            s.regulated_data = False
+
+        if self.get_text(xml, 'nonregulatedData', '') == 'Yes':
+            s.non_regulated_data = True
+        else:
+            s.non_regulated_data = False
+
+        if self.get_text(xml, 'replicated', '') == 'Yes':
+            s.replicated = True
+        else:
+            s.replicated = False
+
+
         s.backup_time = self.get_text(xml, 'dailybackuptime', None)
         s.patch_time = self.get_text(xml, 'patchingScheduleTime', None)
         s.reboot_time = self.get_text(xml, 'rebootScheduleTime', None)
