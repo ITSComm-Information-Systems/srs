@@ -160,14 +160,6 @@ class ServerAdmin(admin.ModelAdmin):
     list_display = ['name', 'owner', 'os']
     list_filter = ('os','in_service')
     ordering = ('name',)
-    #fields = (('name','in_service'),'owner','shortcode', ('managed', 'os'), ('cpu','ram'),
-    #('backup', 'backup_time'),
-    #('patch_day','patch_time'),
-    #('reboot_day', 'reboot_time'),
-    #('on_call', 'support_email', 'support_phone'),
-    #'domain', 'datacenter', 'firewall_requests',
-    
-    #'legacy_data')
 
     inlines = [ServerDiskInline,]
 
@@ -189,8 +181,8 @@ class ServerAdmin(admin.ModelAdmin):
         }),
     )
 
-
-
+    class Media:
+        js = ('order/js/admin_server.js',)
 
 
 @admin.register(Ticket)
