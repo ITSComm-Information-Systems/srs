@@ -1,12 +1,12 @@
 document.addEventListener("DOMContentLoaded", function(event) { 
 
-    element = document.getElementById("id_managed");
+    document.getElementById("id_managed").addEventListener("change", function(){
+        if (this.checked) {
+            document.getElementsByTagName("fieldset")[1].disabled = true;
+        } else {
+            document.getElementsByTagName("fieldset")[1].disabled = false;
+        }
+    });
 
-    element.addEventListener("click", myFunction);
-
-    function myFunction() {
-        console.log('managed')
-    }    
-
-    //do work
+    
 });
