@@ -2,11 +2,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     document.getElementById("id_managed").addEventListener("change", function(){
         if (this.checked) {
-            document.getElementsByTagName("fieldset")[1].disabled = true;
+            document.getElementsByClassName("managed-section")[0].disabled = false;
         } else {
-            document.getElementsByTagName("fieldset")[1].disabled = false;
+            document.getElementsByClassName("managed-section")[0].disabled = true;
         }
+        
     });
-
     
 });

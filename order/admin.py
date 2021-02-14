@@ -172,6 +172,7 @@ class ServerAdmin(admin.ModelAdmin):
                         'managed' )
         }),
         ('Managed', {
+            'classes': ('managed-section',),
             'fields': (('patch_day','patch_time'),
                     ('reboot_day', 'reboot_time'),),
         }),
