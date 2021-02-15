@@ -107,7 +107,7 @@ def single_submit(request):
                 assigned_group_q = UmRteLaborGroupV.objects.get(wo_group_name=assigned_group, wo_group_labor_code=tech_id)
 
                 formatted_date = datetime.strptime(assigned_date, '%Y-%m-%d')
-
+                
                 new_entry = UmRteInput(
                     uniqname=request.user.username,
                     wo_labor_id=None,
