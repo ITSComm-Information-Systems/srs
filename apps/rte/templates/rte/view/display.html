@@ -20,6 +20,7 @@
 	<table class='table table-striped' id='view-time-table'>
 		<thead>
 			<th>Work Order</th>
+			<th>Comment Text</th>
 			<th>Assigned Date</th>
 			<th>Duration</th>
 			<th>Assigned Group</th>
@@ -31,6 +32,7 @@
 			{% for entry in entries %}
 				<tr>
 					<td>{{ entry.work_order_display }}</td>
+					<td>{{ entry.comment_text|truncatechars:200}}</td>
 					<td>{{ entry.assigned_date }}</td>
 					<td>{{ entry.actual_mins_display }}</td>
 					<td>{{ entry.assn_wo_group_name }}</td>
