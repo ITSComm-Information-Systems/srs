@@ -5,6 +5,7 @@ from django.contrib.admin.models import LogEntry, ADDITION
 from django.db import models
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
+from project.models import ShortCodeField
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from django.utils import timezone
@@ -594,7 +595,8 @@ class Server(models.Model):
 
     name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
-    shortcode = models.CharField(max_length=100) 
+    shortcode = ShortCodeField()
+    #shortcode = models.CharField(max_length=100) 
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
     os = models.CharField(max_length=100)     #  <os>Windows2008R2managed</os>
     cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
