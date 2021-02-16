@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from ast import literal_eval
 import json, io, os, requests
 import cx_Oracle
+from django.core.exceptions import ValidationError
 from oscauth.utils import get_mc_user, get_mc_group
 
 class Configuration(models.Model):   #Common fields for configuration models
@@ -574,6 +575,16 @@ class BackupNode(models.Model):
         return self.name
 
 
+class DayOfWeek(models.IntegerChoices):
+    SUNDAY = 0, 'Sunday'
+    MONDAY = 1, 'Monday'
+    TUESDAY = 2, 'Tuesday'
+    WEDNESDAY = 3, 'Wednesday'
+    THURSDAY = 4, 'Thursday'
+    FRIDAY = 5, 'Friday'
+    SATURDAY = 6, 'Saturday'
+
+
 class Server(models.Model):
     BUSINESS_HOURS = 0
     ALL_HOURS = 1
@@ -592,6 +603,7 @@ class Server(models.Model):
         (5, 'Friday'),
         (6, 'Saturday'),
     ]
+    MANAGED_FIELDS = ['patch_time', 'patch_day', 'reboot_time', 'reboot_day']
 
     name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
@@ -613,11 +625,11 @@ class Server(models.Model):
     backup = models.BooleanField(default=False)
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
-    backup_time = models.TimeField('Daily Backup Time', null=True)   #  <dailybackuptime>06:00 PM</dailybackuptime>
-    patch_time = models.TimeField(null=True)    #  <patchingScheduleTime>01:00 AM</patchingScheduleTime>
-    patch_day = models.PositiveSmallIntegerField(choices=DAY_CHOICES, default=0) #  <patchingScheduleDate>Sunday</patchingScheduleDate>
-    reboot_time = models.TimeField(null=True)    #  <rebootScheduleTime>04:00 AM</rebootScheduleTime>
-    reboot_day = models.PositiveSmallIntegerField(null=True, choices=DAY_CHOICES) #   <rebootScheduleDate>Sunday</rebootScheduleDate>
+    backup_time = models.TimeField('Daily Backup Time', null=True, blank=True)   #  <dailybackuptime>06:00 PM</dailybackuptime>
+    patch_time = models.TimeField(null=True, blank=True)    #  <patchingScheduleTime>01:00 AM</patchingScheduleTime>
+    patch_day = models.PositiveSmallIntegerField(null=True, blank=True, choices=DayOfWeek.choices, default=0) #  <patchingScheduleDate>Sunday</patchingScheduleDate>
+    reboot_time = models.TimeField(null=True, blank=True)    #  <rebootScheduleTime>04:00 AM</rebootScheduleTime>
+    reboot_day = models.PositiveSmallIntegerField(null=True, blank=True, choices=DAY_CHOICES) #   <rebootScheduleDate>Sunday</rebootScheduleDate>
     domain = models.CharField(max_length=100)
     datacenter = models.CharField(max_length=100)
     firewall_requests = models.CharField(max_length=100)
@@ -640,6 +652,17 @@ class Server(models.Model):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        if self.managed:
+            errors = {}
+ 
+            for field in self.MANAGED_FIELDS:
+                if getattr(self, field) == None:
+                    errors[field] = ValidationError('', code='required')
+ 
+            if len(errors) > 0:
+                raise ValidationError(errors)
 
 
 class ServerDisk(models.Model):
