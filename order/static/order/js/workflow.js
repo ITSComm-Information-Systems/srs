@@ -215,42 +215,86 @@ $(document).ready(function() {
   });
 
 
-  //MiServer
-  $(document).on("load", "#div_misernonmang" , function() {
-    $('#div_misernonmang').hide();
-    $('#div_misevos').hide();
+  //MiServer Specification
+  $('[data-tab="miSeverSpec"]').on('show.bs.tab', function(event) {
+    $("#div_manageunman").trigger("change");
+    $("#div_misevprefix").trigger("change");
   });
 
-  $(document).on("click", "#manageunman_0" , function() {
-    $('#div_misevos').show().prop('required',true);
-    $('#div_misernonmang').hide().prop('required',false);
+  $(document).on("change", "#div_manageunman" , function() {
+    if ($('#manageunman_0').prop("checked")) {  // Managed
+      $('#div_misevos').show().prop('required',true);
+      $('#div_misernonmang').hide().prop('required',false);
+    } else if ($('#manageunman_1').prop("checked")) {  // Unmanaged
+        $('#div_misevos').hide().prop('required',false);
+        $('#div_misernonmang').show().prop('required',true);
+    } else {
+      $('#div_misevos').hide().prop('required',false);
+      $('#div_misernonmang').hide().prop('required',false);
+    }
   });
 
-  $(document).on("click", "#manageunman_1" , function() {
-    $('#div_misevos').hide().prop('required',false);
-    $('#div_misernonmang').show().prop('required',true);
+  $(document).on("change", "#div_misevprefix" , function() {
+    if ($('#misevprefix_0').prop("checked")) {  // Registered Prefix
+      $('#div_misevregpre').show().prop('required',true);
+      $('#div_misevnopre').hide().prop('required',false);
+    } else if ($('#misevprefix_1').prop("checked")) {  // No, use standard
+      $('#div_misevregpre').hide().prop('required',false);
+      $('#div_misevnopre').show().prop('required',true);
+    } else {
+      $('#div_misevregpre').hide().prop('required',false);
+      $('#div_misevnopre').hide().prop('required',false);
+    }
   });
 
-  $(document).on("load", "#div_misevregulist" , function() {
-    $('#div_misevregulist').hide();
-    $('#div_misevyesnon').hide();
+  // MiServer Data Sensitivity
+  $('[data-tab="miServerData"]').on('show.bs.tab', function(event) {
+    $("#div_misevregu").trigger("change");
+    $("#div_misevnonregu").trigger("change");
   });
 
-  $(document).on("click", "#misevregu_0" , function() {
-    $('#div_misevregulist').show().prop('required',true);
+  $(document).on("change", "#div_misevregu" , function() {
+    if ($('#misevregu_0').prop("checked")) {  // Regulated Sensitive Data
+      $('#div_misevregulist').show().prop('required',true);
+    } else if ($('#misevregu_1').prop("checked")) {  // No Sensitive Data
+      $('#div_misevregulist').hide().prop('required',false);
+    } else {
+      $('#div_misevregulist').hide().prop('required',false);
+    }
   });
 
-  $(document).on("click", "#misevregu_1" , function() {
-    $('#div_misevregulist').hide().prop('required',false);
+  $(document).on("change", "#div_misevnonregu" , function() {
+    if ($('#misevnonregu_0').prop("checked")) {  // Not Regulated Sensitive Data
+      $('#div_misevyesnon').show().prop('required',true);
+    } else if ($('#misevnonregu_1').prop("checked")) {  // No Unregulated Sensitive Data
+      $('#div_misevyesnon').hide().prop('required',false);
+    } else {
+      $('#div_misevyesnon').hide().prop('required',false);
+    }
   });
 
-  $(document).on("click", "#misevnonregu_0" , function() {
-    $('#div_misevyesnon').show().prop('required',true);
+  // Miserver Support Services
+  $('[data-tab="miSevSupport"]').on('show.bs.tab', function(event) {
+    $("#div_misevback").trigger("change");
   });
 
-  $(document).on("click", "#misevnonregu_1" , function() {
-    $('#div_misevyesnon').hide().prop('required',false);
+  $(document).on("change", "#div_misevback" , function() {
+    console.log("backup");
+
+    if ($('#misevback_0').prop("checked")) {  // Add Backup
+      $('#div_misevbacktime').show().prop('required',true);
+      console.log("checky");
+    } else if ($('#misevback_1').prop("checked")) {  // No Backups
+      $('#div_misevbacktime').hide().prop('required',false);
+      console.log("no backup selected");
+    } else {
+      $('#div_misevbacktime').hide().prop('required',false);
+    }
   });
+  
+
+
+
 
 
   var x = document.getElementsByClassName("ccsel");
@@ -781,6 +825,7 @@ function sendTabData(field) {
             $('#pills-tab a[href="#' + pane[0].id + '"]').tab('show')
           } else {
             //$("#workflowForm").addClass('was-validated');
+            $('#pills-tab a[href="#' + pane[0].id + '"]').trigger('show')
             console.log('not valid');
           }
       },
