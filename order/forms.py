@@ -229,7 +229,6 @@ class TabForm(forms.Form):
                                                                         #AuthUserDept.get_order_departments(request.user.id)
                 field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
             elif element.type == 'NU':
-                attr = merge(field.attributes, {'min': "1", 'class': 'form-control'})
                 field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1", 'class': 'form-control'}))
                 field.initial = element.attributes
                 field.template_name = 'project/number.html'
