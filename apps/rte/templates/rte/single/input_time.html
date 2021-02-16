@@ -9,6 +9,12 @@
 </div>
 
 <h3>Enter time</h3>
+<form action='/apps/rte/view-time/display/' target='_blank' method='POST'>{% csrf_token %}
+	<input type='text' name='techSearch' class='tech_id' hidden>
+	<input type='date' name='calendarRangeStart' value='{{ date_start }}' hidden>
+	<input type='date' name='calendarRangeEnd' value='{{ date_end }}' hidden>
+	<button type='submit' class='btn btn-link col-2 offset-10' role='link'>View last week</button>
+</form>
 
 <div class='row'>
 	<div class="form-group col-3" id="searchWorkOrder">
