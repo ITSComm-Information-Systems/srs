@@ -3,27 +3,7 @@
 {% if field.name == 'misevdisk' %}
 
 <div class="form-row">
-
-    <div class="form-group">
-        <label for="{{field.id_for_label}}">
-            <strong>{{ field.label }}</strong>
-        </label>
-        {% if field.help_text %}
-        <a tabindex="0" role="button" data-toggle="popover" data-container="body" data-trigger="focus"
-            data-placement="bottom" data-content="{{ field.help_text }}"><i class="far fa-question-circle"></i> <span
-                class="sr-only">{{ field.help_text }}</span>
-        </a>
-        {% endif %}
-        <small class="text-muted form-text" id="{{ field.name }}">{{ field.field.description }}</small>
-        {{field}}
-        {% for error in field.errors %}
-        <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
-                aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
-        {% endfor %}
-        <div role="alert" class="valid-feedback">Good.</div>
-
-    </div>
-
+    {% include field.field.template_name %}
     <div class="form-group com-md-6 float-bottom">
         <label><strong><br> </strong></label>
         <small class="text-muted form-text"><br></small>
@@ -32,18 +12,7 @@
             <option value="TB">Terabytes</option>
         </select>
     </div>
-
-
-
-
-
-
 </div>
-
-
-
-
-{% elif field.name == 'backupTime' %}
 {% else %}
 <div class="row">
     <div class="col-6">
