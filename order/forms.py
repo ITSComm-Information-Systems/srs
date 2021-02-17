@@ -568,6 +568,13 @@ class DetailsNFSForm(TabForm):
 class ServerSpecForm(TabForm):
     template = 'order/server_spec.html'
 
+
+    def __init__(self, *args, **kwargs):
+        super(ServerSpecForm, self).__init__(*args, **kwargs)
+
+        self.fields['misevCPU'].widget.attrs.update({'max': '16'})
+
+
     def clean(self):
         print(self.cleaned_data)
         disk_size = self.cleaned_data.get('misevdisk', None)
