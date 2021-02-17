@@ -16,15 +16,13 @@
         {% endif %}
         <small class="text-muted form-text" id="{{ field.name }}">{{ field.field.description }}</small>
         {{field}}
+        {% for error in field.errors %}
+        <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+        {% endfor %}
+        <div role="alert" class="valid-feedback">Good.</div>
 
     </div>
-
-    {% for error in field.errors %}
-    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
-            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
-    {% endfor %}
-    <div role="alert" class="valid-feedback">Good.</div>
-
 
     <div class="form-group com-md-6 float-bottom">
         <label><strong><br> </strong></label>
