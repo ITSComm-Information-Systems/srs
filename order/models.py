@@ -57,6 +57,7 @@ class Step(Configuration):
         ('BackupDetailsForm', 'Backup Details'),
         ('VolumeSelectionForm', 'Volume Selection'),
         ('SubscriptionSelForm', 'Subscription Selection'),
+        ('ServerSpecForm', 'Server Specification'),
         ('DataDenForm', 'Data Den Form')
     )
 

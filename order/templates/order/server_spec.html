@@ -1,0 +1,52 @@
+{% for field in tab.form %}
+
+{% if field.name == 'misevdisk' %}
+
+
+
+
+
+<div class="row">
+
+
+    <div class="form-group col-6">
+        <label for="{{field.id_for_label}}">
+            <strong>{{ field.label }}</strong>
+        </label>
+        {% if field.help_text %}
+        <a tabindex="0" role="button" data-toggle="popover" data-container="body" data-trigger="focus"
+            data-placement="bottom" data-content="{{ field.help_text }}"><i class="far fa-question-circle"></i> <span
+                class="sr-only">{{ field.help_text }}</span>
+        </a>
+        {% endif %}
+        <small class="text-muted form-text" id="{{ field.name }}">{{ field.field.description }}</small>
+        <span class="col-4">{{field}}</span>
+        <div class="form-group col-3 float-right">
+            <select class="form-control" id="exampleFormControlSelect1">
+                <option value="GB">Gigabytes</option>
+                <option value="TB">Terabytes</option>
+            </select>
+        </div>
+    </div>
+
+
+
+    {% for error in field.errors %}
+    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+    {% endfor %}
+    <div role="alert" class="valid-feedback">Good.</div>
+</div>
+
+
+
+
+{% elif field.name == 'backupTime' %}
+{% else %}
+<div class="row">
+    <div class="col-6">
+        {% include field.field.template_name %}
+    </div>
+</div>
+{% endif %}
+{% endfor %}
