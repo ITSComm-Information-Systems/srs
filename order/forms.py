@@ -568,6 +568,18 @@ class DetailsNFSForm(TabForm):
 class ServerSpecForm(TabForm):
     template = 'order/server_spec.html'
 
+    def clean(self):
+        print(self.cleaned_data)
+        disk_size = self.cleaned_data.get('misevdisk', None)
+
+        if disk_size != None:
+            if disk_size % 10 != 0:
+                self.add_error('misevdisk', 'Disk size must be in increments of 10.')
+            if disk_size == 0:
+                self.add_error('misevdisk', 'Disk size must be 10 or more.')
+
+        super().clean()
+
 
 class DataDenForm(TabForm):
     template = 'order/accessCIFS.html'
