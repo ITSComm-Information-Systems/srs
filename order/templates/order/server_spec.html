@@ -2,14 +2,9 @@
 
 {% if field.name == 'misevdisk' %}
 
+<div class="form-row">
 
-
-
-
-<div class="row">
-
-
-    <div class="form-group col-6">
+    <div class="form-group">
         <label for="{{field.id_for_label}}">
             <strong>{{ field.label }}</strong>
         </label>
@@ -20,22 +15,31 @@
         </a>
         {% endif %}
         <small class="text-muted form-text" id="{{ field.name }}">{{ field.field.description }}</small>
-        <span class="col-4">{{field}}</span>
-        <div class="form-group col-3 float-right">
-            <select class="form-control" id="exampleFormControlSelect1">
-                <option value="GB">Gigabytes</option>
-                <option value="TB">Terabytes</option>
-            </select>
-        </div>
+        {{field}}
+
     </div>
-
-
 
     {% for error in field.errors %}
     <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
             aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
     {% endfor %}
     <div role="alert" class="valid-feedback">Good.</div>
+
+
+    <div class="form-group com-md-6 float-bottom">
+        <label><strong><br> </strong></label>
+        <small class="text-muted form-text"><br></small>
+        <select class="form-control" id="exampleFormControlSelect1">
+            <option value="GB">Gigabytes</option>
+            <option value="TB">Terabytes</option>
+        </select>
+    </div>
+
+
+
+
+
+
 </div>
 
 
