@@ -565,6 +565,10 @@ class DetailsNFSForm(TabForm):
         #            self.fields['flux'].initial = si.flux  
 
 
+class ServerSpecForm(TabForm):
+    template = 'order/server_spec.html'
+
+
 class DataDenForm(TabForm):
     template = 'order/accessCIFS.html'
     notice3 = Page.objects.get(permalink='/notice/3')
