@@ -43,6 +43,14 @@ $(document).ready(function() {
         $('#notes').removeAttr('readonly');
     });
 
+    $('#workOrderSearch').on('change', function() {
+        $('#rateSelect').removeAttr('disabled');
+        $('#assigned_date').removeAttr('readonly');
+        $('#duration-hours').removeAttr('readonly');
+        $('#duration-mins').removeAttr('readonly');
+        $('#notes').removeAttr('readonly');
+    });
+
     // Hide input table on load
     $('#single-input').hide();
 

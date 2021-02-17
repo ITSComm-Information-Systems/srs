@@ -86,4 +86,14 @@ $(document).ready(function() {
 		minimumResultsForSearch: Infinity
 	})
 
+	// $('#techSearch').select2({
+	// 	placeholder: "Search for the tech name or tech ID whose time you'd like to enter.",
+	// 	display:"inline",
+	// });
+	
+	$('#workOrderSearch').select2({
+		placeholder: "Search...",
+		display:"inline",
+    });
+
 });
