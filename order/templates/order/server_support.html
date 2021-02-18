@@ -1,0 +1,94 @@
+{% for field in tab.form %}
+
+{% if field.name == 'misevpatch' %}
+<div class="row">
+    <div class="col-3">
+    {% include field.field.template_name %}
+    </div>
+{% elif field.name == 'misevpattime' %}
+    <div class="col-3">
+    {% include field.field.template_name %}
+    </div>
+</div>
+{% elif field.name == 'misevredate' %}
+<div class="row">
+    <div class="col-3">
+    {% include field.field.template_name %}
+    </div>
+{% elif field.name == 'misevretime' %}
+    <div class="col-3">
+    {% include field.field.template_name %}
+    </div>
+</div>
+{% elif field.name == 'misevos' %}
+<div class="row">
+    <div class="col-6">
+        <div class="form-group" id="div_{{field.name}}">
+            <label for="{{field.id_for_label}}">
+                <strong>{{ field.label }}</strong>
+            </label>
+            {% if field.help_text %}
+            <a tabindex="0" role="button" data-toggle="popover" data-container="body" data-trigger="focus"
+                data-placement="bottom" data-content="{{ field.help_text }}"><i class="far fa-question-circle"></i>
+                <span class="sr-only">{{ field.help_text }}</span>
+            </a>
+            {% endif %}
+            <small class="text-muted form-text" id="{{ field.name }}">{{ field.field.description }}</small>
+
+            <select class="form-control" id="id_misevos" name="misevos">
+                <option value='RedHatEnterpriseLinux764bitmanaged'>Red Hat Enterprise Linux 7 64-bit - Managed</option>
+                <option value='Ubuntu1804LTS64bitManaged'>Ubuntu 18.04 LTS 64-bit - Managed</option>
+                <option value='Windows2019managed'>Windows 2019 - Managed</option>
+                <option value='Windows2016managed'>Windows 2016 - Managed</option>
+            </select>
+
+            {% for error in field.errors %}
+            <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                    aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+            {% endfor %}
+            <div role="alert" class="valid-feedback">Good.</div>
+        </div>
+    </div>
+</div>
+{% elif field.name == 'misevRAM' %}
+<div class="row">
+    <div class="col-6">
+        <div class="form-group" id="div_{{field.name}}">
+            <label for="{{field.id_for_label}}">
+                <strong>{{ field.label }}</strong>
+            </label>
+            {% if field.help_text %}
+            <a tabindex="0" role="button" data-toggle="popover" data-container="body" data-trigger="focus"
+                data-placement="bottom" data-content="{{ field.help_text }}"><i class="far fa-question-circle"></i>
+                <span class="sr-only">{{ field.help_text }}</span>
+            </a>
+            {% endif %}
+            <small class="text-muted form-text" id="{{ field.name }}">{{ field.field.description }}</small>
+
+            <select style="width: 150px" class="form-control" id="misevRAM" name="misevRAM">
+                <option value=2>2 GB</option>
+                <option value=4>4 GB</option>
+                <option value=8>8 GB</option>
+                <option value=16>16 GB</option>
+                <option value=32>32 GB</option>
+                <option value=64>64 GB</option>
+                <option value=65>More than 64 GB (requires approval)</option>
+            </select>
+
+            {% for error in field.errors %}
+            <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                    aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+            {% endfor %}
+            <div role="alert" class="valid-feedback">Good.</div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="row">
+    <div class="col-6">
+        {% include field.field.template_name %}
+    </div>
+</div>
+{% endif %}
+{% endfor %}

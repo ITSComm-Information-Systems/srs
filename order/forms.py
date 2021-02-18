@@ -565,6 +565,18 @@ class DetailsNFSForm(TabForm):
         #            self.fields['flux'].initial = si.flux  
 
 
+class ServerSupportForm(TabForm):
+    template = 'order/server_support.html'
+
+    def __init__(self, *args, **kwargs):
+        super(ServerSupportForm, self).__init__(*args, **kwargs)
+
+        if kwargs['request'].POST.get('manageunman') == 'unmang':
+            self.fields.pop('misevpatch')
+            self.fields.pop('misevpattime')
+            self.fields.pop('misevredate')
+            self.fields.pop('misevretime')
+
 class ServerSpecForm(TabForm):
     template = 'order/server_spec.html'
 
