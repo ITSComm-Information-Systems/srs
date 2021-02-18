@@ -10,12 +10,13 @@ $(document).ready(function() {
         });
     });
 
-    $('#techTableMultiple tr').click(function() {
-        var tech_name = $(this).find("td").eq(1).html();   
-        var tech_id = $(this).find("td").eq(0).html(); 
-        $("#techSearchMultiple").val(tech_id);  
-        $('#techTableMultiple').hide();
-
+    $('#techSearchMultiple').on('change', function() {
+    // $('#techTableMultiple tr').click(function() {
+    //     var tech_name = $(this).find("td").eq(1).html();   
+    //     var tech_id = $(this).find("td").eq(0).html(); 
+    //     $("#techSearchMultiple").val(tech_id);  
+    //     $('#techTableMultiple').hide();
+        var tech_id = $(this).val();
         load_assigned_groups(tech_id);
 
         $('#assignedGroupSelectMultiple').removeAttr('disabled');

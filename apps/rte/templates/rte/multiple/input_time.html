@@ -14,7 +14,7 @@
 		<label for="techSearchMultiple" id="labelTechSearchMultiple">
 	        <strong>Tech ID/Name</strong>
 	    </label>
-	    <input name='techSearchMultiple' id="techSearchMultiple" class="form-control" type="text" aria-describedby="techSearchBlockMultiple"
+	    <!-- <input name='techSearchMultiple' id="techSearchMultiple" class="form-control" type="text" aria-describedby="techSearchBlockMultiple"
 	        placeholder="Search..">
 		<table id="techTableMultiple" class="table table-hover" aria-live=”polite”>
 	        {% for tech in all_techs %}
@@ -24,7 +24,13 @@
 	                <td name="techName">{{ tech.labor_name_display2 }}</td>
 	            </tr>
 	        {% endfor %}
-		</table>
+		</table> -->
+		<select class='form-control' id='techSearchMultiple'>
+			<option></option>
+			{% for tech in all_techs %}
+				<option value='{{ tech.labor_code }}'>{{ tech.labor_code }}&nbsp;{{ tech.labor_name_display2 }}</option>
+			{% endfor %}
+		</select>
 	</div>
 
 	<div class="form-group col-2" id="selectAssignedGroupMultiple">
