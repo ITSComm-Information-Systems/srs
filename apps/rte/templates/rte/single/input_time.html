@@ -21,17 +21,6 @@
 		<label for="workOrderSearch" id="labelWorkOrderSearch">
 	        <strong>Work Order</strong>
 	    </label>
-	    <!-- <input name='workOrderSearch' id="workOrderSearch" class="form-control" type="text" aria-describedby="workOrderSearchBlock"
-	        placeholder="Search..">
-		<table id="workOrderTable" class="table table-hover" aria-live=”polite”>
-	        {% for wo in all_wos %}
-	            <tr tabindex="0"  id="{{ wo.full_prord_wo_number }}" role="button" aria-label="Select work order 
-	                {{ wo.full_prord_wo_number }}">
-	                <td>{{ wo.full_prord_wo_number }}</td>
-	                <td>{{ wo.comment_text|truncatechars:200 }}</td>
-	            </tr>
-	        {% endfor %}
-		</table> -->
 		<select class='form-control' id='workOrderSearch'>
 			<option></option>
 			{% for wo in all_wos %}

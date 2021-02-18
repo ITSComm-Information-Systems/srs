@@ -21,28 +21,6 @@ $(document).ready(function() {
         $('#tech-error').addClass('hidden');
     });
 
-    $("#workOrderTable").hide();
-
-    $("#workOrderSearch").on("keyup", function() {
-        $("#workOrderTable").show();
-        var value = $(this).val().toLowerCase();
-        $("#workOrderTable tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
-
-    $('#workOrderTable tr').click(function() {
-        var work_order = $(this).find("td").eq(0).html();
-        $("#workOrderSearch").val(work_order);  
-        $('#workOrderTable').hide();
-
-        $('#rateSelect').removeAttr('disabled');
-        $('#assigned_date').removeAttr('readonly');
-        $('#duration-hours').removeAttr('readonly');
-        $('#duration-mins').removeAttr('readonly');
-        $('#notes').removeAttr('readonly');
-    });
-
     $('#workOrderSearch').on('change', function() {
         $('#rateSelect').removeAttr('disabled');
         $('#assigned_date').removeAttr('readonly');
@@ -151,7 +129,7 @@ function add_to_table(num_entries) {
         $('#total-hours').text(calculate_duration());
 
         // Reset all input values
-        $('#workOrderSearch').val('');
+        $("#workOrderSearch").val(null).trigger('change');
         $('#rateSelect').val('Regular');
         $('#assigned_date').val('');
         $('#duration-hours').val('');
