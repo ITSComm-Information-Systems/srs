@@ -568,15 +568,12 @@ class DetailsNFSForm(TabForm):
 class ServerSpecForm(TabForm):
     template = 'order/server_spec.html'
 
-
     def __init__(self, *args, **kwargs):
         super(ServerSpecForm, self).__init__(*args, **kwargs)
 
         self.fields['misevCPU'].widget.attrs.update({'max': '16'})
 
-
     def clean(self):
-        print(self.cleaned_data)
         disk_size = self.cleaned_data.get('misevdisk', None)
 
         if disk_size != None:
@@ -692,7 +689,17 @@ class BillingStorageForm(TabForm):
             descr = self.fields['totalCost'].description.replace('~', str(total_cost))
         elif self.action.service.name == 'miServer':
             option = 1
-            total_cost = '420'
+            server = Server()
+            server.ram = self.request.POST['misevRAM']
+            if self.request.POST['misev'] == 'yesdisk':
+                server.replicated = True
+            else:
+                server.replicated = False
+
+            if self.request.POST['misevback'] == 'yesback':
+                server.backup = True
+
+            total_cost = server.get_total_cost(size=self.request.POST['misevdisk'])
             descr = self.fields['totalCost'].description.replace('~', str(total_cost))
         else:
             option = 1
@@ -737,7 +744,18 @@ class BillingStorageForm(TabForm):
                 option = StorageRate.objects.get(id=self.data['selectOptionType'])
 
             if self.action.service.name == 'miServer':
-                total_cost = 420
+                option = 1
+                server = Server()
+                server.ram = self.request.POST['misevRAM']
+                if self.request.POST['misev'] == 'yesdisk':
+                    server.replicated = True
+                else:
+                    server.replicated = False
+
+                if self.request.POST['misevback'] == 'yesback':
+                    server.backup = True
+
+                total_cost = server.get_total_cost(size=self.request.POST['misevdisk'])
             else:
                 total_cost = option.get_total_cost(self.data['size'])
 

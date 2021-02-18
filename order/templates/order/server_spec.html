@@ -58,13 +58,13 @@
             <small class="text-muted form-text" id="{{ field.name }}">{{ field.field.description }}</small>
 
             <select style="width: 150px" class="form-control" id="misevRAM" name="misevRAM">
-                <option>2 GB</option>
-                <option>4 GB</option>
-                <option>8 GB</option>
-                <option>16 GB</option>
-                <option>32 GB</option>
-                <option>64 GB</option>
-                <option>More than 64 GB (requires approval)</option>
+                <option value=2>2 GB</option>
+                <option value=4>4 GB</option>
+                <option value=8>8 GB</option>
+                <option value=16>16 GB</option>
+                <option value=32>32 GB</option>
+                <option value=64>64 GB</option>
+                <option value=65>More than 64 GB (requires approval)</option>
             </select>
 
             {% for error in field.errors %}

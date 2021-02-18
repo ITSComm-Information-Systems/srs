@@ -1,3 +1,4 @@
+from typing import Sequence
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.postgres.fields import JSONField
@@ -665,6 +666,33 @@ class Server(models.Model):
             if len(errors) > 0:
                 raise ValidationError(errors)
 
+    def get_total_cost(self, **kwargs):
+        size = kwargs['size']
+
+        if size:
+            size = int(size)
+        else:
+            size = 0 #TODO SELECT CHILD
+
+        for rate in StorageRate.objects.filter(name__startswith='MS-'):
+            if rate.name == 'MS-RAM':
+                total_cost = rate.rate * int(self.ram)
+            elif rate.name == 'MS-DISK-REP':
+                ms_disk_rep = rate.rate
+            elif rate.name == 'MS-DISK-NOREP':
+                ms_disk_norep = rate.rate
+            elif rate.name == 'MS-DISK-BACKUP':
+                ms_disk_backup = rate.rate
+    
+        if self.replicated:
+            total_cost = total_cost + (size * ms_disk_rep)       
+        else:
+            total_cost = total_cost + (size * ms_disk_norep)
+
+        if self.backup:
+            total_cost = total_cost + (size * ms_disk_backup)
+
+        return round(total_cost, 2)
 
 class ServerDisk(models.Model):
     server = models.ForeignKey(Server, related_name='disks', on_delete=models.CASCADE)
@@ -990,6 +1018,8 @@ class Item(models.Model):
         else:
             if action.service.id == 8:
                 self.update_mibackup(rec)
+            elif action.service.id == 13:
+                todo = 1
             else:
                 rec.owner = LDAPGroup().lookup( self.data['owner'] )
                 rec.service = action.service
