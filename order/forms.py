@@ -91,7 +91,7 @@ class TabForm(forms.Form):
             if key in visible:  # Add visible fields to the review page
                 label = field.label
  
-                if field.type == 'Radio':
+                if field.type == 'Radio' or field.type == 'Select':
                     for choice in field.choices:
                         if str(choice[0]) == value:
                             value = choice[1]
