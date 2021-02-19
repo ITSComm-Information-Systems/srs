@@ -94,9 +94,6 @@ class Command(BaseCommand):
                 sd.size = size
                 sd.save()
 
-            
-        print('-----')
-
     def add_data(self, xml, server):
         x = self.get_text(xml, 'MWregulateddatacheckboxe1', None)
         if x:
@@ -132,6 +129,8 @@ class Command(BaseCommand):
         service_status = self.get_text(xml, 'servicestatus', None)
         if service_status == 'Ended':
             d.in_service = False
+        elif service_status == 'Active':
+            d.in_service = True
         else:
             print('service status', service_status)
 
@@ -153,7 +152,7 @@ class Command(BaseCommand):
             print(data)
             self.ERRORS +=1
 
-        print(f'{self.LOADS} records Loaded, {self.ERRORS} errors')
+        #print(f'{self.LOADS} records Loaded, {self.ERRORS} errors')
 
 
     def add_members(self):
