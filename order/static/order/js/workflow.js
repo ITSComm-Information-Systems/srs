@@ -215,10 +215,31 @@ $(document).ready(function() {
   });
 
 
+
+  // miSevBasic
+  $('[data-tab="miSevBasic"]').on('shown.bs.tab', function(event) {
+    $("#div_misevexissev").trigger("change");
+  });
+
+  $(document).on("change", "#div_misevexissev" , function() {
+    if ($('#misevexissev_0').prop("checked")) {  // Yes contact me to migrat
+      $('#div_mcommserveradmin').hide().prop('required',false);
+      $('#div_mcommadmingrp').hide().prop('required',false);
+    } else if ($('#misevexissev_1').prop("checked")) {  // Nah, new server
+      $('#div_mcommserveradmin').show().prop('required',true);
+      $('#div_mcommadmingrp').show().prop('required',true);
+    } else {
+      $('#div_mcommserveradmin').hide().prop('required',false);
+      $('#div_mcommadmingrp').hide().prop('required',false);
+    }
+  });
+
+
   //MiServer Specification
   $('[data-tab="miSeverSpec"]').on('show.bs.tab', function(event) {
     $("#div_manageunman").trigger("change");
     $("#div_misevprefix").trigger("change");
+    $("#id_misevCPU").trigger("change");
   });
 
   $(document).on("change", "#div_manageunman" , function() {
@@ -245,6 +266,25 @@ $(document).ready(function() {
       $('#div_misevregpre').hide().prop('required',false);
       $('#div_misevnopre').hide().prop('required',false);
     }
+  });
+
+  
+  $(document).on("change", "#id_misevCPU" , function() {
+    console.log(this.value)
+    cpu = this.value
+    //$("#id_misevRAM option[value=" + value + "]").prop('disabled',true);
+    
+    $("#id_misevRAM option").each(function(i){
+      console.log(this.value, cpu)
+
+      if (this.value) {
+        if (this.value < cpu*2) {
+          $("#id_misevRAM option[value=" + this.value + "]").prop('disabled',true);
+        }
+      }
+
+    });
+
   });
 
   // MiServer Data Sensitivity

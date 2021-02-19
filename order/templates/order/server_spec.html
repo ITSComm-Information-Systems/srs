@@ -6,12 +6,10 @@
     <div class="form-group com-md-6 float-bottom">
         <label><strong><br> </strong></label>
         <small class="text-muted form-text"><br></small>
-        <select class="form-control" id="exampleFormControlSelect1">
-            <option value="GB">Gigabytes</option>
-            <option value="TB">Terabytes</option>
-        </select>
+        {{ tab.form.misevdiskuom }}
     </div>
 </div>
+{% elif field.name == 'misevdiskuom' %}
 {% else %}
 <div class="row">
     <div class="col-6">
