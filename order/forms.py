@@ -235,6 +235,8 @@ class TabForm(forms.Form):
             elif element.type == 'ST' or element.type == 'List':
                 field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
                 field.template_name = 'project/text.html'
+                if element.attributes:
+                    field.widget.input_type = element.attributes
             elif element.type == 'Checkbox':
                 field = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=eval(element.attributes))
                 field.template_name = 'project/checkbox.html'
@@ -576,6 +578,7 @@ class ServerSupportForm(TabForm):
             self.fields.pop('misevpattime')
             self.fields.pop('misevredate')
             self.fields.pop('misevretime')
+
 
 class ServerSpecForm(TabForm):
     template = 'order/server_spec.html'
