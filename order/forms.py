@@ -594,12 +594,13 @@ class ServerSpecForm(TabForm):
 
     def clean(self):
         disk_size = self.cleaned_data.get('misevdisk', None)
+        uom = self.cleaned_data.get('misevdiskuom', None)
 
         if disk_size != None:
-            if disk_size % 10 != 0:
+            if disk_size % 10 != 0 and uom == 'GB':
                 self.add_error('misevdisk', 'Disk size must be in increments of 10.')
             if disk_size == 0:
-                self.add_error('misevdisk', 'Disk size must be 10 or more.')
+                self.add_error('misevdisk', 'Disk size must be 10 GB or more.')
 
         super().clean()
 
