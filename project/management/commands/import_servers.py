@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models.query_utils import Q
 
 from oscauth.utils import get_mc_group
 from oscauth.models import LDAPGroup
@@ -46,6 +47,7 @@ class Command(BaseCommand):
             line_count = 0
             for row in csv_reader:
                 if line_count == 0:
+                #sif line_count < 68:
                     #print(f'Column names are {", ".join(row)}')
                     line_count += 1
                 elif line_count < number_of_records:
@@ -79,23 +81,29 @@ class Command(BaseCommand):
 
         for disk in disk_list:
             if len(disk_list) > 9:
-                print('extra disks', server_id)
-                sys.exit()
-
+                print(len(disk_list), 'extra disks for server_id:', server_id)
+                return
+                
             if disk:
                 equal = disk.find('=')
                 space = disk.find(' ')
                 name = disk[0:equal]
-                size = int(disk[equal+1:space])
+                uom = disk[space+1:space+3]
+
+                if uom == 'GB':
+                    size = int(disk[equal+1:space])
+                elif uom == 'TB':
+                    tb = float(disk[equal+1:space])
+                    size = int(tb * 1000)
+                else:
+                    print('error in disk unit', uom)
+                    return
 
                 sd = ServerDisk()
                 sd.server_id = server_id
                 sd.name = name
                 sd.size = size
                 sd.save()
-
-            
-        print('-----')
 
     def add_data(self, xml, server):
         x = self.get_text(xml, 'MWregulateddatacheckboxe1', None)
@@ -105,9 +113,6 @@ class Command(BaseCommand):
         x = self.get_text(xml, 'nonregulateddataDetail', None)
         if x:
             print(x)
-
-
-
 
     def process_record(self, row, type, service_id):
 
@@ -177,8 +182,10 @@ class Command(BaseCommand):
         service_status = self.get_text(xml, 'servicestatus', None)
         if service_status == 'Ended':
             s.in_service = False
+        elif service_status == 'Active':
+            s.in_service = True
         else:
-            print('service status', service_status)
+            print('unknown service status', service_status)
 
         try:
             s.save()
@@ -190,7 +197,7 @@ class Command(BaseCommand):
             print(data)
             self.ERRORS +=1
 
-        print(f'{self.LOADS} records Loaded, {self.ERRORS} errors')
+        #print(f'{self.LOADS} records Loaded, {self.ERRORS} errors')
 
 
     def add_members(self):
