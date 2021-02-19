@@ -232,6 +232,10 @@ class TabForm(forms.Form):
                 field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1", 'class': 'form-control'}))
                 field.initial = element.attributes
                 field.template_name = 'project/number.html'
+            elif element.type == 'Select':
+                field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.Select(attrs={'class': 'form-control'}))
+                #field.initial = element.attributes
+                field.template_name = 'project/text.html'
             elif element.type == 'ST' or element.type == 'List':
                 field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
                 field.template_name = 'project/text.html'

@@ -71,6 +71,7 @@ class Element(Configuration):
         ('', ''),
         ('Radio', 'Radio'),
         ('ST', 'String'),
+        ('Select', 'Select'),
         ('List', 'List'),
         ('NU', 'Number'),
         ('Chart', 'Chartcom'),
