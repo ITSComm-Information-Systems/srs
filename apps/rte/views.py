@@ -67,6 +67,12 @@ def single_tech(request):
     all_wos = UmRteServiceOrderV.objects.all()
     rate_levels = list(UmRteRateLevelV.objects.all().values('labor_rate_level_name'))
 
+    # Get previous week dates
+    today = date.today()
+    idx = (today.weekday() + 1) % 7 # MON = 0, SUN = 6 -> SUN = 0 .. SAT = 6
+    date_start = today - timedelta(7+idx)
+    date_end = today - timedelta(7+idx-6)
+
     context = {
         'wf': 'single',
         'all_techs': all_techs,
@@ -77,7 +83,9 @@ def single_tech(request):
         'rate_levels': rate_levels,
         'title': 'Single Technician, Multiple Orders/Entries',
         'tab_list': tab_list,
-        'num_tabs': len(tab_list)
+        'num_tabs': len(tab_list),
+        'date_start': date_start.strftime('%Y-%m-%d'),
+        'date_end': date_end.strftime('%Y-%m-%d')
     }
 
     return HttpResponse(template.render(context, request))
@@ -107,7 +115,7 @@ def single_submit(request):
                 assigned_group_q = UmRteLaborGroupV.objects.get(wo_group_name=assigned_group, wo_group_labor_code=tech_id)
 
                 formatted_date = datetime.strptime(assigned_date, '%Y-%m-%d')
-
+                
                 new_entry = UmRteInput(
                     uniqname=request.user.username,
                     wo_labor_id=None,
@@ -532,8 +540,11 @@ def view_time_display(request):
 def get_date_range(date_range):
     date_end = datetime.date(datetime.now())
 
-    if date_range == 'Last 7 Days':
-        date_start = date_end - timedelta(days=6)
+    if date_range == 'Last Week':
+        today = date.today()
+        idx = (today.weekday() + 1) % 7 # MON = 0, SUN = 6 -> SUN = 0 .. SAT = 6
+        date_start = today - timedelta(7+idx)
+        date_end = today - timedelta(7+idx-6)
 
     if date_range == 'Last 3 Months':
         date_start = date_end - timedelta(days=92)
