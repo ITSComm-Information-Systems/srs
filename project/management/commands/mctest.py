@@ -16,9 +16,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         id = options['id']
+
+        print('id', id)
         item = Item.objects.get(id=id)
 
         #ticket_list = Ticket.objects.all()
 
         #for ticket in ticket_list
         item.route()
+

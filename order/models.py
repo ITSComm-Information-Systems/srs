@@ -995,7 +995,7 @@ class Item(models.Model):
 
         for route in routing['routes']:
             if route['target'] == 'tdx':
-                self.submit_incident(route) 
+                self.submit_incident(route, action) 
 
             if route['target'] == 'database':
                 if 'fulfill' in route:
@@ -1051,7 +1051,7 @@ class Item(models.Model):
                 if self.data.get('permittedHosts'):
                     rec.update_hosts(self.data.get('permittedHosts'))
 
-    def submit_incident(self, route):
+    def submit_incident(self, route, action):
         client_id = settings.UM_API['CLIENT_ID']
         auth_token = settings.UM_API['AUTH_TOKEN']
         base_url = settings.UM_API['BASE_URL']
@@ -1080,6 +1080,17 @@ class Item(models.Model):
         payload['Title'] = self.description
         payload['RequestorEmail'] = self.created_by.email
         payload['Description'] = f'{note}\n'
+
+        # Add Attributes using target mapping
+        attributes = []
+        step_list = Step.objects.filter(action=action)
+        element_list = Element.objects.filter(step__in=step_list, target__isnull=False)
+        for element in element_list:
+            value = self.data.get(element.name)
+            if value:
+                attributes.append({'ID': element.target, 'Value': value})
+
+        payload['Attributes'] = attributes
 
         data_string = json.dumps(payload)
         response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
