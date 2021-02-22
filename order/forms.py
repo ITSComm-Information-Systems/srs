@@ -602,6 +602,14 @@ class ServerSpecForm(TabForm):
             if disk_size == 0:
                 self.add_error('misevdisk', 'Disk size must be 10 GB or more.')
 
+        ram = self.cleaned_data.get('misevRAM', None)
+        cpu = self.cleaned_data.get('misevCPU', None)
+        if ram != None and cpu != None:
+            if ram / cpu < 2:
+                self.add_error('misevRAM', 'Ram must be at least double cpu.')
+            else:
+                print(ram/cpu)
+
         super().clean()
 
 

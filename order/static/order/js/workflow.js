@@ -240,6 +240,23 @@ $(document).ready(function() {
     $("#div_manageunman").trigger("change");
     $("#div_misevprefix").trigger("change");
     $("#id_misevCPU").trigger("change");
+    $("#id_misevos").trigger("change");
+  });
+
+  $(document).on("change", "#id_misevos" , function() {
+    os = $('#id_misevos').val();
+    if (os) {
+      if (os.startsWith('Windows')) {
+        $('#div_misevprefix').show().prop('required',true);
+        $('#div_misevregpre').show().prop('required',true);     
+      } else {
+        $('#div_misevprefix').hide().prop('required',false);
+        $('#div_misevregpre').hide().prop('required',false); 
+      }
+    } else {
+      $('#div_misevprefix').hide().prop('required',false);
+      $('#div_misevregpre').hide().prop('required',false); 
+    }
   });
 
   $(document).on("change", "#div_manageunman" , function() {
@@ -258,13 +275,13 @@ $(document).ready(function() {
   $(document).on("change", "#div_misevprefix" , function() {
     if ($('#misevprefix_0').prop("checked")) {  // Registered Prefix
       $('#div_misevregpre').show().prop('required',true);
-      $('#div_misevnopre').hide().prop('required',false);
+      //$('#div_misevnopre').hide().prop('required',false);
     } else if ($('#misevprefix_1').prop("checked")) {  // No, use standard
       $('#div_misevregpre').hide().prop('required',false);
-      $('#div_misevnopre').show().prop('required',true);
+      //$('#div_misevnopre').show().prop('required',true);
     } else {
       $('#div_misevregpre').hide().prop('required',false);
-      $('#div_misevnopre').hide().prop('required',false);
+      //$('#div_misevnopre').hide().prop('required',false);
     }
   });
 
