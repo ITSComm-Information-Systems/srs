@@ -1,14 +1,59 @@
 {% for field in tab.form %}
 
 {% if field.name == 'misevdisk' %}
-<div class="form-row">
-    {% include field.field.template_name %}
-    <div class="form-group com-md-6 float-bottom">
-        <label><strong><br> </strong></label>
-        <small class="text-muted form-text"><br></small>
-        {{ tab.form.misevdiskuom }}
+<div id="host_list" class="form-group">
+    <label for="hosts">
+        <strong>{{ field.label }}</strong>
+    </label>
+
+    <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
+
+    <div class="form-inline" id="host_new" style="display: none;">
+        <input class="form-control form-inline nodeName" name="nodeNames" type="text" value="{{ host.name }}"
+            aria-describedy="hostsText">
+        <select name="backupTime" id="backupTime" class="form-control">
+            {% for opt in tab.form.time_list %}
+            <option value="{{opt}}">{{opt}}</option>
+            {% endfor %}
+            
+        </select>
+        <select name="backupTimeampm" id="backupTimeampm" class="form-control">
+            <option value="GB">GB</option>
+            <option value="TB">TB</option>
+        </select>
+        &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i
+                class="fas fa-minus-circle"></i></a>
     </div>
+
+    {% for node in tab.form.node_list %}
+    <div class="form-inline" id="host_{{ host.id }}">
+        <input class="form-control form-inline" name="nodeNames" type="text" value="{{ node.name }}"
+            aria-describedy="hostsText">
+        <select name="backupTime" class="form-control">
+            {% for opt in tab.form.time_list %}
+            {% if opt ==  node.time|slice:":-3"  %}
+            <option selected value="{{opt}}">{{opt}}</option>
+            {% else %}
+            <option value="{{opt}}">{{opt}}</option>
+            {% endif %}
+            {% endfor %}
+        </select>
+        <select name="backupTimeampm" id="backupTimeampm" class="form-control">
+            {% for opt in tab.form.ampm_list %}
+            {% if opt ==  node.time|slice:"-2:"  %}
+            <option selected value="{{opt}}">{{opt}}</option>
+            {% else %}
+            <option value="{{opt}}">{{opt}}</option>
+            {% endif %}
+            {% endfor %}
+        </select>
+        &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i
+                class="fas fa-minus-circle"></i></a>
+    </div>
+    {% endfor %}
 </div>
+<a href="javascript:addHost()" class="d-block"><i class="fas fa-plus-circle"></i> Add another disk</a>
+<hr>
 {% elif field.name == 'misevdiskuom' %}
 {% else %}
 <div class="row">
