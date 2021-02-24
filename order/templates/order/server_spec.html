@@ -9,15 +9,12 @@
     <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
 
     <div class="form-inline" id="host_new" style="display: none;">
-        <input class="form-control form-inline nodeName" name="nodeNames" type="text" value="{{ host.name }}"
+        <input disabled class="form-control form-inline" name="diskNames" type="text" value="disk0"
             aria-describedy="hostsText">
-        <select name="backupTime" id="backupTime" class="form-control">
-            {% for opt in tab.form.time_list %}
-            <option value="{{opt}}">{{opt}}</option>
-            {% endfor %}
-            
-        </select>
-        <select name="backupTimeampm" id="backupTimeampm" class="form-control">
+        <input class="form-control form-inline diskName" name="diskNames" type="number" value="{{ host.name }}"
+            aria-describedy="hostsText">
+
+        <select name="diskUOM" id="diskUOM" class="form-control">
             <option value="GB">GB</option>
             <option value="TB">TB</option>
         </select>
@@ -25,22 +22,15 @@
                 class="fas fa-minus-circle"></i></a>
     </div>
 
-    {% for node in tab.form.node_list %}
+    {% for disk in tab.form.disk_list %}
     <div class="form-inline" id="host_{{ host.id }}">
-        <input class="form-control form-inline" name="nodeNames" type="text" value="{{ node.name }}"
+        <input disabled class="form-control form-inline" name="diskNames" type="text" value="disk0"
             aria-describedy="hostsText">
-        <select name="backupTime" class="form-control">
-            {% for opt in tab.form.time_list %}
-            {% if opt ==  node.time|slice:":-3"  %}
-            <option selected value="{{opt}}">{{opt}}</option>
-            {% else %}
-            <option value="{{opt}}">{{opt}}</option>
-            {% endif %}
-            {% endfor %}
-        </select>
-        <select name="backupTimeampm" id="backupTimeampm" class="form-control">
+        <input class="form-control form-inline" name="diskSize" type="number" value="{{ disk.size }}"
+            aria-describedy="hostsText">
+        <select name="diskUOM" id="diskUOM" class="form-control">
             {% for opt in tab.form.ampm_list %}
-            {% if opt ==  node.time|slice:"-2:"  %}
+            {% if opt ==  disk.time|slice:"-2:"  %}
             <option selected value="{{opt}}">{{opt}}</option>
             {% else %}
             <option value="{{opt}}">{{opt}}</option>
