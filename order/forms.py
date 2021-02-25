@@ -595,10 +595,15 @@ class ServerSupportForm(TabForm):
 class ServerDataForm(TabForm):
 
     def clean(self):
-        managed = self.request.POST('manageunman')
-        print(managed)
+        self.add_error
+        if self.request.POST.get('manageunman') == 'unmang':
+            if self.request.POST.get('misevregu') == 'yesregu':
+                raise ValidationError("Please select a managed server for sensitive data.")
+            if self.request.POST.get('misevnonregu') == 'yesnonregu':
+                raise ValidationError("Please select a managed server for sensitive data.")
+        super().clean()
 
-
+        
 class ServerSpecForm(TabForm):
     template = 'order/server_spec.html'
 
