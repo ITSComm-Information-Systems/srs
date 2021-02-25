@@ -1,6 +1,6 @@
 {% for field in tab.form %}
 
-{% if field.name == 'misevdisk' %}
+{% if field.name == 'diskSize' %}
 <div id="host_list" class="form-group">
     <label for="hosts">
         <strong>{{ field.label }}</strong>
@@ -9,10 +9,8 @@
     <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
 
     <div class="form-inline" id="host_new" style="display: none;">
-        <input disabled class="form-control form-inline" name="diskNames" type="text" value="disk0"
-            aria-describedy="hostsText">
-        <input class="form-control form-inline diskName" name="diskNames" type="number" value="{{ host.name }}"
-            aria-describedy="hostsText">
+        <input readonly class="form-control form-inline" name="diskName" type="text" value="disk0">
+        <input class="form-control form-inline" name="diskSize" type="number">
 
         <select name="diskUOM" id="diskUOM" class="form-control">
             <option value="GB">GB</option>
@@ -24,13 +22,12 @@
 
     {% for disk in tab.form.disk_list %}
     <div class="form-inline" id="host_{{ host.id }}">
-        <input disabled class="form-control form-inline" name="diskNames" type="text" value="disk0"
-            aria-describedy="hostsText">
-        <input class="form-control form-inline" name="diskSize" type="number" value="{{ disk.size }}"
-            aria-describedy="hostsText">
+        <input readonly class="form-control form-inline" name="diskName" type="text" value="{{ disk.name }}">
+        <input class="form-control form-inline" name="diskSize" type="number" value="{{ disk.size }}">
+
         <select name="diskUOM" id="diskUOM" class="form-control">
-            {% for opt in tab.form.ampm_list %}
-            {% if opt ==  disk.time|slice:"-2:"  %}
+            {% for opt in tab.form.uom_list %}
+            {% if opt ==  disk.uom  %}
             <option selected value="{{opt}}">{{opt}}</option>
             {% else %}
             <option value="{{opt}}">{{opt}}</option>
@@ -42,8 +39,14 @@
     </div>
     {% endfor %}
 </div>
-<a href="javascript:addHost()" class="d-block"><i class="fas fa-plus-circle"></i> Add another disk</a>
-<hr>
+<div>
+    {% for error in field.errors %}
+    <div role="alert" class="invalid-feedback-"><i class="fas fa-exclamation-triangle"
+            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+    {% endfor %}
+    <a href="javascript:addHost()" class="d-block-"><i class="fas fa-plus-circle"></i>Add another disk</a><br><br>
+</div>
+
 {% elif field.name == 'misevdiskuom' %}
 {% else %}
 <div class="row">

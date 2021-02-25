@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 from django.contrib.postgres.fields import JSONField
 from django.contrib.admin.models import LogEntry, ADDITION
 from django.db import models
+from django.forms.fields import DecimalField
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
 from project.models import ShortCodeField
@@ -17,6 +18,8 @@ import json, io, os, requests
 import cx_Oracle
 from django.core.exceptions import ValidationError
 from oscauth.utils import get_mc_user, get_mc_group
+from decimal import Decimal
+
 
 class Configuration(models.Model):   #Common fields for configuration models
     name = models.CharField(max_length=20)
@@ -669,12 +672,18 @@ class Server(models.Model):
                 raise ValidationError(errors)
 
     def get_total_cost(self, **kwargs):
-        size = kwargs['size']
+        size = Decimal(0)
 
-        if size:
-            size = int(size)
+        if 'disk_list' in kwargs:
+            disk_list = kwargs['disk_list']
+            for disk in disk_list:
+
+                size = size + Decimal(disk['size'])
+
         else:
             size = 0 #TODO SELECT CHILD
+
+        print(size)
 
         for rate in StorageRate.objects.filter(name__startswith='MS-'):
             if rate.name == 'MS-RAM':

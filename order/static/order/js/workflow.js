@@ -285,25 +285,6 @@ $(document).ready(function() {
     }
   });
 
-  
-  $(document).on("change", "#id_misevCPU" , function() {
-    console.log(this.value)
-    cpu = this.value
-    //$("#id_misevRAM option[value=" + value + "]").prop('disabled',true);
-    
-    $("#id_misevRAM option").each(function(i){
-      console.log(this.value, cpu)
-
-      if (this.value) {
-        if (this.value < cpu*2) {
-          $("#id_misevRAM option[value=" + this.value + "]").prop('disabled',true);
-        }
-      }
-
-    });
-
-  });
-
   // MiServer Data Sensitivity
   $('[data-tab="miServerData"]').on('show.bs.tab', function(event) {
     $("#div_misevregu").trigger("change");
@@ -755,6 +736,8 @@ function chartcomChange(obj) {
     $("#" + record + "_new").hide()
   
     $(".nodeName").focus(); 
+    $(this).next('input:text').focus();
+
   }
 
 function addHost() {
