@@ -577,11 +577,26 @@ class ServerSupportForm(TabForm):
     def __init__(self, *args, **kwargs):
         super(ServerSupportForm, self).__init__(*args, **kwargs)
 
-        if kwargs['request'].POST.get('manageunman') == 'unmang':
+        os = kwargs['request'].POST.get('misevos', 'NA')
+        if os.startswith('Windows'):
+            windows = True
+        else:
+            windows = False
+
+        if kwargs['request'].POST.get('manageunman') == 'unmang' or not windows:
             self.fields.pop('misevpatch')
             self.fields.pop('misevpattime')
             self.fields.pop('misevredate')
             self.fields.pop('misevretime')
+            self.fields.pop('misevemail')
+            self.fields.pop('misevphone')
+            
+
+class ServerDataForm(TabForm):
+
+    def clean(self):
+        managed = self.request.POST('manageunman')
+        print(managed)
 
 
 class ServerSpecForm(TabForm):
@@ -595,26 +610,18 @@ class ServerSpecForm(TabForm):
         self.uom_list = ['GB','TB']
         
         if self.request.method == 'POST': # Skip for initial load on Add
-            print('post')
             if self.is_bound:   # Reload Host list
-                print('bound', self.request.POST)
                 self.disk_list = []
                 name_list = self.data.getlist('diskName')
                 size_list = self.data.getlist('diskSize')
                 uom_list = self.data.getlist('diskUOM')
 
-                print(name_list)
-
                 for count, size in enumerate(size_list):
                     if size:
                         self.disk_list.append({'name': name_list[count], 'size': float(size), 'uom':uom_list[count]})
-                
-                print('init', self.disk_list)
             else:
-                print('unbound')
                 instance_id = self.request.POST.get('instance_id')
                 if instance_id: 
-                    print('unbound instance')
                     bd = BackupDomain.objects.get(id=instance_id)
                     self.fields["mCommunityName"].initial = bd.owner
                     self.fields["versions_while_exist"].initial = bd.versions_while_exists

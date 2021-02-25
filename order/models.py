@@ -63,6 +63,7 @@ class Step(Configuration):
         ('SubscriptionSelForm', 'Subscription Selection'),
         ('ServerSupportForm', 'Server Support'),
         ('ServerSpecForm', 'Server Specification'),
+        ('ServerDataForm', 'Server Data Sensitivity'),
         ('DataDenForm', 'Data Den Form')
     )
 
