@@ -589,18 +589,49 @@ class ServerSpecForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(ServerSpecForm, self).__init__(*args, **kwargs)
-
         self.fields['misevCPU'].widget.attrs.update({'max': '16'})
 
-    def clean(self):
-        disk_size = self.cleaned_data.get('misevdisk', None)
-        uom = self.cleaned_data.get('misevdiskuom', None)
+        #self.time_list = eval(self.fields['backupTime'].attributes)
+        self.uom_list = ['GB','TB']
+        
+        if self.request.method == 'POST': # Skip for initial load on Add
+            print('post')
+            if self.is_bound:   # Reload Host list
+                print('bound', self.request.POST)
+                self.disk_list = []
+                name_list = self.data.getlist('diskName')
+                size_list = self.data.getlist('diskSize')
+                uom_list = self.data.getlist('diskUOM')
 
-        if disk_size != None:
-            if disk_size % 10 != 0 and uom == 'GB':
-                self.add_error('misevdisk', 'Disk size must be in increments of 10.')
-            if disk_size == 0:
-                self.add_error('misevdisk', 'Disk size must be 10 GB or more.')
+                print(name_list)
+
+                for count, size in enumerate(size_list):
+                    if size:
+                        self.disk_list.append({'name': name_list[count], 'size': float(size), 'uom':uom_list[count]})
+                
+                print('init', self.disk_list)
+            else:
+                print('unbound')
+                instance_id = self.request.POST.get('instance_id')
+                if instance_id: 
+                    print('unbound instance')
+                    bd = BackupDomain.objects.get(id=instance_id)
+                    self.fields["mCommunityName"].initial = bd.owner
+                    self.fields["versions_while_exist"].initial = bd.versions_while_exists
+                    self.fields["versions_after_delet"].initial = bd.versions_after_deleted
+                    self.fields["days_extra_versions"].initial = bd.days_extra_versions
+                    self.fields["days_only_version"].initial = bd.days_only_version
+
+                    self.node_list = BackupNode.objects.filter(backup_domain=instance_id)
+                else:
+                    self.disk_list =[{'name': 'disk0', 'size': 0, 'uom': 'GB'}]
+
+    def clean(self):
+        for disk in self.disk_list:
+            if disk['size'] % 10 != 0 and disk['uom'] == 'GB':
+                self.add_error('diskSize', 'Disk size must be in increments of 10 Gigabytes.')
+            if disk['size'] == 0:
+                self.add_error('diskSize', 'Disk size must be at least 10 Gigabytes')
 
         ram = self.cleaned_data.get('misevRAM', None)
         cpu = self.cleaned_data.get('misevCPU', None)
@@ -727,8 +758,19 @@ class BillingStorageForm(TabForm):
             if self.request.POST['misevback'] == 'yesback':
                 server.backup = True
 
-            total_cost = server.get_total_cost(size=self.request.POST['misevdisk'])
+            disk_list = []
+            name_list = self.request.POST.getlist('diskName')
+            size_list = self.request.POST.getlist('diskSize')
+            uom_list = self.request.POST.getlist('diskUOM')
+
+            for count, size in enumerate(size_list):
+                if size:
+                    disk_list.append({'name': name_list[count], 'size': float(size), 'uom':uom_list[count]})
+
+            #size = self.request.POST.getlist('diskSize')
+            total_cost = server.get_total_cost(disk_list=disk_list)
             descr = self.fields['totalCost'].description.replace('~', str(total_cost))
+
         else:
             option = 1
             #option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
@@ -783,7 +825,7 @@ class BillingStorageForm(TabForm):
                 if self.request.POST['misevback'] == 'yesback':
                     server.backup = True
 
-                total_cost = server.get_total_cost(size=self.request.POST['misevdisk'])
+                total_cost = server.get_total_cost() #TODO Add cost data
             else:
                 total_cost = option.get_total_cost(self.data['size'])
 
