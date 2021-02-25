@@ -577,6 +577,9 @@ class ServerSupportForm(TabForm):
     def __init__(self, *args, **kwargs):
         super(ServerSupportForm, self).__init__(*args, **kwargs)
 
+        if self.action.service.name=='midatabase':
+            return
+        
         os = kwargs['request'].POST.get('misevos', 'NA')
         if os.startswith('Windows'):
             windows = True
@@ -758,6 +761,8 @@ class BillingStorageForm(TabForm):
             option = StorageRate.objects.get(id=28)
             total_cost = option.get_total_cost(self.request.POST['size'])
             descr = self.fields['totalCost'].description.replace('~', str(total_cost))
+        elif self.action.service.name == 'midatabase':
+            descr = self.fields['totalCost'].description.replace('~', '0.00')
         elif self.action.service.name == 'miServer':
             option = 1
             server = Server()
@@ -784,8 +789,7 @@ class BillingStorageForm(TabForm):
             descr = self.fields['totalCost'].description.replace('~', str(total_cost))
 
         else:
-            option = 1
-            #option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
+            option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
 
             #if self.action.service.name == 'miStorage':
             #    total_cost = option.get_total_cost(self.request.POST['sizeGigabyte'])
@@ -817,7 +821,7 @@ class BillingStorageForm(TabForm):
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
 
-        if self.action.service.name != 'miBackup':
+        if self.action.service.name not in ['miBackup','midatabase']:
             if self.action.service.name == 'dataDen':
                 option = StorageRate.objects.get(id=28)
             elif self.action.service.name == 'miServer':
