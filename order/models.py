@@ -1030,7 +1030,7 @@ class Item(models.Model):
         else:
             if action.service.id == 8:
                 self.update_mibackup(rec)
-            elif action.service.id == 13:
+            elif action.service.id in [13,14]:
                 todo = 1
             else:
                 rec.owner = LDAPGroup().lookup( self.data['owner'] )
