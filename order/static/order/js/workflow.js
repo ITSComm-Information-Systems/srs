@@ -239,10 +239,62 @@ $(document).ready(function() {
 
   //MiServer Specification
   $('[data-tab="miSeverSpec"]').on('show.bs.tab', function(event) {
+    ram_rate = $('#server_rates').data('ram_rate');
+    disk_replicated = $('#server_rates').data('disk_replicated');
+    disk_no_replication = $('#server_rates').data('disk_no_replication');
+    disk_backup = $('#server_rates').data('disk_backup');
+    disk_rate = disk_no_replication;
+
     $("#div_manageunman").trigger("change");
     $("#div_misevprefix").trigger("change");
     $("#id_misevCPU").trigger("change");
+    $("#id_misevRAM").trigger("change");
     $("#id_misevos").trigger("change");
+    $(".disk-size").trigger("change");
+    //$("#div_misev").trigger("change");
+  });
+
+  $(document).on("change", "#div_misev" , function() {
+    if ($('#misev_0').prop("checked")) {  // Replicate
+      disk_rate = disk_replicated
+    } else if ($('#misev_1').prop("checked")) {  // No Replication
+      disk_rate = disk_no_replication
+    } else {
+      console.log('no selection');
+    }
+  });
+
+  function update_total_cost() {
+
+    disk_total_cost = 0
+    $( ".disk-cost" ).each(function( index ) {
+      disk_total_cost = disk_total_cost + $( this ).data('disk_cost')
+    });
+    
+    total_cost = ram_cost + disk_total_cost;
+    $("#total_cost").html('$' + total_cost.toFixed(2));
+  }
+
+  $(document).on("change", ".disk-size" , function() {
+    disk_cost = this.value * disk_rate
+    $(this).parent().find("span").html('$' + disk_cost.toFixed(2)).data('disk_cost', disk_cost);
+    update_total_cost();
+  });
+
+  $(document).on("change", "#id_misevCPU" , function() {
+    if ($('#id_misevRAM').val() < this.value * 2) {
+      $('#id_misevRAM').val(this.value * 2);
+      $("#id_misevRAM").trigger("change");
+    }
+  });
+
+  $(document).on("change", "#id_misevRAM" , function() {
+    rate = $('#ram_cost').data('rate');
+    ram = $('#id_misevRAM').val();
+    ram_cost = rate * ram;
+
+    $('#ram_cost').html('$' + ram_cost.toFixed(2));
+    update_total_cost();
   });
 
   $(document).on("change", "#id_misevos" , function() {
@@ -728,13 +780,11 @@ function chartcomChange(obj) {
     } else {
       row_count = row_count + 1;
     }
-    
+
     var row = $("#" + record + "_new").clone();
-  
     row.attr("id", record + "_" + row_count);
     row.show();
     $("#" + record + "_list").append(row);   // TODO Find last host
-  
     $("#" + record + "_new").hide()
   
     $(".nodeName").focus(); 

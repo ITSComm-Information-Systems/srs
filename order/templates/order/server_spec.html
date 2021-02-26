@@ -1,53 +1,83 @@
+<span id="server_rates" 
+    data-ram_rate="{{ tab.form.ram_rate }}"
+    data-disk_replicated="{{ tab.form.disk_replicated }}"
+    data-disk_no_replication="{{ tab.form.disk_no_replication }}"
+    data-disk_backup="{{ tab.form.disk_backup }}"
+></span>
+
 {% for field in tab.form %}
-
 {% if field.name == 'diskSize' %}
-<div id="host_list" class="form-group">
-    <label for="hosts">
-        <strong>{{ field.label }}</strong>
-    </label>
+<div class="row">
+    <div class="col-6">
+        <div id="disk_list" class="form-group">
+            <label for="disks">
+                <strong>{{ field.label }}</strong>
+            </label>
 
-    <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
+            <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
 
-    <div class="form-inline" id="host_new" style="display: none;">
-        <input readonly class="form-control form-inline" name="diskName" type="text" value="disk0">
-        <input class="form-control form-inline" name="diskSize" type="number">
+            <div class="form-inline" id="disk_new" style="display: none;">
+                <input readonly class="form-control form-inline" name="diskName" type="text" value="disk0">
+                <input class="form-control form-inline disk-size" name="diskSize" type="number">
 
-        <select name="diskUOM" id="diskUOM" class="form-control">
-            <option value="GB">GB</option>
-            <option value="TB">TB</option>
-        </select>
-        &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i
-                class="fas fa-minus-circle"></i></a>
-    </div>
+                <select name="diskUOM" class="form-control">
+                    <option value="GB">GB</option>
+                    <option value="TB">TB</option>
+                </select>
+                &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i
+                        class="fas fa-minus-circle"></i></a>
+                <span class="float-right disk-cost"></span>
+            </div>
 
-    {% for disk in tab.form.disk_list %}
-    <div class="form-inline" id="host_{{ host.id }}">
-        <input readonly class="form-control form-inline" name="diskName" type="text" value="{{ disk.name }}">
-        <input class="form-control form-inline" name="diskSize" type="number" value="{{ disk.size }}">
+            {% for disk in tab.form.disk_list %}
+            <div class="form-inline" id="disk_{{ disk.id }}" style="display: block;">
+                <input readonly class="form-control form-inline" name="diskName" type="text" value="{{ disk.name }}">
+                <input class="form-control form-inline disk-size" name="diskSize" type="number" value="{{ disk.size }}">
 
-        <select name="diskUOM" id="diskUOM" class="form-control">
-            {% for opt in tab.form.uom_list %}
-            {% if opt ==  disk.uom  %}
-            <option selected value="{{opt}}">{{opt}}</option>
-            {% else %}
-            <option value="{{opt}}">{{opt}}</option>
-            {% endif %}
+                <select name="diskUOM" id="diskUOM" class="form-control">
+                    {% for opt in tab.form.uom_list %}
+                    {% if opt == disk.uom %}
+                    <option selected value="{{opt}}">{{opt}}</option>
+                    {% else %}
+                    <option value="{{opt}}">{{opt}}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+                &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i
+                        class="fas fa-minus-circle"></i></a>
+                    <span class="float-right disk-cost"></span>
+            </div>
+
             {% endfor %}
-        </select>
-        &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i
-                class="fas fa-minus-circle"></i></a>
+        </div>
     </div>
-    {% endfor %}
 </div>
 <div>
     {% for error in field.errors %}
     <div role="alert" class="invalid-feedback-"><i class="fas fa-exclamation-triangle"
             aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
     {% endfor %}
-    <a href="javascript:addHost()" class="d-block-"><i class="fas fa-plus-circle"></i>Add another disk</a><br><br>
+    <a href="javascript:addRow('disk')"><i class="fas fa-plus-circle"></i>Add another disk</a><br><br>
 </div>
 
 {% elif field.name == 'misevdiskuom' %}
+{% elif field.name == 'misevRAM' %}
+<div class="row">
+    <div class="col-6">
+        <div class="form-group" id="div_misevRAM">
+            <label for="id_misevRAM">
+                <strong>{{ tab.form.misevRAM.label }}</strong>
+            </label>
+            <small class="text-muted form-text" id="misevRAM"> {{ tab.form.misevRAM.field.description }}</small>
+            <input  style="display: inline;" type="number" name="misevRAM" min="2" class="form-control form-inlin col-2" max="16" required="" id="id_misevRAM" value="{{ tab.form.misevRAM.value }}">
+            <span id="ram_cost" data-rate="{{ tab.form.ram_rate }}" class="float-right">{{ tab.form.ram_cost }}</span>
+            {% for error in field.errors %}
+            <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+            {% endfor %}
+            <div role="alert" class="valid-feedback">Good.</div>
+        </div>
+    </div>
+</div>
 {% else %}
 <div class="row">
     <div class="col-6">
@@ -56,3 +86,9 @@
 </div>
 {% endif %}
 {% endfor %}
+
+    <div class="col-6">
+        <hr>
+        <span id="total_cost" class="float-right">$39</span>
+        <strong class="float-center">Monthly Cost</strong>&nbsp;&nbsp;
+    </div>
