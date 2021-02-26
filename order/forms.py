@@ -620,12 +620,19 @@ class ServerDataForm(TabForm):
 class ServerSpecForm(TabForm):
     template = 'order/server_spec.html'
 
+    uom_list = ['GB','TB']
+    for rate in StorageRate.objects.filter(name__startswith='MS-'):
+        if rate.name == 'MS-RAM':
+            ram_rate = rate.rate
+        elif rate.name == 'MS-DISK-REP':
+            disk_replicated = rate.rate
+        elif rate.name == 'MS-DISK-NOREP':
+            disk_no_replication = rate.rate
+        elif rate.name == 'MS-DISK-BACKUP':
+            disk_backup = rate.rate
+
     def __init__(self, *args, **kwargs):
         super(ServerSpecForm, self).__init__(*args, **kwargs)
-        self.fields['misevCPU'].widget.attrs.update({'max': '16'})
-
-        #self.time_list = eval(self.fields['backupTime'].attributes)
-        self.uom_list = ['GB','TB']
         
         if self.request.method == 'POST': # Skip for initial load on Add
             if self.is_bound:   # Reload Host list
@@ -652,7 +659,8 @@ class ServerSpecForm(TabForm):
 
                     self.node_list = BackupNode.objects.filter(backup_domain=instance_id)
                 else:
-                    self.disk_list =[{'name': 'disk0', 'size': 0, 'uom': 'GB'}]
+                    self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB'}]
+                    self.fields['misevCPU'].initial = 1
 
     def clean(self):
         for disk in self.disk_list:
