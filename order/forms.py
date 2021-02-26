@@ -206,6 +206,10 @@ class TabForm(forms.Form):
             self.host = StorageHost
         elif action.service.id == 8:
             self.vol = BackupDomain
+        elif action.service.id == 13:
+            self.vol = Server
+        elif action.service.id == 14:
+            self.vol = Database
         else:
             self.vol = ArcInstance
             self.host = ArcHost
@@ -459,9 +463,13 @@ class VolumeSelectionForm(TabForm):
             action = Action.objects.get(id=action_id)
             service = action.service
 
+            print(groups)
+
             if 'storage_type' in action.override:
                 vol_type = action.override['storage_type']
                 self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name')
+            elif service.id in [13, 14]:
+                self.volume_list = self.vol.objects.filter(owner__in=groups).order_by('name')
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
                     
@@ -598,7 +606,9 @@ class ServerSupportForm(TabForm):
 class ServerDataForm(TabForm):
 
     def clean(self):
-        self.add_error
+        disk_list = self.request.session['disk_list']
+        print('disk', disk_list)
+
         if self.request.POST.get('manageunman') == 'unmang':
             if self.request.POST.get('misevregu') == 'yesregu':
                 raise ValidationError("Please select a managed server for sensitive data.")
@@ -627,6 +637,9 @@ class ServerSpecForm(TabForm):
                 for count, size in enumerate(size_list):
                     if size:
                         self.disk_list.append({'name': name_list[count], 'size': float(size), 'uom':uom_list[count]})
+
+                self.request.session['disk_list'] = self.disk_list
+
             else:
                 instance_id = self.request.POST.get('instance_id')
                 if instance_id: 

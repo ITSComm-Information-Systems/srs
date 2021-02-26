@@ -24,6 +24,9 @@ $(document).ready(function() {
 
   use_cart = $("#wfcart").val();
   use_ajax = $("#wfajax").val();
+  var wfid = parseInt($("#wfid").val());
+  const reviewPages = [50,56,61,63,66,72,73]
+  const modifyPages = [47,49,53,55,59,60,62,65,70,71]
 
   item_id = 0;
   // Workflow stuff
@@ -83,17 +86,16 @@ $(document).ready(function() {
     }
   }
 
-  if ( $("#wfid").val() == 50  || $("#wfid").val() == 63 || $("#wfid").val() == 61 || $("#wfid").val() == 56 || $("#wfid").val() == 66 ) {  // Hide workflow for "Review Storage" (cost data) 
+  if (reviewPages.includes(wfid)) {
     $('#pills-step1').hide();
     $('p').hide();
     $('h2').hide();
     $('#nextBtn').hide();
   }
 
-  if ( $("#wfid").val() == 53 || $("#wfid").val() == 55 || $("#wfid").val() == 59 || $("#wfid").val() == 60 || $("#wfid").val() == 66 ) {
+  if (modifyPages.includes(wfid)) {
     $('#nextBtn').hide();
   }
-
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
