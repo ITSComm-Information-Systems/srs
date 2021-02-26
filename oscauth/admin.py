@@ -4,6 +4,7 @@ from .models import Role
 from .models import Grantor
 from .models import AuthUserDept
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 
 from django.urls import path
 
@@ -22,7 +23,7 @@ class BulkUpdateForm(forms.Form):
 
     department_group = forms.ChoiceField(choices=groups_descr)
     uniqname = Uniqname(max_length=8)
-    role = forms.ChoiceField(choices=[('','----'),('5','Orderer'),('6','Reporter')])
+    role = forms.ChoiceField(choices=[('','----'),('4','Proxy'),('5','Orderer'),('6','Reporter')])
     action = forms.ChoiceField(choices=[('','----'),('Add','Add'),('Delet','Delete')])
 
 
@@ -60,15 +61,19 @@ class AuthUserDeptAdmin(admin.ModelAdmin):
                 count = 0
 
                 for dept in dept_list:
-                    count += 1
                     if form.cleaned_data['action'] == 'Add':
                         rec = AuthUserDept()
                         rec.user = user
                         rec.group_id = group_id
                         rec.dept = dept['deptid']
-                        rec.save()
+                        try:
+                            rec.save()
+                            count += 1
+                        except IntegrityError:
+                            print('Not added, already exists')
                     else:
                         AuthUserDept.objects.filter(dept=dept['deptid'], user=user, group_id=group_id).delete()
+                        count += 1
 
                 context['message'] = f'{count} records {action}ed'
           
