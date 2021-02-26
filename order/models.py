@@ -658,6 +658,11 @@ class Server(models.Model):
   #<service>MiServer</service>
   #<processing>CPU=4 ;RAM=8 GB ;</processing>
 
+    @property
+    def total_cost(self):
+        total_cost = 33
+        return total_cost
+
     def __str__(self):
         return self.name
 
@@ -736,6 +741,7 @@ class Database(models.Model):
     shortcode = models.CharField(max_length=100) 
     cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
     ram = models.IntegerField('RAM')    #  <ram>8</ram>
+    #size = models.IntegerField()
     type = models.PositiveSmallIntegerField(null=True, choices=TYPE_CHOICES)
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
@@ -743,6 +749,14 @@ class Database(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def total_cost(self):
+        total_cost = 33
+        return total_cost
+
+    def get_shortcodes(self):
+        return [self.shortcode]
 
   #<SRVmanaged>Non-Managed</SRVmanaged>
   #<monitoringsystem>businesshours</monitoringsystem>

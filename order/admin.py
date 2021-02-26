@@ -141,6 +141,7 @@ class DatabaseAdmin(admin.ModelAdmin):
     list_filter = ('in_service','type')
     ordering = ('name',)
     readonly_fields = ('legacy_data',)
+    search_fields = ['name','owner__name']
 
     fieldsets = (
         (None, {
@@ -160,6 +161,7 @@ class ServerAdmin(admin.ModelAdmin):
     list_display = ['name', 'owner', 'os']
     list_filter = ('os','in_service')
     ordering = ('name',)
+    search_fields = ['name','owner__name']
 
     inlines = [ServerDiskInline,]
 
