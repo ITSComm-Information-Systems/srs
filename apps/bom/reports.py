@@ -54,6 +54,20 @@ class PdfCreator:
 		header_style = sample_style_sheet['Heading2']
 		return header_style
 
+	def get_location_total_style(self):
+		header_style = ParagraphStyle(name="right", alignment=TA_RIGHT)
+		header_style.fontName='Helvetica-Bold'
+		return header_style
+
+	def location_totals(self):
+		totals = {}	
+		for material in self.estimate.material_list:
+			location = material.material_location
+			if location not in totals:
+				totals[location] = material.extended_price
+			else:
+				totals[location] += material.extended_price
+		return totals
 
 	def build_pdf(self):
 		pdf_buffer = io.BytesIO()
@@ -223,6 +237,7 @@ class PdfCreator:
 						Paragraph('<b>Price Extension</b>', normal)]
 		data = [table_heading]
 		flowables.append(Paragraph(str(self.estimate.material_list[0].material_location), self.subheader))
+		flowables.append(Paragraph('Total: ' + str(self.location_totals[prev_loc]), self.location_total_style))
 
 		# Add materials by location
 		for record in self.estimate.material_list:
@@ -235,6 +250,8 @@ class PdfCreator:
 
 				# Create next location title and reset table to just the headings
 				flowables.append(Paragraph('<b>' + str(record.material_location) + '</b>', self.subheader))
+				flowables.append(Paragraph('Total: ' + str(self.location_totals[record.material_location]), self.location_total_style))
+				#str(self.location_totals[record.material_location])
 				data = [table_heading]
  
 			# Add item to table
@@ -380,6 +397,8 @@ class PdfCreator:
 		self.body = self.get_body_style()
 		self.header = self.get_header_style()
 		self.subheader = self.get_subheader_style()
+		self.location_total_style = self.get_location_total_style()
+		self.location_totals = self.location_totals()
 
 
 def by_location_report(request, estimate_id):
