@@ -243,7 +243,12 @@ $(document).ready(function() {
     disk_replicated = $('#server_rates').data('disk_replicated');
     disk_no_replication = $('#server_rates').data('disk_no_replication');
     disk_backup = $('#server_rates').data('disk_backup');
-    disk_rate = disk_no_replication;
+
+    if ($('#misev_0').prop("checked")) {  // Replicated
+      disk_rate = disk_replicated;
+    } else {
+      disk_rate = disk_no_replication; // Default until selected
+    }
 
     $("#div_manageunman").trigger("change");
     $("#div_misevprefix").trigger("change");
@@ -254,6 +259,16 @@ $(document).ready(function() {
     //$("#div_misev").trigger("change");
   });
 
+  $(document).on("change", "#div_misevback" , function() {
+
+    if ($('#misevback_0').prop("checked")) {  // Replicate
+      backup_cost = 5 * disk_backup
+      $("#backup_cost").html('$' + backup_cost.toFixed(2));
+    } else {
+      $("#backup_cost").html('$0.00');
+    } 
+  });
+
   $(document).on("change", "#div_misev" , function() {
     if ($('#misev_0').prop("checked")) {  // Replicate
       disk_rate = disk_replicated
@@ -262,6 +277,7 @@ $(document).ready(function() {
     } else {
       console.log('no selection');
     }
+    $(".disk-size").trigger("change");
   });
 
   function update_total_cost() {
