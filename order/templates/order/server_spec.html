@@ -78,6 +78,14 @@
         </div>
     </div>
 </div>
+{% elif field.name == 'misevback' %}
+<div class="row">
+    <div class="col-6">
+
+        <span id="backup_cost" class="float-right">$0.00</span>
+        {% include field.field.template_name %}
+    </div>
+</div>
 {% else %}
 <div class="row">
     <div class="col-6">
@@ -86,6 +94,7 @@
 </div>
 {% endif %}
 {% endfor %}
+
 
     <div class="col-6">
         <hr>
