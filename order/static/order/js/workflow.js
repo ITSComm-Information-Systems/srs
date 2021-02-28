@@ -255,14 +255,14 @@ $(document).ready(function() {
     $("#id_misevCPU").trigger("change");
     $("#id_misevRAM").trigger("change");
     $("#id_misevos").trigger("change");
-    $(".disk-size").trigger("change");
+    $(".disk-div").trigger("change");
     //$("#div_misev").trigger("change");
   });
 
   $(document).on("change", "#div_misevback" , function() {
 
-    if ($('#misevback_0').prop("checked")) {  // Replicate
-      backup_cost = 5 * disk_backup
+    if ($('#misevback_0').prop("checked")) {  // Backup
+      backup_cost = disk_total_size * disk_backup
       $("#backup_cost").html('$' + backup_cost.toFixed(2));
     } else {
       $("#backup_cost").html('$0.00');
@@ -283,17 +283,30 @@ $(document).ready(function() {
   function update_total_cost() {
 
     disk_total_cost = 0
+    disk_total_size = 0
     $( ".disk-cost" ).each(function( index ) {
+      console.log('disk line', $( this ).data('disk_size'));
       disk_total_cost = disk_total_cost + $( this ).data('disk_cost')
+      disk_total_size = disk_total_size + $( this ).data('disk_size')
     });
     
     total_cost = ram_cost + disk_total_cost;
     $("#total_cost").html('$' + total_cost.toFixed(2));
   }
 
-  $(document).on("change", ".disk-size" , function() {
-    disk_cost = this.value * disk_rate
-    $(this).parent().find("span").html('$' + disk_cost.toFixed(2)).data('disk_cost', disk_cost);
+  $(document).on("change", ".disk-div" , function() {  // disk change
+    console.log('disk div change');
+    uom = $(this).find("select").val();
+    size = $(this).find(".disk-size").val();
+
+    if (uom=='TB') {
+      size = size * 1024; // Bass2
+    }
+
+    disk_cost = size * disk_rate
+    $(this).find("span").html('$' + disk_cost.toFixed(2))
+      .data('disk_cost', disk_cost)
+      .data('disk_size', size)
     update_total_cost();
   });
 
