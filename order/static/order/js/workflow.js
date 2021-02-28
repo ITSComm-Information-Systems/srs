@@ -244,71 +244,65 @@ $(document).ready(function() {
     disk_no_replication = $('#server_rates').data('disk_no_replication');
     disk_backup = $('#server_rates').data('disk_backup');
 
+
+    $("#div_manageunman").trigger("change");
+    $("#div_misevprefix").trigger("change");
+    $("#id_misevCPU").trigger("change");
+    //$("#id_misevRAM").trigger("change");
+    $("#id_misevos").trigger("change");
+    //$(".disk-div").trigger("change");
+    //$("#div_misev").trigger("change");
+    update_total_cost();
+  });
+
+  $(document).on("change", ".cost-driver" , function() {
+    update_total_cost();
+  });
+
+  function update_total_cost() {
+
+    ram = $('#id_misevRAM').val();
+    ram_cost = ram * ram_rate;
+
     if ($('#misev_0').prop("checked")) {  // Replicated
       disk_rate = disk_replicated;
     } else {
       disk_rate = disk_no_replication; // Default until selected
     }
 
-    $("#div_manageunman").trigger("change");
-    $("#div_misevprefix").trigger("change");
-    $("#id_misevCPU").trigger("change");
-    $("#id_misevRAM").trigger("change");
-    $("#id_misevos").trigger("change");
-    $(".disk-div").trigger("change");
-    //$("#div_misev").trigger("change");
-  });
+    total_disk_size = 0;
+    total_disk_cost = 0;
 
-  $(document).on("change", "#div_misevback" , function() {
+    $( ".disk-div" ).each(function( index ) {  // Tally all disks
 
-    if ($('#misevback_0').prop("checked")) {  // Backup
-      backup_cost = disk_total_size * disk_backup
-      $("#backup_cost").html('$' + backup_cost.toFixed(2));
-    } else {
-      $("#backup_cost").html('$0.00');
-    } 
-  });
+      uom = $(this).find("select").val();
+      size = $(this).find(".disk-size").val();
 
-  $(document).on("change", "#div_misev" , function() {
-    if ($('#misev_0').prop("checked")) {  // Replicate
-      disk_rate = disk_replicated
-    } else if ($('#misev_1').prop("checked")) {  // No Replication
-      disk_rate = disk_no_replication
-    } else {
-      console.log('no selection');
-    }
-    $(".disk-size").trigger("change");
-  });
+      if (uom=="TB") {
+        size = size * 1024;
+      } else {
+        size = size * 1;
 
-  function update_total_cost() {
+      }
+      cost = size * disk_rate
 
-    disk_total_cost = 0
-    disk_total_size = 0
-    $( ".disk-cost" ).each(function( index ) {
-      console.log('disk line', $( this ).data('disk_size'));
-      disk_total_cost = disk_total_cost + $( this ).data('disk_cost')
-      disk_total_size = disk_total_size + $( this ).data('disk_size')
+      $(this).find("span").html('$' + cost.toFixed(2));
+      total_disk_size = total_disk_size + size
+      total_disk_cost = total_disk_cost + cost
+
     });
     
-    total_cost = ram_cost + disk_total_cost;
+    if ($('#misevback_0').prop("checked")) {  // Backup
+      backup_cost = total_disk_size * disk_backup
+      $("#backup_cost").html('$' + backup_cost.toFixed(2));
+    } else {
+      backup_cost = 0;
+      $("#backup_cost").html('$0.00');
+    } 
+
+    total_cost = ram_cost + total_disk_cost + backup_cost;
     $("#total_cost").html('$' + total_cost.toFixed(2));
   }
-
-  $(document).on("change", ".disk-div" , function() {  // disk change
-    console.log('disk div change');
-    uom = $(this).find("select").val();
-    size = $(this).find(".disk-size").val();
-
-    if (uom=='TB') {
-      size = size * 1024; // Bass2
-    }
-
-    disk_cost = size * disk_rate
-    $(this).find("span").html('$' + disk_cost.toFixed(2))
-      .data('disk_cost', disk_cost)
-      .data('disk_size', size)
-    update_total_cost();
-  });
 
   $(document).on("change", "#id_misevCPU" , function() {
     if ($('#id_misevRAM').val() < this.value * 2) {
@@ -398,25 +392,6 @@ $(document).ready(function() {
   $('[data-tab="miSevSupport"]').on('show.bs.tab', function(event) {
     $("#div_misevback").trigger("change");
   });
-
-  $(document).on("change", "#div_misevback" , function() {
-    console.log("backup");
-
-    if ($('#misevback_0').prop("checked")) {  // Add Backup
-      $('#div_misevbacktime').show().prop('required',true);
-      console.log("checky");
-    } else if ($('#misevback_1').prop("checked")) {  // No Backups
-      $('#div_misevbacktime').hide().prop('required',false);
-      console.log("no backup selected");
-    } else {
-      $('#div_misevbacktime').hide().prop('required',false);
-    }
-  });
-  
-
-
-
-
 
   var x = document.getElementsByClassName("ccsel");
   var i;

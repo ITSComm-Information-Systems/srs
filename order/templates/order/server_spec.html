@@ -8,7 +8,7 @@
 {% for field in tab.form %}
 {% if field.name == 'diskSize' %}
 <div class="row">
-    <div class="col-6">
+    <div class="col-6 cost-driver">
         <div id="disk_list" class="form-group">
             <label for="disks">
                 <strong>{{ field.label }}</strong>
@@ -34,7 +34,7 @@
                 <input readonly class="form-control form-inline" name="diskName" type="text" value="{{ disk.name }}">
                 <input class="form-control form-inline disk-size" name="diskSize" type="number" value="{{ disk.size }}">
 
-                <select name="diskUOM" id="diskUOM" class="form-control">
+                <select name="diskUOM" class="form-control">
                     {% for opt in tab.form.uom_list %}
                     {% if opt == disk.uom %}
                     <option selected value="{{opt}}">{{opt}}</option>
@@ -62,7 +62,7 @@
 
 {% elif field.name == 'misevdiskuom' %}
 {% elif field.name == 'misevRAM' %}
-<div class="row">
+<div class="row cost-driver">
     <div class="col-6">
         <div class="form-group" id="div_misevRAM">
             <label for="id_misevRAM">
@@ -79,7 +79,7 @@
     </div>
 </div>
 {% elif field.name == 'misevback' %}
-<div class="row">
+<div class="row cost-driver">
     <div class="col-6">
 
         <span id="backup_cost" class="float-right">$0.00</span>
@@ -87,7 +87,7 @@
     </div>
 </div>
 {% else %}
-<div class="row">
+<div class="row cost-driver">
     <div class="col-6">
         {% include field.field.template_name %}
     </div>
