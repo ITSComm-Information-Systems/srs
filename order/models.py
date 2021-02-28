@@ -677,15 +677,19 @@ class Server(models.Model):
             if len(errors) > 0:
                 raise ValidationError(errors)
 
+    def get_shortcodes(self):
+        return [self.shortcode]
+
+    def get_checkboxes(self):
+        return ['todo'] 
+
     def get_total_cost(self, **kwargs):
         size = Decimal(0)
 
         if 'disk_list' in kwargs:
             disk_list = kwargs['disk_list']
             for disk in disk_list:
-
                 size = size + Decimal(disk['size'])
-
         else:
             size = 0 #TODO SELECT CHILD
 

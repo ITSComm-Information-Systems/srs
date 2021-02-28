@@ -467,6 +467,7 @@ class VolumeSelectionForm(TabForm):
                 self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name')
             elif service.id in [13, 14]:
                 self.volume_list = self.vol.objects.filter(owner__in=groups).order_by('name')
+                self.template = 'order/volume_review.html'
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
                     
@@ -648,30 +649,30 @@ class ServerSpecForm(TabForm):
             else:
                 instance_id = self.request.POST.get('instance_id')
                 if instance_id: 
-                    bd = BackupDomain.objects.get(id=instance_id)
-                    self.fields["mCommunityName"].initial = bd.owner
-                    self.fields["versions_while_exist"].initial = bd.versions_while_exists
-                    self.fields["versions_after_delet"].initial = bd.versions_after_deleted
-                    self.fields["days_extra_versions"].initial = bd.days_extra_versions
-                    self.fields["days_only_version"].initial = bd.days_only_version
+                    server = Server.objects.get(id=instance_id)
+                    #self.fields["mCommunityName"].initial = bd.owner
+                    #self.fields["versions_while_exist"].initial = bd.versions_while_exists
+                    #self.fields["versions_after_delet"].initial = bd.versions_after_deleted
+                    #self.fields["days_extra_versions"].initial = bd.days_extra_versions
+                    #self.fields["days_only_version"].initial = bd.days_only_version
 
-                    self.node_list = BackupNode.objects.filter(backup_domain=instance_id)
+                    self.disk_list = ServerDisk.objects.filter(server_id=instance_id).order_by('name')
                 else:
                     self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB'}]
-                    self.fields['misevCPU'].initial = 1
+                    self.fields['cpu'].initial = 1
 
     def clean(self):
         for disk in self.disk_list:
             if disk['size'] % 10 != 0 and disk['uom'] == 'GB':
-                self.add_error('diskSize', 'Disk size must be in increments of 10 Gigabytes.')
+                self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
             if disk['size'] == 0:
-                self.add_error('diskSize', 'Disk size must be at least 10 Gigabytes')
+                self.add_error('size', 'Disk size must be at least 10 Gigabytes')
 
-        ram = self.cleaned_data.get('misevRAM', None)
-        cpu = self.cleaned_data.get('misevCPU', None)
+        ram = self.cleaned_data.get('ram', None)
+        cpu = self.cleaned_data.get('cpu', None)
         if ram != None and cpu != None:
             if ram / cpu < 2:
-                self.add_error('misevRAM', 'Ram must be at least double cpu.')
+                self.add_error('ram', 'Ram must be at least double cpu.')
 
         super().clean()
 

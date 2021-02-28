@@ -61,15 +61,15 @@
 </div>
 
 {% elif field.name == 'misevdiskuom' %}
-{% elif field.name == 'misevRAM' %}
+{% elif field.name == 'ram' %}
 <div class="row cost-driver">
     <div class="col-6">
-        <div class="form-group" id="div_misevRAM">
-            <label for="id_misevRAM">
-                <strong>{{ tab.form.misevRAM.label }}</strong>
+        <div class="form-group" id="div_ram">
+            <label for="id_ram">
+                <strong>{{ tab.form.ram.label }}</strong>
             </label>
-            <small class="text-muted form-text" id="misevRAM"> {{ tab.form.misevRAM.field.description }}</small>
-            <input  style="display: inline;" type="number" name="misevRAM" min="2" class="form-control form-inlin col-2" max="16" required="" id="id_misevRAM" value="{{ tab.form.misevRAM.value }}">
+            <small class="text-muted form-text" id="ram"> {{ tab.form.ram.field.description }}</small>
+            <input  style="display: inline;" type="number" name="ram" min="2" class="form-control form-inlin col-2" max="16" required="" id="id_ram" value="{{ tab.form.ram.value }}">
             <span id="ram_cost" data-rate="{{ tab.form.ram_rate }}" class="float-right">{{ tab.form.ram_cost }}</span>
             {% for error in field.errors %}
             <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>

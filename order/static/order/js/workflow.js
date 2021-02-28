@@ -247,8 +247,8 @@ $(document).ready(function() {
 
     $("#div_manageunman").trigger("change");
     $("#div_misevprefix").trigger("change");
-    $("#id_misevCPU").trigger("change");
-    //$("#id_misevRAM").trigger("change");
+    $("#id_cpu").trigger("change");
+    //$("#id_ram").trigger("change");
     $("#id_misevos").trigger("change");
     //$(".disk-div").trigger("change");
     //$("#div_misev").trigger("change");
@@ -261,10 +261,11 @@ $(document).ready(function() {
 
   function update_total_cost() {
 
-    ram = $('#id_misevRAM').val();
+    ram = $('#id_ram').val();
     ram_cost = ram * ram_rate;
+    $('#ram_cost').html('$' + ram_cost.toFixed(2));
 
-    if ($('#misev_0').prop("checked")) {  // Replicated
+    if ($('#replicated_0').prop("checked")) {  // Replicated
       disk_rate = disk_replicated;
     } else {
       disk_rate = disk_no_replication; // Default until selected
@@ -305,21 +306,24 @@ $(document).ready(function() {
     $("#total_cost_field").val(total_cost.toFixed(2));
   }
 
-  $(document).on("change", "#id_misevCPU" , function() {
-    if ($('#id_misevRAM').val() < this.value * 2) {
-      $('#id_misevRAM').val(this.value * 2);
-      $("#id_misevRAM").trigger("change");
+  $(document).on("change", "#id_cpu" , function() {
+    if ($('#id_ram').val() < this.value * 2) {
+      $('#id_ram').val(this.value * 2);
+      update_total_cost();
+      //$("#id_ram").trigger("change");
     }
   });
 
-  $(document).on("change", "#id_misevRAM" , function() {
+/*
+  $(document).on("change", "#id_ram" , function() {
     rate = $('#ram_cost').data('rate');
-    ram = $('#id_misevRAM').val();
+    ram = $('#id_ram').val();
     ram_cost = rate * ram;
 
     $('#ram_cost').html('$' + ram_cost.toFixed(2));
     update_total_cost();
   });
+*/
 
   $(document).on("change", "#id_misevos" , function() {
     os = $('#id_misevos').val();
