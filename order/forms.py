@@ -6,7 +6,11 @@ from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 from oscauth.models import LDAPGroupMember
 
+from project.models import Choice
+
 from project.forms.fields import *
+
+get_choices = Choice.objects.get_choices
 
 def get_storage_options(action):
     opt_list = []
@@ -467,7 +471,7 @@ class VolumeSelectionForm(TabForm):
                 self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name')
             elif service.id in [13, 14]:
                 self.volume_list = self.vol.objects.filter(owner__in=groups).order_by('name')
-                self.template = 'order/volume_review.html'
+                #self.template = 'order/volume_review.html'
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
                     
