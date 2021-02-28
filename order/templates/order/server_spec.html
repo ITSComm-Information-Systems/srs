@@ -17,7 +17,7 @@
             <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
 
             <div class="form-inline disk-div" id="disk_new" style="display: none;">
-                <input readonly class="form-control form-inline" name="diskName" type="text" value="disk0">
+                <input readonly class="form-control form-inline col-2" name="diskName" type="text" value="disk0">
                 <input class="form-control form-inline disk-size" name="diskSize" type="number">
 
                 <select name="diskUOM" class="form-control">
@@ -31,7 +31,7 @@
 
             {% for disk in tab.form.disk_list %}
             <div class="form-inline disk-div" id="disk_{{ disk.id }}" style="display: block;">
-                <input readonly class="form-control form-inline" name="diskName" type="text" value="{{ disk.name }}">
+                <input readonly class="form-control form-inline col-2" name="diskName" type="text" value="{{ disk.name }}">
                 <input class="form-control form-inline disk-size" name="diskSize" type="number" value="{{ disk.size }}">
 
                 <select name="diskUOM" class="form-control">
