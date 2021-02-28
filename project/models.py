@@ -36,3 +36,39 @@ class ShortCodeField(models.CharField):
         kwargs['help_text']='Six digit shortcode for billing purposes.'
 
         super().__init__(*args, **kwargs)
+
+class ChoiceManager(models.Manager):
+
+     def get_choices(self, code):
+          group_list = []
+          for optgroup in Choice.objects.filter(parent__code=code, active=True).order_by('sequence'):
+
+               option_list = []
+
+               for option in Choice.objects.filter(parent=optgroup.id, active=True).order_by('sequence'):
+                    option_list.append((option.code, option.label))
+
+               group_list.append((optgroup.label, option_list))
+
+          return group_list
+
+
+class Choice(models.Model):
+     active = models.BooleanField(default=True)
+     code = models.CharField(max_length=80)
+     sequence = models.PositiveSmallIntegerField()
+     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
+     label = models.CharField(max_length=100)
+     objects = ChoiceManager()
+     
+     def __str__(self):
+          return self.code
+
+
+class ChoiceTag(models.Model):
+     code = models.CharField(max_length=20)
+     label = models.CharField(max_length=100)
+
+     def __str__(self):
+          return self.code
+
