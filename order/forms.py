@@ -294,7 +294,6 @@ class TabForm(forms.Form):
                 visible = self.request.POST['visible']
                 for field in self.fields:
                     if field not in visible:
-                        print(field, 'not required')
                         self[field].field.required = False
             except:
                 print('error checking visible')
@@ -463,8 +462,6 @@ class VolumeSelectionForm(TabForm):
             action = Action.objects.get(id=action_id)
             service = action.service
 
-            print(groups)
-
             if 'storage_type' in action.override:
                 vol_type = action.override['storage_type']
                 self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name')
@@ -601,13 +598,14 @@ class ServerSupportForm(TabForm):
             self.fields.pop('misevretime')
             self.fields.pop('misevemail')
             self.fields.pop('misevphone')
+            self.fields.pop('misevbacktime')
+        elif kwargs['request'].POST.get('misevback') != 'yes':
+            self.fields.pop('misevbacktime')
             
 
 class ServerDataForm(TabForm):
 
     def clean(self):
-        disk_list = self.request.session['disk_list']
-        print('disk', disk_list)
 
         if self.request.POST.get('manageunman') == 'unmang':
             if self.request.POST.get('misevregu') == 'yesregu':
@@ -674,8 +672,6 @@ class ServerSpecForm(TabForm):
         if ram != None and cpu != None:
             if ram / cpu < 2:
                 self.add_error('misevRAM', 'Ram must be at least double cpu.')
-            else:
-                print(ram/cpu)
 
         super().clean()
 
@@ -785,30 +781,8 @@ class BillingStorageForm(TabForm):
         elif self.action.service.name == 'midatabase':
             descr = self.fields['totalCost'].description.replace('~', '0.00')
         elif self.action.service.name == 'miServer':
-            option = 1
-            server = Server()
-            server.ram = self.request.POST['misevRAM']
-            if self.request.POST['misev'] == 'yesdisk':
-                server.replicated = True
-            else:
-                server.replicated = False
-
-            if self.request.POST['misevback'] == 'yesback':
-                server.backup = True
-
-            disk_list = []
-            name_list = self.request.POST.getlist('diskName')
-            size_list = self.request.POST.getlist('diskSize')
-            uom_list = self.request.POST.getlist('diskUOM')
-
-            for count, size in enumerate(size_list):
-                if size:
-                    disk_list.append({'name': name_list[count], 'size': float(size), 'uom':uom_list[count]})
-
-            #size = self.request.POST.getlist('diskSize')
-            total_cost = server.get_total_cost(disk_list=disk_list)
+            total_cost = self.request.POST.get('total_cost', 0)
             descr = self.fields['totalCost'].description.replace('~', str(total_cost))
-
         else:
             option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
 
@@ -851,18 +825,7 @@ class BillingStorageForm(TabForm):
                 option = StorageRate.objects.get(id=self.data['selectOptionType'])
 
             if self.action.service.name == 'miServer':
-                option = 1
-                server = Server()
-                server.ram = self.request.POST['misevRAM']
-                if self.request.POST['misev'] == 'yesdisk':
-                    server.replicated = True
-                else:
-                    server.replicated = False
-
-                if self.request.POST['misevback'] == 'yesback':
-                    server.backup = True
-
-                total_cost = server.get_total_cost() #TODO Add cost data
+                total_cost = '$' + self.request.POST.get('total_cost', 0)
             else:
                 total_cost = option.get_total_cost(self.data['size'])
 
