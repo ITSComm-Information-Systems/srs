@@ -224,10 +224,10 @@ $(document).ready(function() {
   });
 
   $(document).on("change", "#div_misevexissev" , function() {
-    if ($('#misevexissev_0').prop("checked")) {  // Yes contact me to migrat
+    if ($('#misevexissev_1').prop("checked")) {  // Yes contact me to migrat
       $('#div_mcommserveradmin').hide().prop('required',false);
       $('#div_mcommadmingrp').hide().prop('required',false);
-    } else if ($('#misevexissev_1').prop("checked")) {  // Nah, new server
+    } else if ($('#misevexissev_0').prop("checked")) {  // Nah, new server
       $('#div_mcommserveradmin').show().prop('required',true);
       $('#div_mcommadmingrp').show().prop('required',true);
     } else {
@@ -302,6 +302,7 @@ $(document).ready(function() {
 
     total_cost = ram_cost + total_disk_cost + backup_cost;
     $("#total_cost").html('$' + total_cost.toFixed(2));
+    $("#total_cost_field").val(total_cost.toFixed(2));
   }
 
   $(document).on("change", "#id_misevCPU" , function() {
