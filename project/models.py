@@ -40,15 +40,21 @@ class ShortCodeField(models.CharField):
 class ChoiceManager(models.Manager):
 
      def get_choices(self, code):
+
           group_list = []
           for optgroup in Choice.objects.filter(parent__code=code, active=True).order_by('sequence'):
 
                option_list = []
+               value = optgroup.label
 
                for option in Choice.objects.filter(parent=optgroup.id, active=True).order_by('sequence'):
-                    option_list.append((option.code, option.label))
+                    option_list.append((option.id, option.label))
 
-               group_list.append((optgroup.label, option_list))
+               if option_list == []:
+                    value = optgroup.id
+                    option_list = optgroup.label
+
+               group_list.append((value, option_list))
 
           return group_list
 
