@@ -456,6 +456,8 @@ class Workflow(UserPassesTestMixin, View):
 
         tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
         action = Action.objects.get(id=action_id)
+        request.session['service'] = action.service.name
+
         js = []
 
         for index, tab in enumerate(tabs, start=1):
@@ -655,8 +657,12 @@ class Services(UserPassesTestMixin, View):
         action_list = Action.objects.filter(active=True).order_by('service','display_seq_no')
         service_list = Service.objects.filter(group_id=group_id,active=True).order_by('display_seq_no')
 
+        selected_service = request.session.get('service','miBackup')
+
         for service in service_list:
             service.actions = action_list.filter(service=service)
+            if service.name == selected_service:
+                service.active = 'active show'
 
         context = {
             'title': 'Request Service',
