@@ -237,7 +237,7 @@ class PdfCreator:
 						Paragraph('<b>Price Extension</b>', normal)]
 		data = [table_heading]
 		flowables.append(Paragraph(str(self.estimate.material_list[0].material_location), self.subheader))
-		flowables.append(Paragraph('Total: $' + "{:,}".format(self.location_totals[prev_loc]), self.location_total_style))
+		flowables.append(Paragraph('Total for Location: $' + "{:,}".format(self.location_totals[prev_loc]), self.location_total_style))
 
 		# Add materials by location
 		for record in self.estimate.material_list:
@@ -250,7 +250,7 @@ class PdfCreator:
 
 				# Create next location title and reset table to just the headings
 				flowables.append(Paragraph('<b>' + str(record.material_location) + '</b>', self.subheader))
-				flowables.append(Paragraph('Total: $' + "{:,}".format(self.location_totals[record.material_location]), self.location_total_style))
+				flowables.append(Paragraph('Total for Location: $' + "{:,}".format(self.location_totals[record.material_location]), self.location_total_style))
 				#str(self.location_totals[record.material_location])
 				data = [table_heading]
  
