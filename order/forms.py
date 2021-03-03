@@ -584,6 +584,21 @@ class DetailsNFSForm(TabForm):
 class DatabaseTypeForm(TabForm):
     template = 'order/database_type.html'
 
+    def clean(self):
+
+        size = self.request.POST.get('midatasize')
+        agent = self.request.POST.get('midatasql')
+
+        if size and agent:   # Capture both values before redirect
+            if int(size) > 50:
+                self.fields['midatasize'].widget.attrs.update({'data-server': 99})
+                raise ValidationError("Too large for shared db")
+            if agent == 'yesjob':
+                self.fields['midatasize'].widget.attrs.update({'data-server': 99})
+                raise ValidationError("Too large for shared db")
+
+        super().clean()
+
 class ServerSupportForm(TabForm):
     template = 'order/server_support.html'
 
