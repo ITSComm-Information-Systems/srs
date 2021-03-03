@@ -581,6 +581,9 @@ class DetailsNFSForm(TabForm):
         #            self.fields['flux'].initial = si.flux  
 
 
+class DatabaseTypeForm(TabForm):
+    template = 'order/database_type.html'
+
 class ServerSupportForm(TabForm):
     template = 'order/server_support.html'
 
