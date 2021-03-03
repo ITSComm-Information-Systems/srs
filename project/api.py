@@ -1,5 +1,5 @@
 #from django.contrib.auth.models import User
-from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain
+from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from rest_framework import routers, viewsets
 from . import serializers
@@ -68,5 +68,7 @@ router.register('storagerates', viewset_factory(StorageRate))
 router.register('arcinstances', viewset_factory(ArcInstance, serializers.ArcInstanceSerializer))
 router.register('arcbilling', viewset_factory(ArcBilling, serializers.ArcBillingSerializer))
 router.register('backupdomains', viewset_factory(BackupDomain, serializers.BackupDomainSerializer))
+router.register('server', viewset_factory(Server, serializers.ServerSerializer))
+router.register('database', viewset_factory(Database, serializers.DatabaseSerializer))
 router.register('ldapgroups', LDAPGroupViewSet)
 router.register('ldapgroupmembers', LDAPGroupMemberViewSet)
