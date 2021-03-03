@@ -252,14 +252,10 @@ $(document).ready(function() {
     disk_no_replication = $('#server_rates').data('disk_no_replication');
     disk_backup = $('#server_rates').data('disk_backup');
 
-
     $("#div_manageunman").trigger("change");
     $("#div_misevprefix").trigger("change");
     $("#id_cpu").trigger("change");
-    //$("#id_ram").trigger("change");
     $("#id_misevos").trigger("change");
-    //$(".disk-div").trigger("change");
-    //$("#div_misev").trigger("change");
     update_total_cost();
   });
 
@@ -318,23 +314,11 @@ $(document).ready(function() {
     if ($('#id_ram').val() < this.value * 2) {
       $('#id_ram').val(this.value * 2);
       update_total_cost();
-      //$("#id_ram").trigger("change");
     }
   });
 
-/*
-  $(document).on("change", "#id_ram" , function() {
-    rate = $('#ram_cost').data('rate');
-    ram = $('#id_ram').val();
-    ram_cost = rate * ram;
-
-    $('#ram_cost').html('$' + ram_cost.toFixed(2));
-    update_total_cost();
-  });
-*/
-
   $(document).on("change", "#id_misevos" , function() {
-    os = $('#id_misevos').val();
+    os = $('#id_misevos option:selected').text();
     if (os) {
       if (os.startsWith('Windows')) {
         $('#div_misevprefix').show().prop('required',true);
