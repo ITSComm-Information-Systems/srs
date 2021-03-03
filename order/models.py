@@ -61,6 +61,7 @@ class Step(Configuration):
         ('BackupDetailsForm', 'Backup Details'),
         ('VolumeSelectionForm', 'Volume Selection'),
         ('SubscriptionSelForm', 'Subscription Selection'),
+        ('DatabaseTypeForm', 'Database Type'),
         ('ServerSupportForm', 'Server Support'),
         ('ServerSpecForm', 'Server Specification'),
         ('ServerDataForm', 'Server Data Sensitivity'),
