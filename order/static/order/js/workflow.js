@@ -236,6 +236,14 @@ $(document).ready(function() {
     }
   });
 
+  // MiDatabase Type
+  $('[data-tab="midbtype"]').on('show.bs.tab', function(event) {
+    server = $('#id_midatasize').data('server');
+    if (server) {
+      $('#id_midatasize').data('server', '');
+      $("#order_server").modal('show');
+    }
+  });
 
   //MiServer Specification
   $('[data-tab="miSeverSpec"]').on('show.bs.tab', function(event) {
