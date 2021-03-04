@@ -599,6 +599,11 @@ class DatabaseTypeForm(TabForm):
 
         super().clean()
 
+
+class ServerInfoForm(TabForm):
+    template = 'order/base_form.html'
+
+
 class ServerSupportForm(TabForm):
     template = 'order/server_support.html'
 

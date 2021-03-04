@@ -241,6 +241,13 @@ $(document).ready(function() {
     server = $('#id_midatasize').data('server');
     if (server) {
       $('#id_midatasize').data('server', '');
+      type = $('#id_midatatype').val();
+      version = $('#id_dbversion').val();
+      size=$('#id_midatasize').val();
+      console.log('type', type, version, size);
+      //onclick="location.href='67?database=55';"
+      link = "location.href='67?type=" + type + "&version=" + version + "&size=" + size +"';"; 
+      $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
     }
   });
