@@ -241,6 +241,7 @@ $(document).ready(function() {
 
   // MiDatabase Type
   $('[data-tab="midbtype"]').on('show.bs.tab', function(event) {
+    $("#id_midatatype").trigger("change");
     server = $('#id_midatasize').data('server');
     if (server) {
       $('#id_midatasize').data('server', '');
@@ -272,10 +273,11 @@ $(document).ready(function() {
   $(document).on("change", "#id_midatatype" , function() {
     if (this.value=="MSSQL") {
       $("#div_dbversion").show();
+      $("#div_midatasql").show();
     } else {
       $("#div_dbversion").hide();
+      $("#div_midatasql").hide();
     }
-    console.log('this', this.value)
   });
 
   $(document).on("change", ".cost-driver" , function() {
