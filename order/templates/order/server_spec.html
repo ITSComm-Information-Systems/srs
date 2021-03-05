@@ -32,9 +32,9 @@
             {% for disk in tab.form.disk_list %}
             <div class="form-inline disk-div" id="disk_{{ disk.id }}" style="display: block;">
                 <input readonly class="form-control form-inline col-2" name="diskName" type="text" value="{{ disk.name }}">
-                <input class="form-control form-inline disk-size" name="diskSize" type="number" value="{{ disk.size }}">
+                <input {{ disk.state }} class="form-control form-inline disk-size" name="diskSize" type="number" min="50" value="{{ disk.size }}" >
 
-                <select name="diskUOM" class="form-control">
+                <select name="diskUOM" class="form-control" {{ disk.state }}>
                     {% for opt in tab.form.uom_list %}
                     {% if opt == disk.uom %}
                     <option selected value="{{opt}}">{{opt}}</option>
@@ -43,9 +43,11 @@
                     {% endif %}
                     {% endfor %}
                 </select>
+                {% if disk.state != 'disabled' %}
                 &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i
                         class="fas fa-minus-circle"></i></a>
-                    <span class="float-right disk-cost"></span>
+                {% endif %}
+                <span class="float-right disk-cost"></span>
             </div>
 
             {% endfor %}
@@ -69,7 +71,7 @@
                 <strong>{{ tab.form.ram.label }}</strong>
             </label>
             <small class="text-muted form-text" id="ram"> {{ tab.form.ram.field.description }}</small>
-            <input  style="display: inline;" type="number" name="ram" min="2" class="form-control form-inlin col-2" max="16" required="" id="id_ram" value="{{ tab.form.ram.value }}">
+            <input  style="display: inline;" type="number" name="ram" min="2" class="form-control form-inlin col-2" max="64" required="" id="id_ram" value="{{ tab.form.ram.value }}">
             <span id="ram_cost" data-rate="{{ tab.form.ram_rate }}" class="float-right">{{ tab.form.ram_cost }}</span>
             {% for error in field.errors %}
             <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>

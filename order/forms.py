@@ -5,7 +5,7 @@ from .models import *
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 from oscauth.models import LDAPGroupMember
-
+import math
 from project.models import Choice
 
 from project.forms.fields import *
@@ -585,23 +585,63 @@ class DatabaseTypeForm(TabForm):
     template = 'order/database_type.html'
 
     def clean(self):
-
         size = self.request.POST.get('midatasize')
         agent = self.request.POST.get('midatasql')
+        type = self.request.POST.get('midatatype', None)
+        version = self.request.POST.get('dbversion')
 
         if size and agent:   # Capture both values before redirect
-            if int(size) > 50:
+            if type == 'MSSQL':
+                max = 50
+            else:
+                max = 100
+
+            if int(size) > max:
                 self.fields['midatasize'].widget.attrs.update({'data-server': 99})
-                raise ValidationError("Too large for shared db")
+                raise ValidationError("Requires Dedicated Server")
             if agent == 'yesjob':
                 self.fields['midatasize'].widget.attrs.update({'data-server': 99})
-                raise ValidationError("Too large for shared db")
+                raise ValidationError("Requires Dedicated Server")
+            if version.find('ssas') != -1:
+                self.fields['midatasize'].widget.attrs.update({'data-server': 99})
+                raise ValidationError("Requires Dedicated Server")
 
         super().clean()
 
 
 class ServerInfoForm(TabForm):
     template = 'order/base_form.html'
+
+    def __init__(self, *args, **kwargs):
+        super(ServerInfoForm, self).__init__(*args, **kwargs)
+
+        if self.request.method == 'GET':
+            type = self.request.GET.get('type', None)
+            version = self.request.GET.get('version', None)
+            size = self.request.GET.get('size', None)
+        else:
+            type = self.request.POST.get('type', None)
+            version = self.request.POST.get('version', None)
+            size = self.request.POST.get('size', None)
+
+        if type:
+            self.fields['database'].widget.attrs.update({'readonly': True})
+            self.fields['database'].initial = type
+            self.fields.update({'database_size': forms.IntegerField(initial=size)})
+            self.fields['database_size'].widget.attrs.update({'readonly': True})
+            self.fields['database_size'].template_name = 'project/number.html'
+            self.fields.pop('misevexissev')
+            self.fields['mcommadmingrp'].initial = 'MiDatabase Support Team'
+            self.fields['mcommadmingrp'].widget.attrs.update({'readonly': True})
+
+            if type == 'MSSQL':
+                self.fields['database_version'].widget.attrs.update({'readonly': True})
+                self.fields['database_version'].initial = version
+            else:
+                self.fields.pop('database_version') 
+        else:
+            self.fields.pop('database') 
+            self.fields.pop('database_version') 
 
 
 class ServerSupportForm(TabForm):
@@ -659,15 +699,19 @@ class ServerSpecForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(ServerSpecForm, self).__init__(*args, **kwargs)
-        
-        if self.request.method == 'POST': # Skip for initial load on Add
-            if self.is_bound:   # Reload Host list
+
+        if self.request.POST.get('database'):
+            self.set_database_defaults()
+
+        elif self.request.method == 'POST': 
+            if self.is_bound:   # Reload Disk List
                 self.disk_list = []
                 name_list = self.data.getlist('diskName')
                 size_list = self.data.getlist('diskSize')
                 uom_list = self.data.getlist('diskUOM')
 
                 for count, size in enumerate(size_list):
+                    print(count, size)
                     if size:
                         self.disk_list.append({'name': name_list[count], 'size': float(size), 'uom':uom_list[count]})
 
@@ -678,22 +722,93 @@ class ServerSpecForm(TabForm):
                 if instance_id: 
                     server = Server.objects.get(id=instance_id)
                     #self.fields["mCommunityName"].initial = bd.owner
-                    #self.fields["versions_while_exist"].initial = bd.versions_while_exists
-                    #self.fields["versions_after_delet"].initial = bd.versions_after_deleted
-                    #self.fields["days_extra_versions"].initial = bd.days_extra_versions
-                    #self.fields["days_only_version"].initial = bd.days_only_version
-
                     self.disk_list = ServerDisk.objects.filter(server_id=instance_id).order_by('name')
                 else:
                     self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB'}]
                     self.fields['cpu'].initial = 1
 
+    def set_database_defaults(self):
+        
+        print('set defaults')
+        database = self.request.POST.get('database')
+        database_size = self.request.POST.get('database_size')
+        database_version = self.request.POST.get('database_version')
+
+        cpu = self.request.POST.get('cpu', 2)
+        ram = self.request.POST.get('ram')
+        if ram:
+            ram = int(ram)
+        else:
+            ram = 4
+
+        self.fields['cpu'].widget.attrs.update({'data-server': 99})
+
+        self.fields['misevos'].initial = 4
+        self.fields['misevos'].required = False
+        self.fields['misevos'].disabled = True
+
+        self.fields['diskSize'].required = False
+
+        #self.fields['misevos'].initial = 4
+        self.fields['manageunman'].required = False
+        self.fields['manageunman'].disabled = True
+
+        #self.fields['misevos'].widget.attrs.update({'disabled': True})
+        self.fields['manageunman'].initial = 'mang'
+        self.fields['replicated'].initial = 'yesdisk'
+        self.fields['misevback'].initial = 'Yes'
+        self.fields['misevback'].readonly = True
+
+        if database == 'MSSQL':
+            self.fields['cpu'].initial = 2
+
+            base_size = float(database_size) / 10
+            fifteen_percent = math.ceil(base_size * .15) * 10
+            thirty_percent = math.ceil(base_size * .3) * 10
+
+            if ram < 8:
+                paging_disk = 60
+            else:
+                paging_disk = math.ceil((ram-8)/4) * 10 + 60  # Source: Dude, trust me.
+                # =roundup((D45-8)/4)*10+60
+
+            if database_version.startswith('sql'):
+                print('sql not SSAS')
+                self.disk_list =[{'name': 'disk0', 'size': paging_disk, 'uom': 'GB', 'state': 'disabled'},
+                                    {'name': 'disk1', 'size': thirty_percent, 'uom': 'GB', 'state': 'disabled'},
+                                    {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'},
+                                    {'name': 'disk3', 'size': fifteen_percent, 'uom': 'GB', 'state': 'disabled'},
+                                    {'name': 'disk4', 'size': fifteen_percent, 'uom': 'GB', 'state': 'disabled'}]
+            else:
+                print('ssas not SQL')
+                self.disk_list =[{'name': 'disk0', 'size': paging_disk, 'uom': 'GB', 'state': 'disabled'},
+                                    {'name': 'disk1', 'size': thirty_percent, 'uom': 'GB', 'state': 'disabled'},
+                                    {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'}]
+
+        elif database == 'MYSQL':
+            self.fields['cpu'].initial = 2
+            self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk1', 'size': '70', 'uom': 'GB', 'state': 'disabled'}]
+
+        elif database == 'ORACLE':
+            self.fields['cpu'].initial = 2
+            self.disk_list =[{'name': 'disk0', 'size': database_size, 'uom': 'GB'}]
+
+
+        #self.fields['manageunman'].widget.attrs.update({'readonly': True, 'initial':'mang'})
+        #self.fields['manageunman'].widget.attrs.update({'readonly': True})
+
+
+
     def clean(self):
-        for disk in self.disk_list:
-            if disk['size'] % 10 != 0 and disk['uom'] == 'GB':
-                self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
-            if disk['size'] == 0:
-                self.add_error('size', 'Disk size must be at least 10 Gigabytes')
+
+        if not self.request.POST.get('database', None):
+
+            for disk in self.disk_list:
+                if disk['size'] % 10 != 0 and disk['uom'] == 'GB':
+                    self.add_error('diskSize', 'Disk size must be in increments of 10 Gigabytes.')
+                if disk['size'] == 0:
+                    self.add_error('diskSize', 'Disk size must be at least 10 Gigabytes')
 
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)
@@ -701,7 +816,7 @@ class ServerSpecForm(TabForm):
             if ram / cpu < 2:
                 self.add_error('ram', 'Ram must be at least double cpu.')
 
-        super().clean()
+        super().clean()  # When regular clean isn't enough
 
 
 class DataDenForm(TabForm):
