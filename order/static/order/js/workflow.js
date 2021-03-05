@@ -236,6 +236,9 @@ $(document).ready(function() {
     }
   });
 
+
+
+
   // MiDatabase Type
   $('[data-tab="midbtype"]').on('show.bs.tab', function(event) {
     server = $('#id_midatasize').data('server');
@@ -266,6 +269,15 @@ $(document).ready(function() {
     update_total_cost();
   });
 
+  $(document).on("change", "#id_midatatype" , function() {
+    if (this.value=="MSSQL") {
+      $("#div_dbversion").show();
+    } else {
+      $("#div_dbversion").hide();
+    }
+    console.log('this', this.value)
+  });
+
   $(document).on("change", ".cost-driver" , function() {
     update_total_cost();
   });
@@ -275,6 +287,18 @@ $(document).ready(function() {
     ram = $('#id_ram').val();
     ram_cost = ram * ram_rate;
     $('#ram_cost').html('$' + ram_cost.toFixed(2));
+
+    if ($('#id_cpu').data('server')){
+      disk_0 = $('.disk-size')[1];
+
+      if (ram < 8) {
+        paging_disk = 60;
+      } else {
+        paging_disk = Math.ceil((ram-8)/4) * 10 + 60;
+      }
+
+      $(disk_0).val(paging_disk);
+    }
 
     if ($('#replicated_0').prop("checked")) {  // Replicated
       disk_rate = disk_replicated;
