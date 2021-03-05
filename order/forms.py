@@ -654,6 +654,8 @@ class ServerSupportForm(TabForm):
             return
         
         os = kwargs['request'].POST.get('misevos', 'NA')
+        os = Choice.objects.get(id=os).label
+
         if os.startswith('Windows'):
             windows = True
         else:
@@ -803,7 +805,7 @@ class ServerSpecForm(TabForm):
 
             value = ''
             for disk in self.disk_list:
-                value = value + f"{disk['name']}: {disk['size']} {disk['uom']},  ds"
+                value = value + f"{disk['name']}: {disk['size']} {disk['uom']}, "
 
             line['value'] = value
 
