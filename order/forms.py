@@ -590,7 +590,7 @@ class DatabaseTypeForm(TabForm):
         type = self.request.POST.get('midatatype', None)
         version = self.request.POST.get('dbversion')
 
-        if size and agent:   # Capture both values before redirect
+        if size: # Capture both values before redirect
             if type == 'MSSQL':
                 max = 50
             else:
@@ -741,26 +741,23 @@ class ServerSpecForm(TabForm):
         else:
             ram = 4
 
-        self.fields['cpu'].widget.attrs.update({'data-server': 99})
-
-        self.fields['misevos'].initial = 4
         self.fields['misevos'].required = False
         self.fields['misevos'].disabled = True
 
         self.fields['diskSize'].required = False
 
-        #self.fields['misevos'].initial = 4
         self.fields['manageunman'].required = False
         self.fields['manageunman'].disabled = True
 
-        #self.fields['misevos'].widget.attrs.update({'disabled': True})
         self.fields['manageunman'].initial = 'mang'
         self.fields['replicated'].initial = 'yesdisk'
         self.fields['misevback'].initial = 'Yes'
-        self.fields['misevback'].readonly = True
+        self.fields['misevback'].disabled = True
 
         if database == 'MSSQL':
+            self.fields['cpu'].widget.attrs.update({'data-server': 99, 'min': 2})
             self.fields['cpu'].initial = 2
+            self.fields['misevos'].initial = 4
 
             base_size = float(database_size) / 10
             fifteen_percent = math.ceil(base_size * .15) * 10
@@ -785,19 +782,32 @@ class ServerSpecForm(TabForm):
                                     {'name': 'disk1', 'size': thirty_percent, 'uom': 'GB', 'state': 'disabled'},
                                     {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'}]
 
-        elif database == 'MYSQL':
+        #elif database == 'MYSQL':
+        else:
             self.fields['cpu'].initial = 2
+            self.fields['misevos'].initial = 8
             self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB', 'state': 'disabled'},
-                                {'name': 'disk1', 'size': '70', 'uom': 'GB', 'state': 'disabled'}]
+                                {'name': 'disk1', 'size': database_size, 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'}]
 
-        elif database == 'ORACLE':
-            self.fields['cpu'].initial = 2
-            self.disk_list =[{'name': 'disk0', 'size': database_size, 'uom': 'GB'}]
+    def get_summary(self, *args, **kwargs):
+        summary = super().get_summary(*args, **kwargs)
 
+        if self.request.POST.get('database'):
+            os = summary[1]['value']
+            summary[1]['value'] = Choice.objects.get(id=int(os)).label
 
-        #self.fields['manageunman'].widget.attrs.update({'readonly': True, 'initial':'mang'})
-        #self.fields['manageunman'].widget.attrs.update({'readonly': True})
+            for line in summary:
+                if line['label'] == 'Disk Space':
+                    break
 
+            value = ''
+            for disk in self.disk_list:
+                value = value + f"{disk['name']}: {disk['size']} {disk['uom']},  ds"
+
+            line['value'] = value
+
+        return summary
 
 
     def clean(self):
