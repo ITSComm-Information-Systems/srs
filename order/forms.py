@@ -653,13 +653,20 @@ class ServerSupportForm(TabForm):
         if self.action.service.name=='midatabase':
             return
         
-        os = kwargs['request'].POST.get('misevos', 'NA')
-        os = Choice.objects.get(id=os).label
-
-        if os.startswith('Windows'):
-            windows = True
+        if self.request.POST.get('database'):
+            db = self.request.POST.get('database')
+            if db == 'MSSQL':
+                windows = True
+            else:
+                windows = False
         else:
-            windows = False
+            os = kwargs['request'].POST.get('misevos', None)
+            os = Choice.objects.get(id=os).label
+
+            if os.startswith('Windows'):
+                windows = True
+            else:
+                windows = False
 
         if kwargs['request'].POST.get('manageunman') == 'unmang' or not windows:
             self.fields.pop('misevpatch')
@@ -713,7 +720,6 @@ class ServerSpecForm(TabForm):
                 uom_list = self.data.getlist('diskUOM')
 
                 for count, size in enumerate(size_list):
-                    print(count, size)
                     if size:
                         self.disk_list.append({'name': name_list[count], 'size': float(size), 'uom':uom_list[count]})
 
@@ -731,7 +737,6 @@ class ServerSpecForm(TabForm):
 
     def set_database_defaults(self):
         
-        print('set defaults')
         database = self.request.POST.get('database')
         database_size = self.request.POST.get('database_size')
         database_version = self.request.POST.get('database_version')
@@ -772,14 +777,12 @@ class ServerSpecForm(TabForm):
                 # =roundup((D45-8)/4)*10+60
 
             if database_version.startswith('sql'):
-                print('sql not SSAS')
                 self.disk_list =[{'name': 'disk0', 'size': paging_disk, 'uom': 'GB', 'state': 'disabled'},
                                     {'name': 'disk1', 'size': thirty_percent, 'uom': 'GB', 'state': 'disabled'},
                                     {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'},
                                     {'name': 'disk3', 'size': fifteen_percent, 'uom': 'GB', 'state': 'disabled'},
                                     {'name': 'disk4', 'size': fifteen_percent, 'uom': 'GB', 'state': 'disabled'}]
             else:
-                print('ssas not SQL')
                 self.disk_list =[{'name': 'disk0', 'size': paging_disk, 'uom': 'GB', 'state': 'disabled'},
                                     {'name': 'disk1', 'size': thirty_percent, 'uom': 'GB', 'state': 'disabled'},
                                     {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'}]
@@ -795,19 +798,22 @@ class ServerSpecForm(TabForm):
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
 
-        if self.request.POST.get('database'):
-            os = summary[1]['value']
-            summary[1]['value'] = Choice.objects.get(id=int(os)).label
+        os = summary[1]['value']
+        summary[1]['value'] = Choice.objects.get(id=int(os)).label
 
-            for line in summary:
-                if line['label'] == 'Disk Space':
-                    break
+        for line in summary:
+            if line['label'] == 'Disk Space':
+                break
 
-            value = ''
-            for disk in self.disk_list:
-                value = value + f"{disk['name']}: {disk['size']} {disk['uom']}, "
+        disk_review = []
+        disk_size = 0
 
-            line['value'] = value
+        for disk in self.disk_list:
+            disk_size = disk_size + int(disk['size'])
+            disk_review.append(f"{disk['name']} {disk['size']} {disk['uom']} ")
+
+        line['value'] = disk_size
+        line['list'] = disk_review
 
         return summary
 
