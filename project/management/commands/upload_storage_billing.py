@@ -36,8 +36,11 @@ class Command(BaseCommand):
                 "where  c.name = 'MB-MCOMM' " \
                 "  and a.owner_id = d.id  order by a.name  "
 
+        self.owner_email = 'arcts-storage-billing@umich.edu'
+
         if self.service == 'MiStorage':
             sql = mistorage_query
+            self.owner_email = 'its.storage@umich.edu'
         elif self.service == 'Turbo':
             sql = arc_ts_query + ' and a.service_id = 9 order by a.name, a.created_date'
         elif self.service == 'Locker-Storage':
@@ -46,6 +49,7 @@ class Command(BaseCommand):
             sql = arc_ts_query + ' and a.service_id = 11 order by a.name, a.created_date'
         elif self.service == 'MiBackup':
             sql = mibackup_query
+            self.owner_email = 'its.storage@umich.edu'
         else:
             print('Service not found')
             return
@@ -108,14 +112,16 @@ class Command(BaseCommand):
 
         if settings.ENVIRONMENT == 'Production':
             subject = f'{self.service} Billing Records Uploaded'
+            to = [self.owner_email, 'ITComBill@umich.edu', 'itscomm.information.systems@umich.edu']
         else:
             subject = f'{self.service} Billing Records Uploaded - {settings.ENVIRONMENT}'
+            to = ['itscomm.information.systems@umich.edu']
 
         email = EmailMessage(
             subject,
             body,
             'srs-otto@umich.edu',
-            ['itscomm.information.systems@umich.edu'],
+            [to],
             []
         )
 
