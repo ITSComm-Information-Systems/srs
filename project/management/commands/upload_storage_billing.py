@@ -1,7 +1,8 @@
+import csv, io
 from django.core.management.base import BaseCommand, CommandError
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from order.models import StorageInstance, ArcBilling, ArcInstance, BackupDomain
 from project.pinnmodels import UmBillInputApiV
 from django.db import connections, connection
@@ -71,8 +72,12 @@ class Command(BaseCommand):
         x = 0
         total_cost = 0
 
+        csvfile = io.StringIO()
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(['shortcode','size','name','date_created','rate_name','total_cost','owner'])
+
         for instance in instances:
-            print(instance['name'], instance['total_cost'])
+            csvwriter.writerow(instance.values())
 
             rec = UmBillInputApiV()
             rec.data_source = self.service #'MiStorage'
@@ -85,8 +90,11 @@ class Command(BaseCommand):
             total_cost = total_cost + rec.total_amount
             rec.voucher_comment = instance['owner']
             rec.bill_input_file_id = today
-            rec.save()
+            #rec.save()
             x+=1
+
+            if x==10:
+                break
 
         print(datetime.now(), x, 'Records Loaded')
         print(datetime.now(), total_cost, 'Total Cost')
@@ -95,11 +103,32 @@ class Command(BaseCommand):
 
         print(datetime.now(), 'Load Infrastructure Billing')
 
-        with connections['pinnacle'].cursor() as cursor:
-            result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load Infrastructure Billings'
-                                   , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'{self.service}',{today}"] )
+        # TODO
+        #with connections['pinnacle'].cursor() as cursor:
+        #    result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load Infrastructure Billings'
+        #                           , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'{self.service}',{today}"] )
         
-        print(datetime.now(), result)
-        send_mail(f'{self.service} Billing Records Uploaded', body, 'srs-otto@umich.edu', ['itscomm.information.systems@umich.edu'])
+        #print(datetime.now(), result)
+
+        #message.attach('invoice.csv', csvfile.getvalue(), 'text/csv')
+        #msg = EmailMessage(f'{self.service} Billing Records Uploaded', body
+        #               , 'srs-otto@umich.edu', ['itscomm.information.systems@umich.edu']
+        #                , attachments=[csvfile])
+
+
+        email = EmailMessage(
+            f'{self.service} Billing Records Uploaded',
+            body,
+            'srs-otto@umich.edu',
+            ['djamison@umich.edu'],
+            []
+            #attachments=[csvwriter]
+            #reply_to=['another@example.com'],
+            #headers={'Message-ID': 'foo'},
+        )
+
+        email.attach('invoice.csv', csvfile.getvalue(), 'text/csv')
+
+        email.send()
         print(datetime.now(), 'Process Complete')
 
