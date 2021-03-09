@@ -106,15 +106,20 @@ class Command(BaseCommand):
         
         print(datetime.now(), result)
 
+        if settings.ENVIRONMENT == 'Production':
+            subject = f'{self.service} Billing Records Uploaded'
+        else:
+            subject = f'{self.service} Billing Records Uploaded - {settings.ENVIRONMENT}'
+
         email = EmailMessage(
-            f'{self.service} Billing Records Uploaded',
+            subject,
             body,
             'srs-otto@umich.edu',
-            ['djamison@umich.edu'],
+            ['itscomm.information.systems@umich.edu'],
             []
         )
 
-        email.attach('invoice.csv', csvfile.getvalue(), 'text/csv')
+        email.attach(f'{self.service}.csv', csvfile.getvalue(), 'text/csv')
 
         email.send()
         print(datetime.now(), 'Process Complete')
