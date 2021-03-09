@@ -90,11 +90,8 @@ class Command(BaseCommand):
             total_cost = total_cost + rec.total_amount
             rec.voucher_comment = instance['owner']
             rec.bill_input_file_id = today
-            #rec.save()
+            rec.save()
             x+=1
-
-            if x==10:
-                break
 
         print(datetime.now(), x, 'Records Loaded')
         print(datetime.now(), total_cost, 'Total Cost')
@@ -103,18 +100,11 @@ class Command(BaseCommand):
 
         print(datetime.now(), 'Load Infrastructure Billing')
 
-        # TODO
-        #with connections['pinnacle'].cursor() as cursor:
-        #    result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load Infrastructure Billings'
-        #                           , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'{self.service}',{today}"] )
+        with connections['pinnacle'].cursor() as cursor:
+            result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load Infrastructure Billings'
+                                   , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'{self.service}',{today}"] )
         
-        #print(datetime.now(), result)
-
-        #message.attach('invoice.csv', csvfile.getvalue(), 'text/csv')
-        #msg = EmailMessage(f'{self.service} Billing Records Uploaded', body
-        #               , 'srs-otto@umich.edu', ['itscomm.information.systems@umich.edu']
-        #                , attachments=[csvfile])
-
+        print(datetime.now(), result)
 
         email = EmailMessage(
             f'{self.service} Billing Records Uploaded',
@@ -122,9 +112,6 @@ class Command(BaseCommand):
             'srs-otto@umich.edu',
             ['djamison@umich.edu'],
             []
-            #attachments=[csvwriter]
-            #reply_to=['another@example.com'],
-            #headers={'Message-ID': 'foo'},
         )
 
         email.attach('invoice.csv', csvfile.getvalue(), 'text/csv')
