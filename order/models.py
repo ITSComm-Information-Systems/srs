@@ -1112,13 +1112,24 @@ class Item(models.Model):
         payload['Description'] = f'{note}\n'
 
         # Add Attributes using target mapping
+        field_map = action.override.get('map', '')
+
         attributes = []
         step_list = Step.objects.filter(action=action)
         element_list = Element.objects.filter(step__in=step_list, target__isnull=False)
         for element in element_list:
             value = self.data.get(element.name)
             if value:
-                attributes.append({'ID': element.target, 'Value': value})
+                if element.name in field_map:
+                    attributes.append({'ID': field_map[element.name], 'Value': value})
+                else:
+                    attributes.append({'ID': element.target, 'Value': value})
+
+        # Add Action Constants to Payload
+        cons = Constant.objects.filter(action=action)
+
+        for con in cons:  # Add Action Constants
+            attributes.append({'ID': con.field, 'Value': con.value})
 
         payload['Attributes'] = attributes
 
