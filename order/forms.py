@@ -584,27 +584,15 @@ class DetailsNFSForm(TabForm):
 class DatabaseTypeForm(TabForm):
     template = 'order/database_type.html'
 
+    def __init__(self, *args, **kwargs):
+        super(DatabaseTypeForm, self).__init__(*args, **kwargs)
+
+        self.fields['midatasize'].widget.attrs.update({'min': 10, 'step': 10})
+
     def clean(self):
-        size = self.request.POST.get('midatasize')
-        agent = self.request.POST.get('midatasql')
-        type = self.request.POST.get('midatatype', None)
-        version = self.request.POST.get('dbversion')
-
-        if size: # Capture both values before redirect
-            if type == 'MSSQL':
-                max = 50
-            else:
-                max = 100
-
-            if int(size) > max:
-                self.fields['midatasize'].widget.attrs.update({'data-server': 99})
-                raise ValidationError("Requires Dedicated Server")
-            if agent == 'yesjob':
-                self.fields['midatasize'].widget.attrs.update({'data-server': 99})
-                raise ValidationError("Requires Dedicated Server")
-            if version.find('ssas') != -1:
-                self.fields['midatasize'].widget.attrs.update({'data-server': 99})
-                raise ValidationError("Requires Dedicated Server")
+        if self.is_valid and self.request.POST.get('shared') == 'Dedicated':
+            self.fields['midatasize'].widget.attrs.update({'data-server': 99})
+            raise ValidationError("Selections require dedicated server")
 
         super().clean()
 
