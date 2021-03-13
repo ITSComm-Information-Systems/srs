@@ -241,8 +241,10 @@ $(document).ready(function() {
 
   // MiDatabase Type
   $('[data-tab="midbtype"]').on('show.bs.tab', function(event) {
+
     $("#id_midatatype").trigger("change");
     server = $('#id_midatasize').data('server');
+
     if (server) {
       $('#id_midatasize').data('server', '');
       type = $('#id_midatatype').val();
@@ -256,6 +258,57 @@ $(document).ready(function() {
     }
   });
 
+  $(document).on("change", "[data-pane='midbtype']" , function() {
+    set_dedicated_server();
+  });
+
+  function set_dedicated_server() {
+    dedicated = false;
+
+    if ($('#id_midatasize').val() > 50) {
+      console.log('size over fidy');
+      dedicated = true;
+    }
+
+    if ($('#id_midatatype').val() == "66") {  // MS SQL
+      if ($('#midatasql_0').prop("checked")) {  // SQL Agent Jobs
+        console.log('sql jobs')
+        dedicated = true;
+      }
+      if ($('#id_dbversion option:selected').text().indexOf('SSAS') > 0) {  // SSAS
+        console.log('Sassy')
+        dedicated = true;
+      }
+    }
+
+    if ($('#sensitiveData_0').prop("checked")) {  // Sensitive Data
+      console.log('data too sensitive')
+      dedicated = true;
+    }
+
+    if (dedicated) {
+      $('#div_shared').prop('readonly', true);
+      $('#shared_1').prop("checked", true);
+    } else {
+      $('#div_shared').prop('readonly', false);
+      //$('#shared_1').prop("checked", true);
+    }
+
+    return dedicated;
+
+  }
+
+  $(document).on("change", "#id_midatatype" , function() {
+    if (this.value=="66") { // MSSQL
+      $("#div_dbversion").show();
+      $("#div_midatasql").show();
+    } else {
+      $("#div_dbversion").hide();
+      $("#div_midatasql").hide();
+    }
+  });
+
+
   //MiServer Specification
   $('[data-tab="miSeverSpec"]').on('show.bs.tab', function(event) {
     ram_rate = $('#server_rates').data('ram_rate');
@@ -268,16 +321,6 @@ $(document).ready(function() {
     $("#id_cpu").trigger("change");
     $("#id_misevos").trigger("change");
     update_total_cost();
-  });
-
-  $(document).on("change", "#id_midatatype" , function() {
-    if (this.value=="MSSQL") {
-      $("#div_dbversion").show();
-      $("#div_midatasql").show();
-    } else {
-      $("#div_dbversion").hide();
-      $("#div_midatasql").hide();
-    }
   });
 
   $(document).on("change", ".cost-driver" , function() {

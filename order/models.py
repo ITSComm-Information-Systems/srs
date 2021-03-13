@@ -1125,6 +1125,15 @@ class Item(models.Model):
                 else:
                     attributes.append({'ID': element.target, 'Value': value})
 
+        if self.data['action_id'] == '67':
+            for field in text[1]['fields']:
+                if field['label'] == 'Disk Space':
+                    nl = '\n'
+                    disks = nl.join(field['list'])
+                    attributes.append({'ID': 1965, 'Value': disks})
+
+        attributes.append({'ID': 1964, 'Value': 'disk0 50GB \n disk1 70GB'})
+
         # Add Action Constants to Payload
         cons = Constant.objects.filter(action=action)
 
