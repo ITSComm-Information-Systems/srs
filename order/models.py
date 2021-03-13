@@ -1132,8 +1132,6 @@ class Item(models.Model):
                     disks = nl.join(field['list'])
                     attributes.append({'ID': 1965, 'Value': disks})
 
-        attributes.append({'ID': 1964, 'Value': 'disk0 50GB \n disk1 70GB'})
-
         # Add Action Constants to Payload
         cons = Constant.objects.filter(action=action)
 
