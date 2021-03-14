@@ -3,7 +3,7 @@
 {% block field_sets %}
 {{ block.super }}
 
-
+{% if server %}
 <fieldset class="module aligned collaps">
     <h2>Server</h2>
 
@@ -14,5 +14,7 @@
         </div>
     </div>
 </fieldset>
+{% endif %}
+
 
 {% endblock %}
