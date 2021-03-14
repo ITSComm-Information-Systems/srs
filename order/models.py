@@ -7,7 +7,7 @@ from django.db import models
 from django.forms.fields import DecimalField
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
-from project.models import ShortCodeField
+from project.models import ShortCodeField, Choice
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from django.utils import timezone
@@ -745,12 +745,14 @@ class Database(models.Model):
     in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     shortcode = models.CharField(max_length=100) 
-    cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
-    ram = models.IntegerField('RAM')    #  <ram>8</ram>
-    #size = models.IntegerField()
+    #cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
+    #ram = models.IntegerField('RAM')    #  <ram>8</ram>
+    size = models.IntegerField()
     type = models.PositiveSmallIntegerField(null=True, choices=TYPE_CHOICES)
+    version = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_VERSION"}, on_delete=models.SET_NULL)
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
+    server = models.ForeignKey(Server, null=True, blank=True, on_delete=models.SET_NULL)
     legacy_data = models.TextField()
 
     def __str__(self):

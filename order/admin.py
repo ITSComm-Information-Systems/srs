@@ -140,21 +140,32 @@ class DatabaseAdmin(admin.ModelAdmin):
     list_display = ['name', 'owner','type']
     list_filter = ('in_service','type')
     ordering = ('name',)
-    readonly_fields = ('legacy_data',)
+    readonly_fields = ('legacy_data','server')
     search_fields = ['name','owner__name']
 
     fieldsets = (
         (None, {
-            'fields': (('name', 'in_service'), 'owner', 'shortcode', ('type','cpu','ram')
+            'fields': (('name', 'in_service'), 'owner', 'shortcode', ('type','version')
             ,'support_email'
             ,'support_phone')
-
         }),
         ('Legacy Data', {
             'classes': ('collapse',),
             'fields': ('legacy_data',),
         }),
     )
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+
+        db = Database.objects.get(id=object_id)
+        if db.server:
+            extra_context = {'server': Server.objects.get(id=db.server_id), 'fieldset': fieldset}
+        else:
+            extra_context = {}
+
+        return super().change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
 
 @admin.register(Server)
 class ServerAdmin(admin.ModelAdmin):
