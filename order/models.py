@@ -1115,11 +1115,22 @@ class Item(models.Model):
         # Add Attributes using target mapping
         field_map = action.override.get('map', '')
 
+        display_values = {}
+        for tab in self.data['reviewSummary']:
+            for field in tab['fields']:
+                if 'name' in field:
+                    print(field['name'])
+                    if 'list' in field:
+                        nl = '\n'
+                        display_values[field['name']] = nl.join(field['list'])
+                    else:
+                        display_values[field['name']] = field['value']
+
         attributes = []
         step_list = Step.objects.filter(action=action)
         element_list = Element.objects.filter(step__in=step_list, target__isnull=False)
         for element in element_list:
-            value = self.data.get(element.name)
+            value = display_values.get(element.name)
             if value:
                 if element.name in field_map:
                     attributes.append({'ID': field_map[element.name], 'Value': value})

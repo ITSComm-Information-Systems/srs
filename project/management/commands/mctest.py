@@ -25,11 +25,10 @@ class Command(BaseCommand):
         #ticket_list = Ticket.objects.all()
 
         #for ticket in ticket_list
-        #item.route()
-        self.get_ticket()
+        item.route()
+        #self.get_ticket()
 
     def get_ticket(self):
-
 
         client_id = settings.UM_API['CLIENT_ID']
         auth_token = settings.UM_API['AUTH_TOKEN']
@@ -39,7 +38,6 @@ class Command(BaseCommand):
             'Authorization': f'Basic {auth_token}',
             'accept': 'application/json'
             }
-
 
         url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
         response = requests.post(url, headers=headers)
