@@ -207,9 +207,9 @@ class TabForm(forms.Form):
                         label = '*' + label
 
                 if isinstance(value, list):
-                    summary.append({'label': label, 'value': '', 'list': value})
+                    summary.append({'name': field.name, 'label': label, 'value': '', 'list': value})
                 else:
-                    summary.append({'label': label, 'value': value})
+                    summary.append({'name': field.name, 'label': label, 'value': value})
 
         return summary
 
