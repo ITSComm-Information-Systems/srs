@@ -182,7 +182,8 @@ class ServerAdmin(admin.ModelAdmin):
         (None, {
             'fields': (('name', 'in_service'), 'owner', 'shortcode', ('os','cpu','ram'),
                         ('backup','backup_time'),
-                        'managed' )
+                        'managed',
+                        ('regulated_data','non_regulated_data')),
         }),
         ('Managed', {
             'classes': ('managed-section',),

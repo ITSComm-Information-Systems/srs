@@ -68,7 +68,7 @@ class Choice(models.Model):
      objects = ChoiceManager()
      
      def __str__(self):
-          return self.code
+          return self.label
 
 
 class ChoiceTag(models.Model):
