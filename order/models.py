@@ -623,9 +623,8 @@ class Server(models.Model):
     os = models.CharField(max_length=100)     #  <os>Windows2008R2managed</os>
     cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
     ram = models.IntegerField('RAM')    #  <ram>8</ram>
-    #disk_space = models.CharField(max_length=100)  #  <diskspace>disk0=100 GB ;</diskspace>
-    regulated_data = models.BooleanField(default=False)    #  <MWregulateddata></MWregulateddata>
-    non_regulated_data = models.BooleanField(default=False)   #   <MWnonregulateddata></MWnonregulateddata>
+    regulated_data = models.ManyToManyField(Choice, blank=True, limit_choices_to={"parent__code": "REGULATED_SENSITIVE_DATA"}, related_name='regulated')
+    non_regulated_data = models.ManyToManyField(Choice, blank=True, limit_choices_to={"parent__code": "NON_REGULATED_SENSITIVE_DATA"})
     replicated = models.BooleanField(default=True)
 
     on_call = models.PositiveSmallIntegerField(null=True, choices=ON_CALL_CHOICES)   #<monitoringsystem>businesshours</monitoringsystem>
