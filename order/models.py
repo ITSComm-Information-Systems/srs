@@ -744,8 +744,6 @@ class Database(models.Model):
     in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     shortcode = models.CharField(max_length=100) 
-    #cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
-    #ram = models.IntegerField('RAM')    #  <ram>8</ram>
     size = models.IntegerField()
     type = models.PositiveSmallIntegerField(null=True, choices=TYPE_CHOICES)
     version = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_VERSION"}, on_delete=models.SET_NULL)
@@ -758,9 +756,11 @@ class Database(models.Model):
         return self.name
 
     @property
-    def total_cost(self):
-        total_cost = 33
-        return total_cost
+    def shared(self):
+        if self.server:
+            return False
+        else:
+            return True
 
     def get_shortcodes(self):
         return [self.shortcode]

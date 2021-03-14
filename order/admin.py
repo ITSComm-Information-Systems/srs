@@ -137,17 +137,18 @@ class ServerDiskInline(admin.TabularInline):
 
 @admin.register(Database)
 class DatabaseAdmin(admin.ModelAdmin):
-    list_display = ['name', 'owner','type']
+    list_display = ['name', 'owner','type', 'shared']
     list_filter = ('in_service','type')
     ordering = ('name',)
-    readonly_fields = ('legacy_data','server')
+    readonly_fields = ('legacy_data','server','shared')
     search_fields = ['name','owner__name']
 
     fieldsets = (
         (None, {
-            'fields': (('name', 'in_service'), 'owner', 'shortcode', ('type','version')
-            ,'support_email'
-            ,'support_phone')
+            'fields': (('name', 'in_service'), 'owner', 'shortcode', ('type','version'),
+            ('support_email','support_phone'),
+            ('shared', 'server')
+            )
         }),
         ('Legacy Data', {
             'classes': ('collapse',),
@@ -159,7 +160,7 @@ class DatabaseAdmin(admin.ModelAdmin):
 
         db = Database.objects.get(id=object_id)
         if db.server:
-            extra_context = {'server': Server.objects.get(id=db.server_id), 'fieldset': fieldset}
+            extra_context = {'server': Server.objects.get(id=db.server_id)}
         else:
             extra_context = {}
 
