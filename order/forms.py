@@ -111,15 +111,20 @@ class TabForm(forms.Form):
                     label = field.choices[0][1]
                     if len(field.choices) > 1:  # Process list of options
                         label = field.label
-                        value = ', '.join(value)
+                        selections = []
+                        for choice in field.choices:
+                            if str(choice[0]) in value:
+                                selections.append(choice[1])
+                        
+                        value = selections
                     elif len(value) > 0:  
                         value = 'Yes'
                     else:
                         value = 'No'
 
                 if field.type == 'List':  
-                    list = self.data.getlist(key)
-                    value = ', '.join(list)
+                    value_list = self.data.getlist(key)
+                    value = ', '.join(value_list)
 
                 if self.action.type == 'M':
 
@@ -201,7 +206,10 @@ class TabForm(forms.Form):
                     elif key in self.changed_data:
                         label = '*' + label
 
-                summary.append({'label': label, 'value': value})
+                if isinstance(value, list):
+                    summary.append({'label': label, 'value': '', 'list': value})
+                else:
+                    summary.append({'label': label, 'value': value})
 
         return summary
 
