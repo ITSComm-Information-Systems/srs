@@ -97,8 +97,15 @@ class TabForm(forms.Form):
  
                 if field.type == 'Radio' or field.type == 'Select':
                     for choice in field.choices:
-                        if str(choice[0]) == value:
-                            value = choice[1]
+                        if isinstance(choice[1], str):
+                            if str(choice[0]) == value:
+                                value = choice[1]
+                                break
+                        else:  # Search Optgroup
+                            for choice in choice[1]:
+                                if str(choice[0]) == value:
+                                    value = choice[1]
+                                    break
 
                 if field.type == 'Checkbox':  
                     label = field.choices[0][1]
@@ -785,9 +792,6 @@ class ServerSpecForm(TabForm):
 
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
-
-        os = summary[1]['value']
-        summary[1]['value'] = Choice.objects.get(id=int(os)).label
 
         for line in summary:
             if line['label'] == 'Disk Space':
