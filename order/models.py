@@ -756,6 +756,11 @@ class Database(models.Model):
         return self.name
 
     @property
+    def total_cost(self):
+        total_cost = 33
+        return total_cost
+
+    @property
     def shared(self):
         if self.server:
             return False
