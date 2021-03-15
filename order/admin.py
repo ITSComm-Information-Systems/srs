@@ -147,7 +147,8 @@ class DatabaseAdmin(admin.ModelAdmin):
         (None, {
             'fields': (('name', 'in_service'), 'owner', 'shortcode', ('type','version'),
             ('support_email','support_phone'),
-            ('shared', 'server')
+            ('shared', 'size'),
+            'purpose'
             )
         }),
         ('Legacy Data', {
