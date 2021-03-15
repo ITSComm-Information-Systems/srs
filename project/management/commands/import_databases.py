@@ -4,6 +4,8 @@ from oscauth.utils import get_mc_group
 from oscauth.models import LDAPGroup
 from order.models import Database, ServerDisk
 
+from project.models import Choice
+
 import datetime, csv, sys
 import xml.etree.ElementTree as ET
 
@@ -40,6 +42,16 @@ class Command(BaseCommand):
         Database.objects.all().delete()
         
         print('open file')
+
+        self.database_types = {}
+        for choice in Choice.objects.filter(parent__code='DATABASE_TYPE'):
+            self.database_types[choice.code] = choice.id
+
+        self.database_versions = {}
+        for choice in Choice.objects.filter(parent__code='DATABASE_VERSION'):
+            self.database_versions[choice.code] = choice.id
+
+        print(self.database_versions)
 
         with open(f'/Users/djamison/Downloads/{filename}', encoding='mac_roman') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
@@ -117,14 +129,22 @@ class Command(BaseCommand):
             print('error converting XML', data)
             return
     
+        size = self.get_text(xml, 'MDDBSize', None)
+        if size:
+            size = size.replace('GB','')
+            size = int(size)
+            d.size = size
+
+
         d.legacy_data = data
         d.name = self.get_text(xml, 'xmlSubscriptionKey', None)   #instancename?
         d.owner = LDAPGroup().lookup( mc_group )
         d.support_email = self.get_text(xml, 'afterhoursemail', 'n/a')
         d.support_phone = self.get_text(xml, 'afterhoursphone', 'n/a')
-        d.cpu = self.get_text(xml, 'cpu', 0)
-        d.ram = self.get_text(xml, 'ram', 0)
-        d.type_name = self.get_text(xml, 'MDDBType', 'n/a')
+        #d.cpu = self.get_text(xml, 'cpu', 0)
+        #d.ram = self.get_text(xml, 'ram', 0)
+
+        d.purpose = self.get_text(xml, 'databasepurpose', '')
 
         service_status = self.get_text(xml, 'servicestatus', None)
         if service_status == 'Ended':
@@ -135,12 +155,15 @@ class Command(BaseCommand):
             print('service status', service_status)
 
         type = self.get_text(xml, 'MDDBType', None)
-        if type == 'MYSQL':
-            d.type = Database.MYSQL
-        elif type == 'MSSQL':
-            d.type = Database.MSSQL
-        elif type == 'Oralce':
-            d.type = Database.ORACLE
+        if type:
+            d.type_id = self.database_types.get(type.upper())
+            if type == 'MSSQL':
+                version = self.get_text(xml, 'MDDBVersion', None)
+                if version:
+                    d.version = self.database_versions.get(version.upper())
+
+                if not d.version:
+                    print('no version', version)
 
         try:
             d.save()

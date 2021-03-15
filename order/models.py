@@ -744,9 +744,10 @@ class Database(models.Model):
     in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     shortcode = models.CharField(max_length=100) 
-    size = models.IntegerField()
-    type = models.PositiveSmallIntegerField(null=True, choices=TYPE_CHOICES)
-    version = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_VERSION"}, on_delete=models.SET_NULL)
+    size = models.IntegerField(null=True)
+    type = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_TYPE"}, on_delete=models.SET_NULL, related_name='type')
+    version = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_VERSION"}, on_delete=models.SET_NULL, related_name='version')
+    purpose = models.TextField()
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
     server = models.ForeignKey(Server, null=True, blank=True, on_delete=models.SET_NULL)
