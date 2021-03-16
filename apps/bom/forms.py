@@ -23,7 +23,7 @@ class EstimateForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(EstimateForm, self).__init__(*args, **kwargs)
         if self.instance:
-            self.fields['assigned_engineer'].queryset = Technician.objects.filter(active=Technician.ACTIVE).order_by('name')
+            self.fields['assigned_engineer'].queryset = Technician.objects.filter(active=Technician.ACTIVE).order_by('labor_name_display')
 
         self.fields['contingency_amount'].required = False
         self.fields['contingency_percentage'].required = False
@@ -86,4 +86,4 @@ class ProjectForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
         if self.instance:
-            self.fields['netops_engineer'].queryset = Technician.objects.filter(active=Technician.ACTIVE).order_by('name')
+            self.fields['netops_engineer'].queryset = Technician.objects.filter(active=Technician.ACTIVE, trade_id='NA').order_by('labor_name_display')
