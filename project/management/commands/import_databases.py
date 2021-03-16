@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from oscauth.utils import get_mc_group
 from oscauth.models import LDAPGroup
-from order.models import Database, ServerDisk
+from order.models import Database, Server, ServerDisk
 
 from project.models import Choice
 
@@ -49,7 +49,12 @@ class Command(BaseCommand):
 
         self.database_versions = {}
         for choice in Choice.objects.filter(parent__code='DATABASE_VERSION'):
-            self.database_versions[choice.code] = choice.id
+            if choice.code == 'SQL2017':
+                self.database_versions['2017SQL'] = choice.id
+            elif choice.code == 'SQL2019':
+                self.database_versions['2019SQL'] = choice.id
+            else:
+                self.database_versions[choice.code] = choice.id
 
         print(self.database_versions)
 
@@ -154,16 +159,22 @@ class Command(BaseCommand):
         else:
             print('service status', service_status)
 
+        if self.get_text(xml, 'MDsharedordedicated', None) == 'dedicated':
+            try:
+                d.server = Server.objects.get(name=d.name)
+            except:
+                print('Server not found', d.name)
+
         type = self.get_text(xml, 'MDDBType', None)
         if type:
             d.type_id = self.database_types.get(type.upper())
             if type == 'MSSQL':
                 version = self.get_text(xml, 'MDDBVersion', None)
                 if version:
-                    d.version = self.database_versions.get(version.upper())
+                    d.version_id = self.database_versions.get(version.upper())
 
-                if not d.version:
-                    print('no version', version)
+                    if not d.version:
+                        print('no version', version)
 
         try:
             d.save()
