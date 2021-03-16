@@ -1,31 +1,31 @@
 {% for field in tab.form %}
 
-{% if field.name == 'misevback' %}
+{% if field.name == 'backup' %}
 <div class="row">
     <div class="col-3">
     {% include field.field.template_name %}
     </div>
-{% elif field.name == 'misevbacktime' %}
+{% elif field.name == 'backuptime' %}
     <div class="col-3">
     {% include field.field.template_name %}
     </div>
 </div>
-{% elif field.name == 'misevpatch' %}
+{% elif field.name == 'patch_day' %}
 <div class="row">
     <div class="col-3">
     {% include field.field.template_name %}
     </div>
-{% elif field.name == 'misevpattime' %}
+{% elif field.name == 'patch_time' %}
     <div class="col-3">
     {% include field.field.template_name %}
     </div>
 </div>
-{% elif field.name == 'misevredate' %}
+{% elif field.name == 'patch_day' %}
 <div class="row">
     <div class="col-3">
     {% include field.field.template_name %}
     </div>
-{% elif field.name == 'misevretime' %}
+{% elif field.name == 'reboot_time' %}
     <div class="col-3">
     {% include field.field.template_name %}
     </div>

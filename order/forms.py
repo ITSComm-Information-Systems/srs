@@ -634,8 +634,8 @@ class ServerInfoForm(TabForm):
             self.fields['database_size'].widget.attrs.update({'readonly': True})
             self.fields['database_size'].template_name = 'project/number.html'
             self.fields.pop('misevexissev')
-            self.fields['mcommadmingrp'].initial = 'MiDatabase Support Team'
-            self.fields['mcommadmingrp'].widget.attrs.update({'readonly': True})
+            self.fields['owner'].initial = 'MiDatabase Support Team'
+            self.fields['owner'].widget.attrs.update({'readonly': True})
 
             if type == 'MSSQL':
                 self.fields['database_version'].widget.attrs.update({'readonly': True})
@@ -671,23 +671,23 @@ class ServerSupportForm(TabForm):
             else:
                 windows = False
 
-        if kwargs['request'].POST.get('manageunman') == 'unmang' or not windows:
-            self.fields.pop('misevpatch')
-            self.fields.pop('misevpattime')
-            self.fields.pop('misevredate')
-            self.fields.pop('misevretime')
-            self.fields.pop('misevemail')
-            self.fields.pop('misevphone')
-            self.fields.pop('misevbacktime')
-        elif kwargs['request'].POST.get('misevback') != 'yes':
-            self.fields.pop('misevbacktime')
+        if kwargs['request'].POST.get('managed') == 'unmang' or not windows:
+            self.fields.pop('backup_time')
+            self.fields.pop('patch_day')
+            self.fields.pop('patch_time')
+            self.fields.pop('reboot_day')
+            self.fields.pop('reboot_time')
+            self.fields.pop('support_email')
+            self.fields.pop('support_phone')
+        elif kwargs['request'].POST.get('backup') != 'yes':
+            self.fields.pop('backup_time')
             
 
 class ServerDataForm(TabForm):
 
     def clean(self):
 
-        if self.request.POST.get('manageunman') == 'unmang':
+        if self.request.POST.get('managed') == 'unmang':
             if self.request.POST.get('misevregu') == 'yesregu':
                 raise ValidationError("Please select a managed server for sensitive data.")
             if self.request.POST.get('misevnonregu') == 'yesnonregu':
@@ -756,13 +756,13 @@ class ServerSpecForm(TabForm):
 
         self.fields['diskSize'].required = False
 
-        self.fields['manageunman'].required = False
-        self.fields['manageunman'].disabled = True
+        self.fields['managed'].required = False
+        self.fields['managed'].disabled = True
 
-        self.fields['manageunman'].initial = 'mang'
+        self.fields['managed'].initial = 'mang'
         self.fields['replicated'].initial = 'yesdisk'
-        self.fields['misevback'].initial = 'Yes'
-        self.fields['misevback'].disabled = True
+        self.fields['backup'].initial = 'Yes'
+        self.fields['backup'].disabled = True
 
         if database == 'MSSQL':
             self.fields['cpu'].widget.attrs.update({'data-server': 99, 'min': 2})
