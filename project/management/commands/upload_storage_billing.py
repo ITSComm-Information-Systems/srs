@@ -115,13 +115,13 @@ class Command(BaseCommand):
             to = [self.owner_email, 'ITComBill@umich.edu', 'itscomm.information.systems@umich.edu']
         else:
             subject = f'{self.service} Billing Records Uploaded - {settings.ENVIRONMENT}'
-            to = ['itscomm.information.systems@umich.edu']
+            to = ['itscomm.information.systems@umich.edu', 'djamison@umich.edu']
 
         email = EmailMessage(
             subject,
             body,
             'srs-otto@umich.edu',
-            [to],
+            to,
             []
         )
 
