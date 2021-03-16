@@ -226,13 +226,13 @@ $(document).ready(function() {
   $(document).on("change", "#div_misevexissev" , function() {
     if ($('#misevexissev_1').prop("checked")) {  // Yes contact me to migrat
       $('#div_mcommserveradmin').hide().prop('required',false);
-      $('#div_mcommadmingrp').hide().prop('required',false);
+      $('#div_owner').hide().prop('required',false);
     } else if ($('#misevexissev_0').prop("checked")) {  // Nah, new server
       $('#div_mcommserveradmin').show().prop('required',true);
-      $('#div_mcommadmingrp').show().prop('required',true);
+      $('#div_owner').show().prop('required',true);
     } else {
       $('#div_mcommserveradmin').hide().prop('required',false);
-      $('#div_mcommadmingrp').hide().prop('required',false);
+      $('#div_owner').hide().prop('required',false);
     }
   });
 
@@ -316,7 +316,7 @@ $(document).ready(function() {
     disk_no_replication = $('#server_rates').data('disk_no_replication');
     disk_backup = $('#server_rates').data('disk_backup');
 
-    $("#div_manageunman").trigger("change");
+    $("#div_managed").trigger("change");
     $("#div_misevprefix").trigger("change");
     $("#id_cpu").trigger("change");
     $("#id_misevos").trigger("change");
@@ -373,7 +373,7 @@ $(document).ready(function() {
 
     });
     
-    if ($('#misevback_0').prop("checked")) {  // Backup
+    if ($('#backup_0').prop("checked")) {  // Backup
       backup_cost = total_disk_size * disk_backup
       $("#backup_cost").html('$' + backup_cost.toFixed(2));
     } else {
@@ -409,11 +409,11 @@ $(document).ready(function() {
     }
   });
 
-  $(document).on("change", "#div_manageunman" , function() {
-    if ($('#manageunman_0').prop("checked")) {  // Managed
+  $(document).on("change", "#div_managed" , function() {
+    if ($('#managed_0').prop("checked")) {  // Managed
       $('#div_misevos').show().prop('required',true);
       $('#div_misernonmang').hide().prop('required',false);
-    } else if ($('#manageunman_1').prop("checked")) {  // Unmanaged
+    } else if ($('#managed_1').prop("checked")) {  // Unmanaged
         $('#div_misevos').hide().prop('required',false);
         $('#div_misernonmang').show().prop('required',true);
     } else {
@@ -443,27 +443,27 @@ $(document).ready(function() {
 
   $(document).on("change", "#div_misevregu" , function() {
     if ($('#misevregu_0').prop("checked")) {  // Regulated Sensitive Data
-      $('#div_misevregulist').show().prop('required',true);
+      $('#div_regulated_data').show().prop('required',true);
     } else if ($('#misevregu_1').prop("checked")) {  // No Sensitive Data
-      $('#div_misevregulist').hide().prop('required',false);
+      $('#div_regulated_data').hide().prop('required',false);
     } else {
-      $('#div_misevregulist').hide().prop('required',false);
+      $('#div_regulated_data').hide().prop('required',false);
     }
   });
 
   $(document).on("change", "#div_misevnonregu" , function() {
     if ($('#misevnonregu_0').prop("checked")) {  // Not Regulated Sensitive Data
-      $('#div_misevyesnon').show().prop('required',true);
+      $('#div_non_regulated_data').show().prop('required',true);
     } else if ($('#misevnonregu_1').prop("checked")) {  // No Unregulated Sensitive Data
-      $('#div_misevyesnon').hide().prop('required',false);
+      $('#div_non_regulated_data').hide().prop('required',false);
     } else {
-      $('#div_misevyesnon').hide().prop('required',false);
+      $('#div_non_regulated_data').hide().prop('required',false);
     }
   });
 
   // Miserver Support Services
   $('[data-tab="miSevSupport"]').on('show.bs.tab', function(event) {
-    $("#div_misevback").trigger("change");
+    $("#div_backup").trigger("change");
   });
 
   var x = document.getElementsByClassName("ccsel");
