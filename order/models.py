@@ -1058,7 +1058,7 @@ class Item(models.Model):
             if action.service.id == 8:
                 self.update_mibackup(rec)
             elif action.service.id in [13,14]:
-                todo = 1
+                self.update_server(rec)
             else:
                 rec.owner = LDAPGroup().lookup( self.data['owner'] )
                 rec.service = action.service
@@ -1163,6 +1163,38 @@ class Item(models.Model):
  
         self.external_reference_id = json.loads(response.text)['ID']
         self.save()   # Save incident number to item
+
+
+    def update_server(self, rec):
+        rec = Server.objects.get(id=10238)
+        rec.owner = LDAPGroup().lookup( self.data['owner'] )
+
+        for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed']:
+            value = self.data.get(field)
+            if value:
+                setattr(rec, field, value)
+
+        if rec.managed:
+            os = self.data.get('misevos')
+        else:
+            os = self.data.get('misernonmang')
+
+        if os:
+            rec.os = Choice.objects.get(id=os).label
+
+        rec.save()
+
+        d = self.data['non_regulated_data']
+        if type(d) == str:
+            d = [d]
+        rec.non_regulated_data.set(d)
+
+        d = self.data['regulated_data']
+        if type(d) == str:
+            d = [d]
+        rec.regulated_data.set(d)
+
+        rec.save()
 
     def update_mibackup(self, rec):
         if rec.name == '':
