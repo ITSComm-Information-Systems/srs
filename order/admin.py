@@ -183,7 +183,7 @@ class ServerAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (('name', 'in_service'), 'owner', 'shortcode', ('os','cpu','ram'),
-                        ('backup','backup_time'),
+                        ('replicated','backup','backup_time'),
                         'managed',
                         ('regulated_data','non_regulated_data')),
         }),
