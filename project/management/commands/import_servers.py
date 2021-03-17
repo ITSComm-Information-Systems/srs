@@ -4,6 +4,7 @@ from django.db.models.query_utils import Q
 from oscauth.utils import get_mc_group
 from oscauth.models import LDAPGroup
 from order.models import Server, ServerDisk
+from project.models import Choice
 
 
 import datetime, csv, sys
@@ -18,6 +19,32 @@ DAYS = {
         'Friday': 5,
         'Saturday': 6
 }
+
+CHOICE_LIST = {}
+
+for choice in Choice.objects.filter(parent__code__in=('REGULATED_SENSITIVE_DATA','NON_REGULATED_SENSITIVE_DATA')):
+    if choice.code == 'HIPAA':
+        CHOICE_LIST['PHI'] = choice.id
+    elif choice.code == 'OTHERREG':
+        CHOICE_LIST['ORS'] = choice.id
+    elif choice.code == 'FERPA':
+        CHOICE_LIST['SER'] = choice.id
+    elif choice.code == 'TRADESEC':
+        CHOICE_LIST['TSI'] = choice.id
+    elif choice.code == 'ITSEC':
+        CHOICE_LIST['ITS'] = choice.id
+    elif choice.code == 'ECR':
+        CHOICE_LIST['EXS'] = choice.id
+    elif choice.code == 'AUDIT':
+        CHOICE_LIST['INT'] = choice.id
+    elif choice.code == 'OTHERNONREG':
+        CHOICE_LIST['ONRN'] = choice.id
+    elif choice.code == 'GLBA':
+        CHOICE_LIST['SLA'] = choice.id  #Student Load Information
+    else:
+        CHOICE_LIST[choice.code] = choice.id
+
+print(CHOICE_LIST)
 
 class Command(BaseCommand):
     help = 'Import CSV from MiServer'
@@ -105,14 +132,26 @@ class Command(BaseCommand):
                 sd.size = size
                 sd.save()
 
-    def add_data(self, xml, server):
-        x = self.get_text(xml, 'MWregulateddatacheckboxe1', None)
-        if x:
-            print(x)
+    def get_checkboxes(self, xml, field):
+        id_list = []
+        x = self.get_text(xml, field, None)
+        if x and x != '[]':
+            x = x.replace('[', '')
+            x = x.replace(']', '')
+            x = x.replace(' ', '')
 
-        x = self.get_text(xml, 'nonregulateddataDetail', None)
-        if x:
-            print(x)
+            val_list = x.split(',')
+            for val in val_list:
+                if val:
+                    if CHOICE_LIST.get(val):
+                        id_list.append(CHOICE_LIST.get(val))
+                    else:
+                        print(val, 'not found')
+                    
+
+        return id_list
+
+
 
     def process_record(self, row, type, service_id):
 
@@ -127,10 +166,10 @@ class Command(BaseCommand):
         except:
             print('error converting XML', data)
             return
-    
+
         s.legacy_data = data
         s.owner = LDAPGroup().lookup( mc_group )
-        s.name = self.get_text(xml, 'name', None)
+        s.name = self.get_text(xml, 'name', 'Not Found')
         if self.get_text(xml, 'SRVmanaged', '') == 'Managed':
             s.managed = True
         else:
@@ -151,16 +190,6 @@ class Command(BaseCommand):
             s.backup = True
         else:
             s.backup = False
-
-        if self.get_text(xml, 'MWregulateddata', '') == 'Yes':
-            s.regulated_data = True
-        else:
-            s.regulated_data = False
-
-        if self.get_text(xml, 'nonregulatedData', '') == 'Yes':
-            s.non_regulated_data = True
-        else:
-            s.non_regulated_data = False
 
         if self.get_text(xml, 'replicated', '') == 'Yes':
             s.replicated = True
@@ -192,6 +221,14 @@ class Command(BaseCommand):
             self.LOADS +=1
             self.add_disks(xml, s.id)
             #self.add_data(xml)
+            reg_list = self.get_checkboxes(xml, 'MWregulateddatacheckboxe1')
+            if len(reg_list) > 0:
+                s.regulated_data.set(reg_list)
+
+            nonreg_list = self.get_checkboxes(xml, 'nonregulateddataDetail')
+            if len(nonreg_list) > 0:
+                s.non_regulated_data.set(nonreg_list)
+
         except Exception as ex:
             print('insert error', ex)
             print(data)
