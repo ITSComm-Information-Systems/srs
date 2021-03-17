@@ -486,7 +486,9 @@ class VolumeSelectionForm(TabForm):
                 self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name')
             elif service.id in [13, 14]:
                 self.volume_list = self.vol.objects.filter(owner__in=groups).order_by('name')
-                #self.template = 'order/volume_review.html'
+
+                if self.action.label.startswith('Review'):
+                    self.template = 'order/volume_review.html'
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
                     

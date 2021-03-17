@@ -615,6 +615,16 @@ class Server(models.Model):
     ]
     MANAGED_FIELDS = ['patch_time', 'patch_day', 'reboot_time', 'reboot_day']
 
+    for rate in StorageRate.objects.filter(name__startswith='MS-'):
+        if rate.name == 'MS-RAM':
+            ram_rate = rate.rate
+        elif rate.name == 'MS-DISK-REP':
+            disk_replicated = rate.rate
+        elif rate.name == 'MS-DISK-NOREP':
+            disk_no_replication = rate.rate
+        elif rate.name == 'MS-DISK-BACKUP':
+            disk_backup = rate.rate
+
     name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     shortcode = ShortCodeField()
@@ -660,8 +670,24 @@ class Server(models.Model):
   #<processing>CPU=4 ;RAM=8 GB ;</processing>
 
     @property
+    def total_disk_size(self):
+        disk = ServerDisk.objects.filter(server=self).aggregate(models.Sum('size'))
+        return disk['size__sum']
+
+    @property
     def total_cost(self):
-        total_cost = 33
+        ram_cost = self.ram * self.ram_rate
+        disk_cost = 0
+
+        if self.total_disk_size:
+            if self.replicated:
+                disk_cost = self.total_disk_size * self.disk_replicated
+            else:
+                disk_cost = self.total_disk_size * self.disk_no_replication
+            if self.backup:
+                disk_cost = disk_cost + (self.total_disk_size * self.disk_backup)
+        
+        total_cost = disk_cost + ram_cost
         return total_cost
 
     def __str__(self):
@@ -684,37 +710,6 @@ class Server(models.Model):
     def get_checkboxes(self):
         return ['todo'] 
 
-    def get_total_cost(self, **kwargs):
-        size = Decimal(0)
-
-        if 'disk_list' in kwargs:
-            disk_list = kwargs['disk_list']
-            for disk in disk_list:
-                size = size + Decimal(disk['size'])
-        else:
-            size = 0 #TODO SELECT CHILD
-
-        print(size)
-
-        for rate in StorageRate.objects.filter(name__startswith='MS-'):
-            if rate.name == 'MS-RAM':
-                total_cost = rate.rate * int(self.ram)
-            elif rate.name == 'MS-DISK-REP':
-                ms_disk_rep = rate.rate
-            elif rate.name == 'MS-DISK-NOREP':
-                ms_disk_norep = rate.rate
-            elif rate.name == 'MS-DISK-BACKUP':
-                ms_disk_backup = rate.rate
-    
-        if self.replicated:
-            total_cost = total_cost + (size * ms_disk_rep)       
-        else:
-            total_cost = total_cost + (size * ms_disk_norep)
-
-        if self.backup:
-            total_cost = total_cost + (size * ms_disk_backup)
-
-        return round(total_cost, 2)
 
 class ServerDisk(models.Model):
     server = models.ForeignKey(Server, related_name='disks', on_delete=models.CASCADE)
@@ -723,6 +718,10 @@ class ServerDisk(models.Model):
 
     def __str__(self):
         return self.name
+
+def get_disk_size(server):
+    size = ServerDisk.objects.filter(server=server)
+    print(size)
 
 class ServerData(models.Model):
     server = models.ForeignKey(Server, related_name='data', on_delete=models.CASCADE)
@@ -758,8 +757,10 @@ class Database(models.Model):
 
     @property
     def total_cost(self):
-        total_cost = 33
-        return total_cost
+        if self.server:
+            return self.server.total_cost
+        else:
+            return 0
 
     @property
     def shared(self):
@@ -1032,7 +1033,8 @@ class Item(models.Model):
 
         for route in routing['routes']:
             if route['target'] == 'tdx':
-                self.submit_incident(route, action) 
+                print('bypass incident')
+                #self.submit_incident(route, action) 
 
             if route['target'] == 'database':
                 if 'fulfill' in route:
@@ -1166,7 +1168,6 @@ class Item(models.Model):
 
 
     def update_server(self, rec):
-        rec = Server.objects.get(id=10238)
         rec.owner = LDAPGroup().lookup( self.data['owner'] )
 
         for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed']:
