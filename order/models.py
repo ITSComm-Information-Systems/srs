@@ -615,18 +615,19 @@ class Server(models.Model):
     ]
     MANAGED_FIELDS = ['patch_time', 'patch_day', 'reboot_time', 'reboot_day']
 
-    for rate in StorageRate.objects.filter(name__startswith='MS-'):
-        if rate.name == 'MS-RAM':
+    for rate in StorageRate.objects.filter(name__startswith='SV-'):
+        if rate.name == 'SV-RAM':
             ram_rate = rate.rate
-        elif rate.name == 'MS-DISK-REP':
+        elif rate.name == 'SV-DI-REP':
             disk_replicated = rate.rate
-        elif rate.name == 'MS-DISK-NOREP':
+        elif rate.name == 'SV-DI-NONREP':
             disk_no_replication = rate.rate
-        elif rate.name == 'MS-DISK-BACKUP':
+        elif rate.name == 'SV-DI-BACKUP':
             disk_backup = rate.rate
 
     name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
+    admin_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
     shortcode = ShortCodeField()
     #shortcode = models.CharField(max_length=100) 
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
@@ -745,7 +746,7 @@ class Database(models.Model):
     shortcode = models.CharField(max_length=100) 
     size = models.IntegerField(null=True)
     type = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_TYPE"}, on_delete=models.SET_NULL, related_name='type')
-    version = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_VERSION"}, on_delete=models.SET_NULL, related_name='version')
+    #version = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_VERSION"}, on_delete=models.SET_NULL, related_name='version')
     purpose = models.TextField()
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
@@ -1128,7 +1129,6 @@ class Item(models.Model):
         for tab in self.data['reviewSummary']:
             for field in tab['fields']:
                 if 'name' in field:
-                    print(field['name'])
                     if 'list' in field:
                         nl = '\n'
                         display_values[field['name']] = nl.join(field['list'])
@@ -1195,15 +1195,18 @@ class Item(models.Model):
 
         rec.save()
 
-        d = self.data['non_regulated_data']
-        if type(d) == str:
-            d = [d]
-        rec.non_regulated_data.set(d)
+        d = self.data.get('non_regulated_data')
+        if d:
+            print(d)
+            if type(d) == str:
+                d = [d]
+            rec.non_regulated_data.set(d)
 
-        d = self.data['regulated_data']
-        if type(d) == str:
-            d = [d]
-        rec.regulated_data.set(d)
+        d = self.data.get('regulated_data')
+        if d:
+            if type(d) == str:
+                d = [d]
+            rec.regulated_data.set(d)
 
         rec.save()
 
