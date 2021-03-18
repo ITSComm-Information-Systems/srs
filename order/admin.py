@@ -145,7 +145,7 @@ class DatabaseAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': (('name', 'in_service'), 'owner', 'shortcode', ('type','version'),
+            'fields': (('name', 'in_service'), 'owner', 'shortcode', 'type',
             ('support_email','support_phone'),
             ('shared', 'size'),
             'purpose'
