@@ -604,11 +604,11 @@ class DatabaseTypeForm(TabForm):
     def __init__(self, *args, **kwargs):
         super(DatabaseTypeForm, self).__init__(*args, **kwargs)
 
-        self.fields['midatasize'].widget.attrs.update({'min': 10, 'step': 10})
+        self.fields['size'].widget.attrs.update({'min': 10, 'step': 10})
 
     def clean(self):
         if self.is_valid and self.request.POST.get('shared') == 'Dedicated':
-            self.fields['midatasize'].widget.attrs.update({'data-server': 99})
+            self.fields['size'].widget.attrs.update({'data-server': 99})
             raise ValidationError("Selections require dedicated server")
 
         super().clean()
@@ -622,32 +622,25 @@ class ServerInfoForm(TabForm):
 
         if self.request.method == 'GET':
             type = self.request.GET.get('type', None)
-            version = self.request.GET.get('version', None)
+            #version = self.request.GET.get('version', None)
             size = self.request.GET.get('size', None)
         else:
-            type = self.request.POST.get('type', None)
-            version = self.request.POST.get('version', None)
+            type = self.request.POST.get('database', None)
+            #version = self.request.POST.get('version', None)
             size = self.request.POST.get('size', None)
 
         if type:
             self.fields['database'].widget.attrs.update({'readonly': True})
             self.fields['database'].initial = type
-            self.fields.update({'database_size': forms.IntegerField(initial=size)})
-            self.fields['database_size'].widget.attrs.update({'readonly': True})
-            self.fields['database_size'].template_name = 'project/number.html'
+            self.fields['size'].widget.attrs.update({'readonly': True}) 
+            self.fields['size'].initial = size
             self.fields.pop('misevexissev')
-            self.fields['owner'].initial = 'MiDatabase Support Team'
-            self.fields['owner'].widget.attrs.update({'readonly': True})
-
-            if type == 'MSSQL':
-                self.fields['database_version'].widget.attrs.update({'readonly': True})
-                self.fields['database_version'].initial = version
-            else:
-                self.fields.pop('database_version') 
+            self.fields['ad_group'].initial = 'MiDatabase Support Team'
+            self.fields['ad_group'].widget.attrs.update({'readonly': True})
         else:
+            self.fields.pop('size') 
             self.fields.pop('database') 
-            self.fields.pop('database_version') 
-
+            self.fields.pop('ad_group') 
 
 class ServerSupportForm(TabForm):
     template = 'order/server_support.html'
@@ -706,14 +699,15 @@ class ServerSpecForm(TabForm):
     template = 'order/server_spec.html'
 
     uom_list = ['GB','TB']
-    for rate in StorageRate.objects.filter(name__startswith='MS-'):
-        if rate.name == 'MS-RAM':
+
+    for rate in StorageRate.objects.filter(name__startswith='SV-'):
+        if rate.name == 'SV-RAM':
             ram_rate = rate.rate
-        elif rate.name == 'MS-DISK-REP':
+        elif rate.name == 'SV-DI-REP':
             disk_replicated = rate.rate
-        elif rate.name == 'MS-DISK-NOREP':
+        elif rate.name == 'SV-DI-NONREP':
             disk_no_replication = rate.rate
-        elif rate.name == 'MS-DISK-BACKUP':
+        elif rate.name == 'SV-DI-BACKUP':
             disk_backup = rate.rate
 
     def __init__(self, *args, **kwargs):
@@ -748,8 +742,8 @@ class ServerSpecForm(TabForm):
     def set_database_defaults(self):
         
         database = self.request.POST.get('database')
-        database_size = self.request.POST.get('database_size')
-        database_version = self.request.POST.get('database_version')
+        database_size = self.request.POST.get('size')
+        #database_version = self.request.POST.get('database_version')
 
         cpu = self.request.POST.get('cpu', 2)
         ram = self.request.POST.get('ram')
@@ -766,9 +760,9 @@ class ServerSpecForm(TabForm):
         self.fields['managed'].required = False
         self.fields['managed'].disabled = True
 
-        self.fields['managed'].initial = 'mang'
-        self.fields['replicated'].initial = 'yesdisk'
-        self.fields['backup'].initial = 'Yes'
+        self.fields['managed'].initial = True
+        self.fields['replicated'].initial = True
+        self.fields['backup'].initial = True
         self.fields['backup'].disabled = True
 
         if database == 'MSSQL':
@@ -786,16 +780,11 @@ class ServerSpecForm(TabForm):
                 paging_disk = math.ceil((ram-8)/4) * 10 + 60  # Source: Dude, trust me.
                 # =roundup((D45-8)/4)*10+60
 
-            if database_version.startswith('sql'):
-                self.disk_list =[{'name': 'disk0', 'size': paging_disk, 'uom': 'GB', 'state': 'disabled'},
-                                    {'name': 'disk1', 'size': thirty_percent, 'uom': 'GB', 'state': 'disabled'},
-                                    {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'},
-                                    {'name': 'disk3', 'size': fifteen_percent, 'uom': 'GB', 'state': 'disabled'},
-                                    {'name': 'disk4', 'size': fifteen_percent, 'uom': 'GB', 'state': 'disabled'}]
-            else:
-                self.disk_list =[{'name': 'disk0', 'size': paging_disk, 'uom': 'GB', 'state': 'disabled'},
-                                    {'name': 'disk1', 'size': thirty_percent, 'uom': 'GB', 'state': 'disabled'},
-                                    {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'}]
+            self.disk_list =[{'name': 'disk0', 'size': paging_disk, 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk1', 'size': thirty_percent, 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk3', 'size': fifteen_percent, 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk4', 'size': fifteen_percent, 'uom': 'GB', 'state': 'disabled'}]
 
         #elif database == 'MYSQL':
         else:

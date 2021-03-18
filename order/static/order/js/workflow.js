@@ -243,16 +243,13 @@ $(document).ready(function() {
   $('[data-tab="midbtype"]').on('show.bs.tab', function(event) {
 
     $("#id_midatatype").trigger("change");
-    server = $('#id_midatasize').data('server');
+    server = $('#id_size').data('server');
 
     if (server) {
-      $('#id_midatasize').data('server', '');
-      type = $('#id_midatatype').val();
-      version = $('#id_dbversion').val();
-      size=$('#id_midatasize').val();
-      console.log('type', type, version, size);
-      //onclick="location.href='67?database=55';"
-      link = "location.href='67?type=" + type + "&version=" + version + "&size=" + size +"';"; 
+      $('#id_size').data('server', '');
+      type = $('#id_midatatype option:selected').text();
+      size=$('#id_size').val();
+      link = "location.href='67?type=" + type + "&size=" + size +"';"; 
       $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
     }
@@ -265,18 +262,13 @@ $(document).ready(function() {
   function set_dedicated_server() {
     dedicated = false;
 
-    if ($('#id_midatasize').val() > 50) {
+    if ($('#id_size').val() > 50) {
       console.log('size over fidy');
       dedicated = true;
     }
 
-    if ($('#id_midatatype').val() == "66") {  // MS SQL
+    if ($('#id_midatatype').text() == "MSSQL") {  // MS SQL
       if ($('#midatasql_0').prop("checked")) {  // SQL Agent Jobs
-        console.log('sql jobs')
-        dedicated = true;
-      }
-      if ($('#id_dbversion option:selected').text().indexOf('SSAS') > 0) {  // SSAS
-        console.log('Sassy')
         dedicated = true;
       }
     }
@@ -299,11 +291,9 @@ $(document).ready(function() {
   }
 
   $(document).on("change", "#id_midatatype" , function() {
-    if (this.value=="66") { // MSSQL
-      $("#div_dbversion").show();
+    if (this.text=="MSSQL") { // MSSQL
       $("#div_midatasql").show();
     } else {
-      $("#div_dbversion").hide();
       $("#div_midatasql").hide();
     }
   });
