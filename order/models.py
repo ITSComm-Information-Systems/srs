@@ -1033,8 +1033,7 @@ class Item(models.Model):
 
         for route in routing['routes']:
             if route['target'] == 'tdx':
-                print('bypass incident')
-                #self.submit_incident(route, action) 
+                self.submit_incident(route, action) 
 
             if route['target'] == 'database':
                 if 'fulfill' in route:
@@ -1059,8 +1058,10 @@ class Item(models.Model):
         else:
             if action.service.id == 8:
                 self.update_mibackup(rec)
-            elif action.service.id in [13,14]:
+            elif action.service.id == 13:
                 self.update_server(rec)
+            elif action.service.id == 14:
+                self.update_db(rec)
             else:
                 rec.owner = LDAPGroup().lookup( self.data['owner'] )
                 rec.service = action.service
@@ -1166,6 +1167,15 @@ class Item(models.Model):
         self.external_reference_id = json.loads(response.text)['ID']
         self.save()   # Save incident number to item
 
+    def update_db(self, rec):
+        rec.owner = LDAPGroup().lookup( self.data['owner'] )
+
+        for field in ['purpose','size','name','support_email','support_phone','shortcode','type']:
+            value = self.data.get(field)
+            if value:
+                setattr(rec, field, value)
+
+        rec.save()
 
     def update_server(self, rec):
         rec.owner = LDAPGroup().lookup( self.data['owner'] )
