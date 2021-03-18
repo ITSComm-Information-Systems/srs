@@ -388,14 +388,15 @@ $(document).ready(function() {
     if (os) {
       if (os.startsWith('Windows')) {
         $('#div_misevprefix').show().prop('required',true);
-        $('#div_misevregpre').show().prop('required',true);     
+        if ( $('#id_cpu').val() < 2 ) {
+          $('#id_cpu').val(2);
+          $("#id_cpu").trigger("change");
+        }
       } else {
         $('#div_misevprefix').hide().prop('required',false);
-        $('#div_misevregpre').hide().prop('required',false); 
       }
     } else {
       $('#div_misevprefix').hide().prop('required',false);
-      $('#div_misevregpre').hide().prop('required',false); 
     }
   });
 

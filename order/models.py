@@ -1180,6 +1180,11 @@ class Item(models.Model):
     def update_server(self, rec):
         rec.owner = LDAPGroup().lookup( self.data['owner'] )
 
+        if self.data.get('admin_group'):
+            rec.admin_group = LDAPGroup().lookup( self.data['admin_group'] )
+        else:
+            rec.admin_group = rec.owner
+
         for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed']:
             value = self.data.get(field)
             if value:
