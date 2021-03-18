@@ -1,11 +1,7 @@
 {% for field in tab.form %}
 
-{% if field.name == 'backup' %}
+{% if field.name == 'backup_time' %}
 <div class="row">
-    <div class="col-3">
-    {% include field.field.template_name %}
-    </div>
-{% elif field.name == 'backuptime' %}
     <div class="col-3">
     {% include field.field.template_name %}
     </div>
@@ -20,7 +16,7 @@
     {% include field.field.template_name %}
     </div>
 </div>
-{% elif field.name == 'patch_day' %}
+{% elif field.name == 'reboot_day' %}
 <div class="row">
     <div class="col-3">
     {% include field.field.template_name %}

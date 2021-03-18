@@ -656,6 +656,11 @@ class ServerSupportForm(TabForm):
         super(ServerSupportForm, self).__init__(*args, **kwargs)
 
         if self.action.service.name=='midatabase':
+            self.fields.pop('backup_time')
+            self.fields.pop('patch_day')
+            self.fields.pop('patch_time')
+            self.fields.pop('reboot_day')
+            self.fields.pop('reboot_time')
             return
         
         if self.request.POST.get('database'):
@@ -681,7 +686,7 @@ class ServerSupportForm(TabForm):
             self.fields.pop('reboot_time')
             self.fields.pop('support_email')
             self.fields.pop('support_phone')
-        elif kwargs['request'].POST.get('backup') != 'yes':
+        elif kwargs['request'].POST.get('backup') == False:
             self.fields.pop('backup_time')
             
 
