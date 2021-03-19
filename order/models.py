@@ -645,10 +645,18 @@ class Server(models.Model):
     backup = models.BooleanField(default=False)
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
-    backup_time = models.TimeField('Daily Backup Time', null=True, blank=True)   #  <dailybackuptime>06:00 PM</dailybackuptime>
-    patch_time = models.TimeField(null=True, blank=True)    #  <patchingScheduleTime>01:00 AM</patchingScheduleTime>
+    backup_time = models.ForeignKey(Choice, null=True, limit_choices_to={"parent__code": "SERVER_BACKUP_TIME"}
+                                    , related_name='backup_time'
+                                    , on_delete=models.CASCADE,)
+    patch_time = models.ForeignKey(Choice, null=True, limit_choices_to={"parent__code": "SERVER_PATCH_TIME"}
+                                    , related_name='patch_time'
+                                    , on_delete=models.CASCADE,)
     patch_day = models.PositiveSmallIntegerField(null=True, blank=True, choices=DayOfWeek.choices, default=0) #  <patchingScheduleDate>Sunday</patchingScheduleDate>
-    reboot_time = models.TimeField(null=True, blank=True)    #  <rebootScheduleTime>04:00 AM</rebootScheduleTime>
+
+    reboot_time = models.ForeignKey(Choice, null=True, limit_choices_to={"parent__code": "SERVER_REBOOT_TIME"}
+                                    , related_name='reboot_time'
+                                    , on_delete=models.CASCADE,)
+
     reboot_day = models.PositiveSmallIntegerField(null=True, blank=True, choices=DAY_CHOICES) #   <rebootScheduleDate>Sunday</rebootScheduleDate>
     domain = models.CharField(max_length=100)
     datacenter = models.CharField(max_length=100)
@@ -1034,7 +1042,8 @@ class Item(models.Model):
 
         for route in routing['routes']:
             if route['target'] == 'tdx':
-                self.submit_incident(route, action) 
+                #self.submit_incident(route, action) 
+                print('bypass incident')
 
             if route['target'] == 'database':
                 if 'fulfill' in route:
