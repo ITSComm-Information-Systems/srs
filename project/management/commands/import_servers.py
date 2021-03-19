@@ -46,6 +46,21 @@ for choice in Choice.objects.filter(parent__code__in=('REGULATED_SENSITIVE_DATA'
 
 print(CHOICE_LIST)
 
+BACKUP_TIME = {}
+for choice in Choice.objects.filter(parent__code=('SERVER_BACKUP_TIME')):
+    BACKUP_TIME[choice.label] = choice.id
+
+print('x', BACKUP_TIME)
+
+PATCH_TIME = {}
+for choice in Choice.objects.filter(parent__code=('SERVER_PATCH_TIME')):
+    PATCH_TIME[choice.label] = choice.id
+
+REBOOT_TIME = {}
+for choice in Choice.objects.filter(parent__code=('SERVER_REBOOT_TIME')):
+    REBOOT_TIME[choice.label] = choice.id
+
+
 class Command(BaseCommand):
     help = 'Import CSV from MiServer'
 
@@ -166,6 +181,8 @@ class Command(BaseCommand):
         except:
             print('error converting XML', data)
             return
+        
+        self.xml = xml
 
         s.legacy_data = data
         s.owner = LDAPGroup().lookup( mc_group )
@@ -197,9 +214,14 @@ class Command(BaseCommand):
             s.replicated = False
 
 
-        s.backup_time = self.get_text(xml, 'dailybackuptime', None)
-        s.patch_time = self.get_text(xml, 'patchingScheduleTime', None)
-        s.reboot_time = self.get_text(xml, 'rebootScheduleTime', None)
+        bu = self.get_time('dailybackuptime', BACKUP_TIME)
+
+        s.backup_time_id = self.get_time('dailybackuptime', BACKUP_TIME)
+        s.patch_time_id = self.get_time('patchingScheduleTime', PATCH_TIME)
+        s.reboot_time_id = self.get_time('rebootScheduleTime', REBOOT_TIME)
+        s#._time_id = self.get_time('dailybackuptime', BACKUP_TIME)
+        #s.patch_time = PATCH_TIME.get(self.get_text(xml, 'patchingScheduleTime', None))
+        #s.reboot_time = REBOOT_TIME.get(self.get_text(xml, 'rebootScheduleTime', None))
         s.reboot_day = DAYS.get(self.get_text(xml, 'rebootScheduleTime', None), None)
 
         on_call = self.get_text(xml, 'monitoringsystem', None)
@@ -235,6 +257,21 @@ class Command(BaseCommand):
             self.ERRORS +=1
 
         #print(f'{self.LOADS} records Loaded, {self.ERRORS} errors')
+
+    def get_time(self, field, map): # for a good time call 867-5309
+
+        time = self.get_text(self.xml, field, None)
+        if not time:
+            return
+        else:
+            time = time.replace('0','').replace(':','')
+            id = map.get(time)
+            if id:
+                return id
+            else:
+                print(time, 'not found in', map)
+                return None
+
 
 
     def add_members(self):
