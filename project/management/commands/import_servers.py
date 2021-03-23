@@ -214,11 +214,11 @@ class Command(BaseCommand):
             s.replicated = False
 
 
-        bu = self.get_time('dailybackuptime', BACKUP_TIME)
+        #sbu = self.get_time('dailybackuptime', BACKUP_TIME)
 
-        s.backup_time_id = self.get_time('dailybackuptime', BACKUP_TIME)
-        s.patch_time_id = self.get_time('patchingScheduleTime', PATCH_TIME)
-        s.reboot_time_id = self.get_time('rebootScheduleTime', REBOOT_TIME)
+        s.backup_time_id = self.get_time('dailybackuptime', BACKUP_TIME, s.name)
+        s.patch_time_id = self.get_time('patchingScheduleTime', PATCH_TIME, s.name)
+        s.reboot_time_id = self.get_time('rebootScheduleTime', REBOOT_TIME, s.name)
         s#._time_id = self.get_time('dailybackuptime', BACKUP_TIME)
         #s.patch_time = PATCH_TIME.get(self.get_text(xml, 'patchingScheduleTime', None))
         #s.reboot_time = REBOOT_TIME.get(self.get_text(xml, 'rebootScheduleTime', None))
@@ -258,7 +258,7 @@ class Command(BaseCommand):
 
         #print(f'{self.LOADS} records Loaded, {self.ERRORS} errors')
 
-    def get_time(self, field, map): # for a good time call 867-5309
+    def get_time(self, field, map, name): # for a good time call 867-5309
 
         time = self.get_text(self.xml, field, None)
         if not time:
@@ -269,7 +269,7 @@ class Command(BaseCommand):
             if id:
                 return id
             else:
-                print(time, 'not found in', map)
+                print(time, 'not found for', field, name)
                 return None
 
 
