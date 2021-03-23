@@ -249,10 +249,15 @@ $(document).ready(function() {
       $('#id_size').data('server', '');
       type = $('#id_midatatype option:selected').text();
       size=$('#id_size').val();
+      size = Math.trunc(size)
       link = "location.href='67?type=" + type + "&size=" + size +"';"; 
       $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
     }
+  });
+
+  $(document).on("click", "#not_dedicated" , function() {
+    $('#shared_1').prop("checked", false);
   });
 
   $(document).on("change", "[data-pane='midbtype']" , function() {
@@ -283,7 +288,7 @@ $(document).ready(function() {
       $('#shared_1').prop("checked", true);
     } else {
       $('#div_shared').prop('readonly', false);
-      //$('#shared_1').prop("checked", true);
+      //$('#shared_0').prop("checked", true);
     }
 
     return dedicated;
@@ -291,7 +296,7 @@ $(document).ready(function() {
   }
 
   $(document).on("change", "#id_midatatype" , function() {
-    if (this.text=="MSSQL") { // MSSQL
+    if ($('#id_midatatype option:selected').text()=="MSSQL") { // MSSQL
       $("#div_midatasql").show();
     } else {
       $("#div_midatasql").hide();

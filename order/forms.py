@@ -607,7 +607,7 @@ class DatabaseTypeForm(TabForm):
         self.fields['size'].widget.attrs.update({'min': 10, 'step': 10})
 
     def clean(self):
-        if self.is_valid and self.request.POST.get('shared') == 'Dedicated':
+        if self.is_valid() and self.request.POST.get('shared') == 'Dedicated':
             self.fields['size'].widget.attrs.update({'data-server': 99})
             raise ValidationError("Selections require dedicated server")
 
