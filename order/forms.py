@@ -798,6 +798,10 @@ class ServerSpecForm(TabForm):
         summary = super().get_summary(*args, **kwargs)
 
         for line in summary:
+            if line['label'] == 'Server Name':
+                line['value'] = self.data.get('name')
+                print('label', self.data)
+
             if line['label'] == 'Disk Space':
                 break
 
