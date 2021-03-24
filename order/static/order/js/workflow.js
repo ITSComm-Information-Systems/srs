@@ -334,7 +334,11 @@ $(document).ready(function() {
     server_name = $("#id_serverName").val();
 
     if (database) {
-      server_name = 'db-' + server_name + '-' + database.toLowerCase();
+      if (database == "MSSQL") {
+        server_name = 'db-' + server_name
+      } else {
+        server_name = 'db-' + server_name + '-' + database.toLowerCase();
+      }
     } else if (managed_windows) {
       if ($('#misevprefix_0').prop("checked")) {
         server_name = $("#id_misevregpre").val() + '-' + server_name;
