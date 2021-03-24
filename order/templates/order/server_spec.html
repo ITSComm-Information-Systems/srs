@@ -1,12 +1,32 @@
-<span id="server_rates" 
-    data-ram_rate="{{ tab.form.ram_rate }}"
-    data-disk_replicated="{{ tab.form.disk_replicated }}"
-    data-disk_no_replication="{{ tab.form.disk_no_replication }}"
-    data-disk_backup="{{ tab.form.disk_backup }}"
-></span>
+<span id="server_rates" data-ram_rate="{{ tab.form.ram_rate }}" data-disk_replicated="{{ tab.form.disk_replicated }}"
+    data-disk_no_replication="{{ tab.form.disk_no_replication }}" data-disk_backup="{{ tab.form.disk_backup }}"></span>
 
 {% for field in tab.form %}
-{% if field.name == 'diskSize' %}
+
+{% if field.name == 'serverName' %}
+<label for="name">
+    <strong>{{ field.label }}</strong>
+    <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
+</label>
+
+<div class="row">
+    <div class="col-6">
+        <div class="form-group form-inline">
+            <div class="form-inline">
+                {{ field }}
+                <input tabindex="-1" id="id_name" name="name" class="form-control" type="text" readonly>
+            </div>
+        </div>
+        {% for error in field.errors %}
+        <div role="alert" class="invalid-feedback-"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+        {% endfor %}
+    </div>
+
+</div>
+
+
+{% elif field.name == 'diskSize' %}
 <div class="row">
     <div class="col-6 cost-driver">
         <div id="disk_list" class="form-group">
@@ -31,8 +51,10 @@
 
             {% for disk in tab.form.disk_list %}
             <div class="form-inline disk-div" id="disk_{{ disk.id }}" style="display: block;">
-                <input readonly class="form-control form-inline col-2" name="diskName" type="text" value="{{ disk.name }}">
-                <input {{ disk.state }} class="form-control form-inline disk-size" name="diskSize" type="number" min="50" value="{{ disk.size }}" >
+                <input readonly class="form-control form-inline col-2" name="diskName" type="text"
+                    value="{{ disk.name }}">
+                <input {{ disk.state }} class="form-control form-inline disk-size" name="diskSize" type="number"
+                    min="50" value="{{ disk.size }}">
 
                 <select name="diskUOM" class="form-control" {{ disk.state }}>
                     {% for opt in tab.form.uom_list %}
@@ -59,7 +81,7 @@
     <div role="alert" class="invalid-feedback-"><i class="fas fa-exclamation-triangle"
             aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
     {% endfor %}
-    <a href="javascript:addRow('disk')"><i class="fas fa-plus-circle"></i>Add another disk</a><br><br>
+    <a id="add_disk_link" href="javascript:addRow('disk')"><i class="fas fa-plus-circle"></i>Add another disk</a><br><br>
 </div>
 
 {% elif field.name == 'misevdiskuom' %}
@@ -71,10 +93,12 @@
                 <strong>{{ tab.form.ram.label }}</strong>
             </label>
             <small class="text-muted form-text" id="ram"> {{ tab.form.ram.field.description }}</small>
-            <input  style="display: inline;" type="number" name="ram" min="2" class="form-control form-inlin col-2" max="64" required="" id="id_ram" value="{{ tab.form.ram.value }}">
+            <input style="display: inline;" type="number" name="ram" min="2" class="form-control form-inlin col-2"
+                max="64" required="" id="id_ram" value="{{ tab.form.ram.value }}">
             <span id="ram_cost" data-rate="{{ tab.form.ram_rate }}" class="float-right">{{ tab.form.ram_cost }}</span>
             {% for error in field.errors %}
-            <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle" aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+            <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                    aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
             {% endfor %}
             <div role="alert" class="valid-feedback">Good.</div>
         </div>
@@ -98,9 +122,9 @@
 {% endfor %}
 
 
-    <div class="col-6">
-        <hr>
-        <span id="total_cost" class="float-right">$</span>
-        <strong class="float-center">Monthly Cost</strong>&nbsp;&nbsp;
-    </div>
-    <input type="hidden" name="total_cost" id="total_cost_field">
+<div class="col-6">
+    <hr>
+    <span id="total_cost" class="float-right">$</span>
+    <strong class="float-center">Monthly Cost</strong>&nbsp;&nbsp;
+</div>
+<input type="hidden" name="total_cost" id="total_cost_field">

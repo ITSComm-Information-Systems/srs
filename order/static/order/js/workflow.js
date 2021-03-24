@@ -223,6 +223,10 @@ $(document).ready(function() {
     $("#div_misevexissev").trigger("change");
   });
 
+  $(document).on("change", "#id_owner", function() {
+    database = $("#id_database").val();
+  });
+
   $(document).on("change", "#div_misevexissev" , function() {
     if ($('#misevexissev_1').prop("checked")) {  // Yes contact me to migrat
       $('#div_mcommserveradmin').hide().prop('required',false);
@@ -311,12 +315,34 @@ $(document).ready(function() {
     disk_no_replication = $('#server_rates').data('disk_no_replication');
     disk_backup = $('#server_rates').data('disk_backup');
 
+    if (database) {
+      $("#add_disk_link").hide();
+    }
+
     $("#div_managed").trigger("change");
-    $("#div_misevprefix").trigger("change");
     $("#id_cpu").trigger("change");
-    $("#id_misevos").trigger("change");
+
     update_total_cost();
   });
+
+  $(document).on("focusout", "#id_serverName" , function() {
+    set_server_name();
+  });
+
+  function set_server_name() {
+    
+    server_name = $("#id_serverName").val();
+    if (database) {
+      server_name = 'db-' + server_name + '-' + database.toLowerCase();
+    } else {
+      prefix = $("#id_misevregpre").val();
+      if (prefix) {
+        server_name = prefix + '-' + server_name;
+      }
+    }
+
+    $("#id_name").val(server_name);
+  }
 
   $(document).on("change", ".cost-driver" , function() {
     update_total_cost();
@@ -388,21 +414,40 @@ $(document).ready(function() {
     }
   });
 
-  $(document).on("change", "#id_misevos" , function() {
-    os = $('#id_misevos option:selected').text();
-    if (os) {
-      if (os.startsWith('Windows')) {
-        $('#div_misevprefix').show().prop('required',true);
-        if ( $('#id_cpu').val() < 2 ) {
-          $('#id_cpu').val(2);
-          $("#id_cpu").trigger("change");
+  function set_managed_windows() {
+    managed_windows = false;
+    if ($('#managed_0').prop("checked")) {
+      os = $('#id_misevos option:selected').text()
+      if (os) {
+        if (os.startsWith('Windows')) {
+          managed_windows = true;
         }
+      }
+    }
+
+    if (managed_windows && !database) {  // No prefix for database servers
+      $('#div_misevprefix').show().prop('required',true);  // Prefix Y/N?
+      if ($('#misevprefix_0').prop("checked") ) { // Yes, special prefix
+        $('#div_misevregpre').show().prop('required',true);
       } else {
-        $('#div_misevprefix').hide().prop('required',false);
+        $('#div_misevregpre').hide().prop('required',false);
       }
     } else {
       $('#div_misevprefix').hide().prop('required',false);
+      $('#div_misevregpre').hide().prop('required',false);
     }
+
+    if (managed_windows) {
+      if ( $('#id_cpu').val() < 2 ) {
+        $('#id_cpu').val(2);
+        $("#id_cpu").trigger("change");
+      }
+    }
+
+  }
+
+  $(document).on("change", "#id_misevos" , function() {
+    set_managed_windows();
   });
 
   $(document).on("change", "#div_managed" , function() {
@@ -416,6 +461,7 @@ $(document).ready(function() {
       $('#div_misevos').hide().prop('required',false);
       $('#div_misernonmang').hide().prop('required',false);
     }
+    set_managed_windows();
   });
 
   $(document).on("change", "#div_misevprefix" , function() {
