@@ -332,12 +332,14 @@ $(document).ready(function() {
   function set_server_name() {
     
     server_name = $("#id_serverName").val();
+
     if (database) {
       server_name = 'db-' + server_name + '-' + database.toLowerCase();
-    } else {
-      prefix = $("#id_misevregpre").val();
-      if (prefix) {
-        server_name = prefix + '-' + server_name;
+    } else if (managed_windows) {
+      if ($('#misevprefix_0').prop("checked")) {
+        server_name = $("#id_misevregpre").val() + '-' + server_name;
+      } else {
+        server_name = 'MIS-' + server_name;
       }
     }
 
@@ -443,8 +445,12 @@ $(document).ready(function() {
         $("#id_cpu").trigger("change");
       }
     }
-
+    set_server_name();
   }
+
+  $(document).on("change", "#id_misevregpre" , function() {
+    set_server_name();
+  });
 
   $(document).on("change", "#id_misevos" , function() {
     set_managed_windows();
@@ -467,14 +473,12 @@ $(document).ready(function() {
   $(document).on("change", "#div_misevprefix" , function() {
     if ($('#misevprefix_0').prop("checked")) {  // Registered Prefix
       $('#div_misevregpre').show().prop('required',true);
-      //$('#div_misevnopre').hide().prop('required',false);
     } else if ($('#misevprefix_1').prop("checked")) {  // No, use standard
       $('#div_misevregpre').hide().prop('required',false);
-      //$('#div_misevnopre').show().prop('required',true);
     } else {
       $('#div_misevregpre').hide().prop('required',false);
-      //$('#div_misevnopre').hide().prop('required',false);
     }
+    set_server_name();
   });
 
   // MiServer Data Sensitivity
