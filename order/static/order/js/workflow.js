@@ -216,7 +216,20 @@ $(document).ready(function() {
     $('#div_ad_group').hide();
   });
 
+  // midatabasic
+  $('[data-tab="midatabasic"]').on('shown.bs.tab', function(event) {
+    
+    if (typeof database === 'undefined') {
+      database = 'MSSQL';
+    }
 
+    if (database="MySQL") {
+      $('#div_url').show().prop('required',false);  // Optional
+    } else {
+      $('#div_url').hide().prop('required',false);
+    }
+
+  });
 
   // miSevBasic
   $('[data-tab="miSevBasic"]').on('shown.bs.tab', function(event) {
@@ -305,6 +318,7 @@ $(document).ready(function() {
     } else {
       $("#div_midatasql").hide();
     }
+    database = $('#id_midatatype option:selected').text();
   });
 
 
@@ -337,7 +351,7 @@ $(document).ready(function() {
       if (database == "MSSQL") {
         server_name = 'db-' + server_name
       } else {
-        server_name = 'db-' + server_name + '-' + database.toLowerCase();
+        server_name = server_name + '-' + database.toLowerCase();
       }
     } else if (managed_windows) {
       if ($('#misevprefix_0').prop("checked")) {
