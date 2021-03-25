@@ -280,6 +280,9 @@ class TabForm(forms.Form):
                 field.template_name = 'project/text.html'
                 #field = forms.IntegerField(label=element.label, help_text=element.description)
 
+            if element.attributes == 'optional':
+                field.required = False
+
             field.name = element.name
             field.current_user = self.request.user
             field.label = element.label
