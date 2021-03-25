@@ -944,6 +944,7 @@ class BillingStorageForm(TabForm):
             descr = self.fields['totalCost'].description.replace('~', str(total_cost))
         elif self.action.service.name == 'midatabase':
             descr = self.fields['totalCost'].description.replace('~', '0.00')
+            self.fields['shortcode'].label = 'Enter Shortcode for departmental tracking purposes'
         elif self.action.service.name == 'miServer':
             total_cost = self.request.POST.get('total_cost', 0)
             descr = self.fields['totalCost'].description.replace('~', str(total_cost))
