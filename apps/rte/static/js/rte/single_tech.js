@@ -105,6 +105,17 @@ function wo_to_review() {
     $('#tech-info-review').append($("#tech-info-input").html());
 }
 
+
+// Copy entry
+entries = {}
+function test(num){
+    $('#workOrderSearch').val()=entries[num]['order'];
+    $('#workOrderSearch').val()=entries[num]['rate'];
+    $('#duration-hours').val()=entries[num]['hour'];
+    $('#duration-mins').val()=entries[num]['min'];
+    $('#notes').val()=entries[num]['notes']
+}
+
 // Add row to input table
 function add_to_table(num_entries) {
     if (num_entries < 15) {
@@ -115,8 +126,14 @@ function add_to_table(num_entries) {
                         '<td>' + $('#assigned_date').val() + '</td>' +
                         '<td>' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</td>' +
                         '<td>' + $('#notes').val() + '</td>' +
-                        '<td class="delete-col"><button class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></td>' +
+                        '<td class="delete-col"><button id="single-copy" onClick="test('+num_entries+')" >Copy</button><button class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></td>' +
                     '</tr>';
+    entries[num_entries] = {'order':$('#workOrderSearch').val(), 
+    'rate': $('#rateSelect').val(),
+    'hour': $('#duration-hours').val(),
+    'min': $('#duration-mins').val(),
+    'notes':$('#notes').val()
+}        
         var form_html = '<input type="text" name="' + num_entries + '_work_order" value="' + $('#workOrderSearch').val() + '" hidden>' +
                         '<input type="text" name="' + num_entries + '_rate" value="' + $('#rateSelect').val() + '" hidden>' +
                         '<input type="date" name="' + num_entries + '_assigned_date" value="' + $('#assigned_date').val() + '" hidden>' +
