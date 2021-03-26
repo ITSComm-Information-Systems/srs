@@ -675,14 +675,12 @@ class ServerSupportForm(TabForm):
                 windows = False
 
         if kwargs['request'].POST.get('managed') == 'unmang' or not windows:
-            self.fields.pop('backup_time')
             self.fields.pop('patch_day')
             self.fields.pop('patch_time')
             self.fields.pop('reboot_day')
             self.fields.pop('reboot_time')
-            self.fields.pop('support_email')
-            self.fields.pop('support_phone')
-        elif kwargs['request'].POST.get('backup') == False:
+
+        if kwargs['request'].POST.get('backup') == 'False':
             self.fields.pop('backup_time')
             
 
