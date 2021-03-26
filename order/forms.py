@@ -803,7 +803,6 @@ class ServerSpecForm(TabForm):
         for line in summary:
             if line['label'] == 'Server Name':
                 line['value'] = self.data.get('name')
-                print('label', self.data)
 
             if line['label'] == 'Disk Space':
                 break
