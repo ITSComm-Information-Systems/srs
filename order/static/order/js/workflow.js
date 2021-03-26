@@ -285,7 +285,6 @@ $(document).ready(function() {
     dedicated = false;
 
     if ($('#id_size').val() > 50) {
-      console.log('size over fidy');
       dedicated = true;
     }
 
@@ -296,7 +295,6 @@ $(document).ready(function() {
     }
 
     if ($('#sensitiveData_0').prop("checked")) {  // Sensitive Data
-      console.log('data too sensitive')
       dedicated = true;
     }
 
@@ -527,8 +525,75 @@ $(document).ready(function() {
 
   // Miserver Support Services
   $('[data-tab="miSevSupport"]').on('show.bs.tab', function(event) {
-    $("#div_backup").trigger("change");
+    $("#id_reboot_day").trigger("change");
+    $("#id_backup_time").trigger("change");
   });
+
+  $(document).on("change", "#id_reboot_day" , function() {
+    if ($( "#id_reboot_day option:selected" ).text() == 'No Reboot Needed') {
+      $('#div_reboot_time').hide();
+    } else {
+      $('#div_reboot_time').show();
+    }
+  });
+
+  $(document).on("change", "#id_backup_time" , function() {
+
+    function get_hour(time) {
+      t1 = time.split(" ");
+      meridian = t1[1];
+      t2 = t1[0].split(':')
+      hour = parseFloat(t2[0]);
+      minute = t2[1];
+
+      if (meridian=='PM') {
+        hour = hour + 12;
+      } else if (hour==12) {
+        hour = 0;
+      }
+
+      if (minute=='30') {
+        hour = hour + .5;
+      }
+  
+      return hour;
+    }
+
+    function within_window(timeA, timeB, offset) {
+      if (Math.abs(timeA - timeB) < offset) { // within offset
+        return true;
+      } else if (Math.abs((timeA+24) - timeB) < offset) {  // does timeA span midnight? eg 23:30 and 0:30
+          return true;
+      } else if (Math.abs(timeA - (timeB+24)) < offset) {  // does timeB span midnight? eg 23:30 and 0:30
+          return true;
+      } else {
+        return false;
+      }
+    }
+
+    function disable_options(target) {
+      $("#" + target + " > option").each(function() {
+        this_time = get_hour(this.text);
+        
+        if (within_window(this_time, backup_time,2)) {
+          $(this).attr('disabled','disabled')
+        } else {
+          $(this).removeAttr('disabled','disabled')
+        }
+      });
+    }
+
+    time = $( "#id_backup_time option:selected" ).text();
+    if (time != 'None') {
+      backup_time = get_hour(time);
+      disable_options('id_reboot_time');
+      disable_options('id_patch_time');
+    }
+
+  });
+
+
+
 
   var x = document.getElementsByClassName("ccsel");
   var i;
@@ -692,7 +757,6 @@ $(document).ready(function() {
         }
       } else {
         name = $("#" + inp[i].id).attr('name')
-        //console.log('name:' + name);
         if (!label) {
           label = $("label[for='" + id + "']").text();
         }
