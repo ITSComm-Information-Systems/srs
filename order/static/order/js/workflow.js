@@ -223,7 +223,7 @@ $(document).ready(function() {
       database = 'MSSQL';
     }
 
-    if (database="MySQL") {
+    if (database=="MySQL") {
       $('#div_url').show().prop('required',false);  // Optional
     } else {
       $('#div_url').hide().prop('required',false);
