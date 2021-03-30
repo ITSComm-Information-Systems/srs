@@ -1155,12 +1155,29 @@ class Item(models.Model):
                     attributes.append({'ID': element.target, 'Value': value})
 
         if self.data['action_id'] == '67':
+            db = self.data.get('database')
+            if db:
+                if db == 'MSSQL':
+                    attributes.append({'ID': 1994, 'Value': 215}) # Windows
+                else:
+                    attributes.append({'ID': 1994, 'Value': 216}) # Linux
+            else:
+                managed = self.data.get('managed')
+                if managed:
+                    os_name = Choice.objects.get(id=self.data.get('misevos')).code
+                    if os_name.startswith('Windows'):
+                        attributes.append({'ID': 1994, 'Value': 215}) # Windows
+                    else:
+                        attributes.append({'ID': 1994, 'Value': 216}) # Linux
+                else:
+                    attributes.append({'ID': 1994, 'Value': 214}) # IAAS
+
             for field in text[1]['fields']:
                 if field['label'] == 'Disk Space':
                     nl = '\n'
                     disks = nl.join(field['list'])
                     attributes.append({'ID': 1965, 'Value': disks})
-
+            
         # Add Action Constants to Payload
         cons = Constant.objects.filter(action=action)
 
