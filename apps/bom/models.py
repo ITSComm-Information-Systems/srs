@@ -71,18 +71,20 @@ class Technician(models.Model):
     ACTIVE = 1
     INACTIVE = 0
 
-    id = models.IntegerField(primary_key=True)
-    code = models.CharField(max_length=20)
+    labor_id = models.IntegerField(primary_key=True)
+    labor_code = models.CharField(max_length=20)
     name = models.CharField(max_length=80)
+    labor_name_display = models.CharField(max_length=80)
     user_name = models.CharField(max_length=80)
     active = models.PositiveSmallIntegerField()
+    trade_id = models.CharField(max_length=3)
 
     class Meta:
         db_table = 'um_bom_technician_v'
         managed = False
 
     def __str__(self):
-        return self.name
+        return self.labor_name_display
         
 
 class EstimateManager(models.Manager):
