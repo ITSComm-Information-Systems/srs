@@ -37,7 +37,8 @@ class TDx():
         attr_list = self.get_attributes()
         for attr in attr_list:
             if attr['ID'] == id:
-                print(attr)
+                formatted = json.dumps(attr, indent=2)
+                print(formatted)
 
     def get_child_attributes(self, parent_id):
         attr_list = self.get_attributes()
