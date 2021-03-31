@@ -109,6 +109,7 @@ function wo_to_review() {
 // Copy entry
 entries = {}
 function test(num){
+    console.log(entries)
     $('#workOrderSearch').val()=entries[num]['order'];
     $('#workOrderSearch').val()=entries[num]['rate'];
     $('#duration-hours').val()=entries[num]['hour'];
@@ -126,7 +127,7 @@ function add_to_table(num_entries) {
                         '<td>' + $('#assigned_date').val() + '</td>' +
                         '<td>' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</td>' +
                         '<td>' + $('#notes').val() + '</td>' +
-                        '<td class="delete-col"><button id="single-copy" onClick="test('+num_entries+')" >Copy</button><button class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></td>' +
+                        '<td style="padding-right: 0px;" class="delete-col"><div style="float:right;"><button style="float: left;" class="btn btn-success" id="single-copy" onClick="test('+num_entries+')" >Copy</button> <button style="float: right;" class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></div></td>' +
                     '</tr>';
     entries[num_entries] = {'order':$('#workOrderSearch').val(), 
     'rate': $('#rateSelect').val(),
