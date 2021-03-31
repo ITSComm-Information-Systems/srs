@@ -688,10 +688,10 @@ class ServerDataForm(TabForm):
 
     def clean(self):
 
-        if self.request.POST.get('managed') == 'unmang':
-            if self.request.POST.get('misevregu') == 'yesregu':
+        if self.request.POST.get('managed') == False:
+            if self.request.POST.get('misevregu') == True:
                 raise ValidationError("Please select a managed server for sensitive data.")
-            if self.request.POST.get('misevnonregu') == 'yesnonregu':
+            if self.request.POST.get('misevnonregu') == True:
                 raise ValidationError("Please select a managed server for sensitive data.")
         super().clean()
 
