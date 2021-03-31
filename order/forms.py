@@ -740,6 +740,7 @@ class ServerSpecForm(TabForm):
                 else:
                     self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB'}]
                     self.fields['cpu'].initial = 1
+                    self.fields['managed'].initial = True
 
     def set_database_defaults(self):
         
