@@ -13,7 +13,7 @@ from datetime import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
 
-from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, EstimateView, UmOscNoteProfileV, NotificationManager, Notification
+from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, ProjectView, EstimateView, UmOscNoteProfileV, NotificationManager, Notification
 from .forms import FavoriteForm, EstimateForm, ProjectForm, MaterialForm, MaterialLocationForm, LaborForm
 
 
@@ -515,3 +515,15 @@ class Favorites(PermissionRequiredMixin, View):
                       {'title': 'My Favorites',
                        'formset': formset,
                        'item_list': item_list, })
+
+
+class NetOpsSearch(PermissionRequiredMixin, View):
+    permission_required = 'bom.can_access_bom'
+
+    def get(self, request):
+        template = 'bom/netops.html'
+
+        search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3) | Q(percent_completed__lt=100)).order_by('-woid')
+        return render(request, template,
+                      {'title': 'Netops Projects',
+                       'search_list': search_list})
