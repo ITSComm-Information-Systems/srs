@@ -87,7 +87,11 @@ ENVIRONMENT = os.getenv('ENVIRONMENT', 'DEV')
 SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')
 OIDC_RP_CLIENT_ID = os.getenv('OIDC_RP_CLIENT_ID', 'N/A')
 OIDC_RP_CLIENT_SECRET = os.getenv('OIDC_RP_CLIENT_SECRET','N/A')
-AUTH_BASE_URL = os.getenv('AUTH_BASE_URL','https://shib-idp-staging.dsc.umich.edu')
+#AUTH_BASE_URL = os.getenv('AUTH_BASE_URL','https://shib-idp-test.www.umich.edu')
+
+OIDC_RP_CLIENT_ID = '38e946e0-dfc8-4b4f-b5f7-3dcadaa94ebb'
+OIDC_RP_CLIENT_SECRET = 'd8d538eb-48cd-4a24-82ec-767eb393b657'
+AUTH_BASE_URL = 'https://shibboleth.umich.edu'
 OIDC_CALLBACK = SITE_URL + '/oidc/callback/'
 OIDC_OP_AUTHORIZATION_ENDPOINT = AUTH_BASE_URL + '/idp/profile/oidc/authorize'
 OIDC_OP_TOKEN_ENDPOINT = AUTH_BASE_URL + '/idp/profile/oidc/token'
