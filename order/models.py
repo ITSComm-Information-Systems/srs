@@ -1167,11 +1167,13 @@ class Item(models.Model):
                 managed = self.data.get('managed')
                 if managed:
                     os_name = Choice.objects.get(id=self.data.get('misevos')).code
+                    attributes.append({'ID': 1952, 'Value': 203}) # Managed
                     if os_name.startswith('Windows'):
                         attributes.append({'ID': 1994, 'Value': 215}) # Windows
                     else:
                         attributes.append({'ID': 1994, 'Value': 216}) # Linux
                 else:
+                    attributes.append({'ID': 1952, 'Value': 207}) # Non-Managed
                     attributes.append({'ID': 1994, 'Value': 214}) # IAAS
 
             for field in text[1]['fields']:
