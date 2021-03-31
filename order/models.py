@@ -1157,6 +1157,8 @@ class Item(models.Model):
         if self.data['action_id'] == '67':
             db = self.data.get('database')
             if db:
+                attributes.append({'ID': 5413, 'Value': db})
+
                 if db == 'MSSQL':
                     attributes.append({'ID': 1994, 'Value': 215}) # Windows
                 else:
