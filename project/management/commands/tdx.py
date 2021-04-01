@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from project.integrations import UmAPI, MCommunity
+
 
 import requests, json
 
@@ -11,9 +13,21 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        id = options['id']
-        tdx = TDx()
-        tdx.get_attribute_by_id(id)
+
+        #api = UmAPI('shortcode')
+
+        mc = MCommunity()
+        mc.get_groups('djamison')
+
+        groups = mc.get_groups('djamison')
+        for group in groups:
+            print(group)
+
+        #api.get_shortcode(940314)
+
+        #id = options['id']
+        #tdx = TDx()
+        #tdx.get_attribute_by_id(id)
         #tdx.get_child_attributes(id)
         #tdx.get_choices(id)
 
