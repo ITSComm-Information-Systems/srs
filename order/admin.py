@@ -333,9 +333,8 @@ class BackupDomainAdmin(admin.ModelAdmin):
         )
 
 class BackupNodeAdmin(admin.ModelAdmin):
-    list_display = ['backup_domain', 'name']
+    list_display = ['name','backup_domain']
     search_fields = ['name']
-
 
 
 admin.site.register(Constant)
