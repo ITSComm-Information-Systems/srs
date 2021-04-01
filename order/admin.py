@@ -332,6 +332,11 @@ class BackupDomainAdmin(admin.ModelAdmin):
             request, object_id, form_url, extra_context=extra_context,
         )
 
+class BackupNodeAdmin(admin.ModelAdmin):
+    list_display = ['backup_domain', 'name']
+    search_fields = ['name']
+
+
 
 admin.site.register(Constant)
 admin.site.register(ProductCategory, ProductCategoryAdmin)
@@ -350,4 +355,4 @@ admin.site.register(FeatureCategory, FeatureCategoryAdmin)
 admin.site.register(StorageRate, StorageRateAdmin)
 
 admin.site.register(BackupDomain, BackupDomainAdmin)
-admin.site.register(BackupNode)
+admin.site.register(BackupNode, BackupNodeAdmin)
