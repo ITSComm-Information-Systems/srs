@@ -34,9 +34,9 @@
                 <td>{{ record.status_name }}</td>
                 <td>{{ record.percent_completed }}</td>
                 <td>{{ record.get_health_display }}</td>
-                <td>{{ record.assigned_date }}</td>
-                <td>{{ record.due_date }}</td>
-                <td>{{ record.completed_date }}</td>
+                <td>{{ record.assigned_date|date:"N j, Y"|default:"None" }}</td>
+                <td>{{ record.due_date|date:"N j, Y"|default:"None" }}</td>
+                <td>{{ record.completed_date|date:"N j, Y"|default:"None" }}</td>
                 <td>{{ record.activity }}</td>
             </tr>
             {% endfor %}

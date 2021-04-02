@@ -76,7 +76,7 @@ class Technician(models.Model):
     labor_name_display = models.CharField(max_length=80)
     user_name = models.CharField(max_length=80)
     active = models.PositiveSmallIntegerField()
-    trade_id = models.CharField(max_length=3)
+    wo_group_code = models.CharField(max_length=32)
 
     class Meta:
         db_table = 'um_bom_technician_v'
@@ -188,7 +188,7 @@ class Estimate(BOM):
     woid = models.IntegerField()
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=ESTIMATE)
     label = models.CharField(max_length=20)
-    assigned_engineer = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True)
+    assigned_engineer = models.ForeignKey(Technician, on_delete=models.CASCADE, limit_choices_to={'wo_group_code':'Network Operation'},blank=True,null=True)
     contingency_amount = models.DecimalField(null=True, max_digits=8, decimal_places=2, default=0)
     contingency_percentage = models.IntegerField(null=True, default=0)
     folder = models.URLField(null=True, blank=True)

@@ -86,4 +86,4 @@ class ProjectForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
         if self.instance:
-            self.fields['netops_engineer'].queryset = Technician.objects.filter(active=Technician.ACTIVE, trade_id='NA').order_by('labor_name_display')
+            self.fields['netops_engineer'].queryset = Technician.objects.filter(active=Technician.ACTIVE, wo_group_code = 'Network Operation').order_by('labor_name_display')
