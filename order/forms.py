@@ -5,6 +5,7 @@ from .models import *
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 from oscauth.models import LDAPGroupMember
+from project.integrations import MCommunity
 import math
 from project.models import Choice
 
@@ -270,9 +271,17 @@ class TabForm(forms.Form):
             elif element.type == 'HTML':
                 field = forms.CharField(required=False)
                 field.template_name = 'project/static.html'
-            elif element.type == 'McGroup--':
-                field = McGroup()
-                field.template_name = 'project/static.html'
+            elif element.type == 'McGroup':
+                print(self.request.user.username)
+                group_list = MCommunity().get_groups(self.request.user.username)
+
+                choice_list = []
+                for group in group_list:
+                    choice_list.append((group, group,))
+
+                field = forms.ChoiceField(choices=choice_list, widget=forms.Select(attrs={'class': 'form-control'}))
+                #field.initial = element.attributes
+                field.template_name = 'project/text.html'
             else:
                 # Use custom field from project.forms.fields
                 field = globals()[element.type](label=element.name)
