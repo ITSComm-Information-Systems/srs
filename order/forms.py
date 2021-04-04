@@ -272,10 +272,9 @@ class TabForm(forms.Form):
                 field = forms.CharField(required=False)
                 field.template_name = 'project/static.html'
             elif element.type == 'McGroup':
-                print(self.request.user.username)
                 group_list = MCommunity().get_groups(self.request.user.username)
 
-                choice_list = []
+                choice_list = [(None, '---')]
                 for group in group_list:
                     choice_list.append((group, group,))
 
