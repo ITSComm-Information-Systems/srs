@@ -240,6 +240,13 @@ $(document).ready(function() {
     database = $("#id_database").val();
   });
 
+  $(document).on("keypress", ".validate-integer", function(e) {
+    console.log(this.value);
+    if (e.keyCode==46 || e.keyCode==45) {
+      e.preventDefault();
+    }
+  });
+
   $(document).on("change", "#div_misevexissev" , function() {
     if ($('#misevexissev_1').prop("checked")) {  // Yes contact me to migrat
       $('#div_mcommserveradmin').hide().prop('required',false);
