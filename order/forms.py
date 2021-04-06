@@ -296,7 +296,7 @@ class TabForm(forms.Form):
             if element.attributes == 'optional':
                 field.required = False
 
-            if not hasattr(field, 'template'):
+            if not hasattr(field, 'template_name'):
                 field.template_name = 'project/text.html'
 
             field.name = element.name
@@ -847,6 +847,13 @@ class ServerSpecForm(TabForm):
             if ram / cpu < 2:
                 self.add_error('ram', 'Ram must be at least double cpu.')
 
+            if cpu < 2 and self.cleaned_data.get('managed', False):
+                os = self.cleaned_data.get('misevos', False)
+                if os:
+                    os_name = Choice.objects.get(id=int(os)).label
+                    if os_name.startswith('Windows'):
+                        self.add_error('cpu', 'Managed Windows requires at least two cpu.')
+    
         super().clean()  # When regular clean isn't enough
 
 
