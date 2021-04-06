@@ -23,8 +23,14 @@
                     <td><a class="related-widget-wrapper-link change-related" id="change_id_service" data-href-template="/admin/order/service/__fk__/change/?_to_field=id&amp;_popup=1" title="Change selected service" href="/admin/order/element/{{ element.id }}/change/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-changelink.svg" alt="Change"></a></td>
                     <td> {{ element.display_seq_no }} </td>
                     <td> {{ element.name }} </td>
-                    <td> {{ element.type }} </td>
-                    <td> {{ element.label }} </td>
+                    <td> {{ element.type }}</td>
+                    <td> {{ element.label }}  <br>
+                        <ul>
+                        {% for key, value in element.arguments.items %}
+                            <li><b>{{ key }}</b> : {{ value }}</li>
+                        {% endfor %}
+                        </ul>
+                    </td>
                     <td> {{ element.attributes }} </td>
                     <td> {{ element.display_condition }} </td>
                     <td> {{ element.target }} </td>

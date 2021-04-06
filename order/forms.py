@@ -7,7 +7,7 @@ from project.pinnmodels import UmOSCBuildingV
 from oscauth.models import LDAPGroupMember
 from project.integrations import MCommunity
 import math
-from project.models import Choice 
+from project.models import Choice
 
 from project.forms.fields import *
 
@@ -80,25 +80,6 @@ class TabForm(forms.Form):
                     self.add_error('size', 'Enter a size of at least 5 terabytes') 
 
         for field in self.fields:
-            if self.fields[field].type == 'NU' and field in self.cleaned_data:
-                f = self.fields[field]
-
-                val = self.cleaned_data[field]
-
-                attrs = json.loads(f.attributes)
-                if 'min' in attrs:
-                    if val < attrs['min']:
-                        min = attrs['min']
-                        self.add_error(field, f'Enter a value of at least {min}')
-                if 'max' in attrs:
-                    if val > attrs['max']:
-                        min = attrs['max']
-                        self.add_error(field, f'Enter a value of no more than {max}')
-                if 'step' in attrs:
-                    if val % attrs['step'] != 0:
-                        step = attrs['step']
-                        self.add_error(field, f'Enter a multiple of {step}')
-                
             if self.has_error(field):
                 if self.fields[field].type == 'Radio' or self.fields[field].type == 'Checkbox':
                     self.fields[field].widget.attrs.update({'class': ' is-invalid'}) #form-control makes radio buttons wonky
@@ -272,14 +253,7 @@ class TabForm(forms.Form):
                                                                         #AuthUserDept.get_order_departments(request.user.id)
                 field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
             elif element.type == 'NU':
-                if element.attributes:
-                    attrs = json.loads(element.attributes)
-                else:
-                    attrs = {}
-
-                attrs['class'] = 'form-control validate-integer'
-
-                field = forms.IntegerField(widget=forms.NumberInput(attrs=attrs))
+                field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1", 'class': 'form-control'}), **element.arguments)
                 field.template_name = 'project/number.html'
             elif element.type == 'Select':
                 field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.Select(attrs={'class': 'form-control'}))
@@ -306,6 +280,12 @@ class TabForm(forms.Form):
                 field = forms.ChoiceField(choices=choice_list, widget=forms.Select(attrs={'class': 'form-control'}))
                 #field.initial = element.attributes
                 field.template_name = 'project/text.html'
+            elif hasattr(forms, element.type):
+                fld = getattr(forms, element.type)
+                field = fld(**element.arguments)
+                field.widget.attrs={'class': 'form-control'}
+                field.template_name = 'project/text.html'
+
             else:
                 # Use custom field from project.forms.fields
                 field = globals()[element.type](label=element.name)
@@ -315,6 +295,9 @@ class TabForm(forms.Form):
 
             if element.attributes == 'optional':
                 field.required = False
+
+            if not hasattr(field, 'template'):
+                field.template_name = 'project/text.html'
 
             field.name = element.name
             field.current_user = self.request.user
