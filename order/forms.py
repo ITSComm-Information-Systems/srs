@@ -620,7 +620,18 @@ class DetailsNFSForm(TabForm):
 class DatabaseTypeForm(TabForm):
     template = 'order/database_type.html'
 
+
+    def __init__(self, *args, **kwargs):
+        super(DatabaseTypeForm, self).__init__(*args, **kwargs)
+
+        self.fields['size'].widget.attrs.update({'step': 10})
+
+
     def clean(self):
+        size = self.cleaned_data.get('size', 0)
+        if size % 10 != 0:
+            self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
+
         if self.is_valid() and self.request.POST.get('shared') == 'Dedicated':
             self.fields['size'].widget.attrs.update({'data-server': 99})
             raise ValidationError("Selections require dedicated server")
