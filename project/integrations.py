@@ -46,38 +46,30 @@ class UmAPI:
     AUTH_TOKEN = settings.UM_API['AUTH_TOKEN']
     BASE_URL = settings.UM_API['BASE_URL']
 
-    def __init__(self, scope):
-        print(scope)
-        self.scope = scope
-        self.access_token = self._get_token()
-        self.headers = {
-            'X-IBM-Client-Id': self.CLIENT_ID,
-            'Authorization': 'Bearer ' + self.access_token,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json' 
-            }
-
-    def _get_token(self):
+    def _get_token(self, scope, prefix):
 
         headers = { 
             'Authorization': f'Basic {self.AUTH_TOKEN}',
             'accept': 'application/json'
             }
 
-        url = f'{self.BASE_URL}/um/it/oauth2/token?grant_type=client_credentials&scope={self.scope}'
+        url = f'{self.BASE_URL}/um/{prefix}/oauth2/token?grant_type=client_credentials&scope={scope}'
         response = requests.post(url, headers=headers)
         response_token = json.loads(response.text)
         access_token = response_token.get('access_token')
-        print(response.status_code, response.text)
+
+        self.headers = {
+            'X-IBM-Client-Id': self.CLIENT_ID,
+            'Authorization': 'Bearer ' + access_token,
+            #'Content-Type': 'application/json',
+            'Accept': 'application/json' 
+        }
+
         return access_token
         
-    def get_shortcode(self, shortcode):
-        url = f'{self.BASE_URL}/um/bf/ShortCodes/{shortcode}'
-        print('earl', url)
-        response = requests.get(url, headers=self.headers)
-        print(response.status_code, response.text)
 
-    def send_ticket():
+
+    def get_ticket():
         return 'x'
 
     def submit_incident(self, route, action):
@@ -163,3 +155,21 @@ class UmAPI:
  
         self.external_reference_id = json.loads(response.text)['ID']
         self.save()   # Save incident number to item
+
+
+class ShortCodesAPI(UmAPI):
+    SCOPE = 'shortcodes'
+    PREFIX = 'bf'
+
+    def __init__(self):
+        self._get_token(self.SCOPE, self.PREFIX)
+
+    def get_shortcode(self, shortcode):        
+        url = f'{self.BASE_URL}/um/bf/ShortCodes/ShortCodes/{shortcode}'
+        response = requests.get(url, headers=self.headers)
+
+        if response.status_code != 200:
+            print('error', response.status_code, response.text)
+            return response.status_code
+        else:
+            return json.loads(response.text)
