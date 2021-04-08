@@ -41,7 +41,7 @@ class DefaultViewSet(viewsets.ModelViewSet):
         kwargs = {}
 
         for parm, val in self.request.GET.items():
-            if parm != 'page':
+            if hasattr(self.serializer_class.Meta.model, parm):
                 kwargs[parm] = val
 
         queryset = queryset.filter(**kwargs)
