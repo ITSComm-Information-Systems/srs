@@ -932,6 +932,8 @@ class BillingStorageForm(TabForm):
         super(BillingStorageForm, self).__init__(*args, **kwargs)
         total_cost = 0
 
+        self.fields['shortcode'].validators=[validate_shortcode]
+
         if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':
             self.template = 'order/billing_storage.html'
             self.shortcode_list = []
