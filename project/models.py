@@ -2,14 +2,25 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 import re
-
+from project.integrations import ShortCodesAPI
 
 def validate_shortcode(value):
 
-     if re.search("\d{6}", value):
-          print('todo lookup shortcode')
-     else:
+     if not re.search("\d{6}", value):
           raise ValidationError(f'Please enter a six digit shortcode.')
+     else:
+          try:
+               api = ShortCodesAPI()
+               shortcodes = api.get_shortcode(value)
+               shortcode = shortcodes['ShortCodes']['ShortCode']
+               descr = shortcode['shortCodeDescription']
+               status = shortcode['ShortCodeStatusDescription']
+          except:
+               raise ValidationError(f'ShortCode {value} Not Found.')
+
+     if status != 'Open':
+          raise ValidationError(f'ShortCode {value} is {status}.')
+
 
 
 # This view uses the Pinnacle location table and includes locations added by ITS staff
@@ -32,7 +43,7 @@ class ShortCodeField(models.CharField):
 
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 6
-        kwargs['validators']=[validate_shortcode]
+        #kwargs['validators']=[validate_shortcode]
         kwargs['help_text']='Six digit shortcode for billing purposes.'
 
         super().__init__(*args, **kwargs)
