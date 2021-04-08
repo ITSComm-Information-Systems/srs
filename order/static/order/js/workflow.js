@@ -218,10 +218,12 @@ $(document).ready(function() {
 
   // midatabasic
   $('[data-tab="midatabasic"]').on('shown.bs.tab', function(event) {
-    
+
     if (typeof database === 'undefined') {
       database = 'MSSQL';
     }
+
+    console.log('shown mdb etc', database);
 
     if (database=="MySQL") {
       $('#div_url').show().prop('required',false);  // Optional
@@ -333,6 +335,10 @@ $(document).ready(function() {
     disk_replicated = $('#server_rates').data('disk_replicated');
     disk_no_replication = $('#server_rates').data('disk_no_replication');
     disk_backup = $('#server_rates').data('disk_backup');
+
+    if (typeof database === 'undefined') {
+      database = '';
+    }
 
     if (database) {
       $("#add_disk_link").hide();

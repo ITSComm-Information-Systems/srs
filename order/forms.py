@@ -639,6 +639,14 @@ class DatabaseTypeForm(TabForm):
         super().clean()
 
 
+class DatabaseConfigForm(TabForm):
+
+    def __init__(self, *args, **kwargs):
+        super(DatabaseConfigForm, self).__init__(*args, **kwargs)
+
+        #self.fields['size'].widget.attrs.update({'step': 10})
+
+
 class ServerInfoForm(TabForm):
     template = 'order/base_form.html'
 

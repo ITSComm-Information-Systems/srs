@@ -62,6 +62,7 @@ class Step(Configuration):
         ('VolumeSelectionForm', 'Volume Selection'),
         ('SubscriptionSelForm', 'Subscription Selection'),
         ('DatabaseTypeForm', 'Database Type'),
+        ('DatabaseConfigForm', 'Database Configuration'),
         ('ServerInfoForm', 'Server Info'),
         ('ServerSupportForm', 'Server Support'),
         ('ServerSpecForm', 'Server Specification'),
