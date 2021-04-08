@@ -260,7 +260,7 @@ class TabForm(forms.Form):
                 #field.initial = element.attributes
                 field.template_name = 'project/text.html'
             elif element.type == 'ST' or element.type == 'List':
-                field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+                field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), **element.arguments)
                 field.template_name = 'project/text.html'
                 if element.attributes:
                     field.widget.input_type = element.attributes
