@@ -1159,6 +1159,7 @@ class Item(models.Model):
         if self.data['action_id'] == '67':
             db = self.data.get('database')
             if db:
+                attributes.append({'ID': 1953, 'Value': self.data.get('ad_group')})  # Admin Group
                 attributes.append({'ID': 5413, 'Value': db})
 
                 if db == 'MSSQL':
@@ -1166,6 +1167,7 @@ class Item(models.Model):
                 else:
                     attributes.append({'ID': 1994, 'Value': 216}) # Linux
             else:
+                attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
                 managed = self.data.get('managed')
                 if managed == 'True':
                     os = Choice.objects.get(id=self.data.get('misevos'))
