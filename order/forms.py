@@ -644,7 +644,12 @@ class DatabaseConfigForm(TabForm):
     def __init__(self, *args, **kwargs):
         super(DatabaseConfigForm, self).__init__(*args, **kwargs)
 
-        #self.fields['size'].widget.attrs.update({'step': 10})
+        try:
+            if not Choice.objects.get(id=self.request.POST.get('midatatype')).code == 'MYSQL':
+                self.fields.pop('url') 
+        except:
+            print('error getting database type')
+
 
 
 class ServerInfoForm(TabForm):
