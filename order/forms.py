@@ -698,6 +698,13 @@ class ServerSupportForm(TabForm):
             db = self.request.POST.get('database')
             if db == 'MSSQL':
                 windows = True
+                self.fields['backup_time'].disabled = True
+                self.fields['backup_time'].initial = Choice.objects.get(parent__code='SERVER_BACKUP_TIME', code='1800').id
+                self.fields['patch_day'].disabled = True
+                self.fields['patch_day'].initial = Choice.objects.get(parent__code='SERVER_PATCH_DATE', code='SAT').id
+                self.fields['patch_time'].disabled = True
+                self.fields['patch_time'].initial = Choice.objects.get(parent__code='SERVER_PATCH_TIME', code='0500').id
+                print('sequel 2', Choice.objects.get(parent__code='SERVER_PATCH_DATE', code='SAT'))
             else:
                 windows = False
         else:
