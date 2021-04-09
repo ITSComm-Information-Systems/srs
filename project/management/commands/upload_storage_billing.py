@@ -1,7 +1,8 @@
+import csv, io
 from django.core.management.base import BaseCommand, CommandError
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from order.models import StorageInstance, ArcBilling, ArcInstance, BackupDomain
 from project.pinnmodels import UmBillInputApiV
 from django.db import connections, connection
@@ -35,8 +36,13 @@ class Command(BaseCommand):
                 "where  c.name = 'MB-MCOMM' " \
                 "  and a.owner_id = d.id  order by a.name  "
 
+        miserver_query = 'select * from order_miserver_billing_v order by name'
+
+        self.owner_email = 'arcts-storage-billing@umich.edu'
+
         if self.service == 'MiStorage':
             sql = mistorage_query
+            self.owner_email = 'its.storage@umich.edu'
         elif self.service == 'Turbo':
             sql = arc_ts_query + ' and a.service_id = 9 order by a.name, a.created_date'
         elif self.service == 'Locker-Storage':
@@ -45,6 +51,10 @@ class Command(BaseCommand):
             sql = arc_ts_query + ' and a.service_id = 11 order by a.name, a.created_date'
         elif self.service == 'MiBackup':
             sql = mibackup_query
+            self.owner_email = 'its.storage@umich.edu'
+        elif self.service == 'MiServer':
+            sql = miserver_query
+            self.owner_email = 'MiServer.Support@umich.edu'
         else:
             print('Service not found')
             return
@@ -71,8 +81,12 @@ class Command(BaseCommand):
         x = 0
         total_cost = 0
 
+        csvfile = io.StringIO()
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(['shortcode','size','name','date_created','rate_name','total_cost','owner'])
+
         for instance in instances:
-            print(instance['name'], instance['total_cost'])
+            csvwriter.writerow(instance.values())
 
             rec = UmBillInputApiV()
             rec.data_source = self.service #'MiStorage'
@@ -100,6 +114,24 @@ class Command(BaseCommand):
                                    , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'{self.service}',{today}"] )
         
         print(datetime.now(), result)
-        send_mail(f'{self.service} Billing Records Uploaded', body, 'srs-otto@umich.edu', ['itscomm.information.systems@umich.edu'])
+
+        if settings.ENVIRONMENT == 'Production':
+            subject = f'{self.service} Billing Records Uploaded'
+            to = [self.owner_email, 'ITComBill@umich.edu', 'itscomm.information.systems@umich.edu']
+        else:
+            subject = f'{self.service} Billing Records Uploaded - {settings.ENVIRONMENT}'
+            to = ['itscomm.information.systems@umich.edu', 'djamison@umich.edu']
+
+        email = EmailMessage(
+            subject,
+            body,
+            'srs-otto@umich.edu',
+            to,
+            []
+        )
+
+        email.attach(f'{self.service}.csv', csvfile.getvalue(), 'text/csv')
+
+        email.send()
         print(datetime.now(), 'Process Complete')
 
