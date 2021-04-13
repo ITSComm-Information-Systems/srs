@@ -306,10 +306,13 @@ class ArcBillingAdmin(admin.ModelAdmin):
 
 @admin.register(ArcHost)
 class ArcHostAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['name','arc_instance']
+    search_fields = ['name']
+
 @admin.register(StorageHost)
 class StorageHostAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['name','storage_instance']
+    search_fields = ['name']
 
 class StorageRateAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','name','label','type','rate','service']
