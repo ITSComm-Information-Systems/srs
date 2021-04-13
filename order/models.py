@@ -687,20 +687,29 @@ class Server(models.Model):
         return disk['size__sum']
 
     @property
-    def total_cost(self):
-        ram_cost = self.ram * self.ram_rate
-        disk_cost = 0
+    def ram_cost(self):
+        return self.ram * self.ram_rate
 
+    @property
+    def backup_cost(self):
+        if self.backup:
+            return self.total_disk_size * self.disk_backup
+        else:
+            return 0
+
+    @property
+    def disk_cost(self):
         if self.total_disk_size:
             if self.replicated:
-                disk_cost = self.total_disk_size * self.disk_replicated
+                return self.total_disk_size * self.disk_replicated
             else:
-                disk_cost = self.total_disk_size * self.disk_no_replication
-            if self.backup:
-                disk_cost = disk_cost + (self.total_disk_size * self.disk_backup)
-        
-        total_cost = disk_cost + ram_cost
-        return total_cost
+                return self.total_disk_size * self.disk_no_replication
+        else:
+            return 0
+
+    @property
+    def total_cost(self):
+        return self.ram_cost + self.backup_cost + self.disk_cost
 
     def __str__(self):
         return self.name
