@@ -178,12 +178,12 @@ class ServerAdmin(admin.ModelAdmin):
 
     inlines = [ServerDiskInline,]
 
-    readonly_fields = ('legacy_data',)
+    readonly_fields = ('legacy_data','created_date')
 
     fieldsets = (
         (None, {
-            'fields': (('name', 'in_service'), 'owner', 'admin_group', 'shortcode', ('os','cpu','ram'),
-                        ('replicated','backup','backup_time'),
+            'fields': (('name', 'in_service','created_date'), 'owner', 'admin_group', 'shortcode', ('os','cpu','ram'),
+                        ('replicated','backup','backup_time','public_facing'),
                         'managed',
                         ('regulated_data','non_regulated_data')),
         }),

@@ -632,7 +632,9 @@ class Server(models.Model):
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     admin_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
     shortcode = ShortCodeField()
+    created_date = models.DateTimeField(default=timezone.now)
     #shortcode = models.CharField(max_length=100) 
+    public_facing = models.BooleanField(default=False)
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
     os = models.CharField(max_length=100)     #  <os>Windows2008R2managed</os>
     cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
@@ -648,15 +650,15 @@ class Server(models.Model):
     backup = models.BooleanField(default=False)
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
-    backup_time = models.ForeignKey(Choice, null=True, limit_choices_to={"parent__code": "SERVER_BACKUP_TIME"}
+    backup_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_BACKUP_TIME"}
                                     , related_name='backup_time'
                                     , on_delete=models.CASCADE,)
-    patch_time = models.ForeignKey(Choice, null=True, limit_choices_to={"parent__code": "SERVER_PATCH_TIME"}
+    patch_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_PATCH_TIME"}
                                     , related_name='patch_time'
                                     , on_delete=models.CASCADE,)
     patch_day = models.PositiveSmallIntegerField(null=True, blank=True, choices=DayOfWeek.choices, default=0) #  <patchingScheduleDate>Sunday</patchingScheduleDate>
 
-    reboot_time = models.ForeignKey(Choice, null=True, limit_choices_to={"parent__code": "SERVER_REBOOT_TIME"}
+    reboot_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_REBOOT_TIME"}
                                     , related_name='reboot_time'
                                     , on_delete=models.CASCADE,)
 
@@ -764,6 +766,7 @@ class Database(models.Model):
     in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     shortcode = models.CharField(max_length=100) 
+    created_date = models.DateTimeField(default=timezone.now)
     size = models.IntegerField(null=True)
     type = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_TYPE"}, on_delete=models.SET_NULL, related_name='type')
     #version = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_VERSION"}, on_delete=models.SET_NULL, related_name='version')

@@ -186,6 +186,7 @@ class Command(BaseCommand):
 
         s.legacy_data = data
         s.owner = LDAPGroup().lookup( mc_group )
+        s.admin_group = s.owner
         s.name = self.get_text(xml, 'name', 'Not Found')
         if self.get_text(xml, 'SRVmanaged', '') == 'Managed':
             s.managed = True
@@ -213,9 +214,15 @@ class Command(BaseCommand):
         else:
             s.replicated = False
 
+        sub = self.get_text(xml, 'ipsubnet', '')
+        if sub == 'public':
+            s.public_facing = True
+        else:
+            s.public_facing = False
+
+        s.created_date = self.get_text(xml, 'subscribedDate', '')
 
         #sbu = self.get_time('dailybackuptime', BACKUP_TIME)
-
         s.backup_time_id = self.get_time('dailybackuptime', BACKUP_TIME, s.name)
         s.patch_time_id = self.get_time('patchingScheduleTime', PATCH_TIME, s.name)
         s.reboot_time_id = self.get_time('rebootScheduleTime', REBOOT_TIME, s.name)
@@ -264,7 +271,11 @@ class Command(BaseCommand):
         if not time:
             return
         else:
-            time = time.replace('0','').replace(':','')
+            if time.startswith('0'):
+                time = time[1:9]
+            #print('time', time)
+            #time = time.replace('0','').replace(':','')
+            #print('time', time)
             id = map.get(time)
             if id:
                 return id

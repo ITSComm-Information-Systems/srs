@@ -168,13 +168,6 @@ class Command(BaseCommand):
         type = self.get_text(xml, 'MDDBType', None)
         if type:
             d.type_id = self.database_types.get(type.upper())
-            if type == 'MSSQL':
-                version = self.get_text(xml, 'MDDBVersion', None)
-                if version:
-                    d.version_id = self.database_versions.get(version.upper())
-
-                    if not d.version:
-                        print('no version', version)
 
         try:
             d.save()
