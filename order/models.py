@@ -1162,35 +1162,40 @@ class Item(models.Model):
             if db:
                 attributes.append({'ID': 1953, 'Value': self.data.get('ad_group')})  # Admin Group
                 attributes.append({'ID': 5413, 'Value': db})
+                attributes.append({'ID': 1952, 'Value': 203}) # Managed
 
                 if db == 'MSSQL':
                     attributes.append({'ID': 1994, 'Value': 215}) # Windows
+                    os = Choice.objects.get(code='Windows2019managed')
                 else:
                     attributes.append({'ID': 1994, 'Value': 216}) # Linux
+                    os = Choice.objects.get(code='RedHatEnterpriseLinux8')
+                    
+                attributes.append({'ID': 1957, 'Value': os.label}) 
             else:
                 attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
 
-            managed = self.data.get('managed')
-            if managed == 'True':
-                os = Choice.objects.get(id=self.data.get('misevos'))
-                attributes.append({'ID': 1952, 'Value': 203}) # Managed
-                if os.code.startswith('Windows'):
-                    attributes.append({'ID': 1994, 'Value': 215}) # Windows
+                managed = self.data.get('managed')
+                if managed == 'True' or db:
+                    os = Choice.objects.get(id=self.data.get('misevos'))
+                    attributes.append({'ID': 1952, 'Value': 203}) # Managed
+                    if os.code.startswith('Windows'):
+                        attributes.append({'ID': 1994, 'Value': 215}) # Windows
+                    else:
+                        attributes.append({'ID': 1994, 'Value': 216}) # Linux
                 else:
-                    attributes.append({'ID': 1994, 'Value': 216}) # Linux
-            else:
-                os = Choice.objects.get(id=self.data.get('misernonmang'))
-                attributes.append({'ID': 1952, 'Value': 207}) # Non-Managed
-                attributes.append({'ID': 1994, 'Value': 214}) # IAAS
-            
-            attributes.append({'ID': 1957, 'Value': os.label}) 
+                    os = Choice.objects.get(id=self.data.get('misernonmang'))
+                    attributes.append({'ID': 1952, 'Value': 207}) # Non-Managed
+                    attributes.append({'ID': 1994, 'Value': 214}) # IAAS
+                
+                attributes.append({'ID': 1957, 'Value': os.label}) 
 
             for field in text[1]['fields']:
                 if field['label'] == 'Disk Space':
                     nl = '\n'
                     disks = nl.join(field['list'])
                     attributes.append({'ID': 1965, 'Value': disks})
-            
+        
         # Add Action Constants to Payload
         cons = Constant.objects.filter(action=action)
 
