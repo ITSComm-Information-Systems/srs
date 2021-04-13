@@ -503,11 +503,18 @@ class VolumeSelectionForm(TabForm):
             if 'storage_type' in action.override:
                 vol_type = action.override['storage_type']
                 self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name')
-            elif service.id in [13, 14]:
-                self.volume_list = self.vol.objects.filter(owner__in=groups).order_by('name')
+            elif service.id == 13:
+                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name')
+                self.detail = [{'name': 'CPU', 'quantity': 2, 'cost': 14.33},{'name': 'RAM', 'quantity': 4, 'cost': 4.20},{'name': 'DISK', 'quantity': 55, 'cost': 1.69}]
+                self.cost_types = ['CPU', 'RAM', 'QUANTITY']
 
                 if self.action.label.startswith('Review'):
-                    self.template = 'order/volume_review.html'
+                    self.template = 'order/server_review.html'
+            elif service.id == 14:
+                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name')
+
+                if self.action.label.startswith('Review'):
+                    self.template = 'order/database_review.html'
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
                     
