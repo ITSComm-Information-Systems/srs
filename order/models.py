@@ -1169,20 +1169,21 @@ class Item(models.Model):
                     attributes.append({'ID': 1994, 'Value': 216}) # Linux
             else:
                 attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
-                managed = self.data.get('managed')
-                if managed == 'True':
-                    os = Choice.objects.get(id=self.data.get('misevos'))
-                    attributes.append({'ID': 1952, 'Value': 203}) # Managed
-                    if os.code.startswith('Windows'):
-                        attributes.append({'ID': 1994, 'Value': 215}) # Windows
-                    else:
-                        attributes.append({'ID': 1994, 'Value': 216}) # Linux
+
+            managed = self.data.get('managed')
+            if managed == 'True':
+                os = Choice.objects.get(id=self.data.get('misevos'))
+                attributes.append({'ID': 1952, 'Value': 203}) # Managed
+                if os.code.startswith('Windows'):
+                    attributes.append({'ID': 1994, 'Value': 215}) # Windows
                 else:
-                    os = Choice.objects.get(id=self.data.get('misernonmang'))
-                    attributes.append({'ID': 1952, 'Value': 207}) # Non-Managed
-                    attributes.append({'ID': 1994, 'Value': 214}) # IAAS
-                
-                attributes.append({'ID': 1957, 'Value': os.label}) 
+                    attributes.append({'ID': 1994, 'Value': 216}) # Linux
+            else:
+                os = Choice.objects.get(id=self.data.get('misernonmang'))
+                attributes.append({'ID': 1952, 'Value': 207}) # Non-Managed
+                attributes.append({'ID': 1994, 'Value': 214}) # IAAS
+            
+            attributes.append({'ID': 1957, 'Value': os.label}) 
 
             for field in text[1]['fields']:
                 if field['label'] == 'Disk Space':
