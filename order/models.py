@@ -703,7 +703,7 @@ class Server(models.Model):
         return self.name
 
     def get_shortcodes(self):
-        return [self.shortcode]
+        return [{'size':'', 'shortcode':self.shortcode}]
 
     def get_checkboxes(self):
         return [] 
@@ -769,8 +769,8 @@ class Database(models.Model):
             return True
 
     def get_shortcodes(self):
-        return [self.shortcode]
-
+        return [{'size':'', 'shortcode':self.shortcode}]
+        
     def get_checkboxes(self):
         return []
 
