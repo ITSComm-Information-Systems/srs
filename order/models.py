@@ -1174,6 +1174,10 @@ class Item(models.Model):
             if value:
                 setattr(rec, field, value)
 
+        type = self.data.get('midatatype')
+        if type:
+            rec.type = Choice.objects.get(id=type)
+            
         rec.save()
 
     def update_server(self, rec):
