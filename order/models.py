@@ -1245,6 +1245,28 @@ class Item(models.Model):
 
         rec.save()
 
+        size_list = self.data.get('diskSize')
+        uom_list = self.data.get('diskUOM')
+        disk_num = 0
+
+        for count, size in enumerate(size_list):
+            if size:
+                if '.' in size:
+                    size = int(float(size))
+                else:
+                    size = int(size)
+                
+                if uom_list[count] == 'TB':
+                    size = size * 1024
+
+                d = ServerDisk()
+                d.server = rec
+                d.name = 'disk' + str(disk_num)
+                d.size = size
+                d.save()
+
+                disk_num +=1
+
     def update_mibackup(self, rec):
         if rec.name == '':
             rec.name = 'temp'
