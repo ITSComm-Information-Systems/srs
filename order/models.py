@@ -1004,6 +1004,8 @@ class Item(models.Model):
                 self.submit_incident(route, action) 
 
             if route['target'] == 'database':
+                print('bypass Update')
+                return
                 if 'fulfill' in route:
                     if route['fulfill'] == 'manual' and action.type != 'A':
                         self.data['fulfill'] = 'Pending'
@@ -1113,7 +1115,29 @@ class Item(models.Model):
                 else:
                     attributes.append({'ID': element.target, 'Value': value})
 
-        if self.data['action_id'] == '67':
+        if action.service.name == 'miServer':
+            if self.data.get('volaction') == 'Delete':
+                print('delete server', self.data.get('instance_id'))
+
+            if action.type == 'M':
+                instance_id = self.data.get('instance_id')
+                instance = Server.objects.get(id=instance_id)
+                print('mod or delete', instance.managed)
+                if instance.managed:
+                    mod_man = 'True'
+                else:
+                    mod_man = 'False'
+                os_id = instance.os_id
+                if self.data.get('volaction') == 'Delete':
+                    attributes.append({'ID': 1959, 'Value': instance.name})
+                    attributes.append({'ID': 1951, 'Value': 202})
+                    payload['Title'] = 'Delete MiServer'
+                else:
+                    attributes.append({'ID': 1951, 'Value': 201})
+            else:
+                mod_man = None
+                os_id = None
+
             db = self.data.get('database')
             if db:
                 attributes.append({'ID': 1953, 'Value': self.data.get('ad_group')})  # Admin Group
@@ -1131,26 +1155,27 @@ class Item(models.Model):
             else:
                 attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
 
-                managed = self.data.get('managed')
+                managed = self.data.get('managed', mod_man)
                 if managed == 'True' or db:
-                    os = Choice.objects.get(id=self.data.get('misevos'))
+                    os = Choice.objects.get(id=self.data.get('misevos', os_id))
                     attributes.append({'ID': 1952, 'Value': 203}) # Managed
                     if os.code.startswith('Windows'):
                         attributes.append({'ID': 1994, 'Value': 215}) # Windows
                     else:
                         attributes.append({'ID': 1994, 'Value': 216}) # Linux
                 else:
-                    os = Choice.objects.get(id=self.data.get('misernonmang'))
+                    os = Choice.objects.get(id=self.data.get('misernonmang', os_id))
                     attributes.append({'ID': 1952, 'Value': 207}) # Non-Managed
                     attributes.append({'ID': 1994, 'Value': 214}) # IAAS
                 
                 attributes.append({'ID': 1957, 'Value': os.label}) 
 
-            for field in text[1]['fields']:
-                if field['label'] == 'Disk Space':
-                    nl = '\n'
-                    disks = nl.join(field['list'])
-                    attributes.append({'ID': 1965, 'Value': disks})
+            if self.data.get('volaction') != 'Delete':
+                for field in text[1]['fields']:
+                    if field['label'] == 'Disk Space':
+                        nl = '\n'
+                        disks = nl.join(field['list'])
+                        attributes.append({'ID': 1965, 'Value': disks})
         
         # Add Action Constants to Payload
         cons = Constant.objects.filter(action=action)
