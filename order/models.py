@@ -1251,7 +1251,7 @@ class Item(models.Model):
             os = self.data.get('misernonmang')
 
         if os:
-            rec.os = Choice.objects.get(id=os).label
+            rec.os = Choice.objects.get(id=os)
 
         rec.save()
 
