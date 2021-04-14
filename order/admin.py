@@ -172,7 +172,7 @@ class DatabaseAdmin(admin.ModelAdmin):
 @admin.register(Server)
 class ServerAdmin(admin.ModelAdmin):
     list_display = ['name', 'owner', 'os']
-    list_filter = ('os','in_service')
+    list_filter = ('in_service','managed')
     ordering = ('name',)
     search_fields = ['name','owner__name']
 
