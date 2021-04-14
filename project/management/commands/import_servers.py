@@ -60,6 +60,14 @@ REBOOT_TIME = {}
 for choice in Choice.objects.filter(parent__code=('SERVER_REBOOT_TIME')):
     REBOOT_TIME[choice.label] = choice.id
 
+PATCH_DAY = {}
+for choice in Choice.objects.filter(parent__code=('SERVER_PATCH_DATE')):
+    PATCH_DAY[choice.label] = choice.id
+
+REBOOT_DAY = {}
+for choice in Choice.objects.filter(parent__code=('SERVER_REBOOT_DATE')):
+    REBOOT_DAY[choice.label] = choice.id
+
 
 class Command(BaseCommand):
     help = 'Import CSV from MiServer'
@@ -235,14 +243,12 @@ class Command(BaseCommand):
 
         s.created_date = self.get_text(xml, 'subscribedDate', '')
 
-        #sbu = self.get_time('dailybackuptime', BACKUP_TIME)
         s.backup_time_id = self.get_time('dailybackuptime', BACKUP_TIME, s.name)
         s.patch_time_id = self.get_time('patchingScheduleTime', PATCH_TIME, s.name)
         s.reboot_time_id = self.get_time('rebootScheduleTime', REBOOT_TIME, s.name)
-        s#._time_id = self.get_time('dailybackuptime', BACKUP_TIME)
-        #s.patch_time = PATCH_TIME.get(self.get_text(xml, 'patchingScheduleTime', None))
-        #s.reboot_time = REBOOT_TIME.get(self.get_text(xml, 'rebootScheduleTime', None))
-        s.reboot_day = DAYS.get(self.get_text(xml, 'rebootScheduleTime', None), None)
+
+        s.reboot_day_id = REBOOT_DAY.get(self.get_text(xml, 'rebootScheduleDate', None), None)
+        s.patch_day_id = PATCH_DAY.get(self.get_text(xml, 'patchingScheduleDate', None), None)
 
         on_call = self.get_text(xml, 'monitoringsystem', None)
         if on_call == 'businesshours':
