@@ -607,15 +607,6 @@ class Server(models.Model):
         (ALL_HOURS, '24/7'),
     ]
 
-    DAY_CHOICES = [
-        (0, 'Sunday'),
-        (1, 'Monday'),
-        (2, 'Tuesday'),
-        (3, 'Wednesday'),
-        (4, 'Thursday'),
-        (5, 'Friday'),
-        (6, 'Saturday'),
-    ]
     MANAGED_FIELDS = ['patch_time', 'patch_day', 'reboot_time', 'reboot_day']
 
     for rate in StorageRate.objects.filter(name__startswith='SV-'):
@@ -636,7 +627,7 @@ class Server(models.Model):
     #shortcode = models.CharField(max_length=100) 
     public_facing = models.BooleanField(default=False)
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
-    #os = models.CharField(max_length=100)     #  <os>Windows2008R2managed</os>
+
     os = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={'parent__code__in': ['SERVER_UNMANAGED_OS','LINUX','WINDOWS']}
                                     , related_name='os'
                                     , on_delete=models.CASCADE,)
@@ -660,11 +651,9 @@ class Server(models.Model):
     patch_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_PATCH_TIME"}
                                     , related_name='patch_time'
                                     , on_delete=models.CASCADE,)
-    #patch_day = models.PositiveSmallIntegerField(null=True, blank=True, choices=DayOfWeek.choices, default=0) #  <patchingScheduleDate>Sunday</patchingScheduleDate>
     patch_day = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_PATCH_DATE"}
                                     , related_name='patch_day'
                                     , on_delete=models.CASCADE,)
-
     reboot_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_REBOOT_TIME"}
                                     , related_name='reboot_time'
                                     , on_delete=models.CASCADE,)
@@ -672,32 +661,18 @@ class Server(models.Model):
     reboot_day = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_REBOOT_DATE"}
                                     , related_name='reboot_day'
                                     , on_delete=models.CASCADE,)
-
-    #reboot_day = models.PositiveSmallIntegerField(null=True, blank=True, choices=DAY_CHOICES) #   <rebootScheduleDate>Sunday</rebootScheduleDate>
     domain = models.CharField(max_length=100)
     datacenter = models.CharField(max_length=100)
     firewall_requests = models.CharField(max_length=100)
     legacy_data = models.TextField()
 
-  #<diskspaceEnd>disk0=100 GB ;</diskspaceEnd>
-  #<recovery>delayed</recovery>
-  #<MWregulateddatacheckboxe1>[[]]</MWregulateddatacheckboxe1>
-  #<recoveryoptions>Yes</recoveryoptions>
-  #<servicestatusdate></servicestatusdate>
-  #<xmlSubscriptionKey>PS-VD-DIRECTORY-1</xmlSubscriptionKey>
-  #<additionalneedspage4></additionalneedspage4>
-  #<afterhourssupportpage4>No. dpss-technology-management@umich.edu 7346470657</afterhourssupportpage4>
-  #<updateByRequest>85605</updateByRequest>
-  #<nonregulateddataDetail>[[]]</nonregulateddataDetail>
-  #<subscribedDate>2012-11-01T14:56:40-04:00</subscribedDate>
-  #<ipsubnet>secure</ipsubnet>
-  #<service>MiServer</service>
-  #<processing>CPU=4 ;RAM=8 GB ;</processing>
-
     @property
     def total_disk_size(self):
         disk = ServerDisk.objects.filter(server=self).aggregate(models.Sum('size'))
-        return disk['size__sum']
+        if disk:
+            return disk['size__sum']
+        else:
+            return 0
 
     @property
     def ram_cost(self):
