@@ -192,7 +192,20 @@ class Command(BaseCommand):
             s.managed = True
         else:
             s.managed = False
-        s.os = self.get_text(xml, 'os', 'n/a')
+
+        os_name = self.get_text(xml, 'os', None)
+
+        os = Choice.objects.filter(label=os_name)
+
+        if os:
+            s.os = os[0]
+        else:
+            os = Choice.objects.filter(code=os_name)
+            if os:
+                s.os = os[0]
+            else:
+                print('os not found', os_name)
+
         s.cpu = self.get_text(xml, 'cpu', 0)
         s.ram = self.get_text(xml, 'ram', 0)
         #s.disk_space = self.get_text(xml, 'diskspace', '')

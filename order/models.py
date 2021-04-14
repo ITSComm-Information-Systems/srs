@@ -636,7 +636,11 @@ class Server(models.Model):
     #shortcode = models.CharField(max_length=100) 
     public_facing = models.BooleanField(default=False)
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
-    os = models.CharField(max_length=100)     #  <os>Windows2008R2managed</os>
+    #os = models.CharField(max_length=100)     #  <os>Windows2008R2managed</os>
+    os = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={'parent__code__in': ['SERVER_UNMANAGED_OS','LINUX','WINDOWS']}
+                                    , related_name='os'
+                                    , on_delete=models.CASCADE,)
+
     cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
     ram = models.IntegerField('RAM')    #  <ram>8</ram>
     regulated_data = models.ManyToManyField(Choice, blank=True, limit_choices_to={"parent__code": "REGULATED_SENSITIVE_DATA"}, related_name='regulated')
@@ -656,13 +660,20 @@ class Server(models.Model):
     patch_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_PATCH_TIME"}
                                     , related_name='patch_time'
                                     , on_delete=models.CASCADE,)
-    patch_day = models.PositiveSmallIntegerField(null=True, blank=True, choices=DayOfWeek.choices, default=0) #  <patchingScheduleDate>Sunday</patchingScheduleDate>
+    #patch_day = models.PositiveSmallIntegerField(null=True, blank=True, choices=DayOfWeek.choices, default=0) #  <patchingScheduleDate>Sunday</patchingScheduleDate>
+    patch_day = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_PATCH_DATE"}
+                                    , related_name='patch_day'
+                                    , on_delete=models.CASCADE,)
 
     reboot_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_REBOOT_TIME"}
                                     , related_name='reboot_time'
                                     , on_delete=models.CASCADE,)
 
-    reboot_day = models.PositiveSmallIntegerField(null=True, blank=True, choices=DAY_CHOICES) #   <rebootScheduleDate>Sunday</rebootScheduleDate>
+    reboot_day = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_REBOOT_DATE"}
+                                    , related_name='reboot_day'
+                                    , on_delete=models.CASCADE,)
+
+    #reboot_day = models.PositiveSmallIntegerField(null=True, blank=True, choices=DAY_CHOICES) #   <rebootScheduleDate>Sunday</rebootScheduleDate>
     domain = models.CharField(max_length=100)
     datacenter = models.CharField(max_length=100)
     firewall_requests = models.CharField(max_length=100)
@@ -715,17 +726,6 @@ class Server(models.Model):
 
     def __str__(self):
         return self.name
-
-    def clean(self):
-        if self.managed:
-            errors = {}
- 
-            for field in self.MANAGED_FIELDS:
-                if getattr(self, field) == None:
-                    errors[field] = ValidationError('', code='required')
- 
-            if len(errors) > 0:
-                raise ValidationError(errors)
 
     def get_shortcodes(self):
         return [self.shortcode]
