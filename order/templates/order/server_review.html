@@ -29,35 +29,37 @@
                                 RAM
                             </div>
                             <div class="col-sm text-right">
-                                {{ volume.ram }}
+                                {{ volume.ram }} GB
                             </div>
                             <div class="col-sm text-right">
-                                {{ volume.ram_cost|floatformat:2 }}
+                                ${{ volume.ram_cost|floatformat:2 }}
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-sm">
-                                DISK
+                                Disk
                             </div>
                             <div class="col-sm text-right">
-                                {{ volume.total_disk_size }}
+                                {{ volume.total_disk_size }} GB
                             </div>
                             <div class="col-sm text-right">
-                                {{ volume.disk_cost|floatformat:2 }}
+                                ${{ volume.disk_cost|floatformat:2 }}
                             </div>
                         </div>
+                        {% if volume.backup %}
                         <div class="row">
                             <div class="col-sm">
-                                BACKUP
+                                Backup
                             </div>
                             <div class="col-sm text-right">
-                                
+                                <i class="fas fa-check"></i>
                             </div>
                             <div class="col-sm text-right">
-                                {{ volume.backup_cost|floatformat:2 }}
+                                ${{ volume.backup_cost|floatformat:2 }}
                             </div>
                         </div>
+                        {% endif %}
                         </sm>
 
 
