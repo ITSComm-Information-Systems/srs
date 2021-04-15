@@ -282,6 +282,7 @@ $(document).ready(function() {
 
   $(document).on("click", "#not_dedicated" , function() {
     $('#shared_1').prop("checked", false);
+    $("#workflowForm").removeClass('was-validated');
   });
 
   $(document).on("change", "[data-pane='midbtype']" , function() {
