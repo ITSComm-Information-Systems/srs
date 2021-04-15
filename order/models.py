@@ -1004,8 +1004,6 @@ class Item(models.Model):
                 self.submit_incident(route, action) 
 
             if route['target'] == 'database':
-                print('bypass Update')
-                return
                 if 'fulfill' in route:
                     if route['fulfill'] == 'manual' and action.type != 'A':
                         self.data['fulfill'] = 'Pending'
@@ -1116,13 +1114,9 @@ class Item(models.Model):
                     attributes.append({'ID': element.target, 'Value': value})
 
         if action.service.name == 'miServer':
-            if self.data.get('volaction') == 'Delete':
-                print('delete server', self.data.get('instance_id'))
-
             if action.type == 'M':
                 instance_id = self.data.get('instance_id')
                 instance = Server.objects.get(id=instance_id)
-                print('mod or delete', instance.managed)
                 if instance.managed:
                     mod_man = 'True'
                 else:
