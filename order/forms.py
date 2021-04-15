@@ -693,6 +693,16 @@ class ServerSupportForm(TabForm):
     def __init__(self, *args, **kwargs):
         super(ServerSupportForm, self).__init__(*args, **kwargs)
 
+        instance_id = self.request.POST.get('instance_id')
+        if instance_id:
+            server = Server.objects.get(id=instance_id)
+            if not server.managed:
+                mang = 'unmang'
+            else:
+                mang = 'mang'
+        else:
+            server = None
+
         if self.action.service.name=='midatabase':
             self.fields.pop('backup_time')
             self.fields.pop('patch_day')
@@ -700,7 +710,7 @@ class ServerSupportForm(TabForm):
             self.fields.pop('reboot_day')
             self.fields.pop('reboot_time')
             return
-        
+
         if self.request.POST.get('database'):
             db = self.request.POST.get('database')
             if db == 'MSSQL':
@@ -715,7 +725,7 @@ class ServerSupportForm(TabForm):
             else:
                 windows = False
         else:
-            os = kwargs['request'].POST.get('misevos', None)
+            os = kwargs['request'].POST.get('misevos', server.os_id)
             os = Choice.objects.get(id=os).label
 
             if os.startswith('Windows'):
@@ -723,7 +733,7 @@ class ServerSupportForm(TabForm):
             else:
                 windows = False
 
-        if kwargs['request'].POST.get('managed') == 'unmang' or not windows:
+        if kwargs['request'].POST.get('managed', mang) == 'unmang' or not windows:
             self.fields.pop('patch_day')
             self.fields.pop('patch_time')
             self.fields.pop('reboot_day')
@@ -816,6 +826,9 @@ class ServerSpecForm(TabForm):
         self.fields['replicated'].initial = True
         self.fields['backup'].initial = True
         self.fields['backup'].disabled = True
+
+        self.fields['public_facing'].disabled = True
+        self.fields['public_facing'].initial = False
 
         if database == 'MSSQL':
             self.fields['cpu'].widget.attrs.update({'data-server': 99, 'min': 2})
