@@ -696,12 +696,15 @@ class ServerSupportForm(TabForm):
         instance_id = self.request.POST.get('instance_id')
         if instance_id:
             server = Server.objects.get(id=instance_id)
+            os_id = server.os_id
             if not server.managed:
                 mang = 'unmang'
             else:
                 mang = 'mang'
         else:
+            mang = None
             server = None
+            os_id = None
 
         if self.action.service.name=='midatabase':
             self.fields.pop('backup_time')
@@ -725,7 +728,7 @@ class ServerSupportForm(TabForm):
             else:
                 windows = False
         else:
-            os = kwargs['request'].POST.get('misevos', server.os_id)
+            os = kwargs['request'].POST.get('misevos', os_id)
             os = Choice.objects.get(id=os).label
 
             if os.startswith('Windows'):
