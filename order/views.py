@@ -509,7 +509,7 @@ class Workflow(UserPassesTestMixin, View):
                     tab.form = globals()[tab.custom_form](tab, action, request=request)
                 else:
                     f = forms.Form()
-                    f.template = 'order/dynamic_form.html'
+                    f.template = 'order/base_form.html'  # use base 4/16/2021
                     tab.form = f
 
 
