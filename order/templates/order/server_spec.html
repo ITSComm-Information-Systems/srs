@@ -36,44 +36,27 @@
 
             <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
 
-            <div class="form-inline disk-div" id="disk_new" style="display: none;">
-                <input readonly class="form-control form-inline col-2" name="diskName" type="text" value="disk0">
-                <input class="form-control form-inline disk-size" name="diskSize" type="number">
-
-                <select name="diskUOM" class="form-control">
-                    <option value="GB">GB</option>
-                    <option value="TB">TB</option>
-                </select>
-                &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i
-                        class="fas fa-minus-circle"></i></a>
-                <span class="float-right disk-cost"></span>
+            <div id="formset_wrapper" class="form-inline disk-div" style="display: block;">
+                {{ tab.form.disk_formset.management_form }}
+                {% for diskform in tab.form.disk_formset %}
+                <div class="form-inline disk-div" style="display: block;">
+                    {{ diskform.name }}
+                    {{ diskform.size }}
+                    {{ diskform.uom }}
+                    <span class="float-right disk-cost"></span>
+                </div>
+                {% endfor %}
             </div>
-
-            {% for disk in tab.form.disk_list %}
-            <div class="form-inline disk-div" id="disk_{{ disk.id }}" style="display: block;">
-                <input readonly class="form-control form-inline col-2" name="diskName" type="text"
-                    value="{{ disk.name }}">
-                <input {{ disk.state }} class="form-control form-inline disk-size" name="diskSize" type="number"
-                    min="50" value="{{ disk.size }}">
-
-                <select name="diskUOM" class="form-control" {{ disk.state }}>
-                    {% for opt in tab.form.uom_list %}
-                    {% if opt == disk.uom %}
-                    <option selected value="{{opt}}">{{opt}}</option>
-                    {% else %}
-                    <option value="{{opt}}">{{opt}}</option>
-                    {% endif %}
-                    {% endfor %}
-                </select>
-                {% if disk.state != 'disabled' %}
-                &nbsp;&nbsp;<a onclick="this.parentElement.remove();" href="javascript:void(0)"><i
-                        class="fas fa-minus-circle"></i></a>
-                {% endif %}
+            <div id="emptyform_wrapper" style="display: none">
+                <div class="form-inline disk-div" style="display: block;">
+                {{ tab.form.disk_formset.empty_form.name }}
+                {{ tab.form.disk_formset.empty_form.size }}
+                {{ tab.form.disk_formset.empty_form.uom }}
                 <span class="float-right disk-cost"></span>
+                </div>
             </div>
-
-            {% endfor %}
         </div>
+        <hr>
     </div>
 </div>
 <div>
@@ -81,7 +64,8 @@
     <div role="alert" class="invalid-feedback-"><i class="fas fa-exclamation-triangle"
             aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
     {% endfor %}
-    <a id="add_disk_link" href="javascript:addRow('disk')"><i class="fas fa-plus-circle"></i>Add another disk</a><br><br>
+    <a id="add_disk_link" href="javascript:addDisk('disk')"><i class="fas fa-plus-circle"></i>Add another
+        disk</a><br><br>
 </div>
 
 {% elif field.name == 'misevdiskuom' %}
