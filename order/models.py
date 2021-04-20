@@ -1237,12 +1237,7 @@ class Item(models.Model):
 
         rec.save()
 
-        disk_count = self.data.get('form-TOTAL_FORMS')
-        disk_count = int(disk_count) - 1
-
-        for disk in range(0, disk_count):
-            print(disk)
-            
+        for disk in range(0, int(self.data.get('form-TOTAL_FORMS'))):            
             size = self.data.get('form-'+str(disk)+'-size')
             uom = self.data.get('form-'+str(disk)+'-uom')
             name = self.data.get('form-'+str(disk)+'-name')
@@ -1250,12 +1245,8 @@ class Item(models.Model):
             if uom == 'TB':
                 size = size * 1024
 
-            d = ServerDisk()
-            d.server = rec
-            d.name = name
-            d.size = size
-            d.save()
-
+            d = ServerDisk.objects.update_or_create(server=rec,name=name,
+                defaults={'size': size})
 
     def update_mibackup(self, rec):
         if rec.name == '':
