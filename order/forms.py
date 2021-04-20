@@ -1,5 +1,6 @@
 from django import forms
-from django.forms import ModelForm
+from django.db.models.fields import IntegerField
+from django.forms import ModelForm, formset_factory
 #from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember, StorageHost, StorageRate
 from .models import *
 from pages.models import Page
@@ -758,11 +759,26 @@ class ServerDataForm(TabForm):
 
         super().clean()
 
-        
+
+class DiskForm(forms.ModelForm):
+    name = forms.CharField()
+    name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
+
+    size = forms.IntegerField(min_value=1, initial=10)
+    size.widget.attrs.update({'class': 'form-control disk-size'})  
+
+    uom = forms.ChoiceField(choices=(('GB','GB'),('TB','TB')))
+    uom.widget.attrs.update({'class': 'form-control'})  
+
+    class Meta:
+        model = ServerDisk
+        fields = ['id', 'name', 'size']
+
 class ServerSpecForm(TabForm):
     template = 'order/server_spec.html'
 
     uom_list = ['GB','TB']
+    DiskFormSet = formset_factory(DiskForm, extra=0)
 
     for rate in StorageRate.objects.filter(name__startswith='SV-'):
         if rate.name == 'SV-RAM':
@@ -779,30 +795,20 @@ class ServerSpecForm(TabForm):
 
         if self.request.POST.get('database'):
             self.set_database_defaults()
+            print(self.disk_list)
+            self.disk_formset = self.DiskFormSet(initial=self.disk_list)
+            return
 
-        elif self.request.method == 'POST': 
-            if self.is_bound:   # Reload Disk List
-                self.disk_list = []
-                name_list = self.data.getlist('diskName')
-                size_list = self.data.getlist('diskSize')
-                uom_list = self.data.getlist('diskUOM')
+        instance_id = self.request.POST.get('instance_id')
 
-                for count, size in enumerate(size_list):
-                    if size:
-                        self.disk_list.append({'name': name_list[count], 'size': float(size), 'uom':uom_list[count]})
-
-                self.request.session['disk_list'] = self.disk_list
-
-            else:
-                instance_id = self.request.POST.get('instance_id')
-                if instance_id: 
-                    server = Server.objects.get(id=instance_id)
-                    #self.fields["mCommunityName"].initial = bd.owner
-                    self.disk_list = ServerDisk.objects.filter(server_id=instance_id).order_by('name')
-                else:
-                    self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB'}]
-                    self.fields['cpu'].initial = 1
-                    self.fields['managed'].initial = True
+        if self.is_bound:
+            self.disk_formset = self.DiskFormSet(self.request.POST)
+        elif self.request.POST.get('action_type') == 'M':                
+            self.disk_formset = self.DiskFormSet(initial=ServerDisk.objects.filter(server_id=instance_id).order_by('name').values())
+        else:
+            self.disk_formset = self.DiskFormSet(initial=[{'num': 0, 'name': 'disk0', 'size': 50, 'uom': 'GB'}])
+            self.fields['cpu'].initial = 1
+            self.fields['managed'].initial = True
 
     def set_database_defaults(self):
         
@@ -875,7 +881,7 @@ class ServerSpecForm(TabForm):
         disk_review = []
         disk_size = 0
 
-        for disk in self.disk_list:
+        for disk in self.disk_formset.cleaned_data:
             disk_size = disk_size + int(disk['size'])
             disk_review.append(f"{disk['name']} {disk['size']} {disk['uom']} ")
 
@@ -886,14 +892,6 @@ class ServerSpecForm(TabForm):
 
 
     def clean(self):
-
-        if not self.request.POST.get('database', None):
-
-            for disk in self.disk_list:
-                if disk['size'] % 10 != 0 and disk['uom'] == 'GB':
-                    self.add_error('diskSize', 'Disk size must be in increments of 10 Gigabytes.')
-                if disk['size'] == 0:
-                    self.add_error('diskSize', 'Disk size must be at least 10 Gigabytes')
 
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)

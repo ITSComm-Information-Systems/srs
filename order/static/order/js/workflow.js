@@ -406,7 +406,6 @@ $(document).ready(function() {
     total_disk_cost = 0;
 
     $( ".disk-div" ).each(function( index ) {  // Tally all disks
-
       uom = $(this).find("select").val();
       size = $(this).find(".disk-size").val();
 
@@ -988,6 +987,17 @@ function chartcomChange(obj) {
     
   }
 
+  function addDisk(record) {
+    num = $("#id_form-TOTAL_FORMS").val()
+
+    let total_form = $('#id_form-TOTAL_FORMS');
+    let form_idx = total_form.val();
+
+    $('#formset_wrapper').append($('#emptyform_wrapper').html().replace(/__prefix__/g, form_idx));
+
+    $('#id_form-' + form_idx + '-name').val('disk' + form_idx);
+    total_form.val(parseInt(form_idx)+1);
+  }
 
   function addRow(record) {
     // clone source div by ID

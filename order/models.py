@@ -1001,7 +1001,8 @@ class Item(models.Model):
 
         for route in routing['routes']:
             if route['target'] == 'tdx':
-                self.submit_incident(route, action) 
+                #self.submit_incident(route, action) 
+                print('bypass incident')
 
             if route['target'] == 'database':
                 if 'fulfill' in route:
@@ -1237,27 +1238,25 @@ class Item(models.Model):
 
         rec.save()
 
-        size_list = self.data.get('diskSize')
-        uom_list = self.data.get('diskUOM')
-        disk_num = 0
+        disk_count = self.data.get('form-TOTAL_FORMS')
+        disk_count = int(disk_count) - 1
 
-        for count, size in enumerate(size_list):
-            if size:
-                if '.' in size:
-                    size = int(float(size))
-                else:
-                    size = int(size)
-                
-                if uom_list[count] == 'TB':
-                    size = size * 1024
+        for disk in range(0, disk_count):
+            print(disk)
+            
+            size = self.data.get('form-'+str(disk)+'-size')
+            uom = self.data.get('form-'+str(disk)+'-uom')
+            name = self.data.get('form-'+str(disk)+'-name')
 
-                d = ServerDisk()
-                d.server = rec
-                d.name = 'disk' + str(disk_num)
-                d.size = size
-                d.save()
+            if uom == 'TB':
+                size = size * 1024
 
-                disk_num +=1
+            d = ServerDisk()
+            d.server = rec
+            d.name = name
+            d.size = size
+            d.save()
+
 
     def update_mibackup(self, rec):
         if rec.name == '':
