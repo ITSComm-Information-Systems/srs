@@ -1001,8 +1001,7 @@ class Item(models.Model):
 
         for route in routing['routes']:
             if route['target'] == 'tdx':
-                #self.submit_incident(route, action) 
-                print('bypass incident')
+                self.submit_incident(route, action) 
 
             if route['target'] == 'database':
                 if 'fulfill' in route:

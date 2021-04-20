@@ -725,7 +725,6 @@ class ServerSupportForm(TabForm):
                 self.fields['patch_day'].initial = Choice.objects.get(parent__code='SERVER_PATCH_DATE', code='SAT').id
                 self.fields['patch_time'].disabled = True
                 self.fields['patch_time'].initial = Choice.objects.get(parent__code='SERVER_PATCH_TIME', code='0500').id
-                print('sequel 2', Choice.objects.get(parent__code='SERVER_PATCH_DATE', code='SAT'))
             else:
                 windows = False
         else:
@@ -764,8 +763,8 @@ class DiskForm(forms.ModelForm):
     name = forms.CharField()
     name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
 
-    size = forms.IntegerField(min_value=1, initial=10)
-    size.widget.attrs.update({'class': 'form-control disk-size'})  
+    size = forms.IntegerField(min_value=10, initial=10)
+    size.widget.attrs.update({'class': 'form-control disk-size', 'step': 10})  
 
     uom = forms.ChoiceField(choices=(('GB','GB'),('TB','TB')))
     uom.widget.attrs.update({'class': 'form-control'})  
@@ -901,7 +900,6 @@ class ServerSpecForm(TabForm):
         disk_review = []
         disk_size = 0
 
-        print(self.disk_formset.is_bound)
 
         if self.disk_formset.is_valid:
             for disk in self.disk_formset.cleaned_data:
@@ -915,6 +913,10 @@ class ServerSpecForm(TabForm):
 
 
     def clean(self):
+        for disk in self.disk_formset.cleaned_data:
+            if disk.get('size', 0) % 10 != 0:
+                self.add_error('diskSize', 'Disk size must be in increments of 10 Gigabytes.')
+                break
 
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)
