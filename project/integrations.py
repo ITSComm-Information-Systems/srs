@@ -166,10 +166,5 @@ class ShortCodesAPI(UmAPI):
 
     def get_shortcode(self, shortcode):        
         url = f'{self.BASE_URL}/um/bf/ShortCodes/ShortCodes/{shortcode}'
-        response = requests.get(url, headers=self.headers)
+        return requests.get(url, headers=self.headers)
 
-        if response.status_code != 200:
-            print('error', response.status_code, response.text)
-            return response.status_code
-        else:
-            return json.loads(response.text)
