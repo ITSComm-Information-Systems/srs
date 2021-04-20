@@ -1219,6 +1219,11 @@ class Item(models.Model):
 
         if os:
             rec.os = Choice.objects.get(id=os)
+        elif self.data.get('database'):
+            if self.data.get('database') == 'MSSQL':
+                rec.os = Choice.objects.get(code='Windows2019managed')
+            else:
+                rec.os = Choice.objects.get(code='RedHatEnterpriseLinux8')
 
         rec.save()
 
