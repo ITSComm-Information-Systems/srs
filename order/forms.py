@@ -694,6 +694,14 @@ class ServerSupportForm(TabForm):
     def __init__(self, *args, **kwargs):
         super(ServerSupportForm, self).__init__(*args, **kwargs)
 
+        if self.action.service.name=='midatabase':
+            self.fields.pop('backup_time')
+            self.fields.pop('patch_day')
+            self.fields.pop('patch_time')
+            self.fields.pop('reboot_day')
+            self.fields.pop('reboot_time')
+            return
+
         instance_id = self.request.POST.get('instance_id')
         if instance_id:
             server = Server.objects.get(id=instance_id)
@@ -706,14 +714,6 @@ class ServerSupportForm(TabForm):
             mang = None
             server = None
             os_id = None
-
-        if self.action.service.name=='midatabase':
-            self.fields.pop('backup_time')
-            self.fields.pop('patch_day')
-            self.fields.pop('patch_time')
-            self.fields.pop('reboot_day')
-            self.fields.pop('reboot_time')
-            return
 
         if self.request.POST.get('database'):
             db = self.request.POST.get('database')
