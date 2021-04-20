@@ -774,11 +774,28 @@ class DiskForm(forms.ModelForm):
         model = ServerDisk
         fields = ['id', 'name', 'size']
 
+
+class DiskDisplayForm(forms.ModelForm):
+    name = forms.CharField()
+    name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
+
+    size = forms.IntegerField(min_value=1, initial=10)
+    size.widget.attrs.update({'class': 'form-control disk-size', 'readonly': True})  
+
+    uom = forms.ChoiceField(choices=(('GB','GB'),('TB','TB')))
+    uom.widget.attrs.update({'class': 'form-control', 'readonly': True})  
+
+    class Meta:
+        model = ServerDisk
+        fields = ['id', 'name', 'size']
+
+
 class ServerSpecForm(TabForm):
     template = 'order/server_spec.html'
 
     uom_list = ['GB','TB']
     DiskFormSet = formset_factory(DiskForm, extra=0)
+    DiskDisplayFormSet = formset_factory(DiskDisplayForm, extra=0)
 
     for rate in StorageRate.objects.filter(name__startswith='SV-'):
         if rate.name == 'SV-RAM':
@@ -795,14 +812,17 @@ class ServerSpecForm(TabForm):
 
         if self.request.POST.get('database'):
             self.set_database_defaults()
-            print(self.disk_list)
-            self.disk_formset = self.DiskFormSet(initial=self.disk_list)
+            if self.is_bound:
+                self.disk_formset = self.DiskDisplayFormSet(self.request.POST)            
+            else:
+                self.disk_formset = self.DiskDisplayFormSet(initial=self.disk_list)
             return
 
         instance_id = self.request.POST.get('instance_id')
 
         if self.is_bound:
             self.disk_formset = self.DiskFormSet(self.request.POST)
+            x = self.disk_formset.is_valid
         elif self.request.POST.get('action_type') == 'M':                
             self.disk_formset = self.DiskFormSet(initial=ServerDisk.objects.filter(server_id=instance_id).order_by('name').values())
         else:
@@ -881,9 +901,12 @@ class ServerSpecForm(TabForm):
         disk_review = []
         disk_size = 0
 
-        for disk in self.disk_formset.cleaned_data:
-            disk_size = disk_size + int(disk['size'])
-            disk_review.append(f"{disk['name']} {disk['size']} {disk['uom']} ")
+        print(self.disk_formset.is_bound)
+
+        if self.disk_formset.is_valid:
+            for disk in self.disk_formset.cleaned_data:
+                disk_size = disk_size + int(disk['size'])
+                disk_review.append(f"{disk['name']} {disk['size']} {disk['uom']} ")
 
         line['value'] = disk_size
         line['list'] = disk_review

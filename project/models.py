@@ -11,10 +11,15 @@ def validate_shortcode(value):
      else:
           try:
                api = ShortCodesAPI()
-               shortcodes = api.get_shortcode(value)
-               shortcode = shortcodes['ShortCodes']['ShortCode']
-               descr = shortcode['shortCodeDescription']
-               status = shortcode['ShortCodeStatusDescription']
+               request = api.get_shortcode(value)
+               if request.ok:
+                    json = request.json()
+                    shortcode = json['ShortCodes']['ShortCode']
+                    descr = shortcode['shortCodeDescription']
+                    status = shortcode['ShortCodeStatusDescription']
+               else:
+                    print('error getting shortcode')
+                    status = 'Open'
           except:
                raise ValidationError(f'ShortCode {value} Not Found.')
 
