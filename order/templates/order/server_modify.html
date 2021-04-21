@@ -1,0 +1,36 @@
+<h2>Server Selection</h2>
+<p>Please select the server you wish to modify</p>
+<input type="hidden" id="instance_id" name="instance_id" value="0">
+<div class="row mb-4">
+    <div class="table-responsive-lg">
+        <table class="table table-hover table-striped table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Server Name</th>
+                    <th scope="col">Owner (MCommunity Group)</th>
+                    <th scope="col">Size</th>
+                    <th scope="col">Add Ons</th>
+                    <th scope="col">Shortcode</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for volume in tab.form.volume_list %}
+                    
+                    <tr>
+                        <th data-id="{{volume.id}}" scope="row">{{ volume.name }}</th>
+                        <td>{{ volume.owner }}</td>
+                        <td>{{ volume.total_disk_size }}{{ volume.rate.unit_of_measure }}</td>
+                        <td>{{ volume.rate.label }}</td>
+                        <td>{% for sc in volume.shortcode_list %}
+                            {{ sc.shortcode }}<br>
+                    
+                            {% endfor %}
+                        </td>
+                        <td class="action"><a href="#" onclick="modifyVolume(0, {{ volume.id }})">Edit</a><a href="#" class="delete" onclick="modifyVolume(1, {{ volume.id }})">Delete</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
