@@ -9,7 +9,8 @@
                     <th scope="col">Server Name</th>
                     <th scope="col">Owner (MCommunity Group)</th>
                     <th scope="col">Size</th>
-                    <th scope="col">Add Ons</th>
+                    <th scope="col">CPU</th>
+                    <th scope="col">RAM</th>
                     <th scope="col">Shortcode</th>
                     <th scope="col">Action</th>
                 </tr>
@@ -21,7 +22,8 @@
                         <th data-id="{{volume.id}}" scope="row">{{ volume.name }}</th>
                         <td>{{ volume.owner }}</td>
                         <td>{{ volume.total_disk_size }}{{ volume.rate.unit_of_measure }}</td>
-                        <td>{{ volume.rate.label }}</td>
+                        <td class="text-center">{{ volume.cpu }}</td>
+                        <td class="text-center">{{ volume.ram }}</td>
                         <td>{% for sc in volume.shortcode_list %}
                             {{ sc.shortcode }}<br>
                     
