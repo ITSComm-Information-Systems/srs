@@ -1177,6 +1177,12 @@ class Item(models.Model):
         for con in cons:  # Add Action Constants
             attributes.append({'ID': con.field, 'Value': con.value})
 
+        for attr in attributes:
+            if type(attr['ID']) == int:
+                attr['ID'] = str(attr['ID'])
+            if type(attr['Value']) == int:
+                attr['Value'] = str(attr['Value'])
+
         payload['Attributes'] = attributes
 
         data_string = json.dumps(payload)
