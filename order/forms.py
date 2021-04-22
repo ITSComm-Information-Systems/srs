@@ -900,8 +900,8 @@ class ServerSpecForm(TabForm):
             if line['label'] == 'Server Name':
                 line['value'] = self.data.get('name')
 
-            if line['label'] == 'Disk Space':
-                break
+            #if line['label'] == 'Disk Space':
+            #    break
 
         disk_review = []
         disk_size = 0
@@ -912,8 +912,10 @@ class ServerSpecForm(TabForm):
                 disk_size = disk_size + int(disk['size'])
                 disk_review.append(f"{disk['name']} {disk['size']} {disk['uom']} ")
 
-        line['value'] = disk_size
-        line['list'] = disk_review
+        #print(disk_review)
+        summary.append({'label': 'Disk Space', 'value': disk_size, 'list': disk_review})
+        #line['value'] = disk_size
+        #line['list'] = disk_review
 
         return summary
 
