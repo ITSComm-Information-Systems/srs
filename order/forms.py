@@ -330,7 +330,9 @@ class TabForm(forms.Form):
 
         if self.is_bound:
             try:
-                visible = self.request.POST['visible']
+                vis = self.request.POST['visible']
+                visible = vis.split(',')
+                
                 for field in self.fields:
                     if field not in visible:
                         self[field].field.required = False
