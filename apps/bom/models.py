@@ -407,6 +407,7 @@ class ProjectView(BOM):
     netops_engineer = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True, verbose_name='NetOps')
     estimate_id = models.IntegerField()
     status_name = models.CharField(max_length=60)
+    # description = models.TextField(null=True)
 
     class Meta:
         db_table = 'um_bom_project_v'
