@@ -4,7 +4,7 @@
 
 <div class="form-inline">
 <input type="search" id="workorder_search" class="form-control"
-    aria-label=" Search through site content" placeholder="Filter results">
+    aria-label="Search through site content" placeholder="Filter results">
 </div>
 <br>
 <div id="div_workorder_table">
@@ -13,6 +13,7 @@
             <tr>
                 <th>Workorder</th>
                 <th>Preorder</th>
+                <th>Description</th>
                 <th>Netops Engineer</th>
                 <th>SRS Status</th>
                 <th>Pinnacle Status</th>
@@ -29,6 +30,7 @@
             <tr data-estimate_id={{ record.estimate_id }}>
                 <td>{{ record.wo_number_display }}</td>
                 <td>{{ record.pre_order_number }}</td>
+                <td>{{ record.description |default:"None"}}</td>
                 <td>{{ record.netops_engineer }}</td>
                 <td>{{ record.get_status_display }}</td>
                 <td>{{ record.status_name }}</td>
@@ -57,7 +59,6 @@
     });
 
     $('#workOrderTableBody tr').click(function () {
-        //var estimate = $(this).dataset.estimate_id
         var estimate_id = this.getAttribute('data-estimate_id');
             window.open("/apps/bom/estimate/" + estimate_id + "/");
     });
