@@ -1134,7 +1134,11 @@ class Item(models.Model):
 
             db = self.data.get('database')
             if db:
-                attributes.append({'ID': 1953, 'Value': self.data.get('ad_group')})  # Admin Group
+                if self.data.get('volaction') == 'Delete':
+                    payload['Title'] = 'Delete MiDatabase'
+                else:
+                    attributes.append({'ID': 1953, 'Value': self.data.get('ad_group')})  # Admin Group
+
                 attributes.append({'ID': 5413, 'Value': db})
                 attributes.append({'ID': 1952, 'Value': 203}) # Managed
 
@@ -1147,7 +1151,10 @@ class Item(models.Model):
                     
                 attributes.append({'ID': 1957, 'Value': os.label}) 
             else:
-                attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
+                if self.data.get('volaction') == 'Delete':
+                    payload['Title'] = 'Delete MiServer'
+                else:
+                    attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
 
                 managed = self.data.get('managed', mod_man)
                 if managed == 'True' or db:
