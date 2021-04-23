@@ -1,0 +1,38 @@
+{
+    "FormID": 24,
+    "TypeID": 7,
+    "SourceID": 4,
+    "StatusID": 77,
+    "ServiceID": 10,
+    "PriorityID": 20,
+    "ResponsibleGroupID": 18,
+    "Title": "Delete MiServer",
+    "RequestorEmail": "djamison@umich.edu",
+    "Description": "Modify MiServer\n\nVolume Selection\nAre you sure you want to delete this Server?: \nServer Name:: venus\nOwner:: ITSComm Information Systems\n\n",
+    "Attributes": [
+        {
+            "ID": "1959",
+            "Value": "venus"
+        },
+        {
+            "ID": "1951",
+            "Value": "202"
+        },
+        {
+            "ID": "1953",
+            "Value": null
+        },
+        {
+            "ID": "1952",
+            "Value": "203"
+        },
+        {
+            "ID": "1994",
+            "Value": "216"
+        },
+        {
+            "ID": "1957",
+            "Value": "Red Hat Enterprise Linux 8 64-bit - Managed"
+        }
+    ]
+}
