@@ -51,7 +51,9 @@
                 <div class="form-inline disk-div" style="display: block;">
                 {{ tab.form.disk_formset.empty_form.name }}
                 {{ tab.form.disk_formset.empty_form.size }}
-                {{ tab.form.disk_formset.empty_form.uom }}
+                {{ tab.form.disk_formset.empty_form.uom }}&nbsp;&nbsp;
+                    <a onclick="deleteDisk(this);" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>
+
                 <span class="float-right disk-cost"></span>
                 </div>
             </div>

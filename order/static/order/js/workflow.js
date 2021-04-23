@@ -997,6 +997,26 @@ function chartcomChange(obj) {
 
     $('#id_form-' + form_idx + '-name').val('disk' + form_idx);
     total_form.val(parseInt(form_idx)+1);
+
+    delbuttons = $('.fa-minus-circle');
+    if (delbuttons.length > 2) {
+      delbuttons[delbuttons.length - 3].style.display = "none"
+    }
+  }
+
+  function deleteDisk(disk) {
+    disk.parentElement.remove();
+    num = $("#id_form-TOTAL_FORMS").val()
+
+    let total_form = $('#id_form-TOTAL_FORMS');
+    let form_idx = total_form.val();
+    total_form.val(parseInt(form_idx)-1);
+
+    delbuttons = $('.fa-minus-circle');
+    if (delbuttons.length>1) {
+      delbuttons[delbuttons.length - 2].style.display = "block"
+    }
+
   }
 
   function addRow(record) {
