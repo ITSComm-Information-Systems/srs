@@ -480,13 +480,21 @@ class VolumeSelectionForm(TabForm):
         #summary = super().get_summary(*args, **kwargs)
 
         instance = self.vol.objects.get(id=self.data['instance_id'])
+        service = Action.objects.get(id=self.request.POST.get('action_id')).service
+        print(service.id, 'service')
+        if service.id == 13:
+            label = 'Server'
+        elif service.id == 14:
+            label = 'Database'
+        else:
+            label = 'Volume'
 
         if self.data.get('volaction') == 'Delete':
-            summary = [{'label': 'Are you sure you want to delete this volume?', 'value': ''}
-                        ,{'label': 'Volume Name:', 'value': instance.name}
+            summary = [{'label': f'Are you sure you want to delete this {label}?', 'value': ''}
+                        ,{'label': f'{label} Name:', 'value': instance.name}
                         ,{'label': 'Owner:', 'value': instance.owner.name}]
         else:
-            summary = [{'label': 'Volume Name:', 'value': instance.name}]
+            summary = [{'label': f'{label} Name:', 'value': instance.name}]
 
         return summary
 
