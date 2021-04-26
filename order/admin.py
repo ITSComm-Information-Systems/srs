@@ -184,8 +184,11 @@ class ServerAdmin(admin.ModelAdmin):
         (None, {
             'fields': (('name', 'in_service','created_date'), 'owner', 'admin_group', 'shortcode', ('os','cpu','ram'),
                         ('replicated','backup','backup_time','public_facing'),
-                        'managed',
-                        ('regulated_data','non_regulated_data')),
+                        ('on_call', 'support_email', 'support_phone'),
+
+                        ('regulated_data','non_regulated_data'),
+                        'managed'
+                        ),
         }),
         ('Managed', {
             'classes': ('managed-section',),
