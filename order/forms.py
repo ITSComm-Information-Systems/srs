@@ -717,7 +717,7 @@ class ServerSupportForm(TabForm):
             return
 
         instance_id = self.request.POST.get('instance_id')
-        if self.instance and not self.is_bound:
+        if hasattr(self, 'instance') and not self.is_bound:
             for field in ['patch_day','patch_time','reboot_day','reboot_time','backup_time']:
                 choice = getattr(self.instance, field)
                 self.fields[field].initial = choice.id
