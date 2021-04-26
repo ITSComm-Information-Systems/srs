@@ -1220,10 +1220,16 @@ class Item(models.Model):
         else:
             rec.admin_group = rec.owner
 
-        for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed']:
+        for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing']:
             value = self.data.get(field)
             if value:
                 setattr(rec, field, value)
+
+        for field in ['backup_time','patch_day','patch_time','reboot_day','reboot_time']:
+            value = self.data.get(field)
+            if value:
+                value = int(value)
+                setattr(rec, field + '_id', value)
 
         if rec.managed:
             os = self.data.get('misevos')
