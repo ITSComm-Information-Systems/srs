@@ -68,6 +68,10 @@ REBOOT_DAY = {}
 for choice in Choice.objects.filter(parent__code=('SERVER_REBOOT_DATE')):
     REBOOT_DAY[choice.label] = choice.id
 
+ON_CALL_CHOICES = {}
+for choice in Choice.objects.filter(parent__code=('ON_CALL_CHOICES')):
+    ON_CALL_CHOICES[choice.code] = choice.id
+
 
 class Command(BaseCommand):
     help = 'Import CSV from MiServer'
@@ -252,9 +256,9 @@ class Command(BaseCommand):
 
         on_call = self.get_text(xml, 'monitoringsystem', None)
         if on_call == 'businesshours':
-            s.on_call = 0
+            s.on_call = ON_CALL_CHOICES['BUSINESS_HOURS']
         elif on_call == '247':
-            s.on_call = 1
+            s.on_call = ON_CALL_CHOICES['24/7']
 
         service_status = self.get_text(xml, 'servicestatus', None)
         if service_status == 'Ended':
