@@ -481,7 +481,7 @@ class VolumeSelectionForm(TabForm):
 
         instance = self.vol.objects.get(id=self.data['instance_id'])
         service = Action.objects.get(id=self.request.POST.get('action_id')).service
-        print(service.id, 'service')
+        
         if service.id == 13:
             label = 'Server'
         elif service.id == 14:
@@ -720,7 +720,8 @@ class ServerSupportForm(TabForm):
         if hasattr(self, 'instance') and not self.is_bound:
             for field in ['patch_day','patch_time','reboot_day','reboot_time','backup_time']:
                 choice = getattr(self.instance, field)
-                self.fields[field].initial = choice.id
+                if choice:
+                    self.fields[field].initial = choice.id
 
         if instance_id:
             server = Server.objects.get(id=instance_id)
