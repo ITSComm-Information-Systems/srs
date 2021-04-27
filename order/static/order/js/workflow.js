@@ -250,10 +250,20 @@ $(document).ready(function() {
   $(document).on("change", "#div_misevexissev" , function() {
     if ($('#misevexissev_1').prop("checked")) {  // Yes contact me to migrat
       $('#div_mcommserveradmin').hide().prop('required',false);
-      $('#div_owner').hide().prop('required',false);
+      //$('#div_owner').hide().prop('required',false);;
+      $('#pills-step2').hide();
+      $('#pills-step3').hide();
+      $('#pills-step4').hide();
+      $('#pills-step5').hide();
+      $('#pills-step6').hide();
     } else if ($('#misevexissev_0').prop("checked")) {  // Nah, new server
       $('#div_mcommserveradmin').show().prop('required',true);
       $('#div_owner').show().prop('required',true);
+      $('#pills-step2').show();
+      $('#pills-step3').show();
+      $('#pills-step4').show();
+      $('#pills-step5').show();
+      $('#pills-step6').show();
     } else {
       $('#div_mcommserveradmin').hide().prop('required',false);
       $('#div_owner').hide().prop('required',false);

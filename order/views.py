@@ -62,6 +62,52 @@ def querydict_to_dict(query_dict):  # Kudos to QFXC on StackOverflow
         data[key] = v
     return data
  
+
+def  send_ticket(owner, user):
+
+    client_id = settings.UM_API['CLIENT_ID']
+    auth_token = settings.UM_API['AUTH_TOKEN']
+    base_url = settings.UM_API['BASE_URL']
+
+    headers = { 
+        'Authorization': f'Basic {auth_token}',
+        'accept': 'application/json'
+        }
+
+    url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
+    response = requests.post(url, headers=headers)
+    response_token = json.loads(response.text)
+    access_token = response_token.get('access_token')
+
+    headers = {
+        'X-IBM-Client-Id': client_id,
+        'Authorization': 'Bearer ' + access_token,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json' 
+        }
+
+    payload = {
+        "FormID": 24,
+        "TypeID": 7,
+        "SourceID": 4,
+        "StatusID": 77,
+        "ServiceID": 10,
+        "PriorityID": 20,
+        "ResponsibleGroupID": 18,
+        "Title": "MiServer Migration Assistance",
+        "RequestorEmail": user.email,
+        "Attributes": [
+            {"ID": "1951",
+            "Value": "200"},
+            {"ID": "1953",
+            "Value": owner}
+            ]
+        }
+
+    data_string = json.dumps(payload)
+    response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
+
+
 #@permission_required('oscauth.can_order')
 def send_tab_data(request):
 
@@ -109,6 +155,11 @@ def send_tab_data(request):
     #    f = TabForm(step)
 
     if f.is_valid():
+
+        if request.POST.get('misevexissev') == 'yesexis':
+            send_ticket(request.POST.get('owner'), request.user)
+            return JsonResponse({'redirect': '/requestsent'}, safe=False)
+
         valid = True
         summary = f.get_summary(visible)
         tab = {'title': step.label, 'fields': summary}
