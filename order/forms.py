@@ -940,6 +940,12 @@ class ServerSpecForm(TabForm):
                 self.add_error('diskSize', 'Disk size must be in increments of 10 Gigabytes.')
                 break
 
+        name = self.request.POST.get('name')
+        if name:
+            servername = Server.objects.filter(name=name)
+            if len(servername) > 0:
+                self.add_error('serverName', f'A server named {name} already exists. Please choose a different name.')
+
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)
         if ram != None and cpu != None:
