@@ -1130,6 +1130,9 @@ class BillingStorageForm(TabForm):
 
             summary[0]['value'] = label 
 
+
+        summary[2]['label'] = 'I have read the Sensitive Data Guide, agree that my use of this service complies with those guidelines and accept the terms of the Service Level Agreement.'
+
         #instance_id = self.data.get('instance_id')
         
         #if instance_id:
