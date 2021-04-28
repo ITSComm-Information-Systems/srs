@@ -1172,12 +1172,17 @@ class Item(models.Model):
                 attributes.append({'ID': 1957, 'Value': os.label}) 
 
             if self.data.get('volaction') != 'Delete':
-                for field in text[1]['fields']:
+                if action.type == 'M':
+                    summ = text[2]['fields']
+                else:
+                    summ = text[1]['fields']
+
+                for field in summ:
                     if field['label'] == 'Disk Space':
                         nl = '\n'
                         disks = nl.join(field['list'])
                         attributes.append({'ID': 1965, 'Value': disks})
-        
+
         # Add Action Constants to Payload
         cons = Constant.objects.filter(action=action)
 
