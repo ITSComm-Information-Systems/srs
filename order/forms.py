@@ -708,6 +708,15 @@ class ServerSupportForm(TabForm):
     def __init__(self, *args, **kwargs):
         super(ServerSupportForm, self).__init__(*args, **kwargs)
 
+        if hasattr(self, 'instance'):
+            self.initial = self.instance.__dict__
+            self.initial['patch_day'] = str(self.instance.patch_day_id)
+            self.initial['patch_time'] = str(self.instance.patch_time_id)
+            self.initial['reboot_day'] = str(self.instance.reboot_day_id)
+            self.initial['reboot_time'] = str(self.instance.reboot_time_id)
+            self.initial['backup_time'] = str(self.instance.backup_time_id)
+            self.initial['on_call'] = str(self.instance.on_call)
+
         if self.action.service.name=='midatabase':
             self.fields.pop('backup_time')
             self.fields.pop('patch_day')
