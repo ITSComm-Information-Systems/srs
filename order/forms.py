@@ -780,11 +780,12 @@ class ServerDataForm(TabForm):
 
 
 class DiskForm(forms.ModelForm):
+    id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     name = forms.CharField()
     name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
 
     size = forms.IntegerField(min_value=10, initial=10)
-    size.widget.attrs.update({'class': 'form-control disk-size', 'step': 10})  
+    size.widget.attrs.update({'class': 'form-control disk-size validate-integer', 'step': 10})  
 
     uom = forms.ChoiceField(choices=(('GB','GB'),('TB','TB')))
     uom.widget.attrs.update({'class': 'form-control'})  
@@ -792,6 +793,18 @@ class DiskForm(forms.ModelForm):
     class Meta:
         model = ServerDisk
         fields = ['id', 'name', 'size']
+
+    def clean(self):
+
+        current_size = self.initial.get('size')
+        if current_size:
+            if self.cleaned_data.get('size') < current_size:
+                self.add_error('size', f'Disk size cannot be decreased. Select a size of {current_size} or more.')
+
+        if self.cleaned_data.get('size', 0) % 10 != 0:
+            self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
+
+        super().clean()
 
 
 class DiskDisplayForm(forms.ModelForm):
@@ -840,9 +853,9 @@ class ServerSpecForm(TabForm):
         instance_id = self.request.POST.get('instance_id')
 
         if self.is_bound:
-            self.disk_formset = self.DiskFormSet(self.request.POST)
-            x = self.disk_formset.is_valid
-        elif self.request.POST.get('action_type') == 'M':                
+            self.disk_formset = self.DiskFormSet(self.request.POST, initial=ServerDisk.objects.filter(server_id=instance_id).order_by('name').values())
+            #x = self.disk_formset.is_valid()
+        elif self.request.POST.get('action_type') == 'M':          
             self.disk_formset = self.DiskFormSet(initial=ServerDisk.objects.filter(server_id=instance_id).order_by('name').values())
         else:
             self.disk_formset = self.DiskFormSet(initial=[{'num': 0, 'name': 'disk0', 'size': 50, 'uom': 'GB'}])
@@ -935,10 +948,8 @@ class ServerSpecForm(TabForm):
 
 
     def clean(self):
-        for disk in self.disk_formset.cleaned_data:
-            if disk.get('size', 0) % 10 != 0:
-                self.add_error('diskSize', 'Disk size must be in increments of 10 Gigabytes.')
-                break
+        if not self.disk_formset.is_valid():
+            self.add_error('diskSize', '')
 
         name = self.request.POST.get('name')
         if name:

@@ -40,11 +40,18 @@
                 {{ tab.form.disk_formset.management_form }}
                 {% for diskform in tab.form.disk_formset %}
                 <div class="form-inline disk-div" style="display: block;">
+                    {{ diskform.id }}
                     {{ diskform.name }}
                     {{ diskform.size }}
                     {{ diskform.uom }}
                     <span class="float-right disk-cost"></span>
                 </div>
+
+                {% for error in diskform.size.errors %}
+                <div role="alert" class="invalid-feedback-"><i class="fas fa-exclamation-triangle"
+                        aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+                {% endfor %}
+
                 {% endfor %}
             </div>
             <div id="emptyform_wrapper" style="display: none">
