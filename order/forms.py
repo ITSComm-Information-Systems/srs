@@ -851,6 +851,11 @@ class ServerSpecForm(TabForm):
     def __init__(self, *args, **kwargs):
         super(ServerSpecForm, self).__init__(*args, **kwargs)
 
+        if hasattr(self, 'instance'):
+            self.initial = self.instance.__dict__
+            self.initial['backup'] = str(self.instance.backup)
+            self.initial['replicated'] = str(self.instance.replicated)
+
         if self.request.POST.get('database'):
             self.set_database_defaults()
             if self.is_bound:
