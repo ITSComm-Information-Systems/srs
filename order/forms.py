@@ -977,6 +977,11 @@ class ServerSpecForm(TabForm):
             if ram / cpu < 2:
                 self.add_error('ram', 'Ram must be at least double cpu.')
 
+            if self.action.type == 'M':
+                if self.instance.managed and cpu < 2:
+                    if self.instance.os.label.startswith('Windows'):
+                        self.add_error('cpu', 'Managed Windows requires at least two cpu.')                        
+                
             if cpu < 2 and self.cleaned_data.get('managed', False):
                 os = self.cleaned_data.get('misevos', False)
                 if os:
