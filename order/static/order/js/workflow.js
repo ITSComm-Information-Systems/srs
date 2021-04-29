@@ -340,6 +340,24 @@ $(document).ready(function() {
 
   //MiServer Specification
   $('[data-tab="miSeverSpec"]').on('show.bs.tab', function(event) {
+    size_edit = $('#id_size_edit').val();
+
+    if (size_edit == "0") {
+      i_num = $('#id_form-INITIAL_FORMS').val();
+      for (i = 0; i < i_num; i++) {
+        $('#id_form-' + i + '-size').attr("readonly", true);
+        $('#id_form-' + i + '-uom').attr("readonly", true);
+      }
+    }
+    init_num = $('#id_form-INITIAL_FORMS').val();
+    total_num = $('#id_form-TOTAL_FORMS').val();
+    if (total_num > init_num) {
+      button = '<a onclick="deleteDisk(this);" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>';
+      last = $('#id_form-' + (total_num-1).toString() + '-uom');
+      $(button).insertAfter(last);
+    }
+
+
     ram_rate = $('#server_rates').data('ram_rate');
     disk_replicated = $('#server_rates').data('disk_replicated');
     disk_no_replication = $('#server_rates').data('disk_no_replication');
