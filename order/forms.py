@@ -839,6 +839,7 @@ class ServerSpecForm(TabForm):
     uom_list = ['GB','TB']
     DiskFormSet = formset_factory(DiskForm, extra=0)
     DiskDisplayFormSet = formset_factory(DiskDisplayForm, extra=0)
+    size_edit = forms.IntegerField(widget=forms.HiddenInput(), required=False, initial=0)
 
     for rate in StorageRate.objects.filter(name__startswith='SV-'):
         if rate.name == 'SV-RAM':
@@ -858,6 +859,9 @@ class ServerSpecForm(TabForm):
             self.initial['backup'] = str(self.instance.backup)
             self.initial['replicated'] = str(self.instance.replicated)
 
+            if self.instance.os.label.startswith('Windows'):
+                self.fields['size_edit'].initial = 1
+
         if self.request.POST.get('database'):
             self.set_database_defaults()
             if self.is_bound:
@@ -874,6 +878,7 @@ class ServerSpecForm(TabForm):
         elif self.request.POST.get('action_type') == 'M':          
             self.disk_formset = self.DiskFormSet(initial=ServerDisk.objects.filter(server_id=instance_id).order_by('name').values())
         else:
+            self.fields['size_edit'].initial = 1
             self.disk_formset = self.DiskFormSet(initial=[{'num': 0, 'name': 'disk0', 'size': 50, 'uom': 'GB'}])
             self.fields['cpu'].initial = 1
             self.fields['managed'].initial = True
