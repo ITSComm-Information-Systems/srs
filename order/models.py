@@ -1230,6 +1230,9 @@ class Item(models.Model):
             if value:
                 setattr(rec, field, value)
 
+        on_call = self.data.get('on_call', '0')
+        rec.on_call = int(on_call)
+
         for field in ['backup_time','patch_day','patch_time','reboot_day','reboot_time']:
             value = self.data.get(field)
             if value:
