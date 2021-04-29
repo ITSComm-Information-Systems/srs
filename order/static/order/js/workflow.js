@@ -370,6 +370,8 @@ $(document).ready(function() {
     if (database) {
       if (database == "MSSQL") {
         server_name = 'db-' + server_name
+      } else if (database == "Oracle") {
+        server_name = server_name + '-ora'
       } else {
         server_name = server_name + '-' + database.toLowerCase();
       }
