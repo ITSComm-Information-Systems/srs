@@ -708,6 +708,14 @@ class ServerSupportForm(TabForm):
     def __init__(self, *args, **kwargs):
         super(ServerSupportForm, self).__init__(*args, **kwargs)
 
+        if self.action.service.name=='midatabase':
+            self.fields.pop('backup_time')
+            self.fields.pop('patch_day')
+            self.fields.pop('patch_time')
+            self.fields.pop('reboot_day')
+            self.fields.pop('reboot_time')
+            return
+
         if hasattr(self, 'instance'):
             self.initial = self.instance.__dict__
             self.initial['patch_day'] = str(self.instance.patch_day_id)
@@ -716,14 +724,6 @@ class ServerSupportForm(TabForm):
             self.initial['reboot_time'] = str(self.instance.reboot_time_id)
             self.initial['backup_time'] = str(self.instance.backup_time_id)
             self.initial['on_call'] = str(self.instance.on_call)
-
-        if self.action.service.name=='midatabase':
-            self.fields.pop('backup_time')
-            self.fields.pop('patch_day')
-            self.fields.pop('patch_time')
-            self.fields.pop('reboot_day')
-            self.fields.pop('reboot_time')
-            return
 
         instance_id = self.request.POST.get('instance_id')
         if hasattr(self, 'instance') and not self.is_bound:
@@ -793,7 +793,7 @@ class DiskForm(forms.ModelForm):
     name = forms.CharField()
     name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
 
-    size = forms.IntegerField(min_value=10, initial=10)
+    size = forms.IntegerField(initial=10)
     size.widget.attrs.update({'class': 'form-control disk-size validate-integer', 'step': 10})  
 
     uom = forms.ChoiceField(choices=(('GB','GB'),('TB','TB')))
@@ -807,11 +807,13 @@ class DiskForm(forms.ModelForm):
 
         current_size = self.initial.get('size')
         if current_size:
-            if self.cleaned_data.get('size') < current_size:
-                self.add_error('size', f'Disk size cannot be decreased. Select a size of {current_size} or more.')
+            if self.cleaned_data.get('size', 0) < current_size:
+                if self.cleaned_data.get('uom') != 'TB':
+                    self.add_error('size', f'Disk size cannot be decreased. Select a size of {current_size} or more.')
 
-        if self.cleaned_data.get('size', 0) % 10 != 0:
-            self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
+        if self.cleaned_data.get('uom') == 'GB':
+            if self.cleaned_data.get('size', 0) % 10 != 0:
+                self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
 
         super().clean()
 
