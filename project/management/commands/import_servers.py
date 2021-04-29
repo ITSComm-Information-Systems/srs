@@ -148,7 +148,7 @@ class Command(BaseCommand):
                     size = int(disk[equal+1:space])
                 elif uom == 'TB':
                     tb = float(disk[equal+1:space])
-                    size = int(tb * 1000)
+                    size = int(tb * 1024)
                 else:
                     print('error in disk unit', uom)
                     return
