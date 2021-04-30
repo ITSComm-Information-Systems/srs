@@ -240,6 +240,18 @@ $(document).ready(function() {
     database = $("#id_database").val();
   });
 
+  $(document).on("change", ".disk-uom", function(e) {
+    if (this.getAttribute('readonly')) {
+      return;
+    }
+    if (this.value == 'TB') {
+      id = this.id;
+      tar = '#' + id.substring(0, id.length-3) + 'size';
+      $(tar).val(1);
+    }
+
+  });
+
   $(document).on("keypress", ".validate-integer", function(e) {
     console.log(this.value);
     if (e.keyCode==46 || e.keyCode==45) {
@@ -347,6 +359,14 @@ $(document).ready(function() {
       for (i = 0; i < i_num; i++) {
         $('#id_form-' + i + '-size').attr("readonly", true);
         $('#id_form-' + i + '-uom').attr("readonly", true);
+
+        $('#id_form-' + i + '-uom' + ' > option').each(function() {
+          console.log(this);
+          console.log(this.selected);
+          if (!this.selected) {
+            $(this).remove();
+          }
+        });
       }
     }
     init_num = $('#id_form-INITIAL_FORMS').val();
