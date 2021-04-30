@@ -1234,8 +1234,8 @@ class Item(models.Model):
     def update_server(self, rec):
         rec.owner = LDAPGroup().lookup( self.data['owner'] )
 
-        if self.data.get('admin_group'):
-            rec.admin_group = LDAPGroup().lookup( self.data['admin_group'] )
+        if self.data.get('ad_group'):
+            rec.admin_group = LDAPGroup().lookup( self.data['ad_group'] )
         else:
             rec.admin_group = rec.owner
 
