@@ -797,7 +797,7 @@ class DiskForm(forms.ModelForm):
     size.widget.attrs.update({'class': 'form-control disk-size validate-integer', 'step': 10})  
 
     uom = forms.ChoiceField(choices=(('GB','GB'),('TB','TB')))
-    uom.widget.attrs.update({'class': 'form-control'})  
+    uom.widget.attrs.update({'class': 'form-control disk-uom'})  
 
     class Meta:
         model = ServerDisk
@@ -811,7 +811,7 @@ class DiskForm(forms.ModelForm):
                 if self.cleaned_data.get('uom') != 'TB':
                     self.add_error('size', f'Disk size cannot be decreased. Select a size of {current_size} or more.')
 
-        if self.cleaned_data.get('uom') == 'GB':
+        if self.cleaned_data.get('uom') == 'GB' and self.cleaned_data.get('size', 0) < 1000:
             if self.cleaned_data.get('size', 0) % 10 != 0:
                 self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
 

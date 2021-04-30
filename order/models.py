@@ -1275,7 +1275,7 @@ class Item(models.Model):
             name = self.data.get('form-'+str(disk)+'-name')
 
             if uom == 'TB':
-                size = size * 1024
+                size = int(size) * 1024
 
             d = ServerDisk.objects.update_or_create(server=rec,name=name,
                 defaults={'size': size})
