@@ -1124,12 +1124,15 @@ class Item(models.Model):
                 else:
                     attributes.append({'ID': element.target, 'Value': value})
 
+        dedicated = False
         if action.service.name == 'miServer':
             if action.type == 'M':
                 instance_id = self.data.get('instance_id')
                 instance = Server.objects.get(id=instance_id)
                 if instance.managed:
                     mod_man = 'True'
+                    if instance.admin_group.name == 'MiDatabase Support Team':
+                        dedicated = True
                 else:
                     mod_man = 'False'
                 os_id = instance.os_id
@@ -1165,7 +1168,10 @@ class Item(models.Model):
                 if self.data.get('volaction') == 'Delete':
                     payload['Title'] = 'Delete MiServer'
                 else:
-                    attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
+                    if dedicated:
+                        attributes.append({'ID': 1953, 'Value': instance.admin_group.name})  # Admin Group
+                    else:
+                        attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
 
                 managed = self.data.get('managed', mod_man)
                 if managed == 'True' or db:
