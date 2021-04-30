@@ -737,6 +737,14 @@ class Database(models.Model):
         (ORACLE, 'Oracle'),
     ]
 
+    BUSINESS_HOURS = 0
+    ALL_HOURS = 1
+
+    ON_CALL_CHOICES = [
+        (BUSINESS_HOURS, 'Business Hours'),
+        (ALL_HOURS, '24/7'),
+    ]
+
     name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
     in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
@@ -746,10 +754,13 @@ class Database(models.Model):
     type = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_TYPE"}, on_delete=models.SET_NULL, related_name='type')
     #version = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_VERSION"}, on_delete=models.SET_NULL, related_name='version')
     purpose = models.TextField()
+    on_call = models.PositiveSmallIntegerField(null=True, choices=ON_CALL_CHOICES)
+    url = models.URLField(null=True, blank=True)
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
     server = models.ForeignKey(Server, null=True, blank=True, on_delete=models.SET_NULL)
     legacy_data = models.TextField()
+
 
     def __str__(self):
         return self.name
@@ -1206,10 +1217,13 @@ class Item(models.Model):
     def update_db(self, rec):
         rec.owner = LDAPGroup().lookup( self.data['owner'] )
 
-        for field in ['purpose','size','name','support_email','support_phone','shortcode','type']:
+        for field in ['purpose','size','name','support_email','support_phone','shortcode','type','url']:
             value = self.data.get(field)
             if value:
                 setattr(rec, field, value)
+
+        on_call = self.data.get('on_call', '0')
+        rec.on_call = int(on_call)
 
         type = self.data.get('midatatype')
         if type:
