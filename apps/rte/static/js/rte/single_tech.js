@@ -105,16 +105,14 @@ function wo_to_review() {
     $('#tech-info-review').append($("#tech-info-input").html());
 }
 
-
-// Copy entry
-entries = {}
-function test(num){
-    console.log(entries)
-    $('#workOrderSearch').val()=entries[num]['order'];
-    $('#workOrderSearch').val()=entries[num]['rate'];
-    $('#duration-hours').val()=entries[num]['hour'];
-    $('#duration-mins').val()=entries[num]['min'];
-    $('#notes').val()=entries[num]['notes']
+// Copy row
+function copier(num){
+    $('#workOrderSearch').val($('#row-' + num + '-workOrder').html()).change();
+    $('#rateSelect').val($('#row-' + num + '-rate').html())
+    $('#assigned_date').val($('#row-' + num + '-date').html())
+    $('#duration-hours').val($('#row-' + num + '-hour').val())
+    $('#duration-minute').val($('#row-' + num + '-minute').val())
+    $('#notes').val($('#row-' + num + '-notes').html())
 }
 
 // Add row to input table
@@ -122,19 +120,15 @@ function add_to_table(num_entries) {
     if (num_entries < 15) {
         num_entries = num_entries + 1; 
         var html = '<tr id="row-' + num_entries + '">' + 
-                        '<td>' + $('#workOrderSearch').val() + '</td>' +
-                        '<td>' + $('#rateSelect').val() + '</td>' +
-                        '<td>' + $('#assigned_date').val() + '</td>' +
+                        '<td id="row-' + num_entries + '-workOrder">' + $('#workOrderSearch').val() + '</td>' +
+                        '<td id="row-' + num_entries + '-rate">' + $('#rateSelect').val() + '</td>' +
+                        '<td id="row-' + num_entries + '-date">' + $('#assigned_date').val() + '</td>' +
                         '<td>' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</td>' +
-                        '<td>' + $('#notes').val() + '</td>' +
-                        '<td style="padding-right: 0px;" class="delete-col"><div style="float:right;"><button style="float: left;" class="btn btn-success" id="single-copy" onClick="test('+num_entries+')" >Copy</button> <button style="float: right;" class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></div></td>' +
+                        '<td id="row-' + num_entries + '-notes">' + $('#notes').val() + '</td>' +
+                        '<td style="padding-right: 0px;" class="delete-col"><div style="float:right;">'+
+                        '<button style="float: left;" class="btn btn-success" id="single-copy" onClick="copier('+num_entries+')" >Copy</button>' +
+                        '<button style="float: right;" class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></div></td>' +
                     '</tr>';
-    entries[num_entries] = {'order':$('#workOrderSearch').val(), 
-    'rate': $('#rateSelect').val(),
-    'hour': $('#duration-hours').val(),
-    'min': $('#duration-mins').val(),
-    'notes':$('#notes').val()
-}        
         var form_html = '<input type="text" name="' + num_entries + '_work_order" value="' + $('#workOrderSearch').val() + '" hidden>' +
                         '<input type="text" name="' + num_entries + '_rate" value="' + $('#rateSelect').val() + '" hidden>' +
                         '<input type="date" name="' + num_entries + '_assigned_date" value="' + $('#assigned_date').val() + '" hidden>' +
