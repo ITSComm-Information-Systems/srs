@@ -475,7 +475,7 @@ class Warehouse(PermissionRequiredMixin, View):
         MaterialFormSet = modelformset_factory(
             Material, form=MaterialForm, exclude=('id',), extra=0)
         material_formset = MaterialFormSet(
-            queryset=estimate.material_list.order_by('status','item'), prefix='material')
+            queryset=estimate.material_list.order_by('status','item_code'), prefix='material')
         form = self.WarehouseForm(instance=estimate)
 
         return render(request, 'bom/warehouse.html',
