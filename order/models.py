@@ -670,9 +670,11 @@ class Server(models.Model):
     def total_disk_size(self):
         disk = ServerDisk.objects.filter(server=self).aggregate(models.Sum('size'))
         if disk:
-            return disk['size__sum']
-        else:
-            return 0
+            sum = disk['size__sum']
+            if sum:
+                return disk['size__sum']
+
+        return 0
 
     @property
     def ram_cost(self):
