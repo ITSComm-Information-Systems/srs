@@ -110,8 +110,6 @@ function copier(num){
     $('#workOrderSearch').val($('#row-' + num + '-workOrder').html()).change();
     $('#rateSelect').val($('#row-' + num + '-rate').html())
     $('#assigned_date').val($('#row-' + num + '-date').html())
-    $('#duration-hours').val($('#row-' + num + '-hour').val())
-    $('#duration-minute').val($('#row-' + num + '-minute').val())
     $('#notes').val($('#row-' + num + '-notes').html())
 }
 
