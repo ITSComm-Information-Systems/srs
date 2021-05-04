@@ -9,6 +9,7 @@ $(document).ready(function() {
     current_tab = 1;
 
     $('#submitBtn').hide();
+	$('#prevBtn').hide();
 
     $('.nav-link').on('click', function() {
 		disabled = $(this).hasClass('disabled');
@@ -20,8 +21,10 @@ $(document).ready(function() {
 		// First tab
     	if (current_tab === 1) {
     		$('#prevBtn').addClass('disabled');
+			$('#prevBtn').hide();
     	}
     	else {
+			$('#prevBtn').show();
     		$('#prevBtn').removeClass('disabled');
     	}
 
