@@ -107,10 +107,11 @@ function wo_to_review() {
 
 // Copy row
 function copier(num){
-    $('#workOrderSearch').val($('#row-' + num + '-workOrder').html()).change();
-    $('#rateSelect').val($('#row-' + num + '-rate').html())
-    $('#assigned_date').val($('#row-' + num + '-date').html())
-    $('#notes').val($('#row-' + num + '-notes').html())
+    $('#workOrderSearch').val($('input[name="' + num + '_work_order"').val()).change();
+    $('#rateSelect').val($('input[name="' + num + '_rate"').val())
+    $('#duration-hours').val($('input[name="' + num + '_duration"').val().split(':')[0])
+    $('#duration-mins').val($('input[name="' + num + '_duration"').val().split(':')[1])
+    $('#notes').val($('input[name="' + num + '_notes"').val())
 }
 
 // Add row to input table
@@ -118,10 +119,10 @@ function add_to_table(num_entries) {
     if (num_entries < 15) {
         num_entries = num_entries + 1; 
         var html = '<tr id="row-' + num_entries + '">' + 
-                        '<td id="row-' + num_entries + '-workOrder">' + $('#workOrderSearch').val() + '</td>' +
-                        '<td id="row-' + num_entries + '-rate">' + $('#rateSelect').val() + '</td>' +
-                        '<td id="row-' + num_entries + '-date">' + $('#assigned_date').val() + '</td>' +
-                        '<td>' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</td>' +
+                        '<td>' + $('#workOrderSearch').val() + '</td>' +
+                        '<td>' + $('#rateSelect').val() + '</td>' +
+                        '<td>' + $('#assigned_date').val() + '</td>' +
+                        '<td id="row-' + num_entries + '-date" hour="' + $('#duration-hours').val() + 'minute="'+$('#duration-minute').val()+'">' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</td>' +
                         '<td id="row-' + num_entries + '-notes">' + $('#notes').val() + '</td>' +
                         '<td style="padding-right: 0px;" class="delete-col"><div style="float:right;">'+
                         '<button style="float: left;" class="btn btn-success" id="single-copy" onClick="copier('+num_entries+')" >Copy</button>' +
