@@ -111,7 +111,6 @@ function copier(num){
     $('#rateSelect').val($('input[name="' + num + '_rate"').val())
     $('#duration-hours').val($('input[name="' + num + '_duration"').val().split(':')[0])
     $('#duration-mins').val($('input[name="' + num + '_duration"').val().split(':')[1])
-    $('#notes').val($('input[name="' + num + '_notes"').val())
 }
 
 // Add row to input table
