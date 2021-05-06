@@ -12,6 +12,8 @@ from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer
 from reportlab.lib.units import inch
 from reportlab.graphics.shapes import Drawing,Line
+from .models import Material
+from django.db.models import Sum
 
 # Estimate.get_details()
 
@@ -347,28 +349,30 @@ class PdfCreator:
 		# Add item list
 		data = [[Paragraph('<b>Item Number</b>', normal),
 				Paragraph('<b>Est Qty</b>', normal),
-				Paragraph('<b>Qty</b>', normal),
-				Paragraph('<b>Manufacturer Number</b>', normal),
+				Paragraph('<b>Qty</b>', normal),	
 				Paragraph('<b>Item Description</b>', normal),
+				Paragraph('<b>Manufacturer Number</b>', normal),
 				Paragraph('<b>Release Number</b>', normal),
 				Paragraph('<b>Reel Number</b>', normal),
 				Paragraph('<b>Staged</b>', normal),
 				Paragraph('<b>Status</b>', normal)
 				]]
 
+		options = {1:'Estimate',2:'In Stock',3:'Ordered', 'True':'Yes','False':'No'}
+		
 		for record in self.estimate.part_list:
 			data.append([Paragraph(str(record['item__code']), normal),
 						Paragraph(str(record['quantity__sum']), CENTER),
 						Paragraph('', normal),
-						Paragraph(str(record['item__manufacturer_part_number']), normal),
 						Paragraph(str(record['item__name']), normal),
+						Paragraph(str(record['item__manufacturer_part_number']), normal),
 						Paragraph(str(record['release_number']), normal),
 						Paragraph(str(record['reel_number']), normal),
-						Paragraph(str(record['staged']), normal),
-						Paragraph(str(record['status']), normal),
+						Paragraph(options[str(record['staged'])], normal),
+						Paragraph(str(options[record['status']]), normal),
 						])
 
-		col_widths = [1 * inch, .5 * inch, .9 * inch, 1.5 * inch , 3.2 * inch, .7 * inch, .7 * inch, .7 * inch, .7 * inch]
+		col_widths = [1 * inch, .5 * inch, .8 * inch, 3.3 * inch , 1.5 * inch, .7 * inch, .7 * inch, .7 * inch, .8 * inch]
 		table = Table(data, colWidths=col_widths)
 		table.setStyle(TableStyle([('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
 									('BOX', (0,0), (-1,-1), 0.25, colors.black),]))
