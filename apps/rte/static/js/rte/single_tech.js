@@ -105,6 +105,14 @@ function wo_to_review() {
     $('#tech-info-review').append($("#tech-info-input").html());
 }
 
+// Copy row
+function copier(num){
+    $('#workOrderSearch').val($('input[name="' + num + '_work_order"').val()).change();
+    $('#rateSelect').val($('input[name="' + num + '_rate"').val())
+    $('#duration-hours').val($('input[name="' + num + '_duration"').val().split(':')[0])
+    $('#duration-mins').val($('input[name="' + num + '_duration"').val().split(':')[1])
+}
+
 // Add row to input table
 function add_to_table(num_entries) {
     if (num_entries < 15) {
@@ -113,9 +121,11 @@ function add_to_table(num_entries) {
                         '<td>' + $('#workOrderSearch').val() + '</td>' +
                         '<td>' + $('#rateSelect').val() + '</td>' +
                         '<td>' + $('#assigned_date').val() + '</td>' +
-                        '<td>' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</td>' +
-                        '<td>' + $('#notes').val() + '</td>' +
-                        '<td class="delete-col"><button class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></td>' +
+                        '<td id="row-' + num_entries + '-date" hour="' + $('#duration-hours').val() + 'minute="'+$('#duration-minute').val()+'">' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</td>' +
+                        '<td id="row-' + num_entries + '-notes">' + $('#notes').val() + '</td>' +
+                        '<td style="padding-right: 0px;" class="delete-col"><div style="float:right;">'+
+                        '<button style="float: left;" class="btn btn-success" id="single-copy" onClick="copier('+num_entries+')" >Copy</button>' +
+                        '<button style="float: right;" class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></div></td>' +
                     '</tr>';
         var form_html = '<input type="text" name="' + num_entries + '_work_order" value="' + $('#workOrderSearch').val() + '" hidden>' +
                         '<input type="text" name="' + num_entries + '_rate" value="' + $('#rateSelect').val() + '" hidden>' +
