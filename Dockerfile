@@ -15,10 +15,16 @@ RUN apt-get install -y curl unzip libaio1 \
     && unzip instantclient.zip && rm instantclient.zip
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
 
-COPY requirements.txt /tmp
-RUN pip install -r /tmp/requirements.txt
 
+COPY requirements.txt /usr/src/app/requirements.txt
 WORKDIR /usr/src/app
+RUN pip install -r requirements.txt
+COPY . /usr/src/app
+
+#COPY requirements.txt /tmp
+#RUN pip install -r /tmp/requirements.txt
+
+#WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 
@@ -28,6 +34,8 @@ RUN apt-get purge -y --auto-remove gcc
 RUN chmod -R g+rw /usr/src/app
 
 RUN chmod g+x /usr/src/app/docker-entrypoint.sh
+
+ENV flag=1
 
 EXPOSE 8000
 
