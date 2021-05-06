@@ -4,15 +4,16 @@
 
 <div class="form-inline">
 <input type="search" id="workorder_search" class="form-control"
-    aria-label=" Search through site content" placeholder="Filter results">
+    aria-label="Search through site content" placeholder="Filter results">
 </div>
 <br>
 <div id="div_workorder_table">
-    <table id="workorder_table" class="table table-hover table-striped" aria-live=”polite”>
+    <table id="workorder_table" class="table table-hover table-striped sortable" aria-live=”polite”>
         <thead>
             <tr>
                 <th>Workorder</th>
                 <th>Preorder</th>
+                <th>Description</th>
                 <th>Netops Engineer</th>
                 <th>SRS Status</th>
                 <th>Pinnacle Status</th>
@@ -21,23 +22,22 @@
                 <th>Assigned Date</th>
                 <th>Due Date</th>
                 <th>Completed Date</th>
-                <th>Activity</th>
             </tr>
         </thead>
         <tbody id="workOrderTableBody">
             {% for record in search_list %}
             <tr data-estimate_id={{ record.estimate_id }}>
-                <td>{{ record.wo_number_display }}</td>
+                <td style="white-space: nowrap;">{{ record.wo_number_display }}</td>
                 <td>{{ record.pre_order_number }}</td>
+                <td>{{ record.project_display |default:"None"}}</td>
                 <td>{{ record.netops_engineer }}</td>
                 <td>{{ record.get_status_display }}</td>
                 <td>{{ record.status_name }}</td>
                 <td>{{ record.percent_completed }}</td>
                 <td>{{ record.get_health_display }}</td>
-                <td>{{ record.assigned_date|date:"N j, Y"|default:"None" }}</td>
-                <td>{{ record.due_date|date:"N j, Y"|default:"None" }}</td>
-                <td>{{ record.completed_date|date:"N j, Y"|default:"None" }}</td>
-                <td>{{ record.activity }}</td>
+                <td sorttable_customkey={{ record.assigned_date|date:"Ymd" }}>{{ record.assigned_date|date:"N j, Y"|default:"None" }}</td>
+                <td sorttable_customkey={{ record.due_date|date:"Ymd" }}>{{ record.due_date|date:"N j, Y"|default:"None" }}</td>
+                <td sorttable_customkey={{ record.completed_date|date:"Ymd" }}>{{ record.completed_date|date:"N j, Y"|default:"None" }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -57,7 +57,6 @@
     });
 
     $('#workOrderTableBody tr').click(function () {
-        //var estimate = $(this).dataset.estimate_id
         var estimate_id = this.getAttribute('data-estimate_id');
             window.open("/apps/bom/estimate/" + estimate_id + "/");
     });

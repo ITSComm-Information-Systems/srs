@@ -402,11 +402,12 @@ class ProjectView(BOM):
     assigned_date = models.DateTimeField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     completed_date = models.DateTimeField(null=True, blank=True)
-    activity = models.TextField(default='')
+    #activity = models.TextField(default='')
     legacy_parent_id = models.CharField(max_length=32, default=0)
     netops_engineer = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True, verbose_name='NetOps')
     estimate_id = models.IntegerField()
     status_name = models.CharField(max_length=60)
+    project_display = models.CharField(max_length = 255, null=True)
 
     class Meta:
         db_table = 'um_bom_project_v'
