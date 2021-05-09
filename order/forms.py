@@ -1,12 +1,12 @@
 from django import forms
-from django.db.models.fields import IntegerField
+#from django.db.models.fields import IntegerField
 from django.forms import ModelForm, formset_factory
 #from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember, StorageHost, StorageRate
 from .models import *
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 from oscauth.models import LDAPGroupMember
-from project.integrations import MCommunity
+from project.integrations import MCommunity, create_ticket_database_modify
 import math
 from project.models import Choice
 
@@ -1277,3 +1277,57 @@ class PhoneLocationForm(TabForm):
     room = forms.CharField(label='Room', max_length=100)
     jack = forms.CharField(max_length=100)
     template = 'order/phone_location.html'
+
+class DatabaseForm(ModelForm):
+    size = forms.IntegerField(label='Size', min_value=10, max_value=50)
+    size.widget.attrs.update({'step': 10})
+
+    owner_name = forms.ChoiceField(label='Owner', widget=forms.Select(attrs={'class': 'form-control'}))    
+    shortcode = forms.CharField(label='Shortcode', validators=[validate_shortcode])
+
+    class Meta:
+        model = Database
+        fields = ('size','support_email','support_phone','shortcode')
+
+    def __init__(self, user, *args, **kwargs):
+        super(DatabaseForm, self).__init__(*args, **kwargs)
+
+        self.user = user
+        group_list = MCommunity().get_groups(user.username)
+
+        choice_list = [(None, '---')]
+        for group in group_list:
+            choice_list.append((group, group,))
+
+        self.fields['owner_name'].choices = choice_list
+        self.fields['owner_name'].initial = self.instance.owner.name
+
+    def clean(self):
+
+        size = self.cleaned_data.get('size', 0)
+        if size % 10 != 0:
+            self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
+
+        super().clean()
+
+        for field in self.errors:
+            self.fields[field].widget.attrs.update({'class': 'form-control is-invalid'})
+
+    def save(self, *args, **kwargs):
+
+        if 'owner_name' in self.changed_data:
+            self.instance.owner = LDAPGroup().lookup( self.cleaned_data.get('owner_name') )
+            #owner = LDAPGroup.lookup(self.cleaned_data.get('owner_name'))
+
+        if self.has_changed() and self.changed_data != ['shortcode']:  # Gotta change more than shortcode to create ticket
+
+            description = ''
+            for key, value in self.cleaned_data.items():
+                label = self.fields[key].label
+                if key in self.changed_data:
+                    value = f'{value}*'
+                description = description + f'{label}:{value} \n'
+
+            create_ticket_database_modify(self.instance, self.user, description)
+
+        super().save(*args, **kwargs)  # Call the "real" save() method.

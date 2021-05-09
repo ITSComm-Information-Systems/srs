@@ -800,3 +800,49 @@ class Status(PermissionRequiredMixin, View):
             'status_help': Page.objects.get(permalink='/status'),
         }
         return HttpResponse(template.render(context, request))
+
+
+
+class DatabaseView(UserPassesTestMixin, View):
+
+    def test_func(self):
+        username = self.request.user.username
+        instance_id = self.kwargs['instance_id']
+        owner = Database.objects.get(id=instance_id).owner.name
+
+        mc = MCommunity()
+        mc.get_group(owner)
+
+        if username in mc.members:
+            return True
+        else:
+            return False
+    
+    def get(self, request, instance_id):
+        db = Database.objects.get(id=instance_id)
+        form = DatabaseForm(request.user, instance=db)
+
+        template = loader.get_template('order/database_edit.html')
+        context = {
+            'title': 'Review Shared Database',
+            'form': form
+        }
+        return HttpResponse(template.render(context, request))
+
+
+    def post(self, request, instance_id):
+        db = Database.objects.get(id=instance_id)
+        form = DatabaseForm(request.user, request.POST, instance=db)
+
+        if form.is_valid() and form.has_changed():
+            form.save()
+            return HttpResponseRedirect('/requestsent') 
+
+        template = loader.get_template('order/database_edit.html')
+        context = {
+            'title': 'Review Shared Database',
+            'form': form,
+        }
+        return HttpResponse(template.render(context, request))
+
+
