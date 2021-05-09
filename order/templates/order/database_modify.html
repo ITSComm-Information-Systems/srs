@@ -27,7 +27,7 @@
                     
                             {% endfor %}
                         </td>
-                        <td class="action"><a href="#" onclick="modifyVolume(0, {{ volume.id }})">Edit</a><a href="#" class="delete" onclick="modifyVolume(1, {{ volume.id }})">Delete</a></td>
+                        <td class="action"><a href="/orders/database/{{ volume.id }}">Edit</a><a href="#" class="delete" onclick="modifyVolume(1, {{ volume.id }})">Delete</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
