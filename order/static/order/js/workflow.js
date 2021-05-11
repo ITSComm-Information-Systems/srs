@@ -244,10 +244,14 @@ $(document).ready(function() {
     if (this.getAttribute('readonly')) {
       return;
     }
+    id = this.id;
+    tar = '#' + id.substring(0, id.length-3) + 'size';
     if (this.value == 'TB') {
-      id = this.id;
-      tar = '#' + id.substring(0, id.length-3) + 'size';
       $(tar).val(1);
+      $(tar).attr('step', '1');
+    } else if (this.value == 'GB') {
+      $(tar).val(10);
+      $(tar).attr('step', '10');
     }
 
   });

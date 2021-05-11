@@ -954,13 +954,25 @@ class ServerSpecForm(TabForm):
         disk_review = []
         disk_size = 0
 
+        #if self.disk_formset.is_valid:
+        #    for disk in self.disk_formset.cleaned_data:
+        #        disk_size = disk_size + int(disk['size'])
+        #        disk_review.append(f"{disk['name']} {disk['size']} {disk['uom']} ")
 
-        if self.disk_formset.is_valid:
-            for disk in self.disk_formset.cleaned_data:
+        for form in self.disk_formset:
+            changed = ''
+            disk = form.cleaned_data
+            if disk['uom'] == 'TB':
+                disk_size = disk_size + int(disk['size']) * 1024
+            else:
                 disk_size = disk_size + int(disk['size'])
-                disk_review.append(f"{disk['name']} {disk['size']} {disk['uom']} ")
 
-        #print(disk_review)
+            if self.action.id == 71:
+                if form.changed_data != ['uom']:
+                    changed = '*'
+
+            disk_review.append(f"{disk['name']} - {disk['size']} {disk['uom']} {changed}")
+
         summary.append({'label': 'Disk Space', 'value': disk_size, 'list': disk_review})
         #line['value'] = disk_size
         #line['list'] = disk_review
