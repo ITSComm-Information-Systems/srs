@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http.response import Http404
 from django.template import loader
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
 from order.forms import *
 from django.contrib.auth.decorators import permission_required
@@ -12,6 +13,7 @@ from pages.models import Page
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from pages.models import Page
 from django.http import JsonResponse
+from project.integrations import create_ticket_server_delete
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from ast import literal_eval
@@ -846,3 +848,39 @@ class DatabaseView(UserPassesTestMixin, View):
         return HttpResponse(template.render(context, request))
 
 
+class ServerView(UserPassesTestMixin, View):
+
+    def test_func(self):
+        username = self.request.user.username
+        instance_id = self.kwargs['instance_id']
+        #owner = Server.objects.get(id=instance_id).owner.name
+        instance = get_object_or_404(Server, pk=instance_id)
+
+        mc = MCommunity() 
+        mc.get_group(instance.owner.name)
+
+        if username in mc.members:
+            return True
+        else:
+            return False
+    
+    def get(self, request, instance_id, action):
+        if action != 'delete':
+            raise Http404
+
+        server = get_object_or_404(Server, pk=instance_id)
+
+        template = loader.get_template('order/server_delete.html')
+        context = {
+            'title': 'Delete Server',
+            'server': server
+        }
+        return HttpResponse(template.render(context, request))
+
+
+    def post(self, request, instance_id, action):
+        instance = get_object_or_404(Server, pk=instance_id)
+        create_ticket_server_delete(instance, request.user, f'End Service for {instance.name}')
+        instance.delete()
+
+        return HttpResponseRedirect('/requestsent') 
