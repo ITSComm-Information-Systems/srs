@@ -90,11 +90,14 @@ class TDx():
         return requests.get( url, headers=self.headers )
 
     def create_ticket(self, payload):
-        #data = json.dumps(payload)
-        #url = f'{self.BASE_URL}/31/tickets/'
-        return requests.post( f'{self.BASE_URL}/31/tickets/'
+        resp = requests.post( f'{self.BASE_URL}/31/tickets/'
                             , headers=self.headers
                             , json=payload )
+
+        if not resp.ok:
+            print(resp.status_code, resp.text)
+
+        return resp
 
     def __init__(self):
         self._get_token()
@@ -159,11 +162,8 @@ def create_ticket_server_delete(instance, user, description):
         ]
     }
 
-    r = TDx().create_ticket(payload)
-    if r.ok:
-        print(r.status_code)
-    else:
-        print(r.status_code, r.text)
+    TDx().create_ticket(payload)
+
 
 def create_ticket_database_modify(instance, user, description):
 
@@ -184,19 +184,19 @@ def create_ticket_database_modify(instance, user, description):
             },
             {
                 "ID": "1875",  # Shortcode
-                "Value": "191248"
+                "Value": instance.shortcode
             },
             {
                 "ID": "1859",  # Owner
-                "Value": "ITS Planview Support"
+                "Value": instance.owner.name
             },
             {
                 "ID": "1975",  # Support Email
-                "Value": "its.pmo.ops@umich.edu"
+                "Value": instance.support_email
             },
             {
                 "ID": "1974",  # On Call
-                "Value": "Contact me/my group only during business hours"
+                "Value": instance.on_call
             },
             {
                 "ID": "1842",
@@ -205,27 +205,5 @@ def create_ticket_database_modify(instance, user, description):
         ]
     }
 
-    client_id = settings.UM_API['CLIENT_ID']
-    auth_token = settings.UM_API['AUTH_TOKEN']
-    base_url = settings.UM_API['BASE_URL']
+    TDx().create_ticket(payload)
 
-    headers = { 
-        'Authorization': f'Basic {auth_token}',
-        'accept': 'application/json'
-        }
-
-    url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
-    response = requests.post(url, headers=headers)
-    response_token = json.loads(response.text)
-    access_token = response_token.get('access_token')
-
-    headers = {
-        'X-IBM-Client-Id': client_id,
-        'Authorization': 'Bearer ' + access_token,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json' 
-        }
-
-    data_string = json.dumps(payload)
-    response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
-    print(response.status_code)
