@@ -16,6 +16,7 @@ urlpatterns = [
     path('services/<int:group_id>', Services.as_view()),
     path('wf/<int:action_id>', Workflow.as_view()),
     path('database/<int:instance_id>', views.DatabaseView.as_view()),
+    path('server/<int:instance_id>/<str:action>/', views.ServerView.as_view()),
 
     path('detail/<int:order_id>', views.get_order_detail),
     path('integration/<int:order_id>', views.Integration.as_view()),
