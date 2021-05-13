@@ -68,95 +68,6 @@ class UmAPI:
         return access_token
         
 
-
-    def get_ticket():
-        return 'x'
-
-    def submit_incident(self, route, action):
-
-
-        headers = {
-            'X-IBM-Client-Id': client_id,
-            'Authorization': 'Bearer ' + access_token,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json' 
-            }
-
-        text = self.data['reviewSummary']
-        note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
- 
-        payload = route['constants']
-        payload['Title'] = self.description
-        payload['RequestorEmail'] = self.created_by.email
-        payload['Description'] = f'{note}\n'
-
-        # Add Attributes using target mapping
-        field_map = action.override.get('map', '')
-
-        display_values = {}
-        for tab in self.data['reviewSummary']:
-            for field in tab['fields']:
-                if 'name' in field:
-                    if 'list' in field:
-                        nl = '\n'
-                        display_values[field['name']] = nl.join(field['list'])
-                    else:
-                        display_values[field['name']] = field['value']
-
-        attributes = []
-        step_list = Step.objects.filter(action=action)
-        element_list = Element.objects.filter(step__in=step_list, target__isnull=False)
-        for element in element_list:
-            value = display_values.get(element.name)
-            if value:
-                if element.name in field_map:
-                    attributes.append({'ID': field_map[element.name], 'Value': value})
-                else:
-                    attributes.append({'ID': element.target, 'Value': value})
-
-        if self.data['action_id'] == '67':
-            db = self.data.get('database')
-            if db:
-                attributes.append({'ID': 5413, 'Value': db})
-
-                if db == 'MSSQL':
-                    attributes.append({'ID': 1994, 'Value': 215}) # Windows
-                else:
-                    attributes.append({'ID': 1994, 'Value': 216}) # Linux
-            else:
-                managed = self.data.get('managed')
-                if managed:
-                    os_name = Choice.objects.get(id=self.data.get('misevos')).code
-                    attributes.append({'ID': 1952, 'Value': 203}) # Managed
-                    if os_name.startswith('Windows'):
-                        attributes.append({'ID': 1994, 'Value': 215}) # Windows
-                    else:
-                        attributes.append({'ID': 1994, 'Value': 216}) # Linux
-                else:
-                    attributes.append({'ID': 1952, 'Value': 207}) # Non-Managed
-                    attributes.append({'ID': 1994, 'Value': 214}) # IAAS
-
-            for field in text[1]['fields']:
-                if field['label'] == 'Disk Space':
-                    nl = '\n'
-                    disks = nl.join(field['list'])
-                    attributes.append({'ID': 1965, 'Value': disks})
-            
-        # Add Action Constants to Payload
-        cons = Constant.objects.filter(action=action)
-
-        for con in cons:  # Add Action Constants
-            attributes.append({'ID': con.field, 'Value': con.value})
-
-        payload['Attributes'] = attributes
-
-        data_string = json.dumps(payload)
-        response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
- 
-        self.external_reference_id = json.loads(response.text)['ID']
-        self.save()   # Save incident number to item
-
-
 class ShortCodesAPI(UmAPI):
     SCOPE = 'shortcodes'
     PREFIX = 'bf'
@@ -167,6 +78,48 @@ class ShortCodesAPI(UmAPI):
     def get_shortcode(self, shortcode):        
         url = f'{self.BASE_URL}/um/bf/ShortCodes/ShortCodes/{shortcode}'
         return requests.get(url, headers=self.headers)
+
+
+class TDx():
+    BASE_URL = settings.TDX['URL']
+    USERNAME = settings.TDX['USERNAME']
+    PASSWORD = settings.TDX['PASSWORD']
+
+    def get_ticket(self, id):
+        url = f'{self.BASE_URL}/tickets/{id}'
+        return requests.get( url, headers=self.headers )
+
+    def create_ticket(self, payload):
+        #data = json.dumps(payload)
+        #url = f'{self.BASE_URL}/31/tickets/'
+        return requests.post( f'{self.BASE_URL}/31/tickets/'
+                            , headers=self.headers
+                            , json=payload )
+
+    def __init__(self):
+        self._get_token()
+
+    def _get_token(self):
+        url = self.BASE_URL + '/auth'
+
+        headers = {'Content-Type': 'application/json; charset=utf-8'}
+
+        data = {
+            'username': self.USERNAME,
+            'password': self.PASSWORD
+        }
+
+        data_string = json.dumps(data)
+        response = requests.post(url, data=data_string, headers=headers )
+
+        if response.ok:
+            self.headers = {
+                'Authorization': 'Bearer ' + response.text,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json' 
+                }
+        else:
+            print(response, response.status_code, response.text)
 
 
 def create_ticket_server_delete(instance, user, description):
@@ -206,32 +159,11 @@ def create_ticket_server_delete(instance, user, description):
         ]
     }
 
-    client_id = settings.UM_API['CLIENT_ID']
-    auth_token = settings.UM_API['AUTH_TOKEN']
-    base_url = settings.UM_API['BASE_URL']
-
-    headers = { 
-        'Authorization': f'Basic {auth_token}',
-        'accept': 'application/json'
-        }
-
-    url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
-    response = requests.post(url, headers=headers)
-    response_token = json.loads(response.text)
-    access_token = response_token.get('access_token')
-
-    headers = {
-        'X-IBM-Client-Id': client_id,
-        'Authorization': 'Bearer ' + access_token,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json' 
-        }
-
-    data_string = json.dumps(payload)
-    response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
-    print(payload)
-    print(response.status_code, response.text)
-
+    r = TDx().create_ticket(payload)
+    if r.ok:
+        print(r.status_code)
+    else:
+        print(r.status_code, r.text)
 
 def create_ticket_database_modify(instance, user, description):
 
