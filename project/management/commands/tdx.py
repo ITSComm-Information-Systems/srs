@@ -1,45 +1,88 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from project.integrations import UmAPI, MCommunity
+from project.integrations import UmAPI, MCommunity, TDx
 
 
 import requests, json
+
+
+payload = {
+    "FormID": 19,
+    "TypeID": 6,
+    "SourceID": 4,
+    "StatusID": 77,
+    "ServiceID": 7,
+    "PriorityID": 20,
+    "ResponsibleGroupID": 17,
+    "Title": "md mdb Instance",
+#    "RequestorUid": '2d3898e5-7a73-ea11-a81b-000d3a8e391e',
+    "RequestorEmail": 'djamison@umich.edu',
+    "Description": 'test',
+
+        "Attributes": [
+            {
+                "ID": "1951", 
+                "Value": "202"  # Delete
+            },
+            {
+                "ID": "1959",  # Server Name
+                "Value": 'venus'
+            },
+            {
+                "ID": "1994",  # Managed
+                "Value": 202
+            },
+        ]
+}
 
 class Command(BaseCommand):
     help = 'TDx read API Data'
 
     def add_arguments(self, parser):
-        parser.add_argument('id',type=int)
+        parser.add_argument('--ticket')
+        parser.add_argument('--attr')
+        parser.add_argument('--parent')
+        parser.add_argument('--choices')
 
 
     def handle(self, *args, **options):
+        tdx = TDx()
+        #r = tdx.get_ticket(873987)
+        #print(r.text)
+        #return
 
-        #api = UmAPI('shortcode')
+        print(payload)
+        r = tdx.create_ticket(payload)
+        if r.ok:
+            print(r.status_code)
+        else:
+            print(r.status_code, r.text)
 
-        mc = MCommunity()
-        mc.get_groups('djamison')
+        return
 
-        groups = mc.get_groups('djamison')
-        for group in groups:
-            print(group)
+        if 'ticket' in options:
+            r = tdx.get_ticket(options['ticket'])
+            print(r.status_code, r.text)
 
-        #api.get_shortcode(940314)
-
-        #id = options['id']
-        #tdx = TDx()
-        #tdx.get_attribute_by_id(id)
-        #tdx.get_child_attributes(id)
-        #tdx.get_choices(id)
+        if 'choices' in options:
+            r = tdx.get_choices(options['choices'])
+            print(r.status_code, r.text)
 
 
 class TDx():
 
-    BASE_URL = 'https://teamdynamix.umich.edu/SBTDWebApi/api'
+    BASE_URL = settings.TDX['URL']
+    USERNAME = settings.TDX['USERNAME']
+    PASSWORD = settings.TDX['PASSWORD']
 
     def get_ticket(self, id):
         url = f'{self.BASE_URL}/tickets/{id}'
-        response = requests.get( url, headers=self.headers )
-        print(response, response.status_code, response.text)   
+        return requests.get( url, headers=self.headers )
+
+    def create_ticket(self, payload):
+        data = json.dumps(payload)
+        url = f'{self.BASE_URL}/31/tickets/'
+        return requests.post( url, headers=self.headers, json=payload )
 
     def get_attributes(self):
         url = f'{self.BASE_URL}/attributes/custom?componentId=9'
@@ -62,30 +105,29 @@ class TDx():
 
     def get_choices(self, id):
         url = f'{self.BASE_URL}/attributes/{id}/choices'
-        response = requests.get( url, headers=self.headers )
-        print(response, response.status_code, response.text)     
+        return requests.get( url, headers=self.headers )   
 
     def __init__(self):
-        print('get token')
         self._get_token()
 
     def _get_token(self):
-        url = self.BASE_URL + '/auth/loginadmin'
+        url = self.BASE_URL + '/auth'
 
         headers = {'Content-Type': 'application/json; charset=utf-8'}
 
         data = {
-            'BEID': 'A6E30356-6BC6-46E5-8E5A-8C2AF9C0AF18',
-            'WebServicesKey': '257D64C2-8E4E-4A96-AD94-BEF42C7EC64B'
+            'username': self.USERNAME,
+            'password': self.PASSWORD
         }
 
         data_string = json.dumps(data)
         response = requests.post(url, data=data_string, headers=headers )
 
-        print(response, response.status_code, response.text)
-
-        self.headers = {
-            'Authorization': 'Bearer ' + response.text,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json' 
-            }
+        if response.ok:
+            self.headers = {
+                'Authorization': 'Bearer ' + response.text,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json' 
+                }
+        else:
+            print(response, response.status_code, response.text)
