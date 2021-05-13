@@ -169,6 +169,70 @@ class ShortCodesAPI(UmAPI):
         return requests.get(url, headers=self.headers)
 
 
+def create_ticket_server_delete(instance, user, description):
+
+    if instance.managed:
+        os = instance.os.label
+        if os.startswith('Windows'):
+            miserver_Managed = '215' # Windows
+        else:
+            miserver_Managed = '216' # Linux
+    else:
+        miserver_Managed = '214' # IAAS
+
+    payload = {
+        "FormID": 24,
+        "TypeID": 7,
+        "SourceID": 0,
+        "StatusID": 77,
+        "ServiceID": 10,
+        "ResponsibleGroupID": 166,
+        "Title": "Delete MiServer",
+        "RequestorEmail": user.email,
+        "Description": description,
+        "Attributes": [
+            {
+                "ID": "1951", 
+                "Value": "202"  # Delete
+            },
+            {
+                "ID": "1959",  # Server Name
+                "Value": instance.name
+            },
+            {
+                "ID": "1994",  # Managed
+                "Value": miserver_Managed
+            },
+        ]
+    }
+
+    client_id = settings.UM_API['CLIENT_ID']
+    auth_token = settings.UM_API['AUTH_TOKEN']
+    base_url = settings.UM_API['BASE_URL']
+
+    headers = { 
+        'Authorization': f'Basic {auth_token}',
+        'accept': 'application/json'
+        }
+
+    url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
+    response = requests.post(url, headers=headers)
+    response_token = json.loads(response.text)
+    access_token = response_token.get('access_token')
+
+    headers = {
+        'X-IBM-Client-Id': client_id,
+        'Authorization': 'Bearer ' + access_token,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json' 
+        }
+
+    data_string = json.dumps(payload)
+    response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
+    print(payload)
+    print(response.status_code, response.text)
+
+
 def create_ticket_database_modify(instance, user, description):
 
     payload = {
