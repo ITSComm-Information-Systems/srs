@@ -164,16 +164,42 @@ def create_ticket_server_delete(instance, user, description):
 
     TDx().create_ticket(payload)
 
+class Payload():
+    BASE = {
+        "SourceID": 4,             # Web
+        "StatusID": 77,            # Open
+        "PriorityID": 20,          # Medium
+    }
+
+    DATABASE = {
+        "FormID": 19,              # ITS-MiDatabase Account Requests - Form
+        "TypeID": 6,               # Infrastructure / Compute Services
+        "ServiceID": 7,            # ITS-MiDatabase Account Requests
+        "ResponsibleGroupID": 17,  # ITS-MiDatabase
+    }
+
+    def get_payload(service):
+        print(service)
+
+def create_ticket(instance, action, user, **kwargs):
+    service = type(instance).__name__
+    service = service.upper()
+
+    payload = getattr(Payload, service.upper())
+    payload.update(Payload.BASE)
+    # TODO Add kwargs
+
+    TDx().create_ticket(payload)
 
 def create_ticket_database_modify(instance, user, description):
 
     payload = {
-        "FormID": 19,
-        "TypeID": 6,
-        "SourceID": 4,
-        "StatusID": 77,
-        "ServiceID": 7,
-        "ResponsibleGroupID": 17,
+        "FormID": 19,              # ITS-MiDatabase Account Requests - Form
+        "TypeID": 6,               # Compute Services
+        "SourceID": 4,             #
+        "StatusID": 77,            # Open
+        "ServiceID": 7,            # ITS-MiDatabase Account Requests
+        "ResponsibleGroupID": 17,  # ITS-MiDatabase
         "Title": "Modify MiDatabase Instance",
         "RequestorEmail": user.email,
         "Description": description,
