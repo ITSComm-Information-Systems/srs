@@ -1291,8 +1291,9 @@ class PhoneLocationForm(TabForm):
     template = 'order/phone_location.html'
 
 class DatabaseForm(ModelForm):
-    size = forms.IntegerField(label='Size', min_value=10, max_value=50)
-    size.widget.attrs.update({'step': 10})
+
+    size_choice = ((10, '10 GB'),(20, '20 GB'),(30, '30 GB'),(40, '40 GB'),(50, '50 GB'))
+    size = forms.ChoiceField(choices=size_choice)
 
     owner_name = forms.ChoiceField(label='Owner', widget=forms.Select(attrs={'class': 'form-control'}))    
     shortcode = forms.CharField(label='Shortcode', validators=[validate_shortcode])
@@ -1315,11 +1316,6 @@ class DatabaseForm(ModelForm):
         self.fields['owner_name'].initial = self.instance.owner.name
 
     def clean(self):
-
-        size = self.cleaned_data.get('size', 0)
-        if size % 10 != 0:
-            self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
-
         super().clean()
 
         for field in self.errors:
