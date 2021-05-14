@@ -46,43 +46,33 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        tdx = TDx()
-        #r = tdx.get_ticket(873987)
-        #print(r.text)
-        #return
 
-        print(payload)
-        r = tdx.create_ticket(payload)
-        if r.ok:
-            print(r.status_code)
-        else:
-            print(r.status_code, r.text)
-
-        return
-
-        if 'ticket' in options:
+        if options['ticket']:
+            tdx = TDx()
             r = tdx.get_ticket(options['ticket'])
-            print(r.status_code, r.text)
 
-        if 'choices' in options:
+        if options['attr']:
+            tdx = TDxAdmin()
+            r = tdx.get_attribute_by_id(options['attr'])
+            
+        if options['choices']:
+            tdx = TDxAdmin()
             r = tdx.get_choices(options['choices'])
-            print(r.status_code, r.text)
+
+        if options['parent']:
+            tdx = TDxAdmin()
+            print(options['parent'])
+            r = tdx.get_child_attributes(options['parent'])
 
 
-class TDx():
+class TDxAdmin():
 
-    BASE_URL = settings.TDX['URL']
-    USERNAME = settings.TDX['USERNAME']
-    PASSWORD = settings.TDX['PASSWORD']
+    BASE_URL = 'https://teamdynamix.umich.edu/SBTDWebApi/api'  # Sandbox only
 
     def get_ticket(self, id):
         url = f'{self.BASE_URL}/tickets/{id}'
-        return requests.get( url, headers=self.headers )
-
-    def create_ticket(self, payload):
-        data = json.dumps(payload)
-        url = f'{self.BASE_URL}/31/tickets/'
-        return requests.post( url, headers=self.headers, json=payload )
+        response = requests.get( url, headers=self.headers )
+        print(response, response.status_code, response.text)   
 
     def get_attributes(self):
         url = f'{self.BASE_URL}/attributes/custom?componentId=9'
@@ -92,6 +82,7 @@ class TDx():
 
     def get_attribute_by_id(self, id):
         attr_list = self.get_attributes()
+        id = int(id)
         for attr in attr_list:
             if attr['ID'] == id:
                 formatted = json.dumps(attr, indent=2)
@@ -99,35 +90,39 @@ class TDx():
 
     def get_child_attributes(self, parent_id):
         attr_list = self.get_attributes()
+        #print('attrs', parent_id, type(parent_id))
+        parent_id = int(parent_id)
+        print(attr_list)
         for attr in attr_list:
             if attr['ParentAttributeID'] == parent_id:
                 print(attr['ID'], attr['Name'])
 
     def get_choices(self, id):
         url = f'{self.BASE_URL}/attributes/{id}/choices'
-        return requests.get( url, headers=self.headers )   
+        response = requests.get( url, headers=self.headers )
+        print(response, response.status_code, response.text)     
 
     def __init__(self):
+        print('get token')
         self._get_token()
 
     def _get_token(self):
-        url = self.BASE_URL + '/auth'
+        url = self.BASE_URL + '/auth/loginadmin'
 
         headers = {'Content-Type': 'application/json; charset=utf-8'}
 
         data = {
-            'username': self.USERNAME,
-            'password': self.PASSWORD
+            'BEID': settings.TDX_ADMIN['BEID'],
+            'WebServicesKey': settings.TDX_ADMIN['KEY']
         }
 
         data_string = json.dumps(data)
         response = requests.post(url, data=data_string, headers=headers )
 
-        if response.ok:
-            self.headers = {
-                'Authorization': 'Bearer ' + response.text,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json' 
-                }
-        else:
-            print(response, response.status_code, response.text)
+        print(response, response.status_code, response.text)
+
+        self.headers = {
+            'Authorization': 'Bearer ' + response.text,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json' 
+            }
