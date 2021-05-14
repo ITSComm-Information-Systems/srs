@@ -143,7 +143,7 @@ def create_ticket_server_delete(instance, user, description):
         "StatusID": 77,
         "ServiceID": 10,
         "ResponsibleGroupID": 166,
-        "Title": "Delete MiServer",
+        "Title": description,
         "RequestorEmail": user.email,
         "Description": description,
         "Attributes": [
