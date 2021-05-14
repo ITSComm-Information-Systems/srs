@@ -9,8 +9,8 @@
                     <th scope="col">Server Name</th>
                     <th scope="col">Owner (MCommunity Group)</th>
                     <th scope="col">Size</th>
-
                     <th scope="col">Shortcode</th>
+                    <th scope="col">Shared</th>
                     <th scope="col">Action</th>
                 </tr>
             </thead>
@@ -27,7 +27,18 @@
                     
                             {% endfor %}
                         </td>
-                        <td class="action"><a href="/orders/database/{{ volume.id }}">Edit</a><a href="#" class="delete" onclick="modifyVolume(1, {{ volume.id }})">Delete</a></td>
+                        <td>
+                            {% if volume.shared %}
+                            <div class="col-sm text-center">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="action">
+                            {% if volume.shared %}
+                            <a href="/orders/database/{{ volume.id }}">Edit</a><a href="#" class="delete" onclick="modifyVolume(1, {{ volume.id }})">Delete</a>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
