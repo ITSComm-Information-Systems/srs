@@ -1155,7 +1155,7 @@ class Item(models.Model):
                 else:
                     attributes.append({'ID': 1953, 'Value': self.data.get('ad_group')})  # Admin Group
 
-                attributes.append({'ID': 5413, 'Value': db})
+                attributes.append({'ID': 5319, 'Value': db})
                 attributes.append({'ID': 1952, 'Value': 203}) # Managed
 
                 if db == 'MSSQL':
