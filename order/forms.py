@@ -986,9 +986,9 @@ class ServerSpecForm(TabForm):
 
         name = self.request.POST.get('name')
         if name:
-            servername = Server.objects.filter(name=name)
+            servername = Server.objects.filter(name__iexact=name)
             if len(servername) > 0:
-                self.add_error('serverName', f'A server named {name} already exists. Please choose a different name.')
+                self.add_error('serverName', f'A server named {name.lower()} already exists. Please choose a different name.')
 
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)
