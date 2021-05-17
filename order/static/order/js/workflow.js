@@ -249,9 +249,13 @@ $(document).ready(function() {
     if (this.value == 'TB') {
       $(tar).val(1);
       $(tar).attr('step', '1');
+      $(tar).attr('max', '10');
+      $(tar).attr('min', '1');
     } else if (this.value == 'GB') {
       $(tar).val(10);
       $(tar).attr('step', '10');
+      $(tar).removeAttr('max');
+      $(tar).attr('min', '10');   
     }
 
   });
