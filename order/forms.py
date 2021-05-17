@@ -793,7 +793,7 @@ class DiskForm(forms.ModelForm):
     name = forms.CharField()
     name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
 
-    size = forms.IntegerField(initial=10)
+    size = forms.IntegerField(initial=10, min_value=10)
     size.widget.attrs.update({'class': 'form-control disk-size validate-integer', 'step': 10})  
 
     uom = forms.ChoiceField(choices=(('GB','GB'),('TB','TB')))
