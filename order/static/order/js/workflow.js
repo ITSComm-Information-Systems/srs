@@ -403,6 +403,18 @@ $(document).ready(function() {
     $("#id_cpu").trigger("change");
 
     update_total_cost();
+
+    $( ".disk-uom" ).each(function( i ) {
+      if (this.value == 'TB') {
+        id = this.id;
+        tar = '#' + id.substring(0, id.length-3) + 'size';
+        $(tar).attr('step', '1');
+        $(tar).attr('max', '10');
+        $(tar).attr('min', '1');  
+      }
+    });
+
+
   });
 
   $(document).on("focusout", "#id_serverName" , function() {
