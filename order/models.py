@@ -85,6 +85,7 @@ class Element(Configuration):
         ('Label', 'Label'),
         ('Checkbox', 'Checkbox'),
         ('McGroup', 'MCommunity Group'),
+        ('MyGroups', 'Users MCommunity Group'),
         ('ShortCode', 'Short Code'),
         ('Phone', 'Phone Number'),
         ('Uniqname', 'Uniqname'),
