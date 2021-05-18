@@ -1,4 +1,5 @@
 from django import forms
+from django.core import validators
 #from django.db.models.fields import IntegerField
 from django.forms import ModelForm, formset_factory
 #from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember, StorageHost, StorageRate
@@ -710,6 +711,11 @@ class ServerSupportForm(TabForm):
 
     def __init__(self, *args, **kwargs):
         super(ServerSupportForm, self).__init__(*args, **kwargs)
+
+        self.fields['support_phone'].validators = [validators.RegexValidator(
+                regex='^^(\+0?1\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$',
+                message='Please provide a 10 digit phone number.',
+                code='invalid_username')]
 
         if self.action.service.name=='midatabase':
             self.fields.pop('backup_time')
