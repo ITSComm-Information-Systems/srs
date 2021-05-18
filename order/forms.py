@@ -271,7 +271,10 @@ class TabForm(forms.Form):
             elif element.type == 'HTML':
                 field = forms.CharField(required=False)
                 field.template_name = 'project/static.html'
-            elif element.type == 'McGroup':
+            elif element.type == 'McGroup--':
+                field = McGroup()
+                field.template_name = 'project/static.html'
+            elif element.type == 'MyGroups':
                 group_list = MCommunity().get_groups(self.request.user.username)
 
                 choice_list = [(None, '---')]
