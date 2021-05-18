@@ -814,6 +814,8 @@ class DiskForm(forms.ModelForm):
         if self.cleaned_data.get('uom') == 'GB' and self.cleaned_data.get('size', 0) < 1000:
             if self.cleaned_data.get('size', 0) % 10 != 0:
                 self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
+        elif self.cleaned_data.get('uom') == 'TB' and self.cleaned_data.get('size', 0) > 10:
+            self.add_error('size', 'Disk size must be 10 TB or less.')            
 
         super().clean()
 
