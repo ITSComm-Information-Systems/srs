@@ -10,9 +10,7 @@
     <input type="hidden" id="current_tab" name="current_tab" value="{{ current_tab }}">
     <input type="hidden" id="element" value="{{ element }}">
 
-
-    <div class="row sticky-top bg-white" style="z-index: 1;">
-
+    <div class="row sticky-top bg-white" style="z-index: 1; width:98%; margin: auto;">
         <div class="input-group col-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon3">{{ form.status.label }}</span>
@@ -25,27 +23,53 @@
                 <span class="input-group-text" id="estimate-label">Label</span>
             </div>
 
-            <input type="text" class="form-control" name="label" value="{{ estimate.label }}" id="estimte-label"
+            <input type="text" class="form-control" name="label" value="{{ estimate.label }}" id="estimate-label"
                 aria-describedby="basic-addon3">
         </div>
 
         <button type="submit" class="btn btn-primary">Save</button>
 
+        <a class='ml-auto mr-3' style="align-content: flex-end" href='/apps/bom/estimate/{{ estimate.id }}'>Return to
+            Main</a>
+        <div style="border: 1px solid black; margin: 1%;">
+            <table style="margin: 1%;">
+                <thead>
+                    <th>Status</th>
+                    <th>Staged</th>
+                    <th>Order Date</th>
+                    <th>Est Receive Date</th>
+                    <th>Release Number</th>
+                    <th>Vendor</th>
+                    <th style="width: 7%">Reel</th>
+                    <th> </th>
+                </thead>
+                <tbody>
+                    <td>{{ form.status }}</td>
+                    <td style="text-align: center; vertical-align: middle;"><input type="checkbox"></td>
+                    <td><input type="date"></td>
+                    <td><input type="date"></td>
+                    <td><input></td>
+                    <td><input></td>
+                    <td><input></td>
+                    <td><button class='btn btn-success'>Copy</button></td>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <a style="float:right;" href="/apps/bom/estimate/{{ estimate.id }}">Return to Main</a>
 
     <table class="table-borderless table-hover table-striped table-sm">
         <thead>
             <tr>
-                <th style="width: 10%">Quantity</th>
-                <th style="width: 11%">Status</th>
+                <th style="width: 5%;">Quantity</th>
+                <th style="width: 15%;">Status</th>
                 <th>Staged</th>
                 <th>Order Date</th>
                 <th>Est Receive Date</th>
                 <th>Release Number</th>
                 <th>Vendor</th>
-                <th style="width: 7%">Reel</th>
+                <th>Reel</th>
+                <th>Copy</th>
             </tr>
         </thead>
         {% for form in material_formset %}
@@ -54,18 +78,20 @@
             <tr>
                 <td colspan="7"><b>{{rec.item_code}}</b> - {{ rec.item_description }} &emsp;
                     <i>({{rec.manufacturer}} - {{rec.manufacturer_part_number}})</i>
-                    &nbsp;&nbsp;Location: {{ rec.material_location }}</td>
+                    &nbsp;&nbsp;Location: {{ rec.material_location }}
+                </td>
             </tr>
             <tr class="border-bottom">
                 {{ form.id }}
                 <td>{{ form.quantity }}</td>
                 <td>{{ form.status }}</td>
-                <td>{{ form.staged }}</td>
+                <td style="text-align: center; vertical-align: middle;">{{ form.staged }}</td>
                 <td>{{ form.order_date }}</td>
                 <td>{{ form.estimated_receive_date }}</td>
                 <td>{{ form.release_number }}</td>
                 <td>{{ form.vendor }}</td>
                 <td>{{ form.reel_number }}</td>
+                <td style="text-align: center; vertical-align: middle;"><input type="checkbox" value='{{ form.id }}'></td>
             </tr>
             {% if form.errors %}
             <tr>
@@ -85,7 +111,7 @@
         {% endwith %}
         {% endfor %}
     </table>
-    
+
 </form>
 
 {% endblock content %}
