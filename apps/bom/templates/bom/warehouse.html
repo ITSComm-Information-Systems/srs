@@ -44,19 +44,27 @@
                     <th> </th>
                 </thead>
                 <tbody>
-                    <td>{{ form.status }}</td>
-                    <td style="text-align: center; vertical-align: middle;"><input type="checkbox"></td>
-                    <td><input type="date"></td>
-                    <td><input type="date"></td>
-                    <td><input></td>
-                    <td><input></td>
-                    <td><input></td>
-                    <td><button class='btn btn-success'>Copy</button></td>
+                    <tr>
+                        <td>
+                            <select name="status" id="copy_status">
+                                <option value="1">Estimate</option>
+                                <option value="2">In Stock</option>
+                                <option value="3">Ordered</option>
+                            </select>
+                        </td>
+                        <td style="text-align: center; vertical-align: middle;"><input id="copy_staged" type="checkbox">
+                        </td>
+                        <td><input id="copy_order_date" type="date"></td>
+                        <td><input id="copy_estimated_receive_date" type="date"></td>
+                        <td><input id="copy_release_number"></td>
+                        <td><input id="copy_vendor"></td>
+                        <td><input id="copy_reel_number"></td>
+                        <td><button type="button" class='btn btn-success' onclick="copier()">Copy</button></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
-
 
     <table class="table-borderless table-hover table-striped table-sm">
         <thead>
@@ -74,7 +82,7 @@
         </thead>
         {% for form in material_formset %}
         {% with rec=form.instance %}
-        <tbody>
+        <tbody id='info'>
             <tr>
                 <td colspan="7"><b>{{rec.item_code}}</b> - {{ rec.item_description }} &emsp;
                     <i>({{rec.manufacturer}} - {{rec.manufacturer_part_number}})</i>
@@ -91,7 +99,8 @@
                 <td>{{ form.release_number }}</td>
                 <td>{{ form.vendor }}</td>
                 <td>{{ form.reel_number }}</td>
-                <td style="text-align: center; vertical-align: middle;"><input type="checkbox" value='{{ form.id }}'></td>
+                <td style="text-align: center; vertical-align: middle;"><input type="checkbox" value='{{ form.id }}'>
+                </td>
             </tr>
             {% if form.errors %}
             <tr>
@@ -141,5 +150,33 @@
 
     });
 
+    function copier() {
+        // console.log('hi')
+        var tocopy = document.querySelectorAll('#info input[type="checkbox"]:checked');
+        var status = document.querySelector("#copy_status").value;
+        var staged = document.querySelector("#copy_staged").checked;
+        var order_date = document.querySelector("#copy_order_date").value;
+        var estimated_receive_date = document.querySelector("#copy_estimated_receive_date").value;
+        var release_number = document.querySelector("#copy_release_number").value;
+        var vendor = document.querySelector("#copy_vendor").value;
+        var reel_number = document.querySelector("#copy_reel_number").value;
+        for (i = 0; i < tocopy.length; ++i) {
+            var num = tocopy[i].value.split(' ')[2].split('-')[1];
+            document.getElementById("id_material-"+num+"-status").value=status;
+            document.getElementById("id_material-"+num+"-staged").checked=staged;
+            document.getElementById("id_material-"+num+"-order_date").value=order_date;
+            document.getElementById("id_material-"+num+"-estimated_receive_date").value=estimated_receive_date;
+            document.getElementById("id_material-"+num+"-release_number").value=release_number;
+            document.getElementById("id_material-"+num+"-vendor").value=vendor;
+            document.getElementById("id_material-"+num+"-reel_number").value=reel_number;
+
+        }
+    }
+
+//     $('#workOrderSearch').val($('input[name="' + num + '_work_order"').val()).change();
+//     $('#rateSelect').val($('input[name="' + num + '_rate"').val())
+//     $('#duration-hours').val($('input[name="' + num + '_duration"').val().split(':')[0])
+//     $('#duration-mins').val($('input[name="' + num + '_duration"').val().split(':')[1])
+// }
 </script>
 {% endblock js %}
