@@ -1,0 +1,6 @@
+{% include 'order/base_form.html' %}
+
+{% for error in tab.form.non_field_errors %}
+<div role="alert" style="color: red;"><i class="fas fa-exclamation-triangle"
+        aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+{% endfor %}
