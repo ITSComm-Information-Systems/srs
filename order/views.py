@@ -89,11 +89,11 @@ def  send_ticket(owner, user):
         }
 
     payload = {
-        "FormID": 24,
-        "TypeID": 7,
+        "FormID": 441,
+        "TypeID": 5,
         "SourceID": 4,
         "StatusID": 77,
-        "ServiceID": 10,
+        "ServiceID": 213,  # No workflow
         "PriorityID": 20,
         "ResponsibleGroupID": 18,
         "Title": "MiServer Migration Assistance",

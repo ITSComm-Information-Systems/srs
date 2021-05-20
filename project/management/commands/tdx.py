@@ -50,6 +50,7 @@ class Command(BaseCommand):
         if options['ticket']:
             tdx = TDx()
             r = tdx.get_ticket(options['ticket'])
+            print(r.text)
 
         if options['attr']:
             tdx = TDxAdmin()
