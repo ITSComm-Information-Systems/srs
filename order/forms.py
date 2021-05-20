@@ -785,6 +785,7 @@ class ServerSupportForm(TabForm):
             
 
 class ServerDataForm(TabForm):
+    template = 'order/server_data.html'
 
     def clean(self):
 
