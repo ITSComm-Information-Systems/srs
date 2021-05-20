@@ -1,0 +1,66 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+<h2>{{ title }}</h2>
+
+<div class="form-inline">
+<input type="search" id="workorder_search" class="form-control"
+    aria-label="Search through site content" placeholder="Filter results">
+</div>
+<br>
+<div id="div_workorder_table">
+    <table id="workorder_table" class="table table-hover table-striped sortable" aria-live=”polite”>
+        <thead>
+            <tr>
+                <th>Workorder</th>
+                <th>Preorder</th>
+                <th>Description</th>
+                <th>Netops Engineer</th>
+                <th>SRS Status</th>
+                <th>Pinnacle Status</th>
+                <th>Percent Completed</th>
+                <th>Health</th>
+                <th>Assigned Date</th>
+                <th>Due Date</th>
+                <th>Completed Date</th>
+            </tr>
+        </thead>
+        <tbody id="workOrderTableBody">
+            {% for record in search_list %}
+            <tr data-estimate_id={{ record.estimate_id }}>
+                <td style="white-space: nowrap;">{{ record.wo_number_display }}</td>
+                <td>{{ record.pre_order_number }}</td>
+                <td>{{ record.project_display |default:"None"}}</td>
+                <td>{{ record.netops_engineer }}</td>
+                <td>{{ record.get_status_display }}</td>
+                <td>{{ record.status_name }}</td>
+                <td>{{ record.percent_completed }}</td>
+                <td>{{ record.get_health_display }}</td>
+                <td sorttable_customkey={{ record.assigned_date|date:"Ymd" }}>{{ record.assigned_date|date:"N j, Y"|default:"None" }}</td>
+                <td sorttable_customkey={{ record.due_date|date:"Ymd" }}>{{ record.due_date|date:"N j, Y"|default:"None" }}</td>
+                <td sorttable_customkey={{ record.completed_date|date:"Ymd" }}>{{ record.completed_date|date:"N j, Y"|default:"None" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+<script>
+    $("#workorder_search").on("keyup", function () {
+        $("#div_workorder_table").show();
+        var value = $(this).val().toLowerCase();
+        $("#workOrderTableBody tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    $('#workOrderTableBody tr').click(function () {
+        var estimate_id = this.getAttribute('data-estimate_id');
+            window.open("/apps/bom/estimate/" + estimate_id + "/");
+    });
+</script>
+
+
+{% endblock js %}

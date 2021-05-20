@@ -9,23 +9,24 @@
 </div>
 
 <h3>Enter time</h3>
+<form action='/apps/rte/view-time/display/' target='_blank' method='POST'>{% csrf_token %}
+	<input type='text' name='techSearch' class='tech_id' hidden>
+	<input type='date' name='calendarRangeStart' value='{{ date_start }}' hidden>
+	<input type='date' name='calendarRangeEnd' value='{{ date_end }}' hidden>
+	<button type='submit' class='btn btn-link col-2 offset-10' role='link'>View last week</button>
+</form>
 
 <div class='row'>
 	<div class="form-group col-3" id="searchWorkOrder">
 		<label for="workOrderSearch" id="labelWorkOrderSearch">
 	        <strong>Work Order</strong>
 	    </label>
-	    <input name='workOrderSearch' id="workOrderSearch" class="form-control" type="text" aria-describedby="workOrderSearchBlock"
-	        placeholder="Search..">
-		<table id="workOrderTable" class="table table-hover" aria-live=”polite”>
-	        {% for wo in all_wos %}
-	            <tr tabindex="0"  id="{{ wo.full_prord_wo_number }}" role="button" aria-label="Select work order 
-	                {{ wo.full_prord_wo_number }}">
-	                <td>{{ wo.full_prord_wo_number }}</td>
-	                <td>{{ wo.comment_text|truncatechars:200 }}</td>
-	            </tr>
-	        {% endfor %}
-		</table>
+		<select class='form-control' id='workOrderSearch'>
+			<option></option>
+			{% for wo in all_wos %}
+				<option value='{{ wo.full_prord_wo_number }}'>{{ wo.full_prord_wo_number }}&nbsp;{{ wo.comment_text|truncatechars:200 }}</option>
+			{% endfor %}
+		</select>
 	</div>
 
 	<div class="form-group col-2" id="selectRateLevel">
@@ -34,7 +35,7 @@
 		</label>
 		<select class='custom-select' id='rateSelect' disabled>
 			{% for rate in rate_levels %}
-				<option>{{ rate.labor_rate_level_name }}</option>
+				<option value='{{ rate.labor_rate_level_name }}'>{{ rate.labor_rate_level_name }}</option>
 			{% endfor %}
 		</select>
 	</div>

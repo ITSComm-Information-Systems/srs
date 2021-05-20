@@ -21,21 +21,7 @@ $(document).ready(function() {
         $('#tech-error').addClass('hidden');
     });
 
-    $("#workOrderTable").hide();
-
-    $("#workOrderSearch").on("keyup", function() {
-        $("#workOrderTable").show();
-        var value = $(this).val().toLowerCase();
-        $("#workOrderTable tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
-
-    $('#workOrderTable tr').click(function() {
-        var work_order = $(this).find("td").eq(0).html();
-        $("#workOrderSearch").val(work_order);  
-        $('#workOrderTable').hide();
-
+    $('#workOrderSearch').on('change', function() {
         $('#rateSelect').removeAttr('disabled');
         $('#assigned_date').removeAttr('readonly');
         $('#duration-hours').removeAttr('readonly');
@@ -119,6 +105,14 @@ function wo_to_review() {
     $('#tech-info-review').append($("#tech-info-input").html());
 }
 
+// Copy row
+function copier(num){
+    $('#workOrderSearch').val($('input[name="' + num + '_work_order"').val()).change();
+    $('#rateSelect').val($('input[name="' + num + '_rate"').val())
+    $('#duration-hours').val($('input[name="' + num + '_duration"').val().split(':')[0])
+    $('#duration-mins').val($('input[name="' + num + '_duration"').val().split(':')[1])
+}
+
 // Add row to input table
 function add_to_table(num_entries) {
     if (num_entries < 15) {
@@ -127,9 +121,11 @@ function add_to_table(num_entries) {
                         '<td>' + $('#workOrderSearch').val() + '</td>' +
                         '<td>' + $('#rateSelect').val() + '</td>' +
                         '<td>' + $('#assigned_date').val() + '</td>' +
-                        '<td>' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</td>' +
-                        '<td>' + $('#notes').val() + '</td>' +
-                        '<td class="delete-col"><button class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></td>' +
+                        '<td id="row-' + num_entries + '-date" hour="' + $('#duration-hours').val() + 'minute="'+$('#duration-minute').val()+'">' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</td>' +
+                        '<td id="row-' + num_entries + '-notes">' + $('#notes').val() + '</td>' +
+                        '<td style="padding-right: 0px;" class="delete-col"><div style="float:right;">'+
+                        '<button style="float: left;" class="btn btn-success" id="single-copy" onClick="copier('+num_entries+')" >Copy</button>' +
+                        '<button style="float: right;" class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></div></td>' +
                     '</tr>';
         var form_html = '<input type="text" name="' + num_entries + '_work_order" value="' + $('#workOrderSearch').val() + '" hidden>' +
                         '<input type="text" name="' + num_entries + '_rate" value="' + $('#rateSelect').val() + '" hidden>' +
@@ -143,7 +139,7 @@ function add_to_table(num_entries) {
         $('#total-hours').text(calculate_duration());
 
         // Reset all input values
-        $('#workOrderSearch').val('');
+        $("#workOrderSearch").val(null).trigger('change');
         $('#rateSelect').val('Regular');
         $('#assigned_date').val('');
         $('#duration-hours').val('');
@@ -237,13 +233,15 @@ function validate_add() {
         return(false);
     }
 
-    if ($('#duration-hours').val() > 23 || $('#duration-hours').val() < 0 || $('#duration-hours').val() % 1 != 0) {
+    var regex = new RegExp('^([01]?[0-9]|2[0-3])$');
+    if (!regex.test($('#duration-hours').val()) && $('#duration-hours').val() != '') {
         $('#add-error').html('Please enter a value for hours between 0 and 23.');
         $('#add-error').removeClass('hidden');
         return(false);
     }
 
-    if ($('#duration-mins').val() > 59 || $('#duration-mins').val() < 0 || $('#duration-mins').val() % 1 != 0) {
+    var regex = new RegExp('^([01]?[0-9]|[2-5][0-9])$');
+    if (!regex.test($('#duration-mins').val()) && $('#duration-mins').val() != '') {
         $('#add-error').html('Please enter a value for minutes between 0 and 59.');
         $('#add-error').removeClass('hidden');
         return(false);
