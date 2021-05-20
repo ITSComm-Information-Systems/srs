@@ -58,7 +58,7 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAdminUser'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 100
 }
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'  # Override widgets
@@ -104,6 +104,12 @@ EMAIL_USE_TLS = True
 
 SRS_OUTAGE = os.getenv('SRS_OUTAGE', False)
 SERVICENOW_EMAIL = os.getenv('SERVICENOW_EMAIL', 'umichdev@service-now.com')
+
+TDX = {
+    'URL': os.getenv('TDX_URL'),
+    'USERNAME': os.getenv('TDX_USERNAME'),
+    'PASSWORD': os.getenv('TDX_PASSWORD'),
+}
 
 MCOMMUNITY = {
     'SERVER': os.getenv('MC_SERVER', 'ldap.umich.edu'),
