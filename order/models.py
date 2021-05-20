@@ -21,6 +21,11 @@ from oscauth.utils import get_mc_user, get_mc_group
 from decimal import Decimal
 
 
+if settings.ENVIRONMENT == 'Production':
+    TDX_URL = 'https://teamdynamix.umich.edu/TDNext/Apps/31/Tickets/TicketDet.aspx?TicketID='
+else:
+    TDX_URL = 'https://teamdynamix.umich.edu/SBTDNext/Apps/31/Tickets/TicketDet?TicketID='
+
 class Configuration(models.Model):   #Common fields for configuration models
     name = models.CharField(max_length=20)
     label = models.CharField(max_length=100)
@@ -389,11 +394,6 @@ class Volume(models.Model):
                     "order by create_date desc"
                     ,[self.service_id, self.id])
 
-        if settings.ENVIRONMENT == 'Production':
-            tdx_url = 'https://teamdynamix.umich.edu/TDNext/Apps/31/Tickets/TicketDet.aspx?TicketID='
-        else:
-            tdx_url = 'https://teamdynamix.umich.edu/SBTDNext/Apps/31/Tickets/TicketDet?TicketID='
-
         ticket_list = []
         for row in cur.fetchall():
 
@@ -409,7 +409,7 @@ class Volume(models.Model):
 
 
             ticket_list.append({'id': row[0]
-                              , 'url': f'{tdx_url}{row[0]}'
+                              , 'url': f'{TDX_URL}{row[0]}'
                               , 'create_date': row[1]
                               , 'fulfill': fulfill
                               , 'note': note})
@@ -1408,10 +1408,14 @@ class Attachment(models.Model):
 class Ticket(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
-    instance = models.ForeignKey(ArcInstance, on_delete=models.PROTECT)
+    instance = models.ForeignKey(ArcInstance, null=True, on_delete=models.DO_NOTHING)
     ticket_id = models.PositiveIntegerField()
     status = models.CharField(max_length=10)
     data = models.JSONField()
+
+    @property
+    def ticket_link(self):
+        return f'{TDX_URL}{self.ticket_id}'
 
     class Meta:
         db_table = 'order_item_ticket_v'

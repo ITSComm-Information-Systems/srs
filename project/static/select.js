@@ -85,5 +85,16 @@ $(document).ready(function() {
 	$('#bill_period').select2({
 		minimumResultsForSearch: Infinity
 	})
+	
+	$('#workOrderSearch').select2({
+		placeholder: "Search...",
+		display:"inline",
+	});
+	
+	$('#techSearchMultiple').select2({
+		placeholder: "Search...",
+		display:"inline",
+    });
+
 
 });

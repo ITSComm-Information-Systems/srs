@@ -4,15 +4,15 @@
 
 
 <div class="form-inline">
-    <input type="search" id="workorder_search" class="form-control form-inline""
-    aria-label=" Search through site content">
+    <input type="search" id="workorder_search" class="form-control form-inline"
+    aria-label = "Search through site content" placeholder="filter">
     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-1"
         aria-expanded="true" aria-controls="collapse-{{ forloop.counter }}">
     </button>
 </div>
-
+<br>
 <div id="div_workorder_table">
-    <table id="workorder_table" class="table table-hover table-striped" aria-live=”polite”>
+    <table id="workorder_table" class="table table-hover table-striped sortable" aria-live=”polite”>
         <thead>
             <tr>
                 <th>Workorder</th>

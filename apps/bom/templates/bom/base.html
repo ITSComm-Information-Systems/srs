@@ -29,6 +29,10 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" />
 	<link rel="stylesheet" href="/static/select2-bootstrap4.css">
 
+	<!-- Sort tables -->
+	<!-- docs: https://www.kryogenix.org/code/browser/sorttable/ -->
+	<script src="/static/sorttable.js"></script>
+
 	<style>
 		#aux-nav {
 			background-color: {{ background_color }}
@@ -108,6 +112,7 @@
 								<a class="dropdown-item" href="/apps/bom/search?filter=open_workorder">Open Preorders/Workorders</a>
 								<a class="dropdown-item" href="/apps/bom/search?filter=open_estimates">Open Estimates</a>
 								<a class="dropdown-item" href="/apps/bom/search?filter=all_estimates">All Preorders/Workorder w/Estimates</a>
+								<a class="dropdown-item" href="/apps/bom/netops/">Netops</a>
 								{% if perms.bom.can_update_bom_ordered %}
 									<a class="dropdown-item" href="/apps/bom/search?filter=warehouse">Warehouse</a>
 								{% endif %}

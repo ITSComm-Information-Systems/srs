@@ -10,12 +10,8 @@ $(document).ready(function() {
         });
     });
 
-    $('#techTableMultiple tr').click(function() {
-        var tech_name = $(this).find("td").eq(1).html();   
-        var tech_id = $(this).find("td").eq(0).html(); 
-        $("#techSearchMultiple").val(tech_id);  
-        $('#techTableMultiple').hide();
-
+    $('#techSearchMultiple').on('change', function() {
+        var tech_id = $(this).val();
         load_assigned_groups(tech_id);
 
         $('#assignedGroupSelectMultiple').removeAttr('disabled');
@@ -114,7 +110,7 @@ function add_to_multiple_table(num_entries) {
         $('#total-hours').text(calculate_duration_multiple());
 
         // Reset all input values
-        $('#techSearchMultiple').val('');
+        $('#techSearchMultiple').val(null).trigger('change');
         $('#assignedGroupSelectMultiple').val('');
         $('#rateSelectMultiple').val('Regular');
         $('#assigned_date_multiple').val('');
@@ -256,7 +252,8 @@ function validate_add_multiple() {
         return(false);
     }
 
-    if ($('#duration-hours-multiple').val() > 23 || $('#duration-hours-multiple').val() < 0 || $('#duration-hours-multiple').val() % 1 !=0) {
+    var regex = new RegExp('^([01]?[0-9]|2[0-3])$');
+    if (!regex.test($('#duration-hours-multiple').val()) && $('#duration-hours-multiple').val() != '') {
         $('#add-error').html('Please enter a value for hours between 0 and 23.');
         $('#add-error').removeClass('hidden');
         return(false);
@@ -265,7 +262,8 @@ function validate_add_multiple() {
     mins = $('#duration-mins').val()
     console.log(mins, mins % 1)
 
-    if ($('#duration-mins-multiple').val() > 59 || $('#duration-mins-multiple').val() < 0 ||  $('#duration-mins-multiple').val() % 1 !=0 ) {
+    var regex = new RegExp('^([01]?[0-9]|[2-5][0-9])$');
+    if (!regex.test($('#duration-mins-multiple').val()) && $('#duration-mins-multiple').val() != '') {
         $('#add-error').html('Please enter a value for minutes between 0 and 59.');
         $('#add-error').removeClass('hidden');
         return(false);

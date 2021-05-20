@@ -13,7 +13,7 @@ from datetime import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
 
-from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, EstimateView, UmOscNoteProfileV, NotificationManager, Notification
+from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, ProjectView, EstimateView, UmOscNoteProfileV, NotificationManager, Notification
 from .forms import FavoriteForm, EstimateForm, ProjectForm, MaterialForm, MaterialLocationForm, LaborForm
 
 
@@ -475,7 +475,7 @@ class Warehouse(PermissionRequiredMixin, View):
         MaterialFormSet = modelformset_factory(
             Material, form=MaterialForm, exclude=('id',), extra=0)
         material_formset = MaterialFormSet(
-            queryset=estimate.material_list.order_by('item'), prefix='material')
+            queryset=estimate.material_list.order_by('status','item_code'), prefix='material')
         form = self.WarehouseForm(instance=estimate)
 
         return render(request, 'bom/warehouse.html',
@@ -515,3 +515,15 @@ class Favorites(PermissionRequiredMixin, View):
                       {'title': 'My Favorites',
                        'formset': formset,
                        'item_list': item_list, })
+
+
+class NetOpsSearch(PermissionRequiredMixin, View):
+    permission_required = 'bom.can_access_bom'
+
+    def get(self, request):
+        template = 'bom/netops.html'
+
+        search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3) | Q(percent_completed__lt=100)).order_by('-woid')
+        return render(request, template,
+                      {'title': 'Netops Projects',
+                       'search_list': search_list})
