@@ -4,7 +4,7 @@
 <div class="form-group form-check">
     <input class="form-check-input {{ widget.attrs.class }}" type="checkbox" value="{{ choice.value }}" name="{{ widget.name }}" id="{{ choice.name }}_{{ index }}" required
     {%if choice.selected %} checked {% endif %}>
-    <label class="form-check-label " for="{{ choice.name }}_{{ index }}">{{ choice.label }}</label>
+    <label class="form-check-label " for="{{ choice.name }}_{{ index }}">{%autoescape off%}{{ choice.label }}{%endautoescape%}</label>
     {% if forloop.parentloop.last %}
     <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"
             aria-label="Icon signfying that user must select a value"></i>Please choose one.</div>

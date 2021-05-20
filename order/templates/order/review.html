@@ -31,6 +31,13 @@
       <div class="mb-1 indented-form-input">
           <strong class="question">{{field.label}}</strong>
           <p class="d-inline" id="questionAnswer">{{field.value}}</p>
+            {% if field.list %}
+            <ul>
+              {% for sub in field.list %}
+              <li>{{ sub }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
       </div>
     {% endfor %}
   </div>

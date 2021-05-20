@@ -24,6 +24,9 @@ $(document).ready(function() {
 
   use_cart = $("#wfcart").val();
   use_ajax = $("#wfajax").val();
+  var wfid = parseInt($("#wfid").val());
+  const reviewPages = [50,56,61,63,66,72,73]
+  const modifyPages = [47,49,53,55,59,60,62,65,70,71]
 
   item_id = 0;
   // Workflow stuff
@@ -83,17 +86,16 @@ $(document).ready(function() {
     }
   }
 
-  if ( $("#wfid").val() == 50  || $("#wfid").val() == 63 || $("#wfid").val() == 61 || $("#wfid").val() == 56 || $("#wfid").val() == 66 ) {  // Hide workflow for "Review Storage" (cost data) 
+  if (reviewPages.includes(wfid)) {
     $('#pills-step1').hide();
     $('p').hide();
     $('h2').hide();
     $('#nextBtn').hide();
   }
 
-  if ( $("#wfid").val() == 53 || $("#wfid").val() == 55 || $("#wfid").val() == 59 || $("#wfid").val() == 60 || $("#wfid").val() == 66 ) {
+  if (modifyPages.includes(wfid)) {
     $('#nextBtn').hide();
   }
-
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
@@ -213,7 +215,473 @@ $(document).ready(function() {
   $(document).on("load", "#div_ad_group" , function() {
     $('#div_ad_group').hide();
   });
+
+  // midatabasic
+  $('[data-tab="midatabasic"]').on('shown.bs.tab', function(event) {
+
+    if (typeof database === 'undefined') {
+      database = 'MSSQL';
+    }
+
+    if (database=="MySQL") {
+      $('#div_url').show().prop('required',false);  // Optional
+    } else {
+      $('#div_url').hide().prop('required',false);
+    }
+
+  });
+
+  // miSevBasic
+  $('[data-tab="miSevBasic"]').on('shown.bs.tab', function(event) {
+    $("#div_misevexissev").trigger("change");
+  });
+
+  $(document).on("change", "#id_owner", function() {
+    database = $("#id_database").val();
+  });
+
+  $(document).on("change", ".disk-uom", function(e) {
+    if (this.getAttribute('readonly')) {
+      return;
+    }
+    id = this.id;
+    tar = '#' + id.substring(0, id.length-3) + 'size';
+    if (this.value == 'TB') {
+      $(tar).val(1);
+      $(tar).attr('step', '1');
+      $(tar).attr('max', '10');
+      $(tar).attr('min', '1');
+    } else if (this.value == 'GB') {
+      if (id=='id_form-0-uom') {
+        $(tar).val(50);
+        $(tar).attr('min', '50');   
+      } else {
+        console.log(id);
+        $(tar).val(10);
+        $(tar).attr('min', '10'); 
+      }
+      $(tar).attr('step', '10');
+      $(tar).removeAttr('max');
+
+    }
+
+  });
+
+  $(document).on("keypress", ".validate-integer", function(e) {
+    console.log(this.value);
+    if (e.keyCode==46 || e.keyCode==45) {
+      e.preventDefault();
+    }
+  });
+
+  $(document).on("change", "#div_misevexissev" , function() {
+    if ($('#misevexissev_1').prop("checked")) {  // Yes contact me to migrat
+      $('#div_mcommserveradmin').hide().prop('required',false);
+      //$('#div_owner').hide().prop('required',false);;
+      $('#pills-step2').hide();
+      $('#pills-step3').hide();
+      $('#pills-step4').hide();
+      $('#pills-step5').hide();
+      $('#pills-step6').hide();
+    } else if ($('#misevexissev_0').prop("checked")) {  // Nah, new server
+      $('#div_mcommserveradmin').show().prop('required',true);
+      $('#div_owner').show().prop('required',true);
+      $('#pills-step2').show();
+      $('#pills-step3').show();
+      $('#pills-step4').show();
+      $('#pills-step5').show();
+      $('#pills-step6').show();
+    } else {
+      $('#div_mcommserveradmin').hide().prop('required',false);
+      $('#div_owner').hide().prop('required',false);
+    }
+  });
+
+
+
+
+  // MiDatabase Type
+  $('[data-tab="midbtype"]').on('show.bs.tab', function(event) {
+
+    $("#id_midatatype").trigger("change");
+    server = $('#id_size').data('server');
+
+    if (server) {
+      $('#id_size').data('server', '');
+      type = $('#id_midatatype option:selected').text();
+      size=$('#id_size').val();
+      size = Math.trunc(size)
+      link = "location.href='67?type=" + type + "&size=" + size +"';"; 
+      $('#go_button').attr('onclick', link)
+      $("#order_server").modal('show');
+    }
+  });
+
+  $(document).on("click", "#not_dedicated" , function() {
+    $('#shared_1').prop("checked", false);
+    $("#workflowForm").removeClass('was-validated');
+  });
+
+  $(document).on("change", "[data-pane='midbtype']" , function() {
+    set_dedicated_server();
+  });
+
+  function set_dedicated_server() {
+    dedicated = false;
+
+    if ($('#id_size').val() > 50) {
+      dedicated = true;
+    }
+
+    if ($('#id_midatatype').text() == "MSSQL") {  // MS SQL
+      if ($('#midatasql_0').prop("checked")) {  // SQL Agent Jobs
+        dedicated = true;
+      }
+    }
+
+    if ($('#sensitiveData_0').prop("checked")) {  // Sensitive Data
+      dedicated = true;
+    }
+
+    if (dedicated) {
+      $('#div_shared').prop('readonly', true);
+      $('#shared_1').prop("checked", true);
+    } else {
+      $('#div_shared').prop('readonly', false);
+      //$('#shared_0').prop("checked", true);
+    }
+
+    return dedicated;
+
+  }
+
+  $(document).on("change", "#id_midatatype" , function() {
+    if ($('#id_midatatype option:selected').text()=="MSSQL") { // MSSQL
+      $("#div_midatasql").show();
+    } else {
+      $("#div_midatasql").hide();
+    }
+    database = $('#id_midatatype option:selected').text();
+  });
+
+
+  //MiServer Specification
+  $('[data-tab="miSeverSpec"]').on('show.bs.tab', function(event) {
+    size_edit = $('#id_size_edit').val();
+
+    if (size_edit == "0") {
+      i_num = $('#id_form-INITIAL_FORMS').val();
+      for (i = 0; i < i_num; i++) {
+        $('#id_form-' + i + '-size').attr("readonly", true);
+        $('#id_form-' + i + '-uom').attr("readonly", true);
+
+        $('#id_form-' + i + '-uom' + ' > option').each(function() {
+          console.log(this);
+          console.log(this.selected);
+          if (!this.selected) {
+            $(this).remove();
+          }
+        });
+      }
+    }
+    init_num = $('#id_form-INITIAL_FORMS').val();
+    total_num = $('#id_form-TOTAL_FORMS').val();
+    if (total_num > init_num) {
+      button = '<a onclick="deleteDisk(this);" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>';
+      last = $('#id_form-' + (total_num-1).toString() + '-uom');
+      $(button).insertAfter(last);
+    }
+
+
+    ram_rate = $('#server_rates').data('ram_rate');
+    disk_replicated = $('#server_rates').data('disk_replicated');
+    disk_no_replication = $('#server_rates').data('disk_no_replication');
+    disk_backup = $('#server_rates').data('disk_backup');
+
+    if (typeof database === 'undefined') {
+      database = '';
+    }
+
+    if (database) {
+      $("#add_disk_link").hide();
+    }
+
+    $("#div_managed").trigger("change");
+    $("#id_cpu").trigger("change");
+
+    update_total_cost();
+
+    $( ".disk-uom" ).each(function( i ) {
+      if (this.value == 'TB') {
+        id = this.id;
+        tar = '#' + id.substring(0, id.length-3) + 'size';
+        $(tar).attr('step', '1');
+        $(tar).attr('max', '10');
+        $(tar).attr('min', '1');  
+      }
+    });
+
+
+  });
+
+  $(document).on("focusout", "#id_serverName" , function() {
+    set_server_name();
+  });
+
+  function set_server_name() {
+    
+    server_name = $("#id_serverName").val();
+
+    if (database) {
+      if (database == "MSSQL") {
+        server_name = 'db-' + server_name
+      } else if (database == "Oracle") {
+        server_name = server_name + '-ora'
+      } else {
+        server_name = server_name + '-' + database.toLowerCase();
+      }
+    } else if (managed_windows) {
+      if ($('#misevprefix_0').prop("checked")) {
+        server_name = $("#id_misevregpre").val() + '-' + server_name;
+      } else {
+        server_name = 'MIS-' + server_name;
+      }
+    }
+
+    $("#id_name").val(server_name);
+  }
+
+  $(document).on("change", ".cost-driver" , function() {
+    update_total_cost();
+  });
+
+  function update_total_cost() {
+
+    ram = $('#id_ram').val();
+    ram_cost = ram * ram_rate;
+    $('#ram_cost').html('$' + ram_cost.toFixed(2));
+
+    if ($('#id_cpu').data('server')){
+      disk_0 = $('.disk-size')[1];
+
+      if (ram < 8) {
+        paging_disk = 60;
+      } else {
+        paging_disk = Math.ceil((ram-8)/4) * 10 + 60;
+      }
+
+      $(disk_0).val(paging_disk);
+    }
+
+    if ($('#replicated_0').prop("checked")) {  // Replicated
+      disk_rate = disk_replicated;
+    } else {
+      disk_rate = disk_no_replication; // Default until selected
+    }
+
+    total_disk_size = 0;
+    total_disk_cost = 0;
+
+    $( ".disk-div" ).each(function( index ) {  // Tally all disks
+      uom = $(this).find("select").val();
+      size = $(this).find(".disk-size").val();
+
+      if (uom=="TB") {
+        size = size * 1024;
+      } else {
+        size = size * 1;
+
+      }
+      cost = size * disk_rate
+
+      $(this).find("span").html('$' + cost.toFixed(2));
+      total_disk_size = total_disk_size + size
+      total_disk_cost = total_disk_cost + cost
+
+    });
+    
+    if ($('#backup_0').prop("checked")) {  // Backup
+      backup_cost = total_disk_size * disk_backup
+      $("#backup_cost").html('$' + backup_cost.toFixed(2));
+    } else {
+      backup_cost = 0;
+      $("#backup_cost").html('$0.00');
+    } 
+
+    total_cost = ram_cost + total_disk_cost + backup_cost;
+    $("#total_cost").html('$' + total_cost.toFixed(2));
+    $("#total_cost_field").val(total_cost.toFixed(2));
+  }
+
+  $(document).on("change", "#id_cpu" , function() {
+    if ($('#id_ram').val() < this.value * 2) {
+      $('#id_ram').val(this.value * 2);
+      update_total_cost();
+    }
+  });
+
+  function set_managed_windows() {
+    managed_windows = false;
+    if ($('#managed_0').prop("checked")) {
+      os = $('#id_misevos option:selected').text()
+      if (os) {
+        if (os.startsWith('Windows')) {
+          managed_windows = true;
+        }
+      }
+    }
+
+    if (managed_windows && !database) {  // No prefix for database servers
+      $('#div_misevprefix').show().prop('required',true);  // Prefix Y/N?
+      if ($('#misevprefix_0').prop("checked") ) { // Yes, special prefix
+        $('#div_misevregpre').show().prop('required',true);
+      } else {
+        $('#div_misevregpre').hide().prop('required',false);
+      }
+    } else {
+      $('#div_misevprefix').hide().prop('required',false);
+      $('#div_misevregpre').hide().prop('required',false);
+    }
+
+    if (managed_windows) {
+      if ( $('#id_cpu').val() < 2 ) {
+        $('#id_cpu').val(2);
+        $("#id_cpu").trigger("change");
+      }
+    }
+    set_server_name();
+  }
+
+  $(document).on("change", "#id_misevregpre" , function() {
+    set_server_name();
+  });
+
+  $(document).on("change", "#id_misevos" , function() {
+    set_managed_windows();
+  });
+
+  $(document).on("change", "#div_managed" , function() {
+    if ($('#managed_0').prop("checked")) {  // Managed
+      $('#div_misevos').show().prop('required',true);
+      $('#div_misernonmang').hide().prop('required',false);
+    } else if ($('#managed_1').prop("checked")) {  // Unmanaged
+        $('#div_misevos').hide().prop('required',false);
+        $('#div_misernonmang').show().prop('required',true);
+    } else {
+      $('#div_misevos').hide().prop('required',false);
+      $('#div_misernonmang').hide().prop('required',false);
+    }
+    set_managed_windows();
+  });
+
+  $(document).on("change", "#div_misevprefix" , function() {
+    if ($('#misevprefix_0').prop("checked")) {  // Registered Prefix
+      $('#div_misevregpre').show().prop('required',true);
+    } else if ($('#misevprefix_1').prop("checked")) {  // No, use standard
+      $('#div_misevregpre').hide().prop('required',false);
+    } else {
+      $('#div_misevregpre').hide().prop('required',false);
+    }
+    set_server_name();
+  });
+
+  // MiServer Data Sensitivity
+  $('[data-tab="miServerData"]').on('show.bs.tab', function(event) {
+    $("#div_misevregu").trigger("change");
+    $("#div_misevnonregu").trigger("change");
+  });
+
+  $(document).on("change", "#div_misevregu" , function() {
+    if ($('#misevregu_0').prop("checked")) {  // Regulated Sensitive Data
+      $('#div_regulated_data').show().prop('required',true);
+    } else if ($('#misevregu_1').prop("checked")) {  // No Sensitive Data
+      $('#div_regulated_data').hide().prop('required',false);
+    } else {
+      $('#div_regulated_data').hide().prop('required',false);
+    }
+  });
+
+  $(document).on("change", "#div_misevnonregu" , function() {
+    if ($('#misevnonregu_0').prop("checked")) {  // Not Regulated Sensitive Data
+      $('#div_non_regulated_data').show().prop('required',true);
+    } else if ($('#misevnonregu_1').prop("checked")) {  // No Unregulated Sensitive Data
+      $('#div_non_regulated_data').hide().prop('required',false);
+    } else {
+      $('#div_non_regulated_data').hide().prop('required',false);
+    }
+  });
+
+  // Miserver Support Services
+  $('[data-tab="miSevSupport"]').on('show.bs.tab', function(event) {
+    $("#id_reboot_day").trigger("change");
+    $("#id_backup_time").trigger("change");
+  });
+
+  $(document).on("change", "#id_reboot_day" , function() {
+    if ($( "#id_reboot_day option:selected" ).text() == 'No Reboot Needed') {
+      $('#div_reboot_time').hide();
+    } else {
+      $('#div_reboot_time').show();
+    }
+  });
+
+  $(document).on("change", "#id_backup_time" , function() {
+
+    function get_hour(time) {
+      t1 = time.split(" ");
+      meridian = t1[1];
+      t2 = t1[0].split(':')
+      hour = parseFloat(t2[0]);
+      minute = t2[1];
+
+      if (meridian=='PM') {
+        hour = hour + 12;
+      } else if (hour==12) {
+        hour = 0;
+      }
+
+      if (minute=='30') {
+        hour = hour + .5;
+      }
   
+      return hour;
+    }
+
+    function within_window(timeA, timeB, offset) {
+      if (Math.abs(timeA - timeB) < offset) { // within offset
+        return true;
+      } else if (Math.abs((timeA+24) - timeB) < offset) {  // does timeA span midnight? eg 23:30 and 0:30
+          return true;
+      } else if (Math.abs(timeA - (timeB+24)) < offset) {  // does timeB span midnight? eg 23:30 and 0:30
+          return true;
+      } else {
+        return false;
+      }
+    }
+
+    function disable_options(target) {
+      $("#" + target + " > option").each(function() {
+        this_time = get_hour(this.text);
+        
+        if (within_window(this_time, backup_time,2)) {
+          $(this).attr('disabled','disabled')
+        } else {
+          $(this).removeAttr('disabled','disabled')
+        }
+      });
+    }
+
+    time = $( "#id_backup_time option:selected" ).text();
+    if (time != 'None') {
+      backup_time = get_hour(time);
+      disable_options('id_reboot_time');
+      disable_options('id_patch_time');
+    }
+
+  });
+
+
+
 
   var x = document.getElementsByClassName("ccsel");
   var i;
@@ -377,7 +845,6 @@ $(document).ready(function() {
         }
       } else {
         name = $("#" + inp[i].id).attr('name')
-        //console.log('name:' + name);
         if (!label) {
           label = $("label[for='" + id + "']").text();
         }
@@ -597,6 +1064,37 @@ function chartcomChange(obj) {
     
   }
 
+  function addDisk(record) {
+    num = $("#id_form-TOTAL_FORMS").val()
+
+    let total_form = $('#id_form-TOTAL_FORMS');
+    let form_idx = total_form.val();
+
+    $('#formset_wrapper').append($('#emptyform_wrapper').html().replace(/__prefix__/g, form_idx));
+
+    $('#id_form-' + form_idx + '-name').val('disk' + form_idx);
+    total_form.val(parseInt(form_idx)+1);
+
+    delbuttons = $('.fa-minus-circle');
+    if (delbuttons.length > 2) {
+      delbuttons[delbuttons.length - 3].style.display = "none"
+    }
+  }
+
+  function deleteDisk(disk) {
+    disk.parentElement.remove();
+    num = $("#id_form-TOTAL_FORMS").val()
+
+    let total_form = $('#id_form-TOTAL_FORMS');
+    let form_idx = total_form.val();
+    total_form.val(parseInt(form_idx)-1);
+
+    delbuttons = $('.fa-minus-circle');
+    if (delbuttons.length>1) {
+      delbuttons[delbuttons.length - 2].style.display = "block"
+    }
+
+  }
 
   function addRow(record) {
     // clone source div by ID
@@ -606,16 +1104,16 @@ function chartcomChange(obj) {
     } else {
       row_count = row_count + 1;
     }
-    
+
     var row = $("#" + record + "_new").clone();
-  
     row.attr("id", record + "_" + row_count);
     row.show();
     $("#" + record + "_list").append(row);   // TODO Find last host
-  
     $("#" + record + "_new").hide()
   
     $(".nodeName").focus(); 
+    $(this).next('input:text').focus();
+
   }
 
 function addHost() {
@@ -743,6 +1241,7 @@ function sendTabData(field) {
             $('#pills-tab a[href="#' + pane[0].id + '"]').tab('show')
           } else {
             //$("#workflowForm").addClass('was-validated');
+            $('#pills-tab a[href="#' + pane[0].id + '"]').trigger('show')
             console.log('not valid');
           }
       },

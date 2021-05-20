@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain
+from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database
 from oscauth.models import LDAPGroup, LDAPGroupMember
 
 def serializer_factory(model):
@@ -14,6 +14,20 @@ def serializer_factory(model):
     #TODO string related fields
 
     return type(f'{name}Serializer', (serializers.ModelSerializer,), {'Meta': meta})
+
+
+class ServerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        exclude = ['id']
+        model = Server
+
+
+class DatabaseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        exclude = ['id']
+        model = Database
 
 
 class RateSerializer(serializers.ModelSerializer):

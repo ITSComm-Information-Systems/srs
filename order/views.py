@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http.response import Http404
 from django.template import loader
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
 from order.forms import *
 from django.contrib.auth.decorators import permission_required
@@ -12,6 +13,7 @@ from pages.models import Page
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from pages.models import Page
 from django.http import JsonResponse
+from project.integrations import create_ticket_server_delete
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from ast import literal_eval
@@ -62,6 +64,52 @@ def querydict_to_dict(query_dict):  # Kudos to QFXC on StackOverflow
         data[key] = v
     return data
  
+
+def  send_ticket(owner, user):
+
+    client_id = settings.UM_API['CLIENT_ID']
+    auth_token = settings.UM_API['AUTH_TOKEN']
+    base_url = settings.UM_API['BASE_URL']
+
+    headers = { 
+        'Authorization': f'Basic {auth_token}',
+        'accept': 'application/json'
+        }
+
+    url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
+    response = requests.post(url, headers=headers)
+    response_token = json.loads(response.text)
+    access_token = response_token.get('access_token')
+
+    headers = {
+        'X-IBM-Client-Id': client_id,
+        'Authorization': 'Bearer ' + access_token,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json' 
+        }
+
+    payload = {
+        "FormID": 441,
+        "TypeID": 5,
+        "SourceID": 4,
+        "StatusID": 77,
+        "ServiceID": 213,  # No workflow
+        "PriorityID": 20,
+        "ResponsibleGroupID": 18,
+        "Title": "MiServer Migration Assistance",
+        "RequestorEmail": user.email,
+        "Attributes": [
+            {"ID": "1951",
+            "Value": "200"},
+            {"ID": "1953",
+            "Value": owner}
+            ]
+        }
+
+    data_string = json.dumps(payload)
+    response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
+
+
 #@permission_required('oscauth.can_order')
 def send_tab_data(request):
 
@@ -109,6 +157,11 @@ def send_tab_data(request):
     #    f = TabForm(step)
 
     if f.is_valid():
+
+        if request.POST.get('misevexissev') == 'yesexis':
+            send_ticket(request.POST.get('owner'), request.user)
+            return JsonResponse({'redirect': '/requestsent'}, safe=False)
+
         valid = True
         summary = f.get_summary(visible)
         tab = {'title': step.label, 'fields': summary}
@@ -456,6 +509,8 @@ class Workflow(UserPassesTestMixin, View):
 
         tabs = Step.objects.filter(action = action_id).order_by('display_seq_no')
         action = Action.objects.get(id=action_id)
+        request.session['service'] = action.service.name
+
         js = []
 
         for index, tab in enumerate(tabs, start=1):
@@ -507,7 +562,7 @@ class Workflow(UserPassesTestMixin, View):
                     tab.form = globals()[tab.custom_form](tab, action, request=request)
                 else:
                     f = forms.Form()
-                    f.template = 'order/dynamic_form.html'
+                    f.template = 'order/base_form.html'  # use base 4/16/2021
                     tab.form = f
 
 
@@ -655,8 +710,12 @@ class Services(UserPassesTestMixin, View):
         action_list = Action.objects.filter(active=True).order_by('service','display_seq_no')
         service_list = Service.objects.filter(group_id=group_id,active=True).order_by('display_seq_no')
 
+        selected_service = request.session.get('service','miBackup')
+
         for service in service_list:
             service.actions = action_list.filter(service=service)
+            if service.name == selected_service:
+                service.active = 'active show'
 
         context = {
             'title': 'Request Service',
@@ -743,3 +802,85 @@ class Status(PermissionRequiredMixin, View):
             'status_help': Page.objects.get(permalink='/status'),
         }
         return HttpResponse(template.render(context, request))
+
+
+
+class DatabaseView(UserPassesTestMixin, View):
+
+    def test_func(self):
+        username = self.request.user.username
+        instance_id = self.kwargs['instance_id']
+        owner = Database.objects.get(id=instance_id).owner.name
+
+        mc = MCommunity()
+        mc.get_group(owner)
+
+        if username in mc.members:
+            return True
+        else:
+            return False
+    
+    def get(self, request, instance_id):
+        db = Database.objects.get(id=instance_id)
+        form = DatabaseForm(request.user, instance=db)
+
+        template = loader.get_template('order/database_edit.html')
+        context = {
+            'title': 'Review Shared Database',
+            'form': form
+        }
+        return HttpResponse(template.render(context, request))
+
+
+    def post(self, request, instance_id):
+        db = Database.objects.get(id=instance_id)
+        form = DatabaseForm(request.user, request.POST, instance=db)
+
+        if form.is_valid() and form.has_changed():
+            form.save()
+            return HttpResponseRedirect('/requestsent') 
+
+        template = loader.get_template('order/database_edit.html')
+        context = {
+            'title': 'Review Shared Database',
+            'form': form,
+        }
+        return HttpResponse(template.render(context, request))
+
+
+class ServerView(UserPassesTestMixin, View):
+
+    def test_func(self):
+        username = self.request.user.username
+        instance_id = self.kwargs['instance_id']
+        #owner = Server.objects.get(id=instance_id).owner.name
+        instance = get_object_or_404(Server, pk=instance_id)
+
+        mc = MCommunity() 
+        mc.get_group(instance.owner.name)
+
+        if username in mc.members:
+            return True
+        else:
+            return False
+    
+    def get(self, request, instance_id, action):
+        if action != 'delete':
+            raise Http404
+
+        server = get_object_or_404(Server, pk=instance_id)
+
+        template = loader.get_template('order/server_delete.html')
+        context = {
+            'title': 'Delete Server',
+            'server': server
+        }
+        return HttpResponse(template.render(context, request))
+
+
+    def post(self, request, instance_id, action):
+        instance = get_object_or_404(Server, pk=instance_id)
+        create_ticket_server_delete(instance, request.user, f'End Service for {instance.name}')
+        instance.delete()
+
+        return HttpResponseRedirect('/requestsent') 

@@ -1,0 +1,80 @@
+<h2>Volume Selection</h2>
+<p>Please select the storage volume you wish to modify</p>
+<input type="hidden" id="instance_id" name="instance_id" value="0">
+<div class="row mb-4">
+    <div class="table-responsive-lg">
+        <table class="table table-hover table-striped table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Server Name</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Owner</th>
+                    <th scope="col">Shortcode</th>
+                    <th scope="col">Size</th>
+                    <th scope="col">Total Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for volume in tab.form.volume_list %}
+
+                <tr>
+                    <th data-id="{{volume.id}}" scope="row">{{ volume.name }}</th>
+                    <td>
+                        <div class="row">
+                            {{ volume.os }}
+                        </div>
+                        <sm>
+                        <div class="row">
+                            <div class="col-sm">
+                                RAM
+                            </div>
+                            <div class="col-sm text-right">
+                                {{ volume.ram }} GB
+                            </div>
+                            <div class="col-sm text-right">
+                                ${{ volume.ram_cost|floatformat:2 }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm">
+                                Disk
+                            </div>
+                            <div class="col-sm text-right">
+                                {{ volume.total_disk_size }} GB
+                            </div>
+                            <div class="col-sm text-right">
+                                ${{ volume.disk_cost|floatformat:2 }}
+                            </div>
+                        </div>
+                        {% if volume.backup %}
+                        <div class="row">
+                            <div class="col-sm">
+                                Backup
+                            </div>
+                            <div class="col-sm text-right">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="col-sm text-right">
+                                ${{ volume.backup_cost|floatformat:2 }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        </sm>
+
+
+                    </td>
+
+                    <td>{{ volume.owner }}
+
+                    </td>
+                    <td>{{ volume.shortcode }} </td>
+                    <td>{{ volume.size }} GB</td>
+                    <td class='text-right'>${{ volume.total_cost|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>

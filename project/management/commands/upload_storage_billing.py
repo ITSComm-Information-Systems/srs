@@ -36,6 +36,8 @@ class Command(BaseCommand):
                 "where  c.name = 'MB-MCOMM' " \
                 "  and a.owner_id = d.id  order by a.name  "
 
+        miserver_query = 'select * from order_miserver_billing_v order by name'
+
         self.owner_email = 'arcts-storage-billing@umich.edu'
 
         if self.service == 'MiStorage':
@@ -50,6 +52,9 @@ class Command(BaseCommand):
         elif self.service == 'MiBackup':
             sql = mibackup_query
             self.owner_email = 'its.storage@umich.edu'
+        elif self.service == 'MiServer':
+            sql = miserver_query
+            self.owner_email = 'MiServer.Support@umich.edu'
         else:
             print('Service not found')
             return

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<h1>Delete Server</h1>
+
+<h6>Are you sure you want to delete this server?</h6>
+
+<b>Name:</b>{{ server.name }} <br>
+{{ server.os }}
+
+<hr>
+<form method="POST">{% csrf_token %}
+    <button type="submit" class="btn btn-primary">Submit Now</button>
+</form>
+
+
+{% endblock %}

@@ -3,6 +3,8 @@ from project.pinnmodels import UmOscAllActiveAcctNbrsV, UmOscServiceProfileV
 from oscauth.utils import get_mc_group, get_mc_user
 from oscauth.models import AuthUserDept
 
+from project.models import validate_shortcode
+
 from django.core.exceptions import ValidationError
 
 
@@ -51,14 +53,15 @@ class Uniqname(forms.CharField):
 class ShortCode(forms.CharField):
     template_name = 'project/text.html'
     widget=forms.TextInput(attrs={'class': 'form-control'})
+    #validators=[validate_shortcode]
 
-    def validate(self, value):
+    #def validate(self, value):
 
-        try:
-            UmOscAllActiveAcctNbrsV.objects.get(short_code=value)
-        except:
-            self.widget.attrs.update({'class': 'form-control is-invalid'})
-            raise ValidationError('That is not a valid shortcode', code='shortcode')
+     #   try:
+     #       UmOscAllActiveAcctNbrsV.objects.get(short_code=value)
+     #   except:
+     #       self.widget.attrs.update({'class': 'form-control is-invalid'})
+     #       raise ValidationError('That is not a valid shortcode', code='shortcode')
 
 
 class McGroup(forms.CharField):

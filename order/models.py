@@ -1,10 +1,13 @@
+from typing import Sequence
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.postgres.fields import JSONField
 from django.contrib.admin.models import LogEntry, ADDITION
 from django.db import models
+from django.forms.fields import DecimalField
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
+from project.models import ShortCodeField, Choice
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from django.utils import timezone
@@ -13,7 +16,10 @@ from django.template.loader import render_to_string
 from ast import literal_eval
 import json, io, os, requests
 import cx_Oracle
+from django.core.exceptions import ValidationError
 from oscauth.utils import get_mc_user, get_mc_group
+from decimal import Decimal
+
 
 if settings.ENVIRONMENT == 'Production':
     TDX_URL = 'https://teamdynamix.umich.edu/TDNext/Apps/31/Tickets/TicketDet.aspx?TicketID='
@@ -60,6 +66,12 @@ class Step(Configuration):
         ('BackupDetailsForm', 'Backup Details'),
         ('VolumeSelectionForm', 'Volume Selection'),
         ('SubscriptionSelForm', 'Subscription Selection'),
+        ('DatabaseTypeForm', 'Database Type'),
+        ('DatabaseConfigForm', 'Database Configuration'),
+        ('ServerInfoForm', 'Server Info'),
+        ('ServerSupportForm', 'Server Support'),
+        ('ServerSpecForm', 'Server Specification'),
+        ('ServerDataForm', 'Server Data Sensitivity'),
         ('DataDenForm', 'Data Den Form')
     )
 
@@ -71,16 +83,19 @@ class Element(Configuration):
         ('', ''),
         ('Radio', 'Radio'),
         ('ST', 'String'),
+        ('Select', 'Select'),
         ('List', 'List'),
         ('NU', 'Number'),
         ('Chart', 'Chartcom'),
         ('Label', 'Label'),
         ('Checkbox', 'Checkbox'),
         ('McGroup', 'MCommunity Group'),
+        ('MyGroups', 'Users MCommunity Group'),
         ('ShortCode', 'Short Code'),
         ('Phone', 'Phone Number'),
         ('Uniqname', 'Uniqname'),
         ('HTML', 'Static HTML'),
+        ('EmailField', 'Email'),
     )
     label = models.TextField()
     description = models.TextField(blank=True)
@@ -88,6 +103,7 @@ class Element(Configuration):
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=ELEMENT_CHOICES)
     attributes = models.CharField(blank=True, max_length=1000)
+    arguments = models.JSONField(blank=True, default=dict)
     display_condition = models.CharField(blank=True, max_length=100)
     target = models.CharField(max_length=80, blank=True, null=True)
 
@@ -573,6 +589,206 @@ class BackupNode(models.Model):
         return self.name
 
 
+class DayOfWeek(models.IntegerChoices):
+    SUNDAY = 0, 'Sunday'
+    MONDAY = 1, 'Monday'
+    TUESDAY = 2, 'Tuesday'
+    WEDNESDAY = 3, 'Wednesday'
+    THURSDAY = 4, 'Thursday'
+    FRIDAY = 5, 'Friday'
+    SATURDAY = 6, 'Saturday'
+
+
+class Server(models.Model):
+    BUSINESS_HOURS = 0
+    ALL_HOURS = 1
+
+    ON_CALL_CHOICES = [
+        (BUSINESS_HOURS, 'Business Hours'),
+        (ALL_HOURS, '24/7'),
+    ]
+
+    MANAGED_FIELDS = ['patch_time', 'patch_day', 'reboot_time', 'reboot_day']
+
+    for rate in StorageRate.objects.filter(name__startswith='SV-'):
+        if rate.name == 'SV-RAM':
+            ram_rate = rate.rate
+        elif rate.name == 'SV-DI-REP':
+            disk_replicated = rate.rate
+        elif rate.name == 'SV-DI-NONREP':
+            disk_no_replication = rate.rate
+        elif rate.name == 'SV-DI-BACKUP':
+            disk_backup = rate.rate
+
+    name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
+    admin_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
+    shortcode = ShortCodeField()
+    created_date = models.DateTimeField(default=timezone.now)
+    #shortcode = models.CharField(max_length=100) 
+    public_facing = models.BooleanField(default=False)
+    managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
+
+    os = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={'parent__code__in': ['SERVER_UNMANAGED_OS','LINUX','WINDOWS']}
+                                    , related_name='os'
+                                    , on_delete=models.CASCADE,)
+
+    cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
+    ram = models.IntegerField('RAM')    #  <ram>8</ram>
+    regulated_data = models.ManyToManyField(Choice, blank=True, limit_choices_to={"parent__code": "REGULATED_SENSITIVE_DATA"}, related_name='regulated')
+    non_regulated_data = models.ManyToManyField(Choice, blank=True, limit_choices_to={"parent__code": "NON_REGULATED_SENSITIVE_DATA"})
+    replicated = models.BooleanField(default=True)
+
+    on_call = models.PositiveSmallIntegerField(null=True, choices=ON_CALL_CHOICES)   #<monitoringsystem>businesshours</monitoringsystem>
+    in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
+
+    firewall = models.CharField(max_length=100)
+    backup = models.BooleanField(default=False)
+    support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
+    support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
+    backup_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_BACKUP_TIME"}
+                                    , related_name='backup_time'
+                                    , on_delete=models.CASCADE,)
+    patch_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_PATCH_TIME"}
+                                    , related_name='patch_time'
+                                    , on_delete=models.CASCADE,)
+    patch_day = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_PATCH_DATE"}
+                                    , related_name='patch_day'
+                                    , on_delete=models.CASCADE,)
+    reboot_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_REBOOT_TIME"}
+                                    , related_name='reboot_time'
+                                    , on_delete=models.CASCADE,)
+
+    reboot_day = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_REBOOT_DATE"}
+                                    , related_name='reboot_day'
+                                    , on_delete=models.CASCADE,)
+    domain = models.CharField(max_length=100)
+    datacenter = models.CharField(max_length=100)
+    firewall_requests = models.CharField(max_length=100)
+    legacy_data = models.TextField()
+
+    @property
+    def total_disk_size(self):
+        disk = ServerDisk.objects.filter(server=self).aggregate(models.Sum('size'))
+        if disk:
+            sum = disk['size__sum']
+            if sum:
+                return disk['size__sum']
+
+        return 0
+
+    @property
+    def ram_cost(self):
+        return self.ram * self.ram_rate
+
+    @property
+    def backup_cost(self):
+        if self.backup:
+            return self.total_disk_size * self.disk_backup
+        else:
+            return 0
+
+    @property
+    def disk_cost(self):
+        if self.total_disk_size:
+            if self.replicated:
+                return self.total_disk_size * self.disk_replicated
+            else:
+                return self.total_disk_size * self.disk_no_replication
+        else:
+            return 0
+
+    @property
+    def total_cost(self):
+        return self.ram_cost + self.backup_cost + self.disk_cost
+
+    def __str__(self):
+        return self.name
+
+    def get_shortcodes(self):
+        return [{'size':'', 'shortcode':self.shortcode}]
+
+    def get_checkboxes(self):
+        return [] 
+
+
+class ServerDisk(models.Model):
+    server = models.ForeignKey(Server, related_name='disks', on_delete=models.CASCADE)
+    name = models.CharField(max_length=10)
+    size = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+
+def get_disk_size(server):
+    size = ServerDisk.objects.filter(server=server)
+    print(size)
+
+class ServerData(models.Model):
+    server = models.ForeignKey(Server, related_name='data', on_delete=models.CASCADE)
+    code = models.CharField(max_length=5)
+
+
+class Database(models.Model):
+    MYSQL = 0
+    MSSQL = 1
+    ORACLE = 2
+
+    TYPE_CHOICES = [
+        (MYSQL, 'MYSQL'),
+        (MSSQL, 'MSSQL'),
+        (ORACLE, 'Oracle'),
+    ]
+
+    BUSINESS_HOURS = 0
+    ALL_HOURS = 1
+
+    ON_CALL_CHOICES = [
+        (BUSINESS_HOURS, 'Business Hours'),
+        (ALL_HOURS, '24/7'),
+    ]
+
+    name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
+    in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
+    shortcode = models.CharField(max_length=100) 
+    created_date = models.DateTimeField(default=timezone.now)
+    size = models.IntegerField(null=True)
+    type = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_TYPE"}, on_delete=models.SET_NULL, related_name='type')
+    #version = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_VERSION"}, on_delete=models.SET_NULL, related_name='version')
+    purpose = models.TextField()
+    on_call = models.PositiveSmallIntegerField(null=True, choices=ON_CALL_CHOICES)
+    url = models.URLField(null=True, blank=True)
+    support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
+    support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
+    server = models.ForeignKey(Server, null=True, blank=True, on_delete=models.SET_NULL)
+    legacy_data = models.TextField()
+
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def total_cost(self):
+        if self.server:
+            return self.server.total_cost
+        else:
+            return 0
+
+    @property
+    def shared(self):
+        if self.server:
+            return False
+        else:
+            return True
+
+    def get_shortcodes(self):
+        return [{'size':'', 'shortcode':self.shortcode}]
+        
+    def get_checkboxes(self):
+        return []
+
+
 class Order(models.Model):
     PRIORITY_CHOICES = (
         ('High', 'Expedited'),
@@ -799,7 +1015,7 @@ class Item(models.Model):
 
         for route in routing['routes']:
             if route['target'] == 'tdx':
-                self.submit_incident(route) 
+                self.submit_incident(route, action) 
 
             if route['target'] == 'database':
                 if 'fulfill' in route:
@@ -824,6 +1040,10 @@ class Item(models.Model):
         else:
             if action.service.id == 8:
                 self.update_mibackup(rec)
+            elif action.service.id == 13:
+                self.update_server(rec)
+            elif action.service.id == 14:
+                self.update_db(rec)
             else:
                 rec.owner = LDAPGroup().lookup( self.data['owner'] )
                 rec.service = action.service
@@ -853,7 +1073,7 @@ class Item(models.Model):
                 if self.data.get('permittedHosts'):
                     rec.update_hosts(self.data.get('permittedHosts'))
 
-    def submit_incident(self, route):
+    def submit_incident(self, route, action):
         client_id = settings.UM_API['CLIENT_ID']
         auth_token = settings.UM_API['AUTH_TOKEN']
         base_url = settings.UM_API['BASE_URL']
@@ -883,11 +1103,205 @@ class Item(models.Model):
         payload['RequestorEmail'] = self.created_by.email
         payload['Description'] = f'{note}\n'
 
+        # Add Attributes using target mapping
+        field_map = action.override.get('map', '')
+
+        display_values = {}
+        for tab in self.data['reviewSummary']:
+            for field in tab['fields']:
+                if 'name' in field:
+                    if 'list' in field:
+                        nl = '\n'
+                        display_values[field['name']] = nl.join(field['list'])
+                    else:
+                        display_values[field['name']] = field['value']
+
+        attributes = []
+        step_list = Step.objects.filter(action=action)
+        element_list = Element.objects.filter(step__in=step_list, target__isnull=False)
+        for element in element_list:
+            value = display_values.get(element.name)
+            if value:
+                if element.name in field_map:
+                    attributes.append({'ID': field_map[element.name], 'Value': value})
+                else:
+                    attributes.append({'ID': element.target, 'Value': value})
+
+        dedicated = False
+        if action.service.name == 'miServer':
+            if action.type == 'M':
+                instance_id = self.data.get('instance_id')
+                instance = Server.objects.get(id=instance_id)
+                if instance.managed:
+                    mod_man = 'True'
+                    if instance.admin_group.name == 'MiDatabase Support Team':
+                        dedicated = True
+                else:
+                    mod_man = 'False'
+                os_id = instance.os_id
+                if self.data.get('volaction') == 'Delete':
+                    attributes.append({'ID': 1959, 'Value': instance.name})
+                    attributes.append({'ID': 1951, 'Value': 202})
+                    payload['Title'] = 'Delete MiServer'
+                else:
+                    attributes.append({'ID': 1951, 'Value': 201})
+            else:
+                mod_man = None
+                os_id = None
+
+            db = self.data.get('database')
+            if db:
+                if self.data.get('volaction') == 'Delete':
+                    payload['Title'] = 'Delete MiDatabase'
+                else:
+                    attributes.append({'ID': 1953, 'Value': self.data.get('ad_group')})  # Admin Group
+
+                attributes.append({'ID': 5319, 'Value': db})
+                attributes.append({'ID': 1952, 'Value': 203}) # Managed
+
+                if db == 'MSSQL':
+                    attributes.append({'ID': 1994, 'Value': 215}) # Windows
+                    os = Choice.objects.get(code='Windows2019managed')
+                else:
+                    attributes.append({'ID': 1994, 'Value': 216}) # Linux
+                    os = Choice.objects.get(code='RedHatEnterpriseLinux8')
+                    
+                attributes.append({'ID': 1957, 'Value': os.label}) 
+            else:
+                if self.data.get('volaction') == 'Delete':
+                    payload['Title'] = 'Delete MiServer'
+                else:
+                    if dedicated:
+                        attributes.append({'ID': 1953, 'Value': instance.admin_group.name})  # Admin Group
+                    else:
+                        attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
+
+                managed = self.data.get('managed', mod_man)
+                if managed == 'True' or db:
+                    os = Choice.objects.get(id=self.data.get('misevos', os_id))
+                    attributes.append({'ID': 1952, 'Value': 203}) # Managed
+                    if os.code.startswith('Windows'):
+                        attributes.append({'ID': 1994, 'Value': 215}) # Windows
+                    else:
+                        attributes.append({'ID': 1994, 'Value': 216}) # Linux
+                else:
+                    os = Choice.objects.get(id=self.data.get('misernonmang', os_id))
+                    attributes.append({'ID': 1952, 'Value': 207}) # Non-Managed
+                    attributes.append({'ID': 1994, 'Value': 214}) # IAAS
+                
+                attributes.append({'ID': 1957, 'Value': os.label}) 
+
+            if self.data.get('volaction') != 'Delete':
+                if action.type == 'M':
+                    summ = text[2]['fields']
+                else:
+                    summ = text[1]['fields']
+
+                for field in summ:
+                    if field['label'] == 'Disk Space':
+                        nl = '\n'
+                        disks = nl.join(field['list'])
+                        attributes.append({'ID': 1965, 'Value': disks})
+
+        # Add Action Constants to Payload
+        cons = Constant.objects.filter(action=action)
+
+        for con in cons:  # Add Action Constants
+            attributes.append({'ID': con.field, 'Value': con.value})
+
+        for attr in attributes:
+            if type(attr['ID']) == int:
+                attr['ID'] = str(attr['ID'])
+            if type(attr['Value']) == int:
+                attr['Value'] = str(attr['Value'])
+
+        payload['Attributes'] = attributes
+
         data_string = json.dumps(payload)
         response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
  
         self.external_reference_id = json.loads(response.text)['ID']
         self.save()   # Save incident number to item
+
+    def update_db(self, rec):
+        rec.owner = LDAPGroup().lookup( self.data['owner'] )
+
+        for field in ['purpose','size','name','support_email','support_phone','shortcode','type','url']:
+            value = self.data.get(field)
+            if value:
+                setattr(rec, field, value)
+
+        on_call = self.data.get('on_call', '0')
+        rec.on_call = int(on_call)
+
+        type = self.data.get('midatatype')
+        if type:
+            rec.type = Choice.objects.get(id=type)
+            
+        rec.save()
+
+    def update_server(self, rec):
+        rec.owner = LDAPGroup().lookup( self.data['owner'] )
+
+        if self.data.get('ad_group'):
+            rec.admin_group = LDAPGroup().lookup( self.data['ad_group'] )
+        else:
+            rec.admin_group = rec.owner
+
+        for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing']:
+            value = self.data.get(field)
+            if value:
+                setattr(rec, field, value)
+
+        on_call = self.data.get('on_call', '0')
+        rec.on_call = int(on_call)
+
+        for field in ['backup_time','patch_day','patch_time','reboot_day','reboot_time']:
+            value = self.data.get(field)
+            if value:
+                value = int(value)
+                setattr(rec, field + '_id', value)
+
+        if rec.managed:
+            os = self.data.get('misevos')
+        else:
+            os = self.data.get('misernonmang')
+
+        if os:
+            rec.os = Choice.objects.get(id=os)
+        elif self.data.get('database'):
+            if self.data.get('database') == 'MSSQL':
+                rec.os = Choice.objects.get(code='Windows2019managed')
+            else:
+                rec.os = Choice.objects.get(code='RedHatEnterpriseLinux8')
+
+        rec.save()
+
+        d = self.data.get('non_regulated_data')
+        if d:
+            print(d)
+            if type(d) == str:
+                d = [d]
+            rec.non_regulated_data.set(d)
+
+        d = self.data.get('regulated_data')
+        if d:
+            if type(d) == str:
+                d = [d]
+            rec.regulated_data.set(d)
+
+        rec.save()
+
+        for disk in range(0, int(self.data.get('form-TOTAL_FORMS'))):            
+            size = self.data.get('form-'+str(disk)+'-size')
+            uom = self.data.get('form-'+str(disk)+'-uom')
+            name = self.data.get('form-'+str(disk)+'-name')
+
+            if uom == 'TB':
+                size = int(size) * 1024
+
+            d = ServerDisk.objects.update_or_create(server=rec,name=name,
+                defaults={'size': size})
 
     def update_mibackup(self, rec):
         if rec.name == '':
