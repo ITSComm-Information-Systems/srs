@@ -802,8 +802,8 @@ class DiskForm(forms.ModelForm):
     name = forms.CharField()
     name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
 
-    size = forms.IntegerField(initial=10, min_value=10)
-    size.widget.attrs.update({'class': 'form-control disk-size validate-integer', 'step': 10})  
+    size = forms.IntegerField(initial=10)
+    size.widget.attrs.update({'class': 'form-control disk-size validate-integer', 'step': 10, 'min': '10'})  
 
     uom = forms.ChoiceField(choices=(('GB','GB'),('TB','TB')))
     uom.widget.attrs.update({'class': 'form-control disk-uom'})  
@@ -823,6 +823,9 @@ class DiskForm(forms.ModelForm):
         if self.cleaned_data.get('uom') == 'GB' and self.cleaned_data.get('size', 0) < 1000:
             if self.cleaned_data.get('size', 0) % 10 != 0:
                 self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
+            elif self.cleaned_data.get('name') == 'disk0' and self.cleaned_data.get('size', 0) < 50:
+                self.add_error('size', f'Disk 0 must be 50 GB or more.')
+
         elif self.cleaned_data.get('uom') == 'TB' and self.cleaned_data.get('size', 0) > 10:
             self.add_error('size', 'Disk size must be 10 TB or less.')            
 

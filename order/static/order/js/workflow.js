@@ -252,10 +252,17 @@ $(document).ready(function() {
       $(tar).attr('max', '10');
       $(tar).attr('min', '1');
     } else if (this.value == 'GB') {
-      $(tar).val(10);
+      if (id=='id_form-0-uom') {
+        $(tar).val(50);
+        $(tar).attr('min', '50');   
+      } else {
+        console.log(id);
+        $(tar).val(10);
+        $(tar).attr('min', '10'); 
+      }
       $(tar).attr('step', '10');
       $(tar).removeAttr('max');
-      $(tar).attr('min', '10');   
+
     }
 
   });
