@@ -1272,6 +1272,9 @@ class Item(models.Model):
         elif self.data.get('database'):
             if self.data.get('database') == 'MSSQL':
                 rec.os = Choice.objects.get(code='Windows2019managed')
+                rec.backup_time_id = 13  # 6:00 PM
+                rec.patch_day_id = 98    # Saturday
+                rec.patch_time_id = 40   # 5:00 AM
             else:
                 rec.os = Choice.objects.get(code='RedHatEnterpriseLinux8')
 
