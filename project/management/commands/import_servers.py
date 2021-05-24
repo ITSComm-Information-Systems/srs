@@ -10,6 +10,64 @@ from project.models import Choice
 import datetime, csv, sys
 import xml.etree.ElementTree as ET
 
+OS = {
+        'Red Hat Enterprise Linux 7 64-bit - Managed': 116, 
+        'RedHatEnterpriseLinux764bitmanaged':116,
+        'Red Hat Enterprise Linux 6 64-bit - Managed':113,
+        'RedHatEnterpriseLinux664bitmanaged':113,
+        'Windows2012R2managed':112,
+        'Windows 2012 R2 - Managed':112,
+        'Windows2016managed':5,
+        'Windows 2016 - Managed':5,
+        'Windows 2019 - Managed':4,
+        'Windows2019managed':4,
+        'Windows2008R2managed':111,
+        'Windows 2008 R2 - Managed':111,
+        'Ubuntu 16.04 LTS 64-bit - Managed':7,
+        'Ubuntu1804LTS64bitManaged':7,
+        'Ubuntu 18.04 LTS 64-bit - Managed':7,
+        'Ubuntu1604LTS64bitManaged':7,
+        'RedHatEnterpriseLinux564bitmanaged':115,
+        'CentOS 4/5/6 (64-bit)':27,
+        'CentOS 6 64-bit':27,
+        'CentOS6':27,
+        'CentOS664-bit':27,
+        'Debian 6 64-bit':27,
+        'Debian GNU/Linux 6 (64-bit)':27,
+        'Debian664bit':27,
+        'None':27,
+        'Other Linux (64-bit)':27,
+        'otherLinux2432bit':27,
+        'otherLinux2664bit':27,
+        'otherLinux64bit':27,
+        'Oracle Linux 4/5/6 (64-bit)':27,
+        'OracleLinux64bit':27,
+        'RedHatEnterpriseLinux564bit':114,
+        'Red Hat Enterprise Linux 6 64-bit':120,
+        'RedHatEnterpriseLinux664bit':120,
+        'Red Hat Enterprise Linux 7 (64-bit)':28,
+        'RedHatEnterpriseLinux764bit':28,
+        'SUSELinuxEnterpriseServer1164bit':27,
+        'SUSELinuxEnterpriseServer1264bit':27,
+        'Ubuntu 10 Linux 64-bit':27,
+        'Ubuntu10Linux64bit':27,
+        'Ubuntu 11 Linux 64-bit':27,
+        'Ubuntu Linux (64-bit)':31,
+        'UbuntuLinux64bit':27,
+        'Microsoft Windows 8 (64-bit)':121,
+        'WindowsServer2003':121,
+        'Microsoft Windows Server 2008 (64-bit)':121,
+        'Microsoft Windows Server 2008 R2 (64-bit)':121,
+        'Windows Server 2008 64-bit':121,
+        'Windows2008R2':121,
+        'WindowsServer2008':121,
+        'Microsoft Windows Server 2012 (64-bit)':34,
+        'WindowsServer201264bit':34,
+        'Microsoft Windows Server 2016 (64-bit)':35,
+        'WindowsServer201664bit':35
+    }
+
+
 DAYS = {
         'Sunday': 0,
         'Monday': 1,
@@ -96,6 +154,8 @@ class Command(BaseCommand):
         
         print('open file')
 
+        self.out_of_service_count = 0
+
         with open(f'/Users/djamison/Downloads/{filename}', encoding='mac_roman') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             line_count = 0
@@ -110,7 +170,10 @@ class Command(BaseCommand):
                 else:
                     break
 
+            print(f'Out of Service Ignored {self.out_of_service_count}')
             print(f'Processed {line_count} lines.')
+            print(f'Loaded {self.LOADS} lines.')
+            print(f'Errors {self.ERRORS} lines.')
 
         print(datetime.datetime.now(), 'end')
 
@@ -196,6 +259,15 @@ class Command(BaseCommand):
         
         self.xml = xml
 
+        service_status = self.get_text(xml, 'servicestatus', None)
+        if service_status == 'Ended':
+            self.out_of_service_count += 1
+            return
+        elif service_status == 'Active':
+            s.in_service = True
+        else:
+            print('unknown service status', service_status)
+
         s.legacy_data = data
         s.owner = LDAPGroup().lookup( mc_group )
         s.admin_group = s.owner
@@ -206,17 +278,18 @@ class Command(BaseCommand):
             s.managed = False
 
         os_name = self.get_text(xml, 'os', None)
+        s.os_id = OS.get(os_name)
 
-        os = Choice.objects.filter(label=os_name)
+        #os = Choice.objects.filter(label=os_name)
 
-        if os:
-            s.os = os[0]
-        else:
-            os = Choice.objects.filter(code=os_name)
-            if os:
-                s.os = os[0]
-            else:
-                print('os not found', os_name)
+        #if os:
+        #    s.os = os[0]
+        #else:
+        #    os = Choice.objects.filter(code=os_name)
+        #    if os:
+        #        s.os = os[0]
+        #    else:
+        #        print('os not found', os_name)
 
         s.cpu = self.get_text(xml, 'cpu', 0)
         s.ram = self.get_text(xml, 'ram', 0)
@@ -245,7 +318,7 @@ class Command(BaseCommand):
         else:
             s.public_facing = False
 
-        s.created_date = self.get_text(xml, 'subscribedDate', '')
+        s.created_date = self.get_text(xml, 'subscribedDate', None)
 
         s.backup_time_id = self.get_time('dailybackuptime', BACKUP_TIME, s.name)
         s.patch_time_id = self.get_time('patchingScheduleTime', PATCH_TIME, s.name)
@@ -260,13 +333,7 @@ class Command(BaseCommand):
         elif on_call == '247':
             s.on_call = ON_CALL_CHOICES['24/7']
 
-        service_status = self.get_text(xml, 'servicestatus', None)
-        if service_status == 'Ended':
-            s.in_service = False
-        elif service_status == 'Active':
-            s.in_service = True
-        else:
-            print('unknown service status', service_status)
+
 
         try:
             s.save()
