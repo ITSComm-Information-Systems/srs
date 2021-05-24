@@ -624,7 +624,7 @@ class Server(models.Model):
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     admin_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
     shortcode = ShortCodeField()
-    created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(default=timezone.now, null=True)
     #shortcode = models.CharField(max_length=100) 
     public_facing = models.BooleanField(default=False)
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
@@ -1272,10 +1272,22 @@ class Item(models.Model):
         elif self.data.get('database'):
             if self.data.get('database') == 'MSSQL':
                 rec.os = Choice.objects.get(code='Windows2019managed')
+                rec.backup_time_id = 13  # 6:00 PM
+                rec.patch_day_id = 98    # Saturday
+                rec.patch_time_id = 40   # 5:00 AM
             else:
                 rec.os = Choice.objects.get(code='RedHatEnterpriseLinux8')
 
         rec.save()
+
+        try:
+            db_type = self.data.get('database')
+            if db_type:
+                db_choice = Choice.objects.get(parent__code='DATABASE_TYPE', label=db_type)
+                db = Database.objects.update_or_create(server=rec,
+                    defaults={'name': rec.name, 'owner': rec.owner, 'support_email': rec.support_email, 'support_phone': rec.support_phone, type: db_choice, 'shortcode': rec.shortcode, 'size': 0, 'purpose': 'dedicated server'})
+        except:
+            print('error creating database')
 
         d = self.data.get('non_regulated_data')
         if d:

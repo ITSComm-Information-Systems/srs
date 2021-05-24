@@ -748,13 +748,20 @@ class ServerSupportForm(TabForm):
                 mang = 'unmang'
             else:
                 mang = 'mang'
+
+            try:
+                database = Database.objects.get(server=server)
+                db = database.type.code
+            except:
+                db = None
         else:
             mang = None
             server = None
             os_id = None
+            db = None
 
-        if self.request.POST.get('database'):
-            db = self.request.POST.get('database')
+        if self.request.POST.get('database', db):
+            db = self.request.POST.get('database', db)
             if db == 'MSSQL':
                 windows = True
                 self.fields['backup_time'].disabled = True
