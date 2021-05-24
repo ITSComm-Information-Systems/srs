@@ -198,7 +198,7 @@ class Command(BaseCommand):
 
         for disk in disk_list:
             if len(disk_list) > 9:
-                print(len(disk_list), 'extra disks for server_id:', server_id)
+                print(len(disk_list), 'extra disks for server_id:', server_id, server_name)
                 return
                 
             if disk:
@@ -236,7 +236,7 @@ class Command(BaseCommand):
                     if CHOICE_LIST.get(val):
                         id_list.append(CHOICE_LIST.get(val))
                     else:
-                        print(val, 'not found')
+                        print(val, 'checkbox not found')
                     
 
         return id_list
@@ -250,11 +250,12 @@ class Command(BaseCommand):
         mc_group =  row[1].strip("'")
         s.shortcode = row[3].strip("'")
         data = row[5].strip("'")
+        server_name = row[6].strip("'")
 
         try:
             xml = ET.fromstring(data)
         except:
-            print('error converting XML', data)
+            print('error converting XML', server_name)
             return
         
         self.xml = xml
@@ -266,7 +267,7 @@ class Command(BaseCommand):
         elif service_status == 'Active':
             s.in_service = True
         else:
-            print('unknown service status', service_status)
+            print('unknown service status', service_status, 'for', server_name)
 
         s.legacy_data = data
         s.owner = LDAPGroup().lookup( mc_group )
@@ -349,8 +350,7 @@ class Command(BaseCommand):
                 s.non_regulated_data.set(nonreg_list)
 
         except Exception as ex:
-            print('insert error', ex)
-            print(data)
+            print('insert error', ex, server_name)
             self.ERRORS +=1
 
         #print(f'{self.LOADS} records Loaded, {self.ERRORS} errors')
@@ -370,7 +370,7 @@ class Command(BaseCommand):
             if id:
                 return id
             else:
-                print(time, 'not found for', field, name)
+                print(time, 'time not found for', field, name)
                 return None
 
 

@@ -1,9 +1,11 @@
+from re import M
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
 from oscauth.utils import get_mc_group, McGroup
 from order.models import BackupDomain, BackupNode, Item, Ticket
 from oscauth.models import LDAPGroup
+from project.integrations import MCommunity
 
 import requests, json
 #import datetime, csv
@@ -16,6 +18,10 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
+        mc = MCommunity()
+        mc.get_groups('djamison')
+        return
+
 
         id = options['id']
 

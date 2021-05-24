@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models.fields import NullBooleanField
 
 from oscauth.utils import get_mc_group
 from oscauth.models import LDAPGroup
@@ -22,8 +23,7 @@ DAYS = {
 class Command(BaseCommand):
     help = 'Import CSV from MiDatabase'
 
-    ERRORS = 0
-    LOADS = 0
+
 
     def add_arguments(self, parser):
         parser.add_argument('filename',type=str)
@@ -58,6 +58,9 @@ class Command(BaseCommand):
 
         print(self.database_versions)
 
+        self.ERRORS = 0
+        self.LOADS = 0
+
         with open(f'/Users/djamison/Downloads/{filename}', encoding='mac_roman') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             line_count = 0
@@ -72,6 +75,8 @@ class Command(BaseCommand):
                     break
 
             print(f'Processed {line_count} lines.')
+            print(f'errors {self.ERRORS} rec.')
+            print(f'saved {self.LOADS} rec.')
 
         print(datetime.datetime.now(), 'end')
 
@@ -134,6 +139,18 @@ class Command(BaseCommand):
             print('error converting XML', data)
             return
     
+
+        service_status = self.get_text(xml, 'servicestatus', None)
+        if service_status == 'Ended':
+            return
+            #d.in_service = False
+        elif service_status == 'Active':
+            d.in_service = True
+        else:
+            d.service_status = None
+            print('service status', service_status)
+
+    
         size = self.get_text(xml, 'MDDBSize', None)
         if size:
             size = size.replace('GB','')
@@ -149,15 +166,20 @@ class Command(BaseCommand):
         #d.cpu = self.get_text(xml, 'cpu', 0)
         #d.ram = self.get_text(xml, 'ram', 0)
 
+        d.url = self.get_text(xml, 'databaseURL', None)
+
+        on_call = self.get_text(xml, 'monitoringsystem', None)
+        if on_call == 'businesshours':
+            d.on_call = 0
+        elif on_call == '247':
+            d.on_call = 1
+        else:
+            print('warning on_call ', on_call, 'not found')
+
+
+
         d.purpose = self.get_text(xml, 'databasepurpose', '')
 
-        service_status = self.get_text(xml, 'servicestatus', None)
-        if service_status == 'Ended':
-            d.in_service = False
-        elif service_status == 'Active':
-            d.in_service = True
-        else:
-            print('service status', service_status)
 
         if self.get_text(xml, 'MDsharedordedicated', None) == 'dedicated':
             try:
