@@ -1285,7 +1285,7 @@ class Item(models.Model):
             if db_type:
                 db_choice = Choice.objects.get(parent__code='DATABASE_TYPE', label=db_type)
                 db = Database.objects.update_or_create(server=rec,
-                    defaults={'name': rec.name, 'owner': rec.owner, 'support_email': rec.support_email, 'support_phone': rec.support_phone, type: db_choice, 'shortcode': rec.shortcode, 'size': 0, 'purpose': 'dedicated server'})
+                    defaults={'name': rec.name, 'owner': rec.owner, 'support_email': rec.support_email, 'support_phone': rec.support_phone, 'type': db_choice, 'shortcode': rec.shortcode, 'size': 0, 'purpose': 'dedicated server'})
         except:
             print('error creating database')
 
