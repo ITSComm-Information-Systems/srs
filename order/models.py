@@ -624,7 +624,7 @@ class Server(models.Model):
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     admin_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
     shortcode = ShortCodeField()
-    created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(default=timezone.now, null=True)
     #shortcode = models.CharField(max_length=100) 
     public_facing = models.BooleanField(default=False)
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>

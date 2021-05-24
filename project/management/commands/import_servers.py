@@ -172,6 +172,8 @@ class Command(BaseCommand):
 
             print(f'Out of Service Ignored {self.out_of_service_count}')
             print(f'Processed {line_count} lines.')
+            print(f'Loaded {self.LOADS} lines.')
+            print(f'Errors {self.ERRORS} lines.')
 
         print(datetime.datetime.now(), 'end')
 
@@ -316,7 +318,7 @@ class Command(BaseCommand):
         else:
             s.public_facing = False
 
-        s.created_date = self.get_text(xml, 'subscribedDate', '')
+        s.created_date = self.get_text(xml, 'subscribedDate', None)
 
         s.backup_time_id = self.get_time('dailybackuptime', BACKUP_TIME, s.name)
         s.patch_time_id = self.get_time('patchingScheduleTime', PATCH_TIME, s.name)
