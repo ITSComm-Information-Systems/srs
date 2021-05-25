@@ -1151,6 +1151,10 @@ class Item(models.Model):
                 payload['Title'] = 'New MiServer Request'
                 mod_man = None
                 os_id = None
+                if self.data.get('public_facing') == 'True':
+                    attributes.append({'ID': 1967, 'Value': 'public'})
+                else:
+                    attributes.append({'ID': 1967, 'Value': 'secure'})
 
             db = self.data.get('database')
             if db:
