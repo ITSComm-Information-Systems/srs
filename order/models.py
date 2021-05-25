@@ -7,6 +7,7 @@ from django.db import models
 from django.forms.fields import DecimalField
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
+from project.integrations import MCommunity
 from project.models import ShortCodeField, Choice
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
@@ -1178,10 +1179,17 @@ class Item(models.Model):
                 if self.data.get('volaction') == 'Delete':
                     payload['Title'] = 'Delete MiServer'
                 else:
-                    if dedicated:
+                    if dedicated: # modifying a dedicated DB server
                         attributes.append({'ID': 1953, 'Value': instance.admin_group.name})  # Admin Group
                     else:
-                        attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
+                        owner = self.data.get('owner')
+                        try:
+                            group = MCommunity().get_group_email(owner)
+                            group = f'{owner} | {group}'
+                            attributes.append({'ID': 1953, 'Value': group})  # Admin Group
+                        except:
+                            print('error getting MC group')
+                            attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
 
                 managed = self.data.get('managed', mod_man)
                 if managed == 'True' or db:
