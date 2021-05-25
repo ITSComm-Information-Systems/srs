@@ -1142,17 +1142,20 @@ class Item(models.Model):
                 if self.data.get('volaction') == 'Delete':
                     attributes.append({'ID': 1959, 'Value': instance.name})
                     attributes.append({'ID': 1951, 'Value': 202})
-                    payload['Title'] = 'Delete MiServer'
+                    payload['Title'] = f'Delete MiServer {instance.name}'
                 else:
+                    attributes.append({'ID': 1959, 'Value': instance.name})
                     attributes.append({'ID': 1951, 'Value': 201})
+                    payload['Title'] = f'Modify MiServer {instance.name}'
             else:
+                payload['Title'] = 'New MiServer Request'
                 mod_man = None
                 os_id = None
 
             db = self.data.get('database')
             if db:
                 if self.data.get('volaction') == 'Delete':
-                    payload['Title'] = 'Delete MiDatabase'
+                    payload['Title'] = 'Delete MiDatabase'  # TODO Unreachable?
                 else:
                     attributes.append({'ID': 1953, 'Value': self.data.get('ad_group')})  # Admin Group
 
