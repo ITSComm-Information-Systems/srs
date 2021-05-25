@@ -1037,7 +1037,11 @@ class Item(models.Model):
             rec = globals()[route['record']].objects.get(id=self.data.get('instance_id'))
         
         if self.data.get('volaction') == 'Delete':
-            rec.delete()
+            if action.service.id == 14:  # MiDatabase
+                rec.in_service = False
+                rec.save()
+            else:
+                rec.delete()
         else:
             if action.service.id == 8:
                 self.update_mibackup(rec)
