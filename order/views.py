@@ -884,6 +884,15 @@ class ServerView(UserPassesTestMixin, View):
     def post(self, request, instance_id, action):
         instance = get_object_or_404(Server, pk=instance_id)
         create_ticket_server_delete(instance, request.user, f'End Service for {instance.name}')
-        instance.delete()
+
+        instance.in_service = False
+        instance.save()
+
+        try:
+            db = Database.objects.get(server=instance)
+            db.in_service = False
+            db.save()
+        except:
+            print('matching db not found')
 
         return HttpResponseRedirect('/requestsent') 

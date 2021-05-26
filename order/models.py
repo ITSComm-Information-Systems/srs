@@ -7,6 +7,7 @@ from django.db import models
 from django.forms.fields import DecimalField
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
+from project.integrations import MCommunity
 from project.models import ShortCodeField, Choice
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
@@ -1036,7 +1037,11 @@ class Item(models.Model):
             rec = globals()[route['record']].objects.get(id=self.data.get('instance_id'))
         
         if self.data.get('volaction') == 'Delete':
-            rec.delete()
+            if action.service.id == 14:  # MiDatabase
+                rec.in_service = False
+                rec.save()
+            else:
+                rec.delete()
         else:
             if action.service.id == 8:
                 self.update_mibackup(rec)
@@ -1142,17 +1147,24 @@ class Item(models.Model):
                 if self.data.get('volaction') == 'Delete':
                     attributes.append({'ID': 1959, 'Value': instance.name})
                     attributes.append({'ID': 1951, 'Value': 202})
-                    payload['Title'] = 'Delete MiServer'
+                    payload['Title'] = f'Delete MiServer {instance.name}'
                 else:
+                    attributes.append({'ID': 1959, 'Value': instance.name})
                     attributes.append({'ID': 1951, 'Value': 201})
+                    payload['Title'] = f'Modify MiServer {instance.name}'
             else:
+                payload['Title'] = 'New MiServer Request'
                 mod_man = None
                 os_id = None
+                if self.data.get('public_facing') == 'True':
+                    attributes.append({'ID': 1967, 'Value': 'public'})
+                else:
+                    attributes.append({'ID': 1967, 'Value': 'secure'})
 
             db = self.data.get('database')
             if db:
                 if self.data.get('volaction') == 'Delete':
-                    payload['Title'] = 'Delete MiDatabase'
+                    payload['Title'] = 'Delete MiDatabase'  # TODO Unreachable?
                 else:
                     attributes.append({'ID': 1953, 'Value': self.data.get('ad_group')})  # Admin Group
 
@@ -1171,10 +1183,17 @@ class Item(models.Model):
                 if self.data.get('volaction') == 'Delete':
                     payload['Title'] = 'Delete MiServer'
                 else:
-                    if dedicated:
+                    if dedicated: # modifying a dedicated DB server
                         attributes.append({'ID': 1953, 'Value': instance.admin_group.name})  # Admin Group
                     else:
-                        attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
+                        owner = self.data.get('owner')
+                        try:
+                            group = MCommunity().get_group_email(owner)
+                            group = f'{owner} | {group}'
+                            attributes.append({'ID': 1953, 'Value': group})  # Admin Group
+                        except:
+                            print('error getting MC group')
+                            attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
 
                 managed = self.data.get('managed', mod_man)
                 if managed == 'True' or db:
@@ -1270,8 +1289,10 @@ class Item(models.Model):
         if os:
             rec.os = Choice.objects.get(id=os)
         elif self.data.get('database'):
+            rec.on_call = 1   # Server is on call even if DB is not
             if self.data.get('database') == 'MSSQL':
                 rec.os = Choice.objects.get(code='Windows2019managed')
+                rec.backup = True
                 rec.backup_time_id = 13  # 6:00 PM
                 rec.patch_day_id = 98    # Saturday
                 rec.patch_time_id = 40   # 5:00 AM
