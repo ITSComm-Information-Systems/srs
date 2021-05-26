@@ -1289,6 +1289,7 @@ class Item(models.Model):
         if os:
             rec.os = Choice.objects.get(id=os)
         elif self.data.get('database'):
+            rec.on_call = 1   # Server is on call even if DB is not
             if self.data.get('database') == 'MSSQL':
                 rec.os = Choice.objects.get(code='Windows2019managed')
                 rec.backup = True
