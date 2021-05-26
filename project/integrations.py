@@ -40,6 +40,16 @@ class MCommunity:
             print(f'none found for {name}')
             self = None
 
+    def get_group_email(self, name):
+        self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["umichGroupEmail"])
+
+        try:
+            umichGroupEmail = self.conn.entries[0].entry_attributes_as_dict['umichGroupEmail'][0]
+            return umichGroupEmail + '@umich.edu'
+        except:
+            print(f'error getting email for {name}')
+
+
 
 class UmAPI:
     CLIENT_ID = settings.UM_API['CLIENT_ID']
