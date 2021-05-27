@@ -1,7 +1,22 @@
 from rest_framework import serializers
 
-from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain
+from project.models import Choice
+from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database, ServerDisk
 from oscauth.models import LDAPGroup, LDAPGroupMember
+from django.db import models
+
+class ServerDiskSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ServerDisk
+        fields = ['name', 'size']
+
+class ChoiceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Choice
+        exclude = ['sequence']
+
 
 def serializer_factory(model):
     name = model.__name__
@@ -11,9 +26,38 @@ def serializer_factory(model):
         'fields': '__all__'
     }
     meta = type('Meta', (), meta_attrs)
-    #TODO string related fields
+    class_attrs = {'Meta': meta}
 
-    return type(f'{name}Serializer', (serializers.ModelSerializer,), {'Meta': meta})
+    for fld in model._meta.get_fields():
+        if type(fld) == models.fields.related.ForeignKey:
+            if fld.related_model == Choice:
+                class_attrs[fld.name] = ChoiceSerializer()
+            else:
+                class_attrs[fld.name] = serializers.StringRelatedField()
+        elif type(fld) == models.fields.related.ManyToManyField:
+            if fld.related_model == Choice:
+                class_attrs[fld.name] = ChoiceSerializer(many=True)
+            else:
+                class_attrs[fld.name] = serializers.StringRelatedField(many=True)
+
+    if model == Server:   #TODO handle children
+        class_attrs['disks'] = ServerDiskSerializer(many=True, read_only=True)
+
+
+    return type(f'{name}Serializer', (serializers.ModelSerializer,), class_attrs)
+
+class DatabaseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        exclude = ['id']
+        model = Database
+
+
+class StorageRateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ['id','name','label', 'display_seq_no','type','rate','unit_of_measure','service']
+        model = StorageRate
 
 
 class RateSerializer(serializers.ModelSerializer):

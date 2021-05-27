@@ -1,5 +1,5 @@
 #from django.contrib.auth.models import User
-from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain
+from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from rest_framework import routers, viewsets
 from . import serializers
@@ -41,7 +41,9 @@ class DefaultViewSet(viewsets.ModelViewSet):
         kwargs = {}
 
         for parm, val in self.request.GET.items():
-            if hasattr(self.serializer_class.Meta.model, parm):
+            field = parm.split('__')[0]
+
+            if hasattr(self.serializer_class.Meta.model, field):
                 kwargs[parm] = val
 
         queryset = queryset.filter(**kwargs)
@@ -64,9 +66,12 @@ def viewset_factory(model, serializer_class=None):
 # Register URLs for API
 router = routers.DefaultRouter()
 router.register('storageinstances', viewset_factory(StorageInstance, serializers.StorageInstanceSerializer))
-router.register('storagerates', viewset_factory(StorageRate))
+router.register('storagerates', viewset_factory(StorageRate, serializers.StorageRateSerializer))
 router.register('arcinstances', viewset_factory(ArcInstance, serializers.ArcInstanceSerializer))
 router.register('arcbilling', viewset_factory(ArcBilling, serializers.ArcBillingSerializer))
 router.register('backupdomains', viewset_factory(BackupDomain, serializers.BackupDomainSerializer))
+#router.register('server', viewset_factory(Server, serializers.ServerSerializer))
+router.register('server', viewset_factory(Server))
+router.register('database', viewset_factory(Database, serializers.DatabaseSerializer))
 router.register('ldapgroups', LDAPGroupViewSet)
 router.register('ldapgroupmembers', LDAPGroupMemberViewSet)

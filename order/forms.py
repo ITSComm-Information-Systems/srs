@@ -1,12 +1,19 @@
 from django import forms
-from django.forms import ModelForm
+from django.core import validators
+#from django.db.models.fields import IntegerField
+from django.forms import ModelForm, formset_factory
 #from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember, StorageHost, StorageRate
 from .models import *
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 from oscauth.models import LDAPGroupMember
+from project.integrations import MCommunity, create_ticket_database_modify
+import math
+from project.models import Choice
 
 from project.forms.fields import *
+
+get_choices = Choice.objects.get_choices
 
 def get_storage_options(action):
     opt_list = []
@@ -91,24 +98,36 @@ class TabForm(forms.Form):
             if key in visible:  # Add visible fields to the review page
                 label = field.label
  
-                if field.type == 'Radio':
+                if field.type == 'Radio' or field.type == 'Select':
                     for choice in field.choices:
-                        if str(choice[0]) == value:
-                            value = choice[1]
+                        if isinstance(choice[1], str):
+                            if str(choice[0]) == value:
+                                value = choice[1]
+                                break
+                        else:  # Search Optgroup
+                            for choice in choice[1]:
+                                if str(choice[0]) == value:
+                                    value = choice[1]
+                                    break
 
                 if field.type == 'Checkbox':  
                     label = field.choices[0][1]
                     if len(field.choices) > 1:  # Process list of options
                         label = field.label
-                        value = ', '.join(value)
+                        selections = []
+                        for choice in field.choices:
+                            if str(choice[0]) in value:
+                                selections.append(choice[1])
+                        
+                        value = selections
                     elif len(value) > 0:  
                         value = 'Yes'
                     else:
                         value = 'No'
 
                 if field.type == 'List':  
-                    list = self.data.getlist(key)
-                    value = ', '.join(list)
+                    value_list = self.data.getlist(key)
+                    value = ', '.join(value_list)
 
                 if self.action.type == 'M':
 
@@ -190,7 +209,10 @@ class TabForm(forms.Form):
                     elif key in self.changed_data:
                         label = '*' + label
 
-                summary.append({'label': label, 'value': value})
+                if isinstance(value, list):
+                    summary.append({'name': getattr(field, 'name', '-'), 'label': label, 'value': '', 'list': value})
+                else:
+                    summary.append({'name': getattr(field, 'name', '-'), 'label': label, 'value': value})
 
         return summary
 
@@ -198,11 +220,18 @@ class TabForm(forms.Form):
         self.request = kwargs.pop('request', None)
         super(TabForm, self).__init__(*args, **kwargs)
 
+
+
+
         if action.service.id == 7:
             self.vol = StorageInstance
             self.host = StorageHost
         elif action.service.id == 8:
             self.vol = BackupDomain
+        elif action.service.id == 13:
+            self.vol = Server
+        elif action.service.id == 14:
+            self.vol = Database
         else:
             self.vol = ArcInstance
             self.host = ArcHost
@@ -226,12 +255,17 @@ class TabForm(forms.Form):
                                                                         #AuthUserDept.get_order_departments(request.user.id)
                 field.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
             elif element.type == 'NU':
-                field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1", 'class': 'form-control'}))
-                field.initial = element.attributes
+                field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1", 'class': 'form-control'}), **element.arguments)
                 field.template_name = 'project/number.html'
-            elif element.type == 'ST' or element.type == 'List':
-                field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+            elif element.type == 'Select':
+                field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.Select(attrs={'class': 'form-control'}))
+                #field.initial = element.attributes
                 field.template_name = 'project/text.html'
+            elif element.type == 'ST' or element.type == 'List':
+                field = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), **element.arguments)
+                field.template_name = 'project/text.html'
+                if element.attributes:
+                    field.widget.input_type = element.attributes
             elif element.type == 'Checkbox':
                 field = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=eval(element.attributes))
                 field.template_name = 'project/checkbox.html'
@@ -241,12 +275,34 @@ class TabForm(forms.Form):
             elif element.type == 'McGroup--':
                 field = McGroup()
                 field.template_name = 'project/static.html'
+            elif element.type == 'MyGroups':
+                group_list = MCommunity().get_groups(self.request.user.username)
+
+                choice_list = [(None, '---')]
+                for group in group_list:
+                    choice_list.append((group, group,))
+
+                field = forms.ChoiceField(choices=choice_list, widget=forms.Select(attrs={'class': 'form-control'}))
+                #field.initial = element.attributes
+                field.template_name = 'project/text.html'
+            elif hasattr(forms, element.type):
+                fld = getattr(forms, element.type)
+                field = fld(**element.arguments)
+                field.widget.attrs={'class': 'form-control'}
+                field.template_name = 'project/text.html'
+
             else:
                 # Use custom field from project.forms.fields
                 field = globals()[element.type](label=element.name)
                 #field.field_name = element.name
                 field.template_name = 'project/text.html'
                 #field = forms.IntegerField(label=element.label, help_text=element.description)
+
+            if element.attributes == 'optional':
+                field.required = False
+
+            if not hasattr(field, 'template_name'):
+                field.template_name = 'project/text.html'
 
             field.name = element.name
             field.current_user = self.request.user
@@ -275,6 +331,18 @@ class TabForm(forms.Form):
                 instance_id = self.request.POST.get('instance_id')
                 if instance_id:
                     self.set_initial(instance_id)
+
+        if self.is_bound:
+            try:
+                vis = self.request.POST['visible']
+                visible = vis.split(',')
+                
+                for field in self.fields:
+                    if field not in visible:
+                        self[field].field.required = False
+            except:
+                print('error checking visible')
+
 
 
 class BillingForm(TabForm):
@@ -416,13 +484,21 @@ class VolumeSelectionForm(TabForm):
         #summary = super().get_summary(*args, **kwargs)
 
         instance = self.vol.objects.get(id=self.data['instance_id'])
+        service = Action.objects.get(id=self.request.POST.get('action_id')).service
+        
+        if service.id == 13:
+            label = 'Server'
+        elif service.id == 14:
+            label = 'Database'
+        else:
+            label = 'Volume'
 
         if self.data.get('volaction') == 'Delete':
-            summary = [{'label': 'Are you sure you want to delete this volume?', 'value': ''}
-                        ,{'label': 'Volume Name:', 'value': instance.name}
+            summary = [{'label': f'Are you sure you want to delete this {label}?', 'value': ''}
+                        ,{'label': f'{label} Name:', 'value': instance.name}
                         ,{'label': 'Owner:', 'value': instance.owner.name}]
         else:
-            summary = [{'label': 'Volume Name:', 'value': instance.name}]
+            summary = [{'label': f'{label} Name:', 'value': instance.name}]
 
         return summary
 
@@ -442,6 +518,22 @@ class VolumeSelectionForm(TabForm):
             if 'storage_type' in action.override:
                 vol_type = action.override['storage_type']
                 self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name')
+            elif service.id == 13:
+                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name')
+                self.detail = [{'name': 'CPU', 'quantity': 2, 'cost': 14.33},{'name': 'RAM', 'quantity': 4, 'cost': 4.20},{'name': 'DISK', 'quantity': 55, 'cost': 1.69}]
+                self.cost_types = ['CPU', 'RAM', 'QUANTITY']
+
+                if self.action.label.startswith('Review'):
+                    self.template = 'order/server_review.html'
+                else:
+                    self.template = 'order/server_modify.html'
+            elif service.id == 14:
+                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name')
+
+                if self.action.label.startswith('Review'):
+                    self.template = 'order/database_review.html'
+                else:
+                    self.template = 'order/database_modify.html'
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
                     
@@ -551,6 +643,396 @@ class DetailsNFSForm(TabForm):
         #            self.fields['flux'].initial = si.flux  
 
 
+class DatabaseTypeForm(TabForm):
+    template = 'order/database_type.html'
+
+
+    def __init__(self, *args, **kwargs):
+        super(DatabaseTypeForm, self).__init__(*args, **kwargs)
+
+        self.fields['size'].widget.attrs.update({'step': 10})
+
+
+    def clean(self):
+        size = self.cleaned_data.get('size', 0)
+        if size % 10 != 0:
+            self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
+
+        if self.is_valid() and self.request.POST.get('shared') == 'Dedicated':
+            self.fields['size'].widget.attrs.update({'data-server': 99})
+            raise ValidationError("Selections require dedicated server")
+
+        super().clean()
+
+
+class DatabaseConfigForm(TabForm):
+
+    def __init__(self, *args, **kwargs):
+        super(DatabaseConfigForm, self).__init__(*args, **kwargs)
+
+        try:
+            if not Choice.objects.get(id=self.request.POST.get('midatatype')).code == 'MYSQL':
+                self.fields.pop('url') 
+        except:
+            print('error getting database type')
+
+
+
+class ServerInfoForm(TabForm):
+    template = 'order/base_form.html'
+
+    def __init__(self, *args, **kwargs):
+        super(ServerInfoForm, self).__init__(*args, **kwargs)
+
+        if self.request.method == 'GET':
+            type = self.request.GET.get('type', None)
+            #version = self.request.GET.get('version', None)
+            size = self.request.GET.get('size', None)
+        else:
+            type = self.request.POST.get('database', None)
+            #version = self.request.POST.get('version', None)
+            size = self.request.POST.get('size', None)
+
+        if type:
+            self.fields['database'].widget.attrs.update({'readonly': True})
+            self.fields['database'].initial = type
+            self.fields['size'].widget.attrs.update({'readonly': True}) 
+            self.fields['size'].initial = size
+            self.fields.pop('misevexissev')
+            self.fields['ad_group'].initial = 'MiDatabase Support Team'
+            self.fields['ad_group'].widget.attrs.update({'readonly': True})
+        else:
+            self.fields.pop('size') 
+            self.fields.pop('database') 
+            self.fields.pop('ad_group') 
+
+class ServerSupportForm(TabForm):
+    template = 'order/server_support.html'
+
+    def __init__(self, *args, **kwargs):
+        super(ServerSupportForm, self).__init__(*args, **kwargs)
+
+        self.fields['support_phone'].validators = [validators.RegexValidator(
+                regex='^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$',
+                message='Please provide a 10 digit phone number.',
+                code='invalid_username')]
+
+        if self.action.service.name=='midatabase':
+            self.fields.pop('backup_time')
+            self.fields.pop('patch_day')
+            self.fields.pop('patch_time')
+            self.fields.pop('reboot_day')
+            self.fields.pop('reboot_time')
+            return
+
+        if hasattr(self, 'instance'):
+            self.initial = self.instance.__dict__
+            self.initial['patch_day'] = str(self.instance.patch_day_id)
+            self.initial['patch_time'] = str(self.instance.patch_time_id)
+            self.initial['reboot_day'] = str(self.instance.reboot_day_id)
+            self.initial['reboot_time'] = str(self.instance.reboot_time_id)
+            self.initial['backup_time'] = str(self.instance.backup_time_id)
+            self.initial['on_call'] = str(self.instance.on_call)
+
+        instance_id = self.request.POST.get('instance_id')
+        if hasattr(self, 'instance') and not self.is_bound:
+            for field in ['patch_day','patch_time','reboot_day','reboot_time','backup_time']:
+                choice = getattr(self.instance, field)
+                if choice:
+                    self.fields[field].initial = choice.id
+
+        if instance_id:
+            server = Server.objects.get(id=instance_id)
+            os_id = server.os_id
+            if not server.managed:
+                mang = 'unmang'
+            else:
+                mang = 'mang'
+
+            try:
+                database = Database.objects.get(server=server)
+                db = database.type.code
+            except:
+                db = None
+        else:
+            mang = None
+            server = None
+            os_id = None
+            db = None
+
+        if self.request.POST.get('database', db):
+            db = self.request.POST.get('database', db)
+            if db == 'MSSQL':
+                windows = True
+                self.fields['backup_time'].disabled = True
+                self.fields['backup_time'].initial = Choice.objects.get(parent__code='SERVER_BACKUP_TIME', code='1800').id
+                self.fields['patch_day'].disabled = True
+                self.fields['patch_day'].initial = Choice.objects.get(parent__code='SERVER_PATCH_DATE', code='SAT').id
+                self.fields['patch_time'].disabled = True
+                self.fields['patch_time'].initial = Choice.objects.get(parent__code='SERVER_PATCH_TIME', code='0500').id
+            else:
+                windows = False
+        else:
+            os = kwargs['request'].POST.get('misevos', os_id)
+            os = Choice.objects.get(id=os).label
+
+            if os.startswith('Windows'):
+                windows = True
+            else:
+                windows = False
+
+        if kwargs['request'].POST.get('managed', mang) == 'unmang' or not windows:
+            self.fields.pop('patch_day')
+            self.fields.pop('patch_time')
+            self.fields.pop('reboot_day')
+            self.fields.pop('reboot_time')
+
+        if kwargs['request'].POST.get('backup') == 'False':
+            self.fields.pop('backup_time')
+            
+
+class ServerDataForm(TabForm):
+    template = 'order/server_data.html'
+
+    def clean(self):
+
+        if self.request.POST.get('managed') == 'False':
+            if self.request.POST.get('misevregu') == 'True':
+                raise ValidationError("Please select a managed server for sensitive data.")
+            if self.request.POST.get('misevnonregu') == 'True':
+                raise ValidationError("Please select a managed server for sensitive data.")
+
+        super().clean()
+
+
+class DiskForm(forms.ModelForm):
+    id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    name = forms.CharField()
+    name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
+
+    size = forms.IntegerField(initial=10)
+    size.widget.attrs.update({'class': 'form-control disk-size validate-integer', 'step': 10, 'min': '10'})  
+
+    uom = forms.ChoiceField(choices=(('GB','GB'),('TB','TB')))
+    uom.widget.attrs.update({'class': 'form-control disk-uom'})  
+
+    class Meta:
+        model = ServerDisk
+        fields = ['id', 'name', 'size']
+
+    def clean(self):
+
+        current_size = self.initial.get('size')
+        if current_size:
+            if self.cleaned_data.get('size', 0) < current_size:
+                if self.cleaned_data.get('uom') != 'TB':
+                    self.add_error('size', f'Disk size cannot be decreased. Select a size of {current_size} or more.')
+
+        if self.cleaned_data.get('uom') == 'GB' and self.cleaned_data.get('size', 0) < 1000:
+            if self.cleaned_data.get('size', 0) % 10 != 0:
+                self.add_error('size', 'Disk size must be in increments of 10 Gigabytes.')
+            elif self.cleaned_data.get('name') == 'disk0' and self.cleaned_data.get('size', 0) < 50:
+                self.add_error('size', f'Disk 0 must be 50 GB or more.')
+
+        elif self.cleaned_data.get('uom') == 'TB' and self.cleaned_data.get('size', 0) > 10:
+            self.add_error('size', 'Disk size must be 10 TB or less.')            
+
+        super().clean()
+
+
+class DiskDisplayForm(forms.ModelForm):
+    name = forms.CharField()
+    name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
+
+    size = forms.IntegerField(min_value=1, initial=10)
+    size.widget.attrs.update({'class': 'form-control disk-size', 'readonly': True})  
+
+    uom = forms.ChoiceField(choices=(('GB','GB'),('TB','TB')))
+    uom.widget.attrs.update({'class': 'form-control', 'readonly': True})  
+
+    class Meta:
+        model = ServerDisk
+        fields = ['id', 'name', 'size']
+
+
+class ServerSpecForm(TabForm):
+    template = 'order/server_spec.html'
+
+    uom_list = ['GB','TB']
+    DiskFormSet = formset_factory(DiskForm, extra=0)
+    DiskDisplayFormSet = formset_factory(DiskDisplayForm, extra=0)
+    size_edit = forms.IntegerField(widget=forms.HiddenInput(), required=False, initial=0)
+
+    for rate in StorageRate.objects.filter(name__startswith='SV-'):
+        if rate.name == 'SV-RAM':
+            ram_rate = rate.rate
+        elif rate.name == 'SV-DI-REP':
+            disk_replicated = rate.rate
+        elif rate.name == 'SV-DI-NONREP':
+            disk_no_replication = rate.rate
+        elif rate.name == 'SV-DI-BACKUP':
+            disk_backup = rate.rate
+
+    def __init__(self, *args, **kwargs):
+        super(ServerSpecForm, self).__init__(*args, **kwargs)
+
+        if hasattr(self, 'instance'):
+            self.initial = self.instance.__dict__
+            self.initial['backup'] = str(self.instance.backup)
+            self.initial['replicated'] = str(self.instance.replicated)
+
+            if self.instance.os.label.startswith('Windows'):
+                self.fields['size_edit'].initial = 1
+
+        if self.request.POST.get('database'):
+            self.set_database_defaults()
+            if self.is_bound:
+                self.disk_formset = self.DiskDisplayFormSet(self.request.POST)            
+            else:
+                self.disk_formset = self.DiskDisplayFormSet(initial=self.disk_list)
+            return
+
+        instance_id = self.request.POST.get('instance_id')
+
+        if self.is_bound:
+            self.disk_formset = self.DiskFormSet(self.request.POST, initial=ServerDisk.objects.filter(server_id=instance_id).order_by('name').values())
+            #x = self.disk_formset.is_valid()
+        elif self.request.POST.get('action_type') == 'M':          
+            self.disk_formset = self.DiskFormSet(initial=ServerDisk.objects.filter(server_id=instance_id).order_by('name').values())
+        else:
+            self.fields['size_edit'].initial = 1
+            self.disk_formset = self.DiskFormSet(initial=[{'num': 0, 'name': 'disk0', 'size': 50, 'uom': 'GB'}])
+            self.fields['cpu'].initial = 1
+            self.fields['managed'].initial = True
+
+    def set_database_defaults(self):
+        
+        database = self.request.POST.get('database')
+        database_size = self.request.POST.get('size')
+        #database_version = self.request.POST.get('database_version')
+
+        cpu = self.request.POST.get('cpu', 2)
+        ram = self.request.POST.get('ram')
+        if ram:
+            ram = int(ram)
+        else:
+            ram = 4
+
+        self.fields['misevos'].required = False
+        self.fields['misevos'].disabled = True
+
+        self.fields['diskSize'].required = False
+
+        self.fields['managed'].required = False
+        self.fields['managed'].disabled = True
+
+        self.fields['managed'].initial = True
+        self.fields['replicated'].initial = True
+        self.fields['backup'].initial = True
+        self.fields['backup'].disabled = True
+
+        self.fields['public_facing'].disabled = True
+        self.fields['public_facing'].initial = False
+
+        if database == 'MSSQL':
+            self.fields['cpu'].widget.attrs.update({'data-server': 99, 'min': 2})
+            self.fields['cpu'].initial = 2
+            self.fields['misevos'].initial = 4
+
+            base_size = float(database_size) / 10
+            fifteen_percent = math.ceil(base_size * .15) * 10
+            thirty_percent = math.ceil(base_size * .3) * 10
+
+            if ram < 8:
+                paging_disk = 60
+            else:
+                paging_disk = math.ceil((ram-8)/4) * 10 + 60  # Source: Dude, trust me.
+                # =roundup((D45-8)/4)*10+60
+
+            self.disk_list =[{'name': 'disk0', 'size': paging_disk, 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk1', 'size': thirty_percent, 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk3', 'size': fifteen_percent, 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk4', 'size': fifteen_percent, 'uom': 'GB', 'state': 'disabled'}]
+
+        #elif database == 'MYSQL':
+        else:
+            self.fields['cpu'].initial = 2
+            self.fields['misevos'].initial = 8
+            self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk1', 'size': database_size, 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'}]
+
+    def get_summary(self, *args, **kwargs):
+        summary = super().get_summary(*args, **kwargs)
+
+        for line in summary:
+            if line['label'] == 'Server Name':
+                line['value'] = self.data.get('name')
+
+            #if line['label'] == 'Disk Space':
+            #    break
+
+        disk_review = []
+        disk_size = 0
+
+        #if self.disk_formset.is_valid:
+        #    for disk in self.disk_formset.cleaned_data:
+        #        disk_size = disk_size + int(disk['size'])
+        #        disk_review.append(f"{disk['name']} {disk['size']} {disk['uom']} ")
+
+        for form in self.disk_formset:
+            changed = ''
+            disk = form.cleaned_data
+            if disk['uom'] == 'TB':
+                disk_size = disk_size + int(disk['size']) * 1024
+            else:
+                disk_size = disk_size + int(disk['size'])
+
+            if self.action.id == 71:
+                if form.changed_data != ['uom']:
+                    changed = '*'
+
+            disk_review.append(f"{disk['name']} - {disk['size']} {disk['uom']} {changed}")
+
+        summary.append({'label': 'Disk Space', 'value': disk_size, 'list': disk_review})
+        #line['value'] = disk_size
+        #line['list'] = disk_review
+
+        return summary
+
+
+    def clean(self):
+        if not self.disk_formset.is_valid():
+            self.add_error('diskSize', '')
+
+        name = self.request.POST.get('name')
+        if name:
+            servername = Server.objects.filter(name__iexact=name)
+            if len(servername) > 0:
+                self.add_error('serverName', f'A server named {name.lower()} already exists. Please choose a different name.')
+
+        ram = self.cleaned_data.get('ram', None)
+        cpu = self.cleaned_data.get('cpu', None)
+        if ram != None and cpu != None:
+            if ram / cpu < 2:
+                self.add_error('ram', 'Ram must be at least double cpu.')
+
+            if self.action.type == 'M':
+                if self.instance.managed and cpu < 2:
+                    if self.instance.os.label.startswith('Windows'):
+                        self.add_error('cpu', 'Managed Windows requires at least two cpu.')                        
+                
+            if cpu < 2 and self.cleaned_data.get('managed', False):
+                os = self.cleaned_data.get('misevos', False)
+                if os:
+                    os_name = Choice.objects.get(id=int(os)).label
+                    if os_name.startswith('Windows'):
+                        self.add_error('cpu', 'Managed Windows requires at least two cpu.')
+    
+        super().clean()  # When regular clean isn't enough
+
+
 class DataDenForm(TabForm):
     template = 'order/accessCIFS.html'
     notice3 = Page.objects.get(permalink='/notice/3')
@@ -607,6 +1089,8 @@ class BillingStorageForm(TabForm):
         super(BillingStorageForm, self).__init__(*args, **kwargs)
         total_cost = 0
 
+        self.fields['shortcode'].validators=[validate_shortcode]
+
         if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':
             self.template = 'order/billing_storage.html'
             self.shortcode_list = []
@@ -653,6 +1137,12 @@ class BillingStorageForm(TabForm):
             option = StorageRate.objects.get(id=28)
             total_cost = option.get_total_cost(self.request.POST['size'])
             descr = self.fields['totalCost'].description.replace('~', str(total_cost))
+        elif self.action.service.name == 'midatabase':
+            descr = self.fields['totalCost'].description.replace('~', '0.00')
+            self.fields['shortcode'].label = 'Enter Shortcode for departmental tracking purposes'
+        elif self.action.service.name == 'miServer':
+            total_cost = self.request.POST.get('total_cost', 0)
+            descr = self.fields['totalCost'].description.replace('~', str(total_cost))
         else:
             option = StorageRate.objects.get(id=self.request.POST['selectOptionType'])
 
@@ -686,13 +1176,19 @@ class BillingStorageForm(TabForm):
     def get_summary(self, *args, **kwargs):
         summary = super().get_summary(*args, **kwargs)
 
-        if self.action.service.name != 'miBackup':
+        if self.action.service.name not in ['miBackup','midatabase']:
             if self.action.service.name == 'dataDen':
                 option = StorageRate.objects.get(id=28)
+            elif self.action.service.name == 'miServer':
+                option = StorageRate.objects.get(id=1)
             else:
                 option = StorageRate.objects.get(id=self.data['selectOptionType'])
 
-            total_cost = option.get_total_cost(self.data['size'])
+            if self.action.service.name == 'miServer':
+                total_cost = '$' + self.request.POST.get('total_cost', 0)
+            else:
+                total_cost = option.get_total_cost(self.data['size'])
+
             summary.append({'label': 'Total Monthly Cost', 'value': str(total_cost)})
 
         if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':
@@ -704,6 +1200,9 @@ class BillingStorageForm(TabForm):
                     label = f'{label}   \n {size_list[num]}TB to {shortcode},'
 
             summary[0]['value'] = label 
+
+
+        summary[2]['label'] = 'I have read the Sensitive Data Guide, agree that my use of this service complies with those guidelines and accept the terms of the Service Level Agreement.'
 
         #instance_id = self.data.get('instance_id')
         
@@ -812,3 +1311,53 @@ class PhoneLocationForm(TabForm):
     room = forms.CharField(label='Room', max_length=100)
     jack = forms.CharField(max_length=100)
     template = 'order/phone_location.html'
+
+class DatabaseForm(ModelForm):
+
+    size_choice = ((10, '10 GB'),(20, '20 GB'),(30, '30 GB'),(40, '40 GB'),(50, '50 GB'))
+    size = forms.ChoiceField(choices=size_choice)
+
+    owner_name = forms.ChoiceField(label='Owner', widget=forms.Select(attrs={'class': 'form-control'}))    
+    shortcode = forms.CharField(label='Shortcode', validators=[validate_shortcode])
+
+    class Meta:
+        model = Database
+        fields = ('size','support_email','support_phone','shortcode')
+
+    def __init__(self, user, *args, **kwargs):
+        super(DatabaseForm, self).__init__(*args, **kwargs)
+
+        self.user = user
+        group_list = MCommunity().get_groups(user.username)
+
+        choice_list = [(None, '---')]
+        for group in group_list:
+            choice_list.append((group, group,))
+
+        self.fields['owner_name'].choices = choice_list
+        self.fields['owner_name'].initial = self.instance.owner.name
+
+    def clean(self):
+        super().clean()
+
+        for field in self.errors:
+            self.fields[field].widget.attrs.update({'class': 'form-control is-invalid'})
+
+    def save(self, *args, **kwargs):
+
+        if 'owner_name' in self.changed_data:
+            self.instance.owner = LDAPGroup().lookup( self.cleaned_data.get('owner_name') )
+            #owner = LDAPGroup.lookup(self.cleaned_data.get('owner_name'))
+
+        if self.has_changed() and self.changed_data != ['shortcode']:  # Gotta change more than shortcode to create ticket
+
+            description = ''
+            for key, value in self.cleaned_data.items():
+                label = self.fields[key].label
+                if key in self.changed_data:
+                    value = f'{value}*'
+                description = description + f'{label}:{value} \n'
+
+            create_ticket_database_modify(self.instance, self.user, description)
+
+        super().save(*args, **kwargs)  # Call the "real" save() method.
