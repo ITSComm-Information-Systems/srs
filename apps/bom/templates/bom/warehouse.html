@@ -31,6 +31,41 @@
 
         <button type="submit" class="btn btn-primary">Save</button>
 
+        <a class='ml-auto mr-3' style="align-content: flex-end" href='/apps/bom/estimate/{{ estimate.id }}'>Return to
+            Main</a>
+        <div style="border: 1px solid black; margin: 1%;">
+            <table style="margin: 1%;">
+                <thead>
+                    <th>Status</th>
+                    <th>Staged</th>
+                    <th>Order Date</th>
+                    <th>Est Receive Date</th>
+                    <th>Release Number</th>
+                    <th>Vendor</th>
+                    <th style="width: 7%">Reel</th>
+                    <th> </th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select id="copy_status">
+                                <option value="1">Estimate</option>
+                                <option value="2">In Stock</option>
+                                <option value="3">Ordered</option>
+                            </select>
+                        </td>
+                        <td style="text-align: center; vertical-align: middle;"><input id="copy_staged" type="checkbox">
+                        </td>
+                        <td><input id="copy_order_date" type="date"></td>
+                        <td><input id="copy_estimated_receive_date" type="date"></td>
+                        <td><input id="copy_release_number"></td>
+                        <td><input id="copy_vendor"></td>
+                        <td><input id="copy_reel_number"></td>
+                        <td><button type="button" class='btn btn-success' onclick="copier()">Copy</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <a style="float:right;" href="/apps/bom/estimate/{{ estimate.id }}">Return to Main</a>
