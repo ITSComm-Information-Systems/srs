@@ -1011,6 +1011,9 @@ $('[data-tab="volumeSelection"]').on('hidden.bs.tab', function(event) {
   $("#nextBtn").show();
 });
 
+$('[data-tab="subscriptionSelect"]').on('hidden.bs.tab', function(event) {
+  $("#nextBtn").show();
+});
 
 
 });  // Document Ready
