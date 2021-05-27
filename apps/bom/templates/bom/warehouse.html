@@ -10,7 +10,9 @@
     <input type="hidden" id="current_tab" name="current_tab" value="{{ current_tab }}">
     <input type="hidden" id="element" value="{{ element }}">
 
-    <div class="row sticky-top bg-white" style="z-index: 1; width:98%; margin: auto;">
+
+    <div class="row sticky-top bg-white" style="z-index: 1;">
+
         <div class="input-group col-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon3">{{ form.status.label }}</span>
@@ -23,7 +25,7 @@
                 <span class="input-group-text" id="estimate-label">Label</span>
             </div>
 
-            <input type="text" class="form-control" name="label" value="{{ estimate.label }}" id="estimate-label"
+            <input type="text" class="form-control" name="label" value="{{ estimate.label }}" id="estimte-label"
                 aria-describedby="basic-addon3">
         </div>
 
@@ -66,18 +68,19 @@
         </div>
     </div>
 
+    <a style="float:right;" href="/apps/bom/estimate/{{ estimate.id }}">Return to Main</a>
+
     <table class="table-borderless table-hover table-striped table-sm">
         <thead>
             <tr>
-                <th style="width: 5%;">Quantity</th>
-                <th style="width: 15%;">Status</th>
+                <th style="width: 10%">Quantity</th>
+                <th style="width: 11%">Status</th>
                 <th>Staged</th>
                 <th>Order Date</th>
                 <th>Est Receive Date</th>
                 <th>Release Number</th>
                 <th>Vendor</th>
-                <th>Reel</th>
-                <th>Copy</th>
+                <th style="width: 7%">Reel</th>
             </tr>
         </thead>
         {% for form in material_formset %}
@@ -86,21 +89,18 @@
             <tr>
                 <td colspan="7"><b>{{rec.item_code}}</b> - {{ rec.item_description }} &emsp;
                     <i>({{rec.manufacturer}} - {{rec.manufacturer_part_number}})</i>
-                    &nbsp;&nbsp;Location: {{ rec.material_location }}
-                </td>
+                    &nbsp;&nbsp;Location: {{ rec.material_location }}</td>
             </tr>
             <tr class="border-bottom">
                 {{ form.id }}
                 <td>{{ form.quantity }}</td>
                 <td>{{ form.status }}</td>
-                <td style="text-align: center; vertical-align: middle;">{{ form.staged }}</td>
+                <td>{{ form.staged }}</td>
                 <td>{{ form.order_date }}</td>
                 <td>{{ form.estimated_receive_date }}</td>
                 <td>{{ form.release_number }}</td>
                 <td>{{ form.vendor }}</td>
                 <td>{{ form.reel_number }}</td>
-                <td id='info' style="text-align: center; vertical-align: middle;"><input type="checkbox" value='{{ form.id }}'>
-                </td>
             </tr>
             {% if form.errors %}
             <tr>
@@ -120,10 +120,12 @@
         {% endwith %}
         {% endfor %}
     </table>
-
+    
 </form>
 
 {% endblock content %}
+
+
 
 {% block js %}
 <script>
@@ -133,6 +135,7 @@
     $(document).ready(function () {
 
         $('[data-toggle="popover"]').popover();
+
         // Class form up with bootstrap
         $("select").addClass("form-control custom-select");
         $('input:not(:checkbox)').addClass("form-control");
@@ -143,30 +146,9 @@
         if (status == 0 || status > 3) {
             $(':input').not('.always-enabled').prop("disabled", true);
         }
+
+
     });
 
-    function copier() {
-        var tocopy = document.querySelectorAll('#info input[type="checkbox"]:checked');
-        var status = document.querySelector("#copy_status").value;
-        var staged = document.querySelector("#copy_staged").checked;
-        var order_date = document.querySelector("#copy_order_date").value;
-        var estimated_receive_date = document.querySelector("#copy_estimated_receive_date").value;
-        var release_number = document.querySelector("#copy_release_number").value;
-        var vendor = document.querySelector("#copy_vendor").value;
-        var reel_number = document.querySelector("#copy_reel_number").value;
-
-        console.log(tocopy)
-        for (i = 0; i < tocopy.length; ++i) {
-            var num = tocopy[i].value.split(' ')[2].split('-')[1];
-            document.getElementById("id_material-" + num + "-status").value = status;
-            document.getElementById("id_material-" + num + "-staged").checked = staged;
-            document.getElementById("id_material-" + num + "-order_date").value = order_date;
-            document.getElementById("id_material-" + num + "-estimated_receive_date").value = estimated_receive_date;
-            document.getElementById("id_material-" + num + "-release_number").value = release_number;
-            document.getElementById("id_material-" + num + "-vendor").value = vendor;
-            document.getElementById("id_material-" + num + "-reel_number").value = reel_number;
-
-        }
-    }
 </script>
 {% endblock js %}

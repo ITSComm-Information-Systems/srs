@@ -7,7 +7,7 @@
         <h2 class="service-menu-header">Category</h2>
         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
             {% for service in service_list %}
-            <a class="nav-link" id="{{ service.name }}-tab" data-toggle="pill" href="#{{ service.name }}" role="tab"
+            <a class="nav-link {{ service.active }}" id="{{ service.name }}-tab" data-toggle="pill" href="#{{ service.name }}" role="tab"
                 aria-controls="v-pills-profile" aria-selected="false">{{ service }}</a>
             {% endfor %}
         </div>
@@ -19,7 +19,7 @@
 
     <div class="tab-content col-xl-6 col-md-9 col-12" id="v-pills-tabContent">
         {% for service in service_list %}
-        <div class="tab-pane fade" id="{{ service.name }}" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+        <div class="tab-pane fade {{ service.active }}" id="{{ service.name }}" role="tabpanel" aria-labelledby="v-pills-profile-tab">
             <div class="row service" id="{{service.name}}" name="serviceCards">
                 <h3 class="lead">{{ service }}</h3>
                 <div class="col-md-12 card-deck">
@@ -76,12 +76,12 @@
 
             $(hash + '-tab').addClass(' active');
             $(hash).addClass(' active show');
-        } else {
-            $('#phoneData-tab').addClass(' active');
-            $('#phoneData').addClass(' active show');
+        //} else {
+            //$('#phoneData-tab').addClass(' active');
+            //$('#phoneData').addClass(' active show');
 
-            $('#miBackup-tab').addClass(' active');
-            $('#miBackup').addClass(' active show');
+            //$('#miBackup-tab').addClass(' active');
+            //$('#miBackup').addClass(' active show');
         }
 
         $('.nav-link').on('show.bs.tab', function (event) {

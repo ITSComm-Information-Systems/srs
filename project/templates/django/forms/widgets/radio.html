@@ -3,7 +3,8 @@
 {% for choice in options %}
 <div class="form-group form-check">
     <input class="form-check-input {{ widget.attrs.class }}" type="radio" value="{{ choice.value }}" name="{{ widget.name }}" id="{{ choice.name }}_{{ index }}" required
-    {%if choice.selected %} checked {% endif %}>
+    {%if choice.selected %} checked {% endif %}
+    {% include "django/forms/widgets/attrs.html" %}>
     <label class="form-check-label " for="{{ choice.name }}_{{ index }}">{{ choice.label }}</label>
     {% if forloop.parentloop.last %}
     <div class="invalid-feedback"><i class="fas fa-exclamation-triangle"

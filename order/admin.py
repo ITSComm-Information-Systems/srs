@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.urls import path
 
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -19,7 +19,7 @@ class ActionAdmin(admin.ModelAdmin):
     list_filter = ('service','type')
     list_display  = ['display_seq_no','label','service','type']
     ordering = ('service','display_seq_no',)
-    fields = ('name',('label','use_cart','cart_label'), ('display_seq_no','active','use_ajax'),('service','type'), 'description', ('steps','charge_types'), ('route','destination'))
+    fields = ('name',('label','use_cart','cart_label'), ('display_seq_no','active','use_ajax'),('service','type'), 'description', ('steps','charge_types'), ('route','destination'), 'override')
 
 
     def get_urls(self):
@@ -129,6 +129,81 @@ class FeatureCategoryAdmin(admin.ModelAdmin):
 class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = ['display_seq_no','label','name']
     ordering = ('display_seq_no',)
+
+
+class ServerDiskInline(admin.TabularInline):
+    model = ServerDisk
+    ordering = ('name',)
+
+
+@admin.register(Database)
+class DatabaseAdmin(admin.ModelAdmin):
+    list_display = ['name', 'owner','type', 'shared']
+    list_filter = ('in_service','type')
+    ordering = ('name',)
+    readonly_fields = ('legacy_data','server','shared')
+    search_fields = ['name','owner__name']
+
+    fieldsets = (
+        (None, {
+            'fields': (('name', 'in_service'), 'owner', 'shortcode', 'type', 'url', 'on_call',
+            ('support_email','support_phone'),
+            ('shared', 'size'),
+            'purpose'
+            )
+        }),
+        ('Legacy Data', {
+            'classes': ('collapse',),
+            'fields': ('legacy_data',),
+        }),
+    )
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+
+        db = Database.objects.get(id=object_id)
+        if db.server:
+            extra_context = {'server': Server.objects.get(id=db.server_id)}
+        else:
+            extra_context = {}
+
+        return super().change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
+
+@admin.register(Server)
+class ServerAdmin(admin.ModelAdmin):
+    list_display = ['name', 'owner', 'os']
+    list_filter = ('in_service','managed')
+    ordering = ('name',)
+    search_fields = ['name','owner__name']
+
+    inlines = [ServerDiskInline,]
+
+    readonly_fields = ('legacy_data','created_date')
+
+    fieldsets = (
+        (None, {
+            'fields': (('name', 'in_service','created_date'), 'owner', 'admin_group', 'shortcode', ('os','cpu','ram'),
+                        ('replicated','backup','backup_time','public_facing'),
+                        ('on_call', 'support_email', 'support_phone'),
+
+                        ('regulated_data','non_regulated_data'),
+                        'managed'
+                        ),
+        }),
+        ('Managed', {
+            'classes': ('managed-section',),
+            'fields': (('patch_day','patch_time'),
+                    ('reboot_day', 'reboot_time'),),
+        }),
+        ('Legacy Data', {
+            'classes': ('collapse',),
+            'fields': ('legacy_data',),
+        }),
+    )
+
+    class Media:
+        js = ('order/js/admin_server.js',)
 
 
 @admin.register(Ticket)

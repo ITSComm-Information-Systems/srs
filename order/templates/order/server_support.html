@@ -1,0 +1,36 @@
+{% for field in tab.form %}
+
+{% if field.name == 'backup_time' %}
+<div class="row">
+    <div class="col-3">
+    {% include field.field.template_name %}
+    </div>
+</div>
+{% elif field.name == 'patch_day' %}
+<div class="row">
+    <div class="col-3">
+    {% include field.field.template_name %}
+    </div>
+{% elif field.name == 'patch_time' %}
+    <div class="col-3">
+    {% include field.field.template_name %}
+    </div>
+</div>
+{% elif field.name == 'reboot_day' %}
+<div class="row">
+    <div class="col-3">
+    {% include field.field.template_name %}
+    </div>
+{% elif field.name == 'reboot_time' %}
+    <div class="col-3">
+    {% include field.field.template_name %}
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-6">
+        {% include field.field.template_name %}
+    </div>
+</div>
+{% endif %}
+{% endfor %}

@@ -6,12 +6,14 @@ from .models import Estimate
 
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer
 from reportlab.lib.units import inch
 from reportlab.graphics.shapes import Drawing,Line
+from .models import Material
+from django.db.models import Sum
 
 # Estimate.get_details()
 
@@ -30,6 +32,17 @@ class PdfCreator:
 		page_number_text = "%d" % (doc.page)
 		canvas.drawCentredString(
 			4.25 * inch,
+			0.25 * inch,
+			page_number_text
+		)
+		canvas.restoreState()
+	
+	def add_page_number_landscape(self, canvas, doc):
+		canvas.saveState()
+		canvas.setFont('Times-Roman', 10)
+		page_number_text = "%d" % (doc.page)
+		canvas.drawCentredString(
+			5.5 * inch,
 			0.25 * inch,
 			page_number_text
 		)
@@ -71,28 +84,46 @@ class PdfCreator:
 
 	def build_pdf(self):
 		pdf_buffer = io.BytesIO()
-		my_doc = SimpleDocTemplate(
+
+		if self.type == 'checkout_list':
+			my_doc = SimpleDocTemplate(
 			pdf_buffer,
 			title='bom_' + self.type + '_report_' + str(self.estimate_id),
-			pagesize=PAGE_SIZE,
+			pagesize=(11 * inch, 8.5 * inch),
 			topMargin=BASE_MARGIN,
 			leftMargin=BASE_MARGIN,
 			rightMargin=BASE_MARGIN,
 			bottomMargin=0.5 * inch
-		)
-
-		if self.type == 'location':
-			flowables = self.get_location_flowables()
-		elif self.type == 'checkout_list':
+			)
 			flowables = self.get_checkout_list_flowables()
-		elif self.type == 'summary':
-			flowables = self.get_summary_flowables()
+			my_doc.build(
+				flowables,
+				onFirstPage=self.add_page_number_landscape,
+				onLaterPages=self.add_page_number_landscape,
+			)
 
-		my_doc.build(
-			flowables,
-			onFirstPage=self.add_page_number,
-			onLaterPages=self.add_page_number,
-		)
+		else:
+			my_doc = SimpleDocTemplate(
+				pdf_buffer,
+				title='bom_' + self.type + '_report_' + str(self.estimate_id),
+				pagesize=PAGE_SIZE,
+				topMargin=BASE_MARGIN,
+				leftMargin=BASE_MARGIN,
+				rightMargin=BASE_MARGIN,
+				bottomMargin=0.5 * inch
+			)
+
+			if self.type == 'location':
+				flowables = self.get_location_flowables()
+				
+			elif self.type == 'summary':
+				flowables = self.get_summary_flowables()
+
+			my_doc.build(
+				flowables,
+				onFirstPage=self.add_page_number,
+				onLaterPages=self.add_page_number,
+			)
 		pdf_value = pdf_buffer.getvalue()
 		pdf_buffer.close()
 		
@@ -299,14 +330,14 @@ class PdfCreator:
 
 		# Add info table
 		d = Drawing(100, 1)
-		d.add(Line(-7, 0, 150, 0))
+		d.add(Line(0, 0, 150, 0))
 		style = ParagraphStyle(name="myStyle", alignment=TA_RIGHT)
 		data = [[Paragraph('<b>Project</b>', normal), Paragraph('<b>Work Order</b>', normal),
 				'', Paragraph('<b>Check Out Date</b>', style), d],
 				[Paragraph(str(self.estimate.workorder.project_code_display), normal),
 				Paragraph(str(self.estimate.workorder.wo_number_display), normal),
 				'', Paragraph('<b>Tech Name</b>', style), d]]
-		col_widths = [1.3 * inch, 1.3 * inch, 1.8 * inch, 1.2 * inch, 3 * inch]
+		col_widths = [1.3 * inch, 1.3 * inch, 4 * inch, 1.2 * inch, 3 * inch]
 		table = Table(data, colWidths=col_widths)
 		table.hAlign = 'LEFT'
 		table.setStyle(TableStyle([('INNERGRID', (0,0), (1,1), 0.25, colors.black),
@@ -316,22 +347,32 @@ class PdfCreator:
 		flowables.append(Spacer(1, 0.4 * inch))
 
 		# Add item list
-		data = [[Paragraph('<b>Item Number</b>', normal), Paragraph('<b>Est Qty</b>', normal),
-				Paragraph('<b>Qty</b>', normal),
-				Paragraph('<b>Manufacturer Number</b>', normal), Paragraph('<b>Item Description</b>', normal),
-				#Paragraph('<b>Release Number</b>', normal), Paragraph('<b>Reel Number</b>', normal),
-				#Paragraph('<b>Staged</b>', normal), Paragraph('<b>Status</b>', normal)
+		data = [[Paragraph('<b>Item Number</b>', normal),
+				Paragraph('<b>Est Qty</b>', normal),
+				Paragraph('<b>Qty</b>', normal),	
+				Paragraph('<b>Item Description</b>', normal),
+				Paragraph('<b>Manufacturer Number</b>', normal),
+				Paragraph('<b>Release Number</b>', normal),
+				Paragraph('<b>Reel Number</b>', normal),
+				Paragraph('<b>Staged</b>', normal),
+				Paragraph('<b>Status</b>', normal)
 				]]
 
+		options = {1:'Estimate',2:'In Stock',3:'Ordered', 'True':'Yes','False':'No'}
+		
 		for record in self.estimate.part_list:
 			data.append([Paragraph(str(record['item__code']), normal),
 						Paragraph(str(record['quantity__sum']), CENTER),
 						Paragraph('', normal),
+						Paragraph(str(record['item__name']), normal),
 						Paragraph(str(record['item__manufacturer_part_number']), normal),
-						Paragraph(str(record['item__name']), normal)
+						Paragraph(str(record['release_number']), normal),
+						Paragraph(str(record['reel_number']), normal),
+						Paragraph(options[str(record['staged'])], normal),
+						Paragraph(str(options[record['status']]), normal),
 						])
 
-		col_widths = [1 * inch, .9 * inch, .9 * inch, 1.5 * inch , 3.2 * inch]
+		col_widths = [1 * inch, .5 * inch, .8 * inch, 3.3 * inch , 1.5 * inch, .7 * inch, .7 * inch, .7 * inch, .8 * inch]
 		table = Table(data, colWidths=col_widths)
 		table.setStyle(TableStyle([('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
 									('BOX', (0,0), (-1,-1), 0.25, colors.black),]))
@@ -352,7 +393,7 @@ class PdfCreator:
 		flowables.append(Spacer(1, 0.2 * inch))
 		for i in range(6):
 			d = Drawing(100, 1)
-			d.add(Line(0, 0, 550, 0))
+			d.add(Line(0, 0, 700, 0))
 			flowables.append(d)
 			flowables.append(Spacer(1, 0.2 * inch))
 
