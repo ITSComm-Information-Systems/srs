@@ -136,9 +136,10 @@ class TDx():
 
 
 def create_ticket_server_delete(instance, user, description):
+    
+    os = instance.os.label
 
     if instance.managed:
-        os = instance.os.label
         if os.startswith('Windows'):
             miserver_Managed = '215' # Windows
         else:
@@ -152,7 +153,7 @@ def create_ticket_server_delete(instance, user, description):
         "SourceID": 0,
         "StatusID": 77,
         "ServiceID": 10,
-        "ResponsibleGroupID": 166,
+        "ResponsibleGroupID": 18,
         "Title": description,
         "RequestorEmail": user.email,
         "Description": description,
@@ -168,6 +169,10 @@ def create_ticket_server_delete(instance, user, description):
             {
                 "ID": "1994",  # Managed
                 "Value": miserver_Managed
+            },
+            {
+                "ID": "1957",  # miserver_Operation System
+                "Value": os
             },
         ]
     }
