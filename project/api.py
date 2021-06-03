@@ -4,6 +4,9 @@ from oscauth.models import LDAPGroup, LDAPGroupMember
 from rest_framework import routers, viewsets
 from . import serializers
 
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from django.core.mail import EmailMessage
 
 class BomMaterialView(APIView):
     permission_classes = [IsAuthenticated]
@@ -32,14 +35,14 @@ class BomMaterialView(APIView):
         print(response)
 
         # Error Message as Email
-        email = EmailMessage(
-        subject='Netbox Error',
-        body=str(response),
-        from_email='donotreply@example.com',
-        to=[request.data.username+'@umich.edu','hujingc@umich.edu'],
-        reply_to=['another@example.com'],
-        )
-        email.send()
+        # email = EmailMessage(
+        # subject='Netbox Error',
+        # body=str(response),
+        # from_email='donotreply@example.com',
+        # to=[request.data.username+'@umich.edu','hujingc@umich.edu'],
+        # reply_to=['another@example.com'],
+        # )
+        # email.send()
 
         return Response(content)
 
