@@ -51,9 +51,10 @@ INSTALLED_APPS = [
     'pages',
     'reports',
     'tools',
-    'apps.rte',
-    'apps.bom'
+    'apps',
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAdminUser'],
