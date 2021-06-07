@@ -210,7 +210,9 @@ class TabForm(forms.Form):
                         label = '*' + label
 
                 if isinstance(value, list):
-                    summary.append({'name': getattr(field, 'name', '-'), 'label': label, 'value': '', 'list': value})
+                    nl = ', '
+                    inline = nl.join(value)
+                    summary.append({'name': getattr(field, 'name', '-'), 'label': label, 'value': '', 'list': value, 'inline': inline})
                 else:
                     summary.append({'name': getattr(field, 'name', '-'), 'label': label, 'value': value})
 
