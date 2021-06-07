@@ -1,5 +1,5 @@
 {{description}}
 {% for tab in text %}
 {{tab.title}}{% for field in tab.fields %}
-{{field.label}}: {{field.value}}{% endfor %}
+{{field.label}}: {{field.value}}{{field.inline}}{% endfor %}
 {% endfor %}
