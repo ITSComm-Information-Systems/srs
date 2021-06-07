@@ -1,23 +1,16 @@
-FROM python:3.8-slim
+FROM python:3.9-slim
 
-ARG ENVIRONMENT="DEVELOPMENT"
+#ARG ENVIRONMENT="DEVELOPMENT"
 
-ENV GUNICORN_WORKERS=2
-ENV GUNICORN_THREADS=4
+COPY . /usr/src/app
 
-ENV PYTHONUNBUFFERED=1
-ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+# Workaround for permission issue on OpenShift
+RUN chmod -R g+rw /usr/src/app
 
-RUN apt-get -y update && apt-get install -y libpq-dev gcc
+RUN chmod g+x /usr/src/app/docker-entrypoint.sh
 
-#Oracle Instant Client
-RUN apt-get install -y curl unzip libaio1 \
-    && mkdir /opt/oracle && cd /opt/oracle \
-    && curl --output instantclient.zip https://download.oracle.com/otn_software/linux/instantclient/19600/instantclient-basiclite-linux.x64-19.6.0.0.0dbru.zip \
-    && unzip instantclient.zip && rm instantclient.zip
-ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
+EXPOSE 8000
 
-COPY requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
 
-USER 1001
+CMD ["sh", "-c", "gunicorn --bind=0.0.0.0:8000 --workers=${GUNICORN_WORKERS} --threads=${GUNICORN_THREADS} --access-logfile=- --log-file=- project.wsgi"]
