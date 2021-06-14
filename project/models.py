@@ -94,3 +94,9 @@ class ChoiceTag(models.Model):
      def __str__(self):
           return self.code
 
+
+class Webhooks(models.Model):
+     sender = models.CharField(max_length=20) #uniqname
+     timestamp = models.DateTimeField(auto_now_add=True)
+     device_id = models.IntegerField()
+     success = models.BooleanField()
