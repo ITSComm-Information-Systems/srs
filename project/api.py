@@ -15,6 +15,7 @@ from .models import Webhooks
 
 class BomMaterialView(APIView):
     permission_classes = [IsAuthenticated]
+    print(Webhooks.objects.all().values())
 
     def post(self, request):
         status = request.data['data']['status']['value']
@@ -41,8 +42,8 @@ class BomMaterialView(APIView):
     
         else:
             response = 'Waiting for staged status or pre-order-number.'
-            
-            
+            webhook.success = False
+            webhook.save()            
 
         content = {
             'status': response
