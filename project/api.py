@@ -7,6 +7,11 @@ from . import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from django.core.mail import EmailMessage
+from apps.bom.models import Item, EstimateView, Material, MaterialLocation
+from rest_framework.response import Response
+import requests
+from .models import Webhooks
+# add timer module here
 
 class BomMaterialView(APIView):
     permission_classes = [IsAuthenticated]
@@ -17,35 +22,34 @@ class BomMaterialView(APIView):
         self.location = request.data['data']['name']
         pre_order = request.data['data']['custom_fields']['install_preorder_num']
 
-        # If status = staged, send get request to Netbox and get material
-        if status == 'staged' and pre_order != '':
+        webhook = Webhooks()
+        webhook.sender = request.data['username']
+        webhook.device_id = self.device_id
+
+
+        # If status = staged, device is an AP, send get request to Netbox and get material
+        if status == 'staged' and pre_order != '' and request.data['data']['device_role']['name']=='WIFI/AP':
             try:
                 self.estimate = EstimateView.objects.get(pre_order_number=pre_order)
                 response = self.get_material(request)
             # except:
-            except Exception as e: 
-                print(e)
+            except Exception as e:
+                print('exception in status == "staged" and pre_order != for:'+str(e))
+                webhook.success = False
+                webhook.save()
                 response = 'No estimate found.'
     
         else:
             response = 'Waiting for staged status or pre-order-number.'
+            
+            
+
         content = {
             'status': response
         }
-        print(response)
-
-        # Error Message as Email
-        # email = EmailMessage(
-        # subject='Netbox Error',
-        # body=str(response),
-        # from_email='donotreply@example.com',
-        # to=[request.data.username+'@umich.edu','hujingc@umich.edu'],
-        # reply_to=['another@example.com'],
-        # )
-        # email.send()
 
         return Response(content)
-
+    
     def get_material(self, request):
         # Get inventory items from Netbox
         API_KEY = '0123456789abcdef0123456789abcdef01234567'
@@ -60,6 +64,7 @@ class BomMaterialView(APIView):
                 item_code = Item.objects.get(manufacturer_part_number=result['name'])
             except:
                 item_code = None
+                #add item to table here with success=false
 
             # Add existing item
             if item_code:
@@ -81,36 +86,39 @@ class BomMaterialView(APIView):
         return result
     
     def add_items(self, request):
-        print('inventory items:')
-        print(self.inv_items)
+        print('add_items inventory items:'+str(self.inv_items))
         # Get rid of all existing items
         try:
             location = MaterialLocation.objects.get(estimate_id=self.estimate.id, name=self.location)
             materials = Material.objects.filter(material_location=location.id)
             for mat in materials:
                 mat.delete()
-        except Exception as e: 
-                print(e)
+        except Exception as e:
+            # probably no existing items
+            print("exception in add_items:"+str(e))
 
         # Add all items from Netbox
         for item in self.inv_items:
             mat = Material()
-            mat.set_create_audit_fields(request.user.username)
+            mat.set_create_audit_fields(request.data['username'])
             mat.item_code = item['code']
             mat.quantity = item['quantity']
             new_location = MaterialLocation.objects.get_or_create(estimate_id=self.estimate.id, name=item['location'])
             mat.material_location = new_location[0]
             mat.save()
 
-        # notification email
-        email = EmailMessage(
-        subject='Netbox Error',
-        body='All items from Netbox added',
-        from_email='donotreply@example.com',
-        to=[request.data.username+'@umich.edu','hujingc@umich.edu'],
-        reply_to=['another@example.com'],
-        )
-        email.send()
+        webhook.success = True
+        webhook.save()
+
+        # # notification email
+        # email = EmailMessage(
+        # subject='SRS Updated',
+        # body='items from Netbox added'+str(self.inv_items),
+        # from_email='donotreply@example.com',
+        # to=[str(request.data['username'])+'@umich.edu'],
+        # reply_to=['another@example.com'],
+        # )
+        # email.send()
         return 'Response premitted.'
     
     def __init__(self):
