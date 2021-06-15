@@ -100,6 +100,8 @@ class TDx():
         return requests.get( url, headers=self.headers )
 
     def create_ticket(self, payload):
+        payload['SourceID'] = 8         # System
+
         resp = requests.post( f'{self.BASE_URL}/31/tickets/'
                             , headers=self.headers
                             , json=payload )
