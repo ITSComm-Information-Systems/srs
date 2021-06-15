@@ -12,34 +12,25 @@ from rest_framework.response import Response
 import requests
 from .models import Webhooks
 # add timer module here
-import threading, sched, time
+import threading, time
 
-scheduler = sched.scheduler(time.time, time.sleep)
-
-def print_event(name):
-    print('EVENT:', time.time(), name)
-
-scheduler.enter(2, 1, print_event, ('first',))
-scheduler.enter(3, 1, print_event, ('second',))
-
-scheduler.run()
-# def netboxEmails():
-#     tosend = Webhooks.objects.filter(notified=False)
-
-#     if len(tosend) > 0:
-
-
-#         email = EmailMessage(
-#         subject='SRS Updated',
-#         body='items from Netbox added',
-#         from_email='donotreply@example.com',
-#         to=[str(request.data['username'])+'@umich.edu'],
-#         reply_to=['another@example.com'],
-#         )
-#         email.send()
-
-# thread = threading.Thread(target=netboxEmails)
-
+def netboxEmails(request):
+    tosend = Webhooks.objects.all().filter(emailed=False)
+    if len(tosend) > 0:
+        time.sleep(5)
+        checkagain=Webhooks.objects.all().filter(emailed=False)
+        if len(tosend) != len(checkagain):
+            print('ongoing')
+        else:
+            email = EmailMessage(
+            subject='SRS Updated',
+            body='items from Netbox added: ' + str(checkagain.values()),
+            from_email='donotreply@example.com',
+            to=[str(request.data['username']) + '@umich.edu'],
+            reply_to=['another@example.com'],
+            )
+            email.send()
+            checkagain.update(emailed=True)
 
 class BomMaterialView(APIView):
     permission_classes = [IsAuthenticated]
@@ -52,29 +43,36 @@ class BomMaterialView(APIView):
             self.location = request.data['data']['name']
             pre_order = request.data['data']['custom_fields']['install_preorder_num']
 
-            webhook = Webhooks()
-            webhook.sender = request.data['username']
-            webhook.device_id = self.device_id
-            webhook.notified = False
-
+            self.webhook = Webhooks(
+                sender = request.data['username'],
+                preorder = pre_order,
+                device_id = self.device_id,
+                name = self.location,  
+            )
             # If status = staged, pre_order=estimate number, send get request to Netbox and get material
             if status == 'staged' and pre_order != '' :
                 try:
                     self.estimate = EstimateView.objects.get(pre_order_number=pre_order)
                     response = self.get_material(request)
+                    
                 except Exception as e:
-                    webhook.issue = str(e)
-                    webhook.success = False
-                    webhook.save()
+                    self.webhook.issue = str(e)
+                    self.webhook.save()
                     response = 'No estimate found.'
             else:
                 response = 'Waiting for staged status or pre-order-number.'
-                webhook.issue = 'status or preorder issue'
-                webhook.success = False
-                webhook.save()            
+                self.webhook.issue = 'status or preorder issue'
+                self.webhook.save()            
 
+            threading.Thread(target=netboxEmails, args=[request]).start()
             content = {
                 'status': response
+            }
+
+            return Response(content)
+        else:
+            content = {
+                'status': 'Not WIFI/AP'
             }
 
             return Response(content)
@@ -135,8 +133,8 @@ class BomMaterialView(APIView):
             mat.material_location = new_location[0]
             mat.save()
 
-        webhook.success = True
-        webhook.save()
+        self.webhook.success = True
+        self.webhook.save()
 
         return 'Response premitted.'
     
