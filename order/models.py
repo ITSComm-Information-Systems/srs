@@ -1114,6 +1114,7 @@ class Item(models.Model):
 
         dedicated = False
         if action.service.name == 'miServer':
+            attributes.append({'ID': 1954, 'Value': self.data.get('shortcode')})
             if action.type == 'M':
                 instance_id = self.data.get('instance_id')
                 instance = Server.objects.get(id=instance_id)
