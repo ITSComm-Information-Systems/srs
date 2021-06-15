@@ -7,7 +7,7 @@ from django.db import models
 from django.forms.fields import DecimalField
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
-from project.integrations import MCommunity
+from project.integrations import MCommunity, TDx
 from project.models import ShortCodeField, Choice
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
@@ -1079,26 +1079,6 @@ class Item(models.Model):
                     rec.update_hosts(self.data.get('permittedHosts'))
 
     def submit_incident(self, route, action):
-        client_id = settings.UM_API['CLIENT_ID']
-        auth_token = settings.UM_API['AUTH_TOKEN']
-        base_url = settings.UM_API['BASE_URL']
-
-        headers = { 
-            'Authorization': f'Basic {auth_token}',
-            'accept': 'application/json'
-            }
-
-        url = f'{base_url}/um/it/oauth2/token?grant_type=client_credentials&scope=tdxticket'
-        response = requests.post(url, headers=headers)
-        response_token = json.loads(response.text)
-        access_token = response_token.get('access_token')
-
-        headers = {
-            'X-IBM-Client-Id': client_id,
-            'Authorization': 'Bearer ' + access_token,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json' 
-            }
 
         text = self.data['reviewSummary']
         note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
@@ -1236,8 +1216,7 @@ class Item(models.Model):
 
         payload['Attributes'] = attributes
 
-        data_string = json.dumps(payload)
-        response = requests.post( base_url + '/um/it/31/tickets', data=data_string, headers=headers )
+        response = TDx().create_ticket(payload=payload)
  
         self.external_reference_id = json.loads(response.text)['ID']
         self.save()   # Save incident number to item
