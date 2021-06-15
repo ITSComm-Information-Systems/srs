@@ -12,44 +12,72 @@ from rest_framework.response import Response
 import requests
 from .models import Webhooks
 # add timer module here
+import threading, sched, time
+
+scheduler = sched.scheduler(time.time, time.sleep)
+
+def print_event(name):
+    print('EVENT:', time.time(), name)
+
+scheduler.enter(2, 1, print_event, ('first',))
+scheduler.enter(3, 1, print_event, ('second',))
+
+scheduler.run()
+# def netboxEmails():
+#     tosend = Webhooks.objects.filter(notified=False)
+
+#     if len(tosend) > 0:
+
+
+#         email = EmailMessage(
+#         subject='SRS Updated',
+#         body='items from Netbox added',
+#         from_email='donotreply@example.com',
+#         to=[str(request.data['username'])+'@umich.edu'],
+#         reply_to=['another@example.com'],
+#         )
+#         email.send()
+
+# thread = threading.Thread(target=netboxEmails)
+
 
 class BomMaterialView(APIView):
     permission_classes = [IsAuthenticated]
-    print(Webhooks.objects.all().values())
 
     def post(self, request):
-        status = request.data['data']['status']['value']
-        self.device_id = request.data['data']['id']
-        self.location = request.data['data']['name']
-        pre_order = request.data['data']['custom_fields']['install_preorder_num']
+        # Only process webhook if it's for WIFI/AP, not anything else
+        if request.data['data']['device_role']['name']=='WIFI/AP':
+            status = request.data['data']['status']['value']
+            self.device_id = request.data['data']['id']
+            self.location = request.data['data']['name']
+            pre_order = request.data['data']['custom_fields']['install_preorder_num']
 
-        webhook = Webhooks()
-        webhook.sender = request.data['username']
-        webhook.device_id = self.device_id
+            webhook = Webhooks()
+            webhook.sender = request.data['username']
+            webhook.device_id = self.device_id
+            webhook.notified = False
 
-
-        # If status = staged, device is an AP, send get request to Netbox and get material
-        if status == 'staged' and pre_order != '' and request.data['data']['device_role']['name']=='WIFI/AP':
-            try:
-                self.estimate = EstimateView.objects.get(pre_order_number=pre_order)
-                response = self.get_material(request)
-            # except:
-            except Exception as e:
-                print('exception in status == "staged" and pre_order != for:'+str(e))
+            # If status = staged, pre_order=estimate number, send get request to Netbox and get material
+            if status == 'staged' and pre_order != '' :
+                try:
+                    self.estimate = EstimateView.objects.get(pre_order_number=pre_order)
+                    response = self.get_material(request)
+                except Exception as e:
+                    webhook.issue = str(e)
+                    webhook.success = False
+                    webhook.save()
+                    response = 'No estimate found.'
+            else:
+                response = 'Waiting for staged status or pre-order-number.'
+                webhook.issue = 'status or preorder issue'
                 webhook.success = False
-                webhook.save()
-                response = 'No estimate found.'
-    
-        else:
-            response = 'Waiting for staged status or pre-order-number.'
-            webhook.success = False
-            webhook.save()            
+                webhook.save()            
 
-        content = {
-            'status': response
-        }
+            content = {
+                'status': response
+            }
 
-        return Response(content)
+            return Response(content)
     
     def get_material(self, request):
         # Get inventory items from Netbox
@@ -58,14 +86,13 @@ class BomMaterialView(APIView):
         response = requests.get(request_address, headers={'Authorization': 'Token ' + API_KEY})
         response = response.json()
 
-        # Add all inventory items to data structure
+        # Add all inventory items to data structure, if we have a Z-code for them
         for result in response['results']:
             # Z-code lookup
             try:
                 item_code = Item.objects.get(manufacturer_part_number=result['name'])
             except:
                 item_code = None
-                #add item to table here with success=false
 
             # Add existing item
             if item_code:
@@ -111,15 +138,6 @@ class BomMaterialView(APIView):
         webhook.success = True
         webhook.save()
 
-        # # notification email
-        # email = EmailMessage(
-        # subject='SRS Updated',
-        # body='items from Netbox added'+str(self.inv_items),
-        # from_email='donotreply@example.com',
-        # to=[str(request.data['username'])+'@umich.edu'],
-        # reply_to=['another@example.com'],
-        # )
-        # email.send()
         return 'Response premitted.'
     
     def __init__(self):

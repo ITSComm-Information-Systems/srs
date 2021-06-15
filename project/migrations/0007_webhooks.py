@@ -18,6 +18,7 @@ class Migration(migrations.Migration):
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
                 ('device_id', models.IntegerField()),
                 ('success', models.BooleanField()),
+                ('notified', models.BooleanField()),
             ],
         ),
     ]
