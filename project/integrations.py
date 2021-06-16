@@ -137,7 +137,7 @@ class TDx():
 
 def create_ticket_server_delete(instance, user, description):
     
-    os = instance.os.label
+    os = getattr(instance.os, 'label', '')
 
     if instance.managed:
         if os.startswith('Windows'):
