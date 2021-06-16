@@ -22,6 +22,10 @@ def netboxEmails(request):
         if len(tosend) != len(checkagain):
             print('ongoing')
         else:
+            success = list(Webhooks.objects.filter(emailed=False, issue='no issue').values_list('preorder','name'))
+            failed = list(Webhooks.objects.filter(emailed=False, issue='status or preorder issue').values_list('preorder','name'))
+            success_message = "The following were successfully added: \n"+"\n".join(["Preorder {} - Device {}".format(x[0],x[1]) for x in success])
+            failed_message = "The following were NOT added: \n"+"\n".join(["Preorder {} - Device {}".format(x[0],x[1]) for x in failed])
             email = EmailMessage(
             subject='SRS Updated',
             body='items from Netbox added: ' + str(checkagain.values()),
