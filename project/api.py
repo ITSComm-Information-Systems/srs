@@ -17,7 +17,7 @@ import threading, time
 def netboxEmails(request):
     tosend = Webhooks.objects.all().filter(emailed=False)
     if len(tosend) > 0:
-        time.sleep(5)
+        time.sleep(15)
         checkagain=Webhooks.objects.all().filter(emailed=False)
         if len(tosend) != len(checkagain):
             print('ongoing')
@@ -28,7 +28,7 @@ def netboxEmails(request):
             failed_message = "The following were NOT added: \n"+"\n".join(["Preorder {} - Device {}".format(x[0],x[1]) for x in failed])
             email = EmailMessage(
             subject='SRS Updated',
-            body='items from Netbox added: ' + str(checkagain.values()),
+            body=success_message + "\n" + failed_message,
             from_email='donotreply@example.com',
             to=[str(request.data['username']) + '@umich.edu'],
             reply_to=['another@example.com'],
