@@ -103,3 +103,5 @@ class Webhooks(models.Model):
      issue = models.CharField(max_length=50, default='no issue')
      emailed = models.BooleanField(default=False) #was it sent in email
      timestamp = models.DateTimeField(auto_now_add=True)
+     added = models.CharField(max_length=255, null=True)
+     skipped = models.CharField(max_length=255, null=True)
