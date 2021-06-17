@@ -155,11 +155,11 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
 
         writer.writerow(row)
 
-        volume_list = self.model.objects.filter(id__lt=130)
-        for volume in volume_list:
+        instance_list = self.model.objects.all()
+        for instance in instance_list:
             row = []
             for field in fields:
-                row.append(getattr(volume,field.name))
+                row.append(getattr(instance,field.name))
 
             writer.writerow(row)
 
