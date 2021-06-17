@@ -10,7 +10,7 @@ from django.core.mail import EmailMessage
 from apps.bom.models import Item, EstimateView, Material, MaterialLocation
 from rest_framework.response import Response
 import requests
-from .models import Webhooks
+# from .models import Webhooks
 # add timer module here
 import threading, time
 
@@ -22,12 +22,12 @@ def netboxEmails(request):
         if len(tosend) != len(checkagain):
             print('ongoing')
         else:
-            success = list(Webhooks.objects.filter(emailed=False, issue='no issue').values_list('preorder','name'))
-            failed = list(Webhooks.objects.filter(emailed=False, issue='status or preorder issue').values_list('preorder','name'))
-            success_message = "The following were successfully added: \n"+"\n".join(["Preorder {} - Device {}".format(x[0],x[1]) for x in success])
-            failed_message = "The following were NOT added: \n"+"\n".join(["Preorder {} - Device {}".format(x[0],x[1]) for x in failed])
+            success = list(Webhooks.objects.filter(emailed=False, issue='no issue').values_list('preorder','name','added', 'skipped'))
+            failed = list(Webhooks.objects.filter(emailed=False, issue='status or preorder issue').values_list('preorder','name', 'issue'))
+            success_message = "Inventory items added: \n"+"\n".join(["Preorder {} - Device {} - Number added: {} - Not added: {}".format(x[0],x[1],x[2],x[3]) for x in success])
+            failed_message = "The following Devices were NOT added: \n"+"\n".join(["Preorder {} - Device {} - Issue: {}".format(x[0],x[1],x[2]) for x in failed])
             email = EmailMessage(
-            subject='SRS Updated',
+            subject='SRS Updated for preorder: '+ ", ".join(list(Webhooks.objects.filter(emailed=False).values_list('preorder', flat=True).distinct())),
             body=success_message + "\n" + failed_message,
             from_email='donotreply@example.com',
             to=[str(request.data['username']) + '@umich.edu'],
@@ -41,7 +41,7 @@ class BomMaterialView(APIView):
 
     def post(self, request):
         # Only process webhook if it's for WIFI/AP, not anything else
-        if request.data['data']['device_role']['name']=='WIFI/AP':
+        if request.data['data']['device_role']['name']=='WIFI/AP' and request.data['data']['status']['value']!='planned':
             status = request.data['data']['status']['value']
             self.device_id = request.data['data']['id']
             self.location = request.data['data']['name']
@@ -65,7 +65,7 @@ class BomMaterialView(APIView):
                     response = 'No estimate found.'
             else:
                 response = 'Waiting for staged status or pre-order-number.'
-                self.webhook.issue = 'status or preorder issue'
+                self.webhook.issue = 'status not staged, or preorder not given'
                 self.webhook.save()            
 
             threading.Thread(target=netboxEmails, args=[request]).start()
@@ -76,7 +76,7 @@ class BomMaterialView(APIView):
             return Response(content)
         else:
             content = {
-                'status': 'Not WIFI/AP'
+                'status': 'Not WIFI/AP, '
             }
 
             return Response(content)
@@ -88,6 +88,7 @@ class BomMaterialView(APIView):
         response = requests.get(request_address, headers={'Authorization': 'Token ' + API_KEY})
         response = response.json()
 
+        unadded = []
         # Add all inventory items to data structure, if we have a Z-code for them
         for result in response['results']:
             # Z-code lookup
@@ -95,6 +96,7 @@ class BomMaterialView(APIView):
                 item_code = Item.objects.get(manufacturer_part_number=result['name'])
             except:
                 item_code = None
+                unadded.append(result['name'])
 
             # Add existing item
             if item_code:
@@ -111,6 +113,7 @@ class BomMaterialView(APIView):
                     item = next((i for i in self.inv_items if i['code'] == item_code.code), None)
                     item['quantity'] = item['quantity'] + 1
         
+        self.webhook.skipped=unadded
         # Add items in data structure to estimate
         result = self.add_items(request)
         return result
@@ -136,7 +139,7 @@ class BomMaterialView(APIView):
             new_location = MaterialLocation.objects.get_or_create(estimate_id=self.estimate.id, name=item['location'])
             mat.material_location = new_location[0]
             mat.save()
-
+        self.webhook.added = len(self.inv_items)
         self.webhook.success = True
         self.webhook.save()
 
