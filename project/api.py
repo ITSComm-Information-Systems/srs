@@ -10,7 +10,7 @@ from django.core.mail import EmailMessage
 from apps.bom.models import Item, EstimateView, Material, MaterialLocation
 from rest_framework.response import Response
 import requests
-# from .models import Webhooks
+from .models import Webhooks
 # add timer module here
 import threading, time
 
