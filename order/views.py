@@ -774,7 +774,7 @@ class Status(PermissionRequiredMixin, View):
             if pin:
                 if(pin.work_status_name == "Received"):
                     order.srs_status = "Submitted"
-                if pin.status_code == 2:
+                if str(pin.status_code) == '2':
                     if(pin.work_status_name == "Cancelled"):
                         order.srs_status = "Cancelled"
                     else:
