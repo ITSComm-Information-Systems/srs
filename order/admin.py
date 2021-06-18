@@ -6,7 +6,7 @@ from django.template import loader
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import path
-
+from project.models import Choice
 
 from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database
 
@@ -149,13 +149,16 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
         writer = csv.writer(response)
         fields = self.model._meta.fields
 
+        choice_related = []
         row = []
         for field in fields:
             row.append(field.name)
+            if field.related_model == Choice:
+                choice_related.append(field.name)
 
         writer.writerow(row)
 
-        instance_list = self.model.objects.all()
+        instance_list = list(self.model.objects.all().prefetch_related(*choice_related))
         for instance in instance_list:
             row = []
             for field in fields:
@@ -237,9 +240,18 @@ class ServerAdmin(ServiceInstanceAdmin):
         }),
     )
 
+    def get_urls(self):
+        urls = super().get_urls()
+
+        download_url = [
+            path('csv/', self.download_csv),
+        ]
+        return download_url + urls
+
+
+
     class Media:
         js = ('order/js/admin_server.js',)
-
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
