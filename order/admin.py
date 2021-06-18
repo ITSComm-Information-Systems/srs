@@ -6,7 +6,7 @@ from django.template import loader
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import path
-
+from project.models import Choice
 
 from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database
 
@@ -131,13 +131,51 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     ordering = ('display_seq_no',)
 
 
+class ServiceInstanceAdmin(admin.ModelAdmin):
+
+    def get_urls(self):
+        urls = super().get_urls()
+
+        download_url = [
+            path('download_csv/', self.download_csv),
+        ]
+        return download_url + urls
+
+    def download_csv(self, request):
+        # Create the HttpResponse object with the appropriate CSV header.
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="full_list.csv"'
+
+        writer = csv.writer(response)
+        fields = self.model._meta.fields
+
+        choice_related = []
+        row = []
+        for field in fields:
+            row.append(field.name)
+            if field.related_model == Choice:
+                choice_related.append(field.name)
+
+        writer.writerow(row)
+
+        instance_list = list(self.model.objects.all().prefetch_related(*choice_related))
+        for instance in instance_list:
+            row = []
+            for field in fields:
+                row.append(getattr(instance,field.name))
+
+            writer.writerow(row)
+
+        return response
+
+
 class ServerDiskInline(admin.TabularInline):
     model = ServerDisk
     ordering = ('name',)
 
 
 @admin.register(Database)
-class DatabaseAdmin(admin.ModelAdmin):
+class DatabaseAdmin(ServiceInstanceAdmin):
     list_display = ['name', 'owner','type', 'shared']
     list_filter = ('in_service','type')
     ordering = ('name',)
@@ -171,7 +209,7 @@ class DatabaseAdmin(admin.ModelAdmin):
         )
 
 @admin.register(Server)
-class ServerAdmin(admin.ModelAdmin):
+class ServerAdmin(ServiceInstanceAdmin):
     list_display = ['name', 'owner', 'os']
     list_filter = ('in_service','managed')
     ordering = ('name',)
@@ -202,9 +240,18 @@ class ServerAdmin(admin.ModelAdmin):
         }),
     )
 
+    def get_urls(self):
+        urls = super().get_urls()
+
+        download_url = [
+            path('csv/', self.download_csv),
+        ]
+        return download_url + urls
+
+
+
     class Media:
         js = ('order/js/admin_server.js',)
-
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
