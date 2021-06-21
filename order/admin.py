@@ -153,12 +153,12 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
         row = []
         for field in fields:
             row.append(field.name)
-            if field.related_model == Choice:
+            if field.related_model:
                 choice_related.append(field.name)
 
         writer.writerow(row)
 
-        instance_list = list(self.model.objects.all().prefetch_related(*choice_related))
+        instance_list = list(self.model.objects.all().select_related(*choice_related))
         for instance in instance_list:
             row = []
             for field in fields:
@@ -240,16 +240,6 @@ class ServerAdmin(ServiceInstanceAdmin):
         }),
     )
 
-    def get_urls(self):
-        urls = super().get_urls()
-
-        download_url = [
-            path('csv/', self.download_csv),
-        ]
-        return download_url + urls
-
-
-
     class Media:
         js = ('order/js/admin_server.js',)
 
@@ -278,7 +268,7 @@ class LDAPGroupAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
-class VolumeAdmin(admin.ModelAdmin):
+class VolumeAdmin(ServiceInstanceAdmin):
     ordering = ('name',)
     search_fields = ['name','owner__name']
     list_filter = ('type',('service', admin.RelatedOnlyFieldListFilter),)
@@ -293,10 +283,7 @@ class VolumeAdmin(admin.ModelAdmin):
             path('fulfill_order/', self.fulfill_order),
         ]
 
-        download_url = [
-            path('download_csv/', self.download_csv),
-        ]
-        return fulfill_url + download_url + urls
+        return fulfill_url + urls
 
     def fulfill_order(self, request):
         item = Item.objects.get(external_reference_id=request.POST['ticket'])
@@ -311,31 +298,6 @@ class VolumeAdmin(admin.ModelAdmin):
         item.save()
 
         return HttpResponseRedirect(f'/admin/order/arcinstance/{instance_id}/change/')
-
-
-    def download_csv(self, request):
-        # Create the HttpResponse object with the appropriate CSV header.
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="mistorage.csv"'
-
-        writer = csv.writer(response)
-        fields = self.model._meta.fields
-
-        row = []
-        for field in fields:
-            row.append(field.name)
-
-        writer.writerow(row)
-
-        volume_list = self.model.objects.all().select_related()
-        for volume in volume_list:
-            row = []
-            for field in fields:
-                row.append(getattr(volume,field.name))
-
-            writer.writerow(row)
-
-        return response
 
     def get_form(self, request, obj=None, **kwargs):
         if obj:
@@ -442,7 +404,7 @@ class StorageRateAdmin(admin.ModelAdmin):
     list_filter = ('service',)
 
 
-class BackupDomainAdmin(admin.ModelAdmin):
+class BackupDomainAdmin(ServiceInstanceAdmin):
     list_display = ['name','owner','shortcode','size']
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
