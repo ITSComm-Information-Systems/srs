@@ -1127,3 +1127,13 @@ class UmBomProcurementUsersV(models.Model):
         managed = False
         db_table = 'PINN_CUSTOM\".\"UM_BOM_PROCUREMENT_USERS_V'
 
+
+class UmOscAuthUsersApi(models.Model):
+     um_osc_auth_users_id = models.IntegerField(primary_key=True)
+     dept = models.CharField(max_length=10)
+     group_name = models.CharField(max_length=150)
+     username = models.CharField(max_length=150)
+       
+     class Meta:
+          managed = False
+          db_table = 'PS_RATING\".\"UM_OSC_AUTH_USERS_API_V'
