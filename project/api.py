@@ -10,8 +10,8 @@ from django.core.mail import EmailMessage
 from apps.bom.models import Item, EstimateView, Material, MaterialLocation
 from rest_framework.response import Response
 import requests
+
 from .models import Webhooks
-# add timer module here
 import threading, time
 
 def netboxEmails(request):
@@ -26,8 +26,10 @@ def netboxEmails(request):
             failed = list(Webhooks.objects.filter(emailed=False, issue='status or preorder issue').values_list('preorder','name', 'issue'))
             success_message = "Inventory items added: \n"+"\n".join(["Preorder {} - Device {} - Number added: {} - Not added: {}".format(x[0],x[1],x[2],x[3]) for x in success])
             failed_message = "The following Devices were NOT added: \n"+"\n".join(["Preorder {} - Device {} - Issue: {}".format(x[0],x[1],x[2]) for x in failed])
+            preorders = list(Webhooks.objects.filter(emailed=False).values_list('preorder', flat=True).distinct())
+            preorders[preorders.index(None)] = 'no preorder'
             email = EmailMessage(
-            subject='SRS Updated for preorder: '+ ", ".join(list(Webhooks.objects.filter(emailed=False).values_list('preorder', flat=True).distinct())),
+            subject='SRS Updated for preorder: '+ ", ".join(preorders),
             body=success_message + "\n" + failed_message,
             from_email='donotreply@example.com',
             to=[str(request.data['username']) + '@umich.edu'],
