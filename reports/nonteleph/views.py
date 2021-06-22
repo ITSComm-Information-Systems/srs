@@ -26,6 +26,8 @@ from django.shortcuts import redirect
 
 from pages.models import Page
 
+from order.models import StorageRate
+
 # Load intial Detail of Charge page
 @permission_required('oscauth.can_report', raise_exception=True)
 def get_new(request):
@@ -82,7 +84,11 @@ def generate_report(request):
     # Fix chartfield format
     chartcoms = format_chartcoms(chartcoms)
 
-
+    # Get MiServer and MiStorage Rates
+    StorageRates= StorageRate.objects.filter(service=13)
+    rates={}
+    for rate in StorageRates:
+        rates[rate.name]=rate.rate
     has_data = False
     charge_types = []
     for cf in chartcoms:
@@ -91,6 +97,11 @@ def generate_report(request):
         prefixes = {}
         charges = {}
         total = 0
+
+        # MiServer/MiDatabase grouped row data
+        # dictionary to save data beyond single row if same server
+        retained = {}
+
         for a in all_data:
             initial_prefix = a.user_defined_id.split('-')[0]
             prefix_query = UmOscRptSubscrib_Api_V.objects.filter(subscriber_prefix=initial_prefix)
@@ -122,8 +133,30 @@ def generate_report(request):
                     'shortcode': a.shortcode,
                     'voucher_comment': a.voucher_comment,
                     'quantity_vouchered': a.quantity_vouchered,
-                    'unique_id': a.unique_identifier
+                    'unique_id': a.unique_identifier,
+                    'invoice_id': a.invoice_id
                 }
+
+                # MiServer/MiDatabase grouped row data
+                # Consolidate server information, set new quality
+                if prefix=='MiServer' or prefix=='MiDatabase':
+                    if a.user_defined_id in retained:
+                        retained[a.user_defined_id]['descr_jh'].append(a.item_description)
+                        retained[a.user_defined_id]['quantity_vouchered_jh'].append(a.quantity_vouchered)
+                        retained[a.user_defined_id]['rate_jh'].append(rates[a.item_code])
+                        retained[a.user_defined_id]['total_charges_jh'].append(a.charge_amount)   
+                    else:
+                        retained[a.user_defined_id]={}
+                        retained[a.user_defined_id]['descr_jh'] = [a.item_description]
+                        retained[a.user_defined_id]['quantity_vouchered_jh'] = [a.quantity_vouchered]
+                        retained[a.user_defined_id]['rate_jh'] = [rates[a.item_code]]
+                        retained[a.user_defined_id]['total_charges_jh'] = [a.charge_amount]
+                    
+                    user_id['descr_jh']=retained[a.user_defined_id]['descr_jh']
+                    user_id['quantity_vouchered_jh']=retained[a.user_defined_id]['quantity_vouchered_jh']
+                    user_id['rate_jh']=retained[a.user_defined_id]['rate_jh']
+                    user_id['total_charges_jh']=retained[a.user_defined_id]['total_charges_jh']
+
                 # Add N/A
                 if not user_id['project_name']:
                     user_id['project_name'] = 'N/A'
@@ -174,7 +207,22 @@ def generate_report(request):
                     r['total_charges'] = '${:,.2f}'.format(r['total_charges'])
             charges[c]['total'] = '${:,.2f}'.format(charges[c]['total'])
 
-        
+        # MiServer/MiDatabase grouped row data
+        # remove duplicate rows
+        for c in charges:
+            if c == 'MiServer' or c == 'MiDatabase':
+                servers= []
+                length = len(charges[c]['rows'])
+                i=0
+                while i < length:
+                    target = charges[c]['rows'][i]
+                    if target['user_defined_id'] in servers:
+                        charges[c]['rows'].remove(target)
+                        length -=1
+                    else:
+                        servers.append(target['user_defined_id'])
+                        i+=1
+
         # Add all tables to that chartfield
         data = {
             'account_number': cf,
