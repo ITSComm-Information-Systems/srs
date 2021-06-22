@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.9-slim
 
 ENV GUNICORN_WORKERS=2
 ENV GUNICORN_THREADS=4
@@ -16,15 +16,10 @@ RUN apt-get install -y curl unzip libaio1 \
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
 
 
-COPY requirements.txt /usr/src/app/requirements.txt
 WORKDIR /usr/src/app
+COPY requirements.txt requirements.txt
+
 RUN pip install -r requirements.txt
-COPY . /usr/src/app
-
-#COPY requirements.txt /tmp
-#RUN pip install -r /tmp/requirements.txt
-
-#WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 
