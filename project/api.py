@@ -27,7 +27,10 @@ def netboxEmails(request):
             success_message = "Inventory items added: \n"+"\n".join(["Preorder {} - Device {} - Number added: {} - Not added: {}".format(x[0],x[1],x[2],x[3]) for x in success])
             failed_message = "The following Devices were NOT added: \n"+"\n".join(["Preorder {} - Device {} - Issue: {}".format(x[0],x[1],x[2]) for x in failed])
             preorders = list(Webhooks.objects.filter(emailed=False).values_list('preorder', flat=True).distinct())
-            preorders[preorders.index(None)] = 'no preorder'
+            try:
+                preorders[preorders.index(None)] = 'no preorder'
+            except:
+                pass
             email = EmailMessage(
             subject='SRS Updated for preorder: '+ ", ".join(preorders),
             body=success_message + "\n" + failed_message,
