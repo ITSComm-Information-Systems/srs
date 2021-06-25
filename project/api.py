@@ -17,13 +17,13 @@ import threading, time
 def netboxEmails(request):
     tosend = Webhooks.objects.all().filter(emailed=False)
     if len(tosend) > 0:
-        time.sleep(15)
+        time.sleep(20)
         checkagain=Webhooks.objects.all().filter(emailed=False)
         if len(tosend) != len(checkagain):
             print('ongoing')
         else:
-            success = list(Webhooks.objects.filter(emailed=False, issue='no issue').values_list('preorder','name','added', 'skipped'))
-            failed = list(Webhooks.objects.filter(emailed=False, issue='status or preorder issue').values_list('preorder','name', 'issue'))
+            success = list(Webhooks.objects.filter(emailed=False, success=True).values_list('preorder','name','added', 'skipped'))
+            failed = list(Webhooks.objects.filter(emailed=False, success=False).values_list('preorder','name', 'issue'))
             success_message = "Inventory items added: \n"+"\n".join(["Preorder {} - Device {} - Number added: {} - Not added: {}".format(x[0],x[1],x[2],x[3]) for x in success])
             failed_message = "The following Devices were NOT added: \n"+"\n".join(["Preorder {} - Device {} - Issue: {}".format(x[0],x[1],x[2]) for x in failed])
             preorders = list(Webhooks.objects.filter(emailed=False).values_list('preorder', flat=True).distinct())
@@ -63,11 +63,13 @@ class BomMaterialView(APIView):
                     
                 except Exception as e:
                     self.webhook.issue = str(e)
+                    self.webhook.success = False
                     self.webhook.save()
                     response = 'No estimate found.'
             else:
                 response = 'Waiting for staged status or pre-order-number.'
                 self.webhook.issue = 'status not staged, or preorder not given'
+                self.webhook.success = False
                 self.webhook.save()            
 
             threading.Thread(target=netboxEmails, args=[request]).start()
