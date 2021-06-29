@@ -33,5 +33,11 @@ class SuBackend(object):
             return UmBomProcurementUsersV.objects.filter(username=user_obj.username.upper(), security_role_code='UM Procurement').exists()
         elif perm == 'rte.add_umrteinput':
             return UmRteTechnicianV.objects.filter(uniqname=user_obj.username).exists()
+
+        elif perm == 'mbid_procurement':
+            return UmBomProcurementUsersV.objects.filter(username=user_obj.username.upper(), security_role_code='UM Procurement').exists()
+        elif perm == 'is_vendor':
+            return UmEcommMbidVendorV.objects.filter(email_address=user_obj.email).exists()
         else:
             return None
+
