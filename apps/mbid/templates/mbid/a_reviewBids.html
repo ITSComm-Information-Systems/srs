@@ -1,0 +1,57 @@
+{% extends 'baseapps.html' %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<h3>{{ subtitle }}</h3>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="input-group col-auto">
+        <div class="input-group-prepend">
+            <label class="input-group-text" for='pickCycle'>
+                Select Cycle
+            </label>
+        </div>
+        <select class="custom-select" id="pickCycle" name='pickCycle'>
+            <option value=''>--Select--</option>
+            {% for cycle in cycles %}
+            <option value='{{cycle.3}} {{cycle.0}}'>
+                {{ cycle.1 }} {{cycle.0}} ({{cycle.2}})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <br>
+    <div id='downloadOptions'>
+        <button id='button' name='downloadOption' value='noBids' class="btn btn-primary btn-lg">
+            Download all commodities WITHOUT bids
+        </button>
+        <br>
+        <br>
+        <button id='button' name='downloadOption' value='allBids' class="btn btn-primary btn-lg">
+            Download all commodities with ALL bids
+        </button>
+        <br>
+        <br>
+        <button id='button' name='downloadOption' value='lowBids' class="btn btn-primary btn-lg">
+            Download all commodities with LOWEST bids
+        </button>
+    </div>
+    <br>
+</form>
+
+<a href="{% url 'mbid:home' %}"><button class='btn btn-secondary'>Back</button></a>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function (event) {
+        document.getElementById("downloadOptions").style.display = 'none';
+    });
+
+    document.querySelector('#pickCycle').addEventListener('change', function () {
+        document.querySelector('#downloadOptions').style.display = ''
+    });
+
+</script>
+{% endblock %}
