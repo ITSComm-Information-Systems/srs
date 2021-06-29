@@ -1247,6 +1247,8 @@ class Item(models.Model):
         else:
             rec.admin_group = rec.owner
 
+        MCommunity().add_entitlement(rec.admin_group.name)
+
         for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing']:
             value = self.data.get(field)
             if value:
