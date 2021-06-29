@@ -1,7 +1,6 @@
 import json, requests
 from django.conf import settings
-from ldap3 import Server, Connection, ALL
-
+from ldap3 import Server, Connection, ALL, MODIFY_ADD
 class MCommunity:
 
     def __init__(self):
@@ -49,6 +48,12 @@ class MCommunity:
         except:
             print(f'error getting email for {name}')
 
+    def add_entitlement(self, name):
+        new_member = f'cn={name},ou=User Groups,ou=Groups,dc=umich,dc=edu'
+        parent_group = 'cn=SRS Service Entitlement Control,ou=User Groups,ou=Groups,dc=umich,dc=edu'
+
+        x = self.conn.modify(parent_group, {'groupMember': [(MODIFY_ADD, [new_member])]})
+        print('add', x, self.conn.response)
 
 
 class UmAPI:
