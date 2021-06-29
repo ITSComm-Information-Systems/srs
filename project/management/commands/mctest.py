@@ -1,9 +1,10 @@
 from re import M
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from ldap3.extend.microsoft.addMembersToGroups import ad_add_members_to_groups
 
 from oscauth.utils import get_mc_group, McGroup
-from order.models import BackupDomain, BackupNode, Item, Ticket
+from order.models import BackupDomain, BackupNode, Item, Ticket, Server
 from oscauth.models import LDAPGroup
 from project.integrations import MCommunity
 
@@ -19,7 +20,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         mc = MCommunity()
-        mc.get_groups('djamison')
+
+        x = 0
+
+        #for server in Server.objects.distinct('admin_group__name').select_related('admin_group').order_by('admin_group__name'):
+        #    print(server.admin_group.name)
+        #    mc.add_entitlement(server.admin_group.name)
+
+        mc.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=SRS Service Entitlement Control)', attributes=["groupMember"])
+        print(mc.conn.entries)
+
         return
 
 
