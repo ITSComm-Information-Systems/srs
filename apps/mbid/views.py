@@ -540,7 +540,7 @@ def create_mike_report(post):
         subject='MBid CSV Report',
         body='See attached CSV',
         from_email='donotreply@example.com',
-        to=['mejones@umich.edu'],
+        to=[request.user.email],
         reply_to=['hujingc@umich.edu'])
 
     # Filter information
