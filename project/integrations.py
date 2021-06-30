@@ -48,6 +48,16 @@ class MCommunity:
         except:
             print(f'error getting email for {name}')
 
+    def get_group_email_and_name(self, name):
+
+        try:
+            group = self.get_group_email(name)
+            group = f'{name} | {group}'
+            return group
+        except:
+            print('error getting MC group')
+            return name
+
     def add_entitlement(self, name):
         new_member = f'cn={name},ou=User Groups,ou=Groups,dc=umich,dc=edu'
         parent_group = 'cn=SRS Service Entitlement Control,ou=User Groups,ou=Groups,dc=umich,dc=edu'
