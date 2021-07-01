@@ -4,6 +4,7 @@ from django.utils.html import format_html
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.contrib import admin
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.urls import path
 from project.models import Choice
@@ -242,6 +243,21 @@ class ServerAdmin(ServiceInstanceAdmin):
 
     class Media:
         js = ('order/js/admin_server.js',)
+
+    def has_change_permission(self, request, obj=None):
+
+        if request.user.has_perm('order.change_server'):
+            return True
+        elif request.user.has_perm('order.change_database'):
+            if obj:
+                try:  # DBA's can modify dedicated servers
+                    Database.objects.get(server_id=obj.id)
+                    return True
+                except ObjectDoesNotExist:
+                    print('not a managed server')
+
+        return False
+
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
