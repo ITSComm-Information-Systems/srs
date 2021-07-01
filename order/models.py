@@ -1147,7 +1147,8 @@ class Item(models.Model):
                 if self.data.get('volaction') == 'Delete':
                     payload['Title'] = 'Delete MiDatabase'  # TODO Unreachable?
                 else:
-                    attributes.append({'ID': 1953, 'Value': self.data.get('ad_group')})  # Admin Group
+                    group_name = self.data.get('ad_group')
+                    attributes.append({'ID': 1953, 'Value': MCommunity().get_group_email_and_name(group_name)})  # Admin Group
 
                 attributes.append({'ID': 5319, 'Value': db})
                 attributes.append({'ID': 1952, 'Value': 203}) # Managed
@@ -1165,16 +1166,11 @@ class Item(models.Model):
                     payload['Title'] = 'Delete MiServer'
                 else:
                     if dedicated: # modifying a dedicated DB server
-                        attributes.append({'ID': 1953, 'Value': instance.admin_group.name})  # Admin Group
+                        group_name = instance.admin_group.name
                     else:
-                        owner = self.data.get('owner')
-                        try:
-                            group = MCommunity().get_group_email(owner)
-                            group = f'{owner} | {group}'
-                            attributes.append({'ID': 1953, 'Value': group})  # Admin Group
-                        except:
-                            print('error getting MC group')
-                            attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
+                        group_name = self.data.get('owner')
+                        
+                    attributes.append({'ID': 1953, 'Value': MCommunity().get_group_email_and_name(group_name)})  # Admin Group
 
                 managed = self.data.get('managed', mod_man)
                 if managed == 'True' or db:
@@ -1246,6 +1242,8 @@ class Item(models.Model):
             rec.admin_group = LDAPGroup().lookup( self.data['ad_group'] )
         else:
             rec.admin_group = rec.owner
+
+        MCommunity().add_entitlement(rec.admin_group.name)
 
         for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing']:
             value = self.data.get(field)
