@@ -225,7 +225,7 @@ $(document).ready(function() {
 					var drp = document.getElementById('select_cf_3');
 					var option = document.createElement("OPTION");
 					option.value = data[i].account_number;
-					option.text = data[i].account_number + " (Shortcode: " + data[i].short_code + ")";
+					option.text = data[i].account_number;
 					drp.add(option);
 				}
 			}
