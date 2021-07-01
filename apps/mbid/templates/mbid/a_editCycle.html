@@ -1,0 +1,158 @@
+{% extends 'baseapps.html' %}
+{% block content %}
+<h1>{{title}}</h1>
+
+{% if cycle_info.open %}
+{% include 'mbid/cycle_info.html' %}
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+    <div class='col-5' id='selectCycle'>
+        <div class="input-group col-auto">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="pickCycle">
+                    Select Cycle
+                </label>
+            </div>
+            <select class="custom-select" name="info">
+                <option value=''>--Select--</option>
+                {% for cycle in cycles %}
+                <option value='{{cycle.info}}'>
+                    {{ cycle.month }} {{cycle.year}} ({{cycle.status}})</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <br>
+    <div id='changeCycle'>
+        <input type="radio" id="edit" name="cycleAction" value="edit"><label for="edit"> Edit Dates</label>
+        <br>
+        <div id='editSection'>
+            <label>New Open Date: </label><input type="date" id='id_openDate' name='newOpenDate'>
+            <br>
+            <label>New Close Date: </label><input type="date" id='id_closeDate' name='newCloseDate'>
+            <br>
+            <button id='editButton' class='btn btn-success' type="button">Submit</button>            
+        </div>
+        <div id='confirmEdit'>
+            <h4>Are you sure you want to make these date changes?</h4>
+            <a href="{% url 'mbid:home' %}" class='btn btn-danger btn-lg' style='color:white'>Cancel</a>
+            <input type="submit" class="btn btn-success btn-lg" value='Yes'>
+        </div>
+
+        <br>
+
+        <input type="radio" id="close" name="cycleAction" value="close"><label for="close"> Close This Cycle</label>
+        <br>
+        <button class='btn btn-danger' id='closeButton' type="button">Close</button>
+        <div id='confirmClose'>
+            <h4>Are you sure you want to close the current cycle?</h4>
+            <a href="{% url 'mbid:home' %}" class='btn btn-danger btn-lg' style='color:white'>Cancel</a>
+            <input type="submit" class='btn btn-success btn-lg' value='Yes'>
+        </div>
+
+        <br>
+
+        <input type="radio" id="archive" name="cycleAction" value="archive"><label for="archive"> Archive Cycle</label>
+        <br>
+        <button class='btn btn-success' id='archiveButton' type="button">Archive</button>
+        <div id='confirmArchive'>
+            <h4>Are you sure you want to archive this cycle?</h4>
+            <a href="{% url 'mbid:home' %}" class='btn btn-danger btn-lg' style='color:white'>Cancel</a>
+            <input type="submit" class='btn btn-success btn-lg' value='Yes'>
+        </div>
+    </div>
+</form>
+<br>
+<a href="{% url 'mbid:home' %}"><button class='btn btn-secondary'>Back</button></a>
+
+{% if cycle_info.open %}
+<div class="row">
+    <div class="col-4">
+        <label style="text-align: left" for='searchitems'>Search items: </label> <input id='searchitems' type='text'>
+    </div>
+    <div class="col-4">
+    </div>
+    <div class="col-4">
+        <h4 style="text-align:right">Items open for bidding: {{totalItems}}</h4>
+    </div>
+</div>
+{% include "mbid/a_table.html" %}
+{% endif %}
+{% endblock %}
+
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function (event) {
+        document.getElementById("changeCycle").style.display = 'none';
+
+        document.getElementById("editSection").style.display = 'none';
+        document.getElementById("confirmEdit").style.display = 'none';
+
+        document.getElementById("id_openDate").value = ''
+        document.getElementById("id_closeDate").value = ''
+
+        document.getElementById("closeButton").style.display = 'none';
+        document.getElementById("confirmClose").style.display = 'none';
+
+        document.getElementById("archiveButton").style.display = 'none';
+        document.getElementById("confirmArchive").style.display = 'none';
+
+    })
+
+    $('#selectCycle').change(function () {
+        $('#changeCycle').show()
+    })
+
+    $('#edit').click(function () {
+        $('#editSection').show()
+
+        $('#closeButton').hide()
+        $('#confirmClose').hide()
+
+        $('#archiveButton').hide()
+        $('#confirmArchive').hide()
+    })
+    $('#editButton').click(function () {
+        $('#confirmEdit').show()
+    })
+
+    $('#close').click(function () {
+        $('#closeButton').show()
+
+        $('#editSection').hide()
+        $('#confirmEdit').hide()
+        $('#id_openDate')
+        $('#id_closeDate').val('')
+
+        $('#archiveButton').hide()
+        $('#confirmArchive').hide()
+    })
+    $('#closeButton').click(function () {
+        $('#confirmClose').show()
+    })
+
+    $('#archive').click(function () {
+        $('#archiveButton').show()
+
+        $('#editSection').hide()
+        $('#confirmEdit').hide()
+        $('#id_openDate').val('')
+        $('#id_closeDate').val('')
+
+        $('#closeButton').hide()
+        $('#confirmClose').hide()
+    })
+    $('#archiveButton').click(function () {
+        $('#confirmArchive').show()
+    })
+    $("#searchitems").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+        $("#availableitems tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+</script>
+{% endblock %}
