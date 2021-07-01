@@ -446,12 +446,7 @@ span {
 .order-summary-list{
 	padding-inline-start:20px;
 }
-.review-order-link {
-	margin:0 auto;
-}
-.review-order-link a {
-	color:#ffffff;
-}
+
 .card-deck {
 	display:flex;
 	flex-direction:column;
