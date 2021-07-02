@@ -133,7 +133,7 @@
 							<a class="nav-link dropdown-toggle {% if page_name == 'Request Service' %}active{% endif %}"
 								href="#" id="servicesDropdown" role="button" data-toggle="dropdown"
 								aria-haspopup="true">
-								<i class="fas fa-check-circle white"></i> Request Service
+								<i class="fas fa-check-circle white"></i> Request or Managed Service
 							</a>
 
 							<div class="dropdown-menu" aria-labelledby="reportsDropdown">
@@ -146,7 +146,7 @@
 						{% elif user.is_authenticated %}
 						<li class="nav-item dropdown">
 							<a href="/orders/services/2" class="nav-link">
-								<i class="fas fa-check-circle white"></i> Request Service
+								<i class="fas fa-check-circle white"></i> Request or Manage Service
 							</a>
 						</li>
 						{% endif %}
