@@ -1317,7 +1317,7 @@ class PhoneLocationForm(TabForm):
 class DatabaseForm(ModelForm):
 
     size_choice = ((10, '10 GB'),(20, '20 GB'),(30, '30 GB'),(40, '40 GB'),(50, '50 GB'))
-    size = forms.ChoiceField(choices=size_choice)
+    size = forms.ChoiceField(label='Size', choices=size_choice)
 
     owner_name = forms.ChoiceField(label='Owner', widget=forms.Select(attrs={'class': 'form-control'}))    
     shortcode = forms.CharField(label='Shortcode', validators=[validate_shortcode])

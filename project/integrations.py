@@ -222,6 +222,10 @@ def create_ticket_database_modify(instance, user, description):
         "Description": description,
         "Attributes": [
             {
+                "ID": "1855", # Name
+                "Value": instance.name
+            },
+            {
                 "ID": "1857", # Size
                 "Value": str(instance.size)
             },
