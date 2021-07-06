@@ -174,6 +174,19 @@ class ServerDiskInline(admin.TabularInline):
     model = ServerDisk
     ordering = ('name',)
 
+    def has_change_permission(self, request, obj=None):
+        print('check perm')
+        if request.user.has_perm('order.change_server'):
+            return True
+        elif request.user.has_perm('order.change_database'):
+            if obj:
+                try:  # DBA's can modify dedicated servers
+                    Database.objects.get(server_id=obj.id)
+                    return True
+                except ObjectDoesNotExist:
+                    print('not a managed server')
+
+        return False
 
 @admin.register(Database)
 class DatabaseAdmin(ServiceInstanceAdmin):
