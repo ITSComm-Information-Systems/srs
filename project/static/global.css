@@ -1,4 +1,4 @@
-@media (min-width:991.99px) {
+@media (min-width:992px) {
     html, body {
     	height: 100%;
 	}
@@ -236,7 +236,7 @@ footer {
 	color:#ffffff;
 	overflow:hidden;
 }
-@media (max-width:991.98px) {
+@media (max-width:992px) {
 	footer {
 		margin:2em 0 0 0;
 	}
