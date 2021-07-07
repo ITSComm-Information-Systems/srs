@@ -624,6 +624,7 @@ class Server(models.Model):
     name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     admin_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
+    database_type = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_TYPE"}, on_delete=models.SET_NULL, related_name='database_type')
     shortcode = ShortCodeField()
     created_date = models.DateTimeField(default=timezone.now, null=True)
     #shortcode = models.CharField(max_length=100) 
@@ -731,6 +732,8 @@ class ServerData(models.Model):
 
 
 class Database(models.Model):
+    MDB_ADMIN_GROUP = 1110
+
     MYSQL = 0
     MSSQL = 1
     ORACLE = 2
