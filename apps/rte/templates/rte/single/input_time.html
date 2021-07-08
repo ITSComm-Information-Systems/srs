@@ -11,9 +11,13 @@
 <h3>Enter time</h3>
 <form action='/apps/rte/view-time/display/' target='_blank' method='POST'>{% csrf_token %}
 	<input type='text' name='techSearch' class='tech_id' hidden>
-	<input type='date' name='calendarRangeStart' value='{{ date_start }}' hidden>
-	<input type='date' name='calendarRangeEnd' value='{{ date_end }}' hidden>
-	<button type='submit' class='btn btn-link col-2 offset-10' role='link'>View last week</button>
+	<input type='date' name='calendarRangeStart' hidden>
+	<input type='date' name='calendarRangeEnd' hidden>
+	<div class='text-right'>
+		<button type='submit' class='btn btn-link' role='link' name='viewLastButton' value='Last Week'>View last week</button>
+		<button type='submit' class='btn btn-link' role='link' name='viewLastButton' value='Last 3 Months'>View last 3 months</button>
+		<button type='submit' class='btn btn-link' role='link' name='viewLastButton' value='Last 6 Months'>View last 6 months</button>
+	</div>
 </form>
 
 <div class='row'>
