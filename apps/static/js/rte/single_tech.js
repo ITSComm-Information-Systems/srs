@@ -66,7 +66,7 @@ $(document).ready(function() {
 
     $('.form-group').on('keyup', function (e) {
         var key = e.which;
-        if(key == 13) {
+        if (key === 13) {
             if (validate_add()) {
                 num_entries = add_to_table(num_entries);
                 total_entries_single = total_entries_single + 1;
