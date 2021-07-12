@@ -758,9 +758,8 @@ $(document).ready(function() {
       //if (n == 1 && !validateForm()) return false;
       nextPrev(1);
     } else {
-      $("#nextBtn").prop('disabled', true).addClass("spinner-border")
+      $("#nextBtn").prop('disabled', true)
       sendTabData();
-      //$("#nextBtn").prop('disabled', false).removeClass("spinner-border")
     }
 
   });
