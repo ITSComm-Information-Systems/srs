@@ -83,7 +83,10 @@ class Command(BaseCommand):
 
         csvfile = io.StringIO()
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(['shortcode','size','name','date_created','rate_name','total_cost','owner'])
+        if self.service == 'MiServer':
+            csvwriter.writerow(['id','cpu','created_date','os_id','os_code','managed','ad_group','shortcode','size','name','rate_name','total_cost','owner'])
+        else:
+            csvwriter.writerow(['shortcode','size','name','date_created','rate_name','total_cost','owner'])
 
         for instance in instances:
             csvwriter.writerow(instance.values())
