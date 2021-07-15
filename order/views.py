@@ -891,11 +891,4 @@ class ServerView(UserPassesTestMixin, View):
         instance.in_service = False
         instance.save()
 
-        try:
-            db = Database.objects.get(server=instance)
-            db.in_service = False
-            db.save()
-        except:
-            print('matching db not found')
-
         return HttpResponseRedirect('/requestsent') 
