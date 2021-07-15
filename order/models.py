@@ -1280,16 +1280,11 @@ class Item(models.Model):
             else:
                 rec.os = Choice.objects.get(code='RedHatEnterpriseLinux8')
 
+        db_type = self.data.get('database')
+        if db_type:
+            rec.database_type = Choice.objects.get(parent__code='DATABASE_TYPE', label=db_type)
+        
         rec.save()
-
-        try:
-            db_type = self.data.get('database')
-            if db_type:
-                db_choice = Choice.objects.get(parent__code='DATABASE_TYPE', label=db_type)
-                db = Database.objects.update_or_create(server=rec,
-                    defaults={'name': rec.name, 'owner': rec.owner, 'support_email': rec.support_email, 'support_phone': rec.support_phone, 'type': db_choice, 'shortcode': rec.shortcode, 'size': 0, 'purpose': 'dedicated server'})
-        except:
-            print('error creating database')
 
         d = self.data.get('non_regulated_data')
         if d:
