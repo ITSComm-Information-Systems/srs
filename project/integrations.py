@@ -245,6 +245,10 @@ def create_ticket_database_modify(instance, user, description):
                 "Value": str(instance.size)
             },
             {
+                "ID": "1858", # Type
+                "Value": instance.type.label
+            },
+            {
                 "ID": "1875",  # Shortcode
                 "Value": instance.shortcode
             },
