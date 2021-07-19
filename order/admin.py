@@ -225,7 +225,7 @@ class DatabaseAdmin(ServiceInstanceAdmin):
 @admin.register(Server)
 class ServerAdmin(ServiceInstanceAdmin):
     list_display = ['name', 'owner', 'os']
-    list_filter = ('in_service','managed')
+    list_filter = ('in_service','managed', 'database_type')
     ordering = ('name',)
     search_fields = ['name','owner__name']
 
