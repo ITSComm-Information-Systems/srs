@@ -530,7 +530,8 @@ class VolumeSelectionForm(TabForm):
                 else:
                     self.template = 'order/server_modify.html'
             elif service.id == 14:
-                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name')
+                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True, server__isnull=True).order_by('name')
+                self.server_list = Server.objects.filter(owner__in=groups, in_service=True, database_type__isnull=False).order_by('name')
 
                 if self.action.label.startswith('Review'):
                     self.template = 'order/database_review.html'
