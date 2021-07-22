@@ -20,30 +20,48 @@
                     <tr>
                         <th data-id="{{volume.id}}" scope="row">{{ volume.name }}</th>
                         <td>{{ volume.owner }}</td>
-                        {% if volume.shared %}
                         <td>{{ volume.size }} GB</td>
-                        {% else %}
-                        <td>{{ volume.server.total_disk_size }} GB</td>
-                        {% endif %}
                         <td>{% for sc in volume.shortcode_list %}
                             {{ sc.shortcode }}<br>
-                    
+        
                             {% endfor %}
                         </td>
                         <td>
-                            {% if volume.shared %}
+
                             <div class="col-sm text-center">
                                 <i class="fas fa-check"></i>
                             </div>
-                            {% endif %}
+
                         </td>
                         <td class="action">
-                            {% if volume.shared %}
+
                             <a href="/orders/database/{{ volume.id }}">Edit</a><a href="#" class="delete" onclick="modifyVolume(1, {{ volume.id }})">Delete</a>
-                            {% endif %}
+
                         </td>
                     </tr>
                 {% endfor %}
+
+                {% for volume in tab.form.server_list %}
+                    
+                    <tr>
+                        <th data-id="{{volume.id}}" scope="row">{{ volume.name }}</th>
+                        <td>{{ volume.owner }}</td>
+
+                        <td>{{ volume.total_disk_size }} GB</td>
+
+                        <td>
+                            {{ volume.shortcode }}
+                        </td>
+                        <td>
+
+                        </td>
+                        <td class="action">
+
+                        </td>
+                    </tr>
+                {% endfor %}
+
+
             </tbody>
         </table>
     </div>

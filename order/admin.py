@@ -169,24 +169,24 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
 
         return response
 
+def user_has_permission(request, obj=None):
+    if request.user.has_perm('order.change_server'):
+        return True
+    elif request.user.has_perm('order.change_database'):
+        if obj:
+            if obj.admin_group_id == Database.MDB_ADMIN_GROUP:
+                return True
+    return False    
 
 class ServerDiskInline(admin.TabularInline):
     model = ServerDisk
     ordering = ('name',)
 
-    def has_change_permission(self, request, obj=None):
-        print('check perm')
-        if request.user.has_perm('order.change_server'):
-            return True
-        elif request.user.has_perm('order.change_database'):
-            if obj:
-                try:  # DBA's can modify dedicated servers
-                    Database.objects.get(server_id=obj.id)
-                    return True
-                except ObjectDoesNotExist:
-                    print('not a managed server')
+    def has_add_permission(self, request, obj=None):
+        return user_has_permission(request, obj)
 
-        return False
+    def has_change_permission(self, request, obj=None):
+        return user_has_permission(request, obj)
 
     def has_add_permission(self, request, obj=None):
         if request.user.has_perm('order.change_server'):
@@ -238,7 +238,7 @@ class DatabaseAdmin(ServiceInstanceAdmin):
 @admin.register(Server)
 class ServerAdmin(ServiceInstanceAdmin):
     list_display = ['name', 'owner', 'os']
-    list_filter = ('in_service','managed')
+    list_filter = ('in_service','managed', 'database_type')
     ordering = ('name',)
     search_fields = ['name','owner__name']
 
@@ -248,7 +248,7 @@ class ServerAdmin(ServiceInstanceAdmin):
 
     fieldsets = (
         (None, {
-            'fields': (('name', 'in_service','created_date'), 'owner', 'admin_group', 'shortcode', ('os','cpu','ram'),
+            'fields': (('name', 'in_service','created_date'), 'owner', ('admin_group','database_type'), 'shortcode', ('os','cpu','ram'),
                         ('replicated','backup','backup_time','public_facing'),
                         ('on_call', 'support_email', 'support_phone'),
 
@@ -271,18 +271,7 @@ class ServerAdmin(ServiceInstanceAdmin):
         js = ('order/js/admin_server.js',)
 
     def has_change_permission(self, request, obj=None):
-
-        if request.user.has_perm('order.change_server'):
-            return True
-        elif request.user.has_perm('order.change_database'):
-            if obj:
-                try:  # DBA's can modify dedicated servers
-                    Database.objects.get(server_id=obj.id)
-                    return True
-                except ObjectDoesNotExist:
-                    print('not a managed server')
-
-        return False
+        return user_has_permission(request, obj)
 
 
 @admin.register(Ticket)
