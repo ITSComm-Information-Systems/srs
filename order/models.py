@@ -624,6 +624,7 @@ class Server(models.Model):
     name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     admin_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
+    database_type = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_TYPE"}, on_delete=models.SET_NULL, related_name='database_type')
     shortcode = ShortCodeField()
     created_date = models.DateTimeField(default=timezone.now, null=True)
     #shortcode = models.CharField(max_length=100) 
@@ -731,6 +732,8 @@ class ServerData(models.Model):
 
 
 class Database(models.Model):
+    MDB_ADMIN_GROUP = 1110
+
     MYSQL = 0
     MSSQL = 1
     ORACLE = 2
@@ -1277,16 +1280,11 @@ class Item(models.Model):
             else:
                 rec.os = Choice.objects.get(code='RedHatEnterpriseLinux8')
 
+        db_type = self.data.get('database')
+        if db_type:
+            rec.database_type = Choice.objects.get(parent__code='DATABASE_TYPE', label=db_type)
+        
         rec.save()
-
-        try:
-            db_type = self.data.get('database')
-            if db_type:
-                db_choice = Choice.objects.get(parent__code='DATABASE_TYPE', label=db_type)
-                db = Database.objects.update_or_create(server=rec,
-                    defaults={'name': rec.name, 'owner': rec.owner, 'support_email': rec.support_email, 'support_phone': rec.support_phone, 'type': db_choice, 'shortcode': rec.shortcode, 'size': 0, 'purpose': 'dedicated server'})
-        except:
-            print('error creating database')
 
         d = self.data.get('non_regulated_data')
         if d:
