@@ -4,7 +4,7 @@ from .models import Role
 from .models import Grantor
 from .models import AuthUserDept
 from django.contrib.auth.models import User
-from django.db import IntegrityError
+from django.db import IntegrityError, connections
 
 from django.urls import path
 
@@ -18,10 +18,30 @@ class RoleAdmin(admin.ModelAdmin):
     ordering = ('display_seq_no', )
 
 
-class BulkUpdateForm(forms.Form):
-    groups_descr = UmOscDeptUnitsReptV.objects.order_by('dept_grp_descr').values_list('dept_grp', 'dept_grp_descr').distinct()
+def get_dept_list(dept_grp):
+    sql = "select distinct deptid " \
+            "from PINN_CUSTOM.UM_MPATHDW_CURR_DEPARTMENT " \
+            "where dept_grp = %s " 
 
-    department_group = forms.ChoiceField(choices=groups_descr)
+    with connections['pinnacle'].cursor() as cursor:
+        cursor.execute(sql, [dept_grp])    
+        s = cursor.fetchall()
+        return s
+
+def get_vp_groups():
+    sql = "select distinct dept_grp, dept_grp_descr " \
+            "from PINN_CUSTOM.UM_MPATHDW_CURR_DEPARTMENT " \
+            "where dept_eff_status = 'A' " \
+            "and dept_grp <> ' ' " \
+            "order by 2"
+
+    with connections['pinnacle'].cursor() as cursor:
+        cursor.execute(sql)    
+        return cursor.fetchall()
+
+
+class BulkUpdateForm(forms.Form):
+    department_group = forms.ChoiceField(choices=get_vp_groups())
     uniqname = Uniqname(max_length=8)
     role = forms.ChoiceField(choices=[('','----'),('4','Proxy'),('5','Orderer'),('6','Reporter')])
     action = forms.ChoiceField(choices=[('','----'),('Add','Add'),('Delet','Delete')])
@@ -55,7 +75,8 @@ class AuthUserDeptAdmin(admin.ModelAdmin):
                 group_id = form.cleaned_data['role']
 
                 department_group = form.cleaned_data['department_group']
-                dept_list = list(UmOscDeptUnitsReptV.objects.filter(dept_grp=department_group).values('deptid').distinct())
+                #dept_list = list(UmOscDeptUnitsReptV.objects.filter(dept_grp=department_group).values('deptid').distinct())
+                dept_list = get_dept_list(department_group)
 
                 user = User.objects.get(username=uniqname)
                 count = 0
@@ -65,7 +86,7 @@ class AuthUserDeptAdmin(admin.ModelAdmin):
                         rec = AuthUserDept()
                         rec.user = user
                         rec.group_id = group_id
-                        rec.dept = dept['deptid']
+                        rec.dept = dept[0]
                         try:
                             rec.save()
                             count += 1
