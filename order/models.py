@@ -497,6 +497,7 @@ class ArcInstance(Volume):
     globus = models.BooleanField(default=False) 
     globus_phi = models.BooleanField(default=False) 
     thunder_x = models.BooleanField(default=False)
+    research_commputing_package = models.BooleanField(default=False)
 
     class meta:
         verbose_name = 'ARC Storage Instance'   
