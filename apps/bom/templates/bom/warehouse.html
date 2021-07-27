@@ -69,8 +69,8 @@
     <table class="table-borderless table-hover table-striped table-sm">
         <thead>
             <tr>
-                <th style="width: 5%;">Quantity</th>
-                <th style="width: 15%;">Status</th>
+                <th>Quantity</th>
+                <th>Status</th>
                 <th>Staged</th>
                 <th>Order Date</th>
                 <th>Est Receive Date</th>
@@ -91,8 +91,8 @@
             </tr>
             <tr class="border-bottom">
                 {{ form.id }}
-                <td>{{ form.quantity }}</td>
-                <td>{{ form.status }}</td>
+                <td style="width: 11%;">{{ form.quantity }}</td>
+                <td style="width: 12%;">{{ form.status }}</td>
                 <td style="text-align: center; vertical-align: middle;">{{ form.staged }}</td>
                 <td>{{ form.order_date }}</td>
                 <td>{{ form.estimated_receive_date }}</td>
