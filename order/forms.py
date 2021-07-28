@@ -269,7 +269,7 @@ class TabForm(forms.Form):
                 if element.attributes:
                     field.widget.input_type = element.attributes
             elif element.type == 'Checkbox':
-                field = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=eval(element.attributes))
+                field = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=eval(element.attributes), **element.arguments)
                 field.template_name = 'project/checkbox.html'
             elif element.type == 'HTML':
                 field = forms.CharField(required=False)
