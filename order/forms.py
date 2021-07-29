@@ -1132,6 +1132,9 @@ class BillingStorageForm(TabForm):
 
                 self.fields["billingAuthority"].initial = 'yes'
                 self.fields["serviceLvlAgreement"].initial = 'yes'
+    
+                if si.research_computing_package:
+                    self.fields["research_comp_pkg"].initial = 'yes'
 
         if self.action.service.name == 'miBackup':
             rate = StorageRate.objects.get(name=BackupDomain.RATE_NAME)
@@ -1204,8 +1207,11 @@ class BillingStorageForm(TabForm):
 
             summary[0]['value'] = label 
 
+        if self.action.service.name=='turboResearch':
+            summary[3]['label'] = 'I have read the Sensitive Data Guide, agree that my use of this service complies with those guidelines and accept the terms of the Service Level Agreement.'
+        else:
+            summary[2]['label'] = 'I have read the Sensitive Data Guide, agree that my use of this service complies with those guidelines and accept the terms of the Service Level Agreement.'
 
-        summary[2]['label'] = 'I have read the Sensitive Data Guide, agree that my use of this service complies with those guidelines and accept the terms of the Service Level Agreement.'
 
         #instance_id = self.data.get('instance_id')
         
