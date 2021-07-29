@@ -93,7 +93,7 @@ class AuthUserDeptAdmin(admin.ModelAdmin):
                         except IntegrityError:
                             print('Not added, already exists')
                     else:
-                        AuthUserDept.objects.filter(dept=dept['deptid'], user=user, group_id=group_id).delete()
+                        AuthUserDept.objects.filter(dept=dept[0], user=user, group_id=group_id).delete()
                         count += 1
 
                 context['message'] = f'{count} records {action}ed'
