@@ -34,7 +34,7 @@ from django.db import connections
 from django import db
 import cx_Oracle
 
-
+from django.core.mail import EmailMessage
     
 def homepage(request):
 
@@ -225,6 +225,7 @@ def chartchangedept(request):
 	return HttpResponse(template.render(context, request))
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapprovalinit(request):
+
 	# Check for currently-running bill cycle
 	curr = connections['pinnacle'].cursor()
 	# running = curr.callfunc('UM_OSC_UTIL_K.UM_IS_BILL_RUNNING_F', str)
@@ -243,96 +244,14 @@ def managerapproval(request):
 	context = {"title": "Manager Approval Form"}
 	return HttpResponse(template.render(context, request))
 
-
-
-	# Check for currently-running bill cycle
-	curr = connections['pinnacle'].cursor()
-	# running = curr.callfunc('UM_OSC_UTIL_K.UM_IS_BILL_RUNNING_F', str)
-	curr.close()
-
-	id = request.GET.get("id")
-
-	data = UmChartChangeDept.objects.filter(request_no=id)
-	
-
+@permission_required(('oscauth.can_order'), raise_exception=True)
+def managerapprovalsubmit(request):
 	template = loader.get_template('managerapproval.html')
-
-	context = data.values()[0]
-	print(context)
-	return HttpResponse(template.render(context, request))
+	context = {"title": "Manager Approval Form"}
 
 	
 
-	# Find initial department
-	if request.POST.get('select_dept'):
-		user_depts = ''
-		select_dept = request.POST.get('select_dept')
-	else:
-		# if request.user.has_perm('oscauth.can_report_all'):
-		user_depts = UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid')
-		# else:
-			# user_depts = AuthUserDept.get_order_departments(request.user.id)
-
-		# Find associated chartfields
-		if user_depts:
-			select_dept = user_depts[0].dept
-		else:
-			select_dept = ''
-	
-	# Get department info
-	find_dept_info = UmOscDeptProfileV.objects.filter(deptid=select_dept)
-	if find_dept_info:
-		dept = find_dept_info[0]
-		dept_info = {
-			'dept_id': select_dept,
-			'dept_name': dept.dept_name,
-			'dept_mgr': dept.dept_mgr
-		}
-	else:
-		dept_info = ''
-
-	# Set intitial chartfields
-	chartfield_list = UmOscAcctsInUseV.objects.filter(deptid=select_dept).order_by('account_number')
-
-	# Set intitial chartfield
-	if chartfield_list:
-		selected_cf = chartfield_list[0]
-	else: selected_cf = ''
-
-	# Find chartfield nickname
-	nickname = ''
-	if selected_cf != '':
-		nicknames = Chartcom.objects.all()
-		for n in nicknames:
-			if n.account_number == selected_cf:
-				nickname = n.name
-
-	# Select department to change to
-	if user_depts:
-		new_dept = user_depts[0].dept
-	else:
-		new_dept = ''
-	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
-	# Get notice
-	notice = Page.objects.get(permalink='/ccr')
-	context = {
-		'title': 'Chartfield Change Request',
-		'deptids': user_depts,
-		'dept_info': dept_info,
-		'selected_cf': selected_cf,
-		'cf_info': chartfield_list,
-		'nickname': nickname,
-		'new_dept': new_dept,
-		'new_cf': new_cf,
-		'choose_cf_template': 'choose_cf.html',
-		'choose_users_template': 'choose_users.html',
-		'assign_new_template': 'assign_new.html',
-		'review_submit_template': 'review_submit.html',
-		'notice': notice
-	}
-
-	return HttpResponse(template.render(context, request))
-
+	return JsonResponse({"success": True})
 # Gives new chartfields when user changes department
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def change_dept(request):
@@ -432,14 +351,16 @@ def submit(request):
 				mrc_account_number=strings[2],
 				toll_account_number=strings[3],
 				local_account_number=strings[4],
-				dept_full_name=strings[5],
-				dept_mgr=strings[6],
-				user_full_name=strings[7],
-				new_dept_full_name=strings[8],
-				new_dept_mgr=strings[9],
-				new_chartfield=strings[10],
-				new_shortcode=strings[11],
-				optional_message=strings[12],
+				old_dept_full_name=strings[5],
+				old_dept_mgr=strings[6],
+				old_chartfield=strings[7],
+				old_shortcode=strings[8],
+				# user_full_name=strings[7],
+				new_dept_full_name=strings[9],
+				new_dept_mgr=strings[10],
+				new_chartfield=strings[11],
+				new_shortcode=strings[12],
+				optional_message=strings[13],
 				date_added=date.today(),
 				id=id)
 			new_entry.save()
