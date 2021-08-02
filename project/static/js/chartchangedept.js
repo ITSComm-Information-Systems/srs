@@ -410,7 +410,7 @@ $(document).ready(function() {
 	// Update department for page 1 - AJAX
 	$('#chart_deptids').on('change', function() {
 		var selected = $('#chart_deptids').val();
-
+		$("#old_dept_mgr").html(selected.split("?")[1])
 		$.ajax({
 			url: '/chartchange/ajax/',
 			data: {
@@ -466,8 +466,9 @@ $(document).ready(function() {
 				}
 				name_display = selected.split('?');
 				$('#dept_title').html('Department: ' + name_display[0]);
+				
 				$('#dept_mgr').html(name_display[1].replace(",", ", "));
-				$('.dept_full_name').html(name_display[0]);
+				$('#old_dept_full_name').html(name_display[0]);
 				$('#cfc-2').addClass('disabled');
 				$('#cfc-3').addClass('disabled');
 				$('#cfc-4').addClass('disabled');
@@ -795,7 +796,9 @@ function change_current_page(selected) {
 	$("#class_code").html(selected.class_code);
 	$("#project_grant").html(selected.project_grant);
 	$('#cf_shortcode').html(selected.short_code);
+	$('#old_shortcode').html(selected.short_code);
 	$('#cf_nickname').html(selected.nickname);
+	$('#old_chartfield').html(selected.account_number);
 	$('.cf_num').html(selected.account_number);
 	if (selected.nickname) {
 		$('.cf_nickname').html('(' + selected.nickname + ')');
@@ -876,9 +879,11 @@ function load_4(cf_change_table, review_table) {
 			local
 		]).draw();
 
-		var dept_full_name = $("#dept_full_name").html()
-		var dept_mgr = $("#dept_mgr").html()
-		var user_full_name = $("#user_full_name").html()
+		var old_dept_full_name = $("#old_dept_full_name").html()
+		var old_dept_mgr = $("#old_dept_mgr").html()
+		var old_chartfield = $("#old_chartfield").html()
+		var old_shortcode = $("#old_shortcode").html()
+		// var user_full_name = $("#user_full_name").html()
 		var new_dept_full_name = $("#new_dept_full_name").html()
 		var new_dept_mgr = $("#new_dept_mgr").html()
 		var new_chartfield = $("#new_chartfield").html()
@@ -915,9 +920,11 @@ function load_4(cf_change_table, review_table) {
 		+ mrc + '//' 
 		+ toll + '//' 
 		+ local + '//' 
-		+ dept_full_name + "//"
-		+ dept_mgr + "//"
-		+ user_full_name + "//"
+		+ old_dept_full_name + "//"
+		+ old_dept_mgr + "//"
+		+ old_chartfield + "//"
+		+ old_shortcode + "//"
+		// + user_full_name + "//"
 		+ new_dept_full_name + "//"
 		+ new_dept_mgr + "//"
 		+ new_chartfield + "//"
