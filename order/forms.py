@@ -1015,6 +1015,15 @@ class ServerSpecForm(TabForm):
             if len(servername) > 0:
                 self.add_error('serverName', f'A server named {name.lower()} already exists. Please choose a different name.')
 
+            # managed windows name can't exceed 15 char:
+            if len(name) > 15:
+                if self.cleaned_data.get('managed') == 'True':
+                    os = self.cleaned_data.get('misevos', False)
+                    if os:
+                        os_name = Choice.objects.get(id=int(os)).label
+                        if os_name.startswith('Windows'):
+                            self.add_error('serverName', 'Name for a managed Windows server cannot exceed 15 characters (including prefix).')
+
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)
         if ram != None and cpu != None:
