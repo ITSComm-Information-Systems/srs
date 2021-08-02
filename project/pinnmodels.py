@@ -11,6 +11,30 @@ from django.contrib.auth.models import User
 # This view uses the Pinnacle location table and includes locations added by ITS staff
 #  as well as the official builfing codes from MPathways
 
+class UmChartChangeDept(models.Model):
+     uniqname = models.CharField(max_length=8) 
+     user_defined_id = models.CharField(max_length=20)
+     mrc_account_number = models.CharField(max_length=100)
+     toll_account_number = models.CharField(max_length=100)
+     local_account_number = models.CharField(max_length=100)
+     dept_full_name = models.CharField(max_length=100)
+     dept_mgr = models.CharField(max_length=100)
+     user_full_name = models.CharField(max_length=100)
+     new_dept_full_name = models.CharField(max_length=100)
+     new_dept_mgr = models.CharField(max_length=100)
+     new_chartfield = models.CharField(max_length=100)
+     new_shortcode = models.CharField(max_length=100)
+     optional_message = models.CharField(max_length=100)
+     date_added = models.DateField(null=True) # added null=True
+     # date_processed = models.DateField(null=True) # added null=True
+     # messages = models.CharField(max_length=2000)
+     building = models.CharField(max_length=2000)
+     id = models.IntegerField(9, null=False, primary_key=True)
+
+     class Meta:
+          managed = False
+          ordering = ('id',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_acct_change_requests'
 
 class UmBillInputApiV(models.Model):
      um_bill_input_id = models.IntegerField(primary_key=True)
@@ -717,12 +741,31 @@ class UmOscAcctChangeInput(models.Model):
      date_processed = models.DateField(null=True) # added null=True
      messages = models.CharField(max_length=2000)
      request_no = models.IntegerField(9, null=False, primary_key=True)
+     approved_by = models.CharField(max_length=8, null=True)
 
      class Meta:
           managed = False
           ordering = ('request_no',)
           db_table = 'PINN_CUSTOM\".\"um_osc_acct_change_input'
 
+class UmOscAcctChangeRequests(models.Model):
+     submitted_by = models.CharField(max_length=8, null=True)
+     date_submitted = models.DateField(null=True)
+     submitted_to_deptid = models.CharField(max_length=10, null=True)
+     last_email_date = models.DateField(null=True)
+     approved_by = models.CharField(max_length=8, null=True)
+     date_approved = models.DateField(null=True)
+     user_defined_id = models.CharField(max_length=20, null=True)
+     mrc_account_number = models.CharField(max_length=100)
+     toll_account_number = models.CharField(max_length=100)
+     local_account_number = models.CharField(max_length=100)
+     request_no = models.IntegerField(9, null=False, primary_key=True)
+
+     class Meta:
+          managed = False
+          ordering = ('request_no',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_acct_change_requests'
+          
 class UmOscAcctSubscribersV(models.Model):
      subscriber_id = models.CharField(max_length=7) 
      user_defined_id = models.CharField(max_length=20)
@@ -1127,117 +1170,3 @@ class UmBomProcurementUsersV(models.Model):
         managed = False
         db_table = 'PINN_CUSTOM\".\"UM_BOM_PROCUREMENT_USERS_V'
 
-# MBid Tables
-
-class UmEcommMbidCriticalDate(models.Model):
-    bidding_year = models.CharField(max_length=4, primary_key=True)
-    bidding_month = models.CharField(max_length=2)
-    bidding_closed = models.CharField(max_length=1)
-
-    bidding_open_time = models.DateTimeField()
-    bidding_open_date = models.DateTimeField()
-    bidding_close_time = models.DateTimeField()
-    bidding_close_date = models.DateTimeField()
-
-    date_created = models.DateTimeField()
-    date_last_updated = models.DateTimeField()
-
-    show_lowest_bid = models.CharField(max_length=3)
-    class Meta:
-        managed = False
-        db_table = 'PINN_CUSTOM\".\"UM_ECOMM_MBID_CRITICAL_DATES'
-
-
-# Write CSVs to here
-class UmEcommMbidVendorInput(models.Model):
-    bidding_year = models.CharField(max_length=4, null=True)
-    bidding_month = models.CharField(max_length=2, null=True)
-    bidding_closed = models.CharField(max_length=1, null=True)
-
-    item_code = models.CharField(max_length=12, primary_key=True)
-    item_desc = models.CharField(max_length=50, null=True)
-    subclass_id = models.CharField(max_length=4, null=True)
-    manufacturer_name = models.CharField(max_length=50, null=True)
-    manufacturer_part_number=models.CharField(max_length=50, null=True)
-    vendor_price = models.FloatField()
-    vendor_notes = models.CharField(max_length=2000, null=True)
-
-    vendor_id = models.CharField(max_length=11, null=True)
-    vendor_name = models.CharField(max_length=50, null=True)
-    vendor_address1 = models.CharField(max_length=35, null=True)
-    vendor_address2 = models.CharField(max_length=35, null=True)
-    vendor_city = models.CharField(max_length=25, null=True)
-    vendor_state = models.CharField(max_length=2, null=True)
-    vendor_zip_code = models.CharField(max_length=2, null=True)
-    vendor_zip_ext = models.CharField(max_length=2, null=True)
-    vendor_itemno = models.CharField(max_length=50, null=True) #dont know where this comes from
-    
-    vendor_rank = models.IntegerField()
-
-    vendor_chosen = models.CharField(max_length=1, null=True)
-    date_created = models.DateTimeField()
-    date_last_updated = models.DateTimeField()
-    vendor_email_address = models.CharField(max_length=50, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'PINN_CUSTOM\".\"UM_ECOMM_MBID_VENDOR_INPUT'
-
-
-class UmEcommMbidWarehseInput(models.Model):
-    bidding_year = models.CharField(max_length=4)
-    bidding_month = models.CharField(max_length=2)
-    bidding_closed = models.CharField(max_length=1)
-
-    item_code = models.CharField(max_length=12, primary_key=True)
-    bid_status = models.CharField(max_length=30, null=True)
-    um_notes = models.CharField(max_length=2000)
-    annual_qty = models.IntegerField()
-    qty_required = models.IntegerField()
-
-    item_desc = models.CharField(max_length=50, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'PINN_CUSTOM\".\"UM_ECOMM_MBID_WAREHSE_INPUT'
-
-
-class UmEcommMbidCommodityV(models.Model):
-    bidding_year = models.CharField(max_length=4)
-    bidding_month = models.CharField(max_length=2)
-    bidding_closed = models.CharField(max_length=1)
-    
-    item_code = models.CharField(max_length=12, primary_key=True)
-    bid_status = models.CharField(max_length=30, null=True)
-    um_notes = models.CharField(max_length=2000)
-    annual_qty = models.IntegerField()
-    qty_required = models.IntegerField()
-
-    title = models.CharField(max_length=200)  # description
-
-    subclass_id = models.CharField(max_length=16)
-    manufacturer_id = models.CharField(max_length=512)  # SUTTLE
-    uom = models.CharField(max_length=42)  # unit of measure  
-    manufacturer_part_number = models.CharField(max_length=512) 
-
-    class Meta:
-        managed = False
-        db_table = 'PINN_CUSTOM\".\"UM_ECOMM_MBID_COMMODITY_V'
-
-
-class UmEcommMbidVendorV(models.Model):
-    id = models.CharField(max_length=32, primary_key=True)
-    name = models.CharField(max_length=64, null=True)
-    contact_name = models.CharField(max_length=100)
-    address1 = models.CharField(max_length=255)
-    address2 = models.CharField(max_length=255)
-    city = models.CharField(max_length=50)
-    state = models.CharField(max_length=2)
-    zip_code = models.CharField(max_length=5)
-    phone = models.CharField(max_length=50)
-    fax = models.CharField(max_length=50)
-    email_address = models.CharField(max_length=320)
-
-    class Meta:
-        managed = False
-        db_table = 'PINN_CUSTOM\".\"UM_ECOMM_MBID_VENDOR_V'

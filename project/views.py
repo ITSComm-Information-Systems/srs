@@ -17,7 +17,7 @@ from django.urls import resolve
 
 from ldap3 import Server, Connection, ALL
 
-from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput, UmOscChartfieldV
+from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput, UmOscChartfieldV, UmChartChangeDept
 from order.models import Chartcom
 from oscauth.models import AuthUserDept, AuthUserDeptV
 from datetime import datetime, date
@@ -137,7 +137,201 @@ def chartchange(request):
 
 	return HttpResponse(template.render(context, request))
 
+@permission_required(('oscauth.can_order'), raise_exception=True)
+def chartchangedept(request):
+	# Check for currently-running bill cycle
+	curr = connections['pinnacle'].cursor()
+	running = curr.callfunc('UM_OSC_UTIL_K.UM_IS_BILL_RUNNING_F', str)
+	curr.close()
 
+	if running == 'Y':
+		template = loader.get_template('billingcycle.html')
+		context = {
+			'title': 'Chartfield Change Request',
+		}
+		return HttpResponse(template.render(context, request))
+
+	# Not currently billing
+	template = loader.get_template('chartchangedept.html')
+
+	# Find initial department
+	if request.POST.get('select_dept'):
+		user_depts = ''
+		select_dept = request.POST.get('select_dept')
+	else:
+		# if request.user.has_perm('oscauth.can_report_all'):
+		user_depts = UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid')
+		# else:
+			# user_depts = AuthUserDept.get_order_departments(request.user.id)
+
+		# Find associated chartfields
+		if user_depts:
+			select_dept = user_depts[0].dept
+		else:
+			select_dept = ''
+	
+	# Get department info
+	find_dept_info = UmOscDeptProfileV.objects.filter(deptid=select_dept)
+	if find_dept_info:
+		dept = find_dept_info[0]
+		dept_info = {
+			'dept_id': select_dept,
+			'dept_name': dept.dept_name,
+			'dept_mgr': dept.dept_mgr
+		}
+	else:
+		dept_info = ''
+
+	# Set intitial chartfields
+	chartfield_list = UmOscAcctsInUseV.objects.filter(deptid=select_dept).order_by('account_number')
+
+	# Set intitial chartfield
+	if chartfield_list:
+		selected_cf = chartfield_list[0]
+	else: selected_cf = ''
+
+	# Find chartfield nickname
+	nickname = ''
+	if selected_cf != '':
+		nicknames = Chartcom.objects.all()
+		for n in nicknames:
+			if n.account_number == selected_cf:
+				nickname = n.name
+
+	# Select department to change to
+	if user_depts:
+		new_dept = user_depts[0].dept
+	else:
+		new_dept = ''
+	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
+	# Get notice
+	notice = Page.objects.get(permalink='/ccr')
+	context = {
+		'title': 'Chartfield Change Request (external department)',
+		'deptids': user_depts,
+		'dept_info': dept_info,
+		'selected_cf': selected_cf,
+		'cf_info': chartfield_list,
+		'nickname': nickname,
+		'new_dept': new_dept,
+		'new_cf': new_cf,
+		'choose_cf_template': 'choose_cf.html',
+		'choose_users_template': 'choose_users.html',
+		'assign_new_template': 'assign_new.html',
+		'review_submit_template': 'review_submit.html',
+		'notice': notice
+	}
+
+	return HttpResponse(template.render(context, request))
+@permission_required(('oscauth.can_order'), raise_exception=True)
+def managerapprovalinit(request):
+	# Check for currently-running bill cycle
+	curr = connections['pinnacle'].cursor()
+	# running = curr.callfunc('UM_OSC_UTIL_K.UM_IS_BILL_RUNNING_F', str)
+	curr.close()
+
+	id = request.GET.get("id")
+
+	data = list(UmChartChangeDept.objects.filter(id=id).values())
+	
+	return JsonResponse(data, safe=False)
+
+
+@permission_required(('oscauth.can_order'), raise_exception=True)
+def managerapproval(request):
+	template = loader.get_template('managerapproval.html')
+	context = {"title": "Manager Approval Form"}
+	return HttpResponse(template.render(context, request))
+
+
+
+	# Check for currently-running bill cycle
+	curr = connections['pinnacle'].cursor()
+	# running = curr.callfunc('UM_OSC_UTIL_K.UM_IS_BILL_RUNNING_F', str)
+	curr.close()
+
+	id = request.GET.get("id")
+
+	data = UmChartChangeDept.objects.filter(request_no=id)
+	
+
+	template = loader.get_template('managerapproval.html')
+
+	context = data.values()[0]
+	print(context)
+	return HttpResponse(template.render(context, request))
+
+	
+
+	# Find initial department
+	if request.POST.get('select_dept'):
+		user_depts = ''
+		select_dept = request.POST.get('select_dept')
+	else:
+		# if request.user.has_perm('oscauth.can_report_all'):
+		user_depts = UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid')
+		# else:
+			# user_depts = AuthUserDept.get_order_departments(request.user.id)
+
+		# Find associated chartfields
+		if user_depts:
+			select_dept = user_depts[0].dept
+		else:
+			select_dept = ''
+	
+	# Get department info
+	find_dept_info = UmOscDeptProfileV.objects.filter(deptid=select_dept)
+	if find_dept_info:
+		dept = find_dept_info[0]
+		dept_info = {
+			'dept_id': select_dept,
+			'dept_name': dept.dept_name,
+			'dept_mgr': dept.dept_mgr
+		}
+	else:
+		dept_info = ''
+
+	# Set intitial chartfields
+	chartfield_list = UmOscAcctsInUseV.objects.filter(deptid=select_dept).order_by('account_number')
+
+	# Set intitial chartfield
+	if chartfield_list:
+		selected_cf = chartfield_list[0]
+	else: selected_cf = ''
+
+	# Find chartfield nickname
+	nickname = ''
+	if selected_cf != '':
+		nicknames = Chartcom.objects.all()
+		for n in nicknames:
+			if n.account_number == selected_cf:
+				nickname = n.name
+
+	# Select department to change to
+	if user_depts:
+		new_dept = user_depts[0].dept
+	else:
+		new_dept = ''
+	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
+	# Get notice
+	notice = Page.objects.get(permalink='/ccr')
+	context = {
+		'title': 'Chartfield Change Request',
+		'deptids': user_depts,
+		'dept_info': dept_info,
+		'selected_cf': selected_cf,
+		'cf_info': chartfield_list,
+		'nickname': nickname,
+		'new_dept': new_dept,
+		'new_cf': new_cf,
+		'choose_cf_template': 'choose_cf.html',
+		'choose_users_template': 'choose_users.html',
+		'assign_new_template': 'assign_new.html',
+		'review_submit_template': 'review_submit.html',
+		'notice': notice
+	}
+
+	return HttpResponse(template.render(context, request))
 
 # Gives new chartfields when user changes department
 @permission_required(('oscauth.can_order'), raise_exception=True)
@@ -145,14 +339,17 @@ def change_dept(request):
 	selected_dept = request.GET.get('deptids', None)
 	selected_dept = selected_dept.split(' - ')[0]
 	when = request.GET.get('when', None)
-
 	# Get list of chartcoms in user's shortlist for user to select new
 	if when == 'assign_new':
 		cf_options = Chartcom.get_user_chartcoms_for_dept(request.user, selected_dept)
+		for i in cf_options:
+			db = UmOscAllActiveAcctNbrsV.objects.filter(account_number=i["account_number"])
+			if db:
+				i["short_code"] = db[0].short_code
 	# Get list of chartcoms in use
 	else:
 		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
-
+	
 	return JsonResponse(cf_options, safe=False)
 
 
@@ -161,7 +358,7 @@ def change_dept(request):
 def get_cf_data(request):
 	selected_cf = request.GET.get('selected', None)
 	cf_data = list(UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values())
-
+	
 	if not cf_data:
 		cf_data = {'fund': 'missing'}
 	return JsonResponse(cf_data, safe=False)
@@ -170,14 +367,15 @@ def get_cf_data(request):
 # Finds users for selected chartfield
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def get_users(request):
+	# selected_cf = request.GET.get('selected', None).split(" ")[0]
 	selected_cf = request.GET.get('selected', None)
 
 	# Get info for selected chartfield
-	cf = UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values()
+	cf = UmOscAcctsInUseV.objects.filter(short_code=selected_cf).values()
 	if cf:
 		cf = cf[0]
 	else:
-		cf = ''
+		cf = {}
 
 	# Find chartfield nickname
 	nickname = ''
@@ -188,7 +386,7 @@ def get_users(request):
 				nickname = n.name
 
 	# Get users
-	cf_users = UmOscAcctSubscribersV.objects.filter(chartcom=selected_cf).order_by('user_defined_id')
+	cf_users = UmOscAcctSubscribersV.objects.filter(chartcom=cf.get("account_number", "")).order_by('user_defined_id')
 	users = []
 	for c in cf_users:
 		user = {
@@ -203,7 +401,6 @@ def get_users(request):
 			user['selected'] = request.POST.get('select' + c.user_defined_id)
 		users.append(user)
 
-
 	context = {
 		'selected_cf': cf,
 		'nickname': nickname,
@@ -217,9 +414,10 @@ def get_users(request):
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def submit(request):
 	template = loader.get_template('submitted.html')
-
+	id = UmChartChangeDept.objects.count()
 	for key, value in request.POST.items():
 		# Format of 'string' is user_defined_id//mrc_chartfield//toll_chartfield//local_chartfield
+		# plus a lot of other stuff afterwards
 		string = request.POST.get(key)
 		if '/' in string:
 			strings = string.split('//')
@@ -227,24 +425,31 @@ def submit(request):
 			if strings[2] == 'N/A':
 				strings[2] = strings[1]
 				strings[3] = strings[1]
-			new_entry = UmOscAcctChangeInput(
+			new_entry = UmChartChangeDept(
 				uniqname=request.user.username,
 				user_defined_id=strings[0],
-				mrc_account_number=strings[1],
-				toll_account_number=strings[2],
-				local_account_number=strings[3],
+				building=strings[1],
+				mrc_account_number=strings[2],
+				toll_account_number=strings[3],
+				local_account_number=strings[4],
+				dept_full_name=strings[5],
+				dept_mgr=strings[6],
+				user_full_name=strings[7],
+				new_dept_full_name=strings[8],
+				new_dept_mgr=strings[9],
+				new_chartfield=strings[10],
+				new_shortcode=strings[11],
+				optional_message=strings[12],
 				date_added=date.today(),
-				date_processed=None,
-				messages=None,
-				request_no=None)
+				id=id)
 			new_entry.save()
 
 	# Add record to Pinnacle
-	curr = connections['pinnacle'].cursor()
-	uniqname = request.user.username
-	datetime_added = date.today()
-	curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
-	curr.close()
+	# curr = connections['pinnacle'].cursor()
+	# uniqname = request.user.username
+	# datetime_added = date.today()
+	# curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
+	# curr.close()
 
 	context = {
 		'title': 'Chartfield Change',

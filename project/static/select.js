@@ -25,6 +25,38 @@ $(document).ready(function() {
 		display:"inline",
 	});
 
+	$("#cf_dropdown").select2({
+		placeholder: "-- Select your current shortcode --",
+		display:"inline",
+		sorter: data => data.sort((a, b) => a.text.localeCompare(b.text)),
+	});
+
+	$("#chart_deptids").select2({
+		placeholder: "-- Select your current department --",
+		display:"inline",
+	});
+
+	$("#select_dept_3").select2({
+		placeholder: "-- Select new department --",
+		display:"inline",
+	});
+
+	$("#select_cf_3").select2({
+		placeholder: "-- Select new shortcode --",
+		display:"inline",
+		sorter: data => data.sort((a, b) => a.text.localeCompare(b.text)),
+	});
+
+	$("#cf_chartfield").select2({
+		placeholder: "-- Select your current chartfield --",
+		display:"inline",
+	});
+
+	$("#cf_chartfield_3").select2({
+		placeholder: "-- Select new chartfield --",
+		display:"inline",
+	});
+
 	// Search bar placeholder text
   	// $("#deptf").one('select2:open', function(e) {
     // 	$('input.select2-search__field').prop('placeholder', 'Search by department name or ID');
@@ -96,5 +128,5 @@ $(document).ready(function() {
 		display:"inline",
     });
 
-
+	$("#chart_deptids").siblings()[1].style.width = "auto";
 });
