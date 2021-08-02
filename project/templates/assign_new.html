@@ -1,3 +1,4 @@
+{% load ccr_tags %}
 <div class="container mt-4" id="assign_row">	
 	<p class="mt-4 cf_info inline">You have chosen to change the following User IDs from Chartfield:&nbsp;</p><strong class="current cf_num inline">{{ selected_cf.account_number }}</strong>
 		{% if nickname %}
@@ -10,7 +11,7 @@
 
 	<p>Please select a new department and chartfield.</p>
 
-	<div class="row mt-4 col-md-12">
+	<div class="row mt-4">
 		<div class="col-md-5">
 	        <form action="" id="dept_dropdown_3" method="POST" name="dept_dropdown">{% csrf_token %}
 	            <div class="input-group">
@@ -20,19 +21,20 @@
 	                    </label>
 	                </div>
 	                <select name="select_dept" class="custom-select" id="select_dept_3">
+						<option></option>
 	                    {% for dept in deptids %}
-	                    <option name="dept" value="{{dept.dept}}">{{ dept.dept }} - {{ dept.dept_name }}</option>
+	                    <option name="dept" value="{{dept.dept}}?{{ dept.dept_mgr }}">{{ dept.dept }} - {{ dept.dept_name }}</option>
 	                    {% endfor %}
 	                </select>
 	            </div>
 	        </form>
 	    </div>
-	    <div class="col-md-4">
+	    <div class="col">
 	        <form id="cf_dropdown_3" method="POST" name="cf_dropdown">{% csrf_token %}
 	            <div class="input-group">
 	                <div class="input-group-prepend">
 	                    <label class="input-group-text" for="select_cf_3">
-	                        Select New Chartfield
+	                        Select New Shortcode
 	                    </label>
 	                </div>
 	                <select name="select_cf" class="custom-select" id="select_cf_3">
@@ -42,31 +44,33 @@
 	                </select>
 	            </div>
 	        </form>
+			<form id="cf_chartfield_form_3" method="POST" name="cfs" style="display: none;">{% csrf_token %}
+				<div class="input-group" id="cf_chartfield_group">
+					<div class="input-group-prepend">
+						<label class="input-group-text" for="cf_chartfield_3">
+							Select New Chartfield
+						</label>
+					</div>
+					<select name="chartcom" class="custom-select" id="cf_chartfield_3">
+						{% for cf in cf_info %}
+						<option name="dept" value="{{ cf|jsonify }}">{{ cf.account_number }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</form>
 	    </div>
-
-	    <div class="form-check form-check-inline">
-	    	<input class="form-check-input" type="checkbox" value="" id="mrc">
-	    	<label class="form-check-label" for="mrc">
-		    	<strong>MRC</strong>
-		  	</label>
+		<div class="col-2" style="margin: auto 0 auto 0;">
+			<div class="form-check">
+				<input class="form-check-input" type="checkbox" value="" id="show_chartfield_check_3">
+				<label class="form-check-label" for="show_chartfield_check_3">
+				  Show Chartfield Select
+				</label>
+			  </div>
 		</div>
 
-		<div class="form-check form-check-inline">
-	    	<input class="form-check-input" type="checkbox" value="" id="toll" disabled>
-	    	<label class="form-check-label" for="toll">
-		    	<strong>Toll</strong>
-		  	</label>
-		</div>
-
-		<div class="form-check form-check-inline">
-	    	<input class="form-check-input" type="checkbox" value="" id="local" disabled>
-	    	<label class="form-check-label" for="local">
-		    	<strong>Local</strong>
-		  	</label>
-		</div>
-
-		<button type="button" id="apply" value='Apply' class="btn btn-success">Apply</button>
+	    
 	</div>
+
 
 	<div class="row mt-4">
 		<div class="form-check form-check-inline" id="select_button">
@@ -95,4 +99,27 @@
 	</div>
 
 	<strong id="validate" class="hidden">Please fill out all rows before proceeding.</strong>
+	<div id="checkboxes" class = "row justify-content-end">
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="checkbox" value="" id="mrc">
+			<label class="form-check-label" for="mrc">
+				<strong>MRC</strong>
+			</label>
+		</div>
+
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="checkbox" value="" id="toll" disabled>
+			<label class="form-check-label" for="toll">
+				<strong>Toll</strong>
+			</label>
+		</div>
+
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="checkbox" value="" id="local" disabled>
+			<label class="form-check-label" for="local">
+				<strong>Local</strong>
+			</label>
+		</div>
+		<button type="button" id="apply" value='Apply' class="btn btn-success">Apply</button>
+	</div>
 </div>
