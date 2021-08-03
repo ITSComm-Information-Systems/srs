@@ -679,6 +679,20 @@ class DatabaseConfigForm(TabForm):
         except:
             print('error getting database type')
 
+        type = self.request.POST.get('midatatype')
+        if type == '66':  # MSSQL
+            self.fields['name'].validators = [validators.RegexValidator(
+                    regex='^[a-zA-Z0-9_-]*$',
+                    message='Name can contain letters, numbers, hypens, and underscores.',
+                    code='invalid_name')]
+        else:
+            self.fields['name'].validators = [validators.RegexValidator(
+                    regex='^[a-z0-9_]*$',
+                    message='Name can contain lowercase letters, numbers, and underscores.',
+                    code='invalid_name')]
+
+
+
 
 
 class ServerInfoForm(TabForm):
@@ -1348,6 +1362,7 @@ class DatabaseForm(ModelForm):
 
         self.fields['owner_name'].choices = choice_list
         self.fields['owner_name'].initial = self.instance.owner.name
+
 
     def clean(self):
         super().clean()
