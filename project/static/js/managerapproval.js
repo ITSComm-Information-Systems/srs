@@ -9,7 +9,8 @@ function accept(){
     $.ajax({
         url: '/managerapprovalsubmit/',
         data: {
-            'id': params["id"]
+            'id': params["id"],
+            'data': review_table.ajax.json()
         },
         dataType:'json',
         
@@ -27,7 +28,14 @@ function accept(){
                 ]).draw();
                 for (key in user){
                     $("#" + key).html(user[key])
+                    if (key == "old_dept_mgr_uniqname"){
+                        $("#old_dept_mgr_email").html(user[key] + "@umich.edu")
+                    }
+                    if (key == "new_dept_mgr_uniqname"){
+                        $("#new_dept_mgr_email").html(user[key] + "@umich.edu")
+                    }
                 }
+                
             }
             
         }
@@ -57,35 +65,42 @@ $(document).ready(function() {
 		"lengthChange": false,
 		"bFilter": false,
 		"dom": 'rtp',
-		"ordering":false
-	});
-
-    $.ajax({
-        url: '/managerapprovalinit/',
-        data: {
-            'id': params["id"]
-        },
-        dataType:'json',
-        
-        success: function(data) {
-            console.log(data)
-            $("#manager_submit").removeAttr("disabled")
-	        $("#manager_reject").removeAttr("disabled")
-            for (user of data){
-                review_table.row.add([
-                    user.user_defined_id,
-                    user.building,
-                    user.mrc_account_number,
-                    user.toll_account_number,
-                    user.local_account_number,
-                ]).draw();
-                for (key in user){
-                    $("#" + key).html(user[key])
+		"ordering":false,
+        "processing": true,
+		"language": {
+			"processing": "Loading..."
+		 },
+         "ajax": {
+                url: '/managerapprovalinit/',
+                data: {
+                    'id': params["id"]
+                },
+                dataSrc: "",
+                dataType:'json',
+            },
+            'columns': [
+                { data: 'user_defined_id' },
+                { data: 'building' },
+                { data: 'mrc_account_number' },
+                { data: 'toll_account_number' },
+                { data: 'local_account_number' }
+            ],
+        })
+    review_table.on("xhr", function() {
+        $("#manager_submit").removeAttr("disabled")
+        $("#manager_reject").removeAttr("disabled")
+        for (user of review_table.ajax.json()){
+            for (key in user){
+                $("#" + key).html(user[key])
+                if (key == "old_dept_mgr_uniqname"){
+                    $("#old_dept_mgr_email").html(user[key] + "@umich.edu")
+                }
+                if (key == "new_dept_mgr_uniqname"){
+                    $("#new_dept_mgr_email").html(user[key] + "@umich.edu")
                 }
             }
-            
         }
-    });
+    })
     $("#confirmAccept").on("click", function(){
         accept();
     });

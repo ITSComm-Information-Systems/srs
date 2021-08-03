@@ -90,33 +90,32 @@
         <div class="col">
             <div class="card">
                 <div class="card-header text-center page_4_style">
-                    2. Your contact information
+                    2. Old chartfield details
                 </div>
                 <div class="card-body">
-                    <div class="card-text"><strong>Department:</strong>&nbsp; <span id='dept_full_name'>{{
-                            dept_info.dept_id }} ({{ dept_info.dept_name }})</span></div>
-                    <div class="card-text"><strong>Department Manager:</strong> &nbsp; <span id='dept_mgr'>{{
-                            dept_info.dept_mgr }}</span></div>
-                    <div class="card-text"><strong>Your Contact Name:</strong> &nbsp; <span> {{ user.last_name }}, {{
-                            user.first_name }}</span></div>
+                    <div class="card-text"><strong>Old Department:</strong>&nbsp; <span id='old_dept_full_name'>{{ dept_info.dept_id }} ({{ dept_info.dept_name }})</span></div>
+                    <div class="card-text"><strong>Old Department Manager:</strong> &nbsp; <span id='old_dept_mgr'>{{ dept_info.dept_mgr }}</span></div>
+                    <div class="card-text"><strong>Old Department Manager Uniqname:</strong> &nbsp; <span id='old_dept_mgr_uniqname'>{{ dept_info.dept_mgr }}</span></div>
+                    <div class="card-text"><strong>Old Department Manager Email:</strong> &nbsp; <span id='old_dept_mgr_email'>{{ dept_info.dept_mgr_email }}</span></div>
+                    <div class="card-text"><strong>Old Chartfield:</strong>&nbsp; <span id='old_chartfield'></span></div>
+                    <div class="card-text"><strong>Old Shortcode:</strong>&nbsp; <span id='old_shortcode'></span></div>
+                    <!-- <div class="card-text"><strong>Your Contact Name:</strong> &nbsp; <span id="user_full_name"> {{ user.last_name }}, {{ user.first_name }}</span></div> -->
                 </div>
             </div>
         </div>
-
+        
         <div class="col">
             <div class="card">
                 <div class="card-header text-center page_4_style">
                     3. New chartfield details
                 </div>
                 <div class="card-body">
-                    <div class="card-text"><strong>New Department:</strong>&nbsp; <span id='new_dept_full_name'>{{
-                            dept_info.dept_id }} ({{ dept_info.dept_name }})</span></div>
-                    <div class="card-text"><strong>New Department Manager:</strong> &nbsp; <span id='new_dept_mgr'>{{
-                            dept_info.dept_mgr }}</span></div>
-                    <div class="card-text"><strong>New Chartfield:</strong> &nbsp; <span id='new_chartfield'>{{
-                            dept_info.dept_mgr }}</span></div>
-                    <div class="card-text"><strong>New Shortcode:</strong> &nbsp; <span id='new_shortcode'>{{
-                            dept_info.dept_mgr }}</span></div>
+                    <div class="card-text"><strong>New Department:</strong>&nbsp; <span id='new_dept_full_name'>{{ dept_info.dept_id }} ({{ dept_info.dept_name }})</span></div>
+                    <div class="card-text"><strong>New Department Manager:</strong> &nbsp; <span id='new_dept_mgr'>{{ dept_info.dept_mgr }}</span></div>
+                    <div class="card-text"><strong>New Department Manager Uniqname:</strong> &nbsp; <span id='new_dept_mgr_uniqname'>{{ dept_info.dept_mgr_email }}</span></div>
+                    <div class="card-text"><strong>New Department Manager Email:</strong> &nbsp; <span id='new_dept_mgr_email'>{{ dept_info.dept_mgr_email }}</span></div>
+                    <div class="card-text"><strong>New Chartfield:</strong> &nbsp; <span id='new_chartfield'>{{ dept_info.dept_mgr }}</span></div>
+                    <div class="card-text"><strong>New Shortcode:</strong> &nbsp; <span id='new_shortcode'>{{ dept_info.dept_mgr }}</span></div>
                 </div>
             </div>
         </div>
@@ -126,12 +125,12 @@
                     4. Optional message to new department
                 </div>
                 <div class="card-body">
-                    <textarea disabled class="form-control" id="optional_message"
-                        placeholder="Insert a custom message here..."></textarea>
+                    <textarea class = "form-control" id="optional_message" placeholder="Insert a custom message here..."></textarea>
                 </div>
             </div>
         </div>
     </div>
+    
 
 </form>
 
@@ -153,27 +152,28 @@
           <button id = "confirmAccept" type="button" class="btn btn-success" data-dismiss="modal">Accept Request</button>
         </div>
     </div>
-</div>
+    </div>
 
-<div class="modal fade" id="reject_modal" tabindex="-1" role="dialog" aria-labelledby="rejectmodallabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header text-white bg-danger">
-                <h5 class="modal-title" id="rejectmodallabel">Confirm</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to reject the request?
-                <textarea class="form-control mt-2" placeholder="Optional message..."></textarea>
-            </div>
+    <div class="modal fade" id="reject_modal" tabindex="-1" role="dialog" aria-labelledby="rejectmodallabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-white bg-danger">
+                    <h5 class="modal-title" id="rejectmodallabel">Confirm</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to reject the request?
+                    <textarea class="form-control mt-2" placeholder="Optional message..."></textarea>
+                </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Go Back</button>
-                <button type="button" class="btn btn-success" data-dismiss="modal" onclick="reject()">Reject
-                    Request</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Go Back</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" onclick="reject()">Reject
+                        Request</button>
+                </div>
             </div>
         </div>
     </div>

@@ -1,0 +1,81 @@
+<div class="container mt-4" id="needs-refresh">
+	<div class='row col-12'>
+		<div class='float-left col-9'>
+			<p class="mt-4 cf_info inline">The following User IDs are currently billed to Chartfield:&nbsp;</p><strong
+				class="cf_num inline">{{ selected_cf.account_number }}</strong>
+			{% if nickname %}
+			<strong class="inline">({{ nickname }})</strong>
+			{% endif %}
+			<strong class="cf_nickname inline"></strong>
+			</p>
+
+			<div class='row mt-2'>
+				<div class="">
+					<form id="user_search" method="POST" name="user_search">{% csrf_token %}
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<label class="input-group-prepend input-group-text" for="search_test">
+									Search
+								</label>
+							</div>
+							<input style="width:450px;" class="form-control custom-size noEnterSubmit" id="search_test"
+								type="text" placeholder="Enter User ID, Building..." aria-label="Search">
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<div class="row mt-4">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="" id="select_all">
+					<label class="form-check-label" for="select_all">
+						<strong>Select All IDs</strong>
+					</label>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="" id="select_all_page">
+					<label class="form-check-label" for="select_all_page">
+						<strong>Select All IDs From Page</strong>
+					</label>
+				</div>
+			</div>
+
+			<div class="row">
+				<strong id="record-count">0 Records Selected</strong>
+			</div>
+
+			<div class="row mb-4">
+				<div class="col-md-12 mt-4" id="cf_users">
+					<form id="user_select" method="POST" name="user_select">{% csrf_token %}
+						<table class="table table-striped table-sm" id="cf_users_table">
+							<thead>
+								<th scope="col"></th>
+								<th scope="col">User ID</th>
+								<th scope="col">Building</th>
+								<th scope="col">MRC Charge</th>
+								<th scope="col">Toll Charge</th>
+								<th scope="col">Local Charge</th>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-3 col-md-12 mt-4 float-right">
+			<div class="alert alert-primary hlinks">
+				{% autoescape off %}
+				{{ notice.bodytext }}
+				{% endautoescape %}
+			</div>
+		</div>
+	</div>
+
+	<strong id="empty-validate" class="hidden">Please select at least one row before proceeding.</strong>
+
+</div>

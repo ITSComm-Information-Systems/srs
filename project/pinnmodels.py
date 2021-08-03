@@ -17,8 +17,10 @@ class UmChartChangeDept(models.Model):
      mrc_account_number = models.CharField(max_length=100)
      toll_account_number = models.CharField(max_length=100)
      local_account_number = models.CharField(max_length=100)
-     dept_full_name = models.CharField(max_length=100)
-     dept_mgr = models.CharField(max_length=100)
+     old_dept_full_name = models.CharField(max_length=100)
+     old_dept_mgr = models.CharField(max_length=100)
+     old_chartfield = models.CharField(max_length=100)
+     old_shortcode = models.CharField(max_length=100)
      user_full_name = models.CharField(max_length=100)
      new_dept_full_name = models.CharField(max_length=100)
      new_dept_mgr = models.CharField(max_length=100)
@@ -28,7 +30,9 @@ class UmChartChangeDept(models.Model):
      date_added = models.DateField(null=True) # added null=True
      # date_processed = models.DateField(null=True) # added null=True
      # messages = models.CharField(max_length=2000)
-     building = models.CharField(max_length=2000)
+     building = models.CharField(max_length=2000) 
+     new_dept_mgr_uniqname = models.CharField(max_length=100)
+     old_dept_mgr_uniqname = models.CharField(max_length=100)
      id = models.IntegerField(9, null=False, primary_key=True)
 
      class Meta:

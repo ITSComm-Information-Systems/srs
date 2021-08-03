@@ -1,4 +1,11 @@
 $(document).ready(function() {
+	$("[data-toggle=popover]").popover(
+		{
+			trigger: "hover",
+			template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body"></div></div>',
+			html: true
+		}
+	);
 	ph_count = 0;
 	record_count = 0;
 
@@ -217,7 +224,7 @@ $(document).ready(function() {
 	$('#dept_dropdown_3').on('submit', function(e) {
 		e.preventDefault();
 		$.ajax({
-			url: '/chartchange/ajax/',
+			url: '/chartchangedept/ajax/',
 			data: {
 				'when': 'assign_new',
 				'deptids':$('#dept_text_search').val()
@@ -266,7 +273,7 @@ $(document).ready(function() {
 		
 		e.preventDefault();
 		$.ajax({
-			url: '/chartchange/ajax/',
+			url: '/chartchangedept/ajax/',
 			data: {
 				'when': 'assign_new',
 				'deptids':$('#select_dept_3 option:selected').val().split("?")[0]
@@ -307,7 +314,8 @@ $(document).ready(function() {
 				}
 				$("#new_dept_full_name").html($('#select_dept_3 option:selected').text())
 				$("#new_dept_mgr").html($('#select_dept_3 option:selected').val().split("?")[1])
-
+				$("#new_dept_mgr_uniqname").html($('#select_dept_3 option:selected').val().split("?")[2])
+				$("#new_dept_mgr_email").html($('#select_dept_3 option:selected').val().split("?")[2] + "@umich.edu")
 				$("#select_cf_3").attr("disabled", null)
 				$("#cf_chartfield_3").attr("disabled", null)
 			}
@@ -411,8 +419,10 @@ $(document).ready(function() {
 	$('#chart_deptids').on('change', function() {
 		var selected = $('#chart_deptids').val();
 		$("#old_dept_mgr").html(selected.split("?")[1])
+		$("#old_dept_mgr_uniqname").html(selected.split("?")[2])
+		$("#old_dept_mgr_email").html(selected.split("?")[2] + "@umich.edu")
 		$.ajax({
-			url: '/chartchange/ajax/',
+			url: '/chartchangedept/ajax/',
 			data: {
 				'when': 'choose cf',
 				'deptids':selected
@@ -423,18 +433,20 @@ $(document).ready(function() {
 				$('#cf_dropdown').empty();
 				if (data.length < 1) {
 					$("#cfNextBtn").attr('disabled', 'true');
-					$('#cf_dropdown_group').hide();
+					// $('#cf_dropdown_group').hide();
 					$('#cf_details').hide();
-					$("#checkbox-1").hide()
+					// $("#checkbox-1").hide()
+					$("#cf_dropdown_row").hide()
 					$('#no_cfs_alert').show();
 				}
 				else {
 					$("#cfNextBtn").removeAttr('disabled');
 					$('.cf-dropdown-div').show();
 					$('#no_cfs_alert').hide();
-					$('#cf_dropdown_group').show();
+					// $('#cf_dropdown_group').show();
 					$('#cf_details').show();
-					$("#checkbox-1").show()
+					// $("#checkbox-1").show()
+					$("#cf_dropdown_row").show()
 					var drp = document.getElementById('cf_dropdown');
 					var option = document.createElement("OPTION");
 					drp.add(option);
@@ -883,12 +895,15 @@ function load_4(cf_change_table, review_table) {
 		var old_dept_mgr = $("#old_dept_mgr").html()
 		var old_chartfield = $("#old_chartfield").html()
 		var old_shortcode = $("#old_shortcode").html()
-		// var user_full_name = $("#user_full_name").html()
+		var user_full_name = $("#user_full_name").html()
 		var new_dept_full_name = $("#new_dept_full_name").html()
 		var new_dept_mgr = $("#new_dept_mgr").html()
 		var new_chartfield = $("#new_chartfield").html()
 		var new_shortcode = $("#new_shortcode").html()
 		var optional_message = $("#optional_message").val()
+		var new_dept_mgr_uniqname = $("#new_dept_mgr_uniqname").text()
+		var new_dept_mgr_email = $("#new_dept_mgr_email").text()
+		var old_dept_mgr_uniqname = $("#old_dept_mgr_uniqname").text()
 
 		if (mrc == '') {
 			mrc = current_cf;
@@ -924,12 +939,16 @@ function load_4(cf_change_table, review_table) {
 		+ old_dept_mgr + "//"
 		+ old_chartfield + "//"
 		+ old_shortcode + "//"
-		// + user_full_name + "//"
+		+ user_full_name + "//"
 		+ new_dept_full_name + "//"
 		+ new_dept_mgr + "//"
 		+ new_chartfield + "//"
 		+ new_shortcode + "//"
-		+ optional_message
+		+ optional_message + "//"
+		+ new_dept_mgr_email + "//"
+		+ new_dept_mgr_uniqname + "//"
+		+ old_dept_mgr_uniqname
+		
 		;
 		document.getElementById('submit-form').appendChild(input);
 	})
