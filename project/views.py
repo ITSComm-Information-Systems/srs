@@ -89,7 +89,7 @@ def chartchange(request):
 		dept_info = {
 			'dept_id': select_dept,
 			'dept_name': dept.dept_name,
-			'dept_mgr': dept.dept_mgr
+			'dept_mgr': dept.dept_mgr,
 		}
 	else:
 		dept_info = ''
@@ -159,10 +159,10 @@ def chartchangedept(request):
 		user_depts = ''
 		select_dept = request.POST.get('select_dept')
 	else:
-		# if request.user.has_perm('oscauth.can_report_all'):
-		user_depts = UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid')
-		# else:
-			# user_depts = AuthUserDept.get_order_departments(request.user.id)
+		if request.user.has_perm('oscauth.can_report_all'):
+			user_depts = UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid')
+		else:
+			user_depts = AuthUserDept.get_order_departments(request.user.id)
 
 		# Find associated chartfields
 		if user_depts:
@@ -215,10 +215,10 @@ def chartchangedept(request):
 		'nickname': nickname,
 		'new_dept': new_dept,
 		'new_cf': new_cf,
-		'choose_cf_template': 'choose_cf.html',
-		'choose_users_template': 'choose_users.html',
-		'assign_new_template': 'assign_new.html',
-		'review_submit_template': 'review_submit.html',
+		'choose_cf_dept_template': 'choose_cf_dept.html',
+		'choose_users_dept_template': 'choose_users_dept.html',
+		'assign_new_dept_template': 'assign_new_dept.html',
+		'review_submit_dept_template': 'review_submit_dept.html',
 		'notice': notice
 	}
 
@@ -234,27 +234,54 @@ def managerapprovalinit(request):
 	id = request.GET.get("id")
 
 	data = list(UmChartChangeDept.objects.filter(id=id).values())
-	
+	print(data)
 	return JsonResponse(data, safe=False)
 
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapproval(request):
-	template = loader.get_template('managerapproval.html')
-	context = {"title": "Manager Approval Form"}
-	return HttpResponse(template.render(context, request))
+	id = request.GET.get("id")
+	
+	allowed_mgr = list(UmChartChangeDept.objects.filter(id=id).values())[0]["new_dept_mgr_uniqname"]
+	
+	if (request.user.username == allowed_mgr or request.user.is_superuser):
+		template = loader.get_template('managerapproval.html')
+		context = {"title": "Manager Approval Form"}
+		return HttpResponse(template.render(context, request))
+	else:
+		template = loader.get_template('403.html')
+		context = {"title": "Manager Approval Form"}
+		return HttpResponse(template.render(context, request))
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapprovalsubmit(request):
-	template = loader.get_template('managerapproval.html')
-	context = {"title": "Manager Approval Form"}
-
 	
+	for user in request.GET.get("data"):
+
+		new_entry = UmOscAcctChangeInput(
+			uniqname=request.user.username,
+			user_defined_id=user.user_defined_id,
+			mrc_account_number=user.mrc_account_number,
+			toll_account_number=user.toll_account_number,
+			local_account_number=user.local_account_number,
+			date_added=date.today(),
+			date_processed=None,
+			messages=None,
+			request_no=None)
+		new_entry.save()
+
+	# Add record to Pinnacle
+	curr = connections['pinnacle'].cursor()
+	uniqname = request.user.username
+	datetime_added = date.today()
+	curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
+	curr.close()
+
 
 	return JsonResponse({"success": True})
 # Gives new chartfields when user changes department
 @permission_required(('oscauth.can_order'), raise_exception=True)
-def change_dept(request):
+def change_dept_new(request):
 	selected_dept = request.GET.get('deptids', None)
 	selected_dept = selected_dept.split(' - ')[0]
 	when = request.GET.get('when', None)
@@ -265,11 +292,32 @@ def change_dept(request):
 			db = UmOscAllActiveAcctNbrsV.objects.filter(account_number=i["account_number"])
 			if db:
 				i["short_code"] = db[0].short_code
+
 	# Get list of chartcoms in use
 	else:
 		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
+		
+			
 	
 	return JsonResponse(cf_options, safe=False)
+
+
+# Gives new chartfields when user changes department
+@permission_required(('oscauth.can_order'), raise_exception=True)
+def change_dept(request):
+	selected_dept = request.GET.get('deptids', None)
+	selected_dept = selected_dept.split(' - ')[0]
+	when = request.GET.get('when', None)
+
+	# Get list of chartcoms in user's shortlist for user to select new
+	if when == 'assign_new':
+		cf_options = Chartcom.get_user_chartcoms_for_dept(request.user, selected_dept)
+	# Get list of chartcoms in use
+	else:
+		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
+
+	return JsonResponse(cf_options, safe=False)
+
 
 
 # Finds chartfield data when user changes chartfield
@@ -328,10 +376,49 @@ def get_users(request):
 
 	return JsonResponse(users, safe=False)
 
-
 # Submits change to database
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def submit(request):
+	template = loader.get_template('submitted.html')
+
+	for key, value in request.POST.items():
+		# Format of 'string' is user_defined_id//mrc_chartfield//toll_chartfield//local_chartfield
+		string = request.POST.get(key)
+		if '/' in string:
+			strings = string.split('//')
+			# Set toll and local to MRC if non-phone type
+			if strings[2] == 'N/A':
+				strings[2] = strings[1]
+				strings[3] = strings[1]
+			new_entry = UmOscAcctChangeInput(
+				uniqname=request.user.username,
+				user_defined_id=strings[0],
+				mrc_account_number=strings[1],
+				toll_account_number=strings[2],
+				local_account_number=strings[3],
+				date_added=date.today(),
+				date_processed=None,
+				messages=None,
+				request_no=None)
+			new_entry.save()
+
+	# Add record to Pinnacle
+	curr = connections['pinnacle'].cursor()
+	uniqname = request.user.username
+	datetime_added = date.today()
+	curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
+	curr.close()
+
+	context = {
+		'title': 'Chartfield Change',
+	}
+
+	return HttpResponse(template.render(context, request))
+
+
+# Submits change to database
+@permission_required(('oscauth.can_order'), raise_exception=True)
+def submit_new(request):
 	template = loader.get_template('submitted.html')
 	id = UmChartChangeDept.objects.count()
 	for key, value in request.POST.items():
@@ -340,6 +427,7 @@ def submit(request):
 		string = request.POST.get(key)
 		if '/' in string:
 			strings = string.split('//')
+			
 			# Set toll and local to MRC if non-phone type
 			if strings[2] == 'N/A':
 				strings[2] = strings[1]
@@ -355,14 +443,17 @@ def submit(request):
 				old_dept_mgr=strings[6],
 				old_chartfield=strings[7],
 				old_shortcode=strings[8],
-				# user_full_name=strings[7],
-				new_dept_full_name=strings[9],
-				new_dept_mgr=strings[10],
-				new_chartfield=strings[11],
-				new_shortcode=strings[12],
-				optional_message=strings[13],
+				user_full_name=strings[9],
+				new_dept_full_name=strings[10],
+				new_dept_mgr=strings[11],
+				new_chartfield=strings[12],
+				new_shortcode=strings[13],
+				optional_message=strings[14],
 				date_added=date.today(),
-				id=id)
+				id=id,
+				new_dept_mgr_uniqname=strings[16],
+				old_dept_mgr_uniqname=strings[17],
+				)
 			new_entry.save()
 
 	# Add record to Pinnacle
@@ -371,6 +462,27 @@ def submit(request):
 	# datetime_added = date.today()
 	# curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
 	# curr.close()
+
+	body = '''
+	Hello, 
+
+	{0} from another department has requested to change a chartfield from {1} to {2}, which you have permissions over.
+	You may approve or deny this request here: {3}.
+
+	Thank you!
+	'''.format(strings[9].split(", ")[1] + strings[9].split(", ")[0], strings[5], strings[10], "http://127.0.0.1:8000/managerapproval/?id=" + str(id))
+	subject = "A Chartfield Change Request is awaiting your approval"
+	to = [strings[15]]
+
+	email = EmailMessage(
+		subject,
+		body,
+		'srs@umich.edu',
+		to,
+		[]
+	)
+
+	email.send()
 
 	context = {
 		'title': 'Chartfield Change',

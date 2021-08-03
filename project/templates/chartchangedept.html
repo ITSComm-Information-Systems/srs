@@ -44,6 +44,14 @@
     width: auto !important;
 		flex-grow: 1 !important;
 	}
+
+  .help-popover {
+    display: block;
+    margin-top: auto;
+    margin-bottom: auto;
+    white-space: pre-line; 
+  }
+  
 	</style>
   {% endblock styles %}
 
@@ -74,7 +82,6 @@
       <a class="nav-link disabled" onclick="tab_func4()" data-toggle="tab" id="cfc-4" href="#cf-4" role="tab" aria-selected="false">Review & Submit</a>
     </li>
   </ul>
-
   <p hidden id="dept_mgr">{{ dept_info.dept_mgr }}</p>
   {% if deptids|length > 1 %}
   <form  id="choose_dept" method="POST">{% csrf_token %}
@@ -90,13 +97,14 @@
           <option></option>
             {% for dept in deptids %}
               {% if dept.dept ==  dept_info.dept_id %}
-                <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}" data-default="true">{{ dept.dept }} - {{ dept.dept_name }}</option>
+                <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}?{{dept.dept_mgr_uniqname}}" data-default="true">{{ dept.dept }} - {{ dept.dept_name }}</option>
               {% else %}
-                <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}">{{ dept.dept }} - {{ dept.dept_name }}</option>
+                <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}?{{dept.dept_mgr_uniqname}}">{{ dept.dept }} - {{ dept.dept_name }}</option>
               {% endif %}         
             {% endfor %}
         </select>
       </div>
+      <i class="far fa-question-circle help-popover" data-toggle="popover" title="Popover title" data-placement="right" data-content="Select your current department."></i>
     </div>
   </form> 
   {% endif %}
@@ -106,16 +114,16 @@
 
     <div class="tab-content" id="cf-pills-tabContent">
       <div class="tab-pane fade" id="cf-1" role="tabpanel" aria-labelledby="pills-contact-tab">
-        {% include choose_cf_template %}
+        {% include choose_cf_dept_template %}
       </div>
       <div class="tab-pane fade" id="cf-2" role="tabpanel" aria-labelledby="pills-contact-tab">
-        {% include choose_users_template %}
+        {% include choose_users_dept_template %}
       </div>
       <div class="tab-pane fade" id="cf-3" role="tabpanel" aria-labelledby="pills-contact-tab">
-        {% include assign_new_template %}
+        {% include assign_new_dept_template %}
       </div>
       <div class="tab-pane fade" id="cf-4" role="tabpanel" aria-labelledby="pills-contact-tab">
-        {% include review_submit_template %}
+        {% include review_submit_dept_template %}
       </div>
 
       <div style="overflow:auto;">
