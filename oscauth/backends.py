@@ -26,6 +26,7 @@ class UMichOIDCBackend(OIDCAuthenticationBackend):
 
     def update_user(self, user, claims):
         self._set_claims(user, claims)
+        user.is_active = True # Reactivate user if needed.
         user.save()
         return user
 
