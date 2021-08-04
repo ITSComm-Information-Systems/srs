@@ -65,6 +65,14 @@ class MCommunity:
         x = self.conn.modify(parent_group, {'groupMember': [(MODIFY_ADD, [new_member])]})
         print('add', x, self.conn.response)
 
+    def get_user(self, uniqname):
+        self.conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","umichDisplaySn","umichInstRoles"])
+
+        if self.conn.entries:
+            return self.conn.entries[0]
+        else:
+            return None
+
 
 class UmAPI:
     CLIENT_ID = settings.UM_API['CLIENT_ID']
