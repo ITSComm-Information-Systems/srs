@@ -44,8 +44,8 @@ class Command(BaseCommand):
 
             u+=1
 
-            if u % 10 == 0:
-                print(datetime.datetime.now(), str(u),'records read')
+            #if u % 10 == 0:
+            #    print(datetime.datetime.now(), str(u),'records read')
                 
         print(datetime.datetime.now(), str(u),'records updated')
 
