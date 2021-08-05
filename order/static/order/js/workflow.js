@@ -563,10 +563,10 @@ $(document).ready(function() {
       $('#id_form-0-size').val(50); // Disk 0 on linux must be 50 GB
       $('#id_form-0-uom').val("GB");
       $('#id_form-0-size').prop('readonly', true);
-      $('#id_form-0-uom').prop('disabled', true);
+      $('#id_form-0-uom').attr('readonly', true);
     } else {
       $('#id_form-0-size').prop('readonly', false);
-      $('#id_form-0-uom').prop('disabled', false);
+      $('#id_form-0-uom').attr('readonly', false);
     }
 
     if (managed_windows) {
