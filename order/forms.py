@@ -679,6 +679,20 @@ class DatabaseConfigForm(TabForm):
         except:
             print('error getting database type')
 
+        type = self.request.POST.get('midatatype')
+        if type == '66':  # MSSQL
+            self.fields['name'].validators = [validators.RegexValidator(
+                    regex='^[a-zA-Z0-9_-]*$',
+                    message='Name can contain letters, numbers, hypens, and underscores.',
+                    code='invalid_name')]
+        else:
+            self.fields['name'].validators = [validators.RegexValidator(
+                    regex='^[a-z0-9_]*$',
+                    message='Name can contain lowercase letters, numbers, and underscores.',
+                    code='invalid_name')]
+
+
+
 
 
 class ServerInfoForm(TabForm):
@@ -1015,6 +1029,15 @@ class ServerSpecForm(TabForm):
             if len(servername) > 0:
                 self.add_error('serverName', f'A server named {name.lower()} already exists. Please choose a different name.')
 
+            # managed windows name can't exceed 15 char:
+            if len(name) > 15:
+                if self.cleaned_data.get('managed') == 'True':
+                    os = self.cleaned_data.get('misevos', False)
+                    if os:
+                        os_name = Choice.objects.get(id=int(os)).label
+                        if os_name.startswith('Windows'):
+                            self.add_error('serverName', 'Name for a managed Windows server cannot exceed 15 characters (including prefix).')
+
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)
         if ram != None and cpu != None:
@@ -1345,6 +1368,7 @@ class DatabaseForm(ModelForm):
 
         self.fields['owner_name'].choices = choice_list
         self.fields['owner_name'].initial = self.instance.owner.name
+
 
     def clean(self):
         super().clean()

@@ -39,17 +39,13 @@ var update_total_cost = function() {
 
   $( ".disk-div" ).each(function( index ) {  // Tally all disks
     if (this.id == "formset_wrapper" || this.id == "diskdiv__prefix__") {
-      console.log('skip');
       return;
     }
 
     uom = $(this).find("select").val();
     size = $(this).find(".disk-size").val();
 
-    console.log(index, this.id, size)
-
     $(this).find(".disk-size")
-
 
     if (uom=="TB") {
       size = size * 1024;
@@ -538,14 +534,18 @@ $(document).ready(function() {
 
   function set_managed_windows() {
     managed_windows = false;
+    managed_linux = false;
     if ($('#managed_0').prop("checked")) {
       os = $('#id_misevos option:selected').text()
       if (os) {
         if (os.startsWith('Windows')) {
           managed_windows = true;
+        } else {
+          managed_linux = true;
         }
       }
     }
+    console.log('set managed windows', managed_windows);
 
     if (managed_windows && !database) {  // No prefix for database servers
       $('#div_misevprefix').show().prop('required',true);  // Prefix Y/N?
@@ -557,6 +557,16 @@ $(document).ready(function() {
     } else {
       $('#div_misevprefix').hide().prop('required',false);
       $('#div_misevregpre').hide().prop('required',false);
+    }
+
+    if (managed_linux) {
+      $('#id_form-0-size').val(50); // Disk 0 on linux must be 50 GB
+      $('#id_form-0-uom').val("GB");
+      $('#id_form-0-size').prop('readonly', true);
+      $('#id_form-0-uom').attr('readonly', true);
+    } else {
+      $('#id_form-0-size').prop('readonly', false);
+      $('#id_form-0-uom').attr('readonly', false);
     }
 
     if (managed_windows) {
