@@ -1,4 +1,4 @@
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function(event) {
 	//Set bootstrap theme
 	$.fn.select2.defaults.set( "theme", "bootstrap4" );
 
@@ -26,7 +26,7 @@ $(document).ready(function() {
 	});
 
 	$("#cf_dropdown").select2({
-		placeholder: "-- Select your current shortcode --",
+		// placeholder: "-- Select your current shortcode --",
 		display:"inline",
 		sorter: data => data.sort((a, b) => a.text.localeCompare(b.text)),
 	});

@@ -3,18 +3,16 @@
 
 <div class="mt-4 row"></div>
 
-<p id="test"></p>
-
 <div class='row cf-dropdown-div justify-content-center' id="cf_dropdown_row">
     <div class="col-md-5 offset-md-2">
-        <form id="cf_dropdown" method="POST" name="cfs">{% csrf_token %}
-            <div class="input-group" id="cf_dropdown_group">
+        <form id="cf_shortcode_form" method="POST" name="cfs">{% csrf_token %}
+            <div class="input-group" id="cf_shortcode_group">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="cf_dropdown">
+                    <label class="input-group-text" for="cf_shortcode">
                         Select Shortcode
                     </label>
                 </div>
-                <select name="chartcom" class="custom-select" id="cf_dropdown">
+                <select name="chartcom" class="custom-select" id="cf_shortcode">
                     {% for cf in cf_info %}
                     <option name="dept" value="{{ cf|jsonify }}">{{ cf.account_number }}</option>
                     {% endfor %}
