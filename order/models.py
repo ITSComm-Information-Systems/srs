@@ -1269,7 +1269,7 @@ class Item(models.Model):
                 value = int(value)
                 setattr(rec, field + '_id', value)
 
-        if rec.managed == 'True':
+        if rec.managed == 'True' or rec.managed == True:
             os = self.data.get('misevos')
         else:
             os = self.data.get('misernonmang')
