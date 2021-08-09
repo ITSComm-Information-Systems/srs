@@ -497,6 +497,7 @@ class ArcInstance(Volume):
     globus = models.BooleanField(default=False) 
     globus_phi = models.BooleanField(default=False) 
     thunder_x = models.BooleanField(default=False)
+    research_computing_package = models.BooleanField(default=False)
 
     class meta:
         verbose_name = 'ARC Storage Instance'   
@@ -1066,6 +1067,12 @@ class Item(models.Model):
                     print(rec.rate_id, 'set for dd')
                 else:
                     rec.rate_id = self.data.get('selectOptionType')
+                
+                if action.service.name == 'turboResearch':
+                    if self.data.get('research_comp_pkg') == 'yes':
+                        rec.research_computing_package = True
+                    else:
+                        rec.research_computing_package = False
 
                 rec.type = action.override['storage_type']
                 rec.shortcode = self.data.get('shortcode')
