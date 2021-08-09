@@ -1,53 +1,4 @@
 {% extends 'base.html' %}
-{% block styles %}
-<style>
-    #aux-nav {
-        background-color: {{ background_color }}
-    }
-
-    #checkboxes {
-        float: right;
-    }
-
-    .nav-line {
-        background: #40658f;
-        width: 20px;
-        height: 2px;
-        margin-top: auto;
-        margin-bottom: auto;
-    }
-
-    .nav-line.disabled {
-        background: #e4e1df;
-    }
-
-    .nav-pills .nav-link.active,
-    .nav-pills .nav-link.active:hover,
-    .nav-pills .nav-link.active:focus,
-    .nav-pills .show>.nav-link {
-        border-color: #e4e1df;
-        background-color: #40658f;
-        color: #ffffff;
-        cursor: default;
-    }
-
-    /*.nav-pills a.nav-link:not(.active):hover*/
-    .nav-pills a.nav-link:hover {
-        background-color: #e4e1df;
-        color: #e4e1df;
-    }
-
-    .nav-pills a.nav-link.disabled {
-        color: #655a52;
-        background-color: #e4e1df;
-    }
-
-    .select2-container {
-        width: auto !important;
-        flex-grow: 1 !important;
-    }
-</style>
-{% endblock styles %}
 
 {% block content %}
 
@@ -57,8 +8,6 @@
         for <strong id="dept_title">Department: {{ dept_info.dept_id }} - {{ dept_info.dept_name }}</strong>
     </small>
 </h1>
-
-<!-- <p hidden id="dept_mgr">{{ dept_info.dept_mgr }}</p> -->
 
 <form method="POST">
 
