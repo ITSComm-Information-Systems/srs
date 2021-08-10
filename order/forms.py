@@ -1333,7 +1333,7 @@ class EquipmentForm(TabForm):
 
 class ProductForm(TabForm):
     category_list = ProductCategory.objects.all().order_by('display_seq_no') 
-    product_list = Product.objects.all().order_by('category','display_seq_no') 
+    product_list = Product.objects.all().filter(active=True).order_by('category','display_seq_no') 
     template = 'order/products.html'
 
 
