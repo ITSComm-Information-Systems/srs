@@ -338,7 +338,7 @@ def get_users(request):
 	selected_cf = request.GET.get('selected', None)
 
 	# Get info for selected chartfield
-	cf = UmOscAcctsInUseV.objects.filter(short_code=selected_cf).values()
+	cf = UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values()
 	if cf:
 		cf = cf[0]
 	else:
