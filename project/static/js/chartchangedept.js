@@ -19,8 +19,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	$('#chartchange_nav li:first-child a').tab('show');
 
 	// Select first option in dropdowns
-	// $('#chart_deptids :first-child').prop('selected', true);
-	// $('#cf_dropdown :first-child').prop('selected', true);
+	$('#chart_deptids :first-child').prop('selected', true);
+	$('#cf_chartfield :first-child').prop('selected', true);
 
 	// Hide chartfield selection if department doesn't have any
 	if (cf_info) {
@@ -430,6 +430,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 			dataType:'json',
 			// Reset chartfield options when department changes
 			success: function(data) {
+				console.log(data)
 				$('#cf_shortcode').empty();
 				$('#cf_chartfield').empty();
 				if (data.length < 1) {
@@ -446,8 +447,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
 					$('#cf_details').show();
 					
 					var drp = document.getElementById('cf_shortcode');
-					var option = document.createElement("OPTION");
-					drp.add(option);
 					for (i = 0; i < data.length; ++i) {
 						if (data[i].short_code != ""){
 							var option = document.createElement("OPTION");
@@ -458,15 +457,13 @@ document.addEventListener('DOMContentLoaded', function(event) {
 					}
 					
 					var drp = document.getElementById('cf_chartfield');
-					var option = document.createElement("OPTION");
-					drp.add(option);
 					for (i = 0; i < data.length; ++i) {
 						var option = document.createElement("OPTION");
 						option.value = JSON.stringify(data[i]);
-						option.text = data[i].account_number
+						option.text = data[i].account_number;
 						drp.add(option);
 					}
-					// change_current_page(data[0]);
+					change_current_page(data[0]);
 
 
 				}
@@ -483,8 +480,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	})
 
 	// Reload data when new chartfield is selected
-	$('#cf_dropdown').on('change', function() {
-		var sel = document.getElementById("cf_dropdown");
+	$('#cf_chartfield').on('change', function() {
+		var sel = document.getElementById("cf_chartfield");
 		var selected = sel.options[sel.selectedIndex].value;
 
 		change_current_page(selected);
@@ -498,8 +495,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 		var sel = document.getElementById("cf_chartfield");
 		var selected = sel.options[sel.selectedIndex].value;
 
-		$('#cf_dropdown').val(selected)
-		$('#cf_dropdown').trigger('change')
+		$('#cf_chartfield').val(selected)
+		$('#cf_chartfield').trigger('change')
 
 		change_current_page(selected);
 
@@ -525,11 +522,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
 	$('#show_chartfield_check').on('change', function() {
 		var chartfield = document.getElementById("cf_chartfield_form")
-		var shortcode = document.getElementById("cf_shortcode_group")
+		var shortcode = document.getElementById("cf_shortcode_form")
 		if (chartfield.style.display == "none"){
 			chartfield.style.display = "block"
 			shortcode.style.display = "none"
-			shortcode.clear()
+			$("#cf_shortcode option:selected").prop('selected' , false)
 		}
 		else{
 			chartfield.style.display = "none"

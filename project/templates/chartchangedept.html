@@ -72,11 +72,10 @@
       <div class="input-group col-md-6">
         <div class="input-group-prepend">
             <label class="input-group-text" for="chart_deptids">
-                Select Current Department
+                Switch Department
             </label>
         </div>
         <select name="deptids" class="custom-select" id="chart_deptids">
-          <option></option>
             {% for dept in deptids %}
               {% if dept.dept ==  dept_info.dept_id %}
                 <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}?{{dept.dept_mgr_uniqname}}" data-default="true">{{ dept.dept }} - {{ dept.dept_name }}</option>
