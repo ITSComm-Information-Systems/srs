@@ -128,5 +128,5 @@ document.addEventListener('DOMContentLoaded', function(event) {
 		display:"inline",
     });
 
-	$("#chart_deptids").siblings()[1].style.width = "auto";
+	// $("#chart_deptids").siblings()[1].style.width = "auto";
 });

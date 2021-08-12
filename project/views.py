@@ -189,7 +189,8 @@ def chartchangedept(request):
 	if chartfield_list:
 		selected_cf = chartfield_list[0]
 	else: selected_cf = ''
-
+	print('chartfield_list: ', chartfield_list)
+	print(selected_cf)
 	# Find chartfield nickname
 	nickname = ''
 	if selected_cf != '':
@@ -284,6 +285,7 @@ def managerapprovalsubmit(request):
 def change_dept_new(request):
 	selected_dept = request.GET.get('deptids', None)
 	selected_dept = selected_dept.split(' - ')[0]
+	print('selected dept:', selected_dept)
 	when = request.GET.get('when', None)
 	# Get list of chartcoms in user's shortlist for user to select new
 	if when == 'assign_new':
@@ -336,13 +338,13 @@ def get_cf_data(request):
 def get_users(request):
 	# selected_cf = request.GET.get('selected', None).split(" ")[0]
 	selected_cf = request.GET.get('selected', None)
-
 	# Get info for selected chartfield
 	cf = UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values()
 	if cf:
 		cf = cf[0]
 	else:
 		cf = {}
+	print(cf)
 
 	# Find chartfield nickname
 	nickname = ''
