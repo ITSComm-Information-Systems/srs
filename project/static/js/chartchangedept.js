@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 			url: '/chartchange/update-table/',
 			method: 'GET',
 			data: function(d) {
-				d.selected = $('#cf_chartfield_form option:selected').text();
+				d.selected = $('#cf_chartfield option:selected').text();
 			},
 			dataSrc: ""
 		},
@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 			// Reset chartfield options when department changes
 			success: function(data) {
 				console.log(data)
-				$('#cf_shortcode').empty();
+				$('#cf_shortcode_dr').empty();
 				$('#cf_chartfield').empty();
 				if (data.length < 1) {
 					$("#cfNextBtn").attr('disabled', 'true');
@@ -446,13 +446,13 @@ document.addEventListener('DOMContentLoaded', function(event) {
 					$("#cf_dropdown_row").show()
 					$('#cf_details').show();
 					
-					var drp = document.getElementById('cf_shortcode');
+					var sc_drp = document.getElementById('cf_shortcode_dr');
 					for (i = 0; i < data.length; ++i) {
 						if (data[i].short_code != ""){
 							var option = document.createElement("OPTION");
 							option.value = JSON.stringify(data[i]);
 							option.text = data[i].short_code
-							drp.add(option);
+							sc_drp.add(option);
 						}
 					}
 					
@@ -463,9 +463,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 						option.text = data[i].account_number;
 						drp.add(option);
 					}
+
 					change_current_page(data[0]);
-
-
 				}
 				name_display = selected.split('?');
 				$('#dept_title').html('Department: ' + name_display[0]);
@@ -481,8 +480,9 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
 	// Reload data when new chartfield is selected
 	$('#cf_chartfield').on('change', function() {
-		var sel = document.getElementById("cf_chartfield");
-		var selected = sel.options[sel.selectedIndex].value;
+		// var sel = document.getElementById("cf_chartfield");
+		// var selected = sel.options[sel.selectedIndex].value;
+		var selected = document.getElementById("cf_chartfield").value
 
 		change_current_page(selected);
 
@@ -491,18 +491,20 @@ document.addEventListener('DOMContentLoaded', function(event) {
 		$('#cfc-4').addClass('disabled');
 	})
 
-	$('#cf_chartfield').on('change', function() {
-		var sel = document.getElementById("cf_chartfield");
-		var selected = sel.options[sel.selectedIndex].value;
+	$('#cf_shortcode_dr').on('change', function() {
+		if ($('#cf_shortcode_dr').value != 'blank'){
+			document.getElementById("cf_chartfield").value = $('#cf_shortcode_dr option:selected').value;
+			// var sel = document.getElementById("cf_chartfield");
+			// var selected = sel.options[sel.selectedIndex].value;
+			var selected = document.getElementById("cf_shortcode_dr").value
 
-		$('#cf_chartfield').val(selected)
-		$('#cf_chartfield').trigger('change')
+			$('#cf_chartfield').val(selected)
+			$('#cf_chartfield').trigger('change')
 
-		change_current_page(selected);
-
-		$('#cfc-2').addClass('disabled');
-		$('#cfc-3').addClass('disabled');
-		$('#cfc-4').addClass('disabled');
+			$('#cfc-2').addClass('disabled');
+			$('#cfc-3').addClass('disabled');
+			$('#cfc-4').addClass('disabled');
+		}
 	})
 
 	$('#cf_chartfield_3').on('change', function() {
@@ -521,22 +523,22 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	})
 
 	$('#show_chartfield_check').on('change', function() {
-		var chartfield = document.getElementById("cf_chartfield_form")
-		var shortcode = document.getElementById("cf_shortcode_form")
+		var chartfield = document.getElementById("cf_chartfield_form");
+		var shortcode = document.getElementById("cf_shortcode_form");
 		if (chartfield.style.display == "none"){
 			chartfield.style.display = "block"
 			shortcode.style.display = "none"
-			$("#cf_shortcode option:selected").prop('selected' , false)
+			$('#cf_shortcode_dr').val('blank')
 		}
 		else{
 			chartfield.style.display = "none"
-			shortcode.style.display = "flex"
+			shortcode.style.display = "block"
 		}
 	})
 
 	$('#show_chartfield_check_3').on('change', function() {
-		var cf_select = document.getElementById("cf_chartfield_form_3")
-		var cf_dropdown = document.getElementById("cf_dropdown_3")
+		var cf_select = document.getElementById("cf_chartfield_form_3");
+		var cf_dropdown = document.getElementById("cf_dropdown_3");
 		if (cf_select.style.display == "none"){
 			cf_select.style.display = "block"
 			cf_dropdown.style.display = "none"

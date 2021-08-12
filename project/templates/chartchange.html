@@ -12,7 +12,7 @@
 {% endblock styles %}
 
 
-  {% block content %}
+{% block content %}
 
   <h1>
     Chartfield Change
@@ -44,6 +44,8 @@
     </div>
   </form> 
   {% endif %}
+
+  <form method="POST">
     <ul class="nav justify-content-center nav-pills" id="chartchange_nav" role="tablist">
       <li class="nav-item">
         <a class="nav-link disabled" onclick="tab_func1()" data-toggle="tab" id="cfc-1" href="#cf-1" role="tab" aria-selected="false">Select Current Chartfield</a>
@@ -58,7 +60,7 @@
         <a class="nav-link disabled" onclick="tab_func4()" data-toggle="tab" id="cfc-4" href="#cf-4" role="tab" aria-selected="false">Review & Submit</a>
       </li>
     </ul>
-    <form method="POST">
+
     <div class="tab-content" id="cf-pills-tabContent">
       <div class="tab-pane fade" id="cf-1" role="tabpanel" aria-labelledby="pills-contact-tab">
         {% include choose_cf_template %}
