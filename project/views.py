@@ -118,7 +118,7 @@ def chartchange(request):
 	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
 	# Get notice
 	notice = Page.objects.get(permalink='/ccr')
-
+	print('user_depts',user_depts)
 	context = {
 		'title': 'Chartfield Change Request',
 		'deptids': user_depts,
@@ -189,8 +189,7 @@ def chartchangedept(request):
 	if chartfield_list:
 		selected_cf = chartfield_list[0]
 	else: selected_cf = ''
-	print('chartfield_list: ', chartfield_list)
-	print(selected_cf)
+
 	# Find chartfield nickname
 	nickname = ''
 	if selected_cf != '':
@@ -205,6 +204,7 @@ def chartchangedept(request):
 	else:
 		new_dept = ''
 	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
+	print('new_cf: ', new_cf)
 	# Get notice
 	notice = Page.objects.get(permalink='/ccr')
 	context = {
@@ -235,7 +235,7 @@ def managerapprovalinit(request):
 	id = request.GET.get("id")
 
 	data = list(UmChartChangeDept.objects.filter(id=id).values())
-	print(data)
+	print('managerapprovalinit', data)
 	return JsonResponse(data, safe=False)
 
 
@@ -344,7 +344,7 @@ def get_users(request):
 		cf = cf[0]
 	else:
 		cf = {}
-	print(cf)
+	print('getusers', cf)
 
 	# Find chartfield nickname
 	nickname = ''

@@ -13,7 +13,7 @@
 
 	<div class="row mt-4">
 		<div class="col-md-5">
-	        <form action="" id="dept_dropdown_3" method="POST" name="dept_dropdown">{% csrf_token %}
+	        <div id="dept_dropdown_3" method="POST" name="dept_dropdown">{% csrf_token %}
 	            <div class="input-group">
 	                <div class="input-group-prepend">
 	                    <label class="input-group-text" for="select_dept_3">
@@ -27,37 +27,40 @@
 	                    {% endfor %}
 	                </select>
 	            </div>
-	        </form>
+	        </div>
 	    </div>
 	    <div class="col">
-	        <form id="cf_dropdown_3" method="POST" name="cf_dropdown">{% csrf_token %}
+	        <form id="cf_dropdown_3" method="POST" name="cf_dropdown" style="display: none;">{% csrf_token %}
 	            <div class="input-group">
 	                <div class="input-group-prepend">
 	                    <label class="input-group-text" for="select_cf_3">
-	                        Select New Shortcode
+	                        Select New Chartfield
 	                    </label>
 	                </div>
 	                <select name="select_cf" class="custom-select" id="select_cf_3">
-	                    {% for cf in new_cf %}
-	                    <option name="cf" value="{{cf.account_number}}">{{ cf.account_number }}</option>
+	                    {% for cf in cf_info %}
+	                    <option name="cf" value="{{ cf|jsonify }}">{{ cf.account_number }}</option>
 	                    {% endfor %}
 	                </select>
 	            </div>
 	        </form>
-			<form id="cf_chartfield_form_3" method="POST" name="cfs" style="display: none;">{% csrf_token %}
+			<div id="cf_shortcode_form_3">
 				<div class="input-group" id="cf_chartfield_group">
 					<div class="input-group-prepend">
-						<label class="input-group-text" for="cf_chartfield_3">
-							Select New Chartfield
+						<label class="input-group-text" for="cf_shortcode_3">
+							Select New Shortcode
 						</label>
 					</div>
-					<select name="chartcom" class="custom-select" id="cf_chartfield_3">
+					<select name="chartcom" class="custom-select" id="cf_shortcode_3">
 						{% for cf in cf_info %}
-						<option name="dept" value="{{ cf|jsonify }}">{{ cf.account_number }}</option>
+						{% if cf.shortcode != '' %}
+						<option value="{{ cf|jsonify }}">{{ cf.short_code }}</option>
+						{% endif %}
 						{% endfor %}
 					</select>
 				</div>
-			</form>
+			</div>
+			
 	    </div>
 		<div class="col-2" style="margin: auto 0 auto 0;">
 			<div class="form-check">
@@ -99,7 +102,7 @@
 	</div>
 
 	<strong id="validate" class="hidden">Please fill out all rows before proceeding.</strong>
-	<div id="checkboxes" class = "row justify-content-end">
+	<div id="checkboxes" class = "row mb-4 justify-content-end">
 		<div class="form-check form-check-inline">
 			<input class="form-check-input" type="checkbox" value="" id="mrc">
 			<label class="form-check-label" for="mrc">

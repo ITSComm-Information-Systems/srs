@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
 	// Select first option in dropdowns
 	$('#chart_deptids :first-child').prop('selected', true);
+	// $('#chart_deptids').trigger('change');
 	$('#cf_chartfield :first-child').prop('selected', true);
 
 	// Hide chartfield selection if department doesn't have any
@@ -218,58 +219,12 @@ document.addEventListener('DOMContentLoaded', function(event) {
 			}
 		});
 	});
-
-
-	// Change chartfields on page 3 with selected department
-	$('#dept_dropdown_3').on('submit', function(e) {
-		e.preventDefault();
-		$.ajax({
-			url: '/chartchangedept/ajax/',
-			data: {
-				'when': 'assign_new',
-				'deptids':$('#dept_text_search').val()
-			},
-			dataType:'json',
-			// Reset chartfield options when department changes
-			success: function(data) {
-				$('#select_cf_3').empty();
-				var drp = document.getElementById('select_cf_3');
-				var option = document.createElement("OPTION");
-				drp.add(option);
-				for (i = 0; i < data.length; ++i) {
-					if (data[i].short_code != ""){
-						var drp = document.getElementById('select_cf_3');
-						var option = document.createElement("OPTION");
-						// option.value = data[i].account_number;
-						// option.text = data[i].account_number + " (Shortcode: " + data[i].short_code + ")";
-						option.value = JSON.stringify(data[i]);
-						option.text = data[i].short_code
-						
-						drp.add(option);
-					}
-				}
-
-				$('#cf_chartfield_3').empty();
-				var drp = document.getElementById('cf_chartfield_3');
-				var option = document.createElement("OPTION");
-				drp.add(option);
-				for (i = 0; i < data.length; ++i) {
-					var drp = document.getElementById('cf_chartfield_3');
-					var option = document.createElement("OPTION");
-					// option.value = data[i].account_number;
-					// option.text = data[i].account_number + " (Shortcode: " + data[i].short_code + ")";
-					option.value = JSON.stringify(data[i]);
-					option.text = data[i].account_number
-					
-					drp.add(option);
-				}
-			}
-		})	
-	})
+	$("#select_cf_3").attr("disabled", "disabled")
+	$("#cf_shortcode_3").attr("disabled", "disabled")
 
 	$('#select_dept_3').on('change', function(e) {
 		$("#select_cf_3").attr("disabled", "disabled")
-		$("#cf_chartfield_3").attr("disabled", "disabled")
+		$("#cf_shortcode_3").attr("disabled", "disabled")
 		
 		e.preventDefault();
 		$.ajax({
@@ -281,16 +236,12 @@ document.addEventListener('DOMContentLoaded', function(event) {
 			dataType:'json',
 			// Reset chartfield options when department changes
 			success: function(data) {
-				$('#select_cf_3').empty();
-				var drp = document.getElementById('select_cf_3');
-				var option = document.createElement("OPTION");
-				drp.add(option);
+				$('#cf_shortcode_3').empty();
+				var drp = document.getElementById('cf_shortcode_3');
 				for (i = 0; i < data.length; ++i) {
 					if (data[i].short_code != "" && data[i].short_code != undefined){
-						var drp = document.getElementById('select_cf_3');
+						var drp = document.getElementById('cf_shortcode_3');
 						var option = document.createElement("OPTION");
-						// option.value = data[i].account_number;
-						// option.text = data[i].account_number + " (Shortcode: " + data[i].short_code + ")";
 						option.value = JSON.stringify(data[i]);
 						option.text = data[i].short_code
 						
@@ -298,15 +249,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
 					}
 				}
 
-				$('#cf_chartfield_3').empty();
-				var drp = document.getElementById('cf_chartfield_3');
-				var option = document.createElement("OPTION");
-				drp.add(option);
+				$('#select_cf_3').empty();
+				var drp = document.getElementById('select_cf_3');
 				for (i = 0; i < data.length; ++i) {
-					var drp = document.getElementById('cf_chartfield_3');
+					var drp = document.getElementById('select_cf_3');
 					var option = document.createElement("OPTION");
-					// option.value = data[i].account_number;
-					// option.text = data[i].account_number + " (Shortcode: " + data[i].short_code + ")";
 					option.value = JSON.stringify(data[i]);
 					option.text = data[i].account_number
 					
@@ -317,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 				$("#new_dept_mgr_uniqname").html($('#select_dept_3 option:selected').val().split("?")[2])
 				$("#new_dept_mgr_email").html($('#select_dept_3 option:selected').val().split("?")[2] + "@umich.edu")
 				$("#select_cf_3").attr("disabled", null)
-				$("#cf_chartfield_3").attr("disabled", null)
+				$("#cf_shortcode_3").attr("disabled", null)
 			}
 		})
 	})
@@ -480,11 +427,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
 	// Reload data when new chartfield is selected
 	$('#cf_chartfield').on('change', function() {
-		// var sel = document.getElementById("cf_chartfield");
-		// var selected = sel.options[sel.selectedIndex].value;
-		var selected = document.getElementById("cf_chartfield").value
-
-		change_current_page(selected);
+		change_current_page(document.getElementById("cf_chartfield").value);
 
 		$('#cfc-2').addClass('disabled');
 		$('#cfc-3').addClass('disabled');
@@ -492,10 +435,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	})
 
 	$('#cf_shortcode_dr').on('change', function() {
-		if ($('#cf_shortcode_dr').value != 'blank'){
-			document.getElementById("cf_chartfield").value = $('#cf_shortcode_dr option:selected').value;
-			// var sel = document.getElementById("cf_chartfield");
-			// var selected = sel.options[sel.selectedIndex].value;
+		if (($('#cf_shortcode_dr').val() != '') & ($('#cf_shortcode_dr').val() !=$('#cf_chartfield').value)){
 			var selected = document.getElementById("cf_shortcode_dr").value
 
 			$('#cf_chartfield').val(selected)
@@ -507,16 +447,16 @@ document.addEventListener('DOMContentLoaded', function(event) {
 		}
 	})
 
-	$('#cf_chartfield_3').on('change', function() {
-		var sel = document.getElementById("cf_chartfield_3");
-		var selected = sel.options[sel.selectedIndex].value;
-		$('#select_cf_3').val(selected)
-		$('#select_cf_3').trigger('change')
+	$('#cf_shortcode_3').on('change', function() {
+		if (($('#cf_shortcode_3').val() != '') & ($('#cf_shortcode_3').val() !=$('#select_cf_3').value)){
+			var selected = document.getElementById("cf_shortcode_3").value
+			$('#select_cf_3').val(selected)
+			$('#select_cf_3').trigger('change')
+		}
 	})
 
 	$("#select_cf_3").on('change', function() {
-		var sel = document.getElementById("select_cf_3");
-		var selected = JSON.parse(sel.options[sel.selectedIndex].value);
+		var selected = JSON.parse(document.getElementById("select_cf_3").value);
 		$("#new_chartfield").html(selected.account_number)
 		$("#new_shortcode").html(selected.short_code)
 		
@@ -526,26 +466,29 @@ document.addEventListener('DOMContentLoaded', function(event) {
 		var chartfield = document.getElementById("cf_chartfield_form");
 		var shortcode = document.getElementById("cf_shortcode_form");
 		if (chartfield.style.display == "none"){
-			chartfield.style.display = "block"
-			shortcode.style.display = "none"
-			$('#cf_shortcode_dr').val('blank')
+			chartfield.style.display = "block";
+			shortcode.style.display = "none";
 		}
 		else{
 			chartfield.style.display = "none"
 			shortcode.style.display = "block"
+			document.getElementById('cf_shortcode_dr').value='';
+			$('#cf_shortcode_dr').trigger('change')
 		}
 	})
 
 	$('#show_chartfield_check_3').on('change', function() {
-		var cf_select = document.getElementById("cf_chartfield_form_3");
+		var shortcode_form = document.getElementById("cf_shortcode_form_3");
 		var cf_dropdown = document.getElementById("cf_dropdown_3");
-		if (cf_select.style.display == "none"){
-			cf_select.style.display = "block"
+		if (shortcode_form.style.display == "none"){
+			shortcode_form.style.display = "block"
 			cf_dropdown.style.display = "none"
 		}
 		else{
-			cf_select.style.display = "none"
-			cf_dropdown.style.display = "flex"
+			shortcode_form.style.display = "none";
+			cf_dropdown.style.display = "block";
+			document.getElementById('cf_shortcode_3').value='';
+			$('#cf_shortcode_3').trigger('change')
 		}
 	})
 
@@ -599,7 +542,7 @@ function nextPrev(n, table, cf_change_table, review_table) {
   	}
   }
 
-  if (currStep == lastStep) {
+  if (n == 1 && (currStep == lastStep)) {
 	$(".page_4_style").addClass("bg-success")
 	$(".page_4_style").addClass("text-white")
 	$("#page_4_top_text").addClass("font-weight-bold")
