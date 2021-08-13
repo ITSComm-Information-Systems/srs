@@ -52,8 +52,13 @@ document.addEventListener('DOMContentLoaded', function(event) {
 		display:"inline",
 	});
 
-	$("#cf_chartfield_3").select2({
-		placeholder: "-- Select new chartfield --",
+	$("#cf_shortcode_dr").select2({
+		placeholder: "-- Select shortcode --",
+		display:"inline",
+	});
+
+	$("#cf_shortcode_3").select2({
+		placeholder: "-- Select new shortcode --",
 		display:"inline",
 	});
 

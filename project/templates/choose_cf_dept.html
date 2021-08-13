@@ -13,9 +13,10 @@
                     </label>
                 </div>
                 <select class="custom-select" id="cf_shortcode_dr">
-                    <option value='blank'>Select Shortcode</option>
                     {% for cf in cf_info %}
-                    <option name="dept" value="{{ cf|jsonify }}">{{ cf.account_number }}</option>
+                    {% if cf.short_code != ''%}
+                    <option name="dept" value="{{ cf|jsonify }}">{{ cf.short_code }}</option>
+                    {% endif %}
                     {% endfor %}
                 </select>
             </div>
