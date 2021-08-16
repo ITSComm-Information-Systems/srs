@@ -30,11 +30,11 @@ urlpatterns = [
     path('chartchange/old-cf/', views.get_cf_data),
     path('chartchange/update-table/', views.get_users),
     path('chartchange/submit/', views.submit),
-    path('chartchangedept/submit/', views.submit_new),
+    path('chartchangedept/submit/', views.submit_new), # AJAX
     path('chartchange/', views.chartchange),
     path('chartchangedept/', views.chartchangedept),
     path('managerapproval/', views.managerapproval),
-    path('managerapprovalinit/', views.managerapprovalinit),
+    path('managerapprovalinit/', views.managerapprovalinit), # AJAX
     path('', views.homepage),
     path('', include('pages.urls')),
     path('tools/',include('tools.urls'))
