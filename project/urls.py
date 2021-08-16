@@ -35,6 +35,7 @@ urlpatterns = [
     path('chartchangedept/', views.chartchangedept),
     path('managerapproval/', views.managerapproval),
     path('managerapprovalinit/', views.managerapprovalinit), # AJAX
+    path('managerapproval/submit/', views.managerapprovalsubmit), # AJAX
     path('', views.homepage),
     path('', include('pages.urls')),
     path('tools/',include('tools.urls'))
