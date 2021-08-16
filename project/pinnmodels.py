@@ -11,7 +11,8 @@ from django.contrib.auth.models import User
 # This view uses the Pinnacle location table and includes locations added by ITS staff
 #  as well as the official builfing codes from MPathways
 
-class UmChartChangeDept(models.Model):
+class UmOscAcctChangeRequest(models.Model):
+     id = models.IntegerField(9, null=False, primary_key=True)
      uniqname = models.CharField(max_length=8) 
      user_defined_id = models.CharField(max_length=20)
      mrc_account_number = models.CharField(max_length=100)
@@ -32,8 +33,7 @@ class UmChartChangeDept(models.Model):
      # messages = models.CharField(max_length=2000)
      building = models.CharField(max_length=2000) 
      new_dept_mgr_uniqname = models.CharField(max_length=100)
-     old_dept_mgr_uniqname = models.CharField(max_length=100)
-     id = models.IntegerField(9, null=False, primary_key=True)
+     old_dept_mgr_uniqname = models.CharField(max_length=100) 
 
      class Meta:
           managed = False
@@ -751,24 +751,6 @@ class UmOscAcctChangeInput(models.Model):
           managed = False
           ordering = ('request_no',)
           db_table = 'PINN_CUSTOM\".\"um_osc_acct_change_input'
-
-class UmOscAcctChangeRequests(models.Model):
-     submitted_by = models.CharField(max_length=8, null=True)
-     date_submitted = models.DateField(null=True)
-     submitted_to_deptid = models.CharField(max_length=10, null=True)
-     last_email_date = models.DateField(null=True)
-     approved_by = models.CharField(max_length=8, null=True)
-     date_approved = models.DateField(null=True)
-     user_defined_id = models.CharField(max_length=20, null=True)
-     mrc_account_number = models.CharField(max_length=100)
-     toll_account_number = models.CharField(max_length=100)
-     local_account_number = models.CharField(max_length=100)
-     request_no = models.IntegerField(9, null=False, primary_key=True)
-
-     class Meta:
-          managed = False
-          ordering = ('request_no',)
-          db_table = 'PINN_CUSTOM\".\"um_osc_acct_change_requests'
           
 class UmOscAcctSubscribersV(models.Model):
      subscriber_id = models.CharField(max_length=7) 

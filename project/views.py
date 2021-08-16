@@ -17,7 +17,7 @@ from django.urls import resolve
 
 from ldap3 import Server, Connection, ALL
 
-from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput, UmOscChartfieldV, UmChartChangeDept
+from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput, UmOscChartfieldV, UmOscAcctChangeRequest
 from order.models import Chartcom
 from oscauth.models import AuthUserDept, AuthUserDeptV
 from datetime import datetime, date
@@ -234,7 +234,7 @@ def managerapprovalinit(request):
 
 	id = request.GET.get("id")
 
-	data = list(UmChartChangeDept.objects.filter(id=id).values())
+	data = list(UmOscAcctChangeRequest.objects.filter(id=id).values())
 	print('managerapprovalinit', data)
 	return JsonResponse(data, safe=False)
 
@@ -243,7 +243,7 @@ def managerapprovalinit(request):
 def managerapproval(request):
 	id = request.GET.get("id")
 	
-	allowed_mgr = list(UmChartChangeDept.objects.filter(id=id).values())[0]["new_dept_mgr_uniqname"]
+	allowed_mgr = list(UmOscAcctChangeRequest.objects.filter(id=id).values())[0]["new_dept_mgr_uniqname"]
 	
 	if (request.user.username == allowed_mgr or request.user.is_superuser):
 		template = loader.get_template('managerapproval.html')
@@ -424,7 +424,7 @@ def submit(request):
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def submit_new(request):
 	template = loader.get_template('submitted.html')
-	id = UmChartChangeDept.objects.count()
+	id = UmOscAcctChangeRequest.objects.count()
 	for key, value in request.POST.items():
 		# Format of 'string' is user_defined_id//mrc_chartfield//toll_chartfield//local_chartfield
 		# plus a lot of other stuff afterwards
@@ -437,7 +437,7 @@ def submit_new(request):
 			if strings[2] == 'N/A':
 				strings[2] = strings[1]
 				strings[3] = strings[1]
-			new_entry = UmChartChangeDept(
+			new_entry = UmOscAcctChangeRequest(
 				uniqname=request.user.username,
 				user_defined_id=strings[0],
 				building=strings[1],
