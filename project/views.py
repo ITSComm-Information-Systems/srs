@@ -257,6 +257,8 @@ def managerapproval(request):
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapprovalsubmit(request):
 	
+	print(request)
+	
 	for user in request.GET.get("data"):
 
 		new_entry = UmOscAcctChangeInput(
@@ -427,6 +429,7 @@ def submit_new(request):
 		# Format of 'string' is user_defined_id//mrc_chartfield//toll_chartfield//local_chartfield
 		# plus a lot of other stuff afterwards
 		string = request.POST.get(key)
+		print(string)
 		if '/' in string:
 			strings = string.split('//')
 			
@@ -472,9 +475,9 @@ def submit_new(request):
 	You may approve or deny this request here: {3}.
 
 	Thank you!
-	'''.format(strings[9].split(", ")[1] + strings[9].split(", ")[0], strings[5], strings[10], "http://127.0.0.1:8000/managerapproval/?id=" + str(id))
+	'''.format(strings[9].split(", ")[1] + strings[9].split(", ")[0], strings[5], strings[10], "https://srs-dev.dsc.umich.edu/managerapproval/?id=" + str(id))
 	subject = "A Chartfield Change Request is awaiting your approval"
-	to = [strings[15]]
+	to = [strings[15], 'hujingc@umich.edu']
 
 	email = EmailMessage(
 		subject,

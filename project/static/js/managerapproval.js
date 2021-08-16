@@ -51,6 +51,40 @@ function reject(){
 	$("#page_4_top_text").html("Rejected! The Requestor will be notified shortly. You may leave this page.")
 	$("#manager_submit").attr("disabled", "disabled")
 	$("#manager_reject").attr("disabled", "disabled")
+    $.ajax({
+        url: '/managerapprovalsubmit/',
+        data: {
+            'id': params["id"],
+            'data': review_table.ajax.json()
+        },
+        dataType:'json',
+        
+        success: function(data) {
+            console.log(data)
+            $("#manager_submit").removeAttr("disabled")
+	        $("#manager_reject").removeAttr("disabled")
+            for (user of data){
+                review_table.row.add([
+                    user.user_defined_id,
+                    user.building,
+                    user.mrc_account_number,
+                    user.toll_account_number,
+                    user.local_account_number,
+                ]).draw();
+                for (key in user){
+                    $("#" + key).html(user[key])
+                    if (key == "old_dept_mgr_uniqname"){
+                        $("#old_dept_mgr_email").html(user[key] + "@umich.edu")
+                    }
+                    if (key == "new_dept_mgr_uniqname"){
+                        $("#new_dept_mgr_email").html(user[key] + "@umich.edu")
+                    }
+                }
+                
+            }
+            
+        }
+    });
 }
 
 
