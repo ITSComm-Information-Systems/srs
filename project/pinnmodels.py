@@ -12,26 +12,24 @@ from django.contrib.auth.models import User
 #  as well as the official builfing codes from MPathways
 
 class UmOscAcctChangeRequest(models.Model):
-     id = models.IntegerField(9, null=False, primary_key=True)
      uniqname = models.CharField(max_length=8) 
      user_defined_id = models.CharField(max_length=20)
      mrc_account_number = models.CharField(max_length=100)
      toll_account_number = models.CharField(max_length=100)
      local_account_number = models.CharField(max_length=100)
+     date_added = models.DateField(null=True)
      old_dept_full_name = models.CharField(max_length=100)
      old_dept_mgr = models.CharField(max_length=100)
-     old_chartfield = models.CharField(max_length=100)
-     old_shortcode = models.CharField(max_length=100)
      user_full_name = models.CharField(max_length=100)
      new_dept_full_name = models.CharField(max_length=100)
      new_dept_mgr = models.CharField(max_length=100)
      new_chartfield = models.CharField(max_length=100)
      new_shortcode = models.CharField(max_length=100)
      optional_message = models.CharField(max_length=100)
-     date_added = models.DateField(null=True) # added null=True
-     # date_processed = models.DateField(null=True) # added null=True
-     # messages = models.CharField(max_length=2000)
      building = models.CharField(max_length=2000) 
+     id = models.IntegerField(9, null=False, primary_key=True)
+     old_chartfield = models.CharField(max_length=100)
+     old_shortcode = models.CharField(max_length=100)
      new_dept_mgr_uniqname = models.CharField(max_length=100)
      old_dept_mgr_uniqname = models.CharField(max_length=100) 
 

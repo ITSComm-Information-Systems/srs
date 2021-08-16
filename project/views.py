@@ -229,8 +229,15 @@ def managerapprovalinit(request):
 
 	# Check for currently-running bill cycle
 	curr = connections['pinnacle'].cursor()
-	# running = curr.callfunc('UM_OSC_UTIL_K.UM_IS_BILL_RUNNING_F', str)
+	running = curr.callfunc('UM_OSC_UTIL_K.UM_IS_BILL_RUNNING_F', str)
 	curr.close()
+
+	if running == 'Y':
+		template = loader.get_template('billingcycle.html')
+		context = {
+			'title': 'Chartfield Change Request',
+		}
+		return HttpResponse(template.render(context, request))
 
 	id = request.GET.get("id")
 
@@ -247,7 +254,7 @@ def managerapproval(request):
 	
 	if (request.user.username == allowed_mgr or request.user.is_superuser):
 		template = loader.get_template('managerapproval.html')
-		context = {"title": "Manager Approval Form"}
+		context = {"title": "Manager Approval Form",'allowed_mgr':allowed_mgr}
 		return HttpResponse(template.render(context, request))
 	else:
 		template = loader.get_template('403.html')
@@ -257,28 +264,32 @@ def managerapproval(request):
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapprovalsubmit(request):
 	
-	print(request)
+	print('managerapprovalsubmit request: ', request.POST)
+	# print(request.POST.get('data'))
 	
-	for user in request.GET.get("data"):
+	# for user in request.GET.get("data"):
+	# 	print(user)
 
-		new_entry = UmOscAcctChangeInput(
-			uniqname=request.user.username,
-			user_defined_id=user.user_defined_id,
-			mrc_account_number=user.mrc_account_number,
-			toll_account_number=user.toll_account_number,
-			local_account_number=user.local_account_number,
-			date_added=date.today(),
-			date_processed=None,
-			messages=None,
-			request_no=None)
-		new_entry.save()
+		# new_entry = UmOscAcctChangeInput(
+		# 	uniqname=request.user.username,
+		# 	user_defined_id=user.user_defined_id,
+		# 	mrc_account_number=user.mrc_account_number,
+		# 	toll_account_number=user.toll_account_number,
+		# 	local_account_number=user.local_account_number,
+		# 	date_added=date.today(),
+		# 	date_processed=None,
+		# 	messages=None,
+		# 	request_no=None)
+		# 	# approved_by=)
+
+		# new_entry.save()
 
 	# Add record to Pinnacle
-	curr = connections['pinnacle'].cursor()
-	uniqname = request.user.username
-	datetime_added = date.today()
-	curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
-	curr.close()
+	# curr = connections['pinnacle'].cursor()
+	# uniqname = request.user.username
+	# datetime_added = date.today()
+	# curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
+	# curr.close()
 
 
 	return JsonResponse({"success": True})
@@ -460,13 +471,6 @@ def submit_new(request):
 				old_dept_mgr_uniqname=strings[17],
 				)
 			new_entry.save()
-
-	# Add record to Pinnacle
-	# curr = connections['pinnacle'].cursor()
-	# uniqname = request.user.username
-	# datetime_added = date.today()
-	# curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
-	# curr.close()
 
 	body = '''
 	Hello, 
