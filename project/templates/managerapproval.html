@@ -93,7 +93,7 @@
                 4. Optional message from requestor
             </div>
             <div class="card-body">
-                <div class="card-text"><span class='optional_message'></span>
+                <div class="card-text"><span id='optional_message' class='optional_message'></span>
                 </div>
 
             </div>
@@ -113,7 +113,7 @@
             </div>
             <div class="modal-body">
                 Are you sure you want to accept the request?
-                <form action="submit/" method="POST" id="manager-accept-form">
+                <form>
                     {% csrf_token %}
                     <input type="hidden" name='uniqname' id='uniqname'>
                     <input type="hidden" name='user_defined_id' id='user_defined_id'>
@@ -143,9 +143,8 @@
             </div>
             <div class="modal-body">
                 Are you sure you want to reject the request?
-                <form action="submit/" method="POST" id="manager-reject-form">
-                    {% csrf_token %}
-                    <input type='text' class='form-control' id='reject-message' placeholder="Optional message...">
+                <form>
+                    <input type='text' class='form-control' id='rejectmessage' placeholder="Optional message...">
                 </form>
             </div>
 
@@ -179,13 +178,8 @@
 <!-- <script type="text/javascript" src="/static/select.js"></script> -->
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/sl-1.3.0/datatables.min.css" />
-<link rel="stylesheet" type="text/css" src="/static/global-overrides.css" />
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/sl-1.3.0/datatables.min.js"></script>
 <!-- <script type="text/javascript" src="/static/select.js"></script> -->
 
-<script>
-    var cf_info = {% if cf_info %} true {% else %} false {% endif %};
-</script>
-<script src="/static/js/chartchange.js"></script>
 <script type="text/javascript" src="/static/js/managerapproval.js"></script>
 {% endblock %}
