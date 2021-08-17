@@ -45,35 +45,29 @@ class BomMaterialView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # Only process webhook if it's for WIFI/AP, not anything else
-        if request.data['data']['device_role']['name']=='WIFI/AP' and request.data['data']['status']['value']!='planned':
-            status = request.data['data']['status']['value']
+        status = request.data['data']['status']['value']
+        pre_order = request.data['data']['custom_fields']['install_preorder_num']
+
+        # Only process webhook if it's for WIFI/AP, staged, and has a pre_order number
+        if request.data['data']['device_role']['name']=='WIFI/AP' and status =='staged' and pre_order != '' :
             self.device_id = request.data['data']['id']
             self.location = request.data['data']['name']
-            pre_order = request.data['data']['custom_fields']['install_preorder_num']
-
             self.webhook = Webhooks(
                 sender = request.data['username'],
                 preorder = pre_order,
                 device_id = self.device_id,
                 name = self.location,  
             )
-            # If status = staged, pre_order=estimate number, send get request to Netbox and get material
-            if status == 'staged' and pre_order != '' :
-                try:
-                    self.estimate = EstimateView.objects.get(pre_order_number=pre_order)
-                    response = self.get_material(request)
-                    
-                except Exception as e:
-                    self.webhook.issue = str(e)
-                    self.webhook.success = False
-                    self.webhook.save()
-                    response = 'No estimate found.'
-            else:
-                response = 'Waiting for staged status or pre-order-number.'
-                self.webhook.issue = 'status not staged, or preorder not given'
+            # send get request to Netbox and get material
+            try:
+                self.estimate = EstimateView.objects.get(pre_order_number=pre_order)
+                response = self.get_material(request)
+                
+            except Exception as e:
+                self.webhook.issue = str(e)
                 self.webhook.success = False
-                self.webhook.save()            
+                self.webhook.save()
+                response = 'No estimate found.'     
 
             threading.Thread(target=netboxEmails, args=[request]).start()
             content = {
@@ -83,7 +77,7 @@ class BomMaterialView(APIView):
             return Response(content)
         else:
             content = {
-                'status': 'Not WIFI/AP, '
+                'status': 'Webhook not accepted'
             }
 
             return Response(content)
@@ -91,7 +85,7 @@ class BomMaterialView(APIView):
     def get_material(self, request):
         # Get inventory items from Netbox
         API_KEY = '0123456789abcdef0123456789abcdef01234567'
-        request_address = 'https://netbox-wdb.dev.infra.apps.it.umich.edu/api/dcim/inventory-items/?device_id=' + str(self.device_id)
+        request_address = 'https://netbox-wdb.infra.apps.it.umich.edu/api/dcim/inventory-items/?device_id=' + str(self.device_id)
         response = requests.get(request_address, headers={'Authorization': 'Token ' + API_KEY})
         response = response.json()
 
