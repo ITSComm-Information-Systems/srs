@@ -55,35 +55,52 @@ $(document).ready(function () {
 });
 
 function accept() {
-    $(".page_4_style").addClass("bg-success")
-    $(".page_4_style").addClass("text-white")
-    $("#page_4_top_text").addClass("font-weight-bold")
-    $("#page_4_top_text").addClass("text-success")
-    $("#page_4_top_text").html("Accepted! The Requestor will be notified and access will be automatically granted shortly. You may leave this page.")
-    $("#manager_submit").attr("disabled", "disabled")
-    $("#manager_reject").attr("disabled", "disabled")
-    $('#manager-accept-form').submit();
-}
+    $.ajax({
+        url: "submit/",
+        type: "POST",
+        data: {
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            uniqname: document.getElementById('uniqname').value,
+            user_defined_id: document.getElementById('user_defined_id').value,
+            mrc_account_number: document.getElementById('mrc_account_number').value,
+            toll_account_number: document.getElementById('toll_account_number').value,
+            local_account_number: document.getElementById('local_account_number').value,
+            approved_by: document.getElementById('approved_by').value,
+            optional_message: document.getElementById('optional_message').value
+        },
 
-// Do not redirect
-var form = document.getElementById('manager-accept-form');
-form.addEventListener('submit', function (e) {
-    e.preventDefault();
-});
+        // handle a successful response
+        success: function (json) {
+            $(".page_4_style").addClass("bg-success")
+            $(".page_4_style").addClass("text-white")
+            $("#page_4_top_text").addClass("font-weight-bold")
+            $("#page_4_top_text").addClass("text-success")
+            $("#page_4_top_text").html("Accepted! The Requestor will be notified and access will be automatically granted shortly. You may leave this page.")
+            $("#manager_submit").attr("disabled", "disabled")
+            $("#manager_reject").attr("disabled", "disabled")
+        },
+
+    });
+}
 
 function reject() {
-    $(".page_4_style").addClass("bg-danger")
-    $(".page_4_style").addClass("text-white")
-    $("#page_4_top_text").addClass("font-weight-bold")
-    $("#page_4_top_text").addClass("text-danger")
-    $("#page_4_top_text").html("Rejected! The Requestor will be notified shortly. You may leave this page.")
-    $("#manager_submit").attr("disabled", "disabled")
-    $("#manager_reject").attr("disabled", "disabled")
-    $('#manager-reject-form').submit();
-}
+    $.ajax({
+        url: "submit/",
+        type: "POST",
+        data: {
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            rejectmessage: document.getElementById('rejectmessage').value,
+            uniqname: document.getElementById('uniqname').value,
 
-// Do not redirect
-var form = document.getElementById('manager-reject-form');
-form.addEventListener('submit', function (e) {
-    e.preventDefault();
-});
+        },
+        success: function (json) {
+            $(".page_4_style").addClass("bg-danger")
+            $(".page_4_style").addClass("text-white")
+            $("#page_4_top_text").addClass("font-weight-bold")
+            $("#page_4_top_text").addClass("text-danger")
+            $("#page_4_top_text").html("Rejected! The Requestor will be notified shortly. You may leave this page.")
+            $("#manager_submit").attr("disabled", "disabled")
+            $("#manager_reject").attr("disabled", "disabled")
+        },
+    });
+}

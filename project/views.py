@@ -224,6 +224,26 @@ def chartchangedept(request):
 	}
 
 	return HttpResponse(template.render(context, request))
+
+@permission_required(('oscauth.can_order'), raise_exception=True)
+def managerapproval(request):
+	id = request.GET.get("id")
+	try:
+		allowed_mgr = [UmOscAcctChangeRequest.objects.get(id=id).new_dept_mgr_uniqname]
+	except:
+		# check for proxy here
+		# allowed_mgr = list(UmOscAcctChangeRequest.objects.filter(id=id).values())[0]["new_dept_mgr_uniqname"]
+		allowed_mgr = ['hujingc']
+
+	if ((request.user.username in allowed_mgr) or (request.user.is_superuser)):
+		template = loader.get_template('managerapproval.html')
+		context = {"title": "Manager Approval Form",'allowed_mgr': request.user.username}
+		return HttpResponse(template.render(context, request))
+	else:
+		template = loader.get_template('403.html')
+		context = {"title": "Manager Approval Form"}
+		return HttpResponse(template.render(context, request))
+
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapprovalinit(request):
 
@@ -245,51 +265,59 @@ def managerapprovalinit(request):
 	print('managerapprovalinit', data)
 	return JsonResponse(data, safe=False)
 
-
-@permission_required(('oscauth.can_order'), raise_exception=True)
-def managerapproval(request):
-	id = request.GET.get("id")
-	
-	allowed_mgr = list(UmOscAcctChangeRequest.objects.filter(id=id).values())[0]["new_dept_mgr_uniqname"]
-	
-	if (request.user.username == allowed_mgr or request.user.is_superuser):
-		template = loader.get_template('managerapproval.html')
-		context = {"title": "Manager Approval Form",'allowed_mgr':allowed_mgr}
-		return HttpResponse(template.render(context, request))
-	else:
-		template = loader.get_template('403.html')
-		context = {"title": "Manager Approval Form"}
-		return HttpResponse(template.render(context, request))
-
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapprovalsubmit(request):
+	print(request.POST)
 	
-	print('managerapprovalsubmit request: ', request.POST)
-	# print(request.POST.get('data'))
-	
-	# for user in request.GET.get("data"):
-	# 	print(user)
+	if "approved_by" in request.POST:
+		post = request.POST
+		print(post.get('user_defined_id'))
+		print(post.get('approved_by'))
+		print(post.get('csrfmiddlewaretoken'))
+		new_entry = UmOscAcctChangeInput(
+			uniqname = post.get('uniqname'),
+			user_defined_id = post.get('user_defined_id'),
+			mrc_account_number = post.get('mrc_account_number'),
+			toll_account_number = post.get('toll_account_number'),
+			local_account_number = post.get('local_account_number'),
+			date_added=date.today(),
+			date_processed=None,
+			messages=post.get('optional_message'),
+			request_no=None,
+			approved_by=post.get('approved_by')
+			)
 
-		# new_entry = UmOscAcctChangeInput(
-		# 	uniqname=request.user.username,
-		# 	user_defined_id=user.user_defined_id,
-		# 	mrc_account_number=user.mrc_account_number,
-		# 	toll_account_number=user.toll_account_number,
-		# 	local_account_number=user.local_account_number,
-		# 	date_added=date.today(),
-		# 	date_processed=None,
-		# 	messages=None,
-		# 	request_no=None)
-		# 	# approved_by=)
+		new_entry.save()
 
-		# new_entry.save()
+		# Add record to Pinnacle
+		# curr = connections['pinnacle'].cursor()
+		# uniqname = request.user.username
+		# datetime_added = date.today()
+		# curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
+		# curr.close()
 
-	# Add record to Pinnacle
-	# curr = connections['pinnacle'].cursor()
-	# uniqname = request.user.username
-	# datetime_added = date.today()
-	# curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
-	# curr.close()
+	elif "rejectmessage" in request.POST:
+		print(request.POST)
+	# 	body = '''
+	# 		Hello, 
+
+	# 		{0} from another department has requested to change a chartfield from {1} to {2}, which you have permissions over.
+	# 		You may approve or deny this request here: {3}.
+
+	# 		Thank you!
+	# 		'''.format(strings[9].split(", ")[1] + strings[9].split(", ")[0], strings[5], strings[10], "https://srs-dev.dsc.umich.edu/managerapproval/?id=" + str(id))
+	# 		subject = "A Chartfield Change Request is awaiting your approval"
+	# 		to = [strings[15], 'hujingc@umich.edu']
+
+	# 		email = EmailMessage(
+	# 			subject,
+	# 			body,
+	# 			'srs@umich.edu',
+	# 			to,
+	# 			[]
+	# 		)
+
+	# email.send()
 
 
 	return JsonResponse({"success": True})
