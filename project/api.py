@@ -3,6 +3,7 @@ from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from rest_framework import routers, viewsets
 from . import serializers
+from django.conf import settings
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -85,7 +86,7 @@ class BomMaterialView(APIView):
     def get_material(self, request):
         # Get inventory items from Netbox
         API_KEY = '0123456789abcdef0123456789abcdef01234567'
-        request_address = 'https://netbox-wdb.infra.apps.it.umich.edu/api/dcim/inventory-items/?device_id=' + str(self.device_id)
+        request_address = settings.NETBOX_URL + '/api/dcim/inventory-items/?device_id=' + str(self.device_id)
         response = requests.get(request_address, headers={'Authorization': 'Token ' + API_KEY})
         response = response.json()
 
