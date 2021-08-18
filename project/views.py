@@ -267,13 +267,8 @@ def managerapprovalinit(request):
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapprovalsubmit(request):
-	print(request.POST)
-	
-	if "approved_by" in request.POST:
-		post = request.POST
-		print(post.get('user_defined_id'))
-		print(post.get('approved_by'))
-		print(post.get('csrfmiddlewaretoken'))
+	post = request.POST	
+	if "approved_by" in post:
 		new_entry = UmOscAcctChangeInput(
 			uniqname = post.get('uniqname'),
 			user_defined_id = post.get('user_defined_id'),
@@ -284,43 +279,63 @@ def managerapprovalsubmit(request):
 			date_processed=None,
 			messages=post.get('optional_message'),
 			request_no=None,
-			approved_by=post.get('approved_by')
+			approved_by=post.get('approver')
 			)
 
 		new_entry.save()
 
 		# Add record to Pinnacle
-		# curr = connections['pinnacle'].cursor()
-		# uniqname = request.user.username
-		# datetime_added = date.today()
-		# curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
-		# curr.close()
+		curr = connections['pinnacle'].cursor()
+		uniqname = request.user.username
+		datetime_added = date.today()
+		curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
+		curr.close()
 
-	elif "rejectmessage" in request.POST:
-		print(request.POST)
-	# 	body = '''
-	# 		Hello, 
+		# After Pinnacle is updated, send email
+		subject = "Your Chartfield Change Request was approved"
 
-	# 		{0} from another department has requested to change a chartfield from {1} to {2}, which you have permissions over.
-	# 		You may approve or deny this request here: {3}.
+		body = '''
+			Hello {uniqname}, 
 
-	# 		Thank you!
-	# 		'''.format(strings[9].split(", ")[1] + strings[9].split(", ")[0], strings[5], strings[10], "https://srs-dev.dsc.umich.edu/managerapproval/?id=" + str(id))
-	# 		subject = "A Chartfield Change Request is awaiting your approval"
-	# 		to = [strings[15], 'hujingc@umich.edu']
+			Your chartfield change request was approved by {approver}. 
+			'''.format(uniqname=post.get('uniqname'), approver = post.get('approver'))
+		
+		to = [post.get('uniqname')+'@umich.edu', 'hujingc@umich.edu']
 
-	# 		email = EmailMessage(
-	# 			subject,
-	# 			body,
-	# 			'srs@umich.edu',
-	# 			to,
-	# 			[]
-	# 		)
+		email = EmailMessage(
+			subject,
+			body,
+			'srs@umich.edu', # from email
+			to,
+			[]
+		)
 
-	# email.send()
+	elif "rejectmessage" in post:
+		subject = "Your Chartfield Change Request was denied"
 
+		body = '''
+			Hello {uniqname}, 
 
+			Your chartfield change request was denied by {approver}. 
+			'''.format(uniqname=post.get('uniqname'), approver = post.get('approver'))
+
+		if post.get('rejectmessage')!='':
+			body.append('The following message was included: '+post.get('rejectmessage'))
+		
+		to = [post.get('uniqname')+'@umich.edu', 'hujingc@umich.edu']
+
+		email = EmailMessage(
+			subject,
+			body,
+			'srs@umich.edu', # from email
+			to,
+			[]
+		)
+
+	email.send()
+	
 	return JsonResponse({"success": True})
+
 # Gives new chartfields when user changes department
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def change_dept_new(request):
