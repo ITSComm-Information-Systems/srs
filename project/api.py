@@ -85,8 +85,8 @@ class BomMaterialView(APIView):
     
     def get_material(self, request):
         # Get inventory items from Netbox
-        API_KEY = '0123456789abcdef0123456789abcdef01234567'
-        request_address = settings.NETBOX_URL + '/api/dcim/inventory-items/?device_id=' + str(self.device_id)
+        API_KEY = settings.NETBOX['NETBOX_KEY']
+        request_address = settings.NETBOX['NETBOX_URL'] + '/api/dcim/inventory-items/?device_id=' + str(self.device_id)
         response = requests.get(request_address, headers={'Authorization': 'Token ' + API_KEY})
         response = response.json()
 
