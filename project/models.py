@@ -105,8 +105,3 @@ class Webhooks(models.Model):
      timestamp = models.DateTimeField(auto_now_add=True)
      added = models.CharField(max_length=255, null=True)
      skipped = models.CharField(max_length=255, null=True)
-
-if settings.ENVIRONMENT == 'Production':
-    NETBOX_URL = 'https://netbox-wdb.infra.apps.it.umich.edu'
-else:
-    NETBOX_URL = 'https://netbox-wdb.dev.infra.apps.it.umich.edu'

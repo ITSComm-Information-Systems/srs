@@ -112,7 +112,10 @@ TDX = {
     'PASSWORD': os.getenv('TDX_PASSWORD'),
 }
 
-NETBOX_URL = os.getenv('NETBOX_URL')
+NETBOX = {
+    'NETBOX_KEY' : os.getenv('NETBOX_KEY'),
+    'NETBOX_URL' : os.getenv('NETBOX_URL'),
+}
 
 MCOMMUNITY = {
     'SERVER': os.getenv('MC_SERVER', 'ldap.umich.edu'),
