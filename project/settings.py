@@ -77,7 +77,7 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
+    'oscauth.backends.UMichOIDCBackend',
     'django.contrib.auth.backends.ModelBackend',
     'oscauth.backends.SuBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -95,6 +95,8 @@ OIDC_OP_TOKEN_ENDPOINT = AUTH_BASE_URL + '/idp/profile/oidc/token'
 OIDC_OP_USER_ENDPOINT = AUTH_BASE_URL + '/idp/profile/oidc/userinfo'
 OIDC_OP_JWKS_ENDPOINT = AUTH_BASE_URL + '/oidc/keyset.jwk'
 OIDC_RP_SIGN_ALGO = 'RS256'
+OIDC_USERNAME_ALGO = 'oscauth.backends.generate_username'
+OIDC_RP_SCOPES = 'openid email profile'
 LOGIN_REDIRECT_URL = SITE_URL
 LOGOUT_REDIRECT_URL = SITE_URL
 LOGIN_URL = '/oidc/authenticate'
