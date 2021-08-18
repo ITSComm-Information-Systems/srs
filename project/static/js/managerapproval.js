@@ -65,7 +65,7 @@ function accept() {
             mrc_account_number: document.getElementById('mrc_account_number').value,
             toll_account_number: document.getElementById('toll_account_number').value,
             local_account_number: document.getElementById('local_account_number').value,
-            approved_by: document.getElementById('approved_by').value,
+            approver: document.getElementById('approver').value,
             optional_message: document.getElementById('optional_message').value
         },
 
@@ -91,6 +91,7 @@ function reject() {
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             rejectmessage: document.getElementById('rejectmessage').value,
             uniqname: document.getElementById('uniqname').value,
+            approver: document.getElementById('approver').value, //Approved by uses request.user.username
 
         },
         success: function (json) {
