@@ -4,6 +4,7 @@ from .models import Role
 from .models import Grantor
 from .models import AuthUserDept
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, connections
 
 from django.urls import path
@@ -11,41 +12,28 @@ from django.urls import path
 from django.template.response import TemplateResponse
 from django import forms
 from project.forms.fields import Uniqname
-from project.pinnmodels import UmOscDeptUnitsReptV
+from project.pinnmodels import UmMpathDwCurrDepartment
+
 
 class RoleAdmin(admin.ModelAdmin):
     list_display = ('role', 'display_seq_no', 'active', 'create_date', 'last_update_date')
     ordering = ('display_seq_no', )
 
 
-def get_dept_list(dept_grp):
-    sql = "select distinct deptid " \
-            "from PINN_CUSTOM.UM_MPATHDW_CURR_DEPARTMENT " \
-            "where dept_grp = %s " 
-
-    with connections['pinnacle'].cursor() as cursor:
-        cursor.execute(sql, [dept_grp])    
-        s = cursor.fetchall()
-        return s
-
-def get_vp_groups():
-    sql = "select distinct dept_grp, dept_grp_descr " \
-            "from PINN_CUSTOM.UM_MPATHDW_CURR_DEPARTMENT " \
-            "where dept_eff_status = 'A' " \
-            "and dept_grp <> ' ' " \
-            "order by 2"
-
-    with connections['pinnacle'].cursor() as cursor:
-        cursor.execute(sql)    
-        return cursor.fetchall()
-
-
 class BulkUpdateForm(forms.Form):
-    department_group = forms.ChoiceField(choices=get_vp_groups())
+    vp_groups = UmMpathDwCurrDepartment.objects.exclude(dept_grp=' ').values_list('dept_grp', 'dept_grp_descr').distinct().order_by('dept_grp_descr')
+    department_group = forms.MultipleChoiceField(choices=vp_groups)
     uniqname = Uniqname(max_length=8)
     role = forms.ChoiceField(choices=[('','----'),('4','Proxy'),('5','Orderer'),('6','Reporter')])
     action = forms.ChoiceField(choices=[('','----'),('Add','Add'),('Delet','Delete')])
 
+    def clean(self):
+        try:
+            self.user = User.objects.get(username=self.cleaned_data.get('uniqname'))
+        except ObjectDoesNotExist:
+            self.add_error('uniqname', 'User not found in SRS.')
+
+        super().clean()
 
 class AuthUserDeptAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'group', 'dept')
@@ -70,31 +58,27 @@ class AuthUserDeptAdmin(admin.ModelAdmin):
             form = BulkUpdateForm(request.POST)
 
             if form.is_valid():
-                uniqname = form.cleaned_data['uniqname']
                 action = form.cleaned_data['action']
                 group_id = form.cleaned_data['role']
-
                 department_group = form.cleaned_data['department_group']
-                #dept_list = list(UmOscDeptUnitsReptV.objects.filter(dept_grp=department_group).values('deptid').distinct())
-                dept_list = get_dept_list(department_group)
 
-                user = User.objects.get(username=uniqname)
+                dept_list = list(UmMpathDwCurrDepartment.objects.filter(dept_grp__in=department_group).values_list('deptid', flat=True).distinct())
+
                 count = 0
-
-                for dept in dept_list:
-                    if form.cleaned_data['action'] == 'Add':
+                if form.cleaned_data['action'] == 'Add':
+                    record_list = []
+                    for dept in dept_list:
                         rec = AuthUserDept()
-                        rec.user = user
+                        rec.user = form.user
                         rec.group_id = group_id
-                        rec.dept = dept[0]
-                        try:
-                            rec.save()
-                            count += 1
-                        except IntegrityError:
-                            print('Not added, already exists')
-                    else:
-                        AuthUserDept.objects.filter(dept=dept[0], user=user, group_id=group_id).delete()
-                        count += 1
+                        rec.dept = dept
+                        record_list.append(rec)
+
+                    result = AuthUserDept.objects.bulk_create(record_list, ignore_conflicts=True)
+                    count = len(result)
+                else:
+                    result = AuthUserDept.objects.filter(dept__in=dept_list, user=form.user, group_id=group_id).delete()
+                    count = result[0]
 
                 context['message'] = f'{count} records {action}ed'
           
