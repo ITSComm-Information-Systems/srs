@@ -1241,3 +1241,23 @@ class UmEcommMbidVendorV(models.Model):
     class Meta:
         managed = False
         db_table = 'PINN_CUSTOM\".\"UM_ECOMM_MBID_VENDOR_V'
+
+
+class UmMpathDwCurrDepartment(models.Model):
+    deptid = models.CharField(max_length=10)
+    dept_effdt = models.DateField()
+    dept_eff_status = models.CharField(max_length=1)
+    dept_descr = models.CharField(max_length=30)
+    emplid = models.CharField(max_length=11)
+    dept_grp = models.CharField(max_length=20)
+    dept_grp_descr = models.CharField(max_length=30)
+    dept_grp_vp_area = models.CharField(max_length=20)
+    dept_grp_vp_area_descr = models.CharField(max_length=30)
+    dept_grp_campus = models.CharField(max_length=20)
+    dept_grp_campus_descr = models.CharField(max_length=30)
+    dept_bud_seq = models.CharField(max_length=20, blank=True, null=True)
+    dept_bud_seq_descr = models.CharField(max_length=30, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'PINN_CUSTOM\".\"UM_MPATHDW_CURR_DEPARTMENT'
