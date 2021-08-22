@@ -92,7 +92,7 @@ class Search(PermissionRequiredMixin, View):
             template = 'bom/search_estimates.html'
         else:  # open_workorder
             title = 'Search Open Preorders/Workorders'
-            search_list = Workorder.objects.filter(status_name='Open')
+            search_list = Workorder.objects.filter(status_name='Open').defer('status_name')
 
             for workorder in search_list:
                 if workorder.building_number:
