@@ -19,10 +19,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	$('#chartchange_nav li:first-child a').tab('show');
 
 	// Select first option in dropdowns
-	$('#chart_deptids :first-child').prop('selected', true);
-	// $('#chart_deptids').trigger('change');
-	$('#cf_chartfield :first-child').prop('selected', true);
-
+	// $('#chart_deptids :first-child').prop('selected', true);
+	
+	// $('#cf_chartfield :first-child').prop('selected', true);
+	// $('#select_dept_3 :first-child').prop('selected', true);
+	
 	// Hide chartfield selection if department doesn't have any
 	if (cf_info) {
 		$('#no_cfs_alert').hide();
@@ -41,9 +42,9 @@ document.addEventListener('DOMContentLoaded', function(event) {
 		nextPrev(-1, table, cf_change_table, review_table);
 	});
 
-	$('#chart_deptids').find('[data-default]').each(function(){
-		$(this).prop('selected', true);
-	});
+	// $('#chart_deptids').find('[data-default]').each(function(){
+	// 	$(this).prop('selected', true);
+	// });
 
 	// Create paginated tables
 	var table = $('#cf_users_table').DataTable({
@@ -377,7 +378,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
 			dataType:'json',
 			// Reset chartfield options when department changes
 			success: function(data) {
-				console.log(data)
 				$('#cf_shortcode_dr').empty();
 				$('#cf_chartfield').empty();
 				if (data.length < 1) {
@@ -505,28 +505,6 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
   }
   $('#cfNextBtn').prop('disabled', false);
 })
-
-function accept(){
-	$(".page_4_style").addClass("bg-success")
-	$(".page_4_style").addClass("text-white")
-	$("#page_4_top_text").addClass("font-weight-bold")
-	$("#page_4_top_text").addClass("text-success")
-	$("#page_4_top_text").html("Accepted! The Requestor will be notified and access will be automatically granted shortly. You may leave this page.")
-	$("#manager_submit").attr("disabled", "disabled")
-	$("#manager_reject").attr("disabled", "disabled")
-}
-
-
-function reject(){
-	$(".page_4_style").addClass("bg-danger")
-	$(".page_4_style").addClass("text-white")
-	$("#page_4_top_text").addClass("font-weight-bold")
-	$("#page_4_top_text").addClass("text-danger")
-	$("#page_4_top_text").html("Rejected! The Requestor will be notified shortly. You may leave this page.")
-	$("#manager_submit").attr("disabled", "disabled")
-	$("#manager_reject").attr("disabled", "disabled")
-}
-
 
 // Next/prev functionality
 function nextPrev(n, table, cf_change_table, review_table) {

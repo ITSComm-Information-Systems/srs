@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	});
 
 	$("#chart_deptids").select2({
-		// placeholder: "-- Select your current department --",
+		placeholder: "-- Select your current department --",
 		display:"inline",
 	});
 

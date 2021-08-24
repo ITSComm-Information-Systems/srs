@@ -210,6 +210,7 @@ def chartchangedept(request):
 	context = {
 		'title': 'Chartfield Change Request (external department)',
 		'deptids': user_depts,
+		'all_dept': UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid'),
 		'dept_info': dept_info,
 		'selected_cf': selected_cf,
 		'cf_info': chartfield_list,
