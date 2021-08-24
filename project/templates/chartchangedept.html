@@ -77,11 +77,12 @@
         </div>
         <select name="deptids" class="custom-select" id="chart_deptids">
             {% for dept in deptids %}
-              {% if dept.dept ==  dept_info.dept_id %}
+              <!-- {% if dept.dept ==  dept_info.dept_id %}
                 <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}?{{dept.dept_mgr_uniqname}}" data-default="true">{{ dept.dept }} - {{ dept.dept_name }}</option>
               {% else %}
                 <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}?{{dept.dept_mgr_uniqname}}">{{ dept.dept }} - {{ dept.dept_name }}</option>
-              {% endif %}         
+              {% endif %} -->
+              <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}?{{dept.dept_mgr_uniqname}}">{{ dept.dept }} - {{ dept.dept_name }}</option>         
             {% endfor %}
         </select>
       </div>
