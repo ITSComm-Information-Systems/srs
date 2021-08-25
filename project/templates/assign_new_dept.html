@@ -38,9 +38,9 @@
 	                    </label>
 	                </div>
 	                <select name="select_cf" class="custom-select" id="select_cf_3">
-	                    {% for cf in cf_info %}
+	                    <!-- {% for cf in cf_info %}
 	                    <option name="cf" value="{{ cf|jsonify }}">{{ cf.account_number }}</option>
-	                    {% endfor %}
+	                    {% endfor %} -->
 	                </select>
 	            </div>
 	        </form>
@@ -52,11 +52,11 @@
 						</label>
 					</div>
 					<select name="chartcom" class="custom-select" id="cf_shortcode_3">
-						{% for cf in cf_info %}
+						<!-- {% for cf in cf_info %}
 						{% if cf.shortcode != '' %}
 						<option value="{{ cf|jsonify }}">{{ cf.short_code }}</option>
 						{% endif %}
-						{% endfor %}
+						{% endfor %} -->
 					</select>
 				</div>
 			</div>
