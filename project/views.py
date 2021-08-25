@@ -119,7 +119,6 @@ def chartchange(request):
 	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
 	# Get notice
 	notice = Page.objects.get(permalink='/ccr')
-	print('user_depts',user_depts)
 	context = {
 		'title': 'Chartfield Change Request',
 		'deptids': user_depts,
@@ -206,6 +205,7 @@ def chartchangedept(request):
 		new_dept = ''
 	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
 	print('new_cf: ', new_cf)
+	print('user_depts',user_depts)
 	# Get notice
 	notice = Page.objects.get(permalink='/ccr')
 	context = {
@@ -339,24 +339,20 @@ def managerapprovalsubmit(request):
 	return JsonResponse({"success": True})
 
 # Gives new chartfields when user changes department
+# url chartchangedept/ajax/
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def change_dept_new(request):
 	selected_dept = request.GET.get('deptids', None)
 	selected_dept = selected_dept.split(' - ')[0]
-	print('selected dept:', selected_dept)
 	when = request.GET.get('when', None)
-	# Get list of chartcoms in user's shortlist for user to select new
-	if when == 'assign_new':
-		cf_options = Chartcom.get_user_chartcoms_for_dept(request.user, selected_dept)
-		for i in cf_options:
-			db = UmOscAllActiveAcctNbrsV.objects.filter(account_number=i["account_number"])
-			if db:
-				i["short_code"] = db[0].short_code
+	print('when:', when)
 
-	# Get list of chartcoms in use
-	else:
-		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
-		
+	# Return all departments as options
+	cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
+	for i in cf_options:
+		db = UmOscAllActiveAcctNbrsV.objects.filter(account_number=i["account_number"])
+		if db:
+			i["short_code"] = db[0].short_code
 			
 	
 	return JsonResponse(cf_options, safe=False)
@@ -517,6 +513,7 @@ def submit_new(request):
 				)
 			new_entry.save()
 
+	print(strings[15])
 	body = '''
 	Hello, 
 
@@ -526,7 +523,7 @@ def submit_new(request):
 	Thank you!
 	'''.format(strings[9].split(", ")[1] + strings[9].split(", ")[0], strings[5], strings[10], settings.SITE_URL+"/managerapproval/?id=" + str(id))
 	subject = "A Chartfield Change Request is awaiting your approval"
-	to = [strings[15], 'hujingc@umich.edu']
+	to = ['mkokarde@umich.edu', 'hujingc@umich.edu']
 
 	email = EmailMessage(
 		subject,

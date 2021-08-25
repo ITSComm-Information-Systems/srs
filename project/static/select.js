@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	});
 
 	$("#select_cf_3").select2({
-		placeholder: "-- Select new shortcode --",
+		placeholder: "-- Select new chartfield --",
 		display:"inline",
 		sorter: data => data.sort((a, b) => a.text.localeCompare(b.text)),
 	});
@@ -72,7 +72,10 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	$("#chart_deptids").one('select2:open', function(e) {
     	$('input.select2-search__field').prop('placeholder', 'Search...');
 	});
-
+	$("#select_dept_3").one('select2:open', function(e) {
+    	$('input.select2-search__field').prop('placeholder', 'Search...');
+	});
+	
 	$("#dept_id").one('select2:open', function(e) {
     	$('input.select2-search__field').prop('placeholder', 'Search...');
 	});
