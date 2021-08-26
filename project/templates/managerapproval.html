@@ -115,6 +115,7 @@
                 Are you sure you want to accept the request?
                 <form>
                     {% csrf_token %}
+                    <input type="hidden" name='request_id' class='request_id' id='request_id'>
                     <input type="hidden" name='uniqname' id='uniqname'>
                     <input type="hidden" name='user_defined_id' id='user_defined_id'>
                     <input type="hidden" name='mrc_account_number' id='mrc_account_number'>
@@ -143,9 +144,7 @@
             </div>
             <div class="modal-body">
                 Are you sure you want to reject the request?
-                <form>
-                    <input type='text' class='form-control' id='rejectmessage' placeholder="Optional message...">
-                </form>
+                <input type='text' class='form-control' id='rejectmessage' placeholder="Optional message...">
             </div>
 
             <div class="modal-footer">

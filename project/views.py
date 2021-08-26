@@ -269,10 +269,19 @@ def managerapprovalinit(request):
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapprovalsubmit(request):
-	post = request.POST	
-	if "approved_by" in post:
+	post = request.POST
+	status = post.get('status')
+	id = post.get('request_id')
+	change_row = UmOscAcctChangeRequest.objects.get(id=id)
+	approver = post.get('approver')
+	uniqname = post.get('uniqname')
+	
+	if status == 'accepted':
+		change_row.approved_by = approver
+		change_row.save()
+
 		new_entry = UmOscAcctChangeInput(
-			uniqname = post.get('uniqname'),
+			uniqname = uniqname,
 			user_defined_id = post.get('user_defined_id'),
 			mrc_account_number = post.get('mrc_account_number'),
 			toll_account_number = post.get('toll_account_number'),
@@ -281,14 +290,13 @@ def managerapprovalsubmit(request):
 			date_processed=None,
 			messages=post.get('optional_message'),
 			request_no=None,
-			approved_by=post.get('approver')
+			approved_by=approver
 			)
 
 		new_entry.save()
 
 		# Add record to Pinnacle
 		curr = connections['pinnacle'].cursor()
-		uniqname = post.get('uniqname')
 		datetime_added = date.today()
 		curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
 		curr.close()
@@ -300,9 +308,9 @@ def managerapprovalsubmit(request):
 			Hello {uniqname}, 
 
 			Your chartfield change request was approved by {approver}. 
-			'''.format(uniqname=post.get('uniqname'), approver = post.get('approver'))
+			'''.format(uniqname = uniqname, approver = approver)
 		
-		to = [post.get('uniqname')+'@umich.edu', 'hujingc@umich.edu']
+		to = [uniqname + '@umich.edu', 'hujingc@umich.edu']
 
 		email = EmailMessage(
 			subject,
@@ -312,19 +320,22 @@ def managerapprovalsubmit(request):
 			[]
 		)
 
-	elif "rejectmessage" in post:
+	elif status == 'rejected':
+		change_row.rejected_by = approver
+		change_row.save()
+
 		subject = "Your Chartfield Change Request was denied"
 
 		body = '''
 			Hello {uniqname}, 
 
 			Your chartfield change request was denied by {approver}. 
-			'''.format(uniqname=post.get('uniqname'), approver = post.get('approver'))
+			'''.format(uniqname = uniqname, approver = approver)
 
 		if post.get('rejectmessage')!='':
-			body.append('The following message was included: '+post.get('rejectmessage'))
+			body + 'The following message was included: ' + post.get('rejectmessage')
 		
-		to = [post.get('uniqname')+'@umich.edu', 'hujingc@umich.edu']
+		to = [uniqname + '@umich.edu', 'hujingc@umich.edu']
 
 		email = EmailMessage(
 			subject,

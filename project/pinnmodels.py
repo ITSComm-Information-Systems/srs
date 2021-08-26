@@ -31,7 +31,9 @@ class UmOscAcctChangeRequest(models.Model):
      old_chartfield = models.CharField(max_length=100)
      old_shortcode = models.CharField(max_length=100)
      new_dept_mgr_uniqname = models.CharField(max_length=100)
-     old_dept_mgr_uniqname = models.CharField(max_length=100) 
+     old_dept_mgr_uniqname = models.CharField(max_length=100)
+     approved_by = models.CharField(max_length=100)
+     rejected_by = models.CharField(max_length=100)
 
      class Meta:
           managed = False
