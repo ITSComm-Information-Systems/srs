@@ -2,7 +2,8 @@ $(document).ready(function () {
     $("#manager_submit").attr("disabled", "disabled")
     $("#manager_reject").attr("disabled", "disabled")
     // get url parameters
-    params = {}; location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (s, k, v) { params[k] = v })
+    const urlParams = new URLSearchParams(window.location.search)
+    $('.request_id').val(urlParams.get('id'))
 
     var review_table = $('#review_table').DataTable({
         "destroy": true,
@@ -17,7 +18,7 @@ $(document).ready(function () {
         "ajax": {
             url: '/managerapprovalinit/',
             data: {
-                'id': params["id"]
+                'id': urlParams.get('id')
             },
             dataSrc: "",
             dataType: 'json',
@@ -60,6 +61,8 @@ function accept() {
         type: "POST",
         data: {
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            status:'accepted',
+            request_id: document.getElementById('request_id').value,
             uniqname: document.getElementById('uniqname').value,
             user_defined_id: document.getElementById('user_defined_id').value,
             mrc_account_number: document.getElementById('mrc_account_number').value,
@@ -90,6 +93,8 @@ function reject() {
         data: {
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             rejectmessage: document.getElementById('rejectmessage').value,
+            status:'rejected',
+            request_id: document.getElementById('request_id').value,
             uniqname: document.getElementById('uniqname').value,
             approver: document.getElementById('approver').value, //Approved by uses request.user.username
 
