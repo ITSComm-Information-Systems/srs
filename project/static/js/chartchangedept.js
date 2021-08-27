@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	$('#chartchange_nav li:first-child a').tab('show');
 
 	// Select first option in dropdowns
-	// $('#chart_deptids :first-child').prop('selected', true);
+	$('#chart_deptids :first-child').prop('selected', true);
+	$('#chart_deptids').trigger('change');
 	
 	// $('#cf_chartfield :first-child').prop('selected', true);
 	// $('#select_dept_3 :first-child').prop('selected', true);
