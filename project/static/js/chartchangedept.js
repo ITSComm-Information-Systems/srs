@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
 	// Select first option in dropdowns
 	$('#chart_deptids :first-child').prop('selected', true);
-	$('#chart_deptids').trigger('change');
 	
 	// $('#cf_chartfield :first-child').prop('selected', true);
 	// $('#select_dept_3 :first-child').prop('selected', true);
@@ -42,10 +41,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	$("#cfPrevBtn").click(function(event) {
 		nextPrev(-1, table, cf_change_table, review_table);
 	});
-
-	// $('#chart_deptids').find('[data-default]').each(function(){
-	// 	$(this).prop('selected', true);
-	// });
 
 	// Create paginated tables
 	var table = $('#cf_users_table').DataTable({
@@ -425,6 +420,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 			}
 		})
 	})
+	$('#chart_deptids').trigger('change');
 
 	// Reload data when new chartfield is selected
 	$('#cf_chartfield').on('change', function() {

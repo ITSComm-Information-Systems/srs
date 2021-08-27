@@ -163,55 +163,17 @@ def chartchangedept(request):
 	# Find associated chartfields
 	if user_depts:
 		select_dept = user_depts[0].dept
-	else:
-		select_dept = ''
-	
-	# Get department info
-	find_dept_info = UmOscDeptProfileV.objects.filter(deptid=select_dept)
-	if find_dept_info:
-		dept = find_dept_info[0]
-		dept_info = {
-			'dept_id': select_dept,
-			'dept_name': dept.dept_name,
-			'dept_mgr': dept.dept_mgr
-		}
-	else:
-		dept_info = ''
 
-	# Set intitial chartfields
-	chartfield_list = UmOscAcctsInUseV.objects.filter(deptid=select_dept).order_by('account_number')
+		# Set intitial chartfields
+		chartfield_list = UmOscAcctsInUseV.objects.filter(deptid=select_dept).order_by('account_number')
 
-	# Set intitial chartfield
-	if chartfield_list:
-		selected_cf = chartfield_list.values()[0]
-	else:
-		selected_cf = ''
-
-	# Find chartfield nickname
-	if selected_cf != '':
-		nicknames = Chartcom.objects.all()
-		for n in nicknames:
-			if n.account_number == selected_cf['account_number']:
-				selected_cf['nickname'] = n.name
-
-	# Select department to change to
-	if user_depts:
-		new_dept = user_depts[0].dept
-	else:
-		new_dept = ''
-	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
-	print('user_depts',user_depts)
 	# Get notice
 	notice = Page.objects.get(permalink='/ccr')
 	context = {
 		'title': 'Chartfield Change Request (external department)',
 		'deptids': user_depts,
 		'all_dept': UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid'),
-		'dept_info': dept_info,
-		'selected_cf': selected_cf,
 		'cf_info': chartfield_list,
-		'new_dept': new_dept,
-		'new_cf': new_cf,
 		'choose_cf_dept_template': 'choose_cf_dept.html',
 		'choose_users_dept_template': 'choose_users_dept.html',
 		'assign_new_dept_template': 'assign_new_dept.html',
@@ -349,8 +311,7 @@ def managerapprovalsubmit(request):
 def change_dept_new(request):
 	selected_dept = request.GET.get('deptids', None)
 	selected_dept = selected_dept.split(' - ')[0]
-	when = request.GET.get('when', None)
-	print('when:', when)
+
 	# Find chartfield nickname
 	chartcoms = Chartcom.objects.all()
 	nicknames = {c.account_number:c.name for c in chartcoms}
