@@ -193,6 +193,9 @@ def create_ticket_server_delete(instance, user, description):
             },
         ]
     }
+    
+    if instance.database_type:
+        payload['Attributes'].append({"ID": "5319", "Value": instance.database_type.__str__()})
 
     TDx().create_ticket(payload)
 
