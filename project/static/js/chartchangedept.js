@@ -786,6 +786,7 @@ function load_4(cf_change_table, review_table) {
 		var mrc = row.find('td:nth-child(4)').text()
 		var toll = row.find('td:nth-child(5)').text()
 		var local = row.find('td:nth-child(6)').text()
+		var new_chartfield = $("#new_chartfield").html()
 
 		review_table.row.add([
 			user_id,
@@ -794,20 +795,6 @@ function load_4(cf_change_table, review_table) {
 			toll,
 			local
 		]).draw();
-
-		var old_dept_full_name = $("#old_dept_full_name").html()
-		var old_dept_mgr = $("#old_dept_mgr").html()
-		var old_chartfield = $("#old_chartfield").html()
-		var old_shortcode = $("#old_shortcode").html()
-		var user_full_name = $("#user_full_name").html()
-		var new_dept_full_name = $("#new_dept_full_name").html()
-		var new_dept_mgr = $("#new_dept_mgr").html()
-		var new_chartfield = $("#new_chartfield").html()
-		var new_shortcode = $("#new_shortcode").html()
-		var optional_message = $("#optional_message").val()
-		var new_dept_mgr_uniqname = $("#new_dept_mgr_uniqname").text()
-		var new_dept_mgr_email = $("#new_dept_mgr_email").text()
-		var old_dept_mgr_uniqname = $("#old_dept_mgr_uniqname").text()
 
 		if (mrc == '') {
 			mrc = current_cf;
@@ -828,33 +815,24 @@ function load_4(cf_change_table, review_table) {
 			local = new_chartfield
 		}
 
-
-		
-
-		var input = document.createElement("input");
-        input.type = "hidden";
-        input.name = user_id;
-        input.value = user_id + '//' 
-		+ building + "//" 
-		+ mrc + '//' 
-		+ toll + '//' 
-		+ local + '//' 
-		+ old_dept_full_name + "//"
-		+ old_dept_mgr + "//"
-		+ old_chartfield + "//"
-		+ old_shortcode + "//"
-		+ user_full_name + "//"
-		+ new_dept_full_name + "//"
-		+ new_dept_mgr + "//"
-		+ new_chartfield + "//"
-		+ new_shortcode + "//"
-		+ optional_message + "//"
-		+ new_dept_mgr_email + "//"
-		+ new_dept_mgr_uniqname + "//"
-		+ old_dept_mgr_uniqname
-		
-		;
-		document.getElementById('submit-form').appendChild(input);
+		$('#user_id_form').val(user_id)
+		$('#building_form').val(building)
+		$('#mrc_form').val(mrc)
+		$('#toll_form').val(toll)
+		$('#local_form').val(local)
+		$('#old_dept_full_name_form').val($("#old_dept_full_name").html())
+		$('#old_dept_mgr_form').val($("#old_dept_mgr").html())
+		$('#old_chartfield_form').val($("#old_chartfield").html())
+		$('#old_shortcode_form').val($("#old_shortcode").html())
+		$('#user_full_name_form').val($("#user_full_name").html())
+		$('#new_dept_full_name_form').val($("#new_dept_full_name").html())
+		$('#new_dept_mgr_form').val($("#new_dept_mgr").html())
+		$('#new_chartfield_form').val($("#new_chartfield").html())
+		$('#new_shortcode_form').val($("#new_shortcode").html())
+		// optional message input
+		$('#new_dept_mgr_uniqname_form').val($("#new_dept_mgr_uniqname").text())
+		$('#new_dept_mgr_email_form').val($("#new_dept_mgr_email").text())
+		$('#old_dept_mgr_uniqname_form').val($("#old_dept_mgr_uniqname").text())
 	})
 	$("#review_table")[0].style.width = "100%";
 	
