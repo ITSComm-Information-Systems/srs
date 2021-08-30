@@ -2,11 +2,10 @@
 	<p class="mt-4" id="page_4_top_text"><strong>Please review the following information.</strong> Press Submit to send the change request to the relevant department for authorization.</p>
 </div>
 
-<span id="user_full_name" style="display: none;"> {{ user.last_name }}, {{ user.first_name }}</span>
+<span id="user_full_name" style="display: none;">{{ user.last_name }}, {{ user.first_name }}</span>
 
 <div class="row mt-4">	
 	<div class="mt-4 col-md-12 mb-4" id="cf_change">
-		<form action="submit/" method="POST" id="submit-form">{% csrf_token %}
 	    <table class="table table-striped table-sm" id="review_table">
 	        <thead>
 				<tr>
@@ -19,7 +18,7 @@
 	          	<th scope="col">New Local Charge</th>
 	        </thead>
 	    </table>
-		</form>
+		
 	</div>
 </div>
 <div class="row">
@@ -61,7 +60,26 @@
 				4. Optional message to new department
 			</div>
 			<div class="card-body">
-				<textarea class = "form-control" id="optional_message" placeholder="Insert a custom message here..."></textarea>
+				<form action="submit/" method="POST" id="submit-form">{% csrf_token %}
+					<input type="hidden" name='user_id_form' id='user_id_form'>
+					<input type="hidden" name='building_form' id='building_form'>
+					<input type="hidden" name='mrc_form' id='mrc_form'>
+					<input type="hidden" name='toll_form' id='toll_form'>
+					<input type="hidden" name='local_form' id='local_form'>
+					<input type="hidden" name='old_dept_full_name_form' id='old_dept_full_name_form'>
+					<input type="hidden" name='old_dept_mgr_form' id='old_dept_mgr_form'>
+					<input type="hidden" name='old_chartfield_form' id='old_chartfield_form'>
+					<input type="hidden" name='old_shortcode_form' id='old_shortcode_form'>
+					<input type="hidden" name='user_full_name_form' id='user_full_name_form'>
+					<input type="hidden" name='new_dept_full_name_form' id='new_dept_full_name_form'>
+					<input type="hidden" name='new_dept_mgr_form' id='new_dept_mgr_form'>
+					<input type="hidden" name='new_chartfield_form' id='new_chartfield_form'>
+					<input type="hidden" name='new_shortcode_form' id='new_shortcode_form'>
+					<input class="form-control" name='optional_message' id="optional_message" placeholder="Insert a custom message here...">
+					<input type="hidden" name='new_dept_mgr_email_form' id='new_dept_mgr_email_form'>
+					<input type="hidden" name='new_dept_mgr_uniqname_form' id='new_dept_mgr_uniqname_form'>
+					<input type="hidden" name='old_dept_mgr_uniqname_form' id='old_dept_mgr_uniqname_form'>
+				</form>
 			</div>
 		</div>
 	</div>
