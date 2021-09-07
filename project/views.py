@@ -432,26 +432,25 @@ def submit_new(request):
 	new_chartfield = request.POST.get('new_chartfield_form')
 	manager_url = settings.SITE_URL+"/managerapproval/?id=" + str(id)
 	user_full_name = request.POST.get('user_full_name_form')
+	new_dept_full_name=request.POST.get('new_dept_full_name_form')
 	mrc_account_number=request.POST.get('mrc_form'),
 	toll_account_number=request.POST.get('toll_form'),
 	local_account_number=request.POST.get('local_form'),
 	print(request.POST)
-	# if toll_account_number == '':
-	# 	toll_account_number = mrc_account_number
-	# 	local_account_number = mrc_account_number
+
 	new_entry = UmOscAcctChangeRequest(
 		uniqname=request.user.username,
 		user_defined_id=request.POST.get('user_id_form'),
 		building=request.POST.get('building_form'),
-		mrc_account_number=request.POST.get('mrc_form'),
-		toll_account_number=request.POST.get('toll_form'),
-		local_account_number=request.POST.get('local_form'),
+		mrc_account_number=mrc_account_number,
+		toll_account_number=toll_account_number,
+		local_account_number=local_account_number,
 		old_dept_full_name=request.POST.get('old_dept_full_name_form'),
 		old_dept_mgr=request.POST.get('old_dept_mgr_form'),
 		old_chartfield=old_chartfield,
 		old_shortcode=request.POST.get('old_shortcode_form'),
 		user_full_name=user_full_name,
-		new_dept_full_name=request.POST.get('new_dept_full_name_form'),
+		new_dept_full_name=new_dept_full_name,
 		new_dept_mgr=request.POST.get('new_dept_mgr_form'),
 		new_chartfield=new_chartfield,
 		new_shortcode=request.POST.get('new_shortcode_form'),
@@ -461,41 +460,15 @@ def submit_new(request):
 		old_dept_mgr_uniqname=request.POST.get('old_dept_mgr_uniqname_form'),
 		id=id)
 	new_entry.save()
-	# for key, value in request.POST.items():
-	# 	# Format of 'string' is user_defined_id//mrc_chartfield//toll_chartfield//local_chartfield
-	# 	# plus a lot of other stuff afterwards
-	# 	string = request.POST.get(key)
-	# 	print(string)
-	# 	if '/' in string:
-	# 		strings = string.split('//')
-			
-	# 		# Set toll and local to MRC if non-phone type
-	# 		if strings[2] == 'N/A':
-	# 			strings[2] = strings[1]
-	# 			strings[3] = strings[1]
-	# 		new_entry = UmOscAcctChangeRequest(
-	# 			uniqname=request.user.username,
-	# 			user_defined_id=strings[0],
-	# 			building=strings[1],
-	# 			mrc_account_number=strings[2],
-	# 			toll_account_number=strings[3],
-	# 			local_account_number=strings[4],
-	# 			old_dept_full_name=strings[5],
-	# 			old_dept_mgr=strings[6],
-	# 			old_chartfield=strings[7],
-	# 			old_shortcode=strings[8],
-	# 			user_full_name=strings[9],
-	# 			new_dept_full_name=strings[10],
-	# 			new_dept_mgr=strings[11],
-	# 			new_chartfield=strings[12],
-	# 			new_shortcode=strings[13],
-	# 			optional_message=strings[14],
-	# 			date_added=date.today(),
-	# 			id=id,
-	# 			new_dept_mgr_uniqname=strings[16],
-	# 			old_dept_mgr_uniqname=strings[17],
-	# 			)
-	# 		new_entry.save()
+
+	# Get manager and proxy emails
+	dept = new_dept_full_name.split()[0]
+	allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
+	email_list = []
+	for id in allowed_mgr:
+		email_list.append(User.objects.get(id=id).email)
+
+	subject = "A Chartfield Change Request is awaiting your approval"
 
 	body = '''
 	Hello, 
@@ -504,16 +477,22 @@ def submit_new(request):
 	You may approve or deny this request here: {manager_url}.
 
 	Thank you!
-	'''.format(first=user_full_name.split(", ")[1], last=user_full_name.split(", ")[0], old_chartfield=old_chartfield,new_chartfield=new_chartfield, manager_url=manager_url)
-	subject = "A Chartfield Change Request is awaiting your approval"
-	to = ['mkokarde@umich.edu', 'hujingc@umich.edu']
+	'''.format(
+		first = user_full_name.split(", ")[1],
+		last = user_full_name.split(", ")[0], 
+		old_chartfield = old_chartfield,
+		new_chartfield = new_chartfield, 
+		manager_url = manager_url
+	)
+
+	to = email_list	
 
 	email = EmailMessage(
-		subject,
-		body,
-		'srs@umich.edu',
-		to,
-		[]
+		subject = subject,
+		body = body,
+		from_email = 'srs@umich.edu',
+		to = to,
+		reply_to = []
 	)
 
 	email.send()
