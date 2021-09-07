@@ -186,14 +186,10 @@ def chartchangedept(request):
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapproval(request):
 	id = request.GET.get("id")
-	try:
-		allowed_mgr = [UmOscAcctChangeRequest.objects.get(id=id).new_dept_mgr_uniqname]
-	except:
-		# check for proxy here
-		# allowed_mgr = list(UmOscAcctChangeRequest.objects.filter(id=id).values())[0]["new_dept_mgr_uniqname"]
-		allowed_mgr = ['hujingc']
+	dept = UmOscAcctChangeRequest.objects.get(id=1).new_dept_full_name.split()[0]
+	allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
 
-	if ((request.user.username in allowed_mgr) or (request.user.is_superuser)):
+	if ((request.user.id in allowed_mgr) or (request.user.is_superuser)):
 		template = loader.get_template('managerapproval.html')
 		context = {"title": "Manager Approval Form",'allowed_mgr': request.user.username}
 		return HttpResponse(template.render(context, request))
