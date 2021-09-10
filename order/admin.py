@@ -163,7 +163,14 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
         for instance in instance_list:
             row = []
             for field in fields:
-                row.append(getattr(instance,field.name))
+                if self.model == ArcInstance and field.name == 'shortcode':
+                    shortcode = ''
+                    for sc in instance.get_shortcodes():
+                        shortcode = shortcode + f'{sc.size}TB to {sc.shortcode},'
+
+                    row.append(shortcode)
+                else:
+                    row.append(getattr(instance,field.name))
 
             writer.writerow(row)
 
