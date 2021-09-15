@@ -464,12 +464,12 @@ def submit_new(request):
 	# Get manager and proxy emails
 	dept = new_dept_full_name.split()[0]
 	allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
-	email_list = [request.user.email]
+	email_list = ['mkokarde@umich.edu', 'hujingc@umich.edu']
 	# email_list = []
 	# for id in allowed_mgr:
 	# 	email_list.append(User.objects.get(id=id).email)
 
-	subject = "A Chartfield Change Request is awaiting your approval"
+	subject = "SRS CCR test email"
 
 	body = '''
 	Hello, 
