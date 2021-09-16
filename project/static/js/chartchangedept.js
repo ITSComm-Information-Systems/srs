@@ -262,6 +262,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 				$("#new_dept_mgr_email").html($('#select_dept_3 option:selected').val().split("?")[2] + "@umich.edu")
 				$("#select_cf_3").attr("disabled", null)
 				$("#cf_shortcode_3").attr("disabled", null)
+				$('#select_cf_3').trigger('change')
 			}
 		})
 	})
