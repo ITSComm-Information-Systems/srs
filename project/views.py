@@ -426,7 +426,7 @@ def submit(request):
 # Submits change to database
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def submit_new(request):
-	template = loader.get_template('submitted.html')
+	template = loader.get_template('submitteddept.html')
 	id = UmOscAcctChangeRequest.objects.count() + 1
 	old_chartfield = request.POST.get('old_chartfield_form')
 	new_chartfield = request.POST.get('new_chartfield_form')
