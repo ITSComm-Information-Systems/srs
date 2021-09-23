@@ -71,15 +71,27 @@ class TabForm(forms.Form):
             if self.cleaned_data['oneTimeCharges'] == '11':                    
                 self.add_error('oneTimeCharges', 'You must select a chartcom')
 
-        if self.action.service.id == 10:
+        if self.action.service.id == 10:  # Locker
             if 'size' in self.cleaned_data:
                 if self.cleaned_data['size'] < 10:
                     self.add_error('size', 'Enter a size of at least 10 terabytes') 
 
-        if self.action.service.id == 11:
+        if self.action.service.id == 11:  # Data Den
             if 'size' in self.cleaned_data:
                 if self.cleaned_data['size'] < 5:
                     self.add_error('size', 'Enter a size of at least 5 terabytes') 
+
+        if 'name' in self.cleaned_data and self.action.service.id in [9,10,11]:  # ARC Instance Name check
+            name = self.cleaned_data['name']
+            if name:
+                if self.action.service.id == 9:  # Turbo must be unique within Turbo
+                    instance = ArcInstance.objects.filter(name__iexact=name,service_id=9).select_related('service')                
+                else:  # Data Den and Locker Need to be unique across the two services.
+                    instance = ArcInstance.objects.filter(name__iexact=name,service_id__in=[10,11]).select_related('service')
+
+                if len(instance) > 0:
+                    service = instance[0].service.label
+                    self.add_error('name', f'A {service} volume named {name.lower()} already exists. Please choose a different name.')
 
         for field in self.fields:
             if self.has_error(field):
