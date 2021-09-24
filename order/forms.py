@@ -83,7 +83,7 @@ class TabForm(forms.Form):
 
         if 'name' in self.cleaned_data and self.action.service.id in [9,10,11]:  # ARC Instance Name check
             name = self.cleaned_data['name']
-            if name:
+            if name and 'name' in self.changed_data:
                 if self.action.service.id == 9:  # Turbo must be unique within Turbo
                     instance = ArcInstance.objects.filter(name__iexact=name,service_id=9).select_related('service')                
                 else:  # Data Den and Locker Need to be unique across the two services.
