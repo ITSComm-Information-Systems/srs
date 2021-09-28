@@ -48,12 +48,16 @@ $(document).ready(function () {
         }
     })
     $("#confirmAccept").on("click", function () {
+        $("#manager_submit").attr("disabled", "disabled");
+        $("#manager_reject").attr("disabled", "disabled");
         accept();
     });
     $("#confirmReject").on("click", function () {
+        $("#manager_submit").attr("disabled", "disabled");
+        $("#manager_reject").attr("disabled", "disabled");
         reject();
     });
-});
+
 
 function accept() {
     $.ajax({
@@ -64,12 +68,8 @@ function accept() {
             status:'accepted',
             request_id: document.getElementById('request_id').value,
             uniqname: document.getElementById('uniqname').value,
-            user_defined_id: document.getElementById('user_defined_id').value,
-            mrc_account_number: document.getElementById('mrc_account_number').value,
-            toll_account_number: document.getElementById('toll_account_number').value,
-            local_account_number: document.getElementById('local_account_number').value,
-            approver: document.getElementById('approver').value,
-            optional_message: document.getElementById('optional_message').value
+            optional_message: document.getElementById('optional_message').value,
+            approver: document.getElementById('approver').value, //Approved by uses request.user.username
         },
 
         // handle a successful response
@@ -110,3 +110,5 @@ function reject() {
         },
     });
 }
+
+});

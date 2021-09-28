@@ -186,7 +186,7 @@ def chartchangedept(request):
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapproval(request):
 	id = request.GET.get("id")
-	dept = UmOscAcctChangeRequest.objects.get(id=1).new_dept_full_name.split()[0]
+	dept = UmOscAcctChangeRequest.objects.filter(batch=id)[0].new_dept_full_name.split()[0]
 	allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
 
 	if ((request.user.id in allowed_mgr) or (request.user.is_superuser)):
@@ -215,37 +215,38 @@ def managerapprovalinit(request):
 
 	id = request.GET.get("id")
 
-	data = list(UmOscAcctChangeRequest.objects.filter(id=id).values())
-	print('managerapprovalinit', data)
+	data = list(UmOscAcctChangeRequest.objects.filter(batch=id).values())
+	# print('managerapprovalinit', data)
 	return JsonResponse(data, safe=False)
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapprovalsubmit(request):
 	post = request.POST
+	print(post)
 	status = post.get('status')
 	id = post.get('request_id')
-	change_row = UmOscAcctChangeRequest.objects.get(id=id)
+	change_row = UmOscAcctChangeRequest.objects.filter(batch=id)
 	approver = post.get('approver')
 	uniqname = post.get('uniqname')
 	
 	if status == 'accepted':
-		change_row.approved_by = approver
-		change_row.save()
+		change_row.update(approved_by=approver)
 
-		new_entry = UmOscAcctChangeInput(
-			uniqname = uniqname,
-			user_defined_id = post.get('user_defined_id'),
-			mrc_account_number = post.get('mrc_account_number'),
-			toll_account_number = post.get('toll_account_number'),
-			local_account_number = post.get('local_account_number'),
-			date_added=date.today(),
-			date_processed=None,
-			messages=post.get('optional_message'),
-			request_no=None,
-			approved_by=approver
-			)
+		for x in change_row:
+			new_entry = UmOscAcctChangeInput(
+				uniqname = uniqname,
+				user_defined_id = x.user_defined_id,
+				mrc_account_number = x.mrc_account_number,
+				toll_account_number = x.toll_account_number,
+				local_account_number = x.local_account_number,
+				date_added=date.today(),
+				date_processed=None,
+				messages=None,
+				request_no=None,
+				approved_by=approver
+				)
 
-		new_entry.save()
+			new_entry.save()
 
 		# Add record to Pinnacle
 		curr = connections['pinnacle'].cursor()
@@ -253,51 +254,50 @@ def managerapprovalsubmit(request):
 		curr.callproc('UM_CHANGE_ACCTS_BY_SUBSCRIB_K.UM_UPDATE_SUBSCRIB_FROM_WEB_P',[uniqname, datetime_added])
 		curr.close()
 
-		# After Pinnacle is updated, send email
-		subject = "Your Chartfield Change Request was approved"
+		# # After Pinnacle is updated, send email
+		# subject = "Your Chartfield Change Request was approved"
 
-		body = '''
-			Hello {uniqname}, 
+		# body = '''
+		# 	Hello {uniqname}, 
 
-			Your chartfield change request was approved by {approver}. 
-			'''.format(uniqname = uniqname, approver = approver)
+		# 	Your chartfield change request was approved by {approver}. 
+		# 	'''.format(uniqname = uniqname, approver = approver)
 		
-		to = [uniqname + '@umich.edu', 'hujingc@umich.edu']
+		# to = [uniqname + '@umich.edu', 'hujingc@umich.edu']
 
-		email = EmailMessage(
-			subject,
-			body,
-			'srs@umich.edu', # from email
-			to,
-			[]
-		)
+		# email = EmailMessage(
+		# 	subject,
+		# 	body,
+		# 	'srs@umich.edu', # from email
+		# 	to,
+		# 	[]
+		# )
 
 	elif status == 'rejected':
-		change_row.rejected_by = approver
-		change_row.save()
+		change_row.update(rejected_by=approver)
 
-		subject = "Your Chartfield Change Request was denied"
+	# 	subject = "Your Chartfield Change Request was denied"
 
-		body = '''
-			Hello {uniqname}, 
+	# 	body = '''
+	# 		Hello {uniqname}, 
 
-			Your chartfield change request was denied by {approver}. 
-			'''.format(uniqname = uniqname, approver = approver)
+	# 		Your chartfield change request was denied by {approver}. 
+	# 		'''.format(uniqname = uniqname, approver = approver)
 
-		if post.get('rejectmessage')!='':
-			body + 'The following message was included: ' + post.get('rejectmessage')
+	# 	if post.get('rejectmessage')!='':
+	# 		body + 'The following message was included: ' + post.get('rejectmessage')
 		
-		to = [uniqname + '@umich.edu', 'hujingc@umich.edu']
+	# 	to = [uniqname + '@umich.edu', 'hujingc@umich.edu']
 
-		email = EmailMessage(
-			subject,
-			body,
-			'srs@umich.edu', # from email
-			to,
-			[]
-		)
+	# 	email = EmailMessage(
+	# 		subject,
+	# 		body,
+	# 		'srs@umich.edu', # from email
+	# 		to,
+	# 		[]
+	# 	)
 
-	email.send()
+	# email.send()
 	
 	return JsonResponse({"success": True})
 
@@ -423,80 +423,88 @@ def submit(request):
 	return HttpResponse(template.render(context, request))
 
 
-# Submits change to database
+# Submits user request to table, sends email to manager
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def submit_new(request):
 	template = loader.get_template('submitteddept.html')
-	id = UmOscAcctChangeRequest.objects.count() + 1
+	# Changes per userid, lists
+	user_defined_id = request.POST.getlist('user_id_form') # phone number
+	building = request.POST.getlist('building_form')
+	mrc_account_number = request.POST.getlist('mrc_form')
+	toll_account_number = request.POST.getlist('toll_form')
+	local_account_number = request.POST.getlist('local_form')
+
+	# Same for all userids
+	batch = UmOscAcctChangeRequest.objects.count() # batch id
 	old_chartfield = request.POST.get('old_chartfield_form')
 	new_chartfield = request.POST.get('new_chartfield_form')
-	manager_url = settings.SITE_URL+"/managerapproval/?id=" + str(id)
+	manager_url = settings.SITE_URL+"/managerapproval/?id=" + str(batch)
 	user_full_name = request.POST.get('user_full_name_form')
-	new_dept_full_name=request.POST.get('new_dept_full_name_form')
-	mrc_account_number=request.POST.get('mrc_form'),
-	toll_account_number=request.POST.get('toll_form'),
-	local_account_number=request.POST.get('local_form'),
+	new_dept_full_name = request.POST.get('new_dept_full_name_form')
+	rows = request.POST.get('num_rows')
 	print(request.POST)
+	
+	for row in range(int(rows)+1):
+		print(user_defined_id[row])
+		new_entry = UmOscAcctChangeRequest(
+			uniqname=request.user.username,
+			user_defined_id=user_defined_id[row],
+			building=building[row],
+			mrc_account_number=mrc_account_number[row],
+			toll_account_number=toll_account_number[row],
+			local_account_number=local_account_number[row],
+			old_dept_full_name=request.POST.get('old_dept_full_name_form'),
+			old_dept_mgr=request.POST.get('old_dept_mgr_form'),
+			old_chartfield=old_chartfield,
+			old_shortcode=request.POST.get('old_shortcode_form'),
+			user_full_name=user_full_name,
+			new_dept_full_name=new_dept_full_name,
+			new_dept_mgr=request.POST.get('new_dept_mgr_form'),
+			new_chartfield=new_chartfield,
+			new_shortcode=request.POST.get('new_shortcode_form'),
+			optional_message=request.POST.get('optional_message'),
+			date_added=date.today(),
+			new_dept_mgr_uniqname=request.POST.get('new_dept_mgr_uniqname_form'),
+			old_dept_mgr_uniqname=request.POST.get('old_dept_mgr_uniqname_form'),
+			batch=batch)
+		new_entry.save()
 
-	new_entry = UmOscAcctChangeRequest(
-		uniqname=request.user.username,
-		user_defined_id=request.POST.get('user_id_form'),
-		building=request.POST.get('building_form'),
-		mrc_account_number=mrc_account_number[0],
-		toll_account_number=toll_account_number[0],
-		local_account_number=local_account_number[0],
-		old_dept_full_name=request.POST.get('old_dept_full_name_form'),
-		old_dept_mgr=request.POST.get('old_dept_mgr_form'),
-		old_chartfield=old_chartfield,
-		old_shortcode=request.POST.get('old_shortcode_form'),
-		user_full_name=user_full_name,
-		new_dept_full_name=new_dept_full_name,
-		new_dept_mgr=request.POST.get('new_dept_mgr_form'),
-		new_chartfield=new_chartfield,
-		new_shortcode=request.POST.get('new_shortcode_form'),
-		optional_message=request.POST.get('optional_message'),
-		date_added=date.today(),
-		new_dept_mgr_uniqname=request.POST.get('new_dept_mgr_uniqname_form'),
-		old_dept_mgr_uniqname=request.POST.get('old_dept_mgr_uniqname_form'),
-		id=id)
-	new_entry.save()
+	# # Get manager and proxy emails
+	# dept = new_dept_full_name.split()[0]
+	# allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
+	# email_list = ['mkokarde@umich.edu', 'hujingc@umich.edu']
+	# # email_list = []
+	# # for id in allowed_mgr:
+	# # 	email_list.append(User.objects.get(id=id).email)
 
-	# Get manager and proxy emails
-	dept = new_dept_full_name.split()[0]
-	allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
-	email_list = ['mkokarde@umich.edu', 'hujingc@umich.edu']
-	# email_list = []
-	# for id in allowed_mgr:
-	# 	email_list.append(User.objects.get(id=id).email)
+	# subject = "SRS CCR test email"
 
-	subject = "SRS CCR test email"
+	# body = '''
+	# Hello, 
 
-	body = '''
-	Hello, 
+	# {first} {last} from another department has requested to change a chartfield from {old_chartfield} to {new_chartfield}, which you have permissions over.
+	# You may approve or deny this request here: {manager_url}.
 
-	{first} {last} from another department has requested to change a chartfield from {old_chartfield} to {new_chartfield}, which you have permissions over.
-	You may approve or deny this request here: {manager_url}.
+	# Thank you!
+	# '''.format(
+	# 	first = user_full_name.split(", ")[1],
+	# 	last = user_full_name.split(", ")[0], 
+	# 	old_chartfield = old_chartfield,
+	# 	new_chartfield = new_chartfield, 
+	# 	manager_url = manager_url
+	# )
 
-	Thank you!
-	'''.format(
-		first = user_full_name.split(", ")[1],
-		last = user_full_name.split(", ")[0], 
-		old_chartfield = old_chartfield,
-		new_chartfield = new_chartfield, 
-		manager_url = manager_url
-	)
+	# to = email_list	
 
-	to = email_list	
+	# email = EmailMessage(
+	# 	subject = subject,
+	# 	body = body,
+	# 	from_email = 'srs@umich.edu',
+	# 	to = to,
+	# 	reply_to = []
+	# )
 
-	email = EmailMessage(
-		subject = subject,
-		body = body,
-		from_email = 'srs@umich.edu',
-		to = to,
-		reply_to = []
-	)
-
-	email.send()
+	# email.send()
 
 	context = {
 		'title': 'Chartfield Change',

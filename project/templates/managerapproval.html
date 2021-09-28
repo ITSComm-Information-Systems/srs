@@ -117,10 +117,6 @@
                     {% csrf_token %}
                     <input type="hidden" name='request_id' class='request_id' id='request_id'>
                     <input type="hidden" name='uniqname' id='uniqname'>
-                    <input type="hidden" name='user_defined_id' id='user_defined_id'>
-                    <input type="hidden" name='mrc_account_number' id='mrc_account_number'>
-                    <input type="hidden" name='toll_account_number' id='toll_account_number'>
-                    <input type="hidden" name='local_account_number' id='local_account_number'>
                     <input type="hidden" name='approved_by' id='approver' value="{{allowed_mgr}}">
                 </form>
             </div>
@@ -149,7 +145,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Go Back</button>
-                <button type="button" class="btn btn-success" data-dismiss="modal" onclick="reject()">Reject
+                <button id="confirmReject" type="button" class="btn btn-success" data-dismiss="modal">Reject
                     Request</button>
             </div>
         </div>

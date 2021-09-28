@@ -27,17 +27,18 @@ class UmOscAcctChangeRequest(models.Model):
      new_shortcode = models.CharField(max_length=100)
      optional_message = models.CharField(max_length=100)
      building = models.CharField(max_length=2000) 
-     id = models.IntegerField(9, null=False, primary_key=True)
      old_chartfield = models.CharField(max_length=100)
      old_shortcode = models.CharField(max_length=100)
      new_dept_mgr_uniqname = models.CharField(max_length=100)
      old_dept_mgr_uniqname = models.CharField(max_length=100)
      approved_by = models.CharField(max_length=100)
      rejected_by = models.CharField(max_length=100)
+     batch = models.IntegerField()
+     # id = models.AutoField(primary_key=True)
 
      class Meta:
           managed = False
-          ordering = ('id',)
+          ordering = ('batch',)
           db_table = 'PINN_CUSTOM\".\"um_osc_acct_change_requests'
 
 class UmBillInputApiV(models.Model):
