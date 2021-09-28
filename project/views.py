@@ -255,49 +255,52 @@ def managerapprovalsubmit(request):
 		curr.close()
 
 		# # After Pinnacle is updated, send email
-		# subject = "Your Chartfield Change Request was approved"
+		subject = "Your Chartfield Change Request was approved"
 
-		# body = '''
-		# 	Hello {uniqname}, 
+		body = '''
+			Hello {uniqname}, 
 
-		# 	Your chartfield change request was approved by {approver}. 
-		# 	'''.format(uniqname = uniqname, approver = approver)
+			Your chartfield change request was approved by {approver}. 
+			'''.format(uniqname = uniqname, approver = approver)
 		
-		# to = [uniqname + '@umich.edu', 'hujingc@umich.edu']
+		# to = [uniqname + '@umich.edu']
+		to = ['mkokarde@umich.edu', 'hujingc@umich.edu']
 
-		# email = EmailMessage(
-		# 	subject,
-		# 	body,
-		# 	'srs@umich.edu', # from email
-		# 	to,
-		# 	[]
-		# )
+
+		email = EmailMessage(
+			subject,
+			body,
+			'srs@umich.edu', # from email
+			to,
+			[]
+		)
 
 	elif status == 'rejected':
 		change_row.update(rejected_by=approver)
 
-	# 	subject = "Your Chartfield Change Request was denied"
+		subject = "Your Chartfield Change Request was denied"
 
-	# 	body = '''
-	# 		Hello {uniqname}, 
+		body = '''
+			Hello {uniqname}, 
 
-	# 		Your chartfield change request was denied by {approver}. 
-	# 		'''.format(uniqname = uniqname, approver = approver)
+			Your chartfield change request was denied by {approver}. 
+			'''.format(uniqname = uniqname, approver = approver)
 
-	# 	if post.get('rejectmessage')!='':
-	# 		body + 'The following message was included: ' + post.get('rejectmessage')
+		if post.get('rejectmessage')!='':
+			body + 'The following message was included: ' + post.get('rejectmessage')
 		
-	# 	to = [uniqname + '@umich.edu', 'hujingc@umich.edu']
+		# to = [uniqname + '@umich.edu', 'hujingc@umich.edu']
+		to = ['mkokarde@umich.edu', 'hujingc@umich.edu']
 
-	# 	email = EmailMessage(
-	# 		subject,
-	# 		body,
-	# 		'srs@umich.edu', # from email
-	# 		to,
-	# 		[]
-	# 	)
+		email = EmailMessage(
+			subject,
+			body,
+			'srs@umich.edu', # from email
+			to,
+			[]
+		)
 
-	# email.send()
+	email.send()
 	
 	return JsonResponse({"success": True})
 
@@ -469,42 +472,42 @@ def submit_new(request):
 			batch=batch)
 		new_entry.save()
 
-	# # Get manager and proxy emails
-	# dept = new_dept_full_name.split()[0]
-	# allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
-	# email_list = ['mkokarde@umich.edu', 'hujingc@umich.edu']
-	# # email_list = []
-	# # for id in allowed_mgr:
-	# # 	email_list.append(User.objects.get(id=id).email)
+	# Get manager and proxy emails
+	dept = new_dept_full_name.split()[0]
+	allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
+	email_list = ['mkokarde@umich.edu', 'hujingc@umich.edu']
+	# email_list = []
+	# for id in allowed_mgr:
+	# 	email_list.append(User.objects.get(id=id).email)
 
-	# subject = "SRS CCR test email"
+	subject = "SRS CCR test email"
 
-	# body = '''
-	# Hello, 
+	body = '''
+	Hello, 
 
-	# {first} {last} from another department has requested to change a chartfield from {old_chartfield} to {new_chartfield}, which you have permissions over.
-	# You may approve or deny this request here: {manager_url}.
+	{first} {last} from another department has requested to change a chartfield from {old_chartfield} to {new_chartfield}, which you have permissions over.
+	You may approve or deny this request here: {manager_url}.
 
-	# Thank you!
-	# '''.format(
-	# 	first = user_full_name.split(", ")[1],
-	# 	last = user_full_name.split(", ")[0], 
-	# 	old_chartfield = old_chartfield,
-	# 	new_chartfield = new_chartfield, 
-	# 	manager_url = manager_url
-	# )
+	Thank you!
+	'''.format(
+		first = user_full_name.split(", ")[1],
+		last = user_full_name.split(", ")[0], 
+		old_chartfield = old_chartfield,
+		new_chartfield = new_chartfield, 
+		manager_url = manager_url
+	)
 
-	# to = email_list	
+	to = email_list	
 
-	# email = EmailMessage(
-	# 	subject = subject,
-	# 	body = body,
-	# 	from_email = 'srs@umich.edu',
-	# 	to = to,
-	# 	reply_to = []
-	# )
+	email = EmailMessage(
+		subject = subject,
+		body = body,
+		from_email = 'srs@umich.edu',
+		to = to,
+		reply_to = []
+	)
 
-	# email.send()
+	email.send()
 
 	context = {
 		'title': 'Chartfield Change',
