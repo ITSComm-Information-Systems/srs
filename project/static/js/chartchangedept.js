@@ -816,11 +816,8 @@ function load_4(cf_change_table, review_table) {
 			local = new_chartfield
 		}
 
-		$('#user_id_form').val(user_id)
-		$('#building_form').val(building)
-		$('#mrc_form').val(mrc)
-		$('#toll_form').val(toll)
-		$('#local_form').val(local)
+		// Information that should be the same for all phone numbers
+		$('#num_rows').val(index)
 		$('#old_dept_full_name_form').val($("#old_dept_full_name").html())
 		$('#old_dept_mgr_form').val($("#old_dept_mgr").html())
 		$('#old_chartfield_form').val($("#old_chartfield").html())
@@ -834,6 +831,38 @@ function load_4(cf_change_table, review_table) {
 		$('#new_dept_mgr_uniqname_form').val($("#new_dept_mgr_uniqname").text())
 		$('#new_dept_mgr_email_form').val($("#new_dept_mgr_email").text())
 		$('#old_dept_mgr_uniqname_form').val($("#old_dept_mgr_uniqname").text())
+
+		// Rows for individual phone number (user_id)
+		var user_id_form = document.createElement("input");
+		user_id_form.type = "hidden";
+        user_id_form.name = "user_id_form";
+        user_id_form.value = user_id;
+		document.getElementById('submit-form').appendChild(user_id_form);
+
+		var building_form = document.createElement("input");
+		building_form.type = "hidden";
+        building_form.name = "building_form";
+        building_form.value = building;
+		document.getElementById('submit-form').appendChild(building_form);
+
+		var mrc_form = document.createElement("input");
+		mrc_form.type = "hidden";
+        mrc_form.name = "mrc_form";
+        mrc_form.value = mrc;
+		document.getElementById('submit-form').appendChild(mrc_form);
+
+		var toll_form = document.createElement("input");
+		toll_form.type = "hidden";
+        toll_form.name = "toll_form";
+        toll_form.value = toll;
+		document.getElementById('submit-form').appendChild(toll_form);
+
+		var local_form = document.createElement("input");
+		local_form.type = "hidden";
+        local_form.name = "local_form";
+        local_form.value = local;
+		document.getElementById('submit-form').appendChild(local_form);
+
 	})
 	$("#review_table")[0].style.width = "100%";
 	
