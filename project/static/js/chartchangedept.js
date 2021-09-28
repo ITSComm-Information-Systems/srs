@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 						var drp = document.getElementById('cf_shortcode_3');
 						var option = document.createElement("OPTION");
 						option.value = JSON.stringify(data[i]);
-						option.text = data[i].short_code
+						option.text = data[i].short_code;
 						
 						drp.add(option);
 					}
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 					var drp = document.getElementById('select_cf_3');
 					var option = document.createElement("OPTION");
 					option.value = JSON.stringify(data[i]);
-					option.text = data[i].account_number
+					option.text = data[i].account_number;
 					
 					drp.add(option);
 				}
@@ -560,9 +560,7 @@ function nextPrev(n, table, cf_change_table, review_table) {
   $('#cfc-line-'+currStep).removeClass('disabled');
 
   $('#cf-' + currStep).addClass('active')
-  $('#cf-' + currStep).addClass('show')
-//   $('#chartchange_nav li:nth-child(' + currStep + ') a').tab('show');
-  
+  $('#cf-' + currStep).addClass('show')  
 
   // Details up top
   if (n == 1 && currStep == 2) {

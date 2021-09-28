@@ -47,7 +47,7 @@ $(document).ready(function() {
 			url: '/chartchange/update-table/',
 			method: 'GET',
 			data: function(d) {
-				d.selected = $('#cf_dropdown option:selected').text();
+				d.selected = $('#cf_chartfield option:selected').text();
 			},
 			dataSrc: ""
 		},
@@ -206,51 +206,49 @@ $(document).ready(function() {
 			}
 		});
 	});
+	$("#select_cf_3").attr("disabled", "disabled")
+	$("#cf_shortcode_3").attr("disabled", "disabled")
 
+	$('#select_dept_3').on('change', function(e) {
+		$("#select_cf_3").attr("disabled", "disabled")
+		$("#cf_shortcode_3").attr("disabled", "disabled")
 
-	// Change chartfields on page 3 with selected department
-	$('#dept_dropdown_3').on('submit', function(e) {
 		e.preventDefault();
 		$.ajax({
-			url: '/chartchange/ajax/',
+			url: '/chartchangedept/ajax/',
 			data: {
 				'when': 'assign_new',
-				'deptids':$('#dept_text_search').val()
+				'deptids':$('#select_dept_3 option:selected').val().split("?")[0]
 			},
 			dataType:'json',
 			// Reset chartfield options when department changes
 			success: function(data) {
-				$('#select_cf_3').empty();
+				$('#cf_shortcode_3').empty();
+				var drp = document.getElementById('cf_shortcode_3');
 				for (i = 0; i < data.length; ++i) {
-					var drp = document.getElementById('select_cf_3');
+					if (data[i].short_code != "" && data[i].short_code != undefined){
+						var drp = document.getElementById('cf_shortcode_3');
 					var option = document.createElement("OPTION");
-					option.value = data[i].account_number;
-					option.text = data[i].account_number;
+					option.value = JSON.stringify(data[i]);
+					option.text = data[i].short_code;
+
 					drp.add(option);
 				}
 			}
-		})	
-	})
 
-	$('#select_dept_3').on('change', function(e) {
-		e.preventDefault();
-		$.ajax({
-			url: '/chartchange/ajax/',
-			data: {
-				'when': 'assign_new',
-				'deptids':$('#select_dept_3 option:selected').val()
-			},
-			dataType:'json',
-			// Reset chartfield options when department changes
-			success: function(data) {
 				$('#select_cf_3').empty();
+				var drp = document.getElementById('select_cf_3');
 				for (i = 0; i < data.length; ++i) {
 					var drp = document.getElementById('select_cf_3');
 					var option = document.createElement("OPTION");
-					option.value = data[i].account_number;
+					option.value = JSON.stringify(data[i]);
 					option.text = data[i].account_number;
+
 					drp.add(option);
 				}
+				$("#select_cf_3").attr("disabled", null)
+				$("#cf_shortcode_3").attr("disabled", null)
+				$('#select_cf_3').trigger('change')
 			}
 		})
 	})
@@ -351,9 +349,8 @@ $(document).ready(function() {
 	// Update department for page 1 - AJAX
 	$('#chart_deptids').on('change', function() {
 		var selected = $('#chart_deptids').val();
-
 		$.ajax({
-			url: '/chartchange/ajax/',
+			url: '/chartchangedept/ajax/',
 			data: {
 				'when': 'choose cf',
 				'deptids':selected
@@ -361,26 +358,39 @@ $(document).ready(function() {
 			dataType:'json',
 			// Reset chartfield options when department changes
 			success: function(data) {
-				$('#cf_dropdown').empty();
+				$('#cf_shortcode_dr').empty();
+				$('#cf_chartfield').empty();
 				if (data.length < 1) {
 					$("#cfNextBtn").attr('disabled', 'true');
-					$('#cf_dropdown_group').hide();
 					$('#cf_details').hide();
+					$("#cf_dropdown_row").hide()
 					$('#no_cfs_alert').show();
 				}
 				else {
 					$("#cfNextBtn").removeAttr('disabled');
 					$('.cf-dropdown-div').show();
 					$('#no_cfs_alert').hide();
-					$('#cf_dropdown_group').show();
+					$("#cf_dropdown_row").show()
 					$('#cf_details').show();
-					var drp = document.getElementById('cf_dropdown');
+					
+					var sc_drp = document.getElementById('cf_shortcode_dr');
+					for (i = 0; i < data.length; ++i) {
+						if (data[i].short_code != ""){
+							var option = document.createElement("OPTION");
+							option.value = JSON.stringify(data[i]);
+							option.text = data[i].short_code
+							sc_drp.add(option);
+						}
+					}
+					
+					var drp = document.getElementById('cf_chartfield');
 					for (i = 0; i < data.length; ++i) {
 						var option = document.createElement("OPTION");
 						option.value = JSON.stringify(data[i]);
 						option.text = data[i].account_number;
 						drp.add(option);
 					}
+
 					change_current_page(data[0]);
 				}
 				name_display = selected.split('?');
@@ -394,18 +404,76 @@ $(document).ready(function() {
 			}
 		})
 	})
+	$('#chart_deptids').trigger('change');
 
 	// Reload data when new chartfield is selected
-	$('#cf_dropdown').on('change', function() {
-		var sel = document.getElementById("cf_dropdown");
-		var selected = sel.options[sel.selectedIndex].value;
-
-		change_current_page(selected);
+	$('#cf_chartfield').on('change', function() {
+		change_current_page(document.getElementById("cf_chartfield").value);
 
 		$('#cfc-2').addClass('disabled');
 		$('#cfc-3').addClass('disabled');
 		$('#cfc-4').addClass('disabled');
 	})
+
+	$('#cf_shortcode_dr').on('change', function() {
+		if (($('#cf_shortcode_dr').val() != '') & ($('#cf_shortcode_dr').val() !=$('#cf_chartfield').value)){
+			var selected = document.getElementById("cf_shortcode_dr").value
+
+			$('#cf_chartfield').val(selected)
+			$('#cf_chartfield').trigger('change')
+
+			$('#cfc-2').addClass('disabled');
+			$('#cfc-3').addClass('disabled');
+			$('#cfc-4').addClass('disabled');
+		}
+	})
+
+	$('#cf_shortcode_3').on('change', function() {
+		if (($('#cf_shortcode_3').val() != '') & ($('#cf_shortcode_3').val() !=$('#select_cf_3').value)){
+			var selected = document.getElementById("cf_shortcode_3").value
+			$('#select_cf_3').val(selected)
+			$('#select_cf_3').trigger('change')
+		}
+	})
+
+	$("#select_cf_3").on('change', function() {
+		var selected = JSON.parse(document.getElementById("select_cf_3").value);
+		$("#new_chartfield").html(selected.account_number)
+		$("#new_shortcode").html(selected.short_code)
+		
+	})
+
+	$('#show_chartfield_check').on('change', function() {
+		var chartfield = document.getElementById("cf_chartfield_form");
+		var shortcode = document.getElementById("cf_shortcode_form");
+		if (chartfield.style.display == "none"){
+			chartfield.style.display = "block";
+			shortcode.style.display = "none";
+		}
+		else{
+			chartfield.style.display = "none"
+			shortcode.style.display = "block"
+			document.getElementById('cf_shortcode_dr').value='';
+			$('#cf_shortcode_dr').trigger('change')
+		}
+	})
+
+	$('#show_chartfield_check_3').on('change', function() {
+		var shortcode_form = document.getElementById("cf_shortcode_form_3");
+		var cf_dropdown = document.getElementById("cf_dropdown_3");
+		if (shortcode_form.style.display == "none"){
+			shortcode_form.style.display = "block"
+			cf_dropdown.style.display = "none"
+		}
+		else{
+			shortcode_form.style.display = "none";
+			cf_dropdown.style.display = "block";
+			document.getElementById('cf_shortcode_3').value='';
+			$('#cf_shortcode_3').trigger('change')
+		}
+	})
+
+
 
 });
 
@@ -419,9 +487,9 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
   $('#cfNextBtn').prop('disabled', false);
 })
 
-
 // Next/prev functionality
 function nextPrev(n, table, cf_change_table, review_table) {
+
   // Validate before submit
   if (n ==1 && currStep == 3) {
   	if (!validate(cf_change_table)) {
@@ -564,7 +632,7 @@ function change_current_page(selected) {
 	$("#program").html(selected.program);
 	$("#class_code").html(selected.class_code);
 	$("#project_grant").html(selected.project_grant);
-	$('#cf_shortcode').html(selected.shortcode);
+	$('#cf_shortcode').html(selected.short_code);
 	$('#cf_nickname').html(selected.nickname);
 	$('.cf_num').html(selected.account_number);
 	if (selected.nickname) {

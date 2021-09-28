@@ -10,9 +10,9 @@
 
 	<p>Please select a new department and chartfield.</p>
 
-	<div class="row mt-4 col-md-12">
+	<div class="row mt-4">
 		<div class="col-md-5">
-	        <form action="" id="dept_dropdown_3" method="POST" name="dept_dropdown">{% csrf_token %}
+	        <div id="dept_dropdown_3" method="POST" name="dept_dropdown">{% csrf_token %}
 	            <div class="input-group">
 	                <div class="input-group-prepend">
 	                    <label class="input-group-text" for="select_dept_3">
@@ -25,10 +25,10 @@
 	                    {% endfor %}
 	                </select>
 	            </div>
-	        </form>
+	        </div>
 	    </div>
-	    <div class="col-md-4">
-	        <form id="cf_dropdown_3" method="POST" name="cf_dropdown">{% csrf_token %}
+	    <div class="col">
+	        <form id="cf_dropdown_3" method="POST" name="cf_dropdown" style="display: none;">{% csrf_token %}
 	            <div class="input-group">
 	                <div class="input-group-prepend">
 	                    <label class="input-group-text" for="select_cf_3">
@@ -36,14 +36,45 @@
 	                    </label>
 	                </div>
 	                <select name="select_cf" class="custom-select" id="select_cf_3">
-	                    {% for cf in new_cf %}
-	                    <option name="cf" value="{{cf.account_number}}">{{ cf.account_number }}</option>
-	                    {% endfor %}
+						<!-- Will be filled by JS -->
 	                </select>
 	            </div>
 	        </form>
+			<div id="cf_shortcode_form_3">
+				<div class="input-group" id="cf_chartfield_group">
+					<div class="input-group-prepend">
+						<label class="input-group-text" for="cf_shortcode_3">
+							Select New Shortcode
+						</label>
+					</div>
+					<select name="chartcom" class="custom-select" id="cf_shortcode_3">
+						<!-- Will be filled by JS -->
+					</select>
+				</div>
+			</div>
+			
+	    </div>
+		<div class="col-2" style="margin: auto 0 auto 0;">
+			<div class="form-check">
+				<input class="form-check-input" type="checkbox" value="" id="show_chartfield_check_3">
+				<label class="form-check-label" for="show_chartfield_check_3">
+				  Show Chartfield Select
+				</label>
+			  </div>
 	    </div>
 
+
+	</div>
+
+
+	<div class="mt-4 mb-4">
+		<div class="form-check form-check-inline" id="select_button">
+	    	<input class="form-check-input" type="checkbox" value="" id="select_all_an">
+	    	<label class="form-check-label" for="select_all_an">
+		    	<strong>Select All</strong>
+		  	</label>
+		</div>
+		<div id="checkboxes">
 	    <div class="form-check form-check-inline">
 	    	<input class="form-check-input" type="checkbox" value="" id="mrc">
 	    	<label class="form-check-label" for="mrc">
@@ -64,21 +95,12 @@
 		    	<strong>Local</strong>
 		  	</label>
 		</div>
-
 		<button type="button" id="apply" value='Apply' class="btn btn-success">Apply</button>
-	</div>
-
-	<div class="row mt-4">
-		<div class="form-check form-check-inline" id="select_button">
-	    	<input class="form-check-input" type="checkbox" value="" id="select_all_an">
-	    	<label class="form-check-label" for="select_all_an">
-		    	<strong>Select All</strong>
-		  	</label>
 		</div>
 	</div>
 
-	<div class="row mb-4">	
-		<div class="col-md-12 mt-4">
+	<div class="row">	
+		<div class="col-md-12 mt-2">
 		    <table class="table table-striped table-sm" id="cf_change_table">
 		        <thead>
 		        	<th scope="col" class="click-test" name="checkbox"></th>
@@ -95,4 +117,5 @@
 	</div>
 
 	<strong id="validate" class="hidden">Please fill out all rows before proceeding.</strong>
+
 </div>
