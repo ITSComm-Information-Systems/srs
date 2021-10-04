@@ -1243,7 +1243,7 @@ class BillingStorageForm(TabForm):
 
             summary[0]['value'] = label 
 
-        if self.action.service.name=='turboResearch':
+        if self.action.service.name in ['turboResearch','dataDen']:
             summary[3]['label'] = 'I have read the Sensitive Data Guide, agree that my use of this service complies with those guidelines and accept the terms of the Service Level Agreement.'
         else:
             summary[2]['label'] = 'I have read the Sensitive Data Guide, agree that my use of this service complies with those guidelines and accept the terms of the Service Level Agreement.'
