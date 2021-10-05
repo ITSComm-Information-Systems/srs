@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block styles %}
+<style>
+    #aux-nav {
+        background-color: {{background_color}}
+    }
+
+    /* Create three equal columns that floats next to each other */
+
+    .option {
+        cursor: pointer;
+        width: 50%;
+        height: 200px;
+        margin: auto;
+        border: 1px solid #D6D6D6;
+        border-radius: 1.25rem;
+        background-color: #E6E9EC;
+        outline: none;
+
+        display: flex;
+        flex-direction: row;
+        align-content: space-around;
+        justify-content: space-around;
+        align-items: center;
+
+    }
+
+    .option:focus,
+    .option:hover {
+        outline: none;
+        background-color: #C2C5C7;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<br>
+<div class="row justify-content-around">
+    <div class="col">
+        <div class="option">
+            <h2 class="" onclick="window.location.href='/chartchange/';">
+                Original
+            </h2>
+        </div>
+        <br>
+        <p class="text-center">Makes changes for departments you have access to</p>
+    </div>
+
+    <div class="col">
+        <div class="option">
+            <h2 class="" onclick="window.location.href='/chartchangedept/';">
+                New
+            </h2>
+        </div>
+        <br>
+        <p class="text-center">Request changes for departments you do not have access to</p>
+    </div>
+</div>
+{% endblock %}

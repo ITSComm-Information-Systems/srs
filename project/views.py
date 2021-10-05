@@ -49,6 +49,13 @@ def homepage(request):
 	}
 	return HttpResponse(template.render(context, request))
 
+@permission_required(('oscauth.can_order'), raise_exception=True)
+def chartchangeoptions(request):
+	template = loader.get_template('chartchangeoptions.html')
+	context = {
+		'title': 'Chartfield Change Request',
+	}
+	return HttpResponse(template.render(context, request))
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def chartchange(request):
@@ -226,6 +233,7 @@ def managerapprovalsubmit(request):
 	status = post.get('status')
 	id = post.get('request_id')
 	change_row = UmOscAcctChangeRequest.objects.filter(batch=id)
+	phone= list(change_row.values_list('user_defined_id', flat=True))
 	approver = post.get('approver')
 	uniqname = post.get('uniqname')
 	
@@ -264,7 +272,7 @@ def managerapprovalsubmit(request):
 			'''.format(uniqname = uniqname, approver = approver)
 		
 		# to = [uniqname + '@umich.edu']
-		to = ['mkokarde@umich.edu', 'hujingc@umich.edu']
+		to = ['mkokarde@umich.edu', 'hujingc@umich.edu', 'mazuelke@umich.edu']
 
 
 		email = EmailMessage(
@@ -283,14 +291,16 @@ def managerapprovalsubmit(request):
 		body = '''
 			Hello {uniqname}, 
 
-			Your chartfield change request was denied by {approver}. 
-			'''.format(uniqname = uniqname, approver = approver)
+			Your chartfield change request for:
+			 {phone} 
+			was denied by {approver}. 
+			'''.format(uniqname = uniqname, phone = phone, approver = approver)
 
 		if post.get('rejectmessage')!='':
-			body + 'The following message was included: ' + post.get('rejectmessage')
+			body += 'The following message was included: ' + post.get('rejectmessage')
 		
-		# to = [uniqname + '@umich.edu', 'hujingc@umich.edu']
-		to = ['mkokarde@umich.edu', 'hujingc@umich.edu']
+		# to = [uniqname + '@umich.edu']
+		to = ['mkokarde@umich.edu', 'hujingc@umich.edu', 'mazuelke@umich.edu']
 
 		email = EmailMessage(
 			subject,
@@ -475,7 +485,7 @@ def submit_new(request):
 	# Get manager and proxy emails
 	dept = new_dept_full_name.split()[0]
 	allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
-	email_list = ['mkokarde@umich.edu', 'hujingc@umich.edu']
+	email_list = ['mkokarde@umich.edu', 'hujingc@umich.edu', 'mazuelke@umich.edu']
 	# email_list = []
 	# for id in allowed_mgr:
 	# 	email_list.append(User.objects.get(id=id).email)
