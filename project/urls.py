@@ -33,6 +33,7 @@ urlpatterns = [
     path('chartchangedept/submit/', views.submit_new), # AJAX
     path('chartchange/', views.chartchange),
     path('chartchangedept/', views.chartchangedept),
+    path('chartchangeoptions/', views.chartchangeoptions), #chartfield options home page
     path('managerapproval/', views.managerapproval),
     path('managerapprovalinit/', views.managerapprovalinit), # AJAX
     path('managerapproval/submit/', views.managerapprovalsubmit), # AJAX

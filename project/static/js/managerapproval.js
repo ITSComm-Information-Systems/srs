@@ -1,4 +1,4 @@
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function(event) {
     $("#manager_submit").attr("disabled", "disabled")
     $("#manager_reject").attr("disabled", "disabled")
     // get url parameters
@@ -36,13 +36,15 @@ $(document).ready(function () {
         $("#manager_reject").removeAttr("disabled")
         for (user of review_table.ajax.json()) {
             for (key in user) {
-                $("." + key).html(user[key]) //Fills in information based on id
+                //Fills in information based on class
+                $("." + key).html(user[key]) 
                 if (key == "old_dept_mgr_uniqname") {
-                    $("#old_dept_mgr_email").html(user[key] + "@umich.edu")
+                    $(".old_dept_mgr_email").html(user[key] + "@umich.edu")
                 }
                 if (key == "new_dept_mgr_uniqname") {
-                    $("#new_dept_mgr_email").html(user[key] + "@umich.edu")
+                    $(".new_dept_mgr_email").html(user[key] + "@umich.edu")
                 }
+                // uniqname
                 $('#' + key).val(user[key])
             }
         }
@@ -60,6 +62,7 @@ $(document).ready(function () {
 
 
 function accept() {
+    document.getElementById("loading").style.display= "block";
     $.ajax({
         url: "submit/",
         type: "POST",
@@ -74,10 +77,10 @@ function accept() {
 
         // handle a successful response
         success: function (json) {
+            document.getElementById("loading").style.display= "none";
             $(".page_4_style").addClass("bg-success")
             $(".page_4_style").addClass("text-white")
-            $("#page_4_top_text").addClass("font-weight-bold")
-            $("#page_4_top_text").addClass("text-success")
+            document.getElementById('page_4_top_text').classList.add('alert', 'alert-success')
             $("#page_4_top_text").html("Accepted! The Requestor will be notified and access will be automatically granted shortly. You may leave this page.")
             $("#manager_submit").attr("disabled", "disabled")
             $("#manager_reject").attr("disabled", "disabled")
@@ -102,8 +105,7 @@ function reject() {
         success: function (json) {
             $(".page_4_style").addClass("bg-danger")
             $(".page_4_style").addClass("text-white")
-            $("#page_4_top_text").addClass("font-weight-bold")
-            $("#page_4_top_text").addClass("text-danger")
+            document.getElementById('page_4_top_text').classList.add('alert','alert-danger')
             $("#page_4_top_text").html("Rejected! The Requestor will be notified shortly. You may leave this page.")
             $("#manager_submit").attr("disabled", "disabled")
             $("#manager_reject").attr("disabled", "disabled")

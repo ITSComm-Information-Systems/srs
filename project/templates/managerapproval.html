@@ -9,11 +9,16 @@
     </small>
 </h1>
 
-<div class="container" id="review_submit">
-    <p class="mt-4" id="page_4_top_text"> <strong> The following Chartfield Request was submitted to your department
-            for approval. Please review details and accept/reject. </strong></p>
+<p id="page_4_top_text">
+    The following Chartfield Request was submitted to your department
+    for approval. Please review details and accept/reject.
+</p>
+<div id="loading" style="display: none;">
+    <div class="spinner-border" role="status">
+        <!-- <span class="visually-hidden">Loading...</span> -->
+    </div>
+    Processing Data...
 </div>
-
 <div class="row mt-4">
     <div class="mt-4 col-md-12 mb-4">
         <table class="table table-striped table-sm" id="review_table">
@@ -160,8 +165,6 @@
         <button type="button" class="btn btn-success ml-2" id="manager_submit" data-toggle="modal"
             data-target="#submit_modal">Accept</button>
     </div>
-</div>
-
 </div>
 
 
