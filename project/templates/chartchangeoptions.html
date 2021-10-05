@@ -36,23 +36,44 @@
 <br>
 <div class="row justify-content-around">
     <div class="col">
-        <div class="option">
-            <h2 class="" onclick="window.location.href='/chartchange/';">
+        <div id='original' class="option" onclick="window.location.href='/chartchange/';">
+            <h2 id="text1">
                 Original
             </h2>
+            <div id="loading1" style="display: none;" class="spinner-border" role="status">
+                <!-- <span class="visually-hidden">Loading...</span> -->
+            </div>
         </div>
         <br>
         <p class="text-center">Makes changes for departments you have access to</p>
     </div>
 
     <div class="col">
-        <div class="option">
-            <h2 class="" onclick="window.location.href='/chartchangedept/';">
+        <div id='new' class="option" onclick="window.location.href='/chartchangedept/';">
+            <h2 id="text2">
                 New
             </h2>
+            <div id="loading2" style="display: none;" class="spinner-border" role="status">
+                <!-- <span class="visually-hidden">Loading...</span> -->
+            </div>
         </div>
         <br>
         <p class="text-center">Request changes for departments you do not have access to</p>
     </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function(event) {
+    let originalCCR = document.getElementById('original');
+    originalCCR.addEventListener('click', () => {
+        document.getElementById("text1").style.display = "none";
+        document.getElementById("loading1").style.display = "block";
+    });
+
+    let newCCR = document.getElementById('new');
+    newCCR.addEventListener('click', () => {
+        document.getElementById("text2").style.display = "none";
+        document.getElementById("loading2").style.display = "block";
+    });
+});
+</script>
 {% endblock %}

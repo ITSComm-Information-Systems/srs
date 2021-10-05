@@ -90,6 +90,7 @@ function accept() {
 }
 
 function reject() {
+    document.getElementById("loading").style.display= "block";
     $.ajax({
         url: "submit/",
         type: "POST",
@@ -103,6 +104,7 @@ function reject() {
 
         },
         success: function (json) {
+            document.getElementById("loading").style.display= "none";
             $(".page_4_style").addClass("bg-danger")
             $(".page_4_style").addClass("text-white")
             document.getElementById('page_4_top_text').classList.add('alert','alert-danger')
