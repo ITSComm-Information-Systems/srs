@@ -1068,7 +1068,7 @@ class Item(models.Model):
                 else:
                     rec.rate_id = self.data.get('selectOptionType')
                 
-                if action.service.name == 'turboResearch':
+                if action.service.name in ['turboResearch','dataDen']:
                     if self.data.get('research_comp_pkg') == 'yes':
                         rec.research_computing_package = True
                     else:
