@@ -22,11 +22,19 @@
                         <td>{{ volume.owner }}</td>
                         <td>{{ volume.size }}{{ volume.rate.unit_of_measure }}</td>
                         <td>{{ volume.rate.label }}</td>
+
+                        {% if volume.service.id == 7 %}
+                        <td>
+                            {{ volume.shortcode }}
+                        </td>
+                        {% else %}
                         <td>{% for sc in volume.shortcode_list %}
                             {{ sc.shortcode }} ({{sc.size}}TB)<br>
                     
                             {% endfor %}
                         </td>
+                        {% endif %}
+
                         <td class="action"><a href="#" onclick="modifyVolume(0, {{ volume.id }})">Edit</a><a href="#" class="delete" onclick="modifyVolume(1, {{ volume.id }})">Delete</a></td>
                     </tr>
                 {% endfor %}
