@@ -488,6 +488,7 @@ class StorageHost(VolumeHost):
 
 
 class ArcInstance(Volume):
+
     nfs_group_id = models.CharField(max_length=100, blank=True, null=True)
     multi_protocol = models.BooleanField(default=False)  
     sensitive_regulated = models.BooleanField(default=False)  
@@ -498,6 +499,7 @@ class ArcInstance(Volume):
     globus_phi = models.BooleanField(default=False) 
     thunder_x = models.BooleanField(default=False)
     research_computing_package = models.BooleanField(default=False)
+    amount_used = models.DecimalField(max_digits=12, decimal_places=2, default=0, null=True, blank=True)
 
     class meta:
         verbose_name = 'ARC Storage Instance'   
