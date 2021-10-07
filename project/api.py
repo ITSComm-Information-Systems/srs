@@ -50,7 +50,7 @@ class BomMaterialView(APIView):
         pre_order = request.data['data']['custom_fields']['install_preorder_num']
 
         # Only process webhook if it's for WIFI/AP, staged, and has a pre_order number
-        if request.data['data']['device_role']['name']=='WIFI/AP' and status =='staged' and pre_order != '' :
+        if request.data['data']['device_role']['name']=='WIFI/AP' and status =='staged' and pre_order != None:
             self.device_id = request.data['data']['id']
             self.location = request.data['data']['name']
             self.webhook = Webhooks(
