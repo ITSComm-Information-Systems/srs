@@ -392,7 +392,7 @@ class ArcInstanceAdmin(VolumeAdmin):
     child_key = 'arc_instance_id'
     service_list = [9,10,11]
     fieldsets = (
-        (None, {'fields': ('service', 'name','owner',('type','multi_protocol','ad_group'),'rate','size',('uid','nfs_group_id'),'research_computing_package','created_date','sensitive_regulated')
+        (None, {'fields': ('service', 'name','owner',('type','multi_protocol','ad_group'),'rate','size',('uid','nfs_group_id'),'research_computing_package','amount_used','created_date','sensitive_regulated')
         }),
         ('Regulated/Sensitive', {'fields':(('armis','globus_phi'),)
         }),
