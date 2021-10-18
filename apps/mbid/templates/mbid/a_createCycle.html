@@ -1,0 +1,91 @@
+{% extends 'baseapps.html' %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+{% if create %}
+<div class='row'>
+	<div class="col-6">
+		<form method="POST" id='initial' style="display: inline-block;">
+			{% csrf_token %}
+			<b>{{form.bidYear.label}}</b>: {{form.bidYear}}
+			<br>
+			<br>
+			<b>{{form.bidMonth.label}}</b>: {{form.bidMonth}}
+			<br>
+			<br>
+			<b>{{form.openDate.label}}</b>: {{form.openDate}}
+			<br>
+			<br>
+			<b>{{form.closeDate.label}}</b>: {{form.closeDate}}
+			<br>
+			<br>
+			<input type="submit" name='makeCycle' value="Review" class='btn btn-primary'>
+		</form>
+	</div>
+
+	<div class="col-sm-4">
+		<div class="alert alert-info">
+			<h4>Previous Bid Cycles</h4>
+			<ul>
+				{% for cycle in cycles %}
+				<li>{{ cycle }}</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>
+{% endif %}
+
+{% if confirm %}
+<form method="POST">
+	{% csrf_token %}
+	<div class="alert alert-info">
+		<section id='cycleInfo' style='display: grid; grid-template-columns: 2 ;grid-template-rows: 2;'>
+			<div style="grid-row: 1/-1; grid-column: 1;">
+				<p id='monthyear' class='h4' style="display: flex; align-items: center; justify-content: center;">
+					{{bidMonth}} {{bidYear}}</p>
+			</div>
+			<div style="grid-row: 1; grid-column: 2;">
+				<p>OPENS: <b class='h4'>{{openDate}} @ 12:00 AM</b></p>
+			</div>
+
+			<div style="grid-row: 2; grid-column: 2;">
+				<p>CLOSES: <b class='h4'>{{closeDate}} @ 11:59 PM</b></p>
+			</div>
+		</section>
+	</div>
+
+	<div class="row">
+		<div class="col-4">
+			<label style="text-align: left" for='searchitems'>Search items: </label> <input id='searchitems'
+				type='text'>
+		</div>
+		<div class="col-4">
+		</div>
+		<div class="col-4">
+			<h4 style="text-align:right">Items open for bidding: {{totalItems}}</h4>
+		</div>
+	</div>
+
+	{% include "mbid/a_table.html" %}
+
+	<input style="float:right;" name='infopage' type="submit" value="Create Cycle" class='btn btn-primary'>
+	<br>
+	<br>
+</form>
+
+{% endif %}
+
+{% endblock %}
+{% block js %}
+<script>
+	$(document).ready(function () {
+		$("#searchitems").on("keyup", function () {
+			var value = $(this).val().toLowerCase();
+			$("#availableitems tr").filter(function () {
+				$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+			});
+		});
+	});
+</script>
+{% endblock %}

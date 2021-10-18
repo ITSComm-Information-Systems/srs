@@ -1,0 +1,110 @@
+{% extends 'baseapps.html' %}
+
+{% block content %}
+{% if mistakes %}
+<h3 style="color:#00274c"> These entries are invalid and will be skipped when placing your bids. Please correct them if
+    you want to bid on these items.</h3>
+<label for='searchitems'>Search items: </label> <input id='searchInvalid' type='text'>
+<table class="table table-hover table-striped table-sm" style="display: block; max-height: 500px; overflow-y: scroll">
+    <thead>
+        <tr>
+            <th scope="col">Manufacturer</th>
+            <th scope="col">UM Code</th>
+            <th scope="col">Description</th>
+            <th scope="col">Manufacturer Part Number</th>
+            <th scope="col">Bid Status</th>
+            <th scope="col">Unit of Measure</th>
+            <th scope="col">Required Qty @ Local Vendor Branch</th>
+            <th scope="col">Estimated Annual Qty</th>
+            <th scope="col">UM Notes</th>
+            <th scope="col">Vendor Notes</th>
+            <th scope="col">Bid Price</th>
+        </tr>
+    </thead>
+    <tbody id='invalidTable'>
+        {% for row in notvalid %}
+        <tr>
+            <td>{{row.Manufacturer}}</td>
+            <td>{{row.UMCode}}</td>
+            <td>{{row.Description}}</td>
+            <td>{{row.ManufacturerPartNumber}}</td>
+            <td>{{row.BidStatus}}</td>
+            <td>{{row.UnitofMeasure}}</td>
+            <td>{{row.RequiredQTY}}</td>
+            <td>{{row.AnnualQty}}</td>
+            <td>{{row.UMNotes}}</td>
+            <td>{{row.VendorNotes}}</td>
+            <td>{{row.BidPrice}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+<form method="POST">
+    {% csrf_token %}
+    <h3 style="color:#00274c"> These bids will be submitted: </h3>
+    <br>
+    <label for='searchitems'>Search items: </label> <input id='searchValid' type='text'>
+    <table class="table table-hover table-striped table-sm"
+        style="display: block; max-height: 500px; overflow-y: scroll">
+        <thead>
+            <tr>
+                <th scope="col">Manufacturer</th>
+                <th scope="col">UM Code</th>
+                <th scope="col">Description</th>
+                <th scope="col">Manufacturer Part Number</th>
+                <th scope="col">Bid Status</th>
+                <th scope="col">Unit of Measure</th>
+                <th scope="col">Required Qty @ Local Vendor Branch</th>
+                <th scope="col">Estimated Annual Qty</th>
+                <th scope="col">UM Notes</th>
+                <th scope="col">Vendor Notes</th>
+                <th scope="col">Bid Price</th>
+            </tr>
+        </thead>
+        <tbody id='validTable'>
+            {% for row in valid %}
+            <input type='hidden'
+                value='Manufacturer:{{row.Manufacturer}};UMCode:{{row.UMCode}};ManufacturerPartNumber:{{row.ManufacturerPartNumber}};Description:{{row.Description}};VendorNotes:{{row.VendorNotes}};BidPrice:{{row.BidPrice}}'
+                name='uploads'>
+            <tr>
+                <td>{{row.Manufacturer}}</td>
+                <td>{{row.UMCode}}</td>
+                <td>{{row.Description}}</td>
+                <td>{{row.ManufacturerPartNumber}}</td>
+                <td>{{row.BidStatus}}</td>
+                <td>{{row.UnitofMeasure}}</td>
+                <td>{{row.RequiredQTY}}</td>
+                <td>{{row.AnnualQty}}</td>
+                <td>{{row.UMNotes}}</td>
+                <td>{{row.VendorNotes}}</td>
+                <td>{{row.BidPrice}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'mbid:upload_bids' %}">Cancel</a>
+    <input style="float:right" type="submit" name='uploadstatus' value="Submit Bids" class='btn btn-primary'>
+
+</form>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+        $("#searchValid").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#validTable tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        $("#searchInvalid").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#invalidTable tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+</script>
+{% endblock %}

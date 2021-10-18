@@ -1,3 +1,4 @@
+{% load humanize %}
 <h2>Volume Selection</h2>
 <p>Please select the storage volume you wish to modify</p>
 <input type="hidden" id="instance_id" name="instance_id" value="0">
@@ -22,12 +23,22 @@
                         <th data-id="{{volume.id}}" scope="row">{{ volume.name }}</th>
                         <td>{{ volume.type }}</td>
                         <td>{{ volume.dept }}</td>
+
+                        {% if volume.service.id == 7 %}
+                        <td>
+                            {{ volume.shortcode }}
+                        </td>
+                        {% else %}
                         <td>{% for sc in volume.shortcode_list %}
                             {{ sc.shortcode }} ({{sc.size}}TB)<br>
                     
                             {% endfor %}
                         </td>
-                        <td>{{ volume.size }}{{ volume.rate.unit_of_measure }}</td>
+                        {% endif %}
+
+
+
+                        <td>{{ volume.size|intcomma }} {{ volume.rate.unit_of_measure }}</td>
                         <td>{{ volume.rate.label }}</td>
                         <td style="text-align:right">{{ volume.total_cost }}</td>
                     </tr>

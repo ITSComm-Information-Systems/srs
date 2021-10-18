@@ -1,0 +1,80 @@
+{% extends 'baseapps.html' %}
+
+{% block content %}
+<!-- Review Bids -->
+<h1>{{ title }}</h1>
+<h3>{{ subtitle }}</h3>
+{% if cycle_info %}
+{% include 'mbid/cycle_info.html' %}
+{% endif %}
+
+{% if noitems %}
+<h3>You have not placed any bids</h3>
+<a href="{% url 'mbid:home' %}"><button class='btn btn-secondary'>Back</button></a>
+{% else %}
+
+<div class="row">
+    <div class="col-4">
+    <br>
+    <label for='searchitems'>Search items: </label> <input id='searchitems' type='text'>
+    </div>
+    <div class="col-4">
+    </div>
+    <div class="col-4">
+    <h4 style="text-align:right;">Bids placed: {{totalItems}}</h4>
+
+    </div>
+</div>
+
+<table class="table table-hover table-striped table-sm" style="display: block; max-height: 500px; overflow-y: scroll">
+    <thead>
+        <tr>
+            <th scope="col">Manufacturer</th>
+            <th scope="col">UM Code</th>
+            <th scope="col">Manufacturer Part Number</th>
+            <th scope="col">Description</th>
+            <th scope="col">Bid Status</th>
+            <th scope="col">Unit of Measure</th>
+            <th scope="col">Required Qty @ Local Vendor Branch</th>
+            <th scope="col">Estimated Annual Qty</th>
+            <th scope="col">UM Notes</th>
+            <th scope="col">Vendor Notes</th>
+            <th scope="col">Bid Price</th>
+
+        </tr>
+    </thead>
+    <tbody id='availableitems'>
+        {% for row in rows %}
+        <tr>
+            <td>{{row.manufacturer_name}}</td>
+            <td>{{row.umcode}}</td>
+            <td>{{row.manufacturer_part_number}}</td>
+            <td>{{row.desc}}</td>
+            <td>{{row.bid_status}}</td>
+            <td>{{row.uom}}</td>
+            <td>{{row.req_qty}}</td>
+            <td>{{row.annual_qty}}</td>
+            <td>{{row.um_notes}}</td>
+            <td>{{row.vendor_notes}}</td>
+            <td>{{row.price}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'mbid:home' %}"><button class='btn btn-secondary'>Back</button></a>
+{% endif %}
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+        $("#searchitems").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#availableitems tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+</script>
+{% endblock %}

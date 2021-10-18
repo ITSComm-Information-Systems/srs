@@ -71,15 +71,27 @@ class TabForm(forms.Form):
             if self.cleaned_data['oneTimeCharges'] == '11':                    
                 self.add_error('oneTimeCharges', 'You must select a chartcom')
 
-        if self.action.service.id == 10:
+        if self.action.service.id == 10:  # Locker
             if 'size' in self.cleaned_data:
                 if self.cleaned_data['size'] < 10:
                     self.add_error('size', 'Enter a size of at least 10 terabytes') 
 
-        if self.action.service.id == 11:
+        if self.action.service.id == 11:  # Data Den
             if 'size' in self.cleaned_data:
                 if self.cleaned_data['size'] < 5:
                     self.add_error('size', 'Enter a size of at least 5 terabytes') 
+
+        if 'name' in self.cleaned_data and self.action.service.id in [9,10,11]:  # ARC Instance Name check
+            name = self.cleaned_data['name']
+            if name and 'name' in self.changed_data:
+                if self.action.service.id == 9:  # Turbo must be unique within Turbo
+                    instance = ArcInstance.objects.filter(name__iexact=name,service_id=9).select_related('service')                
+                else:  # Data Den and Locker Need to be unique across the two services.
+                    instance = ArcInstance.objects.filter(name__iexact=name,service_id__in=[10,11]).select_related('service')
+
+                if len(instance) > 0:
+                    service = instance[0].service.label
+                    self.add_error('name', f'A {service} volume named {name.lower()} already exists. Please choose a different name.')
 
         for field in self.fields:
             if self.has_error(field):
@@ -269,7 +281,7 @@ class TabForm(forms.Form):
                 if element.attributes:
                     field.widget.input_type = element.attributes
             elif element.type == 'Checkbox':
-                field = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=eval(element.attributes))
+                field = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=eval(element.attributes), **element.arguments)
                 field.template_name = 'project/checkbox.html'
             elif element.type == 'HTML':
                 field = forms.CharField(required=False)
@@ -530,7 +542,8 @@ class VolumeSelectionForm(TabForm):
                 else:
                     self.template = 'order/server_modify.html'
             elif service.id == 14:
-                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name')
+                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True, server__isnull=True).order_by('name')
+                self.server_list = Server.objects.filter(owner__in=groups, in_service=True, database_type__isnull=False).order_by('name')
 
                 if self.action.label.startswith('Review'):
                     self.template = 'order/database_review.html'
@@ -677,6 +690,20 @@ class DatabaseConfigForm(TabForm):
                 self.fields.pop('url') 
         except:
             print('error getting database type')
+
+        type = self.request.POST.get('midatatype')
+        if type == '66':  # MSSQL
+            self.fields['name'].validators = [validators.RegexValidator(
+                    regex='^[a-zA-Z0-9_-]*$',
+                    message='Name can contain letters, numbers, hypens, and underscores.',
+                    code='invalid_name')]
+        else:
+            self.fields['name'].validators = [validators.RegexValidator(
+                    regex='^[a-z0-9_]*$',
+                    message='Name can contain lowercase letters, numbers, and underscores.',
+                    code='invalid_name')]
+
+
 
 
 
@@ -1014,6 +1041,15 @@ class ServerSpecForm(TabForm):
             if len(servername) > 0:
                 self.add_error('serverName', f'A server named {name.lower()} already exists. Please choose a different name.')
 
+            # managed windows name can't exceed 15 char:
+            if len(name) > 15:
+                if self.cleaned_data.get('managed') == 'True':
+                    os = self.cleaned_data.get('misevos', False)
+                    if os:
+                        os_name = Choice.objects.get(id=int(os)).label
+                        if os_name.startswith('Windows'):
+                            self.add_error('serverName', 'Name for a managed Windows server cannot exceed 15 characters (including prefix).')
+
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)
         if ram != None and cpu != None:
@@ -1131,6 +1167,10 @@ class BillingStorageForm(TabForm):
 
                 self.fields["billingAuthority"].initial = 'yes'
                 self.fields["serviceLvlAgreement"].initial = 'yes'
+    
+                if hasattr(si, 'research_computing_package'):
+                    if si.research_computing_package == True:
+                        self.fields["research_comp_pkg"].initial = 'yes'
 
         if self.action.service.name == 'miBackup':
             rate = StorageRate.objects.get(name=BackupDomain.RATE_NAME)
@@ -1203,8 +1243,11 @@ class BillingStorageForm(TabForm):
 
             summary[0]['value'] = label 
 
+        if self.action.service.name in ['turboResearch','dataDen']:
+            summary[3]['label'] = 'I have read the Sensitive Data Guide, agree that my use of this service complies with those guidelines and accept the terms of the Service Level Agreement.'
+        else:
+            summary[2]['label'] = 'I have read the Sensitive Data Guide, agree that my use of this service complies with those guidelines and accept the terms of the Service Level Agreement.'
 
-        summary[2]['label'] = 'I have read the Sensitive Data Guide, agree that my use of this service complies with those guidelines and accept the terms of the Service Level Agreement.'
 
         #instance_id = self.data.get('instance_id')
         
@@ -1293,16 +1336,16 @@ class NewLocationForm(TabForm):
 
 class EquipmentForm(TabForm):
     cat = ['Basic','VOIP']
-    cat[0] = Product.objects.all().filter(category=1).order_by('display_seq_no')
+    cat[0] = Product.objects.all().filter(active=True, category=1).order_by('display_seq_no')
     cat[0].id = 'basic'
-    cat[1] = Product.objects.all().filter(category__in=[2, 4]).order_by('display_seq_no') # Voip and Conference
+    cat[1] = Product.objects.all().filter(active=True, category__in=[2, 4]).order_by('display_seq_no') # Voip and Conference
     cat[1].id = 'voip'
     template = 'order/equipment.html'
 
 
 class ProductForm(TabForm):
     category_list = ProductCategory.objects.all().order_by('display_seq_no') 
-    product_list = Product.objects.all().order_by('category','display_seq_no') 
+    product_list = Product.objects.all().filter(active=True).order_by('category','display_seq_no') 
     template = 'order/products.html'
 
 
@@ -1317,7 +1360,7 @@ class PhoneLocationForm(TabForm):
 class DatabaseForm(ModelForm):
 
     size_choice = ((10, '10 GB'),(20, '20 GB'),(30, '30 GB'),(40, '40 GB'),(50, '50 GB'))
-    size = forms.ChoiceField(choices=size_choice)
+    size = forms.TypedChoiceField(coerce=int, label='Size', choices=size_choice)
 
     owner_name = forms.ChoiceField(label='Owner', widget=forms.Select(attrs={'class': 'form-control'}))    
     shortcode = forms.CharField(label='Shortcode', validators=[validate_shortcode])
@@ -1339,6 +1382,7 @@ class DatabaseForm(ModelForm):
         self.fields['owner_name'].choices = choice_list
         self.fields['owner_name'].initial = self.instance.owner.name
 
+
     def clean(self):
         super().clean()
 
@@ -1353,7 +1397,7 @@ class DatabaseForm(ModelForm):
 
         if self.has_changed() and self.changed_data != ['shortcode']:  # Gotta change more than shortcode to create ticket
 
-            description = ''
+            description = f'Name: {self.instance.name} \n'
             for key, value in self.cleaned_data.items():
                 label = self.fields[key].label
                 if key in self.changed_data:

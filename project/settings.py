@@ -112,6 +112,11 @@ TDX = {
     'PASSWORD': os.getenv('TDX_PASSWORD'),
 }
 
+NETBOX = {
+    'NETBOX_KEY' : os.getenv('NETBOX_KEY'),
+    'NETBOX_URL' : os.getenv('NETBOX_URL'),
+}
+
 MCOMMUNITY = {
     'SERVER': os.getenv('MC_SERVER', 'ldap.umich.edu'),
     'USERNAME': os.getenv('MC_USERNAME', 'cn=EAS-OSC-McDirApp001,ou=Applications,o=services'),
@@ -129,7 +134,7 @@ ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['apps/rte/templates','apps/bom/templates'],
+        'DIRS': ['apps/rte/templates','apps/bom/templates','apps/mbid/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

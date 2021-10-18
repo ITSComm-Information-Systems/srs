@@ -94,3 +94,14 @@ class ChoiceTag(models.Model):
      def __str__(self):
           return self.code
 
+class Webhooks(models.Model):
+     sender = models.CharField(max_length=20, null=True) #uniqname
+     preorder = models.CharField(max_length=50, null=True) #used to find estimate
+     device_id = models.IntegerField(null=True) #what gets sent in request to netbox
+     name = models.CharField(max_length=50, null=True) #ap-LBME-1350-W, aka location
+     success = models.BooleanField(default=False) #was it added to BOM
+     issue = models.CharField(max_length=50, default='no issue')
+     emailed = models.BooleanField(default=False) #was it sent in email
+     timestamp = models.DateTimeField(auto_now_add=True)
+     added = models.CharField(max_length=255, null=True)
+     skipped = models.CharField(max_length=255, null=True)
