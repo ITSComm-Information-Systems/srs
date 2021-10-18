@@ -5,34 +5,41 @@
 <div class="row">
     <div class="col-lg-8">
         <div class="jumbotron">
-                <h2 class="lead"><strong>About the SRS</strong></h2>
-                <p class="lead">The Service Request System is your one-stop-shop for ordering and managing ITS telecommunications and infrastructure products and services like phone lines, phone features, videoconferencing, and more.</p>
+            <h2 class="lead"><strong>About the SRS</strong></h2>
+            <p class="lead">The Service Request System is your one-stop-shop for ordering and managing ITS
+                telecommunications and infrastructure products and services like phone lines, phone features,
+                videoconferencing, and more.</p>
         </div>
-        
+
         <!--Show this div if user has an access role-->
         {% if user.is_authenticated %}
-            {% if perms.oscauth.can_order or perms.oscauth.can_report %}
-            <div class="alert alert-success" id="osc-users-msg">
-                <h2 class="lead"><strong>New to the SRS?</strong></h2>
-                <p>Refer to <a href="https://documentation.its.umich.edu/node/1206" target="new" class="alert-link">Using the Service Request System.</a> </p>
-            </div>
-            {% else %}
-            <!--Show this div if user does not have an access role-->
-            <div class="alert alert-danger" id="non-user-msg">
-                <h2 class="lead"><strong>You have limited access to this system.</strong></h2>
-                <p>Based on your current access levels, you only have access to <strong>order MiStorage, MiBackup, Turbo Storage, and Locker as well as the help pages</strong>. To gain additional permissions to order Telephones, Data, and Video lines, and/or view reports, contact your Department Manager.</p>
-                <p><a href="/auth/deptpriv/">Look up your Department Manager <i class="fas fa-chevron-right"></i></a></p>
-            </div>
-            {% endif %}
+        {% if perms.oscauth.can_order or perms.oscauth.can_report %}
+        <div class="alert alert-success" id="osc-users-msg">
+            <h2 class="lead"><strong>New to the SRS?</strong></h2>
+            <p>Refer to <a href="https://documentation.its.umich.edu/node/1206" target="new" class="alert-link">Using
+                    the Service Request System.</a> </p>
+        </div>
+        {% else %}
+        <!--Show this div if user does not have an access role-->
+        <div class="alert alert-danger" id="non-user-msg">
+            <h2 class="lead"><strong>You have limited access to this system.</strong></h2>
+            <p>Based on your current access levels, you only have access to <strong>order MiStorage, MiBackup, Turbo
+                    Storage, Locker, Data Den, MiServer, and MiDatabase as well as the help pages</strong>. To gain
+                additional permissions to order
+                Telephones, Data, and Video lines, and/or view financial reports, contact your Department Manager.</p>
+            <p><a target="_blank" href="https://documentation.its.umich.edu/node/2907">Requesting Telephony and Reporting Access <i class="fas fa-chevron-right"></i></a></p>
+            <p><a href="/auth/deptpriv/">Look up your Department Manager <i class="fas fa-chevron-right"></i></a></p>
+        </div>
+        {% endif %}
         {% else %}
         <div class="alert alert-danger" id="non-user-msg">
-                <h2 class="lead"><strong>You are not logged in.</strong></h2>
-                <a href="/oidc/authenticate/" class="alert-link">Click Here to Log In</a>
+            <h2 class="lead"><strong>You are not logged in.</strong></h2>
+            <a href="/oidc/authenticate/" class="alert-link">Click Here to Log In</a>
         </div>
         {% endif %}
     </div>
     {% autoescape off %}
-        {{notices.bodytext}}
+    {{notices.bodytext}}
     {% endautoescape %}
 </div>
 

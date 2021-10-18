@@ -488,6 +488,7 @@ class StorageHost(VolumeHost):
 
 
 class ArcInstance(Volume):
+
     nfs_group_id = models.CharField(max_length=100, blank=True, null=True)
     multi_protocol = models.BooleanField(default=False)  
     sensitive_regulated = models.BooleanField(default=False)  
@@ -497,6 +498,8 @@ class ArcInstance(Volume):
     globus = models.BooleanField(default=False) 
     globus_phi = models.BooleanField(default=False) 
     thunder_x = models.BooleanField(default=False)
+    research_computing_package = models.BooleanField(default=False)
+    amount_used = models.DecimalField(max_digits=12, decimal_places=2, default=0, null=True, blank=True)
 
     class meta:
         verbose_name = 'ARC Storage Instance'   
@@ -624,6 +627,7 @@ class Server(models.Model):
     name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     admin_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
+    database_type = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_TYPE"}, on_delete=models.SET_NULL, related_name='database_type')
     shortcode = ShortCodeField()
     created_date = models.DateTimeField(default=timezone.now, null=True)
     #shortcode = models.CharField(max_length=100) 
@@ -731,6 +735,8 @@ class ServerData(models.Model):
 
 
 class Database(models.Model):
+    MDB_ADMIN_GROUP = 1110
+
     MYSQL = 0
     MSSQL = 1
     ORACLE = 2
@@ -1063,6 +1069,12 @@ class Item(models.Model):
                     print(rec.rate_id, 'set for dd')
                 else:
                     rec.rate_id = self.data.get('selectOptionType')
+                
+                if action.service.name in ['turboResearch','dataDen']:
+                    if self.data.get('research_comp_pkg') == 'yes':
+                        rec.research_computing_package = True
+                    else:
+                        rec.research_computing_package = False
 
                 rec.type = action.override['storage_type']
                 rec.shortcode = self.data.get('shortcode')
@@ -1147,7 +1159,8 @@ class Item(models.Model):
                 if self.data.get('volaction') == 'Delete':
                     payload['Title'] = 'Delete MiDatabase'  # TODO Unreachable?
                 else:
-                    attributes.append({'ID': 1953, 'Value': self.data.get('ad_group')})  # Admin Group
+                    group_name = self.data.get('ad_group')
+                    attributes.append({'ID': 1953, 'Value': MCommunity().get_group_email_and_name(group_name)})  # Admin Group
 
                 attributes.append({'ID': 5319, 'Value': db})
                 attributes.append({'ID': 1952, 'Value': 203}) # Managed
@@ -1165,16 +1178,11 @@ class Item(models.Model):
                     payload['Title'] = 'Delete MiServer'
                 else:
                     if dedicated: # modifying a dedicated DB server
-                        attributes.append({'ID': 1953, 'Value': instance.admin_group.name})  # Admin Group
+                        group_name = instance.admin_group.name
                     else:
-                        owner = self.data.get('owner')
-                        try:
-                            group = MCommunity().get_group_email(owner)
-                            group = f'{owner} | {group}'
-                            attributes.append({'ID': 1953, 'Value': group})  # Admin Group
-                        except:
-                            print('error getting MC group')
-                            attributes.append({'ID': 1953, 'Value': self.data.get('owner')})  # Admin Group
+                        group_name = self.data.get('owner')
+                        
+                    attributes.append({'ID': 1953, 'Value': MCommunity().get_group_email_and_name(group_name)})  # Admin Group
 
                 managed = self.data.get('managed', mod_man)
                 if managed == 'True' or db:
@@ -1247,6 +1255,8 @@ class Item(models.Model):
         else:
             rec.admin_group = rec.owner
 
+        MCommunity().add_entitlement(rec.admin_group.name)
+
         for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing']:
             value = self.data.get(field)
             if value:
@@ -1261,7 +1271,7 @@ class Item(models.Model):
                 value = int(value)
                 setattr(rec, field + '_id', value)
 
-        if rec.managed:
+        if rec.managed == 'True' or rec.managed == True:
             os = self.data.get('misevos')
         else:
             os = self.data.get('misernonmang')
@@ -1279,16 +1289,11 @@ class Item(models.Model):
             else:
                 rec.os = Choice.objects.get(code='RedHatEnterpriseLinux8')
 
+        db_type = self.data.get('database')
+        if db_type:
+            rec.database_type = Choice.objects.get(parent__code='DATABASE_TYPE', label=db_type)
+        
         rec.save()
-
-        try:
-            db_type = self.data.get('database')
-            if db_type:
-                db_choice = Choice.objects.get(parent__code='DATABASE_TYPE', label=db_type)
-                db = Database.objects.update_or_create(server=rec,
-                    defaults={'name': rec.name, 'owner': rec.owner, 'support_email': rec.support_email, 'support_phone': rec.support_phone, 'type': db_choice, 'shortcode': rec.shortcode, 'size': 0, 'purpose': 'dedicated server'})
-        except:
-            print('error creating database')
 
         d = self.data.get('non_regulated_data')
         if d:

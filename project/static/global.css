@@ -1,3 +1,16 @@
+@media (min-width:992px) {
+    html, body {
+    	height: 100%;
+	}
+	.wrapper {
+		min-height: 100%;
+		margin-bottom: -224px;
+		padding-bottom: 224px;
+	}
+	footer {
+		height: 224px;
+	}
+}
 :root {
 	--dark-blue:#00274C;
 	--med-blue:#40658F;
@@ -174,10 +187,6 @@ body {
 		/*Without this, clicking will make it sticky*/
 		pointer-events:none;
 	}
-}
-
-#main-content.container .container {
-/*	padding:0 !important;*/
 }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
@@ -446,12 +455,7 @@ span {
 .order-summary-list{
 	padding-inline-start:20px;
 }
-.review-order-link {
-	margin:0 auto;
-}
-.review-order-link a {
-	color:#ffffff;
-}
+
 .card-deck {
 	display:flex;
 	flex-direction:column;
@@ -534,9 +538,7 @@ h2.service-menu-header {
 #service-menu ul li a {
 	color:#333333;
 }
-#service-menu ul li a:active {
-/*		font-weight:bold;*/
-}
+
 #service-menu ul li:not(.active) a:hover, #service-menu ul li:not(.active) a:focus {
 	background-color:#f4f3f2;
 }

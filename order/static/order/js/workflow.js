@@ -10,6 +10,75 @@ var popOverSettings = {
 }
 
 
+var update_total_cost = function() {
+
+  ram = $('#id_ram').val();
+  ram_cost = ram * ram_rate;
+  $('#ram_cost').html('$' + ram_cost.toFixed(2));
+
+  if ($('#id_cpu').data('server')){
+    disk_0 = $('.disk-size')[1];
+
+    if (ram < 8) {
+      paging_disk = 60;
+    } else {
+      paging_disk = Math.ceil((ram-8)/4) * 10 + 60;
+    }
+
+    $(disk_0).val(paging_disk);
+  }
+
+  if ($('#replicated_0').prop("checked")) {  // Replicated
+    disk_rate = disk_replicated;
+  } else {
+    disk_rate = disk_no_replication; // Default until selected
+  }
+
+  total_disk_size = 0;
+  total_disk_cost = 0;
+
+  $( ".disk-div" ).each(function( index ) {  // Tally all disks
+    if (this.id == "formset_wrapper" || this.id == "diskdiv__prefix__") {
+      return;
+    }
+
+    uom = $(this).find("select").val();
+    size = $(this).find(".disk-size").val();
+
+    $(this).find(".disk-size")
+
+    if (uom=="TB") {
+      size = size * 1024;
+    } else {
+      size = size * 1;
+
+    }
+    cost = size * disk_rate
+
+    $(this).find("span").html('$' + cost.toFixed(2));
+    total_disk_size = total_disk_size + size
+    total_disk_cost = total_disk_cost + cost
+
+  });
+
+  console.log('total_disk_size', total_disk_size)
+
+  if ($('#backup_0').prop("checked")) {  // Backup
+    backup_cost = total_disk_size * disk_backup
+    $("#backup_cost").html('$' + backup_cost.toFixed(2));
+  } else {
+    backup_cost = 0;
+    $("#backup_cost").html('$0.00');
+  } 
+
+  total_cost = ram_cost + total_disk_cost + backup_cost;
+  $("#total_cost").html('$' + total_cost.toFixed(2));
+  $("#total_cost_field").val(total_cost.toFixed(2));
+}
+
+
+
+
 $(document).ready(function() {
 
   $('#productType_1').attr('disabled', true);
@@ -455,63 +524,6 @@ $(document).ready(function() {
     update_total_cost();
   });
 
-  function update_total_cost() {
-
-    ram = $('#id_ram').val();
-    ram_cost = ram * ram_rate;
-    $('#ram_cost').html('$' + ram_cost.toFixed(2));
-
-    if ($('#id_cpu').data('server')){
-      disk_0 = $('.disk-size')[1];
-
-      if (ram < 8) {
-        paging_disk = 60;
-      } else {
-        paging_disk = Math.ceil((ram-8)/4) * 10 + 60;
-      }
-
-      $(disk_0).val(paging_disk);
-    }
-
-    if ($('#replicated_0').prop("checked")) {  // Replicated
-      disk_rate = disk_replicated;
-    } else {
-      disk_rate = disk_no_replication; // Default until selected
-    }
-
-    total_disk_size = 0;
-    total_disk_cost = 0;
-
-    $( ".disk-div" ).each(function( index ) {  // Tally all disks
-      uom = $(this).find("select").val();
-      size = $(this).find(".disk-size").val();
-
-      if (uom=="TB") {
-        size = size * 1024;
-      } else {
-        size = size * 1;
-
-      }
-      cost = size * disk_rate
-
-      $(this).find("span").html('$' + cost.toFixed(2));
-      total_disk_size = total_disk_size + size
-      total_disk_cost = total_disk_cost + cost
-
-    });
-    
-    if ($('#backup_0').prop("checked")) {  // Backup
-      backup_cost = total_disk_size * disk_backup
-      $("#backup_cost").html('$' + backup_cost.toFixed(2));
-    } else {
-      backup_cost = 0;
-      $("#backup_cost").html('$0.00');
-    } 
-
-    total_cost = ram_cost + total_disk_cost + backup_cost;
-    $("#total_cost").html('$' + total_cost.toFixed(2));
-    $("#total_cost_field").val(total_cost.toFixed(2));
-  }
 
   $(document).on("change", "#id_cpu" , function() {
     if ($('#id_ram').val() < this.value * 2) {
@@ -522,14 +534,18 @@ $(document).ready(function() {
 
   function set_managed_windows() {
     managed_windows = false;
+    managed_linux = false;
     if ($('#managed_0').prop("checked")) {
       os = $('#id_misevos option:selected').text()
       if (os) {
         if (os.startsWith('Windows')) {
           managed_windows = true;
+        } else {
+          managed_linux = true;
         }
       }
     }
+    console.log('set managed windows', managed_windows);
 
     if (managed_windows && !database) {  // No prefix for database servers
       $('#div_misevprefix').show().prop('required',true);  // Prefix Y/N?
@@ -541,6 +557,16 @@ $(document).ready(function() {
     } else {
       $('#div_misevprefix').hide().prop('required',false);
       $('#div_misevregpre').hide().prop('required',false);
+    }
+
+    if (managed_linux) {
+      $('#id_form-0-size').val(50); // Disk 0 on linux must be 50 GB
+      $('#id_form-0-uom').val("GB");
+      $('#id_form-0-size').prop('readonly', true);
+      $('#id_form-0-uom').attr('readonly', true);
+    } else {
+      $('#id_form-0-size').prop('readonly', false);
+      $('#id_form-0-uom').attr('readonly', false);
     }
 
     if (managed_windows) {
@@ -758,9 +784,8 @@ $(document).ready(function() {
       //if (n == 1 && !validateForm()) return false;
       nextPrev(1);
     } else {
-      $("#nextBtn").prop('disabled', true).addClass("spinner-border")
+      $("#nextBtn").prop('disabled', true)
       sendTabData();
-      //$("#nextBtn").prop('disabled', false).removeClass("spinner-border")
     }
 
   });
@@ -1001,7 +1026,7 @@ $(document).ready(function() {
         $("#step2").append(rec);
 
     }
-})
+}) 
 
 $('[data-tab="volumeSelection"]').ready(function() {
   //$("#nextBtn").hide();
@@ -1069,21 +1094,23 @@ function chartcomChange(obj) {
 
   function addDisk(record) {
     num = $("#id_form-TOTAL_FORMS").val()
-
+  
     let total_form = $('#id_form-TOTAL_FORMS');
     let form_idx = total_form.val();
-
+  
     $('#formset_wrapper').append($('#emptyform_wrapper').html().replace(/__prefix__/g, form_idx));
-
+  
     $('#id_form-' + form_idx + '-name').val('disk' + form_idx);
     total_form.val(parseInt(form_idx)+1);
-
+  
     delbuttons = $('.fa-minus-circle');
     if (delbuttons.length > 2) {
       delbuttons[delbuttons.length - 3].style.display = "none"
     }
+  
+    update_total_cost();
+  
   }
-
   function deleteDisk(disk) {
     disk.parentElement.remove();
     num = $("#id_form-TOTAL_FORMS").val()
@@ -1096,6 +1123,8 @@ function chartcomChange(obj) {
     if (delbuttons.length>1) {
       delbuttons[delbuttons.length - 2].style.display = "block"
     }
+
+    update_total_cost();
 
   }
 

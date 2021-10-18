@@ -309,10 +309,9 @@ def get_uniqname(request, uniqname_parm=''):
 
                     disable_proxy = False
                     disable_others = False
-                    if role != "Department Manager":
-                        disable_proxy = True
                     if role != "Proxy" and role != 'Department Manager':
                         disable_others = True
+                        disable_proxy = True
 
                     data = {
                         'dept_status' : dept_status,

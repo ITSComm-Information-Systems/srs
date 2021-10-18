@@ -1,0 +1,27 @@
+{% extends 'baseapps.html' %}
+
+{% block content %}
+<h1>Upload Bids</h1>
+{% if cycle_info.open%}
+<div class='alert alert-dark' role='alert'>
+    NOTE: Only the latest upload will be considered during current bid cycle
+</div>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="name">File: </label>
+        <input type="file" name="csv_file" id="csv_file" required="True" class="form-control">
+    </div>
+    <input type="submit" name='uploadstatus' value="Upload Bids" class='btn btn-primary'>
+</form>
+
+
+
+<br>
+<a href="{% url 'mbid:home' %}"><button class='btn btn-secondary'>Back</button></a>
+{% else %}
+<h4>The bidding period has closed. You may still <a href="{% url 'mbid:review_bids'%}">view your bids</a>. </h4>
+
+<a href="{% url 'mbid:home' %}"><button class='btn btn-secondary'>Back</button></a>
+{% endif %}
+{% endblock %}

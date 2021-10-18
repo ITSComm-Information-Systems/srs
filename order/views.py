@@ -768,14 +768,17 @@ class Status(PermissionRequiredMixin, View):
             else:
                 order.timeDiff = (5,"More than 365 days")
    
-                       
+            #add status that should display in SRS
             pin = next((x for x in pins if x.add_info_text_3 == str(order.id)), None)
             order.srs_status = "Submitted"
             if pin:
-                if(pin.work_status_name == "Received"):
-                    order.srs_status = "Submitted"
-                if pin.status_code == 2:
-                    if(pin.work_status_name == "Cancelled"):
+                if pin.work_status_name == "Received":
+                    order.srs_status= "Submitted"
+                elif pin.work_status_name != '' and pin.work_status_name != None:
+                    order.srs_status = pin.work_status_name
+                    
+                if str(pin.status_code) == '2':
+                    if(pin.work_status_name == "Cancelled" or pin.work_status_name == "Withdrawn"):
                         order.srs_status = "Cancelled"
                     else:
                         order.srs_status = "Completed"
@@ -887,12 +890,5 @@ class ServerView(UserPassesTestMixin, View):
 
         instance.in_service = False
         instance.save()
-
-        try:
-            db = Database.objects.get(server=instance)
-            db.in_service = False
-            db.save()
-        except:
-            print('matching db not found')
 
         return HttpResponseRedirect('/requestsent') 

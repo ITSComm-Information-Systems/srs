@@ -20,11 +20,30 @@ class Command(BaseCommand):
 
         self.service = options['service']
 
-        arc_ts_query = 'select b.shortcode, b.size, a.name, a.created_date, c.name as rate_name, round(c.rate * b.size,2) as total_cost, d.name as owner ' \
+        arc_ts_query = 'select b.shortcode, b.size, a.name, a.created_date, c.name as rate_name, round(c.rate * b.size,2) as total_cost, d.name as owner, ' \
                     'from order_arcinstance a, order_arcbilling b, order_storagerate c, oscauth_ldapgroup d ' \
                     'where b.arc_instance_id = a.id ' \
                     '  and a.rate_id = c.id ' \
                     '  and a.owner_id = d.id ' 
+
+        turbo_query = "select b.shortcode, b.size, a.amount_used, a.name, a.created_date, c.name as rate_name, " \
+                    " case    " \
+                    "  when a.research_computing_package = True and b.shortcode = '123150' and (select count(*) from order_arcbilling where arc_instance_id = a.id) = 1 Then " \
+                    "    case when (a.amount_used < 1 or a.amount_used is null) then    " \
+                    "        round(c.rate * 1 , 2)       " \
+                    "    when a.amount_used > 10 then   " \
+                    "        round(c.rate * 10 , 2)    " \
+                    "    else    " \
+                    "        round(c.rate * ceil(a.amount_used) ,2)     " \
+                    "    end     " \
+                    "  else    " \
+                    "    round(c.rate * b.size,2)      " \
+                    "  end as total_cost, d.name as owner  " \
+                    "from order_arcinstance a, order_arcbilling b, order_storagerate c, oscauth_ldapgroup d " \
+                    "where b.arc_instance_id = a.id " \
+                    "  and a.rate_id = c.id " \
+                    "  and a.owner_id = d.id " \
+                    "  and a.service_id = 9 order by a.name, a.created_date "
 
         mistorage_query = 'select a.shortcode, a.size, a.name, a.created_date, c.name as rate_name, round(c.rate * a.size,2) as total_cost, d.name as owner ' \
                 'from order_storageinstance a, order_storagerate c, oscauth_ldapgroup d ' \
@@ -44,7 +63,7 @@ class Command(BaseCommand):
             sql = mistorage_query
             self.owner_email = 'its.storage@umich.edu'
         elif self.service == 'Turbo':
-            sql = arc_ts_query + ' and a.service_id = 9 order by a.name, a.created_date'
+            sql = turbo_query
         elif self.service == 'Locker-Storage':
             sql = arc_ts_query + ' and a.service_id = 10 order by a.name, a.created_date'
         elif self.service == 'Data-Den':
@@ -83,7 +102,12 @@ class Command(BaseCommand):
 
         csvfile = io.StringIO()
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(['shortcode','size','name','date_created','rate_name','total_cost','owner'])
+        if self.service == 'MiServer':
+            csvwriter.writerow(['id','cpu','created_date','os_id','os_code','managed','ad_group','shortcode','size','name','rate_name','total_cost','owner'])
+        elif self.service == 'Turbo':
+            csvwriter.writerow(['shortcode','size','amount_used', 'name','date_created','rate_name','total_cost','owner'])
+        else:
+            csvwriter.writerow(['shortcode','size','name','date_created','rate_name','total_cost','owner'])
 
         for instance in instances:
             csvwriter.writerow(instance.values())

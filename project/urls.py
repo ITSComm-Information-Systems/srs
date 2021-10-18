@@ -22,6 +22,7 @@ urlpatterns = [
     path('auth/', include('oscauth.urls')),
     path('apps/', include('apps.urls')),
     path('api/', include(api.router.urls)),
+    path('api/bommaterial/', api.BomMaterialView.as_view()),
     path('admin/', admin.site.urls),
     path('reports/',include('reports.urls')),
     path('chartchange/ajax/', views.change_dept),

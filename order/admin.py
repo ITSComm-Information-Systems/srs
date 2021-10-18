@@ -4,6 +4,7 @@ from django.utils.html import format_html
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.contrib import admin
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.urls import path
 from project.models import Choice
@@ -153,26 +154,47 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
         row = []
         for field in fields:
             row.append(field.name)
-            if field.related_model == Choice:
+            if field.related_model:
                 choice_related.append(field.name)
 
         writer.writerow(row)
 
-        instance_list = list(self.model.objects.all().prefetch_related(*choice_related))
+        instance_list = list(self.model.objects.all().select_related(*choice_related))
         for instance in instance_list:
             row = []
             for field in fields:
-                row.append(getattr(instance,field.name))
+                if self.model == ArcInstance and field.name == 'shortcode':
+                    shortcode = ''
+                    for sc in instance.get_shortcodes():
+                        shortcode = shortcode + f'{sc.size}TB to {sc.shortcode},'
+
+                    row.append(shortcode)
+                else:
+                    row.append(getattr(instance,field.name))
 
             writer.writerow(row)
 
         return response
 
+def user_has_permission(request, obj=None):
+    if request.user.has_perm('order.change_server'):
+        return True
+    elif request.user.has_perm('order.change_database'):
+        if obj:
+            if obj.admin_group_id == Database.MDB_ADMIN_GROUP:
+                return True
+    return False    
 
 class ServerDiskInline(admin.TabularInline):
     model = ServerDisk
     ordering = ('name',)
 
+    def has_add_permission(self, request, obj=None):
+        return user_has_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        return user_has_permission(request, obj)
+        
 
 @admin.register(Database)
 class DatabaseAdmin(ServiceInstanceAdmin):
@@ -211,7 +233,7 @@ class DatabaseAdmin(ServiceInstanceAdmin):
 @admin.register(Server)
 class ServerAdmin(ServiceInstanceAdmin):
     list_display = ['name', 'owner', 'os']
-    list_filter = ('in_service','managed')
+    list_filter = ('in_service','managed', 'database_type')
     ordering = ('name',)
     search_fields = ['name','owner__name']
 
@@ -221,7 +243,7 @@ class ServerAdmin(ServiceInstanceAdmin):
 
     fieldsets = (
         (None, {
-            'fields': (('name', 'in_service','created_date'), 'owner', 'admin_group', 'shortcode', ('os','cpu','ram'),
+            'fields': (('name', 'in_service','created_date'), 'owner', ('admin_group','database_type'), 'shortcode', ('os','cpu','ram'),
                         ('replicated','backup','backup_time','public_facing'),
                         ('on_call', 'support_email', 'support_phone'),
 
@@ -240,18 +262,12 @@ class ServerAdmin(ServiceInstanceAdmin):
         }),
     )
 
-    def get_urls(self):
-        urls = super().get_urls()
-
-        download_url = [
-            path('csv/', self.download_csv),
-        ]
-        return download_url + urls
-
-
-
     class Media:
         js = ('order/js/admin_server.js',)
+
+    def has_change_permission(self, request, obj=None):
+        return user_has_permission(request, obj)
+
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
@@ -278,7 +294,7 @@ class LDAPGroupAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
-class VolumeAdmin(admin.ModelAdmin):
+class VolumeAdmin(ServiceInstanceAdmin):
     ordering = ('name',)
     search_fields = ['name','owner__name']
     list_filter = ('type',('service', admin.RelatedOnlyFieldListFilter),)
@@ -293,10 +309,7 @@ class VolumeAdmin(admin.ModelAdmin):
             path('fulfill_order/', self.fulfill_order),
         ]
 
-        download_url = [
-            path('download_csv/', self.download_csv),
-        ]
-        return fulfill_url + download_url + urls
+        return fulfill_url + urls
 
     def fulfill_order(self, request):
         item = Item.objects.get(external_reference_id=request.POST['ticket'])
@@ -311,31 +324,6 @@ class VolumeAdmin(admin.ModelAdmin):
         item.save()
 
         return HttpResponseRedirect(f'/admin/order/arcinstance/{instance_id}/change/')
-
-
-    def download_csv(self, request):
-        # Create the HttpResponse object with the appropriate CSV header.
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="mistorage.csv"'
-
-        writer = csv.writer(response)
-        fields = self.model._meta.fields
-
-        row = []
-        for field in fields:
-            row.append(field.name)
-
-        writer.writerow(row)
-
-        volume_list = self.model.objects.all().select_related()
-        for volume in volume_list:
-            row = []
-            for field in fields:
-                row.append(getattr(volume,field.name))
-
-            writer.writerow(row)
-
-        return response
 
     def get_form(self, request, obj=None, **kwargs):
         if obj:
@@ -404,7 +392,7 @@ class ArcInstanceAdmin(VolumeAdmin):
     child_key = 'arc_instance_id'
     service_list = [9,10,11]
     fieldsets = (
-        (None, {'fields': ('service', 'name','owner',('type','multi_protocol','ad_group'),'rate','size',('uid','nfs_group_id'),'created_date','sensitive_regulated')
+        (None, {'fields': ('service', 'name','owner',('type','multi_protocol','ad_group'),'rate','size',('uid','nfs_group_id'),'research_computing_package','amount_used','created_date','sensitive_regulated')
         }),
         ('Regulated/Sensitive', {'fields':(('armis','globus_phi'),)
         }),
@@ -442,7 +430,7 @@ class StorageRateAdmin(admin.ModelAdmin):
     list_filter = ('service',)
 
 
-class BackupDomainAdmin(admin.ModelAdmin):
+class BackupDomainAdmin(ServiceInstanceAdmin):
     list_display = ['name','owner','shortcode','size']
 
     def change_view(self, request, object_id, form_url='', extra_context=None):

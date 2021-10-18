@@ -1,7 +1,6 @@
 import json, requests
 from django.conf import settings
-from ldap3 import Server, Connection, ALL
-
+from ldap3 import Server, Connection, ALL, MODIFY_ADD
 class MCommunity:
 
     def __init__(self):
@@ -49,6 +48,22 @@ class MCommunity:
         except:
             print(f'error getting email for {name}')
 
+    def get_group_email_and_name(self, name):
+
+        try:
+            group = self.get_group_email(name)
+            group = f'{name} | {group}'
+            return group
+        except:
+            print('error getting MC group')
+            return name
+
+    def add_entitlement(self, name):
+        new_member = f'cn={name},ou=User Groups,ou=Groups,dc=umich,dc=edu'
+        parent_group = 'cn=SRS Service Entitlement Control,ou=User Groups,ou=Groups,dc=umich,dc=edu'
+
+        x = self.conn.modify(parent_group, {'groupMember': [(MODIFY_ADD, [new_member])]})
+        print('add', x, self.conn.response)
 
 
 class UmAPI:
@@ -178,6 +193,9 @@ def create_ticket_server_delete(instance, user, description):
             },
         ]
     }
+    
+    if instance.database_type:
+        payload['Attributes'].append({"ID": "5319", "Value": instance.database_type.__str__()})
 
     TDx().create_ticket(payload)
 
@@ -222,8 +240,16 @@ def create_ticket_database_modify(instance, user, description):
         "Description": description,
         "Attributes": [
             {
+                "ID": "1855", # Name
+                "Value": instance.name
+            },
+            {
                 "ID": "1857", # Size
                 "Value": str(instance.size)
+            },
+            {
+                "ID": "1858", # Type
+                "Value": instance.type.label
             },
             {
                 "ID": "1875",  # Shortcode
