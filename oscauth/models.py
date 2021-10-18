@@ -159,6 +159,9 @@ class LDAPGroup(models.Model):
 
         return mc.members
 
+    class Meta:
+        ordering = ['name']
+
 
 class LDAPGroupMember(models.Model):
     ldap_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE)
