@@ -22,7 +22,7 @@ from ldap3 import Server, Connection, ALL
 from .models import AuthUserDept, Grantor, Role, Group, User
 from .forms import UserSuForm, AddUserForm
 from .utils import su_login_callback, custom_login_action, upsert_user
-from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscAcctSubscribersV,UmOscServiceProfileV
+from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV, UmOscAcctSubscribersV,UmOscServiceProfileV,UmOscAuthUsersApi
 from oscauth.forms import *
 from oscauth.utils import upsert_user, get_mc_user
 from pages.models import Page
@@ -241,7 +241,6 @@ def get_uniqname(request, uniqname_parm=''):
                     dept_manager = []
                     disable_proxy = True
 
-                print(dept_manager)
                 #grantable_roles = Role.objects.filter(grantable_by_dept=True,active=True).order_by('role')
                 grantor_roles = Grantor.objects.values('grantor_role').distinct()
                 #this_grantors_roles = AuthUserDept.objects.filter(user=request.user.id).values("group").distinct()
@@ -600,11 +599,25 @@ def add_priv(osc_user, role, dept):
     except IntegrityError: 
         result = 'no change'
 
+    try:
+        rec = UmOscAuthUsersApi()
+        rec.dept = dept
+        rec.group_name = new_auth.group.name
+        rec.username = osc_user.username
+        rec.save()
+    except:
+        print('error updating UmOscAuthUsersApi')
+
     return result
 
 def delete_priv(osc_user, role, dept):
     role = Role.objects.get(role=role).group
     aud = AuthUserDept.objects.filter(user=osc_user,group=role,dept=dept)
+
+    try:
+        UmOscAuthUsersApi.objects.filter(username=osc_user.username,group_name=role.name,dept=dept).delete()
+    except:
+        print('error delete from UmOscAuthUsersApi')
 
     result = 'no change'
     if aud.exists():
