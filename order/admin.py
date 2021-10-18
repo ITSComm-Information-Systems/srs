@@ -203,6 +203,7 @@ class DatabaseAdmin(ServiceInstanceAdmin):
     ordering = ('name',)
     readonly_fields = ('legacy_data','server','shared')
     search_fields = ['name','owner__name']
+    autocomplete_fields = ['owner']
 
     fieldsets = (
         (None, {
@@ -236,6 +237,7 @@ class ServerAdmin(ServiceInstanceAdmin):
     list_filter = ('in_service','managed', 'database_type')
     ordering = ('name',)
     search_fields = ['name','owner__name']
+    autocomplete_fields = ['owner','admin_group']
 
     inlines = [ServerDiskInline,]
 
