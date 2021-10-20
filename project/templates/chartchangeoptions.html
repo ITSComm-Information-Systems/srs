@@ -5,75 +5,74 @@
         background-color: {{background_color}}
     }
 
-    /* Create three equal columns that floats next to each other */
-
     .option {
         cursor: pointer;
         width: 50%;
         height: 200px;
         margin: auto;
+        margin-top: 10%;
         border: 1px solid #D6D6D6;
         border-radius: 1.25rem;
-        background-color: #E6E9EC;
+        background-color: #00264F;
         outline: none;
+        color: white;
 
         display: flex;
         flex-direction: row;
         align-content: space-around;
         justify-content: space-around;
         align-items: center;
+        padding: 20px;
+        box-shadow: 1px 1px 5px grey;
 
     }
 
     .option:focus,
     .option:hover {
         outline: none;
-        background-color: #C2C5C7;
+        background-color: #004785;
     }
+
 </style>
 {% endblock %}
 {% block content %}
-<br>
+
 <div class="row justify-content-around">
     <div class="col">
-        <div id='original' class="option" onclick="window.location.href='/chartchange/';">
-            <h2 id="text1">
-                Original
-            </h2>
-            <div id="loading1" style="display: none;" class="spinner-border" role="status">
+        <div tabindex="0" role="button" id='original' class="option" onclick="window.location.href='/chartchange/'">
+            <div id="text1" class="text-center">
+                Click here to make changes for departments you are authorized for.
+            </div>
+            <div id="loading1" style="display: none;" class="spinner-border text-light" role="status">
                 <!-- <span class="visually-hidden">Loading...</span> -->
             </div>
         </div>
-        <br>
-        <p class="text-center">Makes changes for departments you have access to</p>
     </div>
 
     <div class="col">
-        <div id='new' class="option" onclick="window.location.href='/chartchangedept/';">
-            <h2 id="text2">
-                New
-            </h2>
-            <div id="loading2" style="display: none;" class="spinner-border" role="status">
+        <div tabindex="0" role="button" id='new' class="option" onclick="window.location.href='/chartchangedept/'">
+            <div id="text2" class="text-center">
+                Click here to request changes for departments you are NOT authorized for.
+            </div>
+            <div id="loading2" style="display: none;" class="spinner-border text-light" role="status">
                 <!-- <span class="visually-hidden">Loading...</span> -->
             </div>
         </div>
-        <br>
-        <p class="text-center">Request changes for departments you do not have access to</p>
     </div>
 </div>
 <script>
-document.addEventListener("DOMContentLoaded", function(event) {
-    let originalCCR = document.getElementById('original');
-    originalCCR.addEventListener('click', () => {
-        document.getElementById("text1").style.display = "none";
-        document.getElementById("loading1").style.display = "block";
-    });
+    document.addEventListener("DOMContentLoaded", function (event) {
+        let originalCCR = document.getElementById('original');
+        originalCCR.addEventListener('click', () => {
+            document.getElementById("text1").style.display = "none";
+            document.getElementById("loading1").style.display = "block";
+        });
 
-    let newCCR = document.getElementById('new');
-    newCCR.addEventListener('click', () => {
-        document.getElementById("text2").style.display = "none";
-        document.getElementById("loading2").style.display = "block";
+        let newCCR = document.getElementById('new');
+        newCCR.addEventListener('click', () => {
+            document.getElementById("text2").style.display = "none";
+            document.getElementById("loading2").style.display = "block";
+        });
     });
-});
 </script>
 {% endblock %}

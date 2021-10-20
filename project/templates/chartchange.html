@@ -21,14 +21,14 @@
   <h1>
     Chartfield Change
     <small class="text-muted">
-      for <strong id="dept_title">Department: {{ dept_info.dept_id }} - {{ dept_info.dept_name }}</strong>
+      for <strong id="dept_title"></strong>
     </small>
   </h1>
 
-  <p hidden id="dept_mgr">{{ dept_info.dept_mgr }}</p>
+  <p hidden id="dept_mgr"></p>
   {% if deptids|length > 1 %}
   <form id="choose_dept" method="POST">{% csrf_token %}
-    <div class="row align-items-start mb-4" id="select_dept">
+    <div class="row align-items-start mb-4 justify-content-center mt-5" id="select_dept">
       <div class="input-group col-md-6">
         <div class="input-group-prepend">
             <label class="input-group-text" for="chart_deptids">
@@ -37,11 +37,7 @@
         </div>
         <select name="deptids" class="custom-select" id="chart_deptids">
             {% for dept in deptids %}
-              {% if dept.dept ==  dept_info.dept_id %}
-                <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}" data-default="true">{{ dept.dept }} - {{ dept.dept_name }}</option>
-              {% else %}
-                <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}">{{ dept.dept }} - {{ dept.dept_name }}</option>
-              {% endif %}         
+            <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}">{{ dept.dept }} - {{ dept.dept_name }}</option>
             {% endfor %}
         </select>
       </div>
@@ -79,7 +75,7 @@
       </div>
 
       <div style="overflow:auto;">
-        <div style="float:right;">
+        <div style="float:right; margin-right: 5em; margin-top: 2em;">
           <button type="button" class="btn btn-outline-primary" id=cfPrevBtn disabled>Previous</button>
           <button type="button" class="btn btn-primary" id=cfNextBtn>Next</button>
         </div>
