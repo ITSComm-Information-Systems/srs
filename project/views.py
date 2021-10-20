@@ -75,66 +75,16 @@ def chartchange(request):
 	template = loader.get_template('chartchange.html')
 
 	# Find initial department
-	if request.POST.get('select_dept'):
-		user_depts = ''
-		select_dept = request.POST.get('select_dept')
+	if request.user.has_perm('oscauth.can_report_all'):
+		user_depts = UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid')
 	else:
-		if request.user.has_perm('oscauth.can_report_all'):
-			user_depts = UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid')
-		else:
-			user_depts = AuthUserDept.get_order_departments(request.user.id)
+		user_depts = AuthUserDept.get_order_departments(request.user.id)
 
-		# Find associated chartfields
-		if user_depts:
-			select_dept = user_depts[0].dept
-		else:
-			select_dept = ''
-	
-	# Get department info
-	find_dept_info = UmOscDeptProfileV.objects.filter(deptid=select_dept)
-	if find_dept_info:
-		dept = find_dept_info[0]
-		dept_info = {
-			'dept_id': select_dept,
-			'dept_name': dept.dept_name,
-			'dept_mgr': dept.dept_mgr,
-		}
-	else:
-		dept_info = ''
-
-	# Set intitial chartfields
-	chartfield_list = UmOscAcctsInUseV.objects.filter(deptid=select_dept).order_by('account_number')
-
-	# Set intitial chartfield
-	if chartfield_list:
-		selected_cf = chartfield_list[0]
-	else: selected_cf = ''
-
-	# Find chartfield nickname
-	nickname = ''
-	if selected_cf != '':
-		nicknames = Chartcom.objects.all()
-		for n in nicknames:
-			if n.account_number == selected_cf:
-				nickname = n.name
-
-	# Select department to change to
-	if user_depts:
-		new_dept = user_depts[0].dept
-	else:
-		new_dept = ''
-	new_cf = Chartcom.get_user_chartcoms_for_dept(request.user, new_dept) #UmOscAllActiveAcctNbrsV.objects.filter(deptid=new_dept)
 	# Get notice
 	notice = Page.objects.get(permalink='/ccr')
 	context = {
 		'title': 'Chartfield Change Request',
 		'deptids': user_depts,
-		'dept_info': dept_info,
-		'selected_cf': selected_cf,
-		'cf_info': chartfield_list,
-		'nickname': nickname,
-		'new_dept': new_dept,
-		'new_cf': new_cf,
 		'choose_cf_template': 'choose_cf.html',
 		'choose_users_template': 'choose_users.html',
 		'assign_new_template': 'assign_new.html',
@@ -167,20 +117,12 @@ def chartchangedept(request):
 	else:
 		user_depts = AuthUserDept.get_order_departments(request.user.id)
 
-	# Find associated chartfields
-	if user_depts:
-		select_dept = user_depts[0].dept
-
-		# Set intitial chartfields
-		chartfield_list = UmOscAcctsInUseV.objects.filter(deptid=select_dept).order_by('account_number')
-
 	# Get notice
 	notice = Page.objects.get(permalink='/ccr')
 	context = {
 		'title': 'Chartfield Change Request (external department)',
 		'deptids': user_depts,
 		'all_dept': UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid'),
-		'cf_info': chartfield_list,
 		'choose_cf_dept_template': 'choose_cf_dept.html',
 		'choose_users_dept_template': 'choose_users_dept.html',
 		'assign_new_dept_template': 'assign_new_dept.html',
@@ -314,10 +256,10 @@ def managerapprovalsubmit(request):
 	
 	return JsonResponse({"success": True})
 
-# Gives new chartfields when user changes department
-# url chartchangedept/ajax/
+# Gives new chartfields when user changes department on page 1
+# url chartchange/ajax/
 @permission_required(('oscauth.can_order'), raise_exception=True)
-def change_dept_new(request):
+def change_dept_1(request):
 	selected_dept = request.GET.get('deptids', None)
 	selected_dept = selected_dept.split(' - ')[0]
 
@@ -333,26 +275,26 @@ def change_dept_new(request):
 		if db:
 			i["short_code"] = db[0].short_code
 			
-	
+	print('page1 cf_options:', cf_options)
 	return JsonResponse(cf_options, safe=False)
 
 
-# Gives new chartfields when user changes department
+# Gives new chartfields when user changes department on page 3
+# url chartchangedept/ajax/
 @permission_required(('oscauth.can_order'), raise_exception=True)
-def change_dept(request):
+def change_dept_3(request):
 	selected_dept = request.GET.get('deptids', None)
-	selected_dept = selected_dept.split(' - ')[0]
-	when = request.GET.get('when', None)
 
-	# Get list of chartcoms in user's shortlist for user to select new
-	if when == 'assign_new':
-		cf_options = Chartcom.get_user_chartcoms_for_dept(request.user, selected_dept)
-	# Get list of chartcoms in use
-	else:
-		cf_options = list(UmOscAcctsInUseV.objects.filter(deptid=selected_dept).order_by('account_number').values())
-
-	return JsonResponse(cf_options, safe=False)
-
+	# Get list of chartfields+shortcodes from department
+	cf_options = dict(UmOscChartfieldV.objects.filter(deptid=selected_dept).values_list('chartfield','short_code'))
+	chartcoms = Chartcom.objects.filter(dept=selected_dept)
+	# add_chartcoms = UmOscChartfieldV.objects.filter(deptid=deptid)
+	account_numbers = [c.account_number for c in chartcoms]
+	results=[]
+	for num in account_numbers:
+		results.append({'account_number':num,'short_code':cf_options[num]})
+	print('page 3 results: ',results)
+	return JsonResponse(results, safe=False)
 
 
 # Finds chartfield data when user changes chartfield
@@ -374,6 +316,7 @@ def get_users(request):
 	selected_cf = request.GET.get('selected', None)
 	# Get info for selected chartfield
 	cf = UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values()
+	print(cf)
 	if cf:
 		cf = cf[0]
 	else:
@@ -455,6 +398,12 @@ def submit_new(request):
 	user_full_name = request.POST.get('user_full_name_form')
 	new_dept_full_name = request.POST.get('new_dept_full_name_form')
 	rows = request.POST.get('num_rows')
+	optional_message = request.POST.get('optional_message')
+	if (optional_message != '') & (optional_message != None):
+		message = "Included message: " + optional_message
+	else:
+		message = ""
+
 	print(request.POST)
 	
 	for row in range(int(rows)+1):
@@ -496,7 +445,7 @@ def submit_new(request):
 	Hello, 
 
 	{first} {last} from another department has requested to change a chartfield from {old_chartfield} to {new_chartfield}, which you have permissions over.
-	You may approve or deny this request here: {manager_url}.
+	You may approve or deny this request here: {manager_url}. {message}
 
 	Thank you!
 	'''.format(
@@ -504,7 +453,8 @@ def submit_new(request):
 		last = user_full_name.split(", ")[0], 
 		old_chartfield = old_chartfield,
 		new_chartfield = new_chartfield, 
-		manager_url = manager_url
+		manager_url = manager_url,
+		message=message,
 	)
 
 	to = email_list	

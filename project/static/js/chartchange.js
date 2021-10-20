@@ -1,4 +1,4 @@
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function(event) {
 	ph_count = 0;
 	record_count = 0;
 
@@ -12,7 +12,6 @@ $(document).ready(function() {
 
 	// Select first option in dropdowns
 	$('#chart_deptids :first-child').prop('selected', true);
-	$('#cf_dropdown :first-child').prop('selected', true);
 
 	// Hide chartfield selection if department doesn't have any
 	if (cf_info) {
@@ -32,12 +31,12 @@ $(document).ready(function() {
 		nextPrev(-1, table, cf_change_table, review_table);
 	});
 
-	$('#chart_deptids').find('[data-default]').each(function(){
-		$(this).prop('selected', true);
-	});
-
 	// Create paginated tables
 	var table = $('#cf_users_table').DataTable({
+		"processing": true,
+		"language": {
+			"processing": "Loading..."
+		 },
 		"destroy": true,
 		"lengthChange": false,
 		"dom": 'rtp',
@@ -209,6 +208,7 @@ $(document).ready(function() {
 	$("#select_cf_3").attr("disabled", "disabled")
 	$("#cf_shortcode_3").attr("disabled", "disabled")
 
+	// Update department for page 3 - AJAX
 	$('#select_dept_3').on('change', function(e) {
 		$("#select_cf_3").attr("disabled", "disabled")
 		$("#cf_shortcode_3").attr("disabled", "disabled")
@@ -217,7 +217,6 @@ $(document).ready(function() {
 		$.ajax({
 			url: '/chartchangedept/ajax/',
 			data: {
-				'when': 'assign_new',
 				'deptids':$('#select_dept_3 option:selected').val().split("?")[0]
 			},
 			dataType:'json',
@@ -242,7 +241,7 @@ $(document).ready(function() {
 					var drp = document.getElementById('select_cf_3');
 					var option = document.createElement("OPTION");
 					option.value = JSON.stringify(data[i]);
-					option.text = data[i].account_number;
+					option.text = data[i].chartfield;
 
 					drp.add(option);
 				}
@@ -350,9 +349,8 @@ $(document).ready(function() {
 	$('#chart_deptids').on('change', function() {
 		var selected = $('#chart_deptids').val();
 		$.ajax({
-			url: '/chartchangedept/ajax/',
+			url: '/chartchange/ajax/',
 			data: {
-				'when': 'choose cf',
 				'deptids':selected
 			},
 			dataType:'json',
@@ -624,7 +622,6 @@ function change_current_page(selected) {
 	var dept_title = $('#dept_title').text();
 	dept_title = dept_title.split(':');
 	dept_title = dept_title[1];
-	var dept_mgr = $('#dept_mgr').text();
 
 
 	$("#fund").html(selected.fund);
@@ -635,9 +632,9 @@ function change_current_page(selected) {
 	$('#cf_shortcode').html(selected.short_code);
 	$('#cf_nickname').html(selected.nickname);
 	$('.cf_num').html(selected.account_number);
-	if (selected.nickname) {
-		$('.cf_nickname').html('(' + selected.nickname + ')');
-	}
+	// if (selected.nickname) {
+	// 	$('.cf_nickname').html('(' + selected.nickname + ')');
+	// }
 	$('#cf_users_table').DataTable().ajax.reload();
 }
 

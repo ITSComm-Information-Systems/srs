@@ -20,10 +20,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
 	// Select first option in dropdowns
 	$('#chart_deptids :first-child').prop('selected', true);
-	
-	// $('#cf_chartfield :first-child').prop('selected', true);
-	// $('#select_dept_3 :first-child').prop('selected', true);
-	
+		
 	// Hide chartfield selection if department doesn't have any
 	if (cf_info) {
 		$('#no_cfs_alert').hide();
@@ -218,7 +215,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	});
 	$("#select_cf_3").attr("disabled", "disabled")
 	$("#cf_shortcode_3").attr("disabled", "disabled")
-
+	
+	// Update department for page 3 - AJAX
 	$('#select_dept_3').on('change', function(e) {
 		$("#select_cf_3").attr("disabled", "disabled")
 		$("#cf_shortcode_3").attr("disabled", "disabled")
@@ -227,7 +225,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
 		$.ajax({
 			url: '/chartchangedept/ajax/',
 			data: {
-				'when': 'assign_new',
 				'deptids':$('#select_dept_3 option:selected').val().split("?")[0]
 			},
 			dataType:'json',
@@ -367,9 +364,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 		$("#old_dept_mgr_uniqname").html(selected.split("?")[2])
 		$("#old_dept_mgr_email").html(selected.split("?")[2] + "@umich.edu")
 		$.ajax({
-			url: '/chartchangedept/ajax/',
+			url: '/chartchange/ajax/',
 			data: {
-				'when': 'choose cf',
 				'deptids':selected
 			},
 			dataType:'json',
@@ -551,7 +547,6 @@ function nextPrev(n, table, cf_change_table, review_table) {
 	$('#cfc-' + currStep).removeClass('active')
 	$('#cfc-' + currStep).addClass('disabled')
 	$('#cfc-line-' + currStep).addClass('disabled')
-	
   }
   currStep = currStep + n;
 
@@ -578,7 +573,6 @@ function nextPrev(n, table, cf_change_table, review_table) {
   	load_4(cf_change_table, review_table);
   }
 
-  
   	if (n == 1 && currStep == 4){
 		$("#cfNextBtn").html("Submit")
 	}
@@ -702,7 +696,6 @@ function change_current_page(selected) {
 	var dept_title = $('#dept_title').text();
 	dept_title = dept_title.split(':');
 	dept_title = dept_title[1];
-	var dept_mgr = $('#dept_mgr').text();
 
 
 	$("#fund").html(selected.fund);
@@ -715,9 +708,9 @@ function change_current_page(selected) {
 	$('#cf_nickname').html(selected.nickname);
 	$('#old_chartfield').html(selected.account_number);
 	$('.cf_num').html(selected.account_number);
-	if (selected.nickname) {
-		$('.cf_nickname').html('(' + selected.nickname + ')');
-	}
+	// if (selected.nickname) {
+	// 	$('.cf_nickname').html('(' + selected.nickname + ')');
+	// }
 	$('#cf_users_table').DataTable().ajax.reload();
 }
 

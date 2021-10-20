@@ -61,11 +61,11 @@
   <h1>
     Chartfield Change
     <small class="text-muted">
-      for <strong id="dept_title">Department: {{ dept_info.dept_id }} - {{ dept_info.dept_name }}</strong>
+      for <strong id="dept_title"></strong>
     </small>
   </h1>
 
-  <p hidden id="dept_mgr">{{ dept_info.dept_mgr }}</p>
+  <p hidden id="dept_mgr"></p>
   {% if deptids|length > 1 %}
   <form id="choose_dept" method="POST">{% csrf_token %}
     <div class="row align-items-start mb-4 justify-content-center mt-5" id="select_dept">
