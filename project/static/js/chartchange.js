@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 					var drp = document.getElementById('select_cf_3');
 					var option = document.createElement("OPTION");
 					option.value = JSON.stringify(data[i]);
-					option.text = data[i].chartfield;
+					option.text = data[i].account_number;
 
 					drp.add(option);
 				}
