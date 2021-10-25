@@ -1,4 +1,10 @@
 document.addEventListener("DOMContentLoaded", function(event) {
+    let acceptor = document.getElementById('acceptor').textContent
+    let rejector = document.getElementById('rejector').textContent
+    if ((acceptor != '') || (rejector !='')){
+        $("#manager_submit").hide()
+        $("#manager_reject").hide()
+    }
     $("#manager_submit").attr("disabled", "disabled")
     $("#manager_reject").attr("disabled", "disabled")
     // get url parameters
@@ -80,7 +86,8 @@ function accept() {
             document.getElementById("loading").style.display= "none";
             $(".page_4_style").addClass("bg-success")
             $(".page_4_style").addClass("text-white")
-            document.getElementById('page_4_top_text').classList.add('alert', 'alert-success')
+            document.getElementById('page_4_top_text').classList.remove('alert-primary')
+            document.getElementById('page_4_top_text').classList.add('alert-success')
             $("#page_4_top_text").html("Accepted! The Requestor will be notified and access will be automatically granted shortly. You may leave this page.")
             $("#manager_submit").attr("disabled", "disabled")
             $("#manager_reject").attr("disabled", "disabled")
@@ -107,7 +114,8 @@ function reject() {
             document.getElementById("loading").style.display= "none";
             $(".page_4_style").addClass("bg-danger")
             $(".page_4_style").addClass("text-white")
-            document.getElementById('page_4_top_text').classList.add('alert','alert-danger')
+            document.getElementById('page_4_top_text').classList.remove('alert-primary')
+            document.getElementById('page_4_top_text').classList.add('alert-danger')
             $("#page_4_top_text").html("Rejected! The Requestor will be notified shortly. You may leave this page.")
             $("#manager_submit").attr("disabled", "disabled")
             $("#manager_reject").attr("disabled", "disabled")
