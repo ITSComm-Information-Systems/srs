@@ -1179,6 +1179,7 @@ class Item(models.Model):
                 else:
                     if dedicated: # modifying a dedicated DB server
                         group_name = instance.admin_group.name
+                        attributes.append({'ID': 5319, 'Value': instance.database_type.code})
                     else:
                         group_name = self.data.get('owner')
                         
