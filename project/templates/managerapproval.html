@@ -9,10 +9,22 @@
     </small>
 </h1>
 
-<p id="page_4_top_text">
+<p id="page_4_top_text" class="alert alert-primary">
     The following Chartfield Request was submitted to your department
-    for approval. Please review details and accept/reject.
+    for approval on {{date}}.
+    {% if status == 'not_reviewed'%}
+    Please review details and accept/reject.
+    {% endif %}
+    {% if acceptor != ''%}
+    {{acceptor}} accepted the request.
+    {% endif %}
+    {% if rejector != ''%}
+    {{rejector}} rejected the request.
+    {% endif %}
 </p>
+<p id='acceptor' style="display:None">{{acceptor}}</p>
+<p id='rejector' style="display:None">{{rejector}}</p>
+
 <div id="loading" style="display: none;">
     <div class="spinner-border" role="status">
         <!-- <span class="visually-hidden">Loading...</span> -->

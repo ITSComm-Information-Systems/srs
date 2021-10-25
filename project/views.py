@@ -135,12 +135,28 @@ def chartchangedept(request):
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapproval(request):
 	id = request.GET.get("id")
+	batch_info = UmOscAcctChangeRequest.objects.filter(batch=id).values('approved_by','rejected_by','date_added')[0]
 	dept = UmOscAcctChangeRequest.objects.filter(batch=id)[0].new_dept_full_name.split()[0]
 	allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
 
+	date = batch_info['date_added']
+	acceptor = batch_info['approved_by']
+	rejector = batch_info['rejected_by']
+	if (acceptor == '') and (rejector == ''):
+		status = 'not_reviewed'
+	else:
+		status=''
+
 	if ((request.user.id in allowed_mgr) or (request.user.is_superuser)):
 		template = loader.get_template('managerapproval.html')
-		context = {"title": "Manager Approval Form",'allowed_mgr': request.user.username}
+		context = {
+			"title": "Manager Approval Form",
+			'allowed_mgr': request.user.username,
+			"status": status,
+			"date": date,
+			'acceptor': acceptor,
+			'rejector': rejector,
+			}
 		return HttpResponse(template.render(context, request))
 	else:
 		template = loader.get_template('403.html')
@@ -175,7 +191,7 @@ def managerapprovalsubmit(request):
 	status = post.get('status')
 	id = post.get('request_id')
 	change_row = UmOscAcctChangeRequest.objects.filter(batch=id)
-	phone= list(change_row.values_list('user_defined_id', flat=True))
+	phone = list(change_row.values_list('user_defined_id', flat=True))
 	approver = post.get('approver')
 	uniqname = post.get('uniqname')
 	
@@ -210,11 +226,13 @@ def managerapprovalsubmit(request):
 		body = '''
 			Hello {uniqname}, 
 
-			Your chartfield change request was approved by {approver}. 
-			'''.format(uniqname = uniqname, approver = approver)
+			Your chartfield change request for:
+			{phone}
+			 was approved by {approver}. 
+			'''.format(uniqname = uniqname, phone = phone, approver = approver)
 		
 		# to = [uniqname + '@umich.edu']
-		to = ['mkokarde@umich.edu', 'hujingc@umich.edu', 'mazuelke@umich.edu']
+		to = ['mkokarde@umich.edu', 'hujingc@umich.edu', 'mazuelke@umich.edu', 'schenk@umich.edu', 'krips@umich.edu', 'karenh@umich.edu']
 
 
 		email = EmailMessage(
@@ -242,7 +260,7 @@ def managerapprovalsubmit(request):
 			body += 'The following message was included: ' + post.get('rejectmessage')
 		
 		# to = [uniqname + '@umich.edu']
-		to = ['mkokarde@umich.edu', 'hujingc@umich.edu', 'mazuelke@umich.edu']
+		to = ['mkokarde@umich.edu', 'hujingc@umich.edu', 'mazuelke@umich.edu', 'schenk@umich.edu', 'krips@umich.edu', 'karenh@umich.edu']
 
 		email = EmailMessage(
 			subject,
