@@ -107,8 +107,6 @@ def create_cycle(request):
 
     if (request.method == 'POST') and (request.POST.get('infopage') == 'Create Cycle'):
         return redirect('complete/1')
-    elif (UmEcommMbidCriticalDate.objects.filter(Q(bidding_closed='O') | Q(bidding_closed='C')).exists()):
-        return render(request, "mbid/message.html", {'message': "You must close and archive a bid cycle before creating a new one."})
 
     if (request.method == 'POST') and (request.POST.get('makeCycle') == 'Review'):
         openDateTime = request.POST.get('openDate')+' 00:00:00'
@@ -271,7 +269,7 @@ def review(request):
 
     if request.method == 'POST':
         thread = threading.Thread(
-            target=create_mike_report, args=(request.POST,))
+            target=create_mike_report, args=(request,))
         thread.start()
         return redirect('complete/2')
         
@@ -532,16 +530,17 @@ def update_vendor_table(request):
     )
     email.send()
 
-def create_mike_report(post):
+def create_mike_report(request):
     # Make sure post is a dictionary
-    post = post.dict()
+    print(request)
+    post = request.POST.dict()
+    print(post)
     # Ready email
     email = EmailMessage(
         subject='MBid CSV Report',
         body='See attached CSV',
         from_email='donotreply@example.com',
-        to=[request.user.email],
-        reply_to=['hujingc@umich.edu'])
+        to=[request.user.email],)
 
     # Filter information
     yearmonth = post['pickCycle'].split()
