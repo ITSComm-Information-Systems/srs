@@ -224,12 +224,11 @@ def managerapprovalsubmit(request):
 		subject = "Your Chartfield Change Request was approved"
 
 		body = '''
-			Hello {uniqname}, 
+Hello {uniqname}, 
 
-			Your chartfield change request for:
-			{phone}
-			 was approved by {approver}. 
-			'''.format(uniqname = uniqname, phone = phone, approver = approver)
+Your chartfield change request for:
+{phone}
+ was approved by {approver}. '''.format(uniqname = uniqname, phone = phone, approver = approver)
 		
 		# to = [uniqname + '@umich.edu']
 		to = ['mkokarde@umich.edu', 'hujingc@umich.edu', 'mazuelke@umich.edu', 'schenk@umich.edu', 'krips@umich.edu', 'karenh@umich.edu']
@@ -249,12 +248,11 @@ def managerapprovalsubmit(request):
 		subject = "Your Chartfield Change Request was denied"
 
 		body = '''
-			Hello {uniqname}, 
+Hello {uniqname}, 
 
-			Your chartfield change request for:
-			 {phone} 
-			was denied by {approver}. 
-			'''.format(uniqname = uniqname, phone = phone, approver = approver)
+Your chartfield change request for:
+ {phone} 
+was denied by {approver}. '''.format(uniqname = uniqname, phone = phone, approver = approver)
 
 		if post.get('rejectmessage')!='':
 			body += 'The following message was included: ' + post.get('rejectmessage')
@@ -452,7 +450,8 @@ def submit_new(request):
 	# Get manager and proxy emails
 	dept = new_dept_full_name.split()[0]
 	allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
-	email_list = ['mkokarde@umich.edu', 'hujingc@umich.edu', 'mazuelke@umich.edu']
+	email_list = ['mkokarde@umich.edu', 'hujingc@umich.edu', 'mazuelke@umich.edu', 'schenk@umich.edu', 'krips@umich.edu', 'karenh@umich.edu']
+
 	# email_list = []
 	# for id in allowed_mgr:
 	# 	email_list.append(User.objects.get(id=id).email)
@@ -460,13 +459,12 @@ def submit_new(request):
 	subject = "SRS CCR test email"
 
 	body = '''
-	Hello, 
+Hello, 
 
-	{first} {last} from another department has requested to change a chartfield from {old_chartfield} to {new_chartfield}, which you have permissions over.
-	You may approve or deny this request here: {manager_url}. {message}
+{first} {last} from another department has requested to change a chartfield from {old_chartfield} to {new_chartfield}, which you have permissions over.
+You may approve or deny this request here: {manager_url}. {message}
 
-	Thank you!
-	'''.format(
+Thank you!'''.format(
 		first = user_full_name.split(", ")[1],
 		last = user_full_name.split(", ")[0], 
 		old_chartfield = old_chartfield,
