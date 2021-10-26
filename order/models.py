@@ -1125,7 +1125,14 @@ class Item(models.Model):
                     attributes.append({'ID': element.target, 'Value': value})
 
         dedicated = False
-        if action.service.name == 'miServer':
+        if action.service.name == 'midatabase':
+            if self.data.get('volaction') == 'Delete':
+                payload['Title'] = 'Delete MiDatabase'
+                instance_id = self.data.get('instance_id')
+                db_type = Database.objects.get(id=instance_id).type.label
+                attributes.append({'ID': 1858, 'Value': db_type})
+
+        elif action.service.name == 'miServer':
             attributes.append({'ID': 1954, 'Value': self.data.get('shortcode')})
             if action.type == 'M':
                 instance_id = self.data.get('instance_id')
