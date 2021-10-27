@@ -1,7 +1,7 @@
 <div class="container mt-4" id="assign_row">
 	<p class="mt-4 cf_info inline">You have chosen to change the following User IDs from Chartfield:&nbsp;</p>
 	<strong class="current cf_num inline"></strong>
-	<strong class="cf_nickname inline"></strong>.
+	<strong class="cf_nickname inline"></strong>
 	</p>
 
 	<hr class="style1">
@@ -21,7 +21,8 @@
 					<select name="select_dept" class="custom-select" id="select_dept_3">
 						<option></option>
 						{% for dept in deptids %}
-						<option name="dept" value="{{dept.dept}}">{{ dept.dept }} - {{ dept.dept_name }}</option>
+						<option name="dept" value="{{dept.dept}}">
+							{{ dept.dept }} - {{ dept.dept_name }}</option>
 						{% endfor %}
 					</select>
 				</div>
@@ -59,6 +60,10 @@
 				<input class="form-check-input" type="checkbox" value="" id="show_chartfield_check_3">
 				<label class="form-check-label" for="show_chartfield_check_3">
 					Show Chartfield Select
+				<i class="far fa-question-circle help-popover" data-toggle="popover" title="Popover title"
+					data-placement="right"
+					style="display: inline;"
+					data-content="If your shortcode is not in the list, check the box to search by chartfield"></i>
 				</label>
 			</div>
 		</div>
@@ -98,7 +103,7 @@
 			<button type="button" id="apply" value='Apply' class="btn btn-success">Apply</button>
 		</div>
 	</div>
-	<br/>
+	<br />
 	<div class="mt-4 row">
 		<div class="col-md-12 cf-dropdown-div" id="cf_details" style="background: #40658f; padding-bottom: 10px">
 			<table class="table table-striped table-sm" id="cf_change_table">

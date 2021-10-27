@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', function(event) {
+	$("[data-toggle=popover]").popover(
+		{
+			trigger: "hover",
+			template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body"></div></div>',
+			html: true
+		}
+	);
 	ph_count = 0;
 	record_count = 0;
 
