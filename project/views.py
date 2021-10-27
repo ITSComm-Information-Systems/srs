@@ -456,7 +456,7 @@ def submit_new(request):
 	# for id in allowed_mgr:
 	# 	email_list.append(User.objects.get(id=id).email)
 
-	subject = "SRS CCR test email"
+	subject = "SRS Chartfield Change Request"
 
 	body = '''
 Hello, 
