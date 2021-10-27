@@ -2,85 +2,100 @@
 {% block styles %}
 <style>
   #aux-nav {
-			background-color: {{ background_color }}
-		}
-    
-	#checkboxes{
-		float:right;
-	}
-	.select2-container {
+    background-color: {{ background_color }}
+  }
+
+  #checkboxes {
+    float: right;
+  }
+
+  .select2-container {
     width: auto !important;
-		flex-grow: 1 !important;
-	}  
+    flex-grow: 1 !important;
+  }
+
+  .help-popover {
+    display: block;
+    margin-top: auto;
+    margin-bottom: auto;
+    white-space: pre-line;
+  }
 </style>
 {% endblock styles %}
 
 
 {% block content %}
 
-  <h1>
-    Chartfield Change
-    <small class="text-muted">
-      for <strong id="dept_title"></strong>
-    </small>
-  </h1>
+<h1>
+  Chartfield Change
+  <small class="text-muted">
+    for <strong id="dept_title"></strong>
+  </small>
+</h1>
 
-  <p hidden id="dept_mgr"></p>
-  {% if deptids|length > 1 %}
-  <form id="choose_dept" method="POST">{% csrf_token %}
-    <div class="row align-items-start mb-4 justify-content-center mt-5" id="select_dept">
-      <div class="input-group col-md-6">
-        <div class="input-group-prepend">
-            <label class="input-group-text" for="chart_deptids">
-                Switch Department
-            </label>
-        </div>
-        <select name="deptids" class="custom-select" id="chart_deptids">
-            {% for dept in deptids %}
-            <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}">{{ dept.dept }} - {{ dept.dept_name }}</option>
-            {% endfor %}
-        </select>
+<p hidden id="dept_mgr"></p>
+{% if deptids|length > 1 %}
+<form id="choose_dept" method="POST">{% csrf_token %}
+  <div class="row align-items-start mb-4 justify-content-center mt-5" id="select_dept">
+    <div class="input-group col-md-6">
+      <div class="input-group-prepend">
+        <label class="input-group-text" for="chart_deptids">
+          Switch Department
+        </label>
       </div>
+      <select name="deptids" class="custom-select" id="chart_deptids">
+        {% for dept in deptids %}
+        <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}">
+          {{ dept.dept }} - {{ dept.dept_name }}</option>
+        {% endfor %}
+      </select>
     </div>
-  </form> 
-  {% endif %}
+    <i class="far fa-question-circle help-popover" data-toggle="popover" title="Popover title" data-placement="right"
+      data-content="Select your current department."></i>
+  </div>
+</form>
+{% endif %}
 
-    <ul class="nav justify-content-center nav-pills" id="chartchange_nav" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link disabled" onclick="tab_func1()" data-toggle="tab" id="cfc-1" href="#cf-1" role="tab" aria-selected="false">Select Current Chartfield</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" onclick="tab_func2()" data-toggle="tab" id="cfc-2" href="#cf-2" role="tab" aria-selected="false">Select User IDs</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" onclick="tab_func3()" data-toggle="tab" id="cfc-3" href="#cf-3" role="tab" aria-selected="false">Select New Chartfield</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" onclick="tab_func4()" data-toggle="tab" id="cfc-4" href="#cf-4" role="tab" aria-selected="false">Review & Submit</a>
-      </li>
-    </ul>
+<ul class="nav justify-content-center nav-pills" id="chartchange_nav" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link disabled" onclick="tab_func1()" data-toggle="tab" id="cfc-1" href="#cf-1" role="tab"
+      aria-selected="false">Select Current Chartfield</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link disabled" onclick="tab_func2()" data-toggle="tab" id="cfc-2" href="#cf-2" role="tab"
+      aria-selected="false">Select User IDs</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link disabled" onclick="tab_func3()" data-toggle="tab" id="cfc-3" href="#cf-3" role="tab"
+      aria-selected="false">Select New Chartfield</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link disabled" onclick="tab_func4()" data-toggle="tab" id="cfc-4" href="#cf-4" role="tab"
+      aria-selected="false">Review & Submit</a>
+  </li>
+</ul>
 
-    <div class="tab-content" id="cf-pills-tabContent">
-      <div class="tab-pane fade" id="cf-1" role="tabpanel" aria-labelledby="pills-contact-tab">
-        {% include choose_cf_template %}
-      </div>
-      <div class="tab-pane fade" id="cf-2" role="tabpanel" aria-labelledby="pills-contact-tab">
-        {% include choose_users_template %}
-      </div>
-      <div class="tab-pane fade" id="cf-3" role="tabpanel" aria-labelledby="pills-contact-tab">
-        {% include assign_new_template %}
-      </div>
-      <div class="tab-pane fade" id="cf-4" role="tabpanel" aria-labelledby="pills-contact-tab">
-        {% include review_submit_template %}
-      </div>
+<div class="tab-content" id="cf-pills-tabContent">
+  <div class="tab-pane fade" id="cf-1" role="tabpanel" aria-labelledby="pills-contact-tab">
+    {% include choose_cf_template %}
+  </div>
+  <div class="tab-pane fade" id="cf-2" role="tabpanel" aria-labelledby="pills-contact-tab">
+    {% include choose_users_template %}
+  </div>
+  <div class="tab-pane fade" id="cf-3" role="tabpanel" aria-labelledby="pills-contact-tab">
+    {% include assign_new_template %}
+  </div>
+  <div class="tab-pane fade" id="cf-4" role="tabpanel" aria-labelledby="pills-contact-tab">
+    {% include review_submit_template %}
+  </div>
 
-      <div style="overflow:auto;">
-        <div style="float:right; margin-right: 5em; margin-top: 2em;">
-          <button type="button" class="btn btn-outline-primary" id=cfPrevBtn disabled>Previous</button>
-          <button type="button" class="btn btn-primary" id=cfNextBtn>Next</button>
-        </div>
-      </div>
+  <div style="overflow:auto;">
+    <div style="float:right; margin-right: 5em; margin-top: 2em;">
+      <button type="button" class="btn btn-outline-primary" id=cfPrevBtn disabled>Previous</button>
+      <button type="button" class="btn btn-primary" id=cfNextBtn>Next</button>
     </div>
+  </div>
+</div>
 
 </div>
 
@@ -89,10 +104,10 @@
 
 {% block js %}
 
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/sl-1.3.0/datatables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/sl-1.3.0/datatables.min.css" />
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/sl-1.3.0/datatables.min.js"></script>
 <script type="text/javascript" src="/static/select.js"></script>
-<script> 
+<script>
   var cf_info = {% if cf_info %} true {% else %} false {% endif %};
 </script>
 <script src="/static/js/chartchange.js"></script>

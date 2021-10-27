@@ -461,12 +461,14 @@ def submit_new(request):
 	body = '''
 Hello, 
 
-{first} {last} from another department has requested to change a chartfield from {old_chartfield} to {new_chartfield}, which you have permissions over.
+{first} {last} from another department has requested to change a chartfield from {old_chartfield} to {new_chartfield}, which you have permissions over, for the following:
+{user_defined_id}
 You may approve or deny this request here: {manager_url}. {message}
 
 Thank you!'''.format(
 		first = user_full_name.split(", ")[1],
-		last = user_full_name.split(", ")[0], 
+		last = user_full_name.split(", ")[0],
+		user_defined_id = str(user_defined_id),
 		old_chartfield = old_chartfield,
 		new_chartfield = new_chartfield, 
 		manager_url = manager_url,
