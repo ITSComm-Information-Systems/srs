@@ -308,7 +308,7 @@ def change_dept_3(request):
 	account_numbers = [c.account_number for c in chartcoms]
 	results=[]
 	for num in account_numbers:
-		results.append({'account_number':num,'short_code':cf_options[num]})
+		results.append({'account_number':num,'short_code':cf_options.get(num,'')})
 	print('page 3 results: ',results)
 	return JsonResponse(results, safe=False)
 
