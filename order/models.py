@@ -243,13 +243,7 @@ class Chartcom(models.Model):
 
     @property
     def account_number(self):
-        account_number = self.fund
-        if self.dept:
-            account_number = account_number + '-' + self.dept
-        if self.program:
-            account_number = account_number + '-' + self.program
-        if self.class_code:
-            account_number = account_number + '-' + self.class_code
+        account_number = self.fund + '-' + self.dept + '-' + self.program + '-' + self.class_code
         if self.project_grant:
             account_number = account_number + '-' + self.project_grant
 
