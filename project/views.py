@@ -52,8 +52,10 @@ def homepage(request):
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def chartchangeoptions(request):
 	template = loader.get_template('chartchangeoptions.html')
+	notice = Page.objects.get(permalink='/ccr/home')
 	context = {
 		'title': 'Chartfield Change Request',
+		'notice': notice,
 	}
 	return HttpResponse(template.render(context, request))
 
