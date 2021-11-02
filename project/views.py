@@ -183,13 +183,11 @@ def managerapprovalinit(request):
 	id = request.GET.get("id")
 
 	data = list(UmOscAcctChangeRequest.objects.filter(batch=id).values())
-	# print('managerapprovalinit', data)
 	return JsonResponse(data, safe=False)
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def managerapprovalsubmit(request):
 	post = request.POST
-	print(post)
 	status = post.get('status')
 	id = post.get('request_id')
 	change_row = UmOscAcctChangeRequest.objects.filter(batch=id)
@@ -293,7 +291,6 @@ def change_dept_1(request):
 		if db:
 			i["short_code"] = db[0].short_code
 			
-	print('page1 cf_options:', cf_options)
 	return JsonResponse(cf_options, safe=False)
 
 
@@ -302,7 +299,6 @@ def change_dept_1(request):
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def change_dept_3(request):
 	selected_dept = request.GET.get('deptids', None)
-
 	# Get list of chartfields+shortcodes from department
 	cf_options = dict(UmOscChartfieldV.objects.filter(deptid=selected_dept).values_list('chartfield','short_code'))
 	chartcoms = Chartcom.objects.filter(dept=selected_dept)
@@ -311,7 +307,6 @@ def change_dept_3(request):
 	results=[]
 	for num in account_numbers:
 		results.append({'account_number':num,'short_code':cf_options.get(num,'')})
-	print('page 3 results: ',results)
 	return JsonResponse(results, safe=False)
 
 
@@ -334,7 +329,6 @@ def get_users(request):
 	selected_cf = request.GET.get('selected', None)
 	# Get info for selected chartfield
 	cf = UmOscAcctsInUseV.objects.filter(account_number=selected_cf).values()
-	print(cf)
 	if cf:
 		cf = cf[0]
 	else:
@@ -422,10 +416,8 @@ def submit_new(request):
 	else:
 		message = ""
 
-	print(request.POST)
 	
 	for row in range(int(rows)+1):
-		print(user_defined_id[row])
 		new_entry = UmOscAcctChangeRequest(
 			uniqname=request.user.username,
 			user_defined_id=user_defined_id[row],
