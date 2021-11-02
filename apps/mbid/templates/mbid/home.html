@@ -87,7 +87,8 @@
     </div>
 </div>
 {% elif cycle_info.viewable %}
-<a class="option" href="{% url 'mbid:review_bids'%}">Review Uploaded Bids</a>
+<div tabindex="0" role="button" class="option" onclick="window.location.href='review_bids/'">
+    Review Uploaded Bids</div>
 {% endif %}
 
 
