@@ -381,7 +381,7 @@ def upload_bids(request):
         thread = threading.Thread(target=update_vendor_table, args=(request,))
         thread.start()
         # EDIT MESSAGE 
-        return render(request, 'mbid/message.html', {'title': 'Upload Bids', 'message': 'Your bids have been uploaded. Temporarily disabled confirmation email'})
+        return render(request, 'mbid/message.html', {'title': 'Upload Bids', 'message': 'Your bids are being uploaded.'})
     return render(request, 'mbid/c_uploadBids.html', context)
 
 
@@ -524,9 +524,8 @@ def update_vendor_table(request):
     email = EmailMessage(
         subject='MBid Update',
         body='Your bids were uploaded',
-        from_email='donotreply@example.com',
+        from_email='srs@umich.edu',
         to=[request.user.email],
-        reply_to=['another@example.com'],
     )
     email.send()
 
@@ -539,7 +538,7 @@ def create_mike_report(request):
     email = EmailMessage(
         subject='MBid CSV Report',
         body='See attached CSV',
-        from_email='donotreply@example.com',
+        from_email='srs@umich.edu',
         to=[request.user.email],)
 
     # Filter information
