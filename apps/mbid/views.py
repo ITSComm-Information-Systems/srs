@@ -105,10 +105,10 @@ def create_cycle(request):
         month = convert[item.bidding_month]
         cycles.append(str(month)+' '+str(item.bidding_year))
 
-    if (request.method == 'POST') and (request.POST.get('infopage') == 'Create Cycle'):
+    if (request.method == 'POST') and (request.POST.get('infopage') == 'Done'):
         return redirect('complete/1')
 
-    if (request.method == 'POST') and (request.POST.get('makeCycle') == 'Review'):
+    if (request.method == 'POST') and (request.POST.get('makeCycle') == 'Create'):
         openDateTime = request.POST.get('openDate')+' 00:00:00'
         closeDateTime = request.POST.get('closeDate')+' 23:59:59'
 
