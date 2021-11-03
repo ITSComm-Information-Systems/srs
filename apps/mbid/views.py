@@ -359,14 +359,16 @@ def upload_bids(request):
             row = dict(row)
             for o, n in zip(old, new):
                 row[n] = row.pop(o)
-            # If valid price
+            # Only add to valid if valid price
             if (pricecheck(row['BidPrice']) != None) and (pricecheck(row['BidPrice']) != False):
                 valid.append(row)
             # If empty and vendor notes
             elif (pricecheck(row['BidPrice']) == None) and (row['VendorNotes'] != ''):
                 notvalid.append(row)
-            elif (pricecheck(row['BidPrice']) == False):  # If invalid price
+            # If there's something in the field and it's an invalid price (0 or string)
+            elif (pricecheck(row['BidPrice']) == False):
                 notvalid.append(row)
+            # If for some reason none of the above, ignore it
             else:
                 pass
 
@@ -437,19 +439,18 @@ def review_bids(request):
 
 def pricecheck(bidprice):
     # return None if can't be converted/empty
-    # return False if invalid
     if (bidprice == ''):
         return None
+    
+    # return False if invalid, return float if ok
     try:
-        num = float(bidprice)  # can error here if invalid string
-        if (num > 0) and (num == round(num, 2)):
-            return num
-        elif (num == 0):
-            return 'zero'
+        num = float(bidprice)
+        if (num > 0) and (num == round(num, 2)): 
+            return round(num, 2) # standardize bid to 2 decimal points
         else:
-            return False
+            return False # invalid due to being 0
     except:
-        return False
+        return False   # invalid due to being a string
 
 
 def run_proc():
@@ -476,50 +477,41 @@ def update_vendor_table(request):
     vendor_zip_code = vendor.zip_code  # no zip extension
     vendor_email_address = vendor.email_address
     havetarget = False
+    
+    # clear previous bids if any
+    UmEcommMbidVendorInput.objects.filter(
+                bidding_year=cycle_info['current_year'],
+                bidding_month=cycle_info['current_month_num'],
+                vendor_id=vendor_id).delete()
+    
+    # uses the previously validated list bids
     for string in post.getlist('uploads'):
         row = dict({x.split(':')[0]: x.split(':')[1]
                     for x in [item for item in string.split(';')]})
-        try:
-            target = UmEcommMbidVendorInput.objects.get(
-                bidding_year=cycle_info['current_year'], bidding_month=cycle_info['current_month_num'], vendor_id=vendor_id, item_code=row['UMCode'])
-            havetarget = True
-        except:
-            if (float(row['BidPrice']) != 0):
-                UmEcommMbidVendorInput.objects.create(
-                    bidding_year=cycle_info['current_year'],
-                    bidding_month=cycle_info['current_month_num'],
-                    bidding_closed='O',
-                    item_code=row['UMCode'],
-                    item_desc=row['Description'],
-                    subclass_id=UmEcommMbidCommodityV.objects.get(
-                        item_code=row['UMCode']).subclass_id,
-                    manufacturer_name=row['Manufacturer'],
-                    manufacturer_part_number=row['ManufacturerPartNumber'],
-                    vendor_id=vendor_id,
-                    vendor_name=vendor_name,
-                    vendor_email_address=vendor_email_address,
-                    vendor_address1=vendor_address1,
-                    vendor_address2=vendor_address2,
-                    vendor_city=vendor_city,
-                    vendor_state=vendor_state,
-                    vendor_zip_code=vendor_zip_code,
-                    vendor_price=float(row['BidPrice']),
-                    vendor_notes=str(row['VendorNotes']),
-                    date_created=datetime.now().strftime("%Y-%m-%d %H:%M"),
-                    date_last_updated=datetime.now().strftime("%Y-%m-%d %H:%M"))
-            # print('added item '+ row['UMCode'])
-        if havetarget:
-            toupdate = UmEcommMbidVendorInput.objects.filter(
-                bidding_year=cycle_info['current_year'], bidding_month=cycle_info['current_month_num'], vendor_id=vendor_id, item_code=row['UMCode'])
-            if (row['BidPrice'] == '0'):
-                target.delete()
-                # print('deleted ', row['UMCode'])
-            elif ((float(target.vendor_price) != float(row['BidPrice'])) or (str(target.vendor_notes) != str(row['VendorNotes']))):
-                toupdate.update(date_last_updated=datetime.now().strftime(
-                    "%Y-%m-%d %H:%M"), vendor_price=float(row['BidPrice']), vendor_notes=str(row['VendorNotes']))
-                # print('edited ', row['UMCode'])
-            else:
-                print('no change')
+        if (float(row['BidPrice']) != 0):
+            UmEcommMbidVendorInput.objects.create(
+                bidding_year=cycle_info['current_year'],
+                bidding_month=cycle_info['current_month_num'],
+                bidding_closed='O',
+                item_code=row['UMCode'],
+                item_desc=row['Description'],
+                subclass_id=UmEcommMbidCommodityV.objects.get(
+                    item_code=row['UMCode']).subclass_id,
+                manufacturer_name=row['Manufacturer'],
+                manufacturer_part_number=row['ManufacturerPartNumber'],
+                vendor_id=vendor_id,
+                vendor_name=vendor_name,
+                vendor_email_address=vendor_email_address,
+                vendor_address1=vendor_address1,
+                vendor_address2=vendor_address2,
+                vendor_city=vendor_city,
+                vendor_state=vendor_state,
+                vendor_zip_code=vendor_zip_code,
+                vendor_price=float(row['BidPrice']),
+                vendor_notes=str(row['VendorNotes']),
+                date_created=datetime.now().strftime("%Y-%m-%d %H:%M"),
+                date_last_updated=datetime.now().strftime("%Y-%m-%d %H:%M")
+                )
 
     email = EmailMessage(
         subject='MBid Update',
