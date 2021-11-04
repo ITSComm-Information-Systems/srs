@@ -52,7 +52,7 @@
 {% if procurement %}
 <div class='row'>
     <div class='col-lg-8'>
-        {% if cycle_info.open == False %}
+        {% if cycle_info.open == False and cycle_info.viewable == False %}
         <div tabindex="0" role="button" class="option" onclick="window.location.href='create_cycle/'">
             Create Bid Cycle</div>
         {% endif %}
