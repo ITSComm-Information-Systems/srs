@@ -25,11 +25,18 @@ urlpatterns = [
     path('api/bommaterial/', api.BomMaterialView.as_view()),
     path('admin/', admin.site.urls),
     path('reports/',include('reports.urls')),
-    path('chartchange/ajax/', views.change_dept),
+    path('chartchange/ajax/', views.change_dept_1),
+    path('chartchangedept/ajax/', views.change_dept_3),
     path('chartchange/old-cf/', views.get_cf_data),
     path('chartchange/update-table/', views.get_users),
     path('chartchange/submit/', views.submit),
+    path('chartchangedept/submit/', views.submit_new), # AJAX
     path('chartchange/', views.chartchange),
+    path('chartchangedept/', views.chartchangedept),
+    path('chartchangeoptions/', views.chartchangeoptions), #chartfield options home page
+    path('managerapproval/', views.managerapproval),
+    path('managerapprovalinit/', views.managerapprovalinit), # AJAX
+    path('managerapproval/submit/', views.managerapprovalsubmit), # AJAX
     path('', views.homepage),
     path('', include('pages.urls')),
     path('tools/',include('tools.urls'))

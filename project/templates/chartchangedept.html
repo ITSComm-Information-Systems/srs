@@ -9,6 +9,39 @@
     float: right;
   }
 
+  .nav-line {
+    background: #40658f;
+    width: 20px;
+    height: 2px;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .nav-line.disabled {
+    background: #e4e1df;
+  }
+
+  .nav-pills .nav-link.active,
+  .nav-pills .nav-link.active:hover,
+  .nav-pills .nav-link.active:focus,
+  .nav-pills .show>.nav-link {
+    border-color: #e4e1df;
+    background-color: #40658f;
+    color: #ffffff;
+    cursor: default;
+  }
+
+  a.nav-link.disabled:hover,
+  a.nav-link.disabled:active,
+  a.nav-link.disabled:focus {
+    background-color: #e4e1df !important;
+  }
+
+  .nav-pills a.nav-link.disabled {
+    color: #655a52;
+    background-color: #e4e1df;
+  }
+
   .select2-container {
     width: auto !important;
     flex-grow: 1 !important;
@@ -45,7 +78,7 @@
       </div>
       <select name="deptids" class="custom-select" id="chart_deptids">
         {% for dept in deptids %}
-        <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}">
+        <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}?{{dept.dept_mgr_uniqname}}">
           {{ dept.dept }} - {{ dept.dept_name }}</option>
         {% endfor %}
       </select>
@@ -61,14 +94,17 @@
     <a class="nav-link disabled" onclick="tab_func1()" data-toggle="tab" id="cfc-1" href="#cf-1" role="tab"
       aria-selected="false">Select Current Chartfield</a>
   </li>
+  <span class="nav-line disabled" id="cfc-line-1"></span>
   <li class="nav-item">
     <a class="nav-link disabled" onclick="tab_func2()" data-toggle="tab" id="cfc-2" href="#cf-2" role="tab"
       aria-selected="false">Select User IDs</a>
   </li>
+  <span class="nav-line disabled" id="cfc-line-2"></span>
   <li class="nav-item">
     <a class="nav-link disabled" onclick="tab_func3()" data-toggle="tab" id="cfc-3" href="#cf-3" role="tab"
       aria-selected="false">Select New Chartfield</a>
   </li>
+  <span class="nav-line disabled" id="cfc-line-3"></span>
   <li class="nav-item">
     <a class="nav-link disabled" onclick="tab_func4()" data-toggle="tab" id="cfc-4" href="#cf-4" role="tab"
       aria-selected="false">Review & Submit</a>
@@ -77,16 +113,16 @@
 
 <div class="tab-content" id="cf-pills-tabContent">
   <div class="tab-pane fade" id="cf-1" role="tabpanel" aria-labelledby="pills-contact-tab">
-    {% include choose_cf_template %}
+    {% include choose_cf_dept_template %}
   </div>
   <div class="tab-pane fade" id="cf-2" role="tabpanel" aria-labelledby="pills-contact-tab">
-    {% include choose_users_template %}
+    {% include choose_users_dept_template %}
   </div>
   <div class="tab-pane fade" id="cf-3" role="tabpanel" aria-labelledby="pills-contact-tab">
-    {% include assign_new_template %}
+    {% include assign_new_dept_template %}
   </div>
   <div class="tab-pane fade" id="cf-4" role="tabpanel" aria-labelledby="pills-contact-tab">
-    {% include review_submit_template %}
+    {% include review_submit_dept_template %}
   </div>
 
   <div style="overflow:auto;">
@@ -110,5 +146,5 @@
 <script>
   var cf_info = {% if cf_info %} true {% else %} false {% endif %};
 </script>
-<script src="/static/js/chartchange.js"></script>
+<script src="/static/js/chartchangedept.js"></script>
 {% endblock %}

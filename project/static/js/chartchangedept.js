@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
 	// Enable first pill
 	$("#cfc-1").removeClass('disabled');
+	$("#cfc-line-1").removeClass('disabled');
 
 	// Select first tab
 	currStep = 1;
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
 	// Select first option in dropdowns
 	$('#chart_deptids :first-child').prop('selected', true);
-
+		
 	// Hide chartfield selection if department doesn't have any
 	if (cf_info) {
 		$('#no_cfs_alert').hide();
@@ -214,12 +215,12 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	});
 	$("#select_cf_3").attr("disabled", "disabled")
 	$("#cf_shortcode_3").attr("disabled", "disabled")
-
+	
 	// Update department for page 3 - AJAX
 	$('#select_dept_3').on('change', function(e) {
 		$("#select_cf_3").attr("disabled", "disabled")
 		$("#cf_shortcode_3").attr("disabled", "disabled")
-
+		
 		e.preventDefault();
 		$.ajax({
 			url: '/chartchangedept/ajax/',
@@ -234,13 +235,13 @@ document.addEventListener('DOMContentLoaded', function(event) {
 				for (i = 0; i < data.length; ++i) {
 					if (data[i].short_code != "" && data[i].short_code != undefined){
 						var drp = document.getElementById('cf_shortcode_3');
-					var option = document.createElement("OPTION");
-					option.value = JSON.stringify(data[i]);
-					option.text = data[i].short_code;
-
-					drp.add(option);
+						var option = document.createElement("OPTION");
+						option.value = JSON.stringify(data[i]);
+						option.text = data[i].short_code;
+						
+						drp.add(option);
+					}
 				}
-			}
 
 				$('#select_cf_3').empty();
 				var drp = document.getElementById('select_cf_3');
@@ -249,9 +250,13 @@ document.addEventListener('DOMContentLoaded', function(event) {
 					var option = document.createElement("OPTION");
 					option.value = JSON.stringify(data[i]);
 					option.text = data[i].account_number;
-
+					
 					drp.add(option);
 				}
+				$("#new_dept_full_name").html($('#select_dept_3 option:selected').text())
+				$("#new_dept_mgr").html($('#select_dept_3 option:selected').val().split("?")[1])
+				$("#new_dept_mgr_uniqname").html($('#select_dept_3 option:selected').val().split("?")[2])
+				$("#new_dept_mgr_email").html($('#select_dept_3 option:selected').val().split("?")[2] + "@umich.edu")
 				$("#select_cf_3").attr("disabled", null)
 				$("#cf_shortcode_3").attr("disabled", null)
 				$('#select_cf_3').trigger('change')
@@ -355,6 +360,9 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	// Update department for page 1 - AJAX
 	$('#chart_deptids').on('change', function() {
 		var selected = $('#chart_deptids').val();
+		$("#old_dept_mgr").html(selected.split("?")[1])
+		$("#old_dept_mgr_uniqname").html(selected.split("?")[2])
+		$("#old_dept_mgr_email").html(selected.split("?")[2] + "@umich.edu")
 		$.ajax({
 			url: '/chartchange/ajax/',
 			data: {
@@ -400,9 +408,9 @@ document.addEventListener('DOMContentLoaded', function(event) {
 				}
 				name_display = selected.split('?');
 				$('#dept_title').html('Department: ' + name_display[0]);
-				$('#dept_mgr').html(name_display[1]);
-				$('.dept_full_name').html(name_display[0]);
-				$('.dept_mgr').html(name_display[1]);
+				
+				$('#dept_mgr').html(name_display[1].replace(",", ", "));
+				$('#old_dept_full_name').html(name_display[0]);
 				$('#cfc-2').addClass('disabled');
 				$('#cfc-3').addClass('disabled');
 				$('#cfc-4').addClass('disabled');
@@ -494,7 +502,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
 
 // Next/prev functionality
 function nextPrev(n, table, cf_change_table, review_table) {
-
+	
   // Validate before submit
   if (n ==1 && currStep == 3) {
   	if (!validate(cf_change_table)) {
@@ -505,6 +513,21 @@ function nextPrev(n, table, cf_change_table, review_table) {
   		$('#validate').addClass('hidden');
   	}
   }
+
+  if (n == 1 && (currStep == lastStep)) {
+	$(".page_4_style").addClass("bg-success")
+	$(".page_4_style").addClass("text-white")
+	$("#page_4_top_text").addClass("font-weight-bold")
+	$("#page_4_top_text").addClass("text-success")
+	
+	$("#page_4_top_text").html("Submitted! Nothing left to do. You will be informed when the authorizing department accepts or rejects the request.")
+	document.body.scrollTop = 0;
+  	document.documentElement.scrollTop = 0;
+	$('#submit-form').submit();
+	return
+      
+  }
+  
 
   // Load third page correctly
   if (n == 1 && currStep == 2) {
@@ -518,11 +541,21 @@ function nextPrev(n, table, cf_change_table, review_table) {
   	}
   }
 
-
+  $('#cf-' + currStep).removeClass('active')
+  $('#cf-' + currStep).removeClass('show')
+  if (n == -1){
+	$('#cfc-' + currStep).removeClass('active')
+	$('#cfc-' + currStep).addClass('disabled')
+	$('#cfc-line-' + currStep).addClass('disabled')
+  }
   currStep = currStep + n;
 
   $('#cfc-'+currStep).removeClass('disabled');
-  $('#chartchange_nav li:nth-child(' + currStep + ') a').tab('show');
+  $('#cfc-'+currStep).addClass('active');
+  $('#cfc-line-'+currStep).removeClass('disabled');
+
+  $('#cf-' + currStep).addClass('active')
+  $('#cf-' + currStep).addClass('show')  
 
   // Details up top
   if (n == 1 && currStep == 2) {
@@ -540,15 +573,28 @@ function nextPrev(n, table, cf_change_table, review_table) {
   	load_4(cf_change_table, review_table);
   }
 
-  if (currStep > lastStep) {
-      $('#submit-form').submit();
-  }
-
-  // Scroll to top
-  document.body.scrollTop = 0;
-  document.documentElement.scrollTop = 0;
+  	if (n == 1 && currStep == 4){
+		$("#cfNextBtn").html("Submit")
+	}
+	else{
+		$("#cfNextBtn").html("Next")
+	}
 }
 
+function tab_handler(tab){
+	for (var i = 1; i <= 4; i++){
+		$('#cf-' + i).removeClass('active')
+		$('#cf-' + i).removeClass('show')
+	}
+	$('#cf-' + tab).addClass('active')
+	$('#cf-' + tab).addClass('show')
+	if (tab < 4){
+		$("#cfNextBtn").html("Next")
+	}
+	else{
+		$("#cfNextBtn").html("Submit")
+	}
+}
 
 // Navigation bar functionality
 function tab_func1() {
@@ -558,6 +604,16 @@ function tab_func1() {
  	$('#dept_search').show();
   	$('#select_dept').show();
   	$("#cfPrevBtn").attr('disabled', 'disabled');
+	$("#cfc-line-2").addClass('disabled');
+	$("#cfc-line-3").addClass('disabled');
+	$("#cfc-2").removeClass('active')
+	$("#cfc-3").removeClass('active')
+	$("#cfc-4").removeClass('active')
+	$("#cfc-2").addClass('disabled')
+	$("#cfc-3").addClass('disabled')
+	$("#cfc-4").addClass('disabled')
+	
+	tab_handler(1)
 }
 
 function tab_func2() {
@@ -566,6 +622,12 @@ function tab_func2() {
 		$('#dept_search').hide();
 		$('#select_dept').hide();
 		$("#cfPrevBtn").removeAttr('disabled');
+		$("#cfc-line-3").addClass('disabled');
+		$("#cfc-3").removeClass('active')
+		$("#cfc-4").removeClass('active')
+		$("#cfc-3").addClass('disabled')
+		$("#cfc-4").addClass('disabled')
+		tab_handler(2)
 	}
 }
 
@@ -575,6 +637,10 @@ function tab_func3() {
 		$('#dept_search').hide();
 	  	$('#select_dept').hide();
 	  	$("#cfPrevBtn").removeAttr('disabled');
+		$("#cfc-line-3").removeClass('disabled');
+		$("#cfc-4").removeClass('active')
+		$("#cfc-4").addClass('disabled')
+		tab_handler(3)
 	  }
 }
 
@@ -584,6 +650,7 @@ function tab_func4() {
 		$('#dept_search').hide();
 		$('#select_dept').hide();
 		$("#cfPrevBtn").removeAttr('disabled');
+		tab_handler(4)
 	  }
 }
 
@@ -637,7 +704,9 @@ function change_current_page(selected) {
 	$("#class_code").html(selected.class_code);
 	$("#project_grant").html(selected.project_grant);
 	$('#cf_shortcode').html(selected.short_code);
+	$('#old_shortcode').html(selected.short_code);
 	$('#cf_nickname').html(selected.nickname);
+	$('#old_chartfield').html(selected.account_number);
 	$('.cf_num').html(selected.account_number);
 	// if (selected.nickname) {
 	// 	$('.cf_nickname').html('(' + selected.nickname + ')');
@@ -709,6 +778,7 @@ function load_4(cf_change_table, review_table) {
 		var mrc = row.find('td:nth-child(4)').text()
 		var toll = row.find('td:nth-child(5)').text()
 		var local = row.find('td:nth-child(6)').text()
+		var new_chartfield = $("#new_chartfield").html()
 
 		review_table.row.add([
 			user_id,
@@ -721,19 +791,72 @@ function load_4(cf_change_table, review_table) {
 		if (mrc == '') {
 			mrc = current_cf;
 		}
+		else{
+			mrc = new_chartfield
+		}
 		if (toll == '') {
 			toll = current_cf;
+		}
+		else{
+			toll = new_chartfield
 		}
 		if (local == '') {
 			local = current_cf;
 		}
+		else{
+			local = new_chartfield
+		}
 
-		var input = document.createElement("input");
-        input.type = "hidden";
-        input.name = user_id;
-        input.value = user_id + '//' + mrc + '//' + toll + '//' + local;
-		document.getElementById('submit-form').appendChild(input);
+		// Information that should be the same for all phone numbers
+		$('#num_rows').val(index)
+		$('#old_dept_full_name_form').val($("#old_dept_full_name").html())
+		$('#old_dept_mgr_form').val($("#old_dept_mgr").html())
+		$('#old_chartfield_form').val($("#old_chartfield").html())
+		$('#old_shortcode_form').val($("#old_shortcode").html())
+		$('#user_full_name_form').val($("#user_full_name").html())
+		$('#new_dept_full_name_form').val($("#new_dept_full_name").html())
+		$('#new_dept_mgr_form').val($("#new_dept_mgr").html())
+		$('#new_chartfield_form').val($("#new_chartfield").html())
+		$('#new_shortcode_form').val($("#new_shortcode").html())
+		// optional message input
+		$('#new_dept_mgr_uniqname_form').val($("#new_dept_mgr_uniqname").text())
+		$('#new_dept_mgr_email_form').val($("#new_dept_mgr_email").text())
+		$('#old_dept_mgr_uniqname_form').val($("#old_dept_mgr_uniqname").text())
+
+		// Rows for individual phone number (user_id)
+		var user_id_form = document.createElement("input");
+		user_id_form.type = "hidden";
+        user_id_form.name = "user_id_form";
+        user_id_form.value = user_id;
+		document.getElementById('submit-form').appendChild(user_id_form);
+
+		var building_form = document.createElement("input");
+		building_form.type = "hidden";
+        building_form.name = "building_form";
+        building_form.value = building;
+		document.getElementById('submit-form').appendChild(building_form);
+
+		var mrc_form = document.createElement("input");
+		mrc_form.type = "hidden";
+        mrc_form.name = "mrc_form";
+        mrc_form.value = mrc;
+		document.getElementById('submit-form').appendChild(mrc_form);
+
+		var toll_form = document.createElement("input");
+		toll_form.type = "hidden";
+        toll_form.name = "toll_form";
+        toll_form.value = toll;
+		document.getElementById('submit-form').appendChild(toll_form);
+
+		var local_form = document.createElement("input");
+		local_form.type = "hidden";
+        local_form.name = "local_form";
+        local_form.value = local;
+		document.getElementById('submit-form').appendChild(local_form);
+
 	})
+	$("#review_table")[0].style.width = "100%";
+	
 }
 
 function table_empty(table) {
