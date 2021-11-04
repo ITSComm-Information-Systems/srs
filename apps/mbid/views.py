@@ -32,7 +32,10 @@ reverse_convert = {'January': '01', 'February': '02', 'March': '03', 'April': '0
 
 def cycle():
     cycle_info = {'open': False, 'viewable': False}
-    try:
+    # current cycle exists: open=True, viewable=True
+    # current cycle does not exist, no closed cycle exists: open=False, viewable=False
+    # current cycle does not exist, closed cycle exists: open=False, viewable=True
+    try: # seeing if open bidding cycle exists
         current_cycle = UmEcommMbidCriticalDate.objects.get(bidding_closed='O')
         cycle_info['current_year'] = current_cycle.bidding_year
         cycle_info['current_month_num'] = current_cycle.bidding_month
@@ -42,14 +45,18 @@ def cycle():
             str(current_cycle.bidding_open_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
         cycle_info['current_close_date'] = datetime.strptime(
             str(current_cycle.bidding_close_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
+        # Need to auto-close the bidding cycle
         if current_cycle.bidding_close_time < datetime.now():
             current_cycle.bidding_closed = 'C'
             current_cycle.save()
+            cycle_info['open'] = False
             cycle_info['viewable'] = True
+        # Bidding cycle is open
         else:
             cycle_info['open'] = True
-    except:
-        try:
+            cycle_info['viewable'] = True
+    except: # there is no open bidding cycle
+        try: # seeing if the bidding cycle is closed but not archived
             current_cycle = UmEcommMbidCriticalDate.objects.get(
                 bidding_closed='C')
             cycle_info['current_year'] = current_cycle.bidding_year
@@ -60,9 +67,12 @@ def cycle():
                 str(current_cycle.bidding_open_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
             cycle_info['current_close_date'] = datetime.strptime(
                 str(current_cycle.bidding_close_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
+            
+            cycle_info['open'] = False
             cycle_info['viewable'] = True
         except:
-            cycle_info['viewable'] = False
+            cycle_info['open'] = False
+            cycle_info['viewable'] = False   
 
     return cycle_info
 
@@ -141,7 +151,6 @@ def create_cycle(request):
 
         return render(request, 'mbid/a_createCycle.html', {
             'title': 'Create New Bid Cycle',
-            'subtitle': 'Review:',
             'bidYear': request.POST.get('bidYear'),
             'bidMonth': request.POST.get('bidMonth'),
             'openDate': datetime.strptime(request.POST.get('openDate'), '%Y-%m-%d').strftime('%B %d, %Y'),
@@ -344,7 +353,11 @@ def upload_bids(request):
         return render(request, 'mbid/message.html', {'message': 'You do not have permission to view this'})
 
     # Vendor bids get uploaded if there is an open cycle, and the datetime is within the bid cycle
-    if (request.method == "POST") and (UmEcommMbidCriticalDate.objects.filter(bidding_closed='O').exists()) and (datetime.now() > UmEcommMbidCriticalDate.objects.get(bidding_closed='O').bidding_open_time) and (datetime.now() < UmEcommMbidCriticalDate.objects.get(bidding_closed='O').bidding_close_time) and (request.POST.get('uploadstatus') == 'Upload Bids'):
+    if ((request.method == "POST") and 
+    (UmEcommMbidCriticalDate.objects.filter(bidding_closed='O').exists()) and 
+    (datetime.now() > UmEcommMbidCriticalDate.objects.get(bidding_closed='O').bidding_open_time) and 
+    (datetime.now() < UmEcommMbidCriticalDate.objects.get(bidding_closed='O').bidding_close_time) and 
+    (request.POST.get('uploadstatus') == 'Upload Bids')):
         file = request.FILES['csv_file']
         decoded_file = file.read().decode('utf-8').splitlines()
         reader = csv.DictReader(decoded_file)
