@@ -11,6 +11,35 @@ from django.contrib.auth.models import User
 # This view uses the Pinnacle location table and includes locations added by ITS staff
 #  as well as the official builfing codes from MPathways
 
+class UmOscAcctChangeRequest(models.Model):
+     uniqname = models.CharField(max_length=8) 
+     user_defined_id = models.CharField(max_length=20)
+     mrc_account_number = models.CharField(max_length=100)
+     toll_account_number = models.CharField(max_length=100)
+     local_account_number = models.CharField(max_length=100)
+     date_added = models.DateField(null=True)
+     old_dept_full_name = models.CharField(max_length=100)
+     old_dept_mgr = models.CharField(max_length=100)
+     user_full_name = models.CharField(max_length=100)
+     new_dept_full_name = models.CharField(max_length=100)
+     new_dept_mgr = models.CharField(max_length=100)
+     new_chartfield = models.CharField(max_length=100)
+     new_shortcode = models.CharField(max_length=100)
+     optional_message = models.CharField(max_length=100)
+     building = models.CharField(max_length=2000) 
+     old_chartfield = models.CharField(max_length=100)
+     old_shortcode = models.CharField(max_length=100)
+     new_dept_mgr_uniqname = models.CharField(max_length=100)
+     old_dept_mgr_uniqname = models.CharField(max_length=100)
+     approved_by = models.CharField(max_length=100)
+     rejected_by = models.CharField(max_length=100)
+     batch = models.IntegerField()
+     # id = models.AutoField(primary_key=True)
+
+     class Meta:
+          managed = False
+          ordering = ('batch',)
+          db_table = 'PINN_CUSTOM\".\"um_osc_acct_change_requests'
 
 class UmBillInputApiV(models.Model):
      um_bill_input_id = models.IntegerField(primary_key=True)
@@ -717,12 +746,13 @@ class UmOscAcctChangeInput(models.Model):
      date_processed = models.DateField(null=True) # added null=True
      messages = models.CharField(max_length=2000)
      request_no = models.IntegerField(9, null=False, primary_key=True)
+     approved_by = models.CharField(max_length=8, null=True)
 
      class Meta:
           managed = False
           ordering = ('request_no',)
           db_table = 'PINN_CUSTOM\".\"um_osc_acct_change_input'
-
+          
 class UmOscAcctSubscribersV(models.Model):
      subscriber_id = models.CharField(max_length=7) 
      user_defined_id = models.CharField(max_length=20)

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block styles %}
+<style>
+    #aux-nav {
+        background-color: {{background_color}}
+    }
+
+    .option {
+        cursor: pointer;
+        width: 50%;
+        height: 200px;
+        margin: auto;
+        margin-top: 10%;
+        border: 1px solid #D6D6D6;
+        border-radius: 1.25rem;
+        background-color: #00264F;
+        outline: none;
+        color: white;
+
+        display: flex;
+        flex-direction: row;
+        align-content: space-around;
+        justify-content: space-around;
+        align-items: center;
+        padding: 20px;
+        box-shadow: 1px 1px 5px grey;
+
+    }
+
+    .option:focus,
+    .option:hover {
+        outline: none;
+        background-color: #004785;
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="row justify-content-around">
+    <div class="col">
+        <div tabindex="0" role="button" id='original' class="option" onclick="window.location.href='/chartchange/'">
+            <div id="text1" class="text-center">
+                Click here to make changes for departments you are authorized for.
+            </div>
+            <div id="loading1" style="display: none;" class="spinner-border text-light" role="status">
+                <!-- <span class="visually-hidden">Loading...</span> -->
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div tabindex="0" role="button" id='new' class="option" onclick="window.location.href='/chartchangedept/'">
+            <div id="text2" class="text-center">
+                Click here to request changes for departments you are NOT authorized for.
+            </div>
+            <div id="loading2" style="display: none;" class="spinner-border text-light" role="status">
+                <!-- <span class="visually-hidden">Loading...</span> -->
+            </div>
+        </div>
+    </div>
+</div>
+{% if notice.bodytext != "none"%}
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class='col-6 mt-3'>
+            {% autoescape off %}
+            {{notice.bodytext}}
+            {% endautoescape %}
+        </div>
+    </div>
+</div>
+{% endif %}
+<script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+        let originalCCR = document.getElementById('original');
+        originalCCR.addEventListener('click', () => {
+            document.getElementById("text1").style.display = "none";
+            document.getElementById("loading1").style.display = "block";
+        });
+
+        let newCCR = document.getElementById('new');
+        newCCR.addEventListener('click', () => {
+            document.getElementById("text2").style.display = "none";
+            document.getElementById("loading2").style.display = "block";
+        });
+    });
+</script>
+{% endblock %}

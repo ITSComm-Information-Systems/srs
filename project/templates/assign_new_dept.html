@@ -20,8 +20,8 @@
 					</div>
 					<select name="select_dept" class="custom-select" id="select_dept_3">
 						<option></option>
-						{% for dept in deptids %}
-						<option name="dept" value="{{dept.dept}}">
+						{% for dept in all_dept %}
+						<option name="dept" value="{{dept.dept}}?{{ dept.dept_mgr }}?{{dept.dept_mgr_uniqname}}">
 							{{ dept.dept }} - {{ dept.dept_name }}</option>
 						{% endfor %}
 					</select>

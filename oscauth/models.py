@@ -60,6 +60,11 @@ class AuthUserDeptV(models.Model):
         dept_mgr = UmOscDeptProfileV.objects.get(deptid=self.dept).dept_mgr
         return dept_mgr
 
+    @property
+    def dept_mgr_uniqname(self):
+        dept_mgr_uniqname = UmOscDeptProfileV.objects.get(deptid=self.dept).dept_mgr_uniqname
+        return dept_mgr_uniqname
+
     class Meta:
         managed = False
         db_table = 'auth_user_dept_v'
