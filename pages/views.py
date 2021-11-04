@@ -1,6 +1,7 @@
 # osc\pages\view
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
+from django.conf import settings
 
 from . models import Page
 
@@ -8,6 +9,11 @@ from . models import Page
 def index(request, pagename):
     pagename = '/' + pagename
     pg = get_object_or_404(Page, permalink=pagename)
+
+    if not request.user.is_authenticated and pg.permalink == '/help':
+        # make user login so we can get username for email
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
     context = {
         'title': pg.title,
         'content': pg.bodytext,
