@@ -230,7 +230,8 @@ Your chartfield change request for:
 {phone}
  was approved by {approver}. '''.format(uniqname = uniqname, phone = phone, approver = approver)
 		
-		email_list = [uniqname + '@umich.edu']
+		# email_list = [uniqname + '@umich.edu']
+		email_list = ['hujingc@umich.edu','mkokarde@umich.edu']
 
 		email = EmailMessage(
 			subject = subject,
@@ -254,7 +255,8 @@ was denied by {approver}. '''.format(uniqname = uniqname, phone = phone, approve
 		if post.get('rejectmessage')!='':
 			body += 'The following message was included: ' + post.get('rejectmessage')
 		
-		email_list = [uniqname + '@umich.edu']
+		# email_list = [uniqname + '@umich.edu']
+		email_list = ['hujingc@umich.edu','mkokarde@umich.edu']
 
 		email = EmailMessage(
 			subject = subject,
@@ -440,9 +442,10 @@ def submit_new(request):
 	dept = new_dept_full_name.split()[0]
 	allowed_mgr = list(AuthUserDept.objects.filter(dept=dept, group_id__in=[3, 4]).values_list('user_id', flat=True))
 
-	email_list = []
-	for id in allowed_mgr:
-		email_list.append(User.objects.get(id=id).email)
+	email_list = ['hujingc@umich.edu','mkokarde@umich.edu']
+	# email_list = []
+	# for id in allowed_mgr:
+	# 	email_list.append(User.objects.get(id=id).email)
 
 	subject = "SRS Chartfield Change Request"
 
