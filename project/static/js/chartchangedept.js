@@ -710,7 +710,7 @@ function change_current_page(selected) {
 		$('#cf_shortcode').html(selected.short_code);
 	}
 	else {
-		document.getElementById('cf_shortcode_dr').value = '';
+		$('#cf_shortcode_dr').html('')
 		$('#cf_shortcode_dr').trigger('change')
 	}
 	$('#cf_nickname').html(selected.nickname);
