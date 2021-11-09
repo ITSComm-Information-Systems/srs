@@ -642,10 +642,6 @@ function change_current_page(selected) {
 	if (selected.short_code != '') {
 		$('#cf_shortcode').html(selected.short_code);
 	}
-	else {
-		document.getElementById('cf_shortcode_dr').value = '';
-		$('#cf_shortcode_dr').trigger('change')
-	}
 	$('#cf_nickname').html(selected.nickname);
 	$('.cf_num').html(selected.account_number);
 	$('#cf_users_table').DataTable().ajax.reload();
