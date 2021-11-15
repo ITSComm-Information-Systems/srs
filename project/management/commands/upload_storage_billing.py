@@ -115,7 +115,7 @@ class Command(BaseCommand):
             rec = UmBillInputApiV()
             rec.data_source = self.service #'MiStorage'
             rec.assign_date = instance['created_date'].strftime('%m%d%Y')
-            rec.unique_identifier = instance['name']
+            rec.unique_identifier = instance['name'].strip()
             rec.short_code = instance['shortcode']
             rec.charge_identifier = instance['rate_name']
             rec.quantity_vouchered = instance['size']
