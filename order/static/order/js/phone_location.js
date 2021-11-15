@@ -73,6 +73,8 @@ $(document).ready(function() {
 
 
 function selectCard(card) {
+    $('#div_suspend_restore').show();
+
     if (card.id == 'updateLocation') {
         $("#newLocationFields").show();
         current_number = $("#foundPhone").html()
