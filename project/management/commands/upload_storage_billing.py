@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
         self.service = options['service']
 
-        arc_ts_query = 'select b.shortcode, b.size, a.name, a.created_date, c.name as rate_name, round(c.rate * b.size,2) as total_cost, d.name as owner, ' \
+        arc_ts_query = 'select b.shortcode, b.size, a.name, a.created_date, c.name as rate_name, round(c.rate * b.size,2) as total_cost, d.name as owner ' \
                     'from order_arcinstance a, order_arcbilling b, order_storagerate c, oscauth_ldapgroup d ' \
                     'where b.arc_instance_id = a.id ' \
                     '  and a.rate_id = c.id ' \
