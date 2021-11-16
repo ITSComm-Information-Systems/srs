@@ -68,16 +68,6 @@
 <a href="{% url 'mbid:home' %}"><button class='btn btn-secondary'>Back</button></a>
 
 {% if cycle_info.open %}
-<div class="row">
-    <div class="col-4">
-        <label style="text-align: left" for='searchitems'>Search items: </label> <input id='searchitems' type='text'>
-    </div>
-    <div class="col-4">
-    </div>
-    <div class="col-4">
-        <h4 style="text-align:right">Items open for bidding: {{totalItems}}</h4>
-    </div>
-</div>
 {% include "mbid/a_table.html" %}
 {% endif %}
 {% endblock %}
