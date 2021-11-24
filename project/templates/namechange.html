@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<h1>{{ title }}</h1>
+
+<div class='col-4'>
+
+    {% for message in messages %}
+    <div class="alert alert-success" role="alert">
+    <strong>{{ message|escape }}</strong>
+    </div>
+    {% endfor %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="id_uniqname">
+                <strong>Search for phone:</strong>
+            </label>
+
+            <select id="id_phone_search" name="subscriber" class="col-sm" required placeholder="Search for Number">
+                <option></option>
+                {% for phone in phone_list %}
+                <option {% if phone.subscriber_id == subscriber_id %}selected{% endif %} href="/" value="{{ phone.subscriber_id }}">{{ phone.user_defined_id}} - {{ phone.full_name }} - {{ phone.uniqname }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <br>
+        <div class="form-group">
+            <label for="id_uniqname">
+                <strong>Enter New Uniqname:</strong>
+            </label>
+            
+            <input value="{{ uniqname }}" type="text" name="uniqname" class="form-control form-control" required="" id="id_uniqname">
+
+
+            {% for error in errors %}
+            <div class="alert alert-danger">
+            <strong>{{ error|escape }}</strong>
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <input id="search-btn" type="submit" value="Submit" class="btn btn-primary">
+
+    </form>
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+
+<script>
+    $(document).ready(function () {
+
+        $.fn.select2.defaults.set("theme", "bootstrap4");
+        $('#id_phone_search').select2({
+            placeholder: "Search",
+            display: "inline",
+        });
+
+    });
+
+    $("#id_phone_search").change(function () {
+        console.log('new phone')
+
+    });
+
+</script>
+
+{% endblock %}

@@ -5,6 +5,10 @@
 #   * Made sure each ForeignKey has `on_delete` set to the desired behavior.
 #   * Kept `managed = False` lines if you wish to not  allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+# Generate the soource code as follows:
+# python3 manage.py inspectdb um_osc_name_change_v --database=pinndev
+
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -1302,3 +1306,42 @@ class UmOscAuthUsersApi(models.Model):
      class Meta:
           managed = False
           db_table = 'PS_RATING\".\"UM_OSC_AUTH_USERS_API_V'
+
+
+class UmOscNameChangeV(models.Model):
+    deptid = models.CharField(max_length=15, db_collation='USING_NLS_COMP', blank=True, null=True)
+    service_number = models.CharField(max_length=60, db_collation='USING_NLS_COMP')
+    service_status_code = models.CharField(max_length=15, db_collation='USING_NLS_COMP')
+    service_type = models.CharField(max_length=20, db_collation='USING_NLS_COMP')
+    subscriber_id = models.CharField(max_length=7, db_collation='USING_NLS_COMP', primary_key=True)
+    first_name = models.CharField(max_length=50, db_collation='USING_NLS_COMP', blank=True, null=True)
+    mi = models.CharField(max_length=1, db_collation='USING_NLS_COMP', blank=True, null=True)
+    last_name = models.CharField(max_length=50, db_collation='USING_NLS_COMP', blank=True, null=True)
+    email_address = models.CharField(max_length=320, db_collation='USING_NLS_COMP', blank=True, null=True)
+    uniqname = models.CharField(max_length=320, db_collation='USING_NLS_COMP', blank=True, null=True)
+    subscriber_status = models.CharField(max_length=20, db_collation='USING_NLS_COMP', blank=True, null=True)
+    user_defined_id = models.CharField(max_length=20, db_collation='USING_NLS_COMP', blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    location_id = models.FloatField()
+    building_code = models.CharField(max_length=10, db_collation='USING_NLS_COMP', blank=True, null=True)
+    building_name = models.CharField(max_length=25, db_collation='USING_NLS_COMP', blank=True, null=True)
+    floor_name = models.CharField(max_length=18, db_collation='USING_NLS_COMP', blank=True, null=True)
+    room_name = models.CharField(max_length=18, db_collation='USING_NLS_COMP', blank=True, null=True)
+    jack_name = models.CharField(max_length=30, db_collation='USING_NLS_COMP', blank=True, null=True)
+    cable_path_id = models.FloatField(blank=True, null=True)
+    dept_default_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
+    occ_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
+    mrc_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
+    toll_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
+    local_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
+    other_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
+
+    @property
+    def full_name(self):
+        "Returns the person's full name."
+        return ' '.join([self.first_name, self.mi, self.last_name])
+
+    class Meta:
+        managed = False  # Created from a view. Don't remove.
+        db_table = 'PINN_CUSTOM\".\"um_osc_name_change_v'
