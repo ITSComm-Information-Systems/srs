@@ -522,3 +522,27 @@ class NameChange(PermissionRequiredMixin, View):
 		return render(request, 'namechange.html', 
             {'title': 'Name Change',
 			 'phone_list': phone_list,})
+
+
+@permission_required(('oscauth.can_order'), raise_exception=True)
+def get_uniqname(request):
+	uniqname = request.GET.get('uniqname', None)
+
+	user = get_mc_user(uniqname)
+	if user:
+
+		employee = False
+		for role in user.umichInstRoles:
+			if 'Staff' in role or 'Faculty' in role or 'SponsoredAffiliate' in role:
+				employee = True
+				break
+
+		if not employee:
+			r = {'message': 'User is not faculty, staff or sponsored affiliate.'}
+		else:
+			r = {'name': user.displayName[0]}
+
+	else:
+		r = {'message': 'Uniqname not found.'}
+
+	return JsonResponse(r, safe=False)
