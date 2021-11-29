@@ -11,7 +11,10 @@ import csv
 import math
 import time
 import threading
-from io import StringIO
+from openpyxl import load_workbook
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
+from io import BytesIO
 from datetime import date, datetime
 from django.core.mail import EmailMessage
 from django.db import connections
@@ -277,10 +280,13 @@ def review(request):
         cycles.append((item.bidding_year, month, status, item.bidding_month))
 
     if request.method == 'POST':
-        thread = threading.Thread(
-            target=create_mike_report, args=(request,))
-        thread.start()
-        return redirect('complete/2')
+        direct_download(request)
+        return direct_download(request)
+        # thread = threading.Thread(
+        #     target=create_mike_report, args=(request,))
+        # thread.start()
+        # return redirect('complete/2')
+        
         
     return render(request, 'mbid/a_reviewBids.html', {'title': 'Review Bid Cycles', 'cycles': cycles})
 
@@ -301,15 +307,14 @@ def create_cycle_report(request):
     rows = []
 
     # CSV prep that is also pulling the 'preview' data
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="MBid_' + \
-        str(cycle_info['current_month'])+'_' + \
-        str(cycle_info['current_year'])+'.csv"'
-
+    wb = Workbook(write_only=True)
+    ws = wb.create_sheet()
+    
     fieldnames = ['Manufacturer', 'UM Code', 'Manufacturer Part Number', 'Description', 'Bid Status',
                   'Required QTY @ Local Vendor Branch', 'Estimated Annual Qty', 'Unit of Measure', 'UM Notes', 'Vendor Notes', 'Bid Price']
-    writer = csv.DictWriter(response, fieldnames=fieldnames)
-    writer.writeheader()
+    # writer = csv.DictWriter(response, fieldnames=fieldnames)
+    # writer.writeheader()
+    ws.append(fieldnames)
 
     for data in datalist:
         mfr = data.manufacturer_id
@@ -323,10 +328,15 @@ def create_cycle_report(request):
         um_notes = data.um_notes
         rows.append({'mfr': mfr, 'umcode': umcode, 'manufacturer_part_number': manufacturer_part_number, 'desc': desc, 'bid_status': bid_status,
                      'req_qty': req_qty, 'annual_qty': annual_qty, 'uom': uom, 'um_notes': um_notes})
-        writer.writerow(
-            {'Manufacturer': mfr, 'UM Code': umcode, 'Manufacturer Part Number': manufacturer_part_number, 'Description': desc, 'Bid Status': bid_status, 'Required QTY @ Local Vendor Branch': req_qty, 'Estimated Annual Qty': annual_qty, 'Unit of Measure': uom, 'UM Notes': um_notes, 'Vendor Notes': '', 'Bid Price': ''})
+        ws.append([mfr, umcode, manufacturer_part_number, desc, bid_status, req_qty, annual_qty, uom, um_notes])
+        # writer.writerow(
+        #     {'Manufacturer': mfr, 'UM Code': umcode, 'Manufacturer Part Number': manufacturer_part_number, 'Description': desc, 'Bid Status': bid_status, 'Required QTY @ Local Vendor Branch': req_qty, 'Estimated Annual Qty': annual_qty, 'Unit of Measure': uom, 'UM Notes': um_notes, 'Vendor Notes': '', 'Bid Price': ''})
 
     if request.method == 'POST':
+        response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="MBid_' + \
+            str(cycle_info['current_month'])+'_' + \
+            str(cycle_info['current_year'])+'.xlsx"'
         return response
 
     context = {
@@ -358,20 +368,41 @@ def upload_bids(request):
     (datetime.now() > UmEcommMbidCriticalDate.objects.get(bidding_closed='O').bidding_open_time) and 
     (datetime.now() < UmEcommMbidCriticalDate.objects.get(bidding_closed='O').bidding_close_time) and 
     (request.POST.get('uploadstatus') == 'Upload Bids')):
-        file = request.FILES['csv_file']
-        decoded_file = file.read().decode('utf-8').splitlines()
-        reader = csv.DictReader(decoded_file)
+        file_in_memory = request.FILES['mbid_file'].read()
+        wb = load_workbook(filename=BytesIO(file_in_memory))
+        # wb = load_workbook(filename=request.FILES['mbid_file'].file)
+        worksheet = wb[wb.sheetnames[0]]
+        reader=list()
+        # iterating over the rows and
+        # getting value from each cell in row
+        for row in worksheet.iter_rows(min_row=2,values_only=True):
+            row = ['' if cell==None else cell for cell in row]
+            reader.append({
+                'Manufacturer':row[0],
+                'UMCode':row[1], 
+                'ManufacturerPartNumber':row[2],
+                'Description':row[3],
+                'BidStatus':row[4],
+                'RequiredQTY':row[5],
+                'AnnualQty':row[6], 
+                'UnitofMeasure':row[7], 
+                'UMNotes':row[8], 
+                'VendorNotes':row[9], 
+                'BidPrice':row[10]})
+        # file = request.FILES['csv_file']
+        # decoded_file = file.read().decode('utf-8').splitlines()
+        # reader = csv.DictReader(decoded_file)
         valid = []
         notvalid = []
-        old = ['Manufacturer', 'UM Code', 'Manufacturer Part Number', 'Description', 'Bid Status', 'Required QTY @ Local Vendor Branch',
-               'Estimated Annual Qty', 'Unit of Measure', 'UM Notes', 'Vendor Notes', 'Bid Price']
-        new = ['Manufacturer', 'UMCode', 'ManufacturerPartNumber', 'Description', 'BidStatus', 'RequiredQTY',
-               'AnnualQty', 'UnitofMeasure', 'UMNotes', 'VendorNotes', 'BidPrice']
+        # old = ['Manufacturer', 'UM Code', 'Manufacturer Part Number', 'Description', 'Bid Status', 'Required QTY @ Local Vendor Branch',
+        #        'Estimated Annual Qty', 'Unit of Measure', 'UM Notes', 'Vendor Notes', 'Bid Price']
+        # new = ['Manufacturer', 'UMCode', 'ManufacturerPartNumber', 'Description', 'BidStatus', 'RequiredQTY',
+        #        'AnnualQty', 'UnitofMeasure', 'UMNotes', 'VendorNotes', 'BidPrice']
         for row in reader:
             # DictReader returns as OrderedDict, fix that.
-            row = dict(row)
-            for o, n in zip(old, new):
-                row[n] = row.pop(o)
+            # row = dict(row)
+            # for o, n in zip(old, new):
+            #     row[n] = row.pop(o)
             # Only add to valid if valid price
             if (pricecheck(row['BidPrice']) != None) and (pricecheck(row['BidPrice']) != False):
                 valid.append(row)
@@ -388,8 +419,11 @@ def upload_bids(request):
         mistakes = False
         if (notvalid != []):
             mistakes = True
-        context = {'valid': valid, 'mistakes': mistakes,
-                   'notvalid': notvalid, 'title': 'Uploaded Bids'}
+        context = {
+            'valid': valid,
+            'mistakes': mistakes,
+            'notvalid': notvalid,
+            'title': 'Uploaded Bids'}
 
         return render(request, 'mbid/c_checkLoad.html', context)
     elif (request.method == 'POST') and (request.POST.get('uploadstatus') == 'Submit Bids'):
