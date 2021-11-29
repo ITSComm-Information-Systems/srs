@@ -72,7 +72,7 @@ def get_mc_user(uniqname):
                       password=settings.MCOMMUNITY['PASSWORD'],
                       auto_bind=True)
 
-    conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","umichDisplaySn","telephoneNumber"])
+    conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","umichDisplaySn","telephoneNumber","umichInstRoles","displayName"])
     
     if conn.entries:
         return conn.entries[0] 

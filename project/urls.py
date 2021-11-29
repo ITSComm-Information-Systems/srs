@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/bommaterial/', api.BomMaterialView.as_view()),
     path('admin/', admin.site.urls),
     path('reports/',include('reports.urls')),
+    path('uniqname/', views.get_uniqname),
     path('chartchange/ajax/', views.change_dept_1),
     path('chartchangedept/ajax/', views.change_dept_3),
     path('chartchange/old-cf/', views.get_cf_data),
