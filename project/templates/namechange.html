@@ -39,7 +39,7 @@
                 <button id="search_uniqname" type="button" class="btn btn-primary form-inline">Search</button>
             </div>
 
-            <span id="full_name"></span>
+            <strong><span id="full_name"></span></strong>
 
             {% for error in errors %}
             <div class="alert alert-danger">
@@ -48,6 +48,20 @@
             {% endfor %}
 
         </div>
+        <br>
+
+        <div class="form-group" id="div_full_name">
+            <label for="full_name">
+                <strong>Full Name:</strong>
+            </label>
+
+            <input id="id_full_name" name="full_name" class="form-control form-control" disabled></input>
+        </div>
+
+
+
+
+
         <br>
         <input id="submit_btn" type="submit" value="Submit" class="btn btn-primary" style="display: none">
 
@@ -68,7 +82,7 @@
             display: "inline",
         });
 
-        $('#id_uniqname').change(function () {
+        $('#id_uniqname').keydown(function () {
             $("#full_name").html('');
             $("#search_uniqname").prop('disabled', false);
             $("#submit_btn").prop('disabled', true);
@@ -90,7 +104,7 @@
                         $("#full_name").html(json.message);
 
                     } else {
-                        $("#full_name").html(json.name);
+                        $("#id_full_name").val(json.name);
                         $("#search_uniqname").prop('disabled', true);
                         $("#submit_btn").show().prop('disabled', false)
                     }
