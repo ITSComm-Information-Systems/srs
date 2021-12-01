@@ -4,70 +4,81 @@
 
 <h1>{{ title }}</h1>
 
-<div class='col-4'>
+<div class="row">
 
-    {% for message in messages %}
-    <div class="alert alert-success" role="alert">
-    <strong>{{ message|escape }}</strong>
-    </div>
-    {% endfor %}
+    <div class='col-4'>
 
-    <form method="post">
-        {% csrf_token %}
+        {% for message in messages %}
+        <div class="alert alert-success" role="alert">
+        <strong>{{ message|escape }}</strong>
+        </div>
+        {% endfor %}
 
-        <div class="form-group">
-            <label for="id_uniqname">
-                <strong>Search for phone:</strong>
-            </label>
+        <form method="post">
+            {% csrf_token %}
 
-            <select id="id_phone_search" name="subscriber" class="col-sm" required placeholder="Search for Number">
-                <option></option>
-                {% for phone in phone_list %}
-                <option {% if phone.subscriber_id == subscriber_id %}selected{% endif %} href="/" value="{{ phone.subscriber_id }}">{{ phone.user_defined_id}} - {{ phone.full_name }} - {{ phone.uniqname }}</option>
+            <div class="form-group">
+                <label for="id_uniqname">
+                    <strong>Search for phone:</strong>
+                </label>
+
+                <select id="id_phone_search" name="subscriber" class="col-sm" required placeholder="Search for Number">
+                    <option></option>
+                    {% for phone in phone_list %}
+                    <option {% if phone.subscriber_id == subscriber_id %}selected{% endif %} href="/" value="{{ phone.subscriber_id }}">{{ phone.user_defined_id}} - {{ phone.full_name }} - {{ phone.uniqname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <br>
+            <div class="form-groug">
+                <label for="id_uniqname">
+                    <strong>Enter New Uniqname:</strong>
+                </label>
+                
+                <div class="form-inline">
+                    <input value="{{ uniqname }}" type="text" name="uniqname" class="form-control form-control form-inline" required="" id="id_uniqname">
+                    <button id="search_uniqname" type="button" class="btn btn-primary form-inline">Search</button>
+                </div>
+
+                <strong><span id="full_name"></span></strong>
+
+                {% for error in errors %}
+                <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+                </div>
                 {% endfor %}
-            </select>
-        </div>
 
-        <br>
-        <div class="form-groug">
-            <label for="id_uniqname">
-                <strong>Enter New Uniqname:</strong>
-            </label>
-            
-            <div class="form-inline">
-                <input value="{{ uniqname }}" type="text" name="uniqname" class="form-control form-control form-inline" required="" id="id_uniqname">
-                <button id="search_uniqname" type="button" class="btn btn-primary form-inline">Search</button>
+            </div>
+            <br>
+
+            <div class="form-group" id="div_full_name">
+                <label for="full_name">
+                    <strong>Full Name:</strong>
+                </label>
+
+                <input id="id_full_name" name="full_name" class="form-control form-control" disabled></input>
             </div>
 
-            <strong><span id="full_name"></span></strong>
-
-            {% for error in errors %}
-            <div class="alert alert-danger">
-            <strong>{{ error|escape }}</strong>
-            </div>
-            {% endfor %}
-
-        </div>
-        <br>
-
-        <div class="form-group" id="div_full_name">
-            <label for="full_name">
-                <strong>Full Name:</strong>
-            </label>
-
-            <input id="id_full_name" name="full_name" class="form-control form-control" disabled></input>
-        </div>
 
 
 
 
+            <br>
+            <input id="submit_btn" type="submit" value="Submit" class="btn btn-primary" style="display: none">
 
-        <br>
-        <input id="submit_btn" type="submit" value="Submit" class="btn btn-primary" style="display: none">
+        </form>
+    </div>
 
-    </form>
+    <div class='col-1'>
+
+    </div>
+
+    {% autoescape off %}
+    {{ helptext.bodytext }}
+    {% endautoescape %}
+
 </div>
-
 {% endblock %}
 
 

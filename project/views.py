@@ -515,12 +515,13 @@ class NameChange(PermissionRequiredMixin, View):
             'subscriber_id': subscriber_id})
 
 	def get(self, request):
-
+		helptext = Page.objects.get(permalink=f'/namechangeh')
 		authorized_departments = list(AuthUserDeptV.objects.filter(user=self.request.user, codename='can_report').values_list('dept', flat=True))
 		phone_list = UmOscNameChangeV.objects.filter(deptid__in=authorized_departments)
 
 		return render(request, 'namechange.html', 
             {'title': 'Name Change',
+			 'helptext': helptext,
 			 'phone_list': phone_list,})
 
 
