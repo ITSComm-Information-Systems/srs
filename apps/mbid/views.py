@@ -15,6 +15,8 @@ from openpyxl import load_workbook
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from io import BytesIO
+from collections import OrderedDict
+
 from datetime import date, datetime
 from django.core.mail import EmailMessage
 from django.db import connections
@@ -280,8 +282,8 @@ def review(request):
         cycles.append((item.bidding_year, month, status, item.bidding_month))
 
     if request.method == 'POST':
-        direct_download(request)
-        return direct_download(request)
+        create_mike_report(request)
+        return create_mike_report(request)
         # thread = threading.Thread(
         #     target=create_mike_report, args=(request,))
         # thread.start()
@@ -306,7 +308,7 @@ def create_cycle_report(request):
 
     rows = []
 
-    # CSV prep that is also pulling the 'preview' data
+    # Prep to create workbook
     wb = Workbook(write_only=True)
     ws = wb.create_sheet()
     
@@ -569,10 +571,10 @@ def update_vendor_table(request):
     email.send()
 
 def create_mike_report(request):
-    # Make sure post is a dictionary
-    print(request)
+    # Make sure post is a dictionary for use in determining download option
+    # 'pickCycle': '02 2023', 'downloadOption': 'allBids'
     post = request.POST.dict()
-    print(post)
+
     # Ready email
     email = EmailMessage(
         subject='MBid CSV Report',
@@ -580,116 +582,148 @@ def create_mike_report(request):
         from_email='srs@umich.edu',
         to=[request.user.email],)
 
-    # Filter information
+    # get month/year for queries
     yearmonth = post['pickCycle'].split()
     bidding_month = yearmonth[0]
     bidding_year = yearmonth[1]
-    # Set up CSV
-    target_csv = StringIO()
+
+    # Set up Excel
+    target_xlsx = BytesIO()
+    wb = Workbook(write_only=True)
+    ws = wb.create_sheet()
 
     # Retrieve data as specified by selected option
     # If no vendor notes or bids for noBids option
     if (post['downloadOption'] == 'noBids'):
-        # Set up CSV
+        # Set up header
         fieldnames = ['U-M Code', 'Description', 'Bid Status', 'UM Notes']
-        writer = csv.DictWriter(target_csv, fieldnames=fieldnames)
-        # Header
-        writer.writeheader()
+        ws.append(fieldnames)
 
         # Get data
         havebids = set(UmEcommMbidVendorInput.objects.filter(
             bidding_year=bidding_year, bidding_month=bidding_month).values_list('item_code', flat=True))
         rows = UmEcommMbidWarehseInput.objects.filter(
             bidding_year=bidding_year, bidding_month=bidding_month).exclude(item_code__in=havebids)
-        # Write data to csv
+        
+        # Write data, no vendor info since these have no bids
         for row in rows:
-            writer.writerow({'U-M Code': row.item_code, 'Description': row.item_desc,
-                             'Bid Status': row.bid_status, 'UM Notes': row.um_notes})
-        email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) +
-                     '_noBids.csv', target_csv.getvalue(), 'text/csv')
+            ws.append([row.item_code, row.item_desc, row.bid_status, row.um_notes])
+
+        # wb.save(target_xlsx)
+        # email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) +
+        #              '_noBids.csv', target_xlsx.getvalue(), 'application/ms-excel')
+
+        response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+            str(convert[bidding_month])+'_' + \
+            str(bidding_year)+'_noBids.xlsx"'
+        return response
+
 
     elif (post['downloadOption'] == 'allBids'):
-        # Set up CSV
+        # Set up header
         fieldnames = ['U-M Code', 'Description', 'Bid Status']
-        # Get all vendors in bid cycle for header
+        # Add all vendors that bidded in cycle to header
         for vendor in set(UmEcommMbidVendorInput.objects.filter(bidding_year=bidding_year,bidding_month=bidding_month).values_list('vendor_id', flat=True)):
             fieldnames.extend([vendor + ' Notes', vendor + ' Bids'])
 
-        writer = csv.DictWriter(target_csv, fieldnames=fieldnames)
-        # Header
-        writer.writeheader()
+        ws.append(fieldnames)
 
         # Get list of UM Codes with bids
         item_codes_list = sorted(set(UmEcommMbidVendorInput.objects.filter(
             bidding_year=bidding_year, bidding_month=bidding_month).values_list('item_code', flat=True)))
 
-        # Write to CSV
+        # Write data, each row is item, each item add vendor info (to dict), convert to simple list in end for appending
         for item in item_codes_list:
-            info = UmEcommMbidWarehseInput.objects.get(
-                item_code=item, bidding_year=bidding_year, bidding_month=bidding_month)
-            towrite = {'U-M Code': item, 'Description': info.item_desc,
-                       'Bid Status': info.bid_status}
+            # convert fieldnames to dictionary for easy locating
+            fieldnamesDict = OrderedDict((field, '') for field in fieldnames)
+            
+            info = UmEcommMbidWarehseInput.objects.get(item_code=item, bidding_year=bidding_year, bidding_month=bidding_month)
+            fieldnamesDict['U-M Code'] = item
+            fieldnamesDict['Description'] = info.item_desc
+            fieldnamesDict['Bid Status'] = info.bid_status
 
-            results = UmEcommMbidVendorInput.objects.filter(
-                bidding_year=bidding_year, bidding_month=bidding_month, item_code=item)
+            results = UmEcommMbidVendorInput.objects.filter(bidding_year=bidding_year, bidding_month=bidding_month, item_code=item)
             for row in results:
-                towrite[row.vendor_id+' Notes'] = row.vendor_notes
-                towrite[row.vendor_id + ' Bids'] = row.vendor_price
+                fieldnamesDict[row.vendor_id+' Notes'] = row.vendor_notes
+                fieldnamesDict[row.vendor_id + ' Bids'] = row.vendor_price
 
-            writer.writerow(towrite)
+            ws.append(list(fieldnamesDict.values()))
 
-        email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) +
-                     '_allBids.csv', target_csv.getvalue(), 'text/csv')
+        # for actual
+        # wb.save(target_xlsx)
+        # email.attach('MikeReport_' + str(convert[bidding_month])+'_'+str(bidding_year) + '_allBids.csv', target_xlsx.getvalue(), 'application/ms-excel')
+
+        # for testing
+        response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+            str(convert[bidding_month])+'_' + \
+            str(bidding_year)+'_allBids.xlsx"'
+        return response
 
     elif post.get('downloadOption') == 'lowBids':
-        # Set up CSV, 3 lowest bidders
+        # Set header for 3 lowest bidders
         fieldnames = ['U-M Code', 'Description', 'Bid Status', 'Vendor 1', 'Vendor Notes 1', 'Vendor Price 1',
                       'Vendor 2', 'Vendor Notes 2', 'Vendor Price 2', 'Vendor 3', 'Vendor Notes 3', 'Vendor Price 3']
-        writer = csv.DictWriter(target_csv, fieldnames=fieldnames)
-        # Header
-        writer.writeheader()
+        ws.append(fieldnames)
 
         # Get list of UM Codes with bids
         item_codes_list = sorted(set(UmEcommMbidVendorInput.objects.filter(
             bidding_year=bidding_year, bidding_month=bidding_month).values_list('item_code', flat=True)))
 
-        # Write to CSV
+        # Write data
         for item in item_codes_list:
+            # Get vendor id,notes,bids for item. order by price
             results = UmEcommMbidVendorInput.objects.filter(
-                bidding_year=bidding_year, bidding_month=bidding_month, item_code=item).order_by('vendor_price')[:2]
+                bidding_year=bidding_year, bidding_month=bidding_month, item_code=item).order_by('vendor_price')[:3]
+            
+            # get bid status from warehouse
             info = UmEcommMbidWarehseInput.objects.get(
                 item_code=item, bidding_year=bidding_year, bidding_month=bidding_month)
-            towrite = {'U-M Code': item, 'Description': info.item_desc,
-                       'Bid Status': info.bid_status}  # Basic
+           
+            towrite = [info.item_code, info.item_desc, info.bid_status]  
+
             if len(results) == 3:
-                towrite['Vendor 1'] = results[0].vendor_id
-                towrite['Vendor Notes 1'] = results[0].vendor_notes
-                towrite['Vendor Price 1'] = results[0].vendor_price
-                towrite['Vendor 2'] = results[1].vendor_id
-                towrite['Vendor Notes 2'] = results[1].vendor_notes
-                towrite['Vendor Price 2'] = results[1].vendor_price
-                towrite['Vendor 3'] = results[2].vendor_id
-                towrite['Vendor Notes 3'] = results[2].vendor_notes
-                towrite['Vendor Price 3':] = [2].vendor_price
+                towrite.extend([results[0].vendor_id,results[0].vendor_notes,results[0].vendor_price,
+                results[1].vendor_id,results[1].vendor_notes,results[1].vendor_price,
+                results[2].vendor_id,results[2].vendor_notes,results[2].vendor_price])
+                # towrite['Vendor 1'] = results[0].vendor_id
+                # towrite['Vendor Notes 1'] = results[0].vendor_notes
+                # towrite['Vendor Price 1'] = results[0].vendor_price
+                # towrite['Vendor 2'] = results[1].vendor_id
+                # towrite['Vendor Notes 2'] = results[1].vendor_notes
+                # towrite['Vendor Price 2'] = results[1].vendor_price
+                # towrite['Vendor 3'] = results[2].vendor_id
+                # towrite['Vendor Notes 3'] = results[2].vendor_notes
+                # towrite['Vendor Price 3':] = [2].vendor_price
             elif len(results) == 2:
-                towrite['Vendor 1'] = results[0].vendor_id
-                towrite['Vendor Notes 1'] = results[0].vendor_notes
-                towrite['Vendor Price 1'] = results[0].vendor_price
-                towrite['Vendor 2'] = results[1].vendor_id
-                towrite['Vendor Notes 2'] = results[1].vendor_notes
-                towrite['Vendor Price 2'] = results[1].vendor_price
+                towrite.extend([results[0].vendor_id,results[0].vendor_notes,results[0].vendor_price,
+                results[1].vendor_id,results[1].vendor_notes,results[1].vendor_price])
+                # towrite['Vendor 1'] = results[0].vendor_id
+                # towrite['Vendor Notes 1'] = results[0].vendor_notes
+                # towrite['Vendor Price 1'] = results[0].vendor_price
+                # towrite['Vendor 2'] = results[1].vendor_id
+                # towrite['Vendor Notes 2'] = results[1].vendor_notes
+                # towrite['Vendor Price 2'] = results[1].vendor_price
             elif len(results) == 1:
-                towrite['Vendor 1'] = results[0].vendor_id
-                towrite['Vendor Notes 1'] = results[0].vendor_notes
-                towrite['Vendor Price 1'] = results[0].vendor_price
+                towrite.extend([results[0].vendor_id,results[0].vendor_notes,results[0].vendor_price])
+                # towrite['Vendor 1'] = results[0].vendor_id
+                # towrite['Vendor Notes 1'] = results[0].vendor_notes
+                # towrite['Vendor Price 1'] = results[0].vendor_price
+            ws.append(towrite)
 
-            write.writerow(towrite)
+        # for testing
+        response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+            str(convert[bidding_month])+'_' + \
+            str(bidding_year)+'_lowBids.xlsx"'
+        return response
 
-        email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) +
-                     '_lowestBids.csv', target_csv.getvalue(), 'text/csv')
+        # for actual
+        # email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) + '_lowestBids.csv', target_xlsx.getvalue(), 'application/ms-excel')
 
     # Everything written and attached in if statements. Send email.
-    email.send(fail_silently=False)
+    # email.send(fail_silently=False)
 
 
 # # For testing purposes when making MikeReports
@@ -702,13 +736,13 @@ def direct_download(request):
     bidding_month = yearmonth[0]
     bidding_year = yearmonth[1]
     # Set up CSV
-    target_csv = HttpResponse(content_type='text/csv')
+    target_xlsx = HttpResponse(content_type='text/csv')
     if (post['downloadOption'] == 'noBids'):
         # Set up CSV
-        target_csv['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+        target_xlsx['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
             str(bidding_month)+'_'+str(bidding_year)+'_noBids.csv"'
         fieldnames = ['U-M Code', 'Description', 'Bid Status', 'UM Notes']
-        writer = csv.DictWriter(target_csv, fieldnames=fieldnames)
+        writer = csv.DictWriter(target_xlsx, fieldnames=fieldnames)
         # Header
         writer.writeheader()
 
@@ -722,11 +756,11 @@ def direct_download(request):
         for row in rows:
             writer.writerow({'U-M Code': row.item_code, 'Description': row.item_desc,
                                 'Bid Status': row.bid_status, 'UM Notes': row.um_notes})
-        return target_csv
+        return target_xlsx
 
     elif (post['downloadOption'] == 'allBids'):
         # Set up CSV
-        target_csv['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+        target_xlsx['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
             str(bidding_month)+'_'+str(bidding_year)+'_allBids.csv"'
         fieldnames = ['U-M Code', 'Description', 'Bid Status']
         # Get all vendors in bid cycle for header
@@ -734,7 +768,7 @@ def direct_download(request):
             fieldnames.extend(
                 [vendor + ' Notes', vendor + ' Bids'])
 
-        writer = csv.DictWriter(target_csv, fieldnames=fieldnames)
+        writer = csv.DictWriter(target_xlsx, fieldnames=fieldnames)
         # Header
         writer.writeheader()
 
@@ -757,15 +791,15 @@ def direct_download(request):
 
             writer.writerow(towrite)
 
-        return target_csv
+        return target_xlsx
 
     elif post.get('downloadOption') == 'lowBids':
         # Set up CSV, 3 lowest bidders
-        target_csv['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+        target_xlsx['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
             str(bidding_month)+'_'+str(bidding_year)+'_lowBids.csv"'
         fieldnames = ['U-M Code', 'Description', 'Bid Status', 'Vendor 1', 'Vendor Notes 1', 'Vendor Price 1',
                         'Vendor 2', 'Vendor Notes 2', 'Vendor Price 2', 'Vendor 3', 'Vendor Notes 3', 'Vendor Price 3']
-        writer = csv.DictWriter(target_csv, fieldnames=fieldnames)
+        writer = csv.DictWriter(target_xlsx, fieldnames=fieldnames)
         # Header
         writer.writeheader()
 
@@ -804,4 +838,4 @@ def direct_download(request):
                 towrite['Vendor Price 1'] = results[0].vendor_price
 
             writer.writerow(towrite)
-        return target_csv
+        return target_xlsx
