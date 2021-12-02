@@ -11,3 +11,4 @@ ldap3==2.8
 djangorestframework~=3.11.1
 reportlab
 django-extensions
+openpyxl
