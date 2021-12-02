@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<h1>{{ title }}</h1>
+
+<div class="row">
+
+    <div class='col-4'>
+
+        {% for message in messages %}
+        <div class="alert alert-success" role="alert">
+        <strong>{{ message|escape }}</strong>
+        </div>
+        {% endfor %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_uniqname">
+                    <strong>Search for phone:</strong>
+                </label>
+
+                <select id="id_phone_search" name="subscriber" class="col-sm" required placeholder="Search for Number">
+                    <option></option>
+                    {% for phone in phone_list %}
+                    <option {% if phone.subscriber_id == subscriber_id %}selected{% endif %} href="/" value="{{ phone.subscriber_id }}">{{ phone.user_defined_id}} - {{ phone.full_name }} - {{ phone.uniqname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <br>
+            <div class="form-groug">
+                <label for="id_uniqname">
+                    <strong>Enter New Uniqname:</strong>
+                </label>
+                
+                <div class="form-inline">
+                    <input value="{{ uniqname }}" type="text" name="uniqname" class="form-control form-control form-inline" required="" id="id_uniqname">
+                    <button id="search_uniqname" type="button" class="btn btn-primary form-inline">Search</button>
+                </div>
+
+                <strong><span id="full_name"></span></strong>
+
+                {% for error in errors %}
+                <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+                </div>
+                {% endfor %}
+
+            </div>
+            <br>
+
+            <div class="form-group" id="div_full_name">
+                <label for="full_name">
+                    <strong>Full Name:</strong>
+                </label>
+
+                <input id="id_full_name" name="full_name" class="form-control form-control" disabled></input>
+            </div>
+
+
+
+
+
+            <br>
+            <input id="submit_btn" type="submit" value="Submit" class="btn btn-primary" style="display: none">
+
+        </form>
+    </div>
+
+    <div class='col-1'>
+
+    </div>
+
+    {% autoescape off %}
+    {{ helptext.bodytext }}
+    {% endautoescape %}
+
+</div>
+{% endblock %}
+
+
+{% block js %}
+
+<script>
+    $(document).ready(function () {
+
+        $.fn.select2.defaults.set("theme", "bootstrap4");
+        $('#id_phone_search').select2({
+            placeholder: "Search",
+            display: "inline",
+        });
+
+        $('#id_uniqname').keydown(function () {
+            $("#full_name").html('');
+            $("#search_uniqname").prop('disabled', false);
+            $("#submit_btn").prop('disabled', true);
+            $("#submit_btn").hide();
+        });
+
+        $("#search_uniqname").click(function () {
+
+            uniqname = $('#id_uniqname').val()
+            console.log('new phone')
+
+            $.ajax({
+                url: "/uniqname/?uniqname=" + uniqname,
+
+                success: function (json) {
+                    console.log('response', json)
+
+                    if (json.message) {
+                        $("#full_name").html(json.message);
+
+                    } else {
+                        $("#id_full_name").val(json.name);
+                        $("#search_uniqname").prop('disabled', true);
+                        $("#submit_btn").show().prop('disabled', false)
+                    }
+
+                },
+
+                // handle a non-successful response
+                error: function (xhr, errmsg, err) {
+                    $("#full_name").html('Error searching for name.');
+                },
+
+                // handle a non-successful response
+                complete: function () {
+                    console.log('complete');
+
+                    //$('#nextBtn').removeClass('disabled'); ;
+                }
+
+            });  // AJAX call
+
+        });  // Click Search
+
+    }); // Document Ready
+
+</script>
+
+{% endblock %}
