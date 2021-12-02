@@ -16,6 +16,7 @@ from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from io import BytesIO
 from collections import OrderedDict
+from openpyxl.styles import Protection
 
 from datetime import date, datetime
 from django.core.mail import EmailMessage
@@ -282,7 +283,6 @@ def review(request):
         cycles.append((item.bidding_year, month, status, item.bidding_month))
 
     if request.method == 'POST':
-        create_mike_report(request)
         return create_mike_report(request)
         # thread = threading.Thread(
         #     target=create_mike_report, args=(request,))
@@ -309,13 +309,12 @@ def create_cycle_report(request):
     rows = []
 
     # Prep to create workbook
-    wb = Workbook(write_only=True)
-    ws = wb.create_sheet()
+    wb = Workbook()
+    ws = wb.active
     
     fieldnames = ['Manufacturer', 'UM Code', 'Manufacturer Part Number', 'Description', 'Bid Status',
                   'Required QTY @ Local Vendor Branch', 'Estimated Annual Qty', 'Unit of Measure', 'UM Notes', 'Vendor Notes', 'Bid Price']
-    # writer = csv.DictWriter(response, fieldnames=fieldnames)
-    # writer.writeheader()
+
     ws.append(fieldnames)
 
     for data in datalist:
@@ -331,8 +330,18 @@ def create_cycle_report(request):
         rows.append({'mfr': mfr, 'umcode': umcode, 'manufacturer_part_number': manufacturer_part_number, 'desc': desc, 'bid_status': bid_status,
                      'req_qty': req_qty, 'annual_qty': annual_qty, 'uom': uom, 'um_notes': um_notes})
         ws.append([mfr, umcode, manufacturer_part_number, desc, bid_status, req_qty, annual_qty, uom, um_notes])
-        # writer.writerow(
-        #     {'Manufacturer': mfr, 'UM Code': umcode, 'Manufacturer Part Number': manufacturer_part_number, 'Description': desc, 'Bid Status': bid_status, 'Required QTY @ Local Vendor Branch': req_qty, 'Estimated Annual Qty': annual_qty, 'Unit of Measure': uom, 'UM Notes': um_notes, 'Vendor Notes': '', 'Bid Price': ''})
+       
+    # Only allow vendor notes and bid price columns to be edited
+    ws.protection.sheet = True
+    for cell in ws['J']:
+        cell.protection = Protection(locked=False)
+    for cell in ws['K']:
+        cell.protection = Protection(locked=False)
+
+    # Sheet formatting widths to auto
+    ws.freeze_panes = ws['A2']
+    for letter in ['A','B','C','D','E','F','G','H','I','J','K']:
+        ws.column_dimensions[letter].auto_size = True
 
     if request.method == 'POST':
         response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
@@ -391,21 +400,13 @@ def upload_bids(request):
                 'UMNotes':row[8], 
                 'VendorNotes':row[9], 
                 'BidPrice':row[10]})
-        # file = request.FILES['csv_file']
-        # decoded_file = file.read().decode('utf-8').splitlines()
-        # reader = csv.DictReader(decoded_file)
+        
+        # data validation
         valid = []
         notvalid = []
-        # old = ['Manufacturer', 'UM Code', 'Manufacturer Part Number', 'Description', 'Bid Status', 'Required QTY @ Local Vendor Branch',
-        #        'Estimated Annual Qty', 'Unit of Measure', 'UM Notes', 'Vendor Notes', 'Bid Price']
-        # new = ['Manufacturer', 'UMCode', 'ManufacturerPartNumber', 'Description', 'BidStatus', 'RequiredQTY',
-        #        'AnnualQty', 'UnitofMeasure', 'UMNotes', 'VendorNotes', 'BidPrice']
+
         for row in reader:
-            # DictReader returns as OrderedDict, fix that.
-            # row = dict(row)
-            # for o, n in zip(old, new):
-            #     row[n] = row.pop(o)
-            # Only add to valid if valid price
+
             if (pricecheck(row['BidPrice']) != None) and (pricecheck(row['BidPrice']) != False):
                 valid.append(row)
             # If empty and vendor notes
