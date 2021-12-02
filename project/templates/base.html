@@ -73,6 +73,9 @@
 								{% if perms.oscauth.can_order or perms.oscauth_can_report %}
 								<a class="dropdown-item" href="/chartchangeoptions/">Chartfield Change Request</a>
 								{% endif %}
+								{% if perms.oscauth.can_report %}
+								<a class="dropdown-item" href="/namechange/">Name Change App</a>
+								{% endif %}
 								{% if perms.oscauth.can_administer_access %}
 								<a class="dropdown-item" href="/auth/get_uniqname/">Manage User Access</a>
 								{% endif %}

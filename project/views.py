@@ -9,17 +9,21 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import login, authenticate, user_logged_in
 from django.contrib.auth.decorators import user_passes_test
 from django.views.decorators.http import require_http_methods
+from django.views.generic import View
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth import get_user_model
 from django import forms
+from .forms.fields import Phone, Uniqname
 from django.urls import resolve
 
 from ldap3 import Server, Connection, ALL
 
-from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput, UmOscChartfieldV, UmOscAcctChangeRequest
+from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput, UmOscChartfieldV, UmOscAcctChangeRequest, UmOscNameChangeV
 from order.models import Chartcom
 from oscauth.models import AuthUserDept, AuthUserDeptV
+from oscauth.utils import get_mc_user
 from datetime import datetime, date
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import F
@@ -478,3 +482,70 @@ Thank you!'''.format(
 
 	return HttpResponse(template.render(context, request))
 
+
+class NameChange(PermissionRequiredMixin, View):
+	permission_required = 'oscauth.can_report'
+
+	def post(self, request):
+
+		errors = []
+		messages = []
+
+		subscriber_id = self.request.POST.get('subscriber')
+
+		uniqname = self.request.POST.get('uniqname')
+		if uniqname:
+			user = get_mc_user(uniqname)
+			if user:
+				with connections['pinnacle'].cursor() as cursor:
+					result = cursor.callproc('um_osc_util_k.um_update_subscriber_name_p',  [subscriber_id, str(user.givenName), '', str(user.umichDisplaySn), str(user.mail)])
+					messages = ['Name updated successfully.']
+			else:
+				errors = ['Please enter a valid uniqname']
+
+		authorized_departments = list(AuthUserDeptV.objects.filter(user=self.request.user, codename='can_report').values_list('dept', flat=True))
+		phone_list = UmOscNameChangeV.objects.filter(deptid__in=authorized_departments)
+		helptext = Page.objects.get(permalink=f'/namechangeh')
+
+		return render(request, 'namechange.html', 
+            {'title': 'Name Change',
+			'errors': errors,
+			'messages': messages,
+			'uniqname': uniqname,
+			'phone_list': phone_list,
+			'helptext': helptext,
+            'subscriber_id': subscriber_id})
+
+	def get(self, request):
+		helptext = Page.objects.get(permalink=f'/namechangeh')
+		authorized_departments = list(AuthUserDeptV.objects.filter(user=self.request.user, codename='can_report').values_list('dept', flat=True))
+		phone_list = UmOscNameChangeV.objects.filter(deptid__in=authorized_departments)
+
+		return render(request, 'namechange.html', 
+            {'title': 'Name Change',
+			 'helptext': helptext,
+			 'phone_list': phone_list,})
+
+
+@permission_required(('oscauth.can_order'), raise_exception=True)
+def get_uniqname(request):
+	uniqname = request.GET.get('uniqname', None)
+
+	user = get_mc_user(uniqname)
+	if user:
+
+		employee = False
+		for role in user.umichInstRoles:
+			if 'Staff' in role or 'Faculty' in role or 'SponsoredAffiliate' in role:
+				employee = True
+				break
+
+		if not employee:
+			r = {'message': 'User is not faculty, staff or sponsored affiliate.'}
+		else:
+			r = {'name': user.displayName[0]}
+
+	else:
+		r = {'message': 'Uniqname not found.'}
+
+	return JsonResponse(r, safe=False)
