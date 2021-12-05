@@ -125,7 +125,7 @@ def send_tab_data(request):
         x = label.find('[', 0)
         y = label.find(']', x)
 
-        while x > 0:
+        while x >= 0:
             tag = label[x+1:y]
             element = request.POST.get(tag, '')
             label = label.replace('['+tag+']', element)
@@ -381,7 +381,7 @@ def add_to_cart(request):
         x = label.find('[', 0)
         y = label.find(']', x)
 
-        while x > 0:
+        while x >= 0:
             tag = label[x+1:y]
             element = request.POST[tag]
             label = label.replace('['+tag+']', element)
