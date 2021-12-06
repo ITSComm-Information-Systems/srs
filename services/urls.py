@@ -6,5 +6,7 @@ from . import views
 urlpatterns = [
 
     path('gcp/', views.Gcp.as_view()),
+    path('aws/', views.Aws.as_view()),
+    path('azure/', views.Azure.as_view()),
 
 ]
