@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 from django.contrib.admin.models import LogEntry, ADDITION
 from django.db import models
 from django.forms.fields import DecimalField
+from ldap3.protocol.rfc4511 import Control
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
 from project.integrations import MCommunity, TDx
@@ -718,12 +719,48 @@ class Server(models.Model):
 
 
 class ServerDisk(models.Model):
+    CONTROLLER_LIST = [(0,0),(1,1),(2,2),(3,3),]
+    DEVICE_LIST = []
+    for i in range(0,16):
+        if i != 7:  # VMWare hates 7's
+            DEVICE_LIST.append((i,i))
+
     server = models.ForeignKey(Server, related_name='disks', on_delete=models.CASCADE)
     name = models.CharField(max_length=10)
+    controller = models.IntegerField(choices=CONTROLLER_LIST)
+    device = models.IntegerField(choices=DEVICE_LIST)
     size = models.IntegerField()
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+
+        if self.controller == None or self.device == None:
+            self.set_scsi_id()
+
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+
+
+    def set_scsi_id(self):   # Set controller/device defaults based on name
+        num = int(self.name[4:])
+
+        controller = 0
+        device = 0
+
+        for i in range(0, num):
+            device += 1
+            if device == 7:
+                device = 8
+            elif device == 16:
+                device = 0
+                controller += 1
+
+        self.controller = controller
+        self.device = device
+
+        return 
+
 
 def get_disk_size(server):
     size = ServerDisk.objects.filter(server=server)
