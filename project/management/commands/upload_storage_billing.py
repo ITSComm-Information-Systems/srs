@@ -26,6 +26,25 @@ class Command(BaseCommand):
                     '  and a.rate_id = c.id ' \
                     '  and a.owner_id = d.id ' 
 
+        dataden_query = "select b.shortcode, b.size, a.amount_used, a.name, a.created_date, c.name as rate_name, " \
+                    " case    " \
+                    "  when a.research_computing_package = True and b.shortcode = '123758' and (select count(*) from order_arcbilling where arc_instance_id = a.id) = 1 Then " \
+                    "    case when (a.amount_used < 1 or a.amount_used is null) then    " \
+                    "        round(c.rate * 1 , 2)       " \
+                    "    when a.amount_used > 10 then   " \
+                    "        round(c.rate * 10 , 2)    " \
+                    "    else    " \
+                    "        round(c.rate * ceil(a.amount_used) ,2)     " \
+                    "    end     " \
+                    "  else    " \
+                    "    round(c.rate * b.size,2)      " \
+                    "  end as total_cost, d.name as owner  " \
+                    "from order_arcinstance a, order_arcbilling b, order_storagerate c, oscauth_ldapgroup d " \
+                    "where b.arc_instance_id = a.id " \
+                    "  and a.rate_id = c.id " \
+                    "  and a.owner_id = d.id " \
+                    "  and a.service_id = 9 order by a.name, a.created_date "
+
         turbo_query = "select b.shortcode, b.size, a.amount_used, a.name, a.created_date, c.name as rate_name, " \
                     " case    " \
                     "  when a.research_computing_package = True and b.shortcode = '123150' and (select count(*) from order_arcbilling where arc_instance_id = a.id) = 1 Then " \
@@ -67,7 +86,7 @@ class Command(BaseCommand):
         elif self.service == 'Locker-Storage':
             sql = arc_ts_query + ' and a.service_id = 10 order by a.name, a.created_date'
         elif self.service == 'Data-Den':
-            sql = arc_ts_query + ' and a.service_id = 11 order by a.name, a.created_date'
+            sql = dataden_query
         elif self.service == 'MiBackup':
             sql = mibackup_query
             self.owner_email = 'its.storage@umich.edu'
@@ -104,7 +123,7 @@ class Command(BaseCommand):
         csvwriter = csv.writer(csvfile)
         if self.service == 'MiServer':
             csvwriter.writerow(['id','cpu','created_date','os_id','os_code','managed','ad_group','shortcode','size','name','rate_name','total_cost','owner'])
-        elif self.service == 'Turbo':
+        elif self.service == 'Turbo' or self.service == 'Data-Den':
             csvwriter.writerow(['shortcode','size','amount_used', 'name','date_created','rate_name','total_cost','owner'])
         else:
             csvwriter.writerow(['shortcode','size','name','date_created','rate_name','total_cost','owner'])
