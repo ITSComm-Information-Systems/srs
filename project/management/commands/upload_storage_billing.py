@@ -43,7 +43,7 @@ class Command(BaseCommand):
                     "where b.arc_instance_id = a.id " \
                     "  and a.rate_id = c.id " \
                     "  and a.owner_id = d.id " \
-                    "  and a.service_id = 9 order by a.name, a.created_date "
+                    "  and a.service_id = 11 order by a.name, a.created_date "
 
         turbo_query = "select b.shortcode, b.size, a.amount_used, a.name, a.created_date, c.name as rate_name, " \
                     " case    " \
