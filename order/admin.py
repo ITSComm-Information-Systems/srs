@@ -189,11 +189,11 @@ class ServerDiskInline(admin.TabularInline):
     model = ServerDisk
     ordering = ('name',)
 
-    def has_add_permission(self, request, obj=None):
-        return user_has_permission(request, obj)
+    #def has_add_permission(self, request, obj=None):
+    #    return user_has_permission(request, obj)
 
-    def has_change_permission(self, request, obj=None):
-        return user_has_permission(request, obj)
+    #def has_change_permission(self, request, obj=None):
+    #    return user_has_permission(request, obj)
         
 
 @admin.register(Database)
@@ -267,8 +267,8 @@ class ServerAdmin(ServiceInstanceAdmin):
     class Media:
         js = ('order/js/admin_server.js',)
 
-    def has_change_permission(self, request, obj=None):
-        return user_has_permission(request, obj)
+    #def has_change_permission(self, request, obj=None):
+    #    return user_has_permission(request, obj)
 
 
 @admin.register(Ticket)
