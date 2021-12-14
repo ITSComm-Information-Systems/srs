@@ -38,6 +38,18 @@ $(document).ready(function() {
     		$('#submitBtn').show();
     	}
     })
+
+    $("form").submit(function () {  // Prevent multiple submissions
+		// submit more than once return false
+		$(this).submit(function () {
+		  console.log('prevent click')
+		  return false;
+		});
+		// submit once return true
+		return true;
+	  });
+
+
 }) 
 
 function next(num_tabs) {
