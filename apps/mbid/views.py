@@ -43,28 +43,17 @@ def cycle():
     # current cycle does not exist, closed cycle exists: open=False, viewable=True
     try: # seeing if open bidding cycle exists
         current_cycle = UmEcommMbidCriticalDate.objects.get(bidding_closed='O')
-        cycle_info['current_year'] = current_cycle.bidding_year
-        cycle_info['current_month_num'] = current_cycle.bidding_month
-        cycle_info['current_month'] = convert[current_cycle.bidding_month]
-
-        cycle_info['current_open_date'] = datetime.strptime(
-            str(current_cycle.bidding_open_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
-        cycle_info['current_close_date'] = datetime.strptime(
-            str(current_cycle.bidding_close_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
         # Need to auto-close the bidding cycle
         if current_cycle.bidding_close_time < datetime.now():
-            current_cycle.bidding_closed = 'C'
-            current_cycle.save()
+            UmEcommMbidCriticalDate.objects.filter(bidding_closed='O').update(bidding_closed='C')
+            # current_cycle.bidding_closed = 'C'
+            # current_cycle.save(update_fields=["bidding_closed"])
             cycle_info['open'] = False
             cycle_info['viewable'] = True
+            print(cycle_info)
+            return cycle_info
         # Bidding cycle is open
         else:
-            cycle_info['open'] = True
-            cycle_info['viewable'] = True
-    except: # there is no open bidding cycle
-        try: # seeing if the bidding cycle is closed but not archived
-            current_cycle = UmEcommMbidCriticalDate.objects.get(
-                bidding_closed='C')
             cycle_info['current_year'] = current_cycle.bidding_year
             cycle_info['current_month_num'] = current_cycle.bidding_month
             cycle_info['current_month'] = convert[current_cycle.bidding_month]
@@ -72,15 +61,27 @@ def cycle():
             cycle_info['current_open_date'] = datetime.strptime(
                 str(current_cycle.bidding_open_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
             cycle_info['current_close_date'] = datetime.strptime(
-                str(current_cycle.bidding_close_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
-            
+            str(current_cycle.bidding_close_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
+
+            cycle_info['open'] = True
+            cycle_info['viewable'] = True
+
+            print(cycle_info)
+            return cycle_info
+    except: # there is no open bidding cycle
+        try: # seeing if the bidding cycle is closed but not archived
+            current_cycle = UmEcommMbidCriticalDate.objects.get(bidding_closed='C')
             cycle_info['open'] = False
             cycle_info['viewable'] = True
+
+            print(cycle_info)
+            return cycle_info
         except:
             cycle_info['open'] = False
-            cycle_info['viewable'] = False   
+            cycle_info['viewable'] = False
 
-    return cycle_info
+            print(cycle_info)
+            return cycle_info
 
 # All MBid users views
 
@@ -121,13 +122,11 @@ def create_cycle(request):
         month = convert[item.bidding_month]
         cycles.append(str(month)+' '+str(item.bidding_year))
 
-    if (request.method == 'POST') and (request.POST.get('infopage') == 'Done'):
-        return redirect('complete/1')
-
     if (request.method == 'POST') and (request.POST.get('makeCycle') == 'Create'):
+        print(request.POST)
         openDateTime = request.POST.get('openDate')+' 00:00:00'
         closeDateTime = request.POST.get('closeDate')+' 23:59:59'
-
+        print('creating critical dates')
         UmEcommMbidCriticalDate.objects.create(bidding_open_date=openDateTime,
                                                bidding_open_time=openDateTime,
                                                bidding_close_date=closeDateTime,
@@ -139,8 +138,9 @@ def create_cycle(request):
                                                    'bidMonth')],
                                                date_created=datetime.now().strftime("%Y-%m-%d %H:%M"),
                                                date_last_updated=datetime.now().strftime("%Y-%m-%d %H:%M"))
-
+        print('running proc')
         run_proc()
+        print('proc complete')
         rows = []
         datalist = UmEcommMbidWarehseInput.objects.filter(bidding_closed='O')
         for data in datalist:
@@ -166,7 +166,6 @@ def create_cycle(request):
             'confirm': True,
         })
     else:
-
         form = createCycle()
         return render(request, 'mbid/a_createCycle.html', {
             'form': form,
@@ -197,8 +196,7 @@ def edit_cycle(request):
         target = request.POST.get('info').split()
         month = target[0]
         year = target[1]
-        result = UmEcommMbidCriticalDate.objects.get(
-            bidding_month=month, bidding_year=year)
+        result = UmEcommMbidCriticalDate.objects.get(bidding_month=month, bidding_year=year)
         if request.POST.get('cycleAction') == 'edit':
             oldOpenDate = result.bidding_open_date.strftime("%Y-%m-%d")
             oldCloseDate = result.bidding_close_date.strftime("%Y-%m-%d")
@@ -206,6 +204,7 @@ def edit_cycle(request):
             newCloseDate = request.POST.get('newCloseDate')
 
             if (newOpenDate != ''):
+                UmEcommMbidCriticalDate.objects.filter(bidding_closed='O').update(bidding_open_time=newOpenDate+' 00:00:00',bidding_open_date = newOpenDate+' 00:00:00')
                 result.bidding_open_time = newOpenDate+' 00:00:00'
                 result.bidding_open_date = newOpenDate+' 00:00:00'
                 result.save()
@@ -219,25 +218,31 @@ def edit_cycle(request):
                 newCloseDate = oldCloseDate
             message = "Bid Cycle dates changed."
         elif request.POST.get('cycleAction') == 'close':
-            result.bidding_closed = 'C'
-            result.bidding_close_date = datetime.now().strftime("%Y-%m-%d %H:%M")
-            result.bidding_close_time = datetime.now().strftime("%Y-%m-%d %H:%M")
-            result.save()
-            message = 'Bidding cycle {} {} has been closed.'.format(
-                convert[month], str(year))
-            run_proc()
-            UmEcommMbidVendorInput.objects.filter(
-                bidding_month=month, bidding_year=year).update(bidding_closed='C')
+            earlydate = datetime.now().strftime("%Y-%m-%d %H:%M")
+            UmEcommMbidCriticalDate.objects.filter(bidding_month=month, bidding_year=year).update(bidding_closed='C', bidding_close_date = earlydate, bidding_close_time = earlydate)
+            
+            # result.bidding_close_date = datetime.now().strftime("%Y-%m-%d %H:%M")
+            # result.bidding_close_time = datetime.now().strftime("%Y-%m-%d %H:%M")
+            # result.save()
+
+            message = 'Bidding cycle {} {} has been closed.'.format(convert[month], str(year))
+            # run_proc()
+            # UmEcommMbidVendorInput.objects.filter(
+            #     bidding_month=month, bidding_year=year).update(bidding_closed='C')
 
         elif request.POST.get('cycleAction') == 'archive':
-            result.bidding_closed = 'A'
-            result.date_last_updated = datetime.now().strftime("%Y-%m-%d %H:%M")
-            result.save()
-            message = 'Bidding cycle {} {} has been archived.'.format(
-                convert[month], str(year))
-            run_proc()
-            UmEcommMbidVendorInput.objects.filter(
-                bidding_month=month, bidding_year=year).update(bidding_closed='A')
+            UmEcommMbidCriticalDate.objects.filter(bidding_month=month, bidding_year=year).update(bidding_closed='A')
+            # result.bidding_closed = 'A'
+            # result.date_last_updated = datetime.now().strftime("%Y-%m-%d %H:%M")
+            # result.save()
+            message = 'Bidding cycle {} {} has been archived.'.format(convert[month], str(year))
+            # run_proc()
+            # UmEcommMbidVendorInput.objects.filter(
+            #     bidding_month=month, bidding_year=year).update(bidding_closed='A')
+        elif request.POST.get('cycleAction') == 'delete':
+            UmEcommMbidCriticalDate.objects.get(bidding_month=month, bidding_year=year).delete()
+            UmEcommMbidWarehseInput.objects.filter(bidding_month=month, bidding_year=year).delete()
+            message= 'deleted'
 
         return render(request, 'mbid/message.html', context={'message': message})
 
