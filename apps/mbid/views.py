@@ -204,16 +204,18 @@ def edit_cycle(request):
             newCloseDate = request.POST.get('newCloseDate')
 
             if (newOpenDate != ''):
-                UmEcommMbidCriticalDate.objects.filter(bidding_closed='O').update(bidding_open_time=newOpenDate+' 00:00:00',bidding_open_date = newOpenDate+' 00:00:00')
-                result.bidding_open_time = newOpenDate+' 00:00:00'
-                result.bidding_open_date = newOpenDate+' 00:00:00'
-                result.save()
-            elif (newOpenDate == ''):
-                newOpenDate = oldOpenDate
+                UmEcommMbidCriticalDate.objects.filter(bidding_month = month, bidding_year = year).update(bidding_open_date = newOpenDate+' 00:00:00', bidding_open_time=newOpenDate+' 00:00:00')
+                # result.bidding_open_time = newOpenDate+' 00:00:00'
+                # result.bidding_open_date = newOpenDate+' 00:00:00'
+                # result.save()
+            # elif (newOpenDate == ''):
+            #     UmEcommMbidCriticalDate.objects.filter(bidding_month = month, bidding_year = year).update(bidding_open_time=newOpenDate+' 00:00:00', bidding_open_date = newOpenDate+' 00:00:00')
+            #     newOpenDate = oldOpenDate
             if (newCloseDate != ''):
-                result.bidding_close_time = newCloseDate+' 23:59:59'
-                result.bidding_close_date = newCloseDate+' 23:59:59'
-                result.save()
+                UmEcommMbidCriticalDate.objects.filter(bidding_month = month, bidding_year = year).update(bidding_close_date = newCloseDate+' 00:00:00', bidding_close_time=newCloseDate+' 00:00:00')
+                # result.bidding_close_time = newCloseDate+' 23:59:59'
+                # result.bidding_close_date = newCloseDate+' 23:59:59'
+                # result.save()
             elif (newCloseDate == ''):
                 newCloseDate = oldCloseDate
             message = "Bid Cycle dates changed."
@@ -568,6 +570,7 @@ def update_vendor_table(request):
                 date_last_updated=datetime.now().strftime("%Y-%m-%d %H:%M")
                 )
 
+    print('complete upload')
     email = EmailMessage(
         subject='MBid Update',
         body='Your bids were uploaded',
