@@ -1101,6 +1101,7 @@ function chartcomChange(obj) {
     $('#formset_wrapper').append($('#emptyform_wrapper').html().replace(/__prefix__/g, form_idx));
   
     $('#id_form-' + form_idx + '-name').val('disk' + form_idx);
+    $('#id_form-' + form_idx + '-scsi').val('SCSI-0:' + form_idx);
     total_form.val(parseInt(form_idx)+1);
   
     delbuttons = $('.fa-minus-circle');
