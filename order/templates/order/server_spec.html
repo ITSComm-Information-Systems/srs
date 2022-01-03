@@ -43,6 +43,11 @@
                 <div class="form-inline disk-div" style="display: block;">
                     {{ diskform.id }}
                     {{ diskform.name }}
+                    {% if diskform.initial.device == None %}
+                        <input type="text" value="SCSI-0:{{ diskform.initial.name|slice:'4:' }}" class="form-control col-2" readonly="" id="id_form-0-scsi">
+                    {% else %}
+                        <input type="text" value="SCSI-{{ diskform.initial.controller }}:{{ diskform.initial.device }}" class="form-control col-2" readonly="" id="id_form-0-scsi">
+                    {% endif %}
                     {{ diskform.size }}
                     {{ diskform.uom }}
                     <span class="float-right disk-cost"></span>
@@ -58,6 +63,7 @@
             <div id="emptyform_wrapper" style="display: none">
                 <div id="diskdiv__prefix__" class="form-inline disk-div" style="display: block;">
                 {{ tab.form.disk_formset.empty_form.name }}
+                <input type="text" class="form-control col-2" readonly="" id="id_form-__prefix__-scsi">
                 {{ tab.form.disk_formset.empty_form.size }}
                 {{ tab.form.disk_formset.empty_form.uom }}&nbsp;&nbsp;
                     <a onclick="deleteDisk(this);" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>

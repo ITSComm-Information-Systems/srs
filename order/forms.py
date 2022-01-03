@@ -837,7 +837,7 @@ class ServerDataForm(TabForm):
 class DiskForm(forms.ModelForm):
     id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     name = forms.CharField()
-    name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
+    name.widget.attrs.update({'class': 'form-control col-2', 'readonly': True})  
 
     size = forms.IntegerField(initial=10)
     size.widget.attrs.update({'class': 'form-control disk-size validate-integer', 'step': 10, 'min': '10'})  
@@ -871,7 +871,7 @@ class DiskForm(forms.ModelForm):
 
 class DiskDisplayForm(forms.ModelForm):
     name = forms.CharField()
-    name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
+    name.widget.attrs.update({'class': 'form-control col-2', 'readonly': True})  
 
     size = forms.IntegerField(min_value=1, initial=10)
     size.widget.attrs.update({'class': 'form-control disk-size', 'readonly': True})  

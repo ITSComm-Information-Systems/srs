@@ -187,7 +187,7 @@ def user_has_permission(request, obj=None):
 
 class ServerDiskInline(admin.TabularInline):
     model = ServerDisk
-    ordering = ('name',)
+    ordering = ('controller','device')
 
     #def has_add_permission(self, request, obj=None):
     #    return user_has_permission(request, obj)
