@@ -34,7 +34,7 @@
 </h1>
 
 <p hidden id="dept_mgr"></p>
-{% if deptids|length > 1 %}
+{% if deptids|length > 0 %}
 <form id="choose_dept" method="POST">{% csrf_token %}
   <div class="row align-items-start mb-4 justify-content-center mt-5" id="select_dept">
     <div class="input-group col-md-6">
