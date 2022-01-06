@@ -9,7 +9,7 @@ class ServerDiskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServerDisk
-        fields = ['name', 'size']
+        fields = ['name', 'size', 'controller', 'device']
 
 class ChoiceSerializer(serializers.ModelSerializer):
 
