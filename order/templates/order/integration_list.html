@@ -1,0 +1,27 @@
+<h1>{{ title }}</h1>
+
+<a href="/orders/integration/?filter=TBD" style="float: center">TBD</a>
+<a href="/orders/integration/" style="float: center">ALL</a>
+
+<table>
+    <tr>
+        <th>SRS ID</th>
+        <th>Date</th>
+        <th>User</th>
+        <th>Priority</th>
+        <th>Due Date</th>
+        <th>Service</th>
+        <th>Pinnacle ID</th>
+    </tr>
+    {% for order in order_list %}
+    <tr>
+        <td><a href="{{ order.id }}">{{ order.id }}</a></td>
+        <td>{{ order.create_date }}</td>
+        <td>{{ order.created_by.username }}</td>
+        <td>{{ order.priority }}</td>
+        <td>{{ order.due_date }}</td>
+        <td>{{ order.service }}</td>
+        <td>{{ order.order_reference }}</td>
+    </tr>
+    {% endfor %}
+</table>
