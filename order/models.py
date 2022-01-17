@@ -930,7 +930,10 @@ class Order(models.Model):
                 }
 
         if self.due_date:
-            data['due_date'] = self.due_date
+            if type(self.due_date) == str:   # If resubmitting this is in date format
+                data['due_date'] = self.due_date
+            else:
+                data['due_date'] = self.due_date.strftime('%Y-%m-%d')
 
         item_list = Item.objects.filter(order_id=self.id)
         elements = Element.objects.exclude(target__isnull=True).exclude(target__exact='')

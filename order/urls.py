@@ -20,6 +20,7 @@ urlpatterns = [
 
     path('detail/<int:order_id>', views.get_order_detail),
     path('integration/<int:order_id>', views.Integration.as_view()),
+    path('integration/', views.get_order_list),
 
     path('chartcom/<int:deptid>', views.ManageChartcom.as_view()),
     path('chartcom/', views.ManageChartcom.as_view()),
