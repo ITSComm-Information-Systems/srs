@@ -534,17 +534,21 @@ def view_time_display(request):
 def get_date_range(date_range):
     date_end = datetime.date(datetime.now())
 
-    if date_range == 'Last Week':
+    if date_range == 'Last 7 Days':
         today = date.today()
         idx = (today.weekday() + 1) % 7 # MON = 0, SUN = 6 -> SUN = 0 .. SAT = 6
         date_start = today - timedelta(7+idx)
         date_end = today - timedelta(7+idx-6)
 
-    if date_range == 'Last 3 Months':
+    elif date_range == 'Last 3 Months':
         date_start = date_end - timedelta(days=92)
 
-    if date_range == 'Last 6 Months':
+    elif date_range == 'Last 6 Months':
         date_start = date_end - timedelta(days=183)
+
+    else:
+        print('unknown date range', date_range)
+        date_start = None
 
     return date_start, date_end
 
