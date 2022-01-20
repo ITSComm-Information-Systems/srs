@@ -448,6 +448,22 @@ def delete_from_cart(request):
         dept = request.POST['itemIdDept']
         return HttpResponseRedirect('/orders/cart/' + dept) 
 
+
+@permission_required('oscauth.admin')
+def get_order_list(request):
+    
+    filter = {}
+    if request.GET.get('filter') == 'TBD':
+        filter['order_reference'] = 'TBD'
+
+    template = loader.get_template('order/integration_list.html')
+    context = {
+        'title': 'Admin Order List',
+        'order_list': Order.objects.all().prefetch_related('created_by','service').filter(**filter).order_by('-id'),
+    }
+    return HttpResponse(template.render(context, request))
+
+
 class Integration(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
