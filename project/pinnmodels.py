@@ -1143,7 +1143,7 @@ class UmRteInput(models.Model):
                                     on_delete=models.CASCADE)
   actual_mins_display = models.CharField(max_length=10, blank=True, null=True)
   notes = models.CharField(max_length=4000, blank=True, null=True)
-  date_added = models.DateField(blank=True, null=True)
+  date_added = models.DateTimeField(blank=True, null=True)
   date_processed = models.DateField(blank=True, null=True)
   messages = models.CharField(max_length=2000, blank=True, null=True)
   request_no = models.BigIntegerField(primary_key=True)
