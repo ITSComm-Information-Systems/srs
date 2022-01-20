@@ -86,6 +86,7 @@ def single_tech(request):
 @permission_required('rte.add_umrteinput', raise_exception=True)
 def single_submit(request):
     template = loader.get_template('rte/submitted.html')
+    now = datetime.now()
 
     if request.method == 'POST':
         num_entries = request.POST.get('num_entries')
@@ -122,7 +123,7 @@ def single_submit(request):
                     rate_number=rate_level,
                     actual_mins_display=duration,
                     notes=notes,
-                    date_added=date.today(),
+                    date_added=now, # date.today(),
                     date_processed=None,
                     messages=None,
                     request_no=None)
@@ -131,9 +132,8 @@ def single_submit(request):
         # Add record to Pinnacle
         curr = connections['pinnacle'].cursor()
         uniqname = request.user.username
-        datetime_added = date.today()
         try:
-            curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, datetime_added])
+            curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, now])
         except:
             print('error')
         curr.close()
@@ -209,6 +209,7 @@ def get_assigned_group(request):
 @permission_required('rte.add_submitalltechs', raise_exception=True)
 def multiple_submit(request):
     template = loader.get_template('rte/submitted.html')
+    now = datetime.now()
 
     if request.method == 'POST':
         num_entries = request.POST.get('num_entries')
@@ -245,7 +246,7 @@ def multiple_submit(request):
                     rate_number=rate_level,
                     actual_mins_display=duration,
                     notes=notes,
-                    date_added=date.today(),
+                    date_added=now, #date.today(),
                     date_processed=None,
                     messages=None,
                     request_no=None)
@@ -254,8 +255,7 @@ def multiple_submit(request):
         # Add record to Pinnacle
         curr = connections['pinnacle'].cursor()
         uniqname = request.user.username
-        datetime_added = date.today()
-        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, datetime_added])
+        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, now])
         curr.close()
 
     context = {
@@ -384,6 +384,7 @@ def get_update_entries(request):
 # Submit updated times
 @permission_required('rte.add_umrteinput', raise_exception=True)
 def update_submit(request):
+    now = datetime.now()
     template = loader.get_template('rte/submitted.html')
 
     if request.method == 'POST':
@@ -422,7 +423,7 @@ def update_submit(request):
                 rate_number=rate_level,
                 actual_mins_display=duration,
                 notes=notes,
-                date_added=date.today(),
+                date_added=now, #date.today(),
                 date_processed=None,
                 messages=None,
                 request_no=None)
@@ -431,8 +432,7 @@ def update_submit(request):
         # Add record to Pinnacle
         curr = connections['pinnacle'].cursor()
         uniqname = request.user.username
-        datetime_added = date.today()
-        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, datetime_added])
+        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, now])
         curr.close()
 
     context = {
@@ -534,7 +534,7 @@ def view_time_display(request):
 def get_date_range(date_range):
     date_end = datetime.date(datetime.now())
 
-    if date_range == 'Last 7 Days':
+    if date_range == 'Last Week':
         today = date.today()
         idx = (today.weekday() + 1) % 7 # MON = 0, SUN = 6 -> SUN = 0 .. SAT = 6
         date_start = today - timedelta(7+idx)
