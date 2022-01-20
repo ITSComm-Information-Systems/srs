@@ -910,8 +910,12 @@ class ServerSpecForm(TabForm):
             self.initial['backup'] = str(self.instance.backup)
             self.initial['replicated'] = str(self.instance.replicated)
 
-            if self.instance.os.label.startswith('Microsoft'):  # Unmanaged windows can edit disk
+            if 'indows' in self.instance.os.label:  # Managed Linux can't edit disk
+                print('windos')
                 self.fields['size_edit'].initial = 1
+            elif 'anaged' not in self.instance.os.label: 
+                self.fields['size_edit'].initial = 1
+                print('not managed')
 
         if self.request.POST.get('database'):
             self.set_database_defaults()
