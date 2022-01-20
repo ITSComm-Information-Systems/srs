@@ -910,8 +910,12 @@ class ServerSpecForm(TabForm):
             self.initial['backup'] = str(self.instance.backup)
             self.initial['replicated'] = str(self.instance.replicated)
 
-            if self.instance.os.label.startswith('Windows'):
+            if 'indows' in self.instance.os.label:  # Managed Linux can't edit disk
+                print('windos')
                 self.fields['size_edit'].initial = 1
+            elif 'anaged' not in self.instance.os.label: 
+                self.fields['size_edit'].initial = 1
+                print('not managed')
 
         if self.request.POST.get('database'):
             self.set_database_defaults()
@@ -926,7 +930,7 @@ class ServerSpecForm(TabForm):
         if self.is_bound:
             self.disk_formset = self.DiskFormSet(self.request.POST, initial=ServerDisk.objects.filter(server_id=instance_id).order_by('name').values())
             #x = self.disk_formset.is_valid()
-        elif self.request.POST.get('action_type') == 'M':          
+        elif self.request.POST.get('action_type') == 'M':        
             self.disk_formset = self.DiskFormSet(initial=ServerDisk.objects.filter(server_id=instance_id).order_by('name').values())
         else:
             self.fields['size_edit'].initial = 1
