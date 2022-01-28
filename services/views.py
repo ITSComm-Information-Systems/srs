@@ -3,6 +3,7 @@ from django.template import loader
 from django.views.generic import View
 from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import UserPassesTestMixin
+from .forms import AwsNewForm
 
 
 
@@ -39,11 +40,13 @@ class Aws(ServicesView):
 
     def get(self, request):
 
-        template = loader.get_template('services/gcp.html')
+        template = loader.get_template('services/aws.html')
         #template = loader.get_template('/order/cart.html')
+        form = AwsNewForm()
 
         context = {
             'title': 'Order Amazon Web Services',
+            'form': form
         }
         return HttpResponse(template.render(context, request))
 
