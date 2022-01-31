@@ -502,10 +502,10 @@ def pricecheck(bidprice):
     # return False if invalid, return float if ok
     try:
         num = float(bidprice)
-        if (num > 0) and (num == round(num, 2)): 
+        if (num >= 0) and (num == round(num, 2)): 
             return round(num, 2) # standardize bid to 2 decimal points
         else:
-            return False # invalid due to being 0
+            return False # invalid due to being less than 0
     except:
         return False   # invalid due to being a string
 
@@ -733,118 +733,3 @@ def create_mike_report(request):
 
     # Everything written and attached in if statements. Send email.
     # email.send(fail_silently=False)
-
-
-# # For testing purposes when making MikeReports
-def direct_download(request):
-    # convert to dictionary as with email version
-    post = request.POST.dict()
-
-    # Filter information
-    yearmonth = post['pickCycle'].split()
-    bidding_month = yearmonth[0]
-    bidding_year = yearmonth[1]
-    # Set up CSV
-    target_xlsx = HttpResponse(content_type='text/csv')
-    if (post['downloadOption'] == 'noBids'):
-        # Set up CSV
-        target_xlsx['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(bidding_month)+'_'+str(bidding_year)+'_noBids.csv"'
-        fieldnames = ['U-M Code', 'Description', 'Bid Status', 'UM Notes']
-        writer = csv.DictWriter(target_xlsx, fieldnames=fieldnames)
-        # Header
-        writer.writeheader()
-
-        # Get data
-        havebids = set(UmEcommMbidVendorInput.objects.filter(
-            bidding_year=bidding_year, bidding_month=bidding_month).values_list('item_code', flat=True))
-        rows = UmEcommMbidWarehseInput.objects.filter(
-            bidding_year=bidding_year, bidding_month=bidding_month).exclude(item_code__in=havebids)
-
-        # Write data to csv
-        for row in rows:
-            writer.writerow({'U-M Code': row.item_code, 'Description': row.item_desc,
-                                'Bid Status': row.bid_status, 'UM Notes': row.um_notes})
-        return target_xlsx
-
-    elif (post['downloadOption'] == 'allBids'):
-        # Set up CSV
-        target_xlsx['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(bidding_month)+'_'+str(bidding_year)+'_allBids.csv"'
-        fieldnames = ['U-M Code', 'Description', 'Bid Status']
-        # Get all vendors in bid cycle for header
-        for vendor in set(UmEcommMbidVendorInput.objects.filter(bidding_year=bidding_year,bidding_month=bidding_month).values_list('vendor_id', flat=True)):
-            fieldnames.extend(
-                [vendor + ' Notes', vendor + ' Bids'])
-
-        writer = csv.DictWriter(target_xlsx, fieldnames=fieldnames)
-        # Header
-        writer.writeheader()
-
-        # Get list of UM Codes with bids
-        item_codes_list = sorted(set(UmEcommMbidVendorInput.objects.filter(
-            bidding_year=bidding_year, bidding_month=bidding_month).values_list('item_code', flat=True)))
-
-        # Write to CSV
-        for item in item_codes_list:
-            info = UmEcommMbidWarehseInput.objects.get(
-                item_code=item, bidding_year=bidding_year, bidding_month=bidding_month)
-            towrite = {
-                'U-M Code': item, 'Description': info.item_desc, 'Bid Status': info.bid_status}
-
-            results = UmEcommMbidVendorInput.objects.filter(
-                bidding_year=bidding_year, bidding_month=bidding_month, item_code=item)
-            for row in results:
-                towrite[row.vendor_id+' Notes'] = row.vendor_notes
-                towrite[row.vendor_id + ' Bids'] = row.vendor_price
-
-            writer.writerow(towrite)
-
-        return target_xlsx
-
-    elif post.get('downloadOption') == 'lowBids':
-        # Set up CSV, 3 lowest bidders
-        target_xlsx['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(bidding_month)+'_'+str(bidding_year)+'_lowBids.csv"'
-        fieldnames = ['U-M Code', 'Description', 'Bid Status', 'Vendor 1', 'Vendor Notes 1', 'Vendor Price 1',
-                        'Vendor 2', 'Vendor Notes 2', 'Vendor Price 2', 'Vendor 3', 'Vendor Notes 3', 'Vendor Price 3']
-        writer = csv.DictWriter(target_xlsx, fieldnames=fieldnames)
-        # Header
-        writer.writeheader()
-
-        # Get list of UM Codes with bids
-        item_codes_list = sorted(set(UmEcommMbidVendorInput.objects.filter(
-            bidding_year=bidding_year, bidding_month=bidding_month).values_list('item_code', flat=True)))
-
-        # Write to CSV
-        for item in item_codes_list:
-            results = UmEcommMbidVendorInput.objects.filter(
-                bidding_year=bidding_year, bidding_month=bidding_month, item_code=item).order_by('vendor_price')[:2]
-            info = UmEcommMbidWarehseInput.objects.get(
-                item_code=item, bidding_year=bidding_year, bidding_month=bidding_month)
-            towrite = {'U-M Code': item, 'Description': info.item_desc,
-                        'Bid Status': info.bid_status}  # Basic
-            if len(results) == 3:
-                towrite['Vendor 1'] = results[0].vendor_id
-                towrite['Vendor Notes 1'] = results[0].vendor_notes
-                towrite['Vendor Price 1'] = results[0].vendor_price
-                towrite['Vendor 2'] = results[1].vendor_id
-                towrite['Vendor Notes 2'] = results[1].vendor_notes
-                towrite['Vendor Price 2'] = results[1].vendor_price
-                towrite['Vendor 3'] = results[2].vendor_id
-                towrite['Vendor Notes 3'] = results[2].vendor_notes
-                towrite['Vendor Price 3':] = [2].vendor_price
-            elif len(results) == 2:
-                towrite['Vendor 1'] = results[0].vendor_id
-                towrite['Vendor Notes 1'] = results[0].vendor_notes
-                towrite['Vendor Price 1'] = results[0].vendor_price
-                towrite['Vendor 2'] = results[1].vendor_id
-                towrite['Vendor Notes 2'] = results[1].vendor_notes
-                towrite['Vendor Price 2'] = results[1].vendor_price
-            elif len(results) == 1:
-                towrite['Vendor 1'] = results[0].vendor_id
-                towrite['Vendor Notes 1'] = results[0].vendor_notes
-                towrite['Vendor Price 1'] = results[0].vendor_price
-
-            writer.writerow(towrite)
-        return target_xlsx
