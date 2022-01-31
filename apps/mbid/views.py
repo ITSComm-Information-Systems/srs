@@ -503,7 +503,7 @@ def pricecheck(bidprice):
     try:
         num = float(bidprice)
         if (num >= 0) and (num == round(num, 2)): 
-            return round(num, 2) # standardize bid to 2 decimal points
+            return str(round(num, 2)) # standardize bid to 2 decimal points
         else:
             return False # invalid due to being less than 0
     except:
