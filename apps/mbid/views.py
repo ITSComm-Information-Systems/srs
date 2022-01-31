@@ -545,30 +545,29 @@ def update_vendor_table(request):
     for string in post.getlist('uploads'):
         row = dict({x.split(':')[0]: x.split(':')[1]
                     for x in [item for item in string.split(';')]})
-        if (float(row['BidPrice']) != 0):
-            UmEcommMbidVendorInput.objects.create(
-                bidding_year=cycle_info['current_year'],
-                bidding_month=cycle_info['current_month_num'],
-                bidding_closed='O',
-                item_code=row['UMCode'],
-                item_desc=row['Description'],
-                subclass_id=UmEcommMbidCommodityV.objects.get(
-                    item_code=row['UMCode']).subclass_id,
-                manufacturer_name=row['Manufacturer'],
-                manufacturer_part_number=row['ManufacturerPartNumber'],
-                vendor_id=vendor_id,
-                vendor_name=vendor_name,
-                vendor_email_address=vendor_email_address,
-                vendor_address1=vendor_address1,
-                vendor_address2=vendor_address2,
-                vendor_city=vendor_city,
-                vendor_state=vendor_state,
-                vendor_zip_code=vendor_zip_code,
-                vendor_price=float(row['BidPrice']),
-                vendor_notes=str(row['VendorNotes']),
-                date_created=datetime.now().strftime("%Y-%m-%d %H:%M"),
-                date_last_updated=datetime.now().strftime("%Y-%m-%d %H:%M")
-                )
+        UmEcommMbidVendorInput.objects.create(
+            bidding_year=cycle_info['current_year'],
+            bidding_month=cycle_info['current_month_num'],
+            bidding_closed='O',
+            item_code=row['UMCode'],
+            item_desc=row['Description'],
+            subclass_id=UmEcommMbidCommodityV.objects.get(
+                item_code=row['UMCode']).subclass_id,
+            manufacturer_name=row['Manufacturer'],
+            manufacturer_part_number=row['ManufacturerPartNumber'],
+            vendor_id=vendor_id,
+            vendor_name=vendor_name,
+            vendor_email_address=vendor_email_address,
+            vendor_address1=vendor_address1,
+            vendor_address2=vendor_address2,
+            vendor_city=vendor_city,
+            vendor_state=vendor_state,
+            vendor_zip_code=vendor_zip_code,
+            vendor_price=float(row['BidPrice']),
+            vendor_notes=str(row['VendorNotes']),
+            date_created=datetime.now().strftime("%Y-%m-%d %H:%M"),
+            date_last_updated=datetime.now().strftime("%Y-%m-%d %H:%M")
+            )
 
     print('complete upload')
     email = EmailMessage(
