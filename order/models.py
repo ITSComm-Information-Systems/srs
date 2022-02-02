@@ -1174,6 +1174,22 @@ class Item(models.Model):
 
         elif action.service.name == 'miServer':
             attributes.append({'ID': 1954, 'Value': self.data.get('shortcode')})
+            mc = MCommunity()
+            hr = mc.get_user(self.created_by.username)   #EXEC_VP_MED_AFF
+            michmed = False
+
+            for afil in hr['umichHR']:
+                if afil.find('deptVPArea=EXEC_VP_MED_AFF') > 0:
+                    michmed = True
+                    break
+
+            if michmed:
+                michmed = 17859  # Yes
+            else:
+                michmed = 17860  # No
+
+            attributes.append({'ID': 7907, 'Value': michmed})
+
             if action.type == 'M':
                 instance_id = self.data.get('instance_id')
                 instance = Server.objects.get(id=instance_id)
@@ -1301,7 +1317,9 @@ class Item(models.Model):
         if self.data.get('ad_group'):
             rec.admin_group = LDAPGroup().lookup( self.data['ad_group'] )
         else:
-            if rec.admin_group.name != 'MiDatabase Support Team':
+            if not rec.admin_group:
+                rec.admin_group = rec.owner                
+            elif rec.admin_group.name != 'MiDatabase Support Team':
                 rec.admin_group = rec.owner
 
         MCommunity().add_entitlement(rec.admin_group.name)
