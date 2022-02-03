@@ -1,7 +1,10 @@
+from sqlite3 import Timestamp
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 import re
+
+from django.forms import CharField, JSONField
 from project.integrations import ShortCodesAPI
 
 def validate_shortcode(value):
@@ -52,6 +55,14 @@ class ShortCodeField(models.CharField):
         kwargs['help_text']='Six digit shortcode for billing purposes.'
 
         super().__init__(*args, **kwargs)
+
+
+class ActionLog(models.Model):
+     timestamp = models.DateTimeField()
+     user = models.CharField(max_length=20)
+     url = models.CharField(max_length=200)
+     data = models.JSONField()
+
 
 class ChoiceManager(models.Manager):
 
