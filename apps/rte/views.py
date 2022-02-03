@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.template import loader
 from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput
+from project.models import ActionLog
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
 from django.db import connections
@@ -89,6 +90,11 @@ def single_submit(request):
     now = datetime.now()
 
     if request.method == 'POST':
+        try:
+            ActionLog.objects.create(user=request.user.username, url=request.path, data=request.POST, timestamp=now)
+        except:
+            print('error adding action single_submit')
+
         num_entries = request.POST.get('num_entries')
         tech_id = request.POST.get('tech_id')
         assigned_group = request.POST.get('assigned_group')
@@ -140,6 +146,52 @@ def single_submit(request):
 
     context = {
         'title': 'Rapid Time Entry Submit'
+    }
+
+    return HttpResponse(template.render(context, request))
+
+
+
+# Log
+@permission_required('rte.add_submitalltechs', raise_exception=True)
+def get_action_log(request):
+    template = loader.get_template('rte/actionlog.html')
+
+    action_list = ActionLog.objects.all().order_by('-timestamp')
+
+    context = {
+        'title': 'RTE Action Log',
+        'action_list': action_list,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+@permission_required('rte.add_submitalltechs', raise_exception=True)
+def get_action_log_entry(request, id):
+    template = loader.get_template('rte/actionlogentry.html')
+
+    action = ActionLog.objects.get(id=id)
+
+    entry_list = []
+    for key, value in action.data.items():
+
+        pos = key.find('_')
+        if pos > 0:
+            x = key[0:pos]
+            if x.isnumeric():
+                x = int(x) - 1
+                if len(entry_list) < x+1:
+                    entry_list.append({})
+                entry_list[x][key[pos+1:]] = value
+
+    start = action.timestamp - timedelta(milliseconds=800)
+    input_list = UmRteInput.objects.filter(date_added__range=[start, action.timestamp])
+
+    context = {
+        'title': 'RTE Action Log Entry',
+        'action': action,
+        'entry_list': entry_list,
+        'input_list': input_list,
     }
 
     return HttpResponse(template.render(context, request))
@@ -212,6 +264,11 @@ def multiple_submit(request):
     now = datetime.now()
 
     if request.method == 'POST':
+        try:
+            ActionLog.objects.create(user=request.user.username, url=request.path, data=request.POST, timestamp=now)
+        except:
+            print('error adding action single_submit')
+
         num_entries = request.POST.get('num_entries')
         work_order = request.POST.get('work_order')
 
@@ -388,6 +445,11 @@ def update_submit(request):
     template = loader.get_template('rte/submitted.html')
 
     if request.method == 'POST':
+        try:
+            ActionLog.objects.create(user=request.user.username, url=request.path, data=request.POST, timestamp=now)
+        except:
+            print('error adding action single_submit')
+
         num_entries = request.POST.get('num_entries')
         tech_id = request.POST.get('tech_id')
 

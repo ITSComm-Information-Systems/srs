@@ -14,6 +14,8 @@ urlpatterns = [
     path('update/', views.update),
     path('view-time/display/', views.view_time_display),
     path('view-time/', views.view_time_load),
+    path('actionlog/', views.get_action_log),
+    path('actionlog/<int:id>/', views.get_action_log_entry),
     url(r'', views.load_rte),
     
 ]
