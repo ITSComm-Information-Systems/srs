@@ -151,6 +151,52 @@ def single_submit(request):
     return HttpResponse(template.render(context, request))
 
 
+
+# Log
+@permission_required('rte.add_submitalltechs', raise_exception=True)
+def get_action_log(request):
+    template = loader.get_template('rte/actionlog.html')
+
+    action_list = ActionLog.objects.all().order_by('-timestamp')
+
+    context = {
+        'title': 'RTE Action Log',
+        'action_list': action_list,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+@permission_required('rte.add_submitalltechs', raise_exception=True)
+def get_action_log_entry(request, id):
+    template = loader.get_template('rte/actionlogentry.html')
+
+    action = ActionLog.objects.get(id=id)
+
+    entry_list = []
+    for key, value in action.data.items():
+
+        pos = key.find('_')
+        if pos > 0:
+            x = key[0:pos]
+            if x.isnumeric():
+                x = int(x) - 1
+                if len(entry_list) < x+1:
+                    entry_list.append({})
+                entry_list[x][key[pos+1:]] = value
+
+    start = action.timestamp - timedelta(milliseconds=800)
+    input_list = UmRteInput.objects.filter(date_added__range=[start, action.timestamp])
+
+    context = {
+        'title': 'RTE Action Log Entry',
+        'action': action,
+        'entry_list': entry_list,
+        'input_list': input_list,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+
 # Multiple technicians, single order
 @permission_required('rte.add_submitalltechs', raise_exception=True)
 def multiple_tech(request):
