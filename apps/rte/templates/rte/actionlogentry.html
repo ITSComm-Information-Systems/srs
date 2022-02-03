@@ -1,0 +1,70 @@
+<h1>{{ title }}</h1>
+
+<style>
+    table, th, td {
+  border: 1px solid black;
+    }
+</style>
+
+<hr>
+<h3>Submitted Form Data</h3>
+
+
+Entries: {{ action.data.num_entries }} 
+<br>
+
+{{ action.data.tech_id }}
+{{ action.data.work_order }}
+{{ action.timestamp }}
+<br>
+
+<table class=''>
+    <tr>
+        <th>WO</th>
+        <th>Tech</th>
+        <th>Rate</th>
+        <th>Date</th>
+        <th>Duration</th>
+        <th>Note</th>
+    </tr>
+
+    {% for entry in entry_list %}
+    <tr>
+        <td>{{ entry.work_order }}</td>
+        <td>{{ entry.techid }}</td>
+        <td>{{ entry.rate }}</td>
+        <td>{{ entry.assigned_date }}</td>
+        <td>{{ entry.duration }}</td>
+        <td>{{ entry.notes }}</td>
+    </tr>    
+    {% endfor %}
+
+</table>
+
+<hr>
+<h3>um_rte_input</h3>
+<table>
+    <tr>
+        <th>Uniqname</th>
+        <th>Labor Code</th>
+        <th>Full WO</th>
+        <th>Assigned Date</th>
+        <th>Actual Mins</th>
+        <th>Date Added</th>
+        <th>Date Processed</th>
+    </tr>
+
+    {% for rec in input_list %}
+    <tr>
+        <td>{{ rec.uniqname }}</td>
+        <td>{{ rec.labor_code }}</td>
+        <td>{{ rec.full_prord_wo_number }}</td>
+        <td>{{ rec.assigned_date }}</td>
+        <td>{{ rec.actual_mins_display }}</td>
+        <td>{{ rec.date_added }}</td>
+        <td>{{ rec.date_processed }}</td>
+    </tr>
+
+    {% endfor %}
+</table>
+
