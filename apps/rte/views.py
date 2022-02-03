@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.template import loader
 from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput
+from project.models import ActionLog
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
 from django.db import connections
@@ -89,6 +90,11 @@ def single_submit(request):
     now = datetime.now()
 
     if request.method == 'POST':
+        try:
+            ActionLog.objects.create(user=request.user.username, url=request.path, data=request.POST, timestamp=now)
+        except:
+            print('error adding action single_submit')
+
         num_entries = request.POST.get('num_entries')
         tech_id = request.POST.get('tech_id')
         assigned_group = request.POST.get('assigned_group')
@@ -212,6 +218,11 @@ def multiple_submit(request):
     now = datetime.now()
 
     if request.method == 'POST':
+        try:
+            ActionLog.objects.create(user=request.user.username, url=request.path, data=request.POST, timestamp=now)
+        except:
+            print('error adding action single_submit')
+
         num_entries = request.POST.get('num_entries')
         work_order = request.POST.get('work_order')
 
@@ -388,6 +399,11 @@ def update_submit(request):
     template = loader.get_template('rte/submitted.html')
 
     if request.method == 'POST':
+        try:
+            ActionLog.objects.create(user=request.user.username, url=request.path, data=request.POST, timestamp=now)
+        except:
+            print('error adding action single_submit')
+
         num_entries = request.POST.get('num_entries')
         tech_id = request.POST.get('tech_id')
 
