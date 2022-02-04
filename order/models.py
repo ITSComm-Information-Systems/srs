@@ -1301,7 +1301,9 @@ class Item(models.Model):
         if self.data.get('ad_group'):
             rec.admin_group = LDAPGroup().lookup( self.data['ad_group'] )
         else:
-            if rec.admin_group.name != 'MiDatabase Support Team':
+            if not rec.admin_group:
+                rec.admin_group = rec.owner                
+            elif rec.admin_group.name != 'MiDatabase Support Team':
                 rec.admin_group = rec.owner
 
         MCommunity().add_entitlement(rec.admin_group.name)
