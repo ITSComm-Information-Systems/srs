@@ -4,6 +4,7 @@ from django.views.generic import View
 from oscauth.models import AuthUserDept
 from django.contrib.auth.mixins import UserPassesTestMixin
 from .forms import AwsNewForm
+from project.integrations import create_ticket
 
 
 
@@ -20,6 +21,7 @@ class ServicesView(UserPassesTestMixin, View):
 class Gcp(ServicesView):
 
     def post(self, request):
+        print('post GCP')
         return HttpResponseRedirect('/orders/cart/' + request.POST['deptid'])
 
     def get(self, request):
@@ -36,7 +38,12 @@ class Gcp(ServicesView):
 class Aws(ServicesView):
 
     def post(self, request):
-        return HttpResponseRedirect('/orders/cart/' + request.POST['deptid'])
+        print('post AWS', request.POST)
+
+        create_ticket('ADD', 'AWS', request.POST)
+
+
+        return HttpResponseRedirect('/services/aws/')
 
     def get(self, request):
 

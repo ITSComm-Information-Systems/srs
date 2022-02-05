@@ -1,8 +1,9 @@
+from http.client import REQUEST_URI_TOO_LONG
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from project.integrations import UmAPI, MCommunity, TDx
-
-
+from project.integrations import UmAPI, MCommunity, TDx, AwsPayload
+from services.models import AWS
+from django.contrib.auth.models import User
 import requests, json
 
 
@@ -46,6 +47,16 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
+
+        x = AwsPayload('Delete')
+        print(x.payload)
+
+        return
+
+        aws = AWS.objects.get(id=243)
+        user = User.objects.get(username='djamison')
+        post_data = {'csrfmiddlewaretoken': ['L37YATeBoCVF7vtMbV9B84Ocj0rlcL6Yc4aoN4Wi6Go0tjaR8wdOtsIkV36rd1VW'], 'requestor': ['djamison'], 'owner_group': ['grp'], 'contact_phone': ['734-867-5309'], 'short_code': ['940479'], 'migrate': ['No'], 'redhat': ['No'], 'vpn': ['No'], 'consult': ['No']}
+        create_ticket(aws, 'ADD', post_data, user, title='Amazon Web Services at U-M')
 
         if options['ticket']:
             tdx = TDx()
