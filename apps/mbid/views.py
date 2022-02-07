@@ -109,7 +109,7 @@ def complete(request, message):
         context['message'] = "Created Bid Cycle " + \
             cycle_info['current_month']+' '+cycle_info['current_year']
     if (message == 2):
-        context['message'] = 'You will be emailed a CSV'
+        context['message'] = 'Report will be emailed to you when complete. It may take about 5 minutes.'
     return render(request, 'mbid/message.html', context)
 
 
@@ -290,11 +290,11 @@ def review(request):
         cycles.append((item.bidding_year, month, status, item.bidding_month))
 
     if request.method == 'POST':
-        return create_mike_report(request)
-        # thread = threading.Thread(
-        #     target=create_mike_report, args=(request,))
-        # thread.start()
-        # return redirect('complete/2')
+        # return create_mike_report(request)
+        thread = threading.Thread(
+            target=create_mike_report, args=(request,))
+        thread.start()
+        return redirect('complete/2')
         
         
     return render(request, 'mbid/a_reviewBids.html', {'title': 'Review Bid Cycles', 'cycles': cycles})
@@ -585,8 +585,8 @@ def create_mike_report(request):
 
     # Ready email
     email = EmailMessage(
-        subject='MBid CSV Report',
-        body='See attached CSV',
+        subject='MBid Report',
+        body='See attached',
         from_email='srs@umich.edu',
         to=[request.user.email],)
 
@@ -617,15 +617,16 @@ def create_mike_report(request):
         for row in rows:
             ws.append([row.item_code, row.item_desc, row.bid_status, row.um_notes])
 
-        # wb.save(target_xlsx)
-        # email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) +
-        #              '_noBids.csv', target_xlsx.getvalue(), 'application/ms-excel')
+        # for actual
+        wb.save(target_xlsx)
+        email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) + '_noBids.xlsx', target_xlsx.getvalue(), 'application/ms-excel')
 
-        response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(convert[bidding_month])+'_' + \
-            str(bidding_year)+'_noBids.xlsx"'
-        return response
+        # for testing
+        # response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
+        # response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+        #     str(convert[bidding_month])+'_' + \
+        #     str(bidding_year)+'_noBids.xlsx"'
+        # return response
 
 
     elif (post['downloadOption'] == 'allBids'):
@@ -659,15 +660,15 @@ def create_mike_report(request):
             ws.append(list(fieldnamesDict.values()))
 
         # for actual
-        # wb.save(target_xlsx)
-        # email.attach('MikeReport_' + str(convert[bidding_month])+'_'+str(bidding_year) + '_allBids.csv', target_xlsx.getvalue(), 'application/ms-excel')
+        wb.save(target_xlsx)
+        email.attach('MikeReport_' + str(convert[bidding_month])+'_'+str(bidding_year) + '_allBids.csv', target_xlsx.getvalue(), 'application/ms-excel')
 
         # for testing
-        response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(convert[bidding_month])+'_' + \
-            str(bidding_year)+'_allBids.xlsx"'
-        return response
+        # response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
+        # response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+        #     str(convert[bidding_month])+'_' + \
+        #     str(bidding_year)+'_allBids.xlsx"'
+        # return response
 
     elif post.get('downloadOption') == 'lowBids':
         # Set header for 3 lowest bidders
@@ -720,15 +721,15 @@ def create_mike_report(request):
                 # towrite['Vendor Price 1'] = results[0].vendor_price
             ws.append(towrite)
 
-        # for testing
-        response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(convert[bidding_month])+'_' + \
-            str(bidding_year)+'_lowBids.xlsx"'
-        return response
-
         # for actual
-        # email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) + '_lowestBids.csv', target_xlsx.getvalue(), 'application/ms-excel')
+        email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) + '_lowestBids.xlsx', target_xlsx.getvalue(), 'application/ms-excel')
+        
+        # for testing
+        # response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
+        # response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+        #     str(convert[bidding_month])+'_' + \
+        #     str(bidding_year)+'_lowBids.xlsx"'
+        # return response
 
     # Everything written and attached in if statements. Send email.
-    # email.send(fail_silently=False)
+    email.send(fail_silently=False)
