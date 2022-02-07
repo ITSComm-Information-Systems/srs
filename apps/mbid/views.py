@@ -7,7 +7,6 @@ from django.shortcuts import render, redirect, reverse
 
 # Functional
 from apps.mbid.forms import createCycle
-import csv
 import math
 import time
 import threading
@@ -661,7 +660,7 @@ def create_mike_report(request):
 
         # for actual
         wb.save(target_xlsx)
-        email.attach('MikeReport_' + str(convert[bidding_month])+'_'+str(bidding_year) + '_allBids.csv', target_xlsx.getvalue(), 'application/ms-excel')
+        email.attach('MikeReport_' + str(convert[bidding_month])+'_'+str(bidding_year) + '_allBids.xlsx', target_xlsx.getvalue(), 'application/ms-excel')
 
         # for testing
         # response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
@@ -693,35 +692,21 @@ def create_mike_report(request):
             towrite = [info.item_code, info.item_desc, info.bid_status]  
 
             if len(results) == 3:
-                towrite.extend([results[0].vendor_id,results[0].vendor_notes,results[0].vendor_price,
-                results[1].vendor_id,results[1].vendor_notes,results[1].vendor_price,
-                results[2].vendor_id,results[2].vendor_notes,results[2].vendor_price])
-                # towrite['Vendor 1'] = results[0].vendor_id
-                # towrite['Vendor Notes 1'] = results[0].vendor_notes
-                # towrite['Vendor Price 1'] = results[0].vendor_price
-                # towrite['Vendor 2'] = results[1].vendor_id
-                # towrite['Vendor Notes 2'] = results[1].vendor_notes
-                # towrite['Vendor Price 2'] = results[1].vendor_price
-                # towrite['Vendor 3'] = results[2].vendor_id
-                # towrite['Vendor Notes 3'] = results[2].vendor_notes
-                # towrite['Vendor Price 3':] = [2].vendor_price
+                towrite.extend([results[0].vendor_id, results[0].vendor_notes, results[0].vendor_price,
+                results[1].vendor_id, results[1].vendor_notes, results[1].vendor_price,
+                results[2].vendor_id, results[2].vendor_notes, results[2].vendor_price])
+
             elif len(results) == 2:
                 towrite.extend([results[0].vendor_id,results[0].vendor_notes,results[0].vendor_price,
                 results[1].vendor_id,results[1].vendor_notes,results[1].vendor_price])
-                # towrite['Vendor 1'] = results[0].vendor_id
-                # towrite['Vendor Notes 1'] = results[0].vendor_notes
-                # towrite['Vendor Price 1'] = results[0].vendor_price
-                # towrite['Vendor 2'] = results[1].vendor_id
-                # towrite['Vendor Notes 2'] = results[1].vendor_notes
-                # towrite['Vendor Price 2'] = results[1].vendor_price
+
             elif len(results) == 1:
-                towrite.extend([results[0].vendor_id,results[0].vendor_notes,results[0].vendor_price])
-                # towrite['Vendor 1'] = results[0].vendor_id
-                # towrite['Vendor Notes 1'] = results[0].vendor_notes
-                # towrite['Vendor Price 1'] = results[0].vendor_price
+                towrite.extend([results[0].vendor_id, results[0].vendor_notes, results[0].vendor_price])
+
             ws.append(towrite)
 
         # for actual
+        wb.save(target_xlsx)
         email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) + '_lowestBids.xlsx', target_xlsx.getvalue(), 'application/ms-excel')
         
         # for testing
