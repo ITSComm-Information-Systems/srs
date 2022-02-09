@@ -255,67 +255,84 @@ class PayloadCore():
         return 0
 
 class Payload():
+    title = 'SRS Request'
+    description = title
     Web = 4
     Open = 77
     Medium = 20
 
-    BASE = {
-        "SourceID": Web,             # Web
-        "StatusID": Open,            # Open
-        "PriorityID": Medium,          # Medium
-    }
+    source_id = Web
+    status_id = Open
+    priority_id = Medium
 
     def add_attribute(self, id, value):
-        self.payload['Attributes'].append(
+        self.data['Attributes'].append(
             {
                 "ID": id, 
                 "Value": value
             }
         )
 
+    def __init__(self, action, requester_email):
+        
+        self.data = {
+            "FormID": self.form_id,
+            "TypeID": self.type_id,
+            "SourceID": self.source_id,
+            "StatusID": self.status_id,
+            "ServiceID": self.service_id,
+            "ResponsibleGroupID": self.responsible_group_id,
+            "Title": self.title,
+            "RequestorEmail": requester_email,
+            "Description": self.description,
+            "Attributes": [] }
 
-class Choice():
+
+
+
+        #self.payload = self.BASE | self.payload
+        self.add_attribute(self.request_type.id, getattr(self.request_type, action))
+
+
+class ChoiceAttribute():
     
     def __init__(self, id, **kwargs):
         self.id = id
         for arg in kwargs:
-            print(arg)
+            #print(arg)
             setattr(self, arg, kwargs[arg])
 
 
 class AwsPayload(Payload):
-    request_type = Choice(1879, New=95, Modify=96, Delete=4699)
+    form_id = 152                # ITS-Amazon Web Services at U-M Account Requests - Form
+    type_id = 5                  # Cloud Services
+    service_id = 81              # ITS-Amazon Web Services at U-M Account Requests
+    responsible_group_id = 6     # ITS-CloudComputeServices
+    request_type = ChoiceAttribute(1879, New=95, Modify=96, Delete=4699)    
+    title = 'Amazon Web Services at U-M'
 
-    payload = {
-        "FormID": 152,            # ITS-Amazon Web Services at U-M Account Requests - Form
-        "TypeID": 5,              # Cloud Services
-        "ServiceID": 81,          # ITS-Amazon Web Services at U-M Account Requests
-        "ResponsibleGroupID": 6,  # ITS-CloudComputeServices
-        "Title": "Amazon Web Services at U-M",
-        "RequestorEmail": 'djamison@umich.edu',
-        "Description": 'New AWS instance.',
-        "Attributes": []
-    }
 
-    def __init__(self, action):
-        self.payload = self.BASE | self.payload
-        self.add_attribute(self.request_type.id, getattr(self.request_type, action))
-
+class GcpPayload(Payload):
+    form_id = 22                 # ITS-Amazon Web Services at U-M Account Requests - Form
+    type_id = 5                  # Cloud Services
+    service_id = 12,             # ITS-Amazon Web Services at U-M Account Requests
+    responsible_group_id = 6     # ITS-CloudComputeServices
+    request_type = ChoiceAttribute(1916, New=160, Modify=161, Delete=5465)
+    project_id = 1997
+    change_mc_group = ChoiceAttribute(1998, Yes=217, No=218)
+    change_shortcode = ChoiceAttribute(2000, Yes=219, No=220)
 
 
 def create_ticket(instance, action, post_data, user, **kwargs):
     service = type(instance).__name__
     service = service.upper()
 
-    payload = getattr(Payload, service.upper())
-    #payload.update(Payload.BASE)
-    # TODO Add kwargs
-    payload = payload | kwargs
-    payload['RequestorEmail'] = user.email
-    print(payload)
+    payload = globals()[service.capitalize() + 'Payload'](action, user.email)
 
-    x = TDx().create_ticket(payload)
-    print(x.status_code, x.text)
+    print(payload.data)
+
+    #x = TDx().create_ticket(payload)
+    #print(x.status_code, x.text)
 
 def create_ticket_database_modify(instance, user, description):
 
