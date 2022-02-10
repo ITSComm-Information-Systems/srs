@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput
 from project.models import ActionLog
@@ -17,6 +17,16 @@ def load_rte(request):
     context = {
         'title': 'Rapid Time Entry'
     }
+    return HttpResponse(template.render(context, request))
+
+
+def get_confirmation(request):
+    template = loader.get_template('rte/submitted.html')
+
+    context = {
+        'title': 'Rapid Time Entry Submit',
+    }
+
     return HttpResponse(template.render(context, request))
 
 # Single technician, multiple orders
@@ -144,12 +154,7 @@ def single_submit(request):
             print('error')
         curr.close()
 
-    context = {
-        'title': 'Rapid Time Entry Submit'
-    }
-
-    return HttpResponse(template.render(context, request))
-
+    return HttpResponseRedirect('/apps/rte/confirmation/') 
 
 
 # Log
@@ -315,11 +320,7 @@ def multiple_submit(request):
         curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, now])
         curr.close()
 
-    context = {
-        'title': 'Rapid Time Entry Submit',
-    }
-
-    return HttpResponse(template.render(context, request))
+    return HttpResponseRedirect('/apps/rte/confirmation/') 
 
 
 # Modify time
@@ -497,11 +498,7 @@ def update_submit(request):
         curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, now])
         curr.close()
 
-    context = {
-        'title': 'Rapid Time Entry Submit',
-    }
-
-    return HttpResponse(template.render(context, request))
+    return HttpResponseRedirect('/apps/rte/confirmation/') 
 
 
 # Find open, unbilled entries based on tech ID

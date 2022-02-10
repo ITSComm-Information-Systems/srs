@@ -16,6 +16,7 @@ urlpatterns = [
     path('view-time/', views.view_time_load),
     path('actionlog/', views.get_action_log),
     path('actionlog/<int:id>/', views.get_action_log_entry),
+    path('confirmation/', views.get_confirmation),
     url(r'', views.load_rte),
     
 ]
