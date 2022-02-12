@@ -15,7 +15,8 @@ class AWSAccountAdmin(admin.ModelAdmin):
 
 @admin.register(GCP)
 class GCPAdmin(admin.ModelAdmin):
-    list_display = ('account_id','billing_contact','shortcode')
+    pass
+    #list_display = ('account_id','billing_contact','shortcode')
     
 
 @admin.register(Azure)

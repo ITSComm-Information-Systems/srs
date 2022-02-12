@@ -10,10 +10,10 @@ from services.models import *
 import datetime, csv, sys
 import xml.etree.ElementTree as ET
 
+
 VERSION_ID = {}
 for choice in Choice.objects.filter(parent__code='AWS_VERSION'):
     VERSION_ID[choice.label] = choice.id
-
 
 CHOICE_LIST = {}
 # dt_acp, dt_cui, dt_ferpa, dt_fisma, dt_glba, dt_hsr, dt_itar, dt_itSecInfo, dt_otherData, dt_otherDataInfo, dt_pci, dt_phi, dt_pii, dt_snn
@@ -152,18 +152,18 @@ class Command(BaseCommand):
     def process_gcp_record(self, record):
         contact = record.billingContact.split('@')
 
-        obj, created = GCP.objects.get_or_create(
+        obj, created = GCPAccount.objects.get_or_create(
             account_id = record.billingId,
             defaults={'billing_contact': contact[0], 'shortcode': record.shortcode},
         )
 
-        instance = GCPProject()
+        instance = GCP()
         instance.account = obj 
 
-        #instance.account_id = record.awsAccountId
-        instance.billing_contact = record.billingContact
-        instance.shortcode = record.shortcode
-        instance.requestor = record.requestor
+        instance.gcp_account = obj
+        #instance.billing_contact = record.billingContact
+        #instance.shortcode = record.shortcode
+        instance.requestor = record.requestor[0:record.requestor.find('@')-1]
         instance.created_date = record.dateCreated
         #instance.data_classification = record.dataClassification
         #instance.regulated_data.set() = record
@@ -171,34 +171,37 @@ class Command(BaseCommand):
         #instance.egress_waiver = self.to_boo(record.EgressWaiver)
         instance.owner = LDAPGroup().lookup( record.mcomm )
         instance.security_contact = record.securityContact
-        #instance.version_id = VERSION_ID[record.version]
+        instance.project_id = record.projectId
         instance.vpn = self.to_boo(record.vpn)
-        
+
         instance.save()
+
+
+        instance.regulated_data.set( self.get_checkboxes(record) )
+        instance.non_regulated_data.set( self.get_checkboxes(record) )
 
         self.LOADS += 1
 
     def process_azure_record(self, record):
         instance = Azure()
 
-        instance.account_id = record.awsAccountId
+        instance.account_id = record.subscriptionID
         instance.billing_contact = record.billingContact
         instance.shortcode = record.shortcode
         instance.requestor = record.requestor
         instance.created_date = record.dateCreated
         instance.data_classification = record.dataClassification
-        instance.egress_waiver = self.to_boo(record.EgressWaiver)
         instance.owner = LDAPGroup().lookup( record.mcomm )
         instance.security_contact = record.securityContact
-        instance.version_id = VERSION_ID[record.version]
         instance.vpn = self.to_boo(record.vpn)
         
         instance.save()
 
         instance.regulated_data.set( self.get_checkboxes(record) )
+        instance.non_regulated_data.set( self.get_checkboxes(record) )
         #instance.non_regulated_data = record
 
-        print('process', record.awsAccountId, record.dt_pii)
+        #print('process', record.awsAccountId, record.dt_pii)
 
 
     def get_checkboxes(self, record):
@@ -206,6 +209,7 @@ class Command(BaseCommand):
 
         for key, value in CHOICE_LIST.items():
             if hasattr(record, key):
+                print(getattr(record, key))
                 if getattr(record, key) == 'True':
                     checkbox_list.append(value)
 
