@@ -1,5 +1,6 @@
 from django import forms
 from project.forms.fields import *
+from .models import AWS
 
 # Defaults
 CharField = forms.CharField( widget=forms.TextInput(attrs={'class': 'form-control'}) )
@@ -10,11 +11,11 @@ NoYes = forms.Select(choices=[('No','No',),('Yes','Yes',),] , attrs={'class': 'f
 NoYes = forms.Select(choices=[('No','No',),('Yes','Yes',),] , attrs={'class': 'form-control col-2'})
 
 
-class AwsNewForm(forms.Form):
+class AwsNewForm(forms.ModelForm):
     requestor = Uniqname(help_text='Please enter a valid uniqname.')
-    owner_group = McGroup(help_text="MCommunity Admin Group")  # TODO make this an admin group.
+    owner = McGroup(help_text="MCommunity Admin Group")  # TODO make this an admin group.
     contact_phone = forms.CharField( widget=forms.TextInput(attrs={'class': 'form-control'}) )
-    short_code = ShortCode()
+    shortcode = ShortCode()
     migrate = forms.BooleanField(label='Do you wish to bring an existing AWS account into the UM infrastructure?', widget=NoYes)
 
     redhat = forms.BooleanField(label='Include RedHat OS?', widget=NoYes)
@@ -22,3 +23,8 @@ class AwsNewForm(forms.Form):
     consult = forms.BooleanField(label='Request Consultation?', widget=NoYes)
 
     #Yes/No ask for 12 digit account number.
+
+    class Meta:
+        model = AWS
+        exclude = ['id','created_date','account_id','version']
+        #fields = 

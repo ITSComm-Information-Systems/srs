@@ -18,14 +18,37 @@ for choice in Choice.objects.filter(parent__code='AWS_VERSION'):
 CHOICE_LIST = {}
 # dt_acp, dt_cui, dt_ferpa, dt_fisma, dt_glba, dt_hsr, dt_itar, dt_itSecInfo, dt_otherData, dt_otherDataInfo, dt_pci, dt_phi, dt_pii, dt_snn
 for choice in Choice.objects.filter(parent__code__in=('REGULATED_SENSITIVE_DATA','NON_REGULATED_SENSITIVE_DATA')):
-    if choice.code == 'FERPA':
+    if choice.code == 'ATT':
+        CHOICE_LIST['dt_acp'] = choice.id
+    elif choice.code == 'CUI':
+        CHOICE_LIST['dt_cui'] = choice.id
+    elif choice.code == 'FERPA':
         CHOICE_LIST['dt_ferpa'] = choice.id
+    elif choice.code == 'FISMA':
+        CHOICE_LIST['dt_fisma'] = choice.id
     elif choice.code == 'GLBA':
         CHOICE_LIST['dt_glba'] = choice.id
     elif choice.code == 'HSR':
-        CHOICE_LIST['dt_hsr'] = choice.id
-    #else:
-    #    CHOICE_LIST[choice.code] = choice.id
+        CHOICE_LIST['ECR'] = choice.id
+    elif choice.code == 'dt_itar':
+        CHOICE_LIST['ITSEC'] = choice.id
+    elif choice.code == 'dt_itSecInfo':
+        CHOICE_LIST['OTHERNONREG'] = choice.id
+    elif choice.code == 'dt_otherDataInfo':
+        CHOICE_LIST['PCI'] = choice.id
+    elif choice.code == 'HIPAA':
+        CHOICE_LIST['dt_hipaa'] = choice.id
+        CHOICE_LIST['dt_phi'] = choice.id
+    elif choice.code == 'PPI':
+        CHOICE_LIST['dt_pii'] = choice.id
+    elif choice.code == 'SSN':
+        CHOICE_LIST['dt_snn'] = choice.id
+    else:
+        print(choice, 'not mapped')
+
+    # dt_otherData
+    #,dt_sensitiveData
+
 
 class Record:
     pass
@@ -45,12 +68,17 @@ class Command(BaseCommand):
         filename = options['filename']
         number_of_records = options['number_of_records']
 
+
         service = filename[:3].upper()
+        if service == 'AZU':
+            service = 'Azure'
+
         print('service', service)
 
         print(f'Process {filename} {service}')
 
         model = globals()[service]
+
         model.objects.all().delete()
         
         print('open file')
@@ -75,6 +103,8 @@ class Command(BaseCommand):
                         self.process_aws_record(record)
                     elif service == 'GCP':
                         self.process_gcp_record(record)
+                    elif service == 'Azure':
+                        self.process_azure_record(record)
 
                     line_count += 1
                 else:
@@ -148,11 +178,35 @@ class Command(BaseCommand):
 
         self.LOADS += 1
 
+    def process_azure_record(self, record):
+        instance = Azure()
+
+        instance.account_id = record.awsAccountId
+        instance.billing_contact = record.billingContact
+        instance.shortcode = record.shortcode
+        instance.requestor = record.requestor
+        instance.created_date = record.dateCreated
+        instance.data_classification = record.dataClassification
+        instance.egress_waiver = self.to_boo(record.EgressWaiver)
+        instance.owner = LDAPGroup().lookup( record.mcomm )
+        instance.security_contact = record.securityContact
+        instance.version_id = VERSION_ID[record.version]
+        instance.vpn = self.to_boo(record.vpn)
+        
+        instance.save()
+
+        instance.regulated_data.set( self.get_checkboxes(record) )
+        #instance.non_regulated_data = record
+
+        print('process', record.awsAccountId, record.dt_pii)
+
+
     def get_checkboxes(self, record):
         checkbox_list = []
 
         for key, value in CHOICE_LIST.items():
-            if getattr(record, key) == 'True':
-                checkbox_list.append(value)
+            if hasattr(record, key):
+                if getattr(record, key) == 'True':
+                    checkbox_list.append(value)
 
         return checkbox_list
