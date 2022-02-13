@@ -5,8 +5,22 @@ from . import views
 
 urlpatterns = [
 
-    path('gcp/', views.Gcp.as_view()),
-    path('aws/', views.Aws.as_view()),
-    path('azure/', views.Azure.as_view()),
+    # /services/aws/1/delete/
+    # /services/aws/1/change/
+    # /services/aws/add/
+    # /services/aws/
+
+
+    path('gcp/add/', views.Gcp.as_view()),
+    path('aws/add/', views.Aws.as_view()),
+    path('azure/add/', views.Azure.as_view()),
+
+
+    path('<str:service>/', views.get_service_list),
+
+    path('<str:service>/<int:id>/change/', views.change_request),
+
+    #path('aws/add/', views.ServiceList.as_view()),
+    #path('azure/add/', views.ServiceList.as_view()),
 
 ]

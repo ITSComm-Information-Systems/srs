@@ -6,8 +6,17 @@ from oscauth.models import LDAPGroup
 from django.contrib.auth.models import User
 
 
+
+class Status(models.TextChoices):
+    ACTIVE = 'A', 'Active'
+    ENDED = 'E', 'Ended'
+    PENDING = 'P', 'Pending'
+
+
 class Cloud(models.Model):    # Core class for common fields/methods
+    instance_label = 'Instance'
     account_id = models.CharField(max_length=30)
+    status = models.CharField(max_length=1, choices = Status.choices, default=Status.ACTIVE)
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
     requestor = models.CharField(max_length=8)
     security_contact = models.CharField(max_length=80)
@@ -32,12 +41,13 @@ class Cloud(models.Model):    # Core class for common fields/methods
 
 
 class AWS(Cloud):
+    instance_label = 'Account'
     data_classification = models.CharField(max_length=10, blank=True, null=True)
     egress_waiver = models.BooleanField()
     version = models.ForeignKey(Choice, on_delete=models.CASCADE, limit_choices_to={"parent__code": "AWS_VERSION"}) 
 
     class Meta:
-        verbose_name_plural = 'AWS Accounts'
+        verbose_name = 'Amazon Web Services Account'
 
 
 class GCPAccount(Cloud):
@@ -51,20 +61,28 @@ class GCPAccount(Cloud):
     non_regulated_data = None
 
     class Meta:
-        verbose_name_plural = 'GCP Accounts'
+        verbose_name = 'Google Cloud Platform Account'
 
 
 class GCP(Cloud):
+    instance_label = 'Project'
     account_id = None
     gcp_account = models.ForeignKey(GCPAccount, on_delete=models.CASCADE)
     shortcode = None
     billing_contact = None
     project_id = models.CharField(max_length=40)
 
+    class Meta:
+        verbose_name = 'Google Cloud Platform Project'
+
+
     def __str__(self):
         return self.project_id
 
+
+
 class Azure(Cloud):
+    instance_label = 'Subscription'
     account_id = models.CharField(max_length=40, verbose_name='Subscription ID')
     name = models.CharField(max_length=40)
 
@@ -72,3 +90,9 @@ class Azure(Cloud):
     class Meta:
         verbose_name_plural = 'Azure Subscriptions'
         
+
+
+class Service():
+    aws = AWS
+    gcp = GCP
+    azure = Azure

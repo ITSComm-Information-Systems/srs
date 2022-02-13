@@ -717,9 +717,12 @@ class Services(UserPassesTestMixin, View):
 
         for service in service_list:
             if service.name == 'cloud':
-                service.actions = [{'label': 'Order Google Cloud', 'target': '/services/gcp'},
-                                   {'label': 'Order Microsoft Azure', 'target': '/services/azure'},
-                                   {'label': 'Order AWS', 'target': '/services/aws'} ]
+                service.actions = [{'label': 'Order Google Cloud Platform', 'target': '/services/gcp/add/'},
+                                   {'label': 'View/Change GCP Project', 'target': '/services/gcp'},
+                                   {'label': 'Order Microsoft Azure', 'target': '/services/azure/add/'},
+                                   {'label': 'View/Change Microsoft Azure', 'target': '/services/azure'},
+                                   {'label': 'Order AWS', 'target': '/services/aws/add/'},
+                                   {'label': 'View/Change AWS', 'target': '/services/aws/'} ]
             else:
                 service.actions = action_list.filter(service=service)
                 for action in service.actions:

@@ -15,34 +15,36 @@ VERSION_ID = {}
 for choice in Choice.objects.filter(parent__code='AWS_VERSION'):
     VERSION_ID[choice.label] = choice.id
 
-CHOICE_LIST = {}
+REGULATED_CHOICE_LIST = {}
+NON_REGULATED_CHOICE_LIST = {}
 # dt_acp, dt_cui, dt_ferpa, dt_fisma, dt_glba, dt_hsr, dt_itar, dt_itSecInfo, dt_otherData, dt_otherDataInfo, dt_pci, dt_phi, dt_pii, dt_snn
 for choice in Choice.objects.filter(parent__code__in=('REGULATED_SENSITIVE_DATA','NON_REGULATED_SENSITIVE_DATA')):
     if choice.code == 'ATT':
-        CHOICE_LIST['dt_acp'] = choice.id
+        NON_REGULATED_CHOICE_LIST['dt_acp'] = choice.id
     elif choice.code == 'CUI':
-        CHOICE_LIST['dt_cui'] = choice.id
+        NON_REGULATED_CHOICE_LIST['dt_cui'] = choice.id
     elif choice.code == 'FERPA':
-        CHOICE_LIST['dt_ferpa'] = choice.id
+        REGULATED_CHOICE_LIST['dt_ferpa'] = choice.id
     elif choice.code == 'FISMA':
-        CHOICE_LIST['dt_fisma'] = choice.id
+        REGULATED_CHOICE_LIST['dt_fisma'] = choice.id
     elif choice.code == 'GLBA':
-        CHOICE_LIST['dt_glba'] = choice.id
+        REGULATED_CHOICE_LIST['dt_glba'] = choice.id
     elif choice.code == 'HSR':
-        CHOICE_LIST['ECR'] = choice.id
+        REGULATED_CHOICE_LIST['ECR'] = choice.id
     elif choice.code == 'dt_itar':
-        CHOICE_LIST['ITSEC'] = choice.id
+        NON_REGULATED_CHOICE_LIST['ITSEC'] = choice.id
     elif choice.code == 'dt_itSecInfo':
-        CHOICE_LIST['OTHERNONREG'] = choice.id
+        REGULATED_CHOICE_LIST['OTHERNONREG'] = choice.id
     elif choice.code == 'dt_otherDataInfo':
-        CHOICE_LIST['PCI'] = choice.id
+        REGULATED_CHOICE_LIST['PCI'] = choice.id
     elif choice.code == 'HIPAA':
-        CHOICE_LIST['dt_hipaa'] = choice.id
-        CHOICE_LIST['dt_phi'] = choice.id
+        REGULATED_CHOICE_LIST['dt_hipaa'] = choice.id
+        REGULATED_CHOICE_LIST['dt_phi'] = choice.id
     elif choice.code == 'PPI':
-        CHOICE_LIST['dt_pii'] = choice.id
+        NON_REGULATED_CHOICE_LIST['dt_pii'] = choice.id
     elif choice.code == 'SSN':
-        CHOICE_LIST['dt_snn'] = choice.id
+        REGULATED_CHOICE_LIST['dt_snn'] = choice.id
+        REGULATED_CHOICE_LIST['dt_ssn'] = choice.id
     else:
         print(choice, 'not mapped')
 
@@ -77,9 +79,9 @@ class Command(BaseCommand):
 
         print(f'Process {filename} {service}')
 
-        model = globals()[service]
+        self.model = globals()[service]
 
-        model.objects.all().delete()
+        self.model.objects.all().delete()
         
         print('open file')
 
@@ -143,13 +145,14 @@ class Command(BaseCommand):
         
         instance.save()
 
-        instance.regulated_data.set( self.get_checkboxes(record) )
-        #instance.non_regulated_data = record
+        instance.regulated_data.set( self.get_checkboxes(record, True) )
+        instance.non_regulated_data.set( self.get_checkboxes(record, False) )
 
-        print('process', record.awsAccountId, record.dt_pii)
+        self.LOADS += 1
 
 
     def process_gcp_record(self, record):
+        print(self.model)
         contact = record.billingContact.split('@')
 
         obj, created = GCPAccount.objects.get_or_create(
@@ -157,7 +160,7 @@ class Command(BaseCommand):
             defaults={'billing_contact': contact[0], 'shortcode': record.shortcode},
         )
 
-        instance = GCP()
+        instance = self.model()
         instance.account = obj 
 
         instance.gcp_account = obj
@@ -177,8 +180,8 @@ class Command(BaseCommand):
         instance.save()
 
 
-        instance.regulated_data.set( self.get_checkboxes(record) )
-        instance.non_regulated_data.set( self.get_checkboxes(record) )
+        instance.regulated_data.set( self.get_checkboxes(record, True) )
+        instance.non_regulated_data.set( self.get_checkboxes(record, False) )
 
         self.LOADS += 1
 
@@ -197,19 +200,22 @@ class Command(BaseCommand):
         
         instance.save()
 
-        instance.regulated_data.set( self.get_checkboxes(record) )
-        instance.non_regulated_data.set( self.get_checkboxes(record) )
+        instance.regulated_data.set( self.get_checkboxes(record, True) )
+        instance.non_regulated_data.set( self.get_checkboxes(record, False) )
         #instance.non_regulated_data = record
 
         #print('process', record.awsAccountId, record.dt_pii)
 
 
-    def get_checkboxes(self, record):
+    def get_checkboxes(self, record, reg):
         checkbox_list = []
+        if reg:
+            CHOICE_LIST = REGULATED_CHOICE_LIST
+        else:
+            CHOICE_LIST = NON_REGULATED_CHOICE_LIST
 
         for key, value in CHOICE_LIST.items():
             if hasattr(record, key):
-                print(getattr(record, key))
                 if getattr(record, key) == 'True':
                     checkbox_list.append(value)
 
