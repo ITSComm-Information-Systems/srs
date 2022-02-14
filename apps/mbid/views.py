@@ -319,7 +319,7 @@ def create_cycle_report(request):
     ws = wb.active
     
     fieldnames = ['Manufacturer', 'UM Code', 'Manufacturer Part Number', 'Description', 'Bid Status',
-                  'Required QTY @ Local Vendor Branch', 'Estimated Annual Qty', 'Unit of Measure', 'UM Notes', 'Vendor Notes', 'Bid Price']
+                  'Required QTY @ Local Vendor Branch', 'Estimated Annual Qty', 'Unit of Measure', 'Vendor Notes', 'Bid Price', 'UM Notes']
 
     ws.append(fieldnames)
 
@@ -335,20 +335,29 @@ def create_cycle_report(request):
         um_notes = data.um_notes
         rows.append({'mfr': mfr, 'umcode': umcode, 'manufacturer_part_number': manufacturer_part_number, 'desc': desc, 'bid_status': bid_status,
                      'req_qty': req_qty, 'annual_qty': annual_qty, 'uom': uom, 'um_notes': um_notes})
-        ws.append([mfr, umcode, manufacturer_part_number, desc, bid_status, req_qty, annual_qty, uom, um_notes])
+        ws.append([mfr, umcode, manufacturer_part_number, desc, bid_status, req_qty, annual_qty, uom, '', '', um_notes])
        
     # Only allow vendor notes and bid price columns to be edited
     ws.protection.sheet = True
+    for cell in ws['I']:
+        cell.protection = Protection(locked=False)
     for cell in ws['J']:
         cell.protection = Protection(locked=False)
-    for cell in ws['K']:
-        cell.protection = Protection(locked=False)
 
-    # Sheet formatting widths to auto
+    # Sheet formatting: freeze top row, set column widths
     ws.freeze_panes = ws['A2']
-    for letter in ['A','B','C','D','E','F','G','H','I','J','K']:
-        ws.column_dimensions[letter].auto_size = True
-
+    ws.column_dimensions['A'].width = 26 # Manufacturer
+    ws.column_dimensions['B'].width = 8 # UM Code
+    ws.column_dimensions['C'].width = 24 # Manufacturer Part Number
+    ws.column_dimensions['D'].width = 50 # Description
+    ws.column_dimensions['E'].width = 14 # Bid Status
+    ws.column_dimensions['F'].width = 16 # Required QTY @ Local Vendor Branch
+    ws.column_dimensions['G'].width = 19 # Estimated Annual Qty
+    ws.column_dimensions['H'].width = 14 # Unit of Measure
+    ws.column_dimensions['I'].width = 12 # Vendor Notes
+    ws.column_dimensions['J'].width = 8 # Bid Price
+    
+    
     if request.method == 'POST':
         response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="MBid_' + \
@@ -370,7 +379,7 @@ def create_cycle_report(request):
 def upload_bids(request):
     # Two parts to this view
     # 1. allowing vendors to upload
-    # 2. reviewing the vendor upload before submitting to databse
+    # 2. reviewing the vendor upload before submitting to database
     cycle_info = cycle()
     context = {'title': 'Upload Bids', 'cycle_info': cycle_info}
     try: # No matter who it is you NEED to be in the vendor table to upload
@@ -403,9 +412,9 @@ def upload_bids(request):
                 'RequiredQTY':row[5],
                 'AnnualQty':row[6], 
                 'UnitofMeasure':row[7], 
-                'UMNotes':row[8], 
-                'VendorNotes':row[9], 
-                'BidPrice':row[10]})
+                'UMNotes':row[10], 
+                'VendorNotes':row[8], 
+                'BidPrice':row[9]})
         
         # data validation
         valid = []
