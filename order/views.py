@@ -356,7 +356,7 @@ class Submit(PermissionRequiredMixin, View):
 @csrf_exempt
 def send_email(request):   #Pinnacle will route non prod emails to a test address
     if request.method == "POST":
-        subject = request.POST['emailSubject'] + ' question from: ' + request.user.username
+        subject = request.POST.get(['emailSubject']) + ' question from: ' + request.user.username
         body = request.POST['emailBody'] 
         address = (request.POST.get('emailAddress', 'ITCOM.csr@umich.edu'))
         print(request.POST)
