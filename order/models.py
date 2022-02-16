@@ -1184,11 +1184,11 @@ class Item(models.Model):
                     break
 
             if michmed:
-                michmed = 17859  # Yes
+                michmed = 21619  # Yes
             else:
-                michmed = 17860  # No
+                michmed = 21618  # No
 
-            attributes.append({'ID': 7907, 'Value': michmed})
+            attributes.append({'ID': 8480, 'Value': michmed})
 
             if action.type == 'M':
                 instance_id = self.data.get('instance_id')
