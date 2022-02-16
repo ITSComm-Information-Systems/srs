@@ -1,4 +1,5 @@
 import json, requests
+from ssl import ALERT_DESCRIPTION_UNKNOWN_PSK_IDENTITY
 from django.conf import settings
 from ldap3 import Server, Connection, ALL, MODIFY_ADD
 class MCommunity:
@@ -273,7 +274,7 @@ class Payload():
             }
         )
 
-    def __init__(self, action, requester_email):
+    def __init__(self, action, instance, request):
         
         self.data = {
             "FormID": self.form_id,
@@ -283,10 +284,25 @@ class Payload():
             "ServiceID": self.service_id,
             "ResponsibleGroupID": self.responsible_group_id,
             "Title": self.title,
-            "RequestorEmail": requester_email,
+            "RequestorEmail": request.user.email,
             "Description": self.description,
             "Attributes": [] }
 
+        print('here', dir(self))
+        for attr in dir(self):
+            print('attr', attr, type(attr))
+
+        print(self.vpn)
+        for key, value in request.POST.items():
+            #print(key, value)
+            if key in dir(self):
+                print('found', key)
+                attr = getattr(self, key)
+                val = attr.get_value(value) #getattr(attr, value)
+                self.add_attribute(attr.id, val)
+                print('set', type(value))
+            else:
+                print('not found', key)
 
 
 
@@ -301,15 +317,57 @@ class ChoiceAttribute():
         for arg in kwargs:
             #print(arg)
             setattr(self, arg, kwargs[arg])
+    
+    def get_value(self, value):
+        print('get_value', value)
+        print(type(value))
+        val = getattr(self, value)
+        print('new val', val)
+        return val
 
+class TextAttribute():
+    
+    def __init__(self, id, **kwargs):
+        self.id = id
+
+    def get_value(self, value):
+        return value
 
 class AwsPayload(Payload):
     form_id = 152                # ITS-Amazon Web Services at U-M Account Requests - Form
     type_id = 5                  # Cloud Services
     service_id = 81              # ITS-Amazon Web Services at U-M Account Requests
     responsible_group_id = 6     # ITS-CloudComputeServices
-    request_type = ChoiceAttribute(1879, New=95, Modify=96, Delete=4699)    
+    request_type = ChoiceAttribute(1879, New=95, Modify=96, Delete=4699)    # Azure Request Options
+    contact_email = TextAttribute(1780)
+    contact_phone = TextAttribute(1781)
+    bring_existing = ChoiceAttribute(1881, No=100, Yes=99)
+    owner = TextAttribute(1884)
+    billing_email = TextAttribute(1885)
+    shortcode = TextAttribute(1886)
+    sensitive_data_yn = ChoiceAttribute(1887, No=102, Yes=101)
+    sensitive_data = ChoiceAttribute(1888,HIPAA=103,FERPA=104,GLBA=105,HSR=106,SSN=107,ATT=108,PPI=109,ITSEC=110,PCI=111,ECR=112,FISMA=113,OTHERNONREG=114)
+    security_email = ChoiceAttribute(1889)
+    region_yn = ChoiceAttribute(1890, No=116, Yes=115)
+    region = ChoiceAttribute(1891,USEastNVA=117,USEastOH=118,USWestNCA=119,USWestOR=120,
+                APTokyo=121,APSeoul=122,APMumbai=123,APSingapore=124,APSydney=125,Canada=126,
+                ChinaBejing=127,ChinaNingxia=128,EUFrankfurt=129,EUIreland=130,EULondon=131,EUParis=132,SASaoPaulo=133)
+
+    egress_waiver = ChoiceAttribute(1893, No=135, Yes=134)
+    redhat = ChoiceAttribute(1894, No=137, Yes=136)
+    vpn = ChoiceAttribute(1895, No=139, Yes=138)
+    request_consultation = ChoiceAttribute(1896, No=141, Yes=140)
+    acknowledge_sle = ChoiceAttribute(1898, Yes=142)
+    acknowledge_srd = ChoiceAttribute(3589, Yes=3026)
+
+
+    #aws_account_number = TextAttribute(1901)
+    #change_mc_group = ChoiceAttribute(1902, No=145, Yes=144)    # aws_modify_Change MCommunity Group?
+    #change_billing_contact = ChoiceAttribute(1906, No=149, Yes=148 )
+
     title = 'Amazon Web Services at U-M'
+
+
 
 
 class GcpPayload(Payload):
@@ -323,16 +381,37 @@ class GcpPayload(Payload):
     change_shortcode = ChoiceAttribute(2000, Yes=219, No=220)
 
 
-def create_ticket(instance, action, post_data, user, **kwargs):
+class AzurePayload(Payload):
+    form_id = 16
+    type_id = 6
+    service_id = 6
+    responsible_group_id = 6
+    request_type = ChoiceAttribute(1786, New=19, Modify=20, Delete=4766)    
+    owner = TextAttribute(1802)
+    shortcode = TextAttribute(1798)
+    billing_contact_email = TextAttribute(1804)
+    security_contact_email = TextAttribute(1800)
+    security_contact_phone = TextAttribute(1799)
+    sensitive_data = ChoiceAttribute(1788, No=24, Yes=23)
+    sensitive_data_type = ChoiceAttribute(1814,ATT=53,PCI=56,ECR=57,FISMA=58,HSR=51,ITSEC=55,OTHERNONREG=59,PPI=54,HIPAA=48,SSN=52,FERPA=49,GLBA=50)
+    vpn = ChoiceAttribute(1787, No=22, Yes=21)
+    vpn_tier = ChoiceAttribute(1813, Basic=44, VpnGw1=45, VpnGw2=46, VpnGw3=47)
+    request_consultation = ChoiceAttribute(1801, No=40, Yes=41)
+    additional_details = TextAttribute(1805)
+    sle_acknowledge = ChoiceAttribute(1797, Yes=39)
+    shared_responsibility_acknowledge = ChoiceAttribute(2493, Yes=1100)
+
+
+def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
     service = service.upper()
 
-    payload = globals()[service.capitalize() + 'Payload'](action, user.email)
+    payload = globals()[service.capitalize() + 'Payload'](action, instance, request)
 
     print(payload.data)
 
-    #x = TDx().create_ticket(payload)
-    #print(x.status_code, x.text)
+    resp = TDx().create_ticket(payload.data)
+    print('TDx response', resp.status_code, resp.text)
 
 def create_ticket_database_modify(instance, user, description):
 

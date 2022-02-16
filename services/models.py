@@ -15,7 +15,7 @@ class Status(models.TextChoices):
 
 class Cloud(models.Model):    # Core class for common fields/methods
     instance_label = 'Instance'
-    account_id = models.CharField(max_length=30)
+    account_id = models.CharField(max_length=30, default='TBD')
     status = models.CharField(max_length=1, choices = Status.choices, default=Status.ACTIVE)
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
     requestor = models.CharField(max_length=8)

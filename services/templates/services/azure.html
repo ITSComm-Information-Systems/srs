@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+<div class='col-6'>
+
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+
+            <div class="form-group">
+                <label for="exampleInputEmail1"><strong>{{ field.label }}</strong></label>
+                <small id="emailHelp" class="form-text text-muted">{{ field.help_text }}</small>
+                {{ field }}
+                
+                {% for error in field.errors %}
+                <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                        aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+                {% endfor %}
+            </div>
+
+        {% endfor %}
+
+        <div class="form-group">
+            <label for="region"><strong>Preferred Region</strong></label>
+            <small id="emailHelp" class="form-text text-muted">Some initial network scaffolding is constructed in the your preferred region.  Other regions are also available within the account.  If unsure leave the default.</small>
+            <select id="region" class="form-control col-6">
+                    <option>US East (N. Virginia)
+                    <option>US East (Ohio)
+                    <option>US West (N. California)
+                    <option>US West (Oregon)
+                    <option>Asia Pacific (Tokyo)
+                    <option>Asia Pacific (Seoul)
+                    <option>Asia Pacific (Mumbai)
+                    <option>Asia Pacific (Singapore)
+                    <option>Asia Pacific (Sydney)
+                    <option>Canada (Central)</option>
+                    <option>China (Beijing)</option>
+                    <option>China (Ningxia)</option>
+                    <option>EU (Frankfurt)</option>
+                    <option>EU (Ireland)</option>
+                    <option>EU (London)</option>
+                    <option>EU (Paris)</option>
+                    <option>South America (Sao Paulo)</option>
+            </select>
+        </div>
+        <br>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="charter">
+            <label class="form-check-label" for="charter">I have read and awknowledge the 
+                <a target="_blank" href="https://docs.google.com/document/d/1m401diwNcS70iFEWd861XW7dtKcoAOZfTupgFDs8cEI/edit?usp=sharing">
+                    Service Charter
+                </a>
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="respdoc">
+            <label class="form-check-label" for="respdoc">I have read and awknowledge the 
+                <a target="_blank" href="https://docs.google.com/spreadsheets/d/1UwNYBqUPeMABrYb6OeEdlzY6hZn5mNrT_mW9B_2yV2U/edit#gid=1259966563">
+                    Shared Responsibility Document
+                </a>
+            </label>
+        </div>
+
+
+        <hr>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+</div>
+
+{% endblock %}

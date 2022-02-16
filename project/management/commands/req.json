@@ -1,0 +1,747 @@
+{
+    "ID": 1444502,
+    "ParentID": 0,
+    "ParentTitle": "",
+    "ParentClass": 0,
+    "TypeID": 5,
+    "TypeName": "Cloud Services",
+    "TypeCategoryID": 7,
+    "TypeCategoryName": "Infrastructure",
+    "Classification": 46,
+    "ClassificationName": "Request",
+    "FormID": 16,
+    "FormName": "ITS-Microsoft Azure at U-M Account Requests - Form",
+    "Title": "Microsoft Azure at U-M",
+    "Description": "This is a Microsoft Azure at U-M Account Request. Please review the request record for additional details.",
+    "Uri": "api/31/tickets/1444502",
+    "AccountID": 3181,
+    "AccountName": "ITS Infra Net Pinnacle  481397",
+    "SourceID": 4,
+    "SourceName": "Web",
+    "StatusID": 77,
+    "StatusName": "New",
+    "StatusClass": 1,
+    "ImpactID": 0,
+    "ImpactName": "",
+    "UrgencyID": 18,
+    "UrgencyName": "High",
+    "PriorityID": 19,
+    "PriorityName": "Low",
+    "PriorityOrder": 1.0,
+    "SlaID": 44,
+    "SlaName": "Microsoft Azure at U-M Account Requests (New) 24 hrs High",
+    "IsSlaViolated": false,
+    "IsSlaRespondByViolated": false,
+    "IsSlaResolveByViolated": false,
+    "RespondByDate": "0001-01-01T05:00:00Z",
+    "ResolveByDate": "2022-02-14T17:20:29.947Z",
+    "SlaBeginDate": "2022-02-14T14:20:29.947Z",
+    "IsOnHold": false,
+    "PlacedOnHoldDate": "0001-01-01T05:00:00Z",
+    "GoesOffHoldDate": "0001-01-01T05:00:00Z",
+    "CreatedDate": "2022-02-14T14:20:29.947Z",
+    "CreatedUid": "2d3898e5-7a73-ea11-a81b-000d3a8e391e",
+    "CreatedFullName": "David Jamison",
+    "CreatedEmail": "tdx-sb-donot-modify@umich.edu",
+    "ModifiedDate": "2022-02-14T14:20:34.5Z",
+    "ModifiedUid": "00000000-0000-0000-0000-000000000000",
+    "ModifiedFullName": " ",
+    "RequestorName": "David Jamison",
+    "RequestorFirstName": "David",
+    "RequestorLastName": "Jamison",
+    "RequestorEmail": "tdx-sb-donot-modify@umich.edu",
+    "RequestorPhone": "734-531-7875",
+    "RequestorUid": "2d3898e5-7a73-ea11-a81b-000d3a8e391e",
+    "ActualMinutes": 0,
+    "EstimatedMinutes": 0,
+    "DaysOld": 0,
+    "StartDate": null,
+    "EndDate": null,
+    "ResponsibleUid": null,
+    "ResponsibleFullName": "Unassigned",
+    "ResponsibleEmail": "",
+    "ResponsibleGroupID": 6,
+    "ResponsibleGroupName": "ITS-CloudComputeServices",
+    "RespondedDate": "0001-01-01T05:00:00Z",
+    "RespondedUid": null,
+    "RespondedFullName": "",
+    "CompletedDate": "0001-01-01T05:00:00Z",
+    "CompletedUid": null,
+    "CompletedFullName": "",
+    "ReviewerUid": null,
+    "ReviewerFullName": "",
+    "ReviewerEmail": "",
+    "ReviewingGroupID": 238,
+    "ReviewingGroupName": "ITS-ChangeApproval-CloudServices",
+    "TimeBudget": 0.0,
+    "ExpensesBudget": 0.0,
+    "TimeBudgetUsed": 0.0,
+    "ExpensesBudgetUsed": 0.0,
+    "IsConvertedToTask": false,
+    "ConvertedToTaskDate": "0001-01-01T05:00:00Z",
+    "ConvertedToTaskUid": null,
+    "ConvertedToTaskFullName": "",
+    "TaskProjectID": 0,
+    "TaskProjectName": "",
+    "TaskPlanID": 0,
+    "TaskPlanName": "",
+    "TaskID": 0,
+    "TaskTitle": "",
+    "TaskStartDate": "0001-01-01T05:00:00Z",
+    "TaskEndDate": "0001-01-01T05:00:00Z",
+    "TaskPercentComplete": 0,
+    "LocationID": 0,
+    "LocationName": "",
+    "LocationRoomID": 0,
+    "LocationRoomName": "",
+    "RefCode": "",
+    "ServiceID": 6,
+    "ServiceName": "ITS-Microsoft Azure at U-M Account Requests",
+    "ServiceOfferingID": 0,
+    "ServiceOfferingName": "None",
+    "ServiceCategoryID": 0,
+    "ServiceCategoryName": "None",
+    "ArticleID": 0,
+    "ArticleSubject": "",
+    "ArticleStatus": 0,
+    "ArticleCategoryPathNames": "",
+    "ArticleAppID": 0,
+    "ArticleShortcutID": null,
+    "AppID": 31,
+    "Attributes": [
+        {
+            "ID": 1780,
+            "Name": "generic request_Preferred e-mail",
+            "Order": 0,
+            "Description": "We'll contact you via your UMICH address. If you prefer we use a different address, please enter that here.",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "djams35@gmail.com",
+            "ValueText": "djams35@gmail.com",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1781,
+            "Name": "generic request_Preferred Contact Phone Number",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "7344176943",
+            "ValueText": "7344176943",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1786,
+            "Name": "azure_Azure Request Options",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "vradio",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 19,
+                    "Name": "New",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-25T20:05:08.267Z",
+                    "DateModified": "2020-02-25T20:05:08.267Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 20,
+                    "Name": "Modify",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-25T20:05:14.047Z",
+                    "DateModified": "2021-01-19T18:28:50.473Z",
+                    "Order": 1
+                },
+                {
+                    "ID": 4766,
+                    "Name": "Delete",
+                    "IsActive": true,
+                    "DateCreated": "2020-10-13T18:14:25.04Z",
+                    "DateModified": "2021-02-02T15:56:19.053Z",
+                    "Order": 2
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "19",
+            "ValueText": "New",
+            "ChoicesText": "New",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1802,
+            "Name": "azure_MCommunity Group Email",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "itscomm information systems",
+            "ValueText": "itscomm information systems",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1798,
+            "Name": "azure_Shortcode",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "940479",
+            "ValueText": "940479",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1804,
+            "Name": "azure_Billing Contact Email",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "djams35@gmail.com",
+            "ValueText": "djams35@gmail.com",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1800,
+            "Name": "azure_Security Contact Email",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "djams35@gmail.com",
+            "ValueText": "djams35@gmail.com",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1799,
+            "Name": "azure_Security Contact Phone Number",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "7344176943",
+            "ValueText": "7344176943",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1788,
+            "Name": "azure_Sensitive data used/stored",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "dropdown",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 24,
+                    "Name": "No",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-25T20:08:41.7Z",
+                    "DateModified": "2020-02-25T20:08:41.7Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 23,
+                    "Name": "Yes",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-25T20:08:41.7Z",
+                    "DateModified": "2020-02-25T20:08:41.7Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "23",
+            "ValueText": "Yes",
+            "ChoicesText": "Yes",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1814,
+            "Name": "azure_Sensitive_data_types_list",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "vradio",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 53,
+                    "Name": "Attorney/Client Privileged Information",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:53:25.4Z",
+                    "DateModified": "2020-02-26T14:53:25.4Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 56,
+                    "Name": "Credit Card/Payment Card Information (PCI)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:53:45.83Z",
+                    "DateModified": "2020-02-26T14:53:45.83Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 57,
+                    "Name": "Export Controlled Research (ITAR, EAR)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:53:53.54Z",
+                    "DateModified": "2020-02-26T14:53:53.54Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 58,
+                    "Name": "Federal Information Security Management Act Data (FISMA)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:53:59.167Z",
+                    "DateModified": "2020-02-26T14:53:59.167Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 51,
+                    "Name": "Human Subject Research (HSR)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:53:12.69Z",
+                    "DateModified": "2020-02-26T14:53:12.69Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 55,
+                    "Name": "IT Security Information",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:53:37.15Z",
+                    "DateModified": "2020-02-26T14:53:37.15Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 59,
+                    "Name": "Other Sensitive Data (Specify in Additional Details)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:54:04.6Z",
+                    "DateModified": "2020-02-26T14:54:04.6Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 54,
+                    "Name": "Personally Identifiable Information (PII)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:53:31.377Z",
+                    "DateModified": "2020-02-26T14:53:31.377Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 48,
+                    "Name": "Protected Health Information (ePHI, HIPAA)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:52:51.597Z",
+                    "DateModified": "2020-02-26T14:52:51.597Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 52,
+                    "Name": "Social Security Numbers (SSN)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:53:19.01Z",
+                    "DateModified": "2020-02-26T14:53:19.01Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 49,
+                    "Name": "Student Education Records (FERPA)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:52:58.703Z",
+                    "DateModified": "2020-02-26T14:52:58.703Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 50,
+                    "Name": "Student Loan Application Information (GLBA)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:53:05.79Z",
+                    "DateModified": "2020-02-26T14:53:05.79Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "58",
+            "ValueText": "Federal Information Security Management Act Data (FISMA)",
+            "ChoicesText": "Federal Information Security Management Act Data (FISMA)",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1787,
+            "Name": "azure_VPN required",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "dropdown",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 22,
+                    "Name": "No",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-25T20:06:28.007Z",
+                    "DateModified": "2020-02-25T20:06:28.007Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 21,
+                    "Name": "Yes",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-25T20:06:28.007Z",
+                    "DateModified": "2020-02-25T20:06:28.007Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "21",
+            "ValueText": "Yes",
+            "ChoicesText": "Yes",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1813,
+            "Name": "azure_VPN_tiers",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "vradio",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 44,
+                    "Name": "Basic (100 Mbps ~ $26.79/mo)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:50:24.55Z",
+                    "DateModified": "2020-02-26T14:50:24.55Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 45,
+                    "Name": "VpnGw1 (650 Mbps ~ $141.36/mo)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:50:31.287Z",
+                    "DateModified": "2020-02-26T14:50:31.287Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 46,
+                    "Name": "VpnGw2 (1 Gbps ~ $364.56/mo)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:50:37.08Z",
+                    "DateModified": "2020-02-26T14:50:37.08Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 47,
+                    "Name": "VpnGw3 (1.25 Gbps ~ $930/mo)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:50:44.3Z",
+                    "DateModified": "2020-02-26T14:50:44.3Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "47",
+            "ValueText": "VpnGw3 (1.25 Gbps ~ $930/mo)",
+            "ChoicesText": "VpnGw3 (1.25 Gbps ~ $930/mo)",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1801,
+            "Name": "azure_Request Consultation",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "dropdown",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 40,
+                    "Name": "No",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:08:17.637Z",
+                    "DateModified": "2020-02-26T14:08:17.637Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 41,
+                    "Name": "Yes",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:08:21.42Z",
+                    "DateModified": "2020-02-26T14:08:21.42Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "41",
+            "ValueText": "Yes",
+            "ChoicesText": "Yes",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1805,
+            "Name": "azure_Additional Details",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textarea",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "ipsum",
+            "ValueText": "ipsum",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1900,
+            "Name": "azure_SLE Link",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "https://docs.google.com/document/d/1FC816qxm2cSO_sX2RWKPEuto6WyaQ8HAN3CALxVXlOE/edit?usp=sharing",
+            "ValueText": "https://docs.google.com/document/d/1FC816qxm2cSO_sX2RWKPEuto6WyaQ8HAN3CALxVXlOE/edit?usp=sharing",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1797,
+            "Name": "azure_SLE_read_acknowledge",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "checklist",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 39,
+                    "Name": "I have read and I acknowledge the Service Charter",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-26T14:02:29.597Z",
+                    "DateModified": "2021-12-21T16:18:52.097Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "39",
+            "ValueText": "I have read and I acknowledge the Service Charter",
+            "ChoicesText": "I have read and I acknowledge the Service Charter",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1913,
+            "Name": "azure_Shared Responsibility Link",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "https://docs.google.com/spreadsheets/d/1UwNYBqUPeMABrYb6OeEdlzY6hZn5mNrT_mW9B_2yV2U/edit#gid=1259966563",
+            "ValueText": "https://docs.google.com/spreadsheets/d/1UwNYBqUPeMABrYb6OeEdlzY6hZn5mNrT_mW9B_2yV2U/edit#gid=1259966563",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 2493,
+            "Name": "azure_Shared_read_acknowledge",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "checklist",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 1100,
+                    "Name": "I have read and I acknowledge the Shared Responsibility Doc",
+                    "IsActive": true,
+                    "DateCreated": "2020-04-15T21:11:14.593Z",
+                    "DateModified": "2020-04-15T21:11:14.593Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": false,
+            "Value": "1100",
+            "ValueText": "I have read and I acknowledge the Shared Responsibility Doc",
+            "ChoicesText": "I have read and I acknowledge the Shared Responsibility Doc",
+            "AssociatedItemIDs": [
+                0
+            ]
+        }
+    ],
+    "Attachments": [],
+    "Tasks": [
+        {
+            "ID": 107131,
+            "TicketID": 1444502,
+            "Title": "Provision Azure Account",
+            "Description": "Please refer to the following provisioning documentation:\n\nDesktop App:\nOpen OneNote (its.is.vci Notebook) - then go to: Cloud-Azure-Provisioning\n\nWeb Link:\nhttps://umich.sharepoint.com/sites/its.is.vci/_layouts/OneNote.aspx?id=%2Fsites%2Fits.is.vci%2FSiteAssets%2Fits.is.vci%20Notebook&wd=target%28Cloud%2FAzure%2FProvisioning.one%7CF2BF819E-CFD8-4C7F-92DE-952841BCF640%2FTesting%7C70393F42-6F5A-4572-9FB7-9CA6B9473782%2F%29\nonenote:https://umich.sharepoint.com/sites/its.is.vci/SiteAssets/its.is.vci%20Notebook/Cloud/Azure/Provisioning.one#Testing&section-id={F2BF819E-CFD8-4C7F-92DE-952841BCF640}&page-id={70393F42-6F5A-4572-9FB7-9CA6B9473782}&end",
+            "IsActive": true,
+            "StartDate": null,
+            "EndDate": null,
+            "CompleteWithinMinutes": null,
+            "EstimatedMinutes": 0,
+            "ActualMinutes": 0,
+            "PercentComplete": 0,
+            "CreatedDate": "2022-02-14T14:20:34.64Z",
+            "CreatedUid": "2d3898e5-7a73-ea11-a81b-000d3a8e391e",
+            "CreatedFullName": "David Jamison",
+            "CreatedEmail": "tdx-sb-donot-modify@umich.edu",
+            "ModifiedDate": "2022-02-14T14:20:34.64Z",
+            "ModifiedUid": "2d3898e5-7a73-ea11-a81b-000d3a8e391e",
+            "ModifiedFullName": "David Jamison",
+            "CompletedDate": "0001-01-01T05:00:00Z",
+            "CompletedUid": null,
+            "CompletedFullName": "",
+            "ResponsibleUid": null,
+            "ResponsibleFullName": "",
+            "ResponsibleEmail": "",
+            "ResponsibleGroupID": 6,
+            "ResponsibleGroupName": "ITS-CloudComputeServices",
+            "PredecessorID": 0,
+            "PredecessorTitle": "",
+            "Order": 1,
+            "TypeID": 3,
+            "DetectedConflictCount": 0,
+            "DetectedConflictTypes": 0,
+            "LastConflictScanDateUtc": "0001-01-01T00:00:00Z",
+            "Uri": "api/31/tickets/1444502/tasks/107131"
+        }
+    ],
+    "Notify": [
+        {
+            "ItemRole": "Reviewing Group",
+            "Name": "ITS-ChangeApproval-CloudServices",
+            "Initials": null,
+            "Value": "238",
+            "RefValue": 0,
+            "ProfileImageFileName": null
+        },
+        {
+            "ItemRole": "Responsible Group",
+            "Name": "ITS-CloudComputeServices",
+            "Initials": null,
+            "Value": "6",
+            "RefValue": 0,
+            "ProfileImageFileName": null
+        },
+        {
+            "ItemRole": "Requestor, Creator",
+            "Name": "David Jamison",
+            "Initials": null,
+            "Value": "tdx-sb-donot-modify@umich.edu",
+            "RefValue": 0,
+            "ProfileImageFileName": null
+        }
+    ],
+    "WorkflowID": 2420269,
+    "WorkflowConfigurationID": 1,
+    "WorkflowName": "Azure Workflow"
+}
