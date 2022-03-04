@@ -7,7 +7,6 @@ from django.shortcuts import render, redirect, reverse
 
 # Functional
 from apps.mbid.forms import createCycle
-import csv
 import math
 import time
 import threading
@@ -43,28 +42,17 @@ def cycle():
     # current cycle does not exist, closed cycle exists: open=False, viewable=True
     try: # seeing if open bidding cycle exists
         current_cycle = UmEcommMbidCriticalDate.objects.get(bidding_closed='O')
-        cycle_info['current_year'] = current_cycle.bidding_year
-        cycle_info['current_month_num'] = current_cycle.bidding_month
-        cycle_info['current_month'] = convert[current_cycle.bidding_month]
-
-        cycle_info['current_open_date'] = datetime.strptime(
-            str(current_cycle.bidding_open_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
-        cycle_info['current_close_date'] = datetime.strptime(
-            str(current_cycle.bidding_close_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
         # Need to auto-close the bidding cycle
         if current_cycle.bidding_close_time < datetime.now():
-            current_cycle.bidding_closed = 'C'
-            current_cycle.save()
+            UmEcommMbidCriticalDate.objects.filter(bidding_closed='O').update(bidding_closed='C')
+            # current_cycle.bidding_closed = 'C'
+            # current_cycle.save(update_fields=["bidding_closed"])
             cycle_info['open'] = False
             cycle_info['viewable'] = True
+            print(cycle_info)
+            return cycle_info
         # Bidding cycle is open
         else:
-            cycle_info['open'] = True
-            cycle_info['viewable'] = True
-    except: # there is no open bidding cycle
-        try: # seeing if the bidding cycle is closed but not archived
-            current_cycle = UmEcommMbidCriticalDate.objects.get(
-                bidding_closed='C')
             cycle_info['current_year'] = current_cycle.bidding_year
             cycle_info['current_month_num'] = current_cycle.bidding_month
             cycle_info['current_month'] = convert[current_cycle.bidding_month]
@@ -72,15 +60,27 @@ def cycle():
             cycle_info['current_open_date'] = datetime.strptime(
                 str(current_cycle.bidding_open_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
             cycle_info['current_close_date'] = datetime.strptime(
-                str(current_cycle.bidding_close_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
-            
+            str(current_cycle.bidding_close_date), '%Y-%m-%d %H:%M:%S').strftime('%B %d, %Y')
+
+            cycle_info['open'] = True
+            cycle_info['viewable'] = True
+
+            print(cycle_info)
+            return cycle_info
+    except: # there is no open bidding cycle
+        try: # seeing if the bidding cycle is closed but not archived
+            current_cycle = UmEcommMbidCriticalDate.objects.get(bidding_closed='C')
             cycle_info['open'] = False
             cycle_info['viewable'] = True
+
+            print(cycle_info)
+            return cycle_info
         except:
             cycle_info['open'] = False
-            cycle_info['viewable'] = False   
+            cycle_info['viewable'] = False
 
-    return cycle_info
+            print(cycle_info)
+            return cycle_info
 
 # All MBid users views
 
@@ -108,7 +108,7 @@ def complete(request, message):
         context['message'] = "Created Bid Cycle " + \
             cycle_info['current_month']+' '+cycle_info['current_year']
     if (message == 2):
-        context['message'] = 'You will be emailed a CSV'
+        context['message'] = 'Report will be emailed to you when complete. It may take about 5 minutes.'
     return render(request, 'mbid/message.html', context)
 
 
@@ -121,13 +121,11 @@ def create_cycle(request):
         month = convert[item.bidding_month]
         cycles.append(str(month)+' '+str(item.bidding_year))
 
-    if (request.method == 'POST') and (request.POST.get('infopage') == 'Done'):
-        return redirect('complete/1')
-
     if (request.method == 'POST') and (request.POST.get('makeCycle') == 'Create'):
+        print(request.POST)
         openDateTime = request.POST.get('openDate')+' 00:00:00'
         closeDateTime = request.POST.get('closeDate')+' 23:59:59'
-
+        print('creating critical dates')
         UmEcommMbidCriticalDate.objects.create(bidding_open_date=openDateTime,
                                                bidding_open_time=openDateTime,
                                                bidding_close_date=closeDateTime,
@@ -139,8 +137,9 @@ def create_cycle(request):
                                                    'bidMonth')],
                                                date_created=datetime.now().strftime("%Y-%m-%d %H:%M"),
                                                date_last_updated=datetime.now().strftime("%Y-%m-%d %H:%M"))
-
+        print('running proc')
         run_proc()
+        print('proc complete')
         rows = []
         datalist = UmEcommMbidWarehseInput.objects.filter(bidding_closed='O')
         for data in datalist:
@@ -166,7 +165,6 @@ def create_cycle(request):
             'confirm': True,
         })
     else:
-
         form = createCycle()
         return render(request, 'mbid/a_createCycle.html', {
             'form': form,
@@ -197,8 +195,7 @@ def edit_cycle(request):
         target = request.POST.get('info').split()
         month = target[0]
         year = target[1]
-        result = UmEcommMbidCriticalDate.objects.get(
-            bidding_month=month, bidding_year=year)
+        result = UmEcommMbidCriticalDate.objects.get(bidding_month=month, bidding_year=year)
         if request.POST.get('cycleAction') == 'edit':
             oldOpenDate = result.bidding_open_date.strftime("%Y-%m-%d")
             oldCloseDate = result.bidding_close_date.strftime("%Y-%m-%d")
@@ -206,38 +203,47 @@ def edit_cycle(request):
             newCloseDate = request.POST.get('newCloseDate')
 
             if (newOpenDate != ''):
-                result.bidding_open_time = newOpenDate+' 00:00:00'
-                result.bidding_open_date = newOpenDate+' 00:00:00'
-                result.save()
-            elif (newOpenDate == ''):
-                newOpenDate = oldOpenDate
+                UmEcommMbidCriticalDate.objects.filter(bidding_month = month, bidding_year = year).update(bidding_open_date = newOpenDate+' 00:00:00', bidding_open_time=newOpenDate+' 00:00:00')
+                # result.bidding_open_time = newOpenDate+' 00:00:00'
+                # result.bidding_open_date = newOpenDate+' 00:00:00'
+                # result.save()
+            # elif (newOpenDate == ''):
+            #     UmEcommMbidCriticalDate.objects.filter(bidding_month = month, bidding_year = year).update(bidding_open_time=newOpenDate+' 00:00:00', bidding_open_date = newOpenDate+' 00:00:00')
+            #     newOpenDate = oldOpenDate
             if (newCloseDate != ''):
-                result.bidding_close_time = newCloseDate+' 23:59:59'
-                result.bidding_close_date = newCloseDate+' 23:59:59'
-                result.save()
+                UmEcommMbidCriticalDate.objects.filter(bidding_month = month, bidding_year = year).update(bidding_close_date = newCloseDate+' 00:00:00', bidding_close_time=newCloseDate+' 00:00:00')
+                # result.bidding_close_time = newCloseDate+' 23:59:59'
+                # result.bidding_close_date = newCloseDate+' 23:59:59'
+                # result.save()
             elif (newCloseDate == ''):
                 newCloseDate = oldCloseDate
             message = "Bid Cycle dates changed."
         elif request.POST.get('cycleAction') == 'close':
-            result.bidding_closed = 'C'
-            result.bidding_close_date = datetime.now().strftime("%Y-%m-%d %H:%M")
-            result.bidding_close_time = datetime.now().strftime("%Y-%m-%d %H:%M")
-            result.save()
-            message = 'Bidding cycle {} {} has been closed.'.format(
-                convert[month], str(year))
-            run_proc()
-            UmEcommMbidVendorInput.objects.filter(
-                bidding_month=month, bidding_year=year).update(bidding_closed='C')
+            earlydate = datetime.now().strftime("%Y-%m-%d %H:%M")
+            UmEcommMbidCriticalDate.objects.filter(bidding_month=month, bidding_year=year).update(bidding_closed='C', bidding_close_date = earlydate, bidding_close_time = earlydate)
+            
+            # result.bidding_close_date = datetime.now().strftime("%Y-%m-%d %H:%M")
+            # result.bidding_close_time = datetime.now().strftime("%Y-%m-%d %H:%M")
+            # result.save()
+
+            message = 'Bidding cycle {} {} has been closed.'.format(convert[month], str(year))
+            # run_proc()
+            # UmEcommMbidVendorInput.objects.filter(
+            #     bidding_month=month, bidding_year=year).update(bidding_closed='C')
 
         elif request.POST.get('cycleAction') == 'archive':
-            result.bidding_closed = 'A'
-            result.date_last_updated = datetime.now().strftime("%Y-%m-%d %H:%M")
-            result.save()
-            message = 'Bidding cycle {} {} has been archived.'.format(
-                convert[month], str(year))
-            run_proc()
-            UmEcommMbidVendorInput.objects.filter(
-                bidding_month=month, bidding_year=year).update(bidding_closed='A')
+            UmEcommMbidCriticalDate.objects.filter(bidding_month=month, bidding_year=year).update(bidding_closed='A')
+            # result.bidding_closed = 'A'
+            # result.date_last_updated = datetime.now().strftime("%Y-%m-%d %H:%M")
+            # result.save()
+            message = 'Bidding cycle {} {} has been archived.'.format(convert[month], str(year))
+            # run_proc()
+            # UmEcommMbidVendorInput.objects.filter(
+            #     bidding_month=month, bidding_year=year).update(bidding_closed='A')
+        elif request.POST.get('cycleAction') == 'delete':
+            UmEcommMbidCriticalDate.objects.get(bidding_month=month, bidding_year=year).delete()
+            UmEcommMbidWarehseInput.objects.filter(bidding_month=month, bidding_year=year).delete()
+            message= 'deleted'
 
         return render(request, 'mbid/message.html', context={'message': message})
 
@@ -283,11 +289,11 @@ def review(request):
         cycles.append((item.bidding_year, month, status, item.bidding_month))
 
     if request.method == 'POST':
-        return create_mike_report(request)
-        # thread = threading.Thread(
-        #     target=create_mike_report, args=(request,))
-        # thread.start()
-        # return redirect('complete/2')
+        # return create_mike_report(request)
+        thread = threading.Thread(
+            target=create_mike_report, args=(request,))
+        thread.start()
+        return redirect('complete/2')
         
         
     return render(request, 'mbid/a_reviewBids.html', {'title': 'Review Bid Cycles', 'cycles': cycles})
@@ -313,7 +319,7 @@ def create_cycle_report(request):
     ws = wb.active
     
     fieldnames = ['Manufacturer', 'UM Code', 'Manufacturer Part Number', 'Description', 'Bid Status',
-                  'Required QTY @ Local Vendor Branch', 'Estimated Annual Qty', 'Unit of Measure', 'UM Notes', 'Vendor Notes', 'Bid Price']
+                  'Required QTY @ Local Vendor Branch', 'Estimated Annual Qty', 'Unit of Measure', 'Vendor Notes', 'Bid Price', 'UM Notes']
 
     ws.append(fieldnames)
 
@@ -329,20 +335,29 @@ def create_cycle_report(request):
         um_notes = data.um_notes
         rows.append({'mfr': mfr, 'umcode': umcode, 'manufacturer_part_number': manufacturer_part_number, 'desc': desc, 'bid_status': bid_status,
                      'req_qty': req_qty, 'annual_qty': annual_qty, 'uom': uom, 'um_notes': um_notes})
-        ws.append([mfr, umcode, manufacturer_part_number, desc, bid_status, req_qty, annual_qty, uom, um_notes])
+        ws.append([mfr, umcode, manufacturer_part_number, desc, bid_status, req_qty, annual_qty, uom, '', '', um_notes])
        
     # Only allow vendor notes and bid price columns to be edited
     ws.protection.sheet = True
+    for cell in ws['I']:
+        cell.protection = Protection(locked=False)
     for cell in ws['J']:
         cell.protection = Protection(locked=False)
-    for cell in ws['K']:
-        cell.protection = Protection(locked=False)
 
-    # Sheet formatting widths to auto
+    # Sheet formatting: freeze top row, set column widths
     ws.freeze_panes = ws['A2']
-    for letter in ['A','B','C','D','E','F','G','H','I','J','K']:
-        ws.column_dimensions[letter].auto_size = True
-
+    ws.column_dimensions['A'].width = 26 # Manufacturer
+    ws.column_dimensions['B'].width = 8 # UM Code
+    ws.column_dimensions['C'].width = 24 # Manufacturer Part Number
+    ws.column_dimensions['D'].width = 50 # Description
+    ws.column_dimensions['E'].width = 14 # Bid Status
+    ws.column_dimensions['F'].width = 16 # Required QTY @ Local Vendor Branch
+    ws.column_dimensions['G'].width = 19 # Estimated Annual Qty
+    ws.column_dimensions['H'].width = 14 # Unit of Measure
+    ws.column_dimensions['I'].width = 12 # Vendor Notes
+    ws.column_dimensions['J'].width = 8 # Bid Price
+    
+    
     if request.method == 'POST':
         response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="MBid_' + \
@@ -364,7 +379,7 @@ def create_cycle_report(request):
 def upload_bids(request):
     # Two parts to this view
     # 1. allowing vendors to upload
-    # 2. reviewing the vendor upload before submitting to databse
+    # 2. reviewing the vendor upload before submitting to database
     cycle_info = cycle()
     context = {'title': 'Upload Bids', 'cycle_info': cycle_info}
     try: # No matter who it is you NEED to be in the vendor table to upload
@@ -397,9 +412,9 @@ def upload_bids(request):
                 'RequiredQTY':row[5],
                 'AnnualQty':row[6], 
                 'UnitofMeasure':row[7], 
-                'UMNotes':row[8], 
-                'VendorNotes':row[9], 
-                'BidPrice':row[10]})
+                'UMNotes':row[10], 
+                'VendorNotes':row[8], 
+                'BidPrice':row[9]})
         
         # data validation
         valid = []
@@ -495,10 +510,10 @@ def pricecheck(bidprice):
     # return False if invalid, return float if ok
     try:
         num = float(bidprice)
-        if (num > 0) and (num == round(num, 2)): 
-            return round(num, 2) # standardize bid to 2 decimal points
+        if (num >= 0) and (num == round(num, 2)): 
+            return str(round(num, 2)) # standardize bid to 2 decimal points
         else:
-            return False # invalid due to being 0
+            return False # invalid due to being less than 0
     except:
         return False   # invalid due to being a string
 
@@ -538,31 +553,31 @@ def update_vendor_table(request):
     for string in post.getlist('uploads'):
         row = dict({x.split(':')[0]: x.split(':')[1]
                     for x in [item for item in string.split(';')]})
-        if (float(row['BidPrice']) != 0):
-            UmEcommMbidVendorInput.objects.create(
-                bidding_year=cycle_info['current_year'],
-                bidding_month=cycle_info['current_month_num'],
-                bidding_closed='O',
-                item_code=row['UMCode'],
-                item_desc=row['Description'],
-                subclass_id=UmEcommMbidCommodityV.objects.get(
-                    item_code=row['UMCode']).subclass_id,
-                manufacturer_name=row['Manufacturer'],
-                manufacturer_part_number=row['ManufacturerPartNumber'],
-                vendor_id=vendor_id,
-                vendor_name=vendor_name,
-                vendor_email_address=vendor_email_address,
-                vendor_address1=vendor_address1,
-                vendor_address2=vendor_address2,
-                vendor_city=vendor_city,
-                vendor_state=vendor_state,
-                vendor_zip_code=vendor_zip_code,
-                vendor_price=float(row['BidPrice']),
-                vendor_notes=str(row['VendorNotes']),
-                date_created=datetime.now().strftime("%Y-%m-%d %H:%M"),
-                date_last_updated=datetime.now().strftime("%Y-%m-%d %H:%M")
-                )
+        UmEcommMbidVendorInput.objects.create(
+            bidding_year=cycle_info['current_year'],
+            bidding_month=cycle_info['current_month_num'],
+            bidding_closed='O',
+            item_code=row['UMCode'],
+            item_desc=row['Description'],
+            subclass_id=UmEcommMbidCommodityV.objects.get(
+                item_code=row['UMCode']).subclass_id,
+            manufacturer_name=row['Manufacturer'],
+            manufacturer_part_number=row['ManufacturerPartNumber'],
+            vendor_id=vendor_id,
+            vendor_name=vendor_name,
+            vendor_email_address=vendor_email_address,
+            vendor_address1=vendor_address1,
+            vendor_address2=vendor_address2,
+            vendor_city=vendor_city,
+            vendor_state=vendor_state,
+            vendor_zip_code=vendor_zip_code,
+            vendor_price=float(row['BidPrice']),
+            vendor_notes=str(row['VendorNotes']),
+            date_created=datetime.now().strftime("%Y-%m-%d %H:%M"),
+            date_last_updated=datetime.now().strftime("%Y-%m-%d %H:%M")
+            )
 
+    print('complete upload')
     email = EmailMessage(
         subject='MBid Update',
         body='Your bids were uploaded',
@@ -578,8 +593,8 @@ def create_mike_report(request):
 
     # Ready email
     email = EmailMessage(
-        subject='MBid CSV Report',
-        body='See attached CSV',
+        subject='MBid Report',
+        body='See attached',
         from_email='srs@umich.edu',
         to=[request.user.email],)
 
@@ -610,15 +625,16 @@ def create_mike_report(request):
         for row in rows:
             ws.append([row.item_code, row.item_desc, row.bid_status, row.um_notes])
 
-        # wb.save(target_xlsx)
-        # email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) +
-        #              '_noBids.csv', target_xlsx.getvalue(), 'application/ms-excel')
+        # for actual
+        wb.save(target_xlsx)
+        email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) + '_noBids.xlsx', target_xlsx.getvalue(), 'application/ms-excel')
 
-        response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(convert[bidding_month])+'_' + \
-            str(bidding_year)+'_noBids.xlsx"'
-        return response
+        # for testing
+        # response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
+        # response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+        #     str(convert[bidding_month])+'_' + \
+        #     str(bidding_year)+'_noBids.xlsx"'
+        # return response
 
 
     elif (post['downloadOption'] == 'allBids'):
@@ -652,15 +668,15 @@ def create_mike_report(request):
             ws.append(list(fieldnamesDict.values()))
 
         # for actual
-        # wb.save(target_xlsx)
-        # email.attach('MikeReport_' + str(convert[bidding_month])+'_'+str(bidding_year) + '_allBids.csv', target_xlsx.getvalue(), 'application/ms-excel')
+        wb.save(target_xlsx)
+        email.attach('MikeReport_' + str(convert[bidding_month])+'_'+str(bidding_year) + '_allBids.xlsx', target_xlsx.getvalue(), 'application/ms-excel')
 
         # for testing
-        response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(convert[bidding_month])+'_' + \
-            str(bidding_year)+'_allBids.xlsx"'
-        return response
+        # response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
+        # response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+        #     str(convert[bidding_month])+'_' + \
+        #     str(bidding_year)+'_allBids.xlsx"'
+        # return response
 
     elif post.get('downloadOption') == 'lowBids':
         # Set header for 3 lowest bidders
@@ -685,158 +701,29 @@ def create_mike_report(request):
             towrite = [info.item_code, info.item_desc, info.bid_status]  
 
             if len(results) == 3:
-                towrite.extend([results[0].vendor_id,results[0].vendor_notes,results[0].vendor_price,
-                results[1].vendor_id,results[1].vendor_notes,results[1].vendor_price,
-                results[2].vendor_id,results[2].vendor_notes,results[2].vendor_price])
-                # towrite['Vendor 1'] = results[0].vendor_id
-                # towrite['Vendor Notes 1'] = results[0].vendor_notes
-                # towrite['Vendor Price 1'] = results[0].vendor_price
-                # towrite['Vendor 2'] = results[1].vendor_id
-                # towrite['Vendor Notes 2'] = results[1].vendor_notes
-                # towrite['Vendor Price 2'] = results[1].vendor_price
-                # towrite['Vendor 3'] = results[2].vendor_id
-                # towrite['Vendor Notes 3'] = results[2].vendor_notes
-                # towrite['Vendor Price 3':] = [2].vendor_price
+                towrite.extend([results[0].vendor_id, results[0].vendor_notes, results[0].vendor_price,
+                results[1].vendor_id, results[1].vendor_notes, results[1].vendor_price,
+                results[2].vendor_id, results[2].vendor_notes, results[2].vendor_price])
+
             elif len(results) == 2:
                 towrite.extend([results[0].vendor_id,results[0].vendor_notes,results[0].vendor_price,
                 results[1].vendor_id,results[1].vendor_notes,results[1].vendor_price])
-                # towrite['Vendor 1'] = results[0].vendor_id
-                # towrite['Vendor Notes 1'] = results[0].vendor_notes
-                # towrite['Vendor Price 1'] = results[0].vendor_price
-                # towrite['Vendor 2'] = results[1].vendor_id
-                # towrite['Vendor Notes 2'] = results[1].vendor_notes
-                # towrite['Vendor Price 2'] = results[1].vendor_price
+
             elif len(results) == 1:
-                towrite.extend([results[0].vendor_id,results[0].vendor_notes,results[0].vendor_price])
-                # towrite['Vendor 1'] = results[0].vendor_id
-                # towrite['Vendor Notes 1'] = results[0].vendor_notes
-                # towrite['Vendor Price 1'] = results[0].vendor_price
+                towrite.extend([results[0].vendor_id, results[0].vendor_notes, results[0].vendor_price])
+
             ws.append(towrite)
 
-        # for testing
-        response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(convert[bidding_month])+'_' + \
-            str(bidding_year)+'_lowBids.xlsx"'
-        return response
-
         # for actual
-        # email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) + '_lowestBids.csv', target_xlsx.getvalue(), 'application/ms-excel')
+        wb.save(target_xlsx)
+        email.attach('MikeReport_' + str(bidding_month)+'_'+str(bidding_year) + '_lowestBids.xlsx', target_xlsx.getvalue(), 'application/ms-excel')
+        
+        # for testing
+        # response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
+        # response['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
+        #     str(convert[bidding_month])+'_' + \
+        #     str(bidding_year)+'_lowBids.xlsx"'
+        # return response
 
     # Everything written and attached in if statements. Send email.
-    # email.send(fail_silently=False)
-
-
-# # For testing purposes when making MikeReports
-def direct_download(request):
-    # convert to dictionary as with email version
-    post = request.POST.dict()
-
-    # Filter information
-    yearmonth = post['pickCycle'].split()
-    bidding_month = yearmonth[0]
-    bidding_year = yearmonth[1]
-    # Set up CSV
-    target_xlsx = HttpResponse(content_type='text/csv')
-    if (post['downloadOption'] == 'noBids'):
-        # Set up CSV
-        target_xlsx['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(bidding_month)+'_'+str(bidding_year)+'_noBids.csv"'
-        fieldnames = ['U-M Code', 'Description', 'Bid Status', 'UM Notes']
-        writer = csv.DictWriter(target_xlsx, fieldnames=fieldnames)
-        # Header
-        writer.writeheader()
-
-        # Get data
-        havebids = set(UmEcommMbidVendorInput.objects.filter(
-            bidding_year=bidding_year, bidding_month=bidding_month).values_list('item_code', flat=True))
-        rows = UmEcommMbidWarehseInput.objects.filter(
-            bidding_year=bidding_year, bidding_month=bidding_month).exclude(item_code__in=havebids)
-
-        # Write data to csv
-        for row in rows:
-            writer.writerow({'U-M Code': row.item_code, 'Description': row.item_desc,
-                                'Bid Status': row.bid_status, 'UM Notes': row.um_notes})
-        return target_xlsx
-
-    elif (post['downloadOption'] == 'allBids'):
-        # Set up CSV
-        target_xlsx['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(bidding_month)+'_'+str(bidding_year)+'_allBids.csv"'
-        fieldnames = ['U-M Code', 'Description', 'Bid Status']
-        # Get all vendors in bid cycle for header
-        for vendor in set(UmEcommMbidVendorInput.objects.filter(bidding_year=bidding_year,bidding_month=bidding_month).values_list('vendor_id', flat=True)):
-            fieldnames.extend(
-                [vendor + ' Notes', vendor + ' Bids'])
-
-        writer = csv.DictWriter(target_xlsx, fieldnames=fieldnames)
-        # Header
-        writer.writeheader()
-
-        # Get list of UM Codes with bids
-        item_codes_list = sorted(set(UmEcommMbidVendorInput.objects.filter(
-            bidding_year=bidding_year, bidding_month=bidding_month).values_list('item_code', flat=True)))
-
-        # Write to CSV
-        for item in item_codes_list:
-            info = UmEcommMbidWarehseInput.objects.get(
-                item_code=item, bidding_year=bidding_year, bidding_month=bidding_month)
-            towrite = {
-                'U-M Code': item, 'Description': info.item_desc, 'Bid Status': info.bid_status}
-
-            results = UmEcommMbidVendorInput.objects.filter(
-                bidding_year=bidding_year, bidding_month=bidding_month, item_code=item)
-            for row in results:
-                towrite[row.vendor_id+' Notes'] = row.vendor_notes
-                towrite[row.vendor_id + ' Bids'] = row.vendor_price
-
-            writer.writerow(towrite)
-
-        return target_xlsx
-
-    elif post.get('downloadOption') == 'lowBids':
-        # Set up CSV, 3 lowest bidders
-        target_xlsx['Content-Disposition'] = 'attachment; filename="MikeReport_' + \
-            str(bidding_month)+'_'+str(bidding_year)+'_lowBids.csv"'
-        fieldnames = ['U-M Code', 'Description', 'Bid Status', 'Vendor 1', 'Vendor Notes 1', 'Vendor Price 1',
-                        'Vendor 2', 'Vendor Notes 2', 'Vendor Price 2', 'Vendor 3', 'Vendor Notes 3', 'Vendor Price 3']
-        writer = csv.DictWriter(target_xlsx, fieldnames=fieldnames)
-        # Header
-        writer.writeheader()
-
-        # Get list of UM Codes with bids
-        item_codes_list = sorted(set(UmEcommMbidVendorInput.objects.filter(
-            bidding_year=bidding_year, bidding_month=bidding_month).values_list('item_code', flat=True)))
-
-        # Write to CSV
-        for item in item_codes_list:
-            results = UmEcommMbidVendorInput.objects.filter(
-                bidding_year=bidding_year, bidding_month=bidding_month, item_code=item).order_by('vendor_price')[:2]
-            info = UmEcommMbidWarehseInput.objects.get(
-                item_code=item, bidding_year=bidding_year, bidding_month=bidding_month)
-            towrite = {'U-M Code': item, 'Description': info.item_desc,
-                        'Bid Status': info.bid_status}  # Basic
-            if len(results) == 3:
-                towrite['Vendor 1'] = results[0].vendor_id
-                towrite['Vendor Notes 1'] = results[0].vendor_notes
-                towrite['Vendor Price 1'] = results[0].vendor_price
-                towrite['Vendor 2'] = results[1].vendor_id
-                towrite['Vendor Notes 2'] = results[1].vendor_notes
-                towrite['Vendor Price 2'] = results[1].vendor_price
-                towrite['Vendor 3'] = results[2].vendor_id
-                towrite['Vendor Notes 3'] = results[2].vendor_notes
-                towrite['Vendor Price 3':] = [2].vendor_price
-            elif len(results) == 2:
-                towrite['Vendor 1'] = results[0].vendor_id
-                towrite['Vendor Notes 1'] = results[0].vendor_notes
-                towrite['Vendor Price 1'] = results[0].vendor_price
-                towrite['Vendor 2'] = results[1].vendor_id
-                towrite['Vendor Notes 2'] = results[1].vendor_notes
-                towrite['Vendor Price 2'] = results[1].vendor_price
-            elif len(results) == 1:
-                towrite['Vendor 1'] = results[0].vendor_id
-                towrite['Vendor Notes 1'] = results[0].vendor_notes
-                towrite['Vendor Price 1'] = results[0].vendor_price
-
-            writer.writerow(towrite)
-        return target_xlsx
+    email.send(fail_silently=False)
