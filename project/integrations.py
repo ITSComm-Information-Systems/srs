@@ -2,6 +2,8 @@ import json, requests
 from ssl import ALERT_DESCRIPTION_UNKNOWN_PSK_IDENTITY
 from django.conf import settings
 from ldap3 import Server, Connection, ALL, MODIFY_ADD
+
+
 class MCommunity:
 
     def __init__(self):
@@ -266,6 +268,7 @@ class Payload():
     status_id = Open
     priority_id = Medium
 
+
     def add_attribute(self, id, value):
         self.data['Attributes'].append(
             {
@@ -279,6 +282,9 @@ class Payload():
         self.data = {
             "FormID": self.form_id,
             "TypeID": self.type_id,
+
+            #"UrgencyName": "High",
+
             "SourceID": self.source_id,
             "StatusID": self.status_id,
             "ServiceID": self.service_id,
@@ -288,19 +294,27 @@ class Payload():
             "Description": self.description,
             "Attributes": [] }
 
-        print('here', dir(self))
-        for attr in dir(self):
-            print('attr', attr, type(attr))
+        if 'regulated_data' in request.POST.keys():
+            print('sensitive data')
 
-        print(self.vpn)
+
         for key, value in request.POST.items():
-            #print(key, value)
-            if key in dir(self):
-                print('found', key)
+            if key == 'regulated_data':
+                print('reg')
+                regs = request.POST.getlist('regulated_data')
+                for x in instance.regulated_data.values():
+                    print(x)
+                #reg_list = Choice.objects.filter(regs__in=regs)
+                print('end')
+
+            elif key in dir(self):
                 attr = getattr(self, key)
                 val = attr.get_value(value) #getattr(attr, value)
                 self.add_attribute(attr.id, val)
-                print('set', type(value))
+
+                if key=='owner':
+                    print('owner', val)
+
             else:
                 print('not found', key)
 
@@ -315,15 +329,15 @@ class ChoiceAttribute():
     def __init__(self, id, **kwargs):
         self.id = id
         for arg in kwargs:
-            #print(arg)
             setattr(self, arg, kwargs[arg])
     
     def get_value(self, value):
-        print('get_value', value)
-        print(type(value))
-        val = getattr(self, value)
-        print('new val', val)
-        return val
+        if hasattr(self, value):
+            val = getattr(self, value)
+            return val
+        else:
+            print('not found', value)
+            return ''
 
 class TextAttribute():
     
@@ -333,6 +347,7 @@ class TextAttribute():
     def get_value(self, value):
         return value
 
+
 class AwsPayload(Payload):
     form_id = 152                # ITS-Amazon Web Services at U-M Account Requests - Form
     type_id = 5                  # Cloud Services
@@ -341,13 +356,15 @@ class AwsPayload(Payload):
     request_type = ChoiceAttribute(1879, New=95, Modify=96, Delete=4699)    # Azure Request Options
     contact_email = TextAttribute(1780)
     contact_phone = TextAttribute(1781)
-    bring_existing = ChoiceAttribute(1881, No=100, Yes=99)
+    migrate_existing = ChoiceAttribute(1881, No=100, Yes=99)
+    aws_email = TextAttribute(1882)
+    aws_account_number = TextAttribute(1883)
     owner = TextAttribute(1884)
-    billing_email = TextAttribute(1885)
+    billing_contact = TextAttribute(1885)
     shortcode = TextAttribute(1886)
     sensitive_data_yn = ChoiceAttribute(1887, No=102, Yes=101)
     sensitive_data = ChoiceAttribute(1888,HIPAA=103,FERPA=104,GLBA=105,HSR=106,SSN=107,ATT=108,PPI=109,ITSEC=110,PCI=111,ECR=112,FISMA=113,OTHERNONREG=114)
-    security_email = ChoiceAttribute(1889)
+    security_contact = TextAttribute(1889)
     region_yn = ChoiceAttribute(1890, No=116, Yes=115)
     region = ChoiceAttribute(1891,USEastNVA=117,USEastOH=118,USWestNCA=119,USWestOR=120,
                 APTokyo=121,APSeoul=122,APMumbai=123,APSingapore=124,APSydney=125,Canada=126,
@@ -366,8 +383,6 @@ class AwsPayload(Payload):
     #change_billing_contact = ChoiceAttribute(1906, No=149, Yes=148 )
 
     title = 'Amazon Web Services at U-M'
-
-
 
 
 class GcpPayload(Payload):
@@ -408,7 +423,7 @@ def create_ticket(action, instance, request, **kwargs):
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request)
 
-    print(payload.data)
+    #print(payload.data)
 
     resp = TDx().create_ticket(payload.data)
     print('TDx response', resp.status_code, resp.text)

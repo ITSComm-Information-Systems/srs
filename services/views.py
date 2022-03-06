@@ -19,24 +19,14 @@ class ServicesView(UserPassesTestMixin, View):
             return False
 
     def post(self, request):
-        print('post AWS', request.POST)
-
-        #form = AwsNewForm(request.POST)
         form = self.view_form(request.POST)
 
         if form.is_valid():
-            print('valid')
             form.save()
-            print('form', form.instance.id)
             instance = AWS.objects.get(id=form.instance.id)
 
             create_ticket('New', instance, request)
-
-        else:
-            print('not valid form')
-            for err in form.errors:
-                print(err)
-
+            # TODO Redirect
 
         return render(request, self.template,
                       {'title': self.title,
@@ -105,12 +95,13 @@ class Gcp(ServicesView):
 
 class Aws(ServicesView):
     template = 'services/aws.html'
+    title = 'Order AWS'
     view_form = AwsNewForm
 
 
 
 class Gcp(ServicesView):
-    template = 'services/azure.html'
+    template = 'services/gcp.html'
     title = 'Order Google Cloud'
     view_form = GcpNewForm
     

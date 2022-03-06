@@ -1,0 +1,40 @@
+<div>
+
+    <div class="form-group {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
+        <label for="exampleInputEmail1"><strong>Will any sensitive data be used or stored?</strong></label>
+        <small id="emailHelp" class="form-text text-muted">Please refer to the <a target="_blank" href="https://www.safecomputing.umich.edu/dataguide/?q=sensitive-data-related-to-a-service/195">Sensitive Data Guide</a> for additional details.</small>
+        {{ field }}
+
+        {% for error in field.errors %}
+        <div role="alert" class="invalid-feedback is-invalid"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+        {% endfor %}
+    </div>
+
+    <div class="row" id="div_sensitive_data" style="padding-left: 50px; display: None;">
+        <div class="col-5">
+            <b>Regulated Sensitive Data</b><br> (Check all that apply.)
+            {% for value, label in form.regulated_data.field.widget.choices %}
+            <div class="custom-control custom-checkbox">
+                <input name="regulated_data" type="checkbox" class="custom-control-input" id="reg_{{ value }}"
+                    value="{{ value }}">
+                <label class="custom-control-label" for="reg_{{ value }}">{{ label }}</label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="col-5">
+            <b>Non-Regulated Sensitive Data</b>><br> (Check all that apply.)<br>
+            {% for value, label in form.non_regulated_data.field.widget.choices %}
+            <div class="custom-control custom-checkbox">
+                <input name="regulated_data" type="checkbox" class="custom-control-input" id="reg_{{ value }}"
+                    value="{{ value }}">
+                <label class="custom-control-label" for="reg_{{ value }}">{{ label }}</label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<br>

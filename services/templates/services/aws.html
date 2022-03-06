@@ -2,38 +2,71 @@
 {% block content %}
 <h1>{{ title }}</h1>
 
-<div class='col-6'>
+<div class="container">
 
     <form method="POST">
         {% csrf_token %}
         {% for field in form %}
 
-            <div class="form-group">
-                <label for="exampleInputEmail1"><strong>{{ field.label }}</strong></label>
-                <small id="emailHelp" class="form-text text-muted">{{ field.help_text }}</small>
-                {{ field }}
-                
-                {% for error in field.errors %}
-                <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
-                        aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
-                {% endfor %}
+            {% if field.name == 'aws_email' %}
+            <div class="row" style="padding-left: 50px; display: None;" id="div_aws_account_info">
+                <div class="form-group col-3" id="div_{{ field.name }}">
+                    <small id="emailHelp" class="form-text text-muted">What is the email address<br>you registered with AWS?</small>
+                    {{ form.aws_email }}
+                    
+                    {% for error in field.errors %}
+                    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group col-3" id="div_{{ field.name }}">
+                    <small id="emailHelp" class="form-text text-muted">What is the AWS<br>Account Number?</small>
+                    {{ form.aws_account_number }}
+                    
+                    {% for error in form.aws_account_number.errors %}
+                    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+                    {% endfor %}
+                </div>
             </div>
+
+            {% elif field.name == 'aws_account_number' %}
+            <!-------- Above --------->
+            {% elif field.name == 'regulated_data' %}
+            {% elif field.name == 'acknowledge_srd' %}
+            {% elif field.name == 'acknowledge_sle' %}
+            {% elif field.name == 'non_regulated_data' %}
+            {% elif field.name == 'sensitive_data_yn' %}
+                {% include 'services/sensitive_data.html' %}
+            {% else %}
+                <div class="form-group {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
+                    <label for="exampleInputEmail1"><strong>{{ field.label }}</strong></label>
+                    <small id="emailHelp" class="form-text text-muted">{{ field.help_text }}</small>
+                    {{ field }}
+                    
+                    {% for error in field.errors %}
+                    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
         {% endfor %}
 
-        <div class="form-group">
+        <div class="form-group col-6">
             <label for="region"><strong>Preferred Region</strong></label>
             <small id="emailHelp" class="form-text text-muted">Some initial network scaffolding is constructed in the your preferred region.  Other regions are also available within the account.  If unsure leave the default.</small>
             <select id="region" class="form-control col-6">
-                    <option>US East (N. Virginia)
-                    <option>US East (Ohio)
-                    <option>US West (N. California)
-                    <option>US West (Oregon)
-                    <option>Asia Pacific (Tokyo)
-                    <option>Asia Pacific (Seoul)
-                    <option>Asia Pacific (Mumbai)
-                    <option>Asia Pacific (Singapore)
-                    <option>Asia Pacific (Sydney)
+                    <option val="117">US East (N. Virginia)</option>
+                    <option>US East (Ohio)</option>
+                    <option>US West (N. California)</option>
+                    <option>US West (Oregon)</option>
+                    <option>Asia Pacific (Tokyo)</option>
+                    <option>Asia Pacific (Seoul)</option>
+                    <option>Asia Pacific (Mumbai)</option>
+                    <option>Asia Pacific (Singapore)</option>
+                    <option>Asia Pacific (Sydney)</option>
                     <option>Canada (Central)</option>
                     <option>China (Beijing)</option>
                     <option>China (Ningxia)</option>
@@ -46,8 +79,8 @@
         </div>
         <br>
         <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="charter">
-            <label class="form-check-label" for="charter">I have read and awknowledge the 
+            {{ form.acknowledge_sle}}
+            <label class="form-check-label" for="id_acknowledge_sle">I have read and awknowledge the 
                 <a target="_blank" href="https://docs.google.com/document/d/1m401diwNcS70iFEWd861XW7dtKcoAOZfTupgFDs8cEI/edit?usp=sharing">
                     Service Charter
                 </a>
@@ -55,8 +88,8 @@
         </div>
 
         <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="respdoc">
-            <label class="form-check-label" for="respdoc">I have read and awknowledge the 
+            {{ form.acknowledge_srd}}
+            <label class="form-check-label" for="id_acknowledge_srd">I have read and awknowledge the 
                 <a target="_blank" href="https://docs.google.com/spreadsheets/d/1UwNYBqUPeMABrYb6OeEdlzY6hZn5mNrT_mW9B_2yV2U/edit#gid=1259966563">
                     Shared Responsibility Document
                 </a>
@@ -72,3 +105,29 @@
 </div>
 
 {% endblock %}
+
+
+
+{% block js %}
+<script>
+
+    $("#id_migrate_existing").change(function() {
+        if (this.value=="Yes") {
+            $("#div_aws_account_info").show();
+        } else {
+            $("#div_aws_account_info").hide();
+        }
+    });
+
+    $("#id_sensitive_data_yn").change(function() {
+        if (this.value=="Yes") {
+            $("#div_sensitive_data").show();
+        } else {
+            $("#div_sensitive_data").hide();
+        }
+    });
+
+
+
+</script>
+{% endblock js %}
