@@ -62,19 +62,25 @@ class CloudNewForm(forms.ModelForm):
 
 
 class AwsNewForm(CloudNewForm):
+    custom = ['mirate_existing']
+    skip = ['mirate_existing']
+
     migrate_existing = forms.BooleanField(label='Do you wish to bring an existing AWS account into the UM infrastructure?', widget=NoYes)
     aws_email = forms.CharField(help_text='What is the email address you registered with AWS?', label='')
     aws_account_number = forms.CharField(help_text='What is the AWS Account Number?', label='')
     aws_account_number.div_class = 'col-6'
 
-
     class Meta:
         model = AWS
-        exclude = ['id','created_date','account_id','status']
+        exclude = ['id','created_date','account_id','status','data_classification','version']
         widgets = {
             'billing_contact': forms.TextInput(attrs={'cols': 80, 'rows': 20}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super(AwsNewForm, self).__init__(*args, **kwargs)
+        self.fields['aws_account_number'].required = False
+        self.fields['aws_email'].required = False
 
 class AzureNewForm(CloudNewForm):
     redhat = None

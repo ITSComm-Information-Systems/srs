@@ -7,8 +7,10 @@
     <form method="POST">
         {% csrf_token %}
         {% for field in form %}
-
-            {% if field.name == 'aws_email' %}
+            {% if field.name in form.skip %}
+            {% elif field.name in form.custom %}
+                {% include 'services/{{ field.name }}.html' %}
+            {% elif field.name == 'aws_email' %}
             <div class="row" style="padding-left: 50px; display: None;" id="div_aws_account_info">
                 <div class="form-group col-3" id="div_{{ field.name }}">
                     <small id="emailHelp" class="form-text text-muted">What is the email address<br>you registered with AWS?</small>
