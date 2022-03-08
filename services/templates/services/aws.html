@@ -9,38 +9,7 @@
         {% for field in form %}
             {% if field.name in form.skip %}
             {% elif field.name in form.custom %}
-                {% include 'services/{{ field.name }}.html' %}
-            {% elif field.name == 'aws_email' %}
-            <div class="row" style="padding-left: 50px; display: None;" id="div_aws_account_info">
-                <div class="form-group col-3" id="div_{{ field.name }}">
-                    <small id="emailHelp" class="form-text text-muted">What is the email address<br>you registered with AWS?</small>
-                    {{ form.aws_email }}
-                    
-                    {% for error in field.errors %}
-                    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
-                            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
-                    {% endfor %}
-                </div>
-
-                <div class="form-group col-3" id="div_{{ field.name }}">
-                    <small id="emailHelp" class="form-text text-muted">What is the AWS<br>Account Number?</small>
-                    {{ form.aws_account_number }}
-                    
-                    {% for error in form.aws_account_number.errors %}
-                    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
-                            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            {% elif field.name == 'aws_account_number' %}
-            <!-------- Above --------->
-            {% elif field.name == 'regulated_data' %}
-            {% elif field.name == 'acknowledge_srd' %}
-            {% elif field.name == 'acknowledge_sle' %}
-            {% elif field.name == 'non_regulated_data' %}
-            {% elif field.name == 'sensitive_data_yn' %}
-                {% include 'services/sensitive_data.html' %}
+                {% include 'services/'|add:field.name|add:'.html' %}
             {% else %}
                 <div class="form-group {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
                     <label for="exampleInputEmail1"><strong>{{ field.label }}</strong></label>

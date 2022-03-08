@@ -62,8 +62,8 @@ class CloudNewForm(forms.ModelForm):
 
 
 class AwsNewForm(CloudNewForm):
-    custom = ['mirate_existing']
-    skip = ['mirate_existing']
+    custom = ['mirate_existing','sensitive_data_yn','aws_email']
+    skip = ['aws_account_number','acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data']
 
     migrate_existing = forms.BooleanField(label='Do you wish to bring an existing AWS account into the UM infrastructure?', widget=NoYes)
     aws_email = forms.CharField(help_text='What is the email address you registered with AWS?', label='')
