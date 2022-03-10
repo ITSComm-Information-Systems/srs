@@ -13,6 +13,7 @@ class CloudNewForm(forms.ModelForm):
     requestor = Uniqname(help_text='Please enter a valid uniqname.')
     #owner = McGroup(help_text="MCommunity Admin Group")  # TODO make this an admin group.
     #owner = forms.ChoiceField(choices=LDAPGroup.objects.all())
+    admin_group = forms.ChoiceField(help_text='MCommunity Admin Group')
     acknowledge_sle = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
     acknowledge_srd = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
 
@@ -40,22 +41,27 @@ class CloudNewForm(forms.ModelForm):
             else:
                 print('no widget for', field)
 
-
         if self.user:
+
+            print('get list')
             group_list = MCommunity().get_groups(self.user.username)
 
             choice_list = [(None, '---')]
             for group in group_list:
                 choice_list.append((group, group,))
 
-            self.fields['owner'].choices = choice_list
+            self.fields['admin_group'].choices = choice_list
 
             #if self.instance:
             #    self.fields['owner'].initial = self.instance.owner.name
 
 
     def clean(self):
+
+        print('here')
         super().clean()
+        print(self.cleaned_data)
+
         
         for err_field in self.errors:
             self.fields[err_field].widget.attrs['class'] += ' is-invalid'
@@ -72,7 +78,7 @@ class AwsNewForm(CloudNewForm):
 
     class Meta:
         model = AWS
-        exclude = ['id','created_date','account_id','status','data_classification','version']
+        exclude = ['id','created_date','account_id','status','data_classification','version','owner']
         widgets = {
             'billing_contact': forms.TextInput(attrs={'cols': 80, 'rows': 20}),
         }

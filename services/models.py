@@ -44,7 +44,7 @@ class AWS(Cloud):
     instance_label = 'Account'
     data_classification = models.CharField(max_length=10, blank=True, null=True)
     egress_waiver = models.BooleanField()
-    version = models.ForeignKey(Choice, on_delete=models.CASCADE, limit_choices_to={"parent__code": "AWS_VERSION"}) 
+    version = models.ForeignKey(Choice, on_delete=models.CASCADE, limit_choices_to={"parent__code": "AWS_VERSION"}, default=132) 
 
     class Meta:
         verbose_name = 'Amazon Web Services Account'

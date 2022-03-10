@@ -19,7 +19,7 @@ class ServicesView(UserPassesTestMixin, View):
             return False
 
     def post(self, request):
-        form = self.view_form(request.POST)
+        form = self.view_form(request.POST, user=self.request.user)
 
         if form.is_valid():
             form.save()
@@ -38,7 +38,7 @@ class ServicesView(UserPassesTestMixin, View):
         request.session['backupStorage'] = 'cloud'
 
         #template = loader.get_template('/order/cart.html')
-        form = self.view_form()
+        form = self.view_form(user=self.request.user)
 
         return render(request, self.template,
                       {'title': self.title,
