@@ -277,7 +277,7 @@ class Payload():
             }
         )
 
-    def __init__(self, action, instance, request):
+    def __init__(self, action, instance, request, **kwargs):
         
         self.data = {
             "FormID": self.form_id,
@@ -292,7 +292,7 @@ class Payload():
             "Title": self.title,
             "RequestorEmail": request.user.email,
             "Description": self.description,
-            "Attributes": [] }
+            "Attributes": [] } | kwargs
 
         if 'regulated_data' in request.POST.keys():
             print('sensitive data')
@@ -442,8 +442,7 @@ def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
     service = service.upper()
 
-    payload = globals()[service.capitalize() + 'Payload'](action, instance, request)
-
+    payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
 
     resp = TDx().create_ticket(payload.data)
     print('TDx response', resp.status_code, resp.text)
