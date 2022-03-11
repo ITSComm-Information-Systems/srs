@@ -12,8 +12,8 @@
                 {% include 'services/'|add:field.name|add:'.html' %}
             {% else %}
                 <div class="form-group {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
-                    <label for="exampleInputEmail1"><strong>{{ field.label }}</strong></label>
-                    <small id="emailHelp" class="form-text text-muted">{{ field.help_text }}</small>
+                    <label for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
                     {{ field }}
                     
                     {% for error in field.errors %}
@@ -25,30 +25,6 @@
 
         {% endfor %}
 
-        <div class="form-group col-6">
-            <label for="region"><strong>Preferred Region</strong></label>
-            <small id="emailHelp" class="form-text text-muted">Some initial network scaffolding is constructed in the your preferred region.  Other regions are also available within the account.  If unsure leave the default.</small>
-            <select id="region" class="form-control col-6">
-                    <option val="117">US East (N. Virginia)</option>
-                    <option>US East (Ohio)</option>
-                    <option>US West (N. California)</option>
-                    <option>US West (Oregon)</option>
-                    <option>Asia Pacific (Tokyo)</option>
-                    <option>Asia Pacific (Seoul)</option>
-                    <option>Asia Pacific (Mumbai)</option>
-                    <option>Asia Pacific (Singapore)</option>
-                    <option>Asia Pacific (Sydney)</option>
-                    <option>Canada (Central)</option>
-                    <option>China (Beijing)</option>
-                    <option>China (Ningxia)</option>
-                    <option>EU (Frankfurt)</option>
-                    <option>EU (Ireland)</option>
-                    <option>EU (London)</option>
-                    <option>EU (Paris)</option>
-                    <option>South America (Sao Paulo)</option>
-            </select>
-        </div>
-        <br>
         <div class="form-check">
             {{ form.acknowledge_sle}}
             <label class="form-check-label" for="id_acknowledge_sle">I have read and awknowledge the 
@@ -99,6 +75,13 @@
     });
 
 
+    $("#id_gcp_existing").change(function() {
+        if (this.value=="Yes") {
+            $("#div_gcp_account_info").show();
+        } else {
+            $("#div_gcp_account_info").hide();
+        }
+    });
 
 </script>
 {% endblock js %}

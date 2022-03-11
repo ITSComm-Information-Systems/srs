@@ -26,7 +26,9 @@ class CloudNewForm(forms.ModelForm):
 
     shortcode = forms.CharField(validators=[validate_shortcode])
     redhat = forms.BooleanField(label='Include RedHat OS?', widget=NoYes)
-    vpn = forms.BooleanField(label='Do you require a VPN?', help_text='Choosing Yes will result in additional charges. Select Yes if you need access to resources on campus that are not available to the Internet, such as Active Directory.', widget=NoYes)
+    vpn = forms.BooleanField(label='Do you require a VPN?'
+        , help_text='Choosing Yes will result in additional charges. Select Yes if you need access to resources on campus that are not available to the Internet, such as Active Directory.'
+        , widget=NoYes)
     request_consultation = forms.BooleanField(label='Request Consultation?', widget=NoYes)
 
     def __init__(self, *args, **kwargs):
@@ -63,8 +65,27 @@ class CloudNewForm(forms.ModelForm):
         for err_field in self.errors:
             self.fields[err_field].widget.attrs['class'] += ' is-invalid'
 
+AWS_REGION_CHOICES = [
+    ('USEastNVA', 'US East (N. Virginia)'),
+    ('USEastOH', 'US East (Ohio)'),
+    ('USWestNCA', 'US West (N. California)'),
+    ('USWestOR', 'US West (Oregon)'),
+    ('APTokyo', 'Asia Pacific (Tokyo)'),
+    ('APSeoul', 'Asia Pacific (Seoul)'),
+    ('APMumbai', 'Asia Pacific (Mumbai)'),
+    ('APSingapore', 'Asia Pacific (Singapore)'),
+    ('APSydney', 'Asia Pacific (Sydney)'),
+    ('Canada', 'Canada (Central)'),
+    ('ChinaBejing', 'China (Beijing)'),
+    ('ChinaNingxia', 'China (Ningxia)'),
+    ('EUFrankfurt', 'EU (Frankfurt)'),
+    ('EUIreland', 'EU (Ireland)'),
+    ('EULondon', 'EU (London)'),
+    ('EUParis', 'EU (Paris)'),
+    ('SASaoPaulo', 'South America (Sao Paulo)')]
 
 class AwsNewForm(CloudNewForm):
+    title = 'ITS-Amazon Web Services at U-M Account Requests'
     custom = ['mirate_existing','sensitive_data_yn','aws_email']
     skip = ['aws_account_number','acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data']
 
@@ -72,6 +93,10 @@ class AwsNewForm(CloudNewForm):
     aws_email = forms.CharField(help_text='What is the email address you registered with AWS?', label='')
     aws_account_number = forms.CharField(help_text='What is the AWS Account Number?', label='')
     aws_account_number.div_class = 'col-6'
+
+    region = forms.ChoiceField(label='Preferred Region',
+        help_text='Some initial network scaffolding is constructed in the your preferred region. Other regions are also available within the account. If unsure leave the default.',
+        choices=AWS_REGION_CHOICES)
 
     class Meta:
         model = AWS
@@ -87,6 +112,7 @@ class AwsNewForm(CloudNewForm):
 
 
 class AzureNewForm(CloudNewForm):
+    title = 'ITS-Microsoft Azure at U-M Account Requests'
     redhat = None
     egress_waiver = None
 
@@ -97,7 +123,24 @@ class AzureNewForm(CloudNewForm):
 
 
 class GcpNewForm(CloudNewForm):
+    title = 'ITS-Google Cloud Platform at U-M Account Requests'
+    custom = ['sensitive_data_yn','gcp_existing']
+    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','existing_id','existing_project']
+
     redhat = None
+
+
+    #existing_yn = forms.BooleanField(label='Do you have an existing Google Project?',
+    #    widget=forms.CheckboxInput(attrs={'data-toggle': 'collapse'}))  
+    
+    gcp_existing = forms.BooleanField(label='Do you have an existing Google Project?', widget=NoYes)
+    existing_id = forms.CharField(label='Existing Project ID', required=False)
+    existing_project = forms.CharField(label='Existing Project Name', required=False)
+
+    #billing_yn
+    #billing_id
+    #billing_attach_project
+    #billing_attach_id
 
     class Meta:
         model = GCP

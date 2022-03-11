@@ -21,7 +21,6 @@ class ServicesView(UserPassesTestMixin, View):
 
     def post(self, request, service):
         model = getattr(Service, service)
-        #form = self.view_form(request.POST, user=self.request.user)
         
         form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)
 
@@ -39,10 +38,13 @@ class ServicesView(UserPassesTestMixin, View):
     def get(self, request, service):
         request.session['backupStorage'] = 'cloud'
 
-        form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)
+        try:
+            form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)
+        except:
+            return HttpResponseNotFound('<h1>Page not found</h1>')
 
         return render(request, self.template,
-                      {'title': self.title,
+                      {'title': form.title,
                        'form': form, })
 
 
