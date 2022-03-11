@@ -1,5 +1,5 @@
 from django.urls import path
-from order.views import Services, Workflow
+#from order.views import Services, Workflow
 
 from . import views
 
@@ -11,9 +11,11 @@ urlpatterns = [
     # /services/aws/
 
 
-    path('gcp/add/', views.Gcp.as_view()),
-    path('aws/add/', views.Aws.as_view()),
-    path('azure/add/', views.Azure.as_view()),
+    path('<str:service>/add/', views.ServicesView.as_view()),
+
+    #path('gcp/add/', views.Gcp.as_view()),
+    #path('aws/add/', views.Aws.as_view()),
+    #path('azure/add/', views.Azure.as_view()),
 
 
     path('<str:service>/', views.get_service_list),

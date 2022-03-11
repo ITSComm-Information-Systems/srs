@@ -359,7 +359,7 @@ class AwsPayload(Payload):
     migrate_existing = ChoiceAttribute(1881, No=100, Yes=99)
     aws_email = TextAttribute(1882)
     aws_account_number = TextAttribute(1883)
-    owner = TextAttribute(1884)
+    admin_group = TextAttribute(1884)
     billing_contact = TextAttribute(1885)
     shortcode = TextAttribute(1886)
     sensitive_data_yn = ChoiceAttribute(1887, No=102, Yes=101)
@@ -388,13 +388,34 @@ class AwsPayload(Payload):
 class GcpPayload(Payload):
     form_id = 22                 # ITS-Amazon Web Services at U-M Account Requests - Form
     type_id = 5                  # Cloud Services
-    service_id = 12,             # ITS-Amazon Web Services at U-M Account Requests
+    service_id = 12              # ITS-Amazon Web Services at U-M Account Requests
     responsible_group_id = 6     # ITS-CloudComputeServices
     request_type = ChoiceAttribute(1916, New=160, Modify=161, Delete=5465)
-    project_id = 1997
-    change_mc_group = ChoiceAttribute(1998, Yes=217, No=218)
-    change_shortcode = ChoiceAttribute(2000, Yes=219, No=220)
+    contact_email = TextAttribute(1780)
+    contact_phone = TextAttribute(1781)
+    existing_yn = ChoiceAttribute(1914, No=159, Yes=158)
+    existing_id = TextAttribute(1915)
+    existing_project = TextAttribute(1919)
+    billing_yn = ChoiceAttribute(1921, No=163, Yes=162)
+    billing_id = TextAttribute(1922)
+    billing_attach_project = ChoiceAttribute(4664, No=5441, Yes=5440)
+    billing_attach_id = TextAttribute(4665)
+    admin_group = TextAttribute(1923)
+    shortcode = TextAttribute(1924)
+    billing_contact = TextAttribute(1926)
+    security_contact = TextAttribute(1927)
+    egress_waiver = ChoiceAttribute(1929, No=165, Yes=164)
+    sensitive_data_yn = ChoiceAttribute(1931, No=167, Yes=166)
+    sensitive_data = ChoiceAttribute(1933,HIPAA=168,FERPA=169,GLBA=170,HSR=171,SSN=172,ATT=173,PPI=174,ITSEC=175,PCI=176,ECR=177,FISMA=178,OTHERNONREG=179)
+    network = ChoiceAttribute(1934, No=181, Yes=180)
+    redhat = ChoiceAttribute(1935, No=183, Yes=182)
+    vpn = ChoiceAttribute(1936, No=185, Yes=184)
+    request_consultation = ChoiceAttribute(1937, No=187, Yes=186)
+    acknowledge_sle = ChoiceAttribute(1940, Yes=192)
+    acknowledge_srd = ChoiceAttribute(1942, Yes=195)
+    additional_details = TextAttribute(3590)
 
+    title = 'Google Cloud Platform at U-M'
 
 class AzurePayload(Payload):
     form_id = 16
@@ -423,7 +444,6 @@ def create_ticket(action, instance, request, **kwargs):
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request)
 
-    #print(payload.data)
 
     resp = TDx().create_ticket(payload.data)
     print('TDx response', resp.status_code, resp.text)

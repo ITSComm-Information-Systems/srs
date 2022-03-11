@@ -2,6 +2,7 @@ from django import forms
 from project.forms.fields import *
 from .models import AWS, Azure, GCP
 from project.integrations import MCommunity
+from oscauth.models import LDAPGroup
 
 # Defaults
 CharField = forms.CharField( widget=forms.TextInput(attrs={'class': 'form-control'}) )
@@ -10,9 +11,10 @@ NoYes = forms.Select(choices=[('No','No',),('Yes','Yes',),] , attrs={'class': 'f
 
 
 class CloudNewForm(forms.ModelForm):
+    custom = ['sensitive_data_yn']
+    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data']
+
     requestor = Uniqname(help_text='Please enter a valid uniqname.')
-    #owner = McGroup(help_text="MCommunity Admin Group")  # TODO make this an admin group.
-    #owner = forms.ChoiceField(choices=LDAPGroup.objects.all())
     admin_group = forms.ChoiceField(help_text='MCommunity Admin Group')
     acknowledge_sle = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
     acknowledge_srd = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
@@ -21,7 +23,6 @@ class CloudNewForm(forms.ModelForm):
     egress_waiver = forms.BooleanField(widget=NoYes)    
     sensitive_data_yn = forms.BooleanField(widget=NoYes)
     #non_regulated_data = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(attrs={'class': 'none'}), choices=regdata)
-
 
     shortcode = forms.CharField(validators=[validate_shortcode])
     redhat = forms.BooleanField(label='Include RedHat OS?', widget=NoYes)
@@ -42,8 +43,6 @@ class CloudNewForm(forms.ModelForm):
                 print('no widget for', field)
 
         if self.user:
-
-            print('get list')
             group_list = MCommunity().get_groups(self.user.username)
 
             choice_list = [(None, '---')]
@@ -52,16 +51,14 @@ class CloudNewForm(forms.ModelForm):
 
             self.fields['admin_group'].choices = choice_list
 
-            #if self.instance:
-            #    self.fields['owner'].initial = self.instance.owner.name
+    def save(self):
+        if 'admin_group' in self.changed_data:
+            self.instance.owner = LDAPGroup().lookup( self.cleaned_data.get('admin_group') )
 
+        super().save()
 
     def clean(self):
-
-        print('here')
         super().clean()
-        print(self.cleaned_data)
-
         
         for err_field in self.errors:
             self.fields[err_field].widget.attrs['class'] += ' is-invalid'
@@ -88,17 +85,15 @@ class AwsNewForm(CloudNewForm):
         self.fields['aws_account_number'].required = False
         self.fields['aws_email'].required = False
 
+
 class AzureNewForm(CloudNewForm):
     redhat = None
     egress_waiver = None
 
     class Meta:
         model = Azure
-        exclude = ['id','created_date','account_id','status']
+        exclude = ['id','created_date','account_id','status','owner']
         fields = ['requestor','owner','shortcode']
-        widgets = {
-            'billing_contact': forms.TextInput(attrs={'cols': 80, 'rows': 20}),
-        }
 
 
 class GcpNewForm(CloudNewForm):
@@ -106,7 +101,4 @@ class GcpNewForm(CloudNewForm):
 
     class Meta:
         model = GCP
-        exclude = ['id','created_date','account_id','status']
-        widgets = {
-            'billing_contact': forms.TextInput(attrs={'cols': 80, 'rows': 20}),
-        }
+        exclude = ['id','created_date','account_id','status','owner']

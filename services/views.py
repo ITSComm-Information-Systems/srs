@@ -10,6 +10,7 @@ from project.integrations import create_ticket
 
 class ServicesView(UserPassesTestMixin, View):
     title = 'Order Service'
+    template = 'services/add.html'
 
     def test_func(self):
 
@@ -18,12 +19,15 @@ class ServicesView(UserPassesTestMixin, View):
         else:
             return False
 
-    def post(self, request):
-        form = self.view_form(request.POST, user=self.request.user)
+    def post(self, request, service):
+        model = getattr(Service, service)
+        #form = self.view_form(request.POST, user=self.request.user)
+        
+        form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)
 
         if form.is_valid():
             form.save()
-            instance = AWS.objects.get(id=form.instance.id)
+            instance = model.objects.get(id=form.instance.id)
 
             create_ticket('New', instance, request)
             # TODO Redirect
@@ -32,13 +36,10 @@ class ServicesView(UserPassesTestMixin, View):
                       {'title': self.title,
                        'form': form, })
 
-
-
-    def get(self, request):
+    def get(self, request, service):
         request.session['backupStorage'] = 'cloud'
 
-        #template = loader.get_template('/order/cart.html')
-        form = self.view_form(user=self.request.user)
+        form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)
 
         return render(request, self.template,
                       {'title': self.title,
@@ -94,14 +95,14 @@ class Gcp(ServicesView):
 
 
 class Aws(ServicesView):
-    template = 'services/aws.html'
+    #template = 'services/aws.html'
     title = 'Order AWS'
     view_form = AwsNewForm
 
 
 
 class Gcp(ServicesView):
-    template = 'services/gcp.html'
+    #template = 'services/gcp.html'
     title = 'Order Google Cloud'
     view_form = GcpNewForm
     
