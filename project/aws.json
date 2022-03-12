@@ -1,0 +1,727 @@
+{
+    "ID": 1952913,
+    "ParentID": 0,
+    "ParentTitle": "",
+    "ParentClass": 0,
+    "TypeID": 5,
+    "TypeName": "Cloud Services",
+    "TypeCategoryID": 7,
+    "TypeCategoryName": "Infrastructure",
+    "Classification": 46,
+    "ClassificationName": "Request",
+    "FormID": 152,
+    "FormName": "ITS-Amazon Web Services at U-M Account Requests - Form",
+    "Title": "Amazon Web Services at U-M",
+    "Description": "fdsafdsafa",
+    "Uri": "api/31/tickets/1952913",
+    "AccountID": 3181,
+    "AccountName": "ITS Infra Net Pinnacle  481397",
+    "SourceID": 4,
+    "SourceName": "Web",
+    "StatusID": 77,
+    "StatusName": "New",
+    "StatusClass": 1,
+    "ImpactID": 0,
+    "ImpactName": "",
+    "UrgencyID": 18,
+    "UrgencyName": "High",
+    "PriorityID": 19,
+    "PriorityName": "Low",
+    "PriorityOrder": 1.0,
+    "SlaID": 40,
+    "SlaName": "Amazon Web Services at U-M (New) 24 hrs High",
+    "IsSlaViolated": false,
+    "IsSlaRespondByViolated": false,
+    "IsSlaResolveByViolated": false,
+    "RespondByDate": "0001-01-01T05:00:00Z",
+    "ResolveByDate": "2022-03-16T18:00:00Z",
+    "SlaBeginDate": "2022-03-12T21:34:50.283Z",
+    "IsOnHold": false,
+    "PlacedOnHoldDate": "0001-01-01T05:00:00Z",
+    "GoesOffHoldDate": "0001-01-01T05:00:00Z",
+    "CreatedDate": "2022-03-12T21:34:50.283Z",
+    "CreatedUid": "2d3898e5-7a73-ea11-a81b-000d3a8e391e",
+    "CreatedFullName": "David Jamison",
+    "CreatedEmail": "tdx-sb-donot-modify@umich.edu",
+    "ModifiedDate": "2022-03-12T21:34:51.597Z",
+    "ModifiedUid": "00000000-0000-0000-0000-000000000000",
+    "ModifiedFullName": " ",
+    "RequestorName": "David Jamison",
+    "RequestorFirstName": "David",
+    "RequestorLastName": "Jamison",
+    "RequestorEmail": "tdx-sb-donot-modify@umich.edu",
+    "RequestorPhone": "734-531-7875",
+    "RequestorUid": "2d3898e5-7a73-ea11-a81b-000d3a8e391e",
+    "ActualMinutes": 0,
+    "EstimatedMinutes": 0,
+    "DaysOld": 0,
+    "StartDate": null,
+    "EndDate": null,
+    "ResponsibleUid": null,
+    "ResponsibleFullName": "Unassigned",
+    "ResponsibleEmail": "",
+    "ResponsibleGroupID": 6,
+    "ResponsibleGroupName": "ITS-CloudComputeServices",
+    "RespondedDate": "0001-01-01T05:00:00Z",
+    "RespondedUid": null,
+    "RespondedFullName": "",
+    "CompletedDate": "0001-01-01T05:00:00Z",
+    "CompletedUid": null,
+    "CompletedFullName": "",
+    "ReviewerUid": null,
+    "ReviewerFullName": "",
+    "ReviewerEmail": "",
+    "ReviewingGroupID": 238,
+    "ReviewingGroupName": "ITS-ChangeApproval-CloudServices",
+    "TimeBudget": 0.0,
+    "ExpensesBudget": 0.0,
+    "TimeBudgetUsed": 0.0,
+    "ExpensesBudgetUsed": 0.0,
+    "IsConvertedToTask": false,
+    "ConvertedToTaskDate": "0001-01-01T05:00:00Z",
+    "ConvertedToTaskUid": null,
+    "ConvertedToTaskFullName": "",
+    "TaskProjectID": 0,
+    "TaskProjectName": "",
+    "TaskPlanID": 0,
+    "TaskPlanName": "",
+    "TaskID": 0,
+    "TaskTitle": "",
+    "TaskStartDate": "0001-01-01T05:00:00Z",
+    "TaskEndDate": "0001-01-01T05:00:00Z",
+    "TaskPercentComplete": 0,
+    "LocationID": 0,
+    "LocationName": "",
+    "LocationRoomID": 0,
+    "LocationRoomName": "",
+    "RefCode": "",
+    "ServiceID": 81,
+    "ServiceName": "ITS-Amazon Web Services at U-M Account Requests",
+    "ServiceOfferingID": 0,
+    "ServiceOfferingName": "None",
+    "ServiceCategoryID": 0,
+    "ServiceCategoryName": "None",
+    "ArticleID": 0,
+    "ArticleSubject": "",
+    "ArticleStatus": 0,
+    "ArticleCategoryPathNames": "",
+    "ArticleAppID": 0,
+    "ArticleShortcutID": null,
+    "AppID": 31,
+    "Attributes": [
+        {
+            "ID": 1780,
+            "Name": "generic request_Preferred e-mail",
+            "Order": 0,
+            "Description": "We'll contact you via your UMICH address. If you prefer we use a different address, please enter that here.",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "djams35@gmail.com",
+            "ValueText": "djams35@gmail.com",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1781,
+            "Name": "generic request_Preferred Contact Phone Number",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "7344176943",
+            "ValueText": "7344176943",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1879,
+            "Name": "aws_AWS Request Options",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "vradio",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 95,
+                    "Name": "New",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:21:40.173Z",
+                    "DateModified": "2020-03-02T15:44:53.88Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 96,
+                    "Name": "Modify",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:21:40.173Z",
+                    "DateModified": "2020-02-27T17:21:40.173Z",
+                    "Order": 1
+                },
+                {
+                    "ID": 4699,
+                    "Name": "Delete",
+                    "IsActive": true,
+                    "DateCreated": "2020-09-30T18:01:48.33Z",
+                    "DateModified": "2020-11-04T15:37:19.507Z",
+                    "Order": 2
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "95",
+            "ValueText": "New",
+            "ChoicesText": "New",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1881,
+            "Name": "aws_add_Do you wish to bring an existing AWS account into the UM infrastructure?",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "dropdown",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 100,
+                    "Name": "No",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:27:28.66Z",
+                    "DateModified": "2020-02-27T17:27:28.66Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 99,
+                    "Name": "Yes",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:27:28.66Z",
+                    "DateModified": "2020-02-27T17:27:28.66Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "100",
+            "ValueText": "No",
+            "ChoicesText": "No",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1884,
+            "Name": "aws_add_MCommunity Group Email:",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "djams35@gmail.com",
+            "ValueText": "djams35@gmail.com",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1885,
+            "Name": "aws_add_UM Billing Contact Email:",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "djams35@gmail.com",
+            "ValueText": "djams35@gmail.com",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1886,
+            "Name": "aws_add_Shortcode",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "1234567",
+            "ValueText": "1234567",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1887,
+            "Name": "aws_add_Will any sensitive data be used or stored?",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "dropdown",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 102,
+                    "Name": "No",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:37:04.613Z",
+                    "DateModified": "2020-02-27T17:37:04.613Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 101,
+                    "Name": "Yes",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:37:04.613Z",
+                    "DateModified": "2020-02-27T17:37:04.613Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "101",
+            "ValueText": "Yes",
+            "ChoicesText": "Yes",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1888,
+            "Name": "aws_add_Select all that apply:",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "checklist",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 103,
+                    "Name": "Protected Health Information (ePHI, HIPAA)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.267Z",
+                    "DateModified": "2020-02-27T17:40:54.267Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 104,
+                    "Name": "Student Education Records (FERPA)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.28Z",
+                    "DateModified": "2020-02-27T17:40:54.28Z",
+                    "Order": 1
+                },
+                {
+                    "ID": 105,
+                    "Name": "Student Loan Application Information (GLBA)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.28Z",
+                    "DateModified": "2020-02-27T17:40:54.28Z",
+                    "Order": 2
+                },
+                {
+                    "ID": 106,
+                    "Name": "Human Subject Research (HSR)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.28Z",
+                    "DateModified": "2020-02-27T17:40:54.28Z",
+                    "Order": 3
+                },
+                {
+                    "ID": 107,
+                    "Name": "Social Security Numbers (SSN)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.297Z",
+                    "DateModified": "2020-02-27T17:40:54.297Z",
+                    "Order": 4
+                },
+                {
+                    "ID": 108,
+                    "Name": "Attorney/Client Privileged Information",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.297Z",
+                    "DateModified": "2020-02-27T17:40:54.297Z",
+                    "Order": 5
+                },
+                {
+                    "ID": 109,
+                    "Name": "Personally Identifiable Information (PII)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.297Z",
+                    "DateModified": "2020-02-27T17:40:54.297Z",
+                    "Order": 6
+                },
+                {
+                    "ID": 110,
+                    "Name": "IT Security Information",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.317Z",
+                    "DateModified": "2020-02-27T17:40:54.317Z",
+                    "Order": 7
+                },
+                {
+                    "ID": 111,
+                    "Name": "Credit Card/Payment Card Information (PCI)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.32Z",
+                    "DateModified": "2020-02-27T17:40:54.32Z",
+                    "Order": 8
+                },
+                {
+                    "ID": 112,
+                    "Name": "Export Controlled Research (ITAR, EAR)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.323Z",
+                    "DateModified": "2020-02-27T17:40:54.323Z",
+                    "Order": 9
+                },
+                {
+                    "ID": 113,
+                    "Name": "Federal Information Security Management Act Data (FISMA)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.33Z",
+                    "DateModified": "2020-02-27T17:40:54.33Z",
+                    "Order": 10
+                },
+                {
+                    "ID": 114,
+                    "Name": "Other Sensitive Data (Specify in Additional Details)",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:40:54.337Z",
+                    "DateModified": "2020-02-27T17:40:54.337Z",
+                    "Order": 11
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "105,110",
+            "ValueText": "Student Loan Application Information (GLBA)\r\nIT Security Information",
+            "ChoicesText": "Student Loan Application Information (GLBA), IT Security Information",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1889,
+            "Name": "aws_add_UM Security Contact Email:",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "textbox",
+            "DataType": "String",
+            "Choices": [],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "a",
+            "ValueText": "a",
+            "ChoicesText": "",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1893,
+            "Name": "aws_add_Would you like to participate in the Data Egress Waiver?",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "dropdown",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 135,
+                    "Name": "No",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:51:50.92Z",
+                    "DateModified": "2020-02-27T17:51:50.92Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 134,
+                    "Name": "Yes",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:51:50.907Z",
+                    "DateModified": "2020-02-27T17:51:50.907Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "134",
+            "ValueText": "Yes",
+            "ChoicesText": "Yes",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1894,
+            "Name": "aws_add_Include RedHat OS?",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "dropdown",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 137,
+                    "Name": "No",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:54:26.27Z",
+                    "DateModified": "2020-02-27T17:54:26.27Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 136,
+                    "Name": "Yes",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:54:26.253Z",
+                    "DateModified": "2020-02-27T17:54:26.253Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "136",
+            "ValueText": "Yes",
+            "ChoicesText": "Yes",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1895,
+            "Name": "aws_add_Do you require a VPN?",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "dropdown",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 139,
+                    "Name": "No",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:55:27Z",
+                    "DateModified": "2020-02-27T17:55:27Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 138,
+                    "Name": "Yes",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:55:27Z",
+                    "DateModified": "2020-02-27T17:55:27Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "138",
+            "ValueText": "Yes",
+            "ChoicesText": "Yes",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1896,
+            "Name": "aws_add_Request Consultation?",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "dropdown",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 141,
+                    "Name": "No",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:56:45.817Z",
+                    "DateModified": "2020-02-27T17:56:45.817Z",
+                    "Order": 0
+                },
+                {
+                    "ID": 140,
+                    "Name": "Yes",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T17:56:45.817Z",
+                    "DateModified": "2020-02-27T17:56:45.817Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "140",
+            "ValueText": "Yes",
+            "ChoicesText": "Yes",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 1898,
+            "Name": "aws_add_I have read and I acknowledge the SLE",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "checklist",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 142,
+                    "Name": "I have read and I acknowledge the Service Charter",
+                    "IsActive": true,
+                    "DateCreated": "2020-02-27T18:06:52.66Z",
+                    "DateModified": "2021-12-22T15:53:46.563Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "142",
+            "ValueText": "I have read and I acknowledge the Service Charter",
+            "ChoicesText": "I have read and I acknowledge the Service Charter",
+            "AssociatedItemIDs": [
+                0
+            ]
+        },
+        {
+            "ID": 3589,
+            "Name": "aws_add_Shared Responsibility Doc",
+            "Order": 0,
+            "Description": "",
+            "SectionID": 0,
+            "SectionName": null,
+            "FieldType": "checklist",
+            "DataType": "String",
+            "Choices": [
+                {
+                    "ID": 3036,
+                    "Name": "I have read and I acknowledge the Shared Responsibility Doc",
+                    "IsActive": true,
+                    "DateCreated": "2020-06-09T15:47:28.653Z",
+                    "DateModified": "2020-06-09T15:47:28.653Z",
+                    "Order": 0
+                }
+            ],
+            "IsRequired": false,
+            "IsUpdatable": true,
+            "Value": "3036",
+            "ValueText": "I have read and I acknowledge the Shared Responsibility Doc",
+            "ChoicesText": "I have read and I acknowledge the Shared Responsibility Doc",
+            "AssociatedItemIDs": [
+                0
+            ]
+        }
+    ],
+    "Attachments": [],
+    "Tasks": [
+        {
+            "ID": 137653,
+            "TicketID": 1952913,
+            "Title": "Provision AWS Account",
+            "Description": "Please refer to the following provisioning documentation:\n\nDesktop App:\nOpen OneNote (its.is.vci Notebook) - then go to: Cloud-AWS-Provisioning\n\nWeb Link:\nhttps://umich.sharepoint.com/sites/its.is.vci/_layouts/OneNote.aspx?id=%2Fsites%2Fits.is.vci%2FSiteAssets%2Fits.is.vci%20Notebook&wd=target%28Cloud%2FAWS%2FProvisioning.one%7C31D70063-1AB4-D448-A62B-308E419D51F4%2FTask%201%7CFF841521-4B1D-794D-A4E2-F9893DC3C903%2F%29\nonenote:https://umich.sharepoint.com/sites/its.is.vci/SiteAssets/its.is.vci%20Notebook/Cloud/AWS/Provisioning.one#Task%201&section-id={31D70063-1AB4-D448-A62B-308E419D51F4}&page-id={FF841521-4B1D-794D-A4E2-F9893DC3C903}&end\n\nIf the customer already has an account, please skip to the existing account section.",
+            "IsActive": true,
+            "StartDate": null,
+            "EndDate": null,
+            "CompleteWithinMinutes": null,
+            "EstimatedMinutes": 0,
+            "ActualMinutes": 0,
+            "PercentComplete": 0,
+            "CreatedDate": "2022-03-12T21:34:51.67Z",
+            "CreatedUid": "2d3898e5-7a73-ea11-a81b-000d3a8e391e",
+            "CreatedFullName": "David Jamison",
+            "CreatedEmail": "tdx-sb-donot-modify@umich.edu",
+            "ModifiedDate": "2022-03-12T21:34:51.67Z",
+            "ModifiedUid": "2d3898e5-7a73-ea11-a81b-000d3a8e391e",
+            "ModifiedFullName": "David Jamison",
+            "CompletedDate": "0001-01-01T05:00:00Z",
+            "CompletedUid": null,
+            "CompletedFullName": "",
+            "ResponsibleUid": null,
+            "ResponsibleFullName": "",
+            "ResponsibleEmail": "",
+            "ResponsibleGroupID": 6,
+            "ResponsibleGroupName": "ITS-CloudComputeServices",
+            "PredecessorID": 0,
+            "PredecessorTitle": "",
+            "Order": 1,
+            "TypeID": 3,
+            "DetectedConflictCount": 0,
+            "DetectedConflictTypes": 0,
+            "LastConflictScanDateUtc": "0001-01-01T00:00:00Z",
+            "Uri": "api/31/tickets/1952913/tasks/137653"
+        }
+    ],
+    "Notify": [
+        {
+            "ItemRole": "Reviewing Group",
+            "Name": "ITS-ChangeApproval-CloudServices",
+            "Initials": null,
+            "Value": "238",
+            "RefValue": 0,
+            "ProfileImageFileName": null
+        },
+        {
+            "ItemRole": "Responsible Group",
+            "Name": "ITS-CloudComputeServices",
+            "Initials": null,
+            "Value": "6",
+            "RefValue": 0,
+            "ProfileImageFileName": null
+        },
+        {
+            "ItemRole": "Requestor, Creator",
+            "Name": "David Jamison",
+            "Initials": null,
+            "Value": "tdx-sb-donot-modify@umich.edu",
+            "RefValue": 0,
+            "ProfileImageFileName": null
+        }
+    ],
+    "WorkflowID": 3236905,
+    "WorkflowConfigurationID": 15,
+    "WorkflowName": "Amazon Web Services at U-M Workflow"
+}

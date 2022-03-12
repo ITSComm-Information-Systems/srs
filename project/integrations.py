@@ -294,20 +294,20 @@ class Payload():
             "Description": self.description,
             "Attributes": [] } | kwargs
 
-        if 'regulated_data' in request.POST.keys():
-            print('sensitive data')
+        if request.POST.get('sensitive_data_yn') == 'Yes':
+            value = ''
+            for val in instance.regulated_data.values() | instance.non_regulated_data.values():
+                tdx_id = getattr(self.sensitive_data, val['code'])
 
+                if value == '':
+                    value = str(tdx_id)
+                else:
+                    value = value + ',' + str(tdx_id)
+
+            self.add_attribute(self.sensitive_data.id, value)
 
         for key, value in request.POST.items():
-            if key == 'regulated_data':
-                print('reg')
-                regs = request.POST.getlist('regulated_data')
-                for x in instance.regulated_data.values():
-                    print(x)
-                #reg_list = Choice.objects.filter(regs__in=regs)
-                print('end')
-
-            elif key in dir(self):
+            if key in dir(self):
                 attr = getattr(self, key)
                 val = attr.get_value(value) #getattr(attr, value)
                 self.add_attribute(attr.id, val)
@@ -363,7 +363,7 @@ class AwsPayload(Payload):
     billing_contact = TextAttribute(1885)
     shortcode = TextAttribute(1886)
     sensitive_data_yn = ChoiceAttribute(1887, No=102, Yes=101)
-    sensitive_data = ChoiceAttribute(1888,HIPAA=103,FERPA=104,GLBA=105,HSR=106,SSN=107,ATT=108,PPI=109,ITSEC=110,PCI=111,ECR=112,FISMA=113,OTHERNONREG=114)
+    sensitive_data = ChoiceAttribute(1888,HIPAA=103,FERPA=104,GLBA=105,HSR=106,SSN=107,ATT=108,PPI=109,ITSEC=110,PCI=111,ECR=112,FISMA=113,OTHERNONREG=114,OTHERREG=114)
     security_contact = TextAttribute(1889)
     region_yn = ChoiceAttribute(1890, No=116, Yes=115)
     region = ChoiceAttribute(1891,USEastNVA=117,USEastOH=118,USWestNCA=119,USWestOR=120,
@@ -419,24 +419,25 @@ class GcpPayload(Payload):
 
 class AzurePayload(Payload):
     form_id = 16
-    type_id = 6
+    type_id = 6   # 5 for delete?
     service_id = 6
     responsible_group_id = 6
     request_type = ChoiceAttribute(1786, New=19, Modify=20, Delete=4766)    
-    owner = TextAttribute(1802)
+    admin_group = TextAttribute(1802)
     shortcode = TextAttribute(1798)
-    billing_contact_email = TextAttribute(1804)
-    security_contact_email = TextAttribute(1800)
+    billing_contact = TextAttribute(1804)
+    security_contact = TextAttribute(1800)
     security_contact_phone = TextAttribute(1799)
-    sensitive_data = ChoiceAttribute(1788, No=24, Yes=23)
-    sensitive_data_type = ChoiceAttribute(1814,ATT=53,PCI=56,ECR=57,FISMA=58,HSR=51,ITSEC=55,OTHERNONREG=59,PPI=54,HIPAA=48,SSN=52,FERPA=49,GLBA=50)
+    sensitive_data_yn = ChoiceAttribute(1788, No=24, Yes=23)
+    sensitive_data = ChoiceAttribute(1814,ATT=53,PCI=56,ECR=57,FISMA=58,HSR=51,ITSEC=55,OTHERNONREG=59,PPI=54,HIPAA=48,SSN=52,FERPA=49,GLBA=50)
     vpn = ChoiceAttribute(1787, No=22, Yes=21)
     vpn_tier = ChoiceAttribute(1813, Basic=44, VpnGw1=45, VpnGw2=46, VpnGw3=47)
     request_consultation = ChoiceAttribute(1801, No=40, Yes=41)
     additional_details = TextAttribute(1805)
-    sle_acknowledge = ChoiceAttribute(1797, Yes=39)
-    shared_responsibility_acknowledge = ChoiceAttribute(2493, Yes=1100)
-
+    acknowledge_sle = ChoiceAttribute(1797, Yes=39)
+    acknowledge_srd = ChoiceAttribute(2493, Yes=1100)
+    # Delete
+    account_id = TextAttribute(1796)
 
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
@@ -444,8 +445,12 @@ def create_ticket(action, instance, request, **kwargs):
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
 
+    #print(payload.data)
+     
+
     resp = TDx().create_ticket(payload.data)
-    print('TDx response', resp.status_code, resp.text)
+    if not resp.ok:
+        print('TDx response', resp.status_code, resp.text)
 
 def create_ticket_database_modify(instance, user, description):
 

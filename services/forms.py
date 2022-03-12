@@ -10,32 +10,14 @@ YesNo = forms.Select(choices=[('Yes','Yes',),('No','No',),] , attrs={'class': 'f
 NoYes = forms.Select(choices=[('No','No',),('Yes','Yes',),] , attrs={'class': 'form-control col-2'})
 
 
-class CloudNewForm(forms.ModelForm):
-    custom = ['sensitive_data_yn']
-    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data']
-
-    requestor = Uniqname(help_text='Please enter a valid uniqname.')
+class CloudForm(forms.ModelForm):
     admin_group = forms.ChoiceField(help_text='MCommunity Admin Group')
-    acknowledge_sle = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
-    acknowledge_srd = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
-
-    contact_phone = forms.CharField()
-    egress_waiver = forms.BooleanField(widget=NoYes)    
-    sensitive_data_yn = forms.BooleanField(widget=NoYes)
-    #non_regulated_data = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(attrs={'class': 'none'}), choices=regdata)
-
-    shortcode = forms.CharField(validators=[validate_shortcode])
-    redhat = forms.BooleanField(label='Include RedHat OS?', widget=NoYes)
-    vpn = forms.BooleanField(label='Do you require a VPN?'
-        , help_text='Choosing Yes will result in additional charges. Select Yes if you need access to resources on campus that are not available to the Internet, such as Active Directory.'
-        , widget=NoYes)
-    request_consultation = forms.BooleanField(label='Request Consultation?', widget=NoYes)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user')
         kwargs.pop('user', None)
 
-        super(CloudNewForm, self).__init__(*args, **kwargs)
+        super(CloudForm, self).__init__(*args, **kwargs)
 
         for field in self.fields:
             if hasattr(self.fields[field], 'widget'):
@@ -64,6 +46,29 @@ class CloudNewForm(forms.ModelForm):
         
         for err_field in self.errors:
             self.fields[err_field].widget.attrs['class'] += ' is-invalid'
+
+class CloudNewForm(CloudForm):
+    custom = ['sensitive_data_yn']
+    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data']
+
+    requestor = Uniqname(help_text='Please enter a valid uniqname.')
+
+    acknowledge_sle = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
+    acknowledge_srd = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
+
+    contact_phone = forms.CharField()
+    egress_waiver = forms.BooleanField(widget=NoYes)    
+    sensitive_data_yn = forms.BooleanField(widget=NoYes)
+    #non_regulated_data = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(attrs={'class': 'none'}), choices=regdata)
+
+    shortcode = forms.CharField(validators=[validate_shortcode])
+    redhat = forms.BooleanField(label='Include RedHat OS?', widget=NoYes)
+    vpn = forms.BooleanField(label='Do you require a VPN?'
+        , help_text='Choosing Yes will result in additional charges. Select Yes if you need access to resources on campus that are not available to the Internet, such as Active Directory.'
+        , widget=NoYes)
+    request_consultation = forms.BooleanField(label='Request Consultation?', widget=NoYes)
+
+
 
 AWS_REGION_CHOICES = [
     ('USEastNVA', 'US East (N. Virginia)'),
@@ -119,7 +124,7 @@ class AzureNewForm(CloudNewForm):
     class Meta:
         model = Azure
         exclude = ['id','created_date','account_id','status','owner']
-        fields = ['requestor','owner','shortcode']
+        #fields = ['requestor','owner','shortcode']
 
 
 class GcpNewForm(CloudNewForm):
@@ -145,3 +150,25 @@ class GcpNewForm(CloudNewForm):
     class Meta:
         model = GCP
         exclude = ['id','created_date','account_id','status','owner']
+
+
+
+
+class AwsChangeForm(CloudForm):
+    #title = 'ITS-Microsoft Azure at U-M Account Requests'
+    #redhat = None
+    #egress_waiver = None
+
+    class Meta:
+        model = AWS
+        fields = ['owner','shortcode','billing_contact','security_contact']
+
+    
+class AzureChangeForm(CloudForm):
+    #title = 'ITS-Microsoft Azure at U-M Account Requests'
+    #redhat = None
+    #egress_waiver = None
+
+    class Meta:
+        model = Azure
+        fields = ['owner','shortcode','billing_contact','security_contact']

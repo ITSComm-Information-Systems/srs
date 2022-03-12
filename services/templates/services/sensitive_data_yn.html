@@ -27,7 +27,7 @@
             <b>Non-Regulated Sensitive Data</b>><br> (Check all that apply.)<br>
             {% for value, label in form.non_regulated_data.field.widget.choices %}
             <div class="custom-control custom-checkbox">
-                <input name="regulated_data" type="checkbox" class="custom-control-input" id="reg_{{ value }}"
+                <input name="non_regulated_data" type="checkbox" class="custom-control-input" id="reg_{{ value }}"
                     value="{{ value }}">
                 <label class="custom-control-label" for="reg_{{ value }}">{{ label }}</label>
             </div>

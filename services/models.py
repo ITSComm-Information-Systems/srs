@@ -6,7 +6,6 @@ from oscauth.models import LDAPGroup
 from django.contrib.auth.models import User
 
 
-
 class Status(models.TextChoices):
     ACTIVE = 'A', 'Active'
     ENDED = 'E', 'Ended'
@@ -75,10 +74,16 @@ class GCP(Cloud):
     class Meta:
         verbose_name = 'Google Cloud Platform Project'
 
-
     def __str__(self):
         return self.project_id
 
+    @property
+    def account_id(self):
+        return self.gcp_account.account_id
+
+    @property
+    def shortcode(self):
+        return self.gcp_account.shortcode
 
 
 class Azure(Cloud):

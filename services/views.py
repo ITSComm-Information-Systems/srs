@@ -1,19 +1,17 @@
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.template import loader
 from django.views.generic import View
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import UserPassesTestMixin
-from .forms import AwsNewForm, AzureNewForm, GcpNewForm
+from .forms import *
 from .models import *
 from project.integrations import create_ticket
 
 
 class ServiceRequestView(UserPassesTestMixin, View):
-    title = 'Order Service'
     template = 'services/add.html'
 
     def test_func(self):
-
         if self.request.user.is_authenticated:
             return True
         else:
@@ -21,18 +19,24 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
     def post(self, request, service):
         model = getattr(Service, service)
-        
         form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)
+        title = f'Request {model._meta.verbose_name.title()} {model.instance_label}'
 
         if form.is_valid():
             form.save()
             instance = model.objects.get(id=form.instance.id)
-
-            create_ticket('New', instance, request)
-            # TODO Redirect
+            create_ticket('New', instance, request, title=title)
+            #return HttpResponseRedirect('/requestsent')
+            print('valid form')
+        else:
+            print(form.errors)
+            print(form.fields['regulated_data'].choices)
+            choices = form.fields['regulated_data'].choices
+            for choice in form.fields['regulated_data'].choices:
+                print(choice)
 
         return render(request, self.template,
-                      {'title': self.title,
+                      {'title': form.title,
                        'form': form, })
 
     def get(self, request, service):
@@ -91,6 +95,7 @@ class ServiceDeleteView(UserPassesTestMixin, View):
 
 
 class ServiceChangeView(UserPassesTestMixin, View):
+    template = 'services/change.html'
 
     def test_func(self):
         # TDOO check access to instance
@@ -99,39 +104,40 @@ class ServiceChangeView(UserPassesTestMixin, View):
         else:
             return False
 
-    def post(self, request, service):
+    def post(self, request, service, id):
+        print(self.request.POST)
         model = getattr(Service, service)
+        instance = model.objects.get(id=id)        
         
-        form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)
+        form = globals()[service.capitalize() + 'ChangeForm'](request.POST, user=self.request.user)
 
         if form.is_valid():
             form.save()
-            instance = model.objects.get(id=form.instance.id)
-
-            create_ticket('New', instance, request)
-            # TODO Redirect
+            create_ticket('Modify', instance, request, title=f'Modify {instance._meta.verbose_name.title()} {model.instance_label}')
+            HttpResponseRedirect(request.path) 
 
         return render(request, self.template,
-                      {'title': self.title,
+                      {'title': f'Modify {instance._meta.verbose_name.title()}',
                        'form': form, })
 
     def get(self, request, service, id):
         request.session['backupStorage'] = 'cloud'
         model = getattr(Service, service)
-        instance = get_object_or_404(model, pk=id)
+        instance = get_object_or_404(model, pk=id, status=Status.ACTIVE)
 
         print(instance)
 
         title = 'Modify ' + instance._meta.verbose_name.title()
-        template = 'services/modify.html'
+
 
 
         try:
-            form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)
+            form = globals()[service.capitalize() + 'ChangeForm'](user=self.request.user, instance=instance)
         except:
             return HttpResponseNotFound('<h1>Page not found</h1>')
 
-        return render(request, template,
+
+        return render(request, self.template,
                       {'title': title,
                        'form': form, })
 

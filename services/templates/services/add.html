@@ -57,30 +57,39 @@
 
 {% block js %}
 <script>
-
-    $("#id_migrate_existing").change(function() {
-        if (this.value=="Yes") {
-            $("#div_aws_account_info").show();
-        } else {
-            $("#div_aws_account_info").hide();
-        }
-    });
-
-    $("#id_sensitive_data_yn").change(function() {
-        if (this.value=="Yes") {
-            $("#div_sensitive_data").show();
-        } else {
-            $("#div_sensitive_data").hide();
-        }
-    });
+    $(document).ready(function () {
 
 
-    $("#id_gcp_existing").change(function() {
-        if (this.value=="Yes") {
-            $("#div_gcp_account_info").show();
-        } else {
-            $("#div_gcp_account_info").hide();
-        }
+        $("#id_migrate_existing").change(function () {
+            if (this.value == "Yes") {
+                $("#div_aws_account_info").show();
+            } else {
+                $("#div_aws_account_info").hide();
+            }
+        });
+
+        $("#id_sensitive_data_yn").change(function () {
+            if (this.value == "Yes") {
+                $("#div_sensitive_data").show();
+            } else {
+                $("#div_sensitive_data").hide();
+            }
+        });
+
+        $("#id_gcp_existing").change(function () {
+            if (this.value == "Yes") {
+                $("#div_gcp_account_info").show();
+            } else {
+                $("#div_gcp_account_info").hide();
+            }
+        });
+
+        $('#id_migrate_existing').trigger('change')
+        $('#id_sensitive_data_yn').trigger('change')
+        $('#id_gcp_existing').trigger('change')
+
+
+
     });
 
 </script>
