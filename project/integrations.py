@@ -297,7 +297,10 @@ class Payload():
         if request.POST.get('sensitive_data_yn') == 'Yes':
             value = ''
             for val in instance.regulated_data.values() | instance.non_regulated_data.values():
-                tdx_id = getattr(self.sensitive_data, val['code'])
+                if hasattr(self.sensitive_data, val['code']):
+                    tdx_id = getattr(self.sensitive_data, val['code'])
+                else:
+                    tdx_id = getattr(self.sensitive_data, 'OTHERNONREG')
 
                 if value == '':
                     value = str(tdx_id)
@@ -363,7 +366,7 @@ class AwsPayload(Payload):
     billing_contact = TextAttribute(1885)
     shortcode = TextAttribute(1886)
     sensitive_data_yn = ChoiceAttribute(1887, No=102, Yes=101)
-    sensitive_data = ChoiceAttribute(1888,HIPAA=103,FERPA=104,GLBA=105,HSR=106,SSN=107,ATT=108,PPI=109,ITSEC=110,PCI=111,ECR=112,FISMA=113,OTHERNONREG=114,OTHERREG=114)
+    sensitive_data = ChoiceAttribute(1888,HIPAA=103,FERPA=104,GLBA=105,HSR=106,SSN=107,ATT=108,PPI=109,ITSEC=110,PCI=111,ECR=112,FISMA=113,OTHERNONREG=114)
     security_contact = TextAttribute(1889)
     region_yn = ChoiceAttribute(1890, No=116, Yes=115)
     region = ChoiceAttribute(1891,USEastNVA=117,USEastOH=118,USWestNCA=119,USWestOR=120,
@@ -444,9 +447,7 @@ def create_ticket(action, instance, request, **kwargs):
     service = service.upper()
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
-
     #print(payload.data)
-     
 
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:

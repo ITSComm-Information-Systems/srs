@@ -30,10 +30,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
             print('valid form')
         else:
             print(form.errors)
-            print(form.fields['regulated_data'].choices)
-            choices = form.fields['regulated_data'].choices
-            for choice in form.fields['regulated_data'].choices:
-                print(choice)
+
 
         return render(request, self.template,
                       {'title': form.title,
