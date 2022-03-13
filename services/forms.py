@@ -35,6 +35,8 @@ class CloudForm(forms.ModelForm):
 
             self.fields['admin_group'].choices = choice_list
 
+        self.fields['admin_group'].initial = self.instance.owner
+
     def save(self):
         if 'admin_group' in self.changed_data:
             self.instance.owner = LDAPGroup().lookup( self.cleaned_data.get('admin_group') )
@@ -152,23 +154,22 @@ class GcpNewForm(CloudNewForm):
         exclude = ['id','created_date','account_id','status','owner']
 
 
-
-
 class AwsChangeForm(CloudForm):
-    #title = 'ITS-Microsoft Azure at U-M Account Requests'
-    #redhat = None
-    #egress_waiver = None
 
     class Meta:
         model = AWS
-        fields = ['owner','shortcode','billing_contact','security_contact']
+        fields = ['shortcode','billing_contact','security_contact']
 
     
 class AzureChangeForm(CloudForm):
-    #title = 'ITS-Microsoft Azure at U-M Account Requests'
-    #redhat = None
-    #egress_waiver = None
 
     class Meta:
         model = Azure
-        fields = ['owner','shortcode','billing_contact','security_contact']
+        fields = ['shortcode','billing_contact','security_contact']
+
+
+class GcpChangeForm(CloudForm):
+
+    class Meta:
+        model = GCP
+        fields = ['admin_group','security_contact']

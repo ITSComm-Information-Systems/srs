@@ -172,7 +172,8 @@ class Command(BaseCommand):
         #instance.regulated_data.set() = record
         #instance.non_regulated_data = record
         #instance.egress_waiver = self.to_boo(record.EgressWaiver)
-        instance.owner = LDAPGroup().lookup( record.mcomm )
+        grp = record.mcomm.split('@')
+        instance.owner = LDAPGroup().lookup( grp[0] )
         instance.security_contact = record.securityContact
         instance.project_id = record.projectId
         instance.vpn = self.to_boo(record.vpn)
