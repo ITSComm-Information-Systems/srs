@@ -132,7 +132,7 @@ class AzureNewForm(CloudNewForm):
 class GcpNewForm(CloudNewForm):
     title = 'ITS-Google Cloud Platform at U-M Account Requests'
     custom = ['sensitive_data_yn','gcp_existing']
-    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','existing_id','existing_project']
+    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','existing_id','existing_project','gcp_account','project_id']
 
     redhat = None
 
