@@ -713,6 +713,23 @@ class ServerInfoForm(TabForm):
     def __init__(self, *args, **kwargs):
         super(ServerInfoForm, self).__init__(*args, **kwargs)
 
+        mc = MCommunity()
+        hr = mc.get_user(self.request.user.username)   #EXEC_VP_MED_AFF
+        michmed = False
+        self.fields['michmed_flag'].initial = 'No'
+
+        for afil in hr['umichHR']:
+            if afil.find('deptVPArea=EXEC_VP_MED_AFF') > 0:
+                michmed = True
+                self.fields['michmed_flag'].initial = 'Yes'
+                break
+
+        if len(hr['umichHR']) > 1 and michmed:   # Hide field unless user has multiple appointments
+            print('ask')
+        else:
+            self.fields['michmed_flag'].widget = forms.HiddenInput()
+            self.fields['michmed_flag'].label = ' '          
+
         if self.request.method == 'GET':
             type = self.request.GET.get('type', None)
             #version = self.request.GET.get('version', None)
@@ -727,7 +744,7 @@ class ServerInfoForm(TabForm):
             self.fields['database'].initial = type
             self.fields['size'].widget.attrs.update({'readonly': True}) 
             self.fields['size'].initial = size
-            self.fields.pop('misevexissev')
+            #self.fields.pop('misevexissev')
             self.fields['ad_group'].initial = 'MiDatabase Support Team'
             self.fields['ad_group'].widget.attrs.update({'readonly': True})
         else:
@@ -1375,7 +1392,7 @@ class DatabaseForm(ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(DatabaseForm, self).__init__(*args, **kwargs)
-
+        print('here')
         self.user = user
         group_list = MCommunity().get_groups(user.username)
 
