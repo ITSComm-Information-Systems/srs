@@ -258,10 +258,14 @@ class Payload():
             if key in dir(self):
                 attr = getattr(self, key)
                 val = attr.get_value(value) #getattr(attr, value)
+                if val == '':
+                    if hasattr(instance, key):    # not found so check to see if choice code exists and use that
+                        f = getattr(instance, key)
+                        if hasattr(f, 'code'):
+                            code = getattr(f, 'code')
+                            val = getattr(attr, code)
+                
                 self.add_attribute(attr.id, val)
-
-                if key=='owner':
-                    print('owner', val)
             else:
                 print('not found', key)
 

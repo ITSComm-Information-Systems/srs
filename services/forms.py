@@ -122,6 +122,8 @@ class AwsNewForm(CloudNewForm):
 
 class AzureNewForm(CloudNewForm):
     title = 'ITS-Microsoft Azure at U-M Account Requests'
+    custom = ['sensitive_data_yn','vpn_tier']
+    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','vpn']
     redhat = None
     egress_waiver = None
     request_consultation = None

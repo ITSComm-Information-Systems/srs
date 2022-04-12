@@ -90,7 +90,7 @@ class Azure(Cloud):
     instance_label = 'Subscription'
     account_id = models.CharField(max_length=40, verbose_name='Subscription ID')
     name = models.CharField(max_length=40)
-
+    vpn_tier = models.ForeignKey(Choice, blank=True, null=True, on_delete=models.CASCADE, limit_choices_to={"parent__code": "VPN_TIER"})
 
     class Meta:
         verbose_name = 'Azure Subscription'

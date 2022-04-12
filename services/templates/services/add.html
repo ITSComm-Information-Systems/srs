@@ -84,9 +84,18 @@
             }
         });
 
+        $("#id_vpn").change(function () {
+            if (this.value == "Yes") {
+                $("#div_vpn_tier").show();
+            } else {
+                $("#div_vpn_tier").hide();
+            }
+        });
+
         $('#id_migrate_existing').trigger('change')
         $('#id_sensitive_data_yn').trigger('change')
         $('#id_gcp_existing').trigger('change')
+        $('#id_vpn').trigger('change')
 
 
 
