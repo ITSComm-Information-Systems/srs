@@ -93,7 +93,7 @@ class Azure(Cloud):
 
 
     class Meta:
-        verbose_name_plural = 'Azure Subscriptions'
+        verbose_name = 'Azure Subscription'
         
 
 

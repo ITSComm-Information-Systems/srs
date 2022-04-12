@@ -54,6 +54,8 @@ class CloudNewForm(CloudForm):
     skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data']
 
     requestor = Uniqname(help_text='Please enter a valid uniqname.')
+    billing_contact = Uniqname(help_text='Please enter a valid uniqname.')
+    security_contact = Uniqname(help_text='Please enter a valid uniqname.')
 
     acknowledge_sle = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
     acknowledge_srd = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
@@ -122,6 +124,7 @@ class AzureNewForm(CloudNewForm):
     title = 'ITS-Microsoft Azure at U-M Account Requests'
     redhat = None
     egress_waiver = None
+    request_consultation = None
 
     class Meta:
         model = Azure

@@ -202,60 +202,6 @@ def create_ticket_server_delete(instance, user, description):
 
     TDx().create_ticket(payload)
 
-class PayloadCore():
-    BASE = {
-        "SourceID": 4,             # Web
-        "StatusID": 77,            # Open
-        "PriorityID": 20,          # Medium
-    }
-
-    DATABASE = {
-        "FormID": 19,              # ITS-MiDatabase Account Requests - Form
-        "TypeID": 6,               # Infrastructure / Compute Services
-        "ServiceID": 7,            # ITS-MiDatabase Account Requests
-        "ResponsibleGroupID": 17,  # ITS-MiDatabase
-    }
-
-    AWS = BASE | {
-        "FormID": 152,            # ITS-Amazon Web Services at U-M Account Requests - Form
-        "TypeID": 5,              # Cloud Services
-        "ServiceID": 81,          # ITS-Amazon Web Services at U-M Account Requests
-        "ResponsibleGroupID": 6,  # ITS-CloudComputeServices
-    }
-
-    AZURE = BASE | {
-        "FormID": 16,              # ITS-Microsoft Azure at U-M Account Requests - Form
-        "TypeID": 6,               # Cloud Services
-        "ServiceID": 6,            # ITS-Microsoft Azure at U-M Account Requests
-        "ResponsibleGroupID": 6,   # ITS-CloudComputeServices
-    }
-
-    GCP = BASE | {
-        "FormID": 22,              # ITS-Google Cloud Platform at U-M Account Requests - Form
-        "TypeID": 5,               # Cloud Services
-        "ServiceID": 12,           # ITS-Google Cloud Platform at U-M Account Requests
-        "ResponsibleGroupID": 6,   # ITS-CloudComputeServices
-    }
-    def get_payload(service):
-        print(service)
-
-    def get_payload_aws(self, action):
-        New = 95
-        Modify = 96
-        Delete = 4699
-
-        AWS = self.BASE | {
-            "FormID": 152,            # ITS-Amazon Web Services at U-M Account Requests - Form
-            "TypeID": 5,              # Cloud Services
-            "ServiceID": 81,          # ITS-Amazon Web Services at U-M Account Requests
-            "ResponsibleGroupID": 6,  # ITS-CloudComputeServices
-        }
-
-        self.add_attribute(1879, action)
-
-
-    def add_attribute(self, id, attr):
-        return 0
 
 class Payload():
     title = 'SRS Request'
@@ -267,7 +213,6 @@ class Payload():
     source_id = Web
     status_id = Open
     priority_id = Medium
-
 
     def add_attribute(self, id, value):
         self.data['Attributes'].append(
@@ -317,11 +262,14 @@ class Payload():
 
                 if key=='owner':
                     print('owner', val)
-
             else:
                 print('not found', key)
 
-
+        if action == 'Delete':
+            self.add_attribute(self.delete_account.id, instance.account_id)
+            self.add_attribute(self.delete_owner.id, instance.owner.name)
+            self.add_attribute(self.delete_acknowledgement.id, self.delete_acknowledgement.Yes)
+            #self.add_attribute(self.delete_vpn.id, instance.vpn)
 
         #self.payload = self.BASE | self.payload
         self.add_attribute(self.request_type.id, getattr(self.request_type, action))
@@ -384,7 +332,9 @@ class AwsPayload(Payload):
     #aws_account_number = TextAttribute(1901)
     #change_mc_group = ChoiceAttribute(1902, No=145, Yes=144)    # aws_modify_Change MCommunity Group?
     #change_billing_contact = ChoiceAttribute(1906, No=149, Yes=148 )
-
+    delete_account = TextAttribute(4327)
+    delete_owner = TextAttribute(4315)
+    delete_acknowledgement = ChoiceAttribute(4316, Yes=4698)
     title = 'Amazon Web Services at U-M'
 
 
@@ -418,11 +368,16 @@ class GcpPayload(Payload):
     acknowledge_srd = ChoiceAttribute(1942, Yes=195)
     additional_details = TextAttribute(3590)
 
+    delete_vpn = TextAttribute(4742)
+    delete_account = TextAttribute(4692)
+    delete_owner = TextAttribute(4693)
+    delete_acknowledgement = ChoiceAttribute(4694, Yes=5466)
+
     title = 'Google Cloud Platform at U-M'
 
 class AzurePayload(Payload):
     form_id = 16
-    type_id = 6   # 5 for delete?
+    type_id = 5   # 5 for delete?
     service_id = 6
     responsible_group_id = 6
     request_type = ChoiceAttribute(1786, New=19, Modify=20, Delete=4766)    
@@ -440,7 +395,11 @@ class AzurePayload(Payload):
     acknowledge_sle = ChoiceAttribute(1797, Yes=39)
     acknowledge_srd = ChoiceAttribute(2493, Yes=1100)
     # Delete
-    account_id = TextAttribute(1796)
+    #account_id = TextAttribute(1796)
+
+    delete_account = TextAttribute(1796)
+    delete_owner = TextAttribute(4690)
+    delete_acknowledgement = ChoiceAttribute(4691, Yes=5464)
 
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
