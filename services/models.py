@@ -88,8 +88,8 @@ class GCP(Cloud):
 
 class Azure(Cloud):
     instance_label = 'Subscription'
-    account_id = models.CharField(max_length=40, verbose_name='Subscription ID')
-    name = models.CharField(max_length=40)
+    account_id = models.CharField(max_length=40, verbose_name='Subscription ID', default='TBD')
+    name = models.CharField(max_length=40, default='TBD')
     vpn_tier = models.ForeignKey(Choice, blank=True, null=True, on_delete=models.CASCADE, limit_choices_to={"parent__code": "VPN_TIER"})
 
     class Meta:

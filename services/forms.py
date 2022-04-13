@@ -130,7 +130,7 @@ class AzureNewForm(CloudNewForm):
 
     class Meta:
         model = Azure
-        exclude = ['id','created_date','account_id','status','owner']
+        exclude = ['id','created_date','account_id','status','owner','name']
         #fields = ['requestor','owner','shortcode']
 
 
