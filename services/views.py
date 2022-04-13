@@ -46,7 +46,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
         try:
             form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)
-        except:
+        except KeyError:
             return HttpResponseNotFound('<h1>Page not found</h1>')
 
         return render(request, self.template,
@@ -133,7 +133,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
 
         try:
             form = globals()[service.capitalize() + 'ChangeForm'](user=self.request.user, instance=instance)
-        except:
+        except KeyError:
             return HttpResponseNotFound('<h1>Page not found</h1>')
 
         return render(request, self.template,

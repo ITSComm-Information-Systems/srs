@@ -1,8 +1,8 @@
 from django import forms
 from project.forms.fields import *
-from .models import AWS, Azure, GCP
+from .models import AWS, Azure, GCP, GCPAccount
 from project.integrations import MCommunity
-from oscauth.models import LDAPGroup
+from oscauth.models import LDAPGroup, LDAPGroupMember
 
 # Defaults
 CharField = forms.CharField( widget=forms.TextInput(attrs={'class': 'form-control'}) )
@@ -154,9 +154,35 @@ class GcpNewForm(CloudNewForm):
     #billing_attach_project
     #billing_attach_id
 
+    def __init__(self, *args, **kwargs):
+        super(GcpNewForm, self).__init__(*args, **kwargs)
+
+        if self.user:
+            groups = list(LDAPGroupMember.objects.filter(username=self.user).values_list('ldap_group_id'))
+            account_list = GCP.objects.filter(status='A',owner__in=groups).distinct().values('gcp_account__id','gcp_account__account_id')
+
+            choice_list = []
+            for account in account_list:
+                choice_list.append((account['gcp_account__id'], account['gcp_account__account_id'],))
+
+            choice_list.append((None, 'New'))
+
+            self.fields['gcp_account'].choices = choice_list
+            self.fields['gcp_account'].required = False
+
     class Meta:
         model = GCP
         exclude = ['id','created_date','account_id','status','owner','project_id']
+
+    def save(self, *args, **kwargs):
+        if self.instance.gcp_account_id == None:
+            acct = GCPAccount()
+            acct.shortcode = self.cleaned_data.get('shortcode')
+            acct.billing_contact = self.cleaned_data.get('billing_contact')
+            acct.save()
+            self.instance.gcp_account_id = acct.id
+
+        super().save(*args, **kwargs)  # Call the "real" save() method.
 
 
 class AwsChangeForm(CloudForm):

@@ -50,7 +50,7 @@ class AWS(Cloud):
 
 
 class GCPAccount(Cloud):
-    account_id = models.CharField(max_length=30, verbose_name='Billing ID')
+    account_id = models.CharField(max_length=30, verbose_name='Billing ID', default='TBD')
     owner = None
     requestor = None
     security_contact = None
@@ -84,6 +84,13 @@ class GCP(Cloud):
     @property
     def shortcode(self):
         return self.gcp_account.shortcode
+
+    def save(self, *args, **kwargs):
+        if self.gcp_account_id == None:
+            acct = GCPAccount.objects.create()
+            self.gcp_account_id = acct.id
+
+        super().save(*args, **kwargs)  # Call the "real" save() method.
 
 
 class Azure(Cloud):
