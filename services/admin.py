@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from services.views import Azure
 from .models import *
 
@@ -16,6 +15,18 @@ class AWSAccountAdmin(admin.ModelAdmin):
 @admin.register(GCP)
 class GCPAdmin(admin.ModelAdmin):
     pass
+
+
+class GCPInline(admin.TabularInline):
+    model = GCP
+    fields = ['status','owner']
+    #fk_name = 'parent'
+
+
+@admin.register(GCPAccount)
+class GCPAccountAdmin(admin.ModelAdmin):
+    inlines = [GCPInline]
+    #pass
     #list_display = ('account_id','billing_contact','shortcode')
     
 
