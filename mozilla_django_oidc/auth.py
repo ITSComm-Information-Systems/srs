@@ -5,7 +5,7 @@ import logging
 import requests
 from requests.auth import HTTPBasicAuth
 from oscauth.utils import upsert_user
-
+from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
@@ -90,6 +90,16 @@ class OIDCAuthenticationBackend(ModelBackend):
     def create_user(self, claims):
         """Return object for a newly created user account."""
         user = upsert_user(claims['sub'])
+        if user == None:
+            if '@' in claims['sub']:
+
+                user = User()
+                user.username = claims['sub']
+                user.last_name = claims['sub']
+                user.first_name = '~'
+                user.email = claims['sub']
+                user.save()
+
         #email = claims.get('email')
         #username = self.get_username(claims)
         #return self.UserModel.objects.create_user(claims['sub'], email, first_name='Dave', last_name='Jamison')
