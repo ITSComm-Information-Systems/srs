@@ -92,12 +92,19 @@
             }
         });
 
+        $("#id_nih_yn").change(function () {
+            if (this.value == "Yes") {
+                $("#div_nih_info").show();
+            } else {
+                $("#div_nih_info").hide();
+            }
+        });
+
         $('#id_migrate_existing').trigger('change')
         $('#id_sensitive_data_yn').trigger('change')
         $('#id_gcp_existing').trigger('change')
         $('#id_vpn').trigger('change')
-
-
+        $('#id_nih_yn').trigger('change')
 
     });
 

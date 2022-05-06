@@ -61,7 +61,7 @@ class CloudNewForm(CloudForm):
     acknowledge_srd = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
 
     contact_phone = forms.CharField()
-    egress_waiver = forms.BooleanField(widget=NoYes)    
+    egress_waiver = forms.BooleanField(widget=YesNo)    
     sensitive_data_yn = forms.BooleanField(widget=NoYes)
     #non_regulated_data = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(attrs={'class': 'none'}), choices=regdata)
 
@@ -136,23 +136,22 @@ class AzureNewForm(CloudNewForm):
 
 class GcpNewForm(CloudNewForm):
     title = 'ITS-Google Cloud Platform at U-M Account Requests'
-    custom = ['sensitive_data_yn','gcp_existing']
-    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','existing_id','existing_project','project_id']
+    custom = ['sensitive_data_yn','gcp_existing','nih_yn']
+    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','existing_id','existing_project','project_id'
+            ,'nih_id','nih_officer_name','nih_officer_email']
 
-    redhat = None
 
-
-    #existing_yn = forms.BooleanField(label='Do you have an existing Google Project?',
-    #    widget=forms.CheckboxInput(attrs={'data-toggle': 'collapse'}))  
+    nih_yn = forms.BooleanField(label='Have you been awarded NIH STRIDES funding?', widget=NoYes)
+    nih_id = forms.CharField(label='NIH Award/Project/Application ID', required=False)
+    nih_officer_name = forms.CharField(label='NIH Program Officer Name', required=False)
+    nih_officer_email = forms.CharField(label='NIH Program Officer Email', required=False)
     
-    gcp_existing = forms.BooleanField(label='Do you have an existing Google Project?', widget=NoYes)
+
+    gcp_existing = forms.BooleanField(label='Do you have an existing Google Project?',
+                                       help_text='Are you migrating an existing project into MCloud?', widget=NoYes)
     existing_id = forms.CharField(label='Existing Project ID', required=False)
     existing_project = forms.CharField(label='Existing Project Name', required=False)
-
-    #billing_yn
-    #billing_id
-    #billing_attach_project
-    #billing_attach_id
+    network = forms.BooleanField(label='Do you require a network?', widget=NoYes)
 
     def __init__(self, *args, **kwargs):
         super(GcpNewForm, self).__init__(*args, **kwargs)
@@ -169,10 +168,13 @@ class GcpNewForm(CloudNewForm):
 
             self.fields['gcp_account'].choices = choice_list
             self.fields['gcp_account'].required = False
+            self.fields['gcp_account'].label = 'GCP Billing Account'
 
     class Meta:
         model = GCP
         exclude = ['id','created_date','account_id','status','owner','project_id']
+
+    field_order = ['requestor','nih_yn','gcp_account','gcp_existing']
 
     def save(self, *args, **kwargs):
         if self.instance.gcp_account_id == None:

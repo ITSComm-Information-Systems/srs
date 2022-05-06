@@ -377,6 +377,11 @@ class GcpPayload(Payload):
     delete_owner = TextAttribute(4693)
     delete_acknowledgement = ChoiceAttribute(4694, Yes=5466)
 
+    nih_yn = ChoiceAttribute(8930, Yes=22957, No=22958)
+    nih_id = TextAttribute(8932)
+    nih_officer_name = TextAttribute(8933)
+    nih_officer_email = TextAttribute(8934)
+
     title = 'Google Cloud Platform at U-M'
 
 class AzurePayload(Payload):
