@@ -1,0 +1,307 @@
+{% extends 'softphone/base_softphone.html' %}
+
+{% block body %}
+
+{% load humanize %}
+
+<div id="softphone-navigation" class='container-fluid' style="background-color: white;">
+
+    <div class='container'>
+
+        <h1>Telephone Upgrade Request Form</h1>
+
+        <div>
+            <div class="d-inline">
+                <label for="deptf">
+                    <strong>Department:</strong>
+                </label>
+
+                <select type='select' name="dept_parm" id="deptf" size="1" class="form-control text-field-short col-4">
+                    {% if dept_list.access_error %}
+                    <option selected> {{ dept_list.access_error }} </option>
+                    {% endif %}
+
+                    {% for dept in dept_list %}
+                    <option {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.dept_id }} - {{ dept.dept_name }} ({{ dept.remaining }} remaining)</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="d-inline">Status:</div>
+            <div class="d-inline-block align-middle">
+                {% if selections_made == 0 %}
+                0 Telephone Lines Submitted
+                {% else %}
+                <a href="/softphone/dept/{{ dept_id }}/selections/"> {{ selections_made }} Telephone Lines Submitted</a>
+                {% endif %}
+                <br>
+                {{ phone_list.paginator.count }} Telephone Lines Remaining
+            </div>
+
+
+            <hr>
+
+            <div>
+                <h5 style="color: blue">Select Phone(s):</h5>
+                <form class="form-inline">
+
+                    <strong class="d-sm-inline">Search:</strong>
+                    <div class="col-4">
+                        <select id="id_phone_search" class="col-sm" placeholder="Search for Number">
+                            <option></option>
+                            {% for line in full_list %}
+                            <option href="/" value="{{ forloop.counter }}">{{ line.number }} - {{ line.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <br>
+
+        <div>
+            {% if phone_list.paginator.count > 0 %}
+
+            {% if selections_saved %}
+            <div><i class="fas fa-info-circle" aria-label="Icon signfying that user must select a value"></i>&nbsp; {{
+                selections_saved }} Telephone lines submitted.</div>
+            <br>
+            {% endif %}
+
+            {% if selection_formset.errors %}
+            <div style="color: red;"><i class="fas fa-exclamation-triangle"
+                    aria-label="Icon signfying that user must select a value"></i>&nbsp; {{ selections_errored }}
+                telephone
+                entries errored, please correct and resubmit.</div>
+            <br>
+            {% endif %}
+
+
+            <div id="heading" class="sticky-top bg-white">
+                <div class="d-inline">
+                    Showing {{ phone_list.start_index }}-{{ phone_list.end_index }} of {{ phone_list.paginator.count }}
+                </div>
+                <div class="d-inline align-center">
+                    <nav class="text-cente">
+                        <ul class="pagination">
+                            {% if phone_list.has_previous %}
+                            <li class="page-item"><a class="page-link"
+                                    href="?page={{ phone_list.previous_page_number }}">Previous</a></li>
+                            {% else %}
+                            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                            {% endif %}
+
+                            {% for i in phone_list.paginator.page_range %}
+                            <li class="{% if phone_list.number == i %}active{% endif %} page-item"><a class="page-link"
+                                    href="?page={{ i }}">{{ i }}</a></li>
+                            {% endfor %}
+
+                            {% if phone_list.has_next %}
+                            <li class="page-item"><a class="page-link"
+                                    href="?page={{ phone_list.next_page_number }}">Next</a></li>
+                            {% else %}
+                            <li class="page-item disabled"><a class="page-link">Next</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    &nbsp;
+</div>
+
+<form id="card_form" method="post">
+    <div class='container-fluid'>
+
+        {% csrf_token %}
+
+        <input type="hidden" name="page_number" value="{{ phone_list.number }}">
+        <div id="card-deck" class='container'>
+            &nbsp;
+
+            {% for phone in phone_list %}
+
+
+            <div id="card-{{ forloop.counter0 }}" class="card border-primary p-3 my-3 {% if phone.checked %}bg-light{% else %}shadow{% endif %}">
+
+                <div class="row pl-2">
+
+                    <div class="pt-1">
+                        {% if phone.checked %}
+                            <i class="fas fa-check-square"></i>
+                            <i style="display: none;" class="far fa-square"></i>
+                        {% else %}
+                            <i style="display: none;" class="fas fa-check-square"></i>
+                            <i class="far fa-square"></i>
+                        {% endif %}
+                        <input hidden class="phone-selected" type="checkbox" name="subscriber" value="{{ phone.subscriber }}" {{ phone.checked }}>
+                    </div>
+
+                    <div class="pl-4 pt-2 col-sm-4">
+
+                        &nbsp;
+                        Phone: <strong>{{ phone.number }}</strong>
+                    </div>
+                    <div class="col-sm-4">
+                        Uniqname: <strong>{{ phone.user }}</strong>
+                    </div>
+                </div>
+
+                <div class="pl-5 pt-2 row">
+                    <div class="col-sm-4">
+                        <strong>Location:</strong><br>
+                        {{ phone.building }}<br>
+                        Floor: {{ phone.floor }}<br>
+                        Room: {{ phone.room }}<br>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="container">
+                            <div>
+                                <strong>Charges:</strong>
+                            </div>
+
+                            {% for charge in phone.charges %}
+                            <div class="row">
+                                <div class="col-sm">
+                                    {{ charge.charge_name }}
+                                </div>
+
+                                <div class="col-sm text-right">
+                                    ${{ charge.recurring_amount|floatformat:2 }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {% endfor %}
+            &nbsp;
+        </div> <!-- Card Deck -->
+        {% endif %}
+        &nbsp;
+    </div>
+
+
+    <div id="footered" class="container-fluid fixed-bottom bg-white border-top">
+
+        <div class="container">
+            <div class="float-right">
+                <strong><span id="id_selection_count">0</span> Phones Selected</strong>&nbsp;
+                <button id="id_next" type="submit" class="btn btn-primary">Next</button>
+            </div>
+        </div>
+
+    </div>
+
+</form>
+{% endblock %}
+
+
+{% block footer %}
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+    {% if phone_list.paginator.per_page %}
+    var per_page = {{ phone_list.paginator.per_page }};
+    var start_index = {{ phone_list.start_index }};
+    var end_index = {{ phone_list.end_index }};
+    var cards_selected = {{ cards_selected }};
+    {% endif %}
+
+    function update_phones_selected() {
+        phone_count = $('.phone-selected:checkbox:checked').length + cards_selected;
+        $('#id_selection_count').text(phone_count)
+        if (phone_count > 0) {
+            $("#id_next").attr("disabled", false);
+        } else {
+            $("#id_next").attr("disabled", true);
+        }
+    }
+
+
+    $(document).ready(function () {
+
+        $(document).on("click", ".page-link", function (e) {
+            e.preventDefault();
+            f = $('#card_form');
+            tar = $(this).attr("href").replace("?page=", "");
+            var target_page = $("<input>")
+                .attr("type", "hidden")
+                .attr("name", "target_page").val(tar);
+            f.append(target_page)
+            $('#card_form').submit();
+        });
+
+        $("#id_phone_search").change(function () {
+            rec = parseInt(this.value);
+            card_num = rec % per_page - 1;
+
+            if (this.value >= start_index && this.value <= end_index) { // We are on the same page
+                tar = "#card-" + (card_num);
+                $([document.documentElement, document.body]).animate({
+                    scrollTop: $(tar).offset().top - 100
+                }, 300);
+            } else {  // redirect to correct page
+                page = Math.ceil(rec / per_page);
+                //window.location.href = "?page=" + page + "#card-" + card_num;
+                f = $('#card_form');
+                var target_page = $("<input>")
+                .attr("type", "hidden")
+                .attr("name", "target_page").val(page);
+                f.append(target_page)
+                var target_card = $("<input>")
+                .attr("type", "hidden")
+                .attr("name", "target_card").val("#card-" + card_num);
+                f.append(target_card)
+                $('#card_form').submit();
+            }
+        });
+
+        $.fn.select2.defaults.set("theme", "bootstrap4");
+        $('#id_phone_search').select2({
+            placeholder: "Search",
+            display: "inline",
+        });
+
+        $("#deptf").change(function () {
+            window.location.href = "/softphone/dept/" + this.value + "/";
+        });
+
+        $(".card").click(function () {
+            x = $(this).toggleClass('bg-light shadow');
+            $(this).find('.fa-check-square').toggle();
+            $(this).find('.fa-square').toggle();
+
+            checkbox = $(this).find('.phone-selected') //.prop('checked', true);
+            
+            if ($(checkbox).prop('checked')) {
+                $(checkbox).prop('checked', false);
+            } else {
+                $(checkbox).prop('checked', true);
+            }
+            update_phones_selected();
+        });
+
+
+        $(".phone-selected").change(function () {
+            update_phones_selected(); 
+        });
+
+        $(window).on('pageshow', function () {
+            update_phones_selected();  // Deal with going back.
+        });
+
+    });
+</script>
+
+
+{% endblock %}
