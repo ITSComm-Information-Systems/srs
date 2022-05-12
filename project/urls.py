@@ -21,6 +21,7 @@ urlpatterns = [
     path('pages/', include('pages.urls')),
     path('auth/', include('oscauth.urls')),
     path('apps/', include('apps.urls')),
+    path('softphone/', include('softphone.urls')),
     path('api/', include(api.router.urls)),
     path('api/bommaterial/', api.BomMaterialView.as_view()),
     path('admin/', admin.site.urls),
