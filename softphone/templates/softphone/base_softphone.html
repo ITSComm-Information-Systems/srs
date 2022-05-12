@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	{% load static %}
+	<link rel="shortcut icon" href="/static/favicon.ico" />
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+		integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+	<!-- FontAwesome CSS -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+		integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" href="/static/global.css">
+
+	<!-- Fonts -->
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:400" />
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:400i" />
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:700" />
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:700i" />
+
+	<!-- Searchable select -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" />
+	<link rel="stylesheet" href="/static/select2-bootstrap4.css">
+	{% block styles %}
+	<style>
+		#aux-nav {
+			background-color: {{ background_color }}
+		}
+	</style>
+	{% endblock styles %}
+	{% block title %}
+	<title>SRS - {{ title }}</title>
+	{% endblock title %}
+</head>
+
+<body>
+	<div id="skip-link">
+		<a href="#main-content" class="sr-only sr-only-focusable">Skip to main content</a>
+	</div>
+	<div class="wrapper">
+	{% block header %}
+	<header id="navbarSupportedContent">
+		<nav class="navbar navbar-expand-lg" id="aux-nav" aria-label="Auxiliary Navigation">
+			<div class="container">
+				<div class="navbar-brand">
+					{% if debug %}
+					<pre>{{ connections }}</pre>
+					{% else %}
+					<a class="logo" href="/softphone/">Service Request System</a>
+					{% endif %}
+				</div>
+				<button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target=".navbars"
+					aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<i class="fas fa-bars text-light"></i>
+				</button>
+				<div class="collapse navbar-collapse navbars" aria-labelledby="aux-nav" role="navigation">
+					<ul class="navbar-nav ml-auto">
+
+						<li class="nav-item">
+							<a class="nav-link {% if title == 'Help' %}active {% endif %}" href="/softphone/help">Help</a>
+						</li>
+						{% if user.is_authenticated %}
+						<li class="nav-item dropdown ">
+							<a class="nav-link dropdown-toggle {% if title == 'View My System Privileges' %}active{% endif %}"
+								href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true"
+								aria-expanded="false">
+								{{ user.get_full_name }}
+
+							</a>
+							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+								{% if user.is_staff %}
+								<a class="dropdown-item" href="/admin/">Admin</a>
+								{% endif %}
+
+								{% if perms.oscauth.can_impersonate %}
+								{% if not request.session.exit_users_pk %}
+								<a class="dropdown-item" href="/auth/su_login/">Impersonate</a>
+								{% endif %}
+								{% endif %}
+								{% if request.session.exit_users_pk %}
+								<a class="dropdown-item" href="/auth/su/">Exit Impersonate</a>
+								{% endif %}
+								<a class="dropdown-item" href="/auth/mypriv/">View System Privileges</a>
+								<a class="dropdown-item" href="/auth/logout/">Logout</a>
+							</div>
+						</li>
+						{% else %}
+						<li class="nav-item">
+							<a class="nav-link" href="{% url 'oidc_authentication_init' %}">Login</a>
+						</li>
+						{% endif %}
+					</ul>
+				</div>
+			</div>
+		</nav>
+	</header>
+	{% endblock header %}
+	{% block body %}{% endblock body %}
+	<div id="main-content" class="container" role="main">
+
+		{% block content %}{% endblock content %}
+		{% autoescape off %}
+		{{ content }}
+		{% endautoescape %}
+
+	</div>
+</div>
+{% block footer %}
+	<footer>
+		<div class="container">
+
+			<div class="umich"><a href="https://umich.edu/">University of Michigan</a></div>
+
+			<div class="links">
+				<h2><a href="https://its.umich.edu/">Information and Technology Services</a></h2>
+				<ul>
+					<li><a href="https://its.umich.edu/about">About ITS</a></li>
+					<li><a href="https://safecomputing.umich.edu/">Safe Computing</a></li>
+					<li><a href="https://status.its.umich.edu/">ITS Service Status</a></li>
+					<li><a href="https://its.umich.edu/web-strategy/">ITS Web Strategy</a></li>
+					<li><a href="https://its.umich.edu/about/work-at-its">Work at ITS</a></li>
+				</ul>
+			</div>
+
+			<div class="links">
+				<h2>Stay Connected</h2>
+				<div class="socialmedia">
+					<a href="https://twitter.com/umichTECH"><span class="fab fa-twitter"><span
+								class="sr-only">Twitter</span></span></a>
+					<a href="https://www.youtube.com/user/UMITSCommunications"><span class="fab fa-youtube"><span
+								class="sr-only">YouTube</span></span></a>
+				</div>
+				<p><a href="https://its.umich.edu/softphone/help">Contact ITS</a></p>
+			</div>
+
+			<div class="links right">
+				<ul>
+					<li><a href="https://wolverineaccess.umich.edu/">Wolverine Access</a></li>
+					<li><a href="https://its.umich.edu/remote-resource-guide">Remote Resource Guide</a></li>
+					<li><a href="https://it.umich.edu/">Office of the VPIT-CIO</a></li>
+				</ul>
+			</div>
+
+			<div class="copyright"><a href="http://www.regents.umich.edu/">&copy; 2021 The Regents of the University of
+					Michigan</a></div>
+
+		</div>
+	</footer>
+	{% endblock footer %}
+	<!-- Optional JavaScript -->
+	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="https://code.jquery.com/jquery-1.12.4.min.js"
+		integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+	<!-- Searchable Select -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+	<!-- Sort tables -->
+	<!-- docs: https://www.kryogenix.org/code/browser/sorttable/ -->
+	<script src="/static/sorttable.js"></script>
+	{% block js %}{% endblock js %}
+</body>
+
+</html>
