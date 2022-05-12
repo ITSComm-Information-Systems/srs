@@ -1,0 +1,10 @@
+{% extends 'softphone/base_softphone.html' %}
+{% block content %}
+
+{% load humanize %}
+
+{% autoescape off %}
+{{ context.bodytext }}
+{% endautoescape %}
+
+{% endblock %}

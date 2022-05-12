@@ -1,0 +1,56 @@
+{% extends 'softphone/base_softphone.html' %}
+{% block content %}
+
+{% load humanize %}
+
+<h1>Telephone Upgrade Request Report</h1>
+
+    <div class="form-group">
+        <label for="deptf">
+            <strong>Selections for department</strong>
+        </label>
+        <br>
+        <select type='select' name="dept_parm" id="deptf" size="1" class="form-control text-field-short col-4">
+            {% for dept in dept_list %}
+            <option {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.dept_id }} - {{ dept.dept_name }}</option>
+            {% endfor %}
+        </select>
+
+        <a href="/softphone/dept/{{ dept_id }}/" class="float-right">Return to Request Form</a>
+    </div>
+
+    <table class="table">
+        <tr>
+            <th>Phone</th>
+            <th>Convert</th>
+            <th>Uniqname</th>
+            <th>Category</th>
+            <th>Submitted</th>
+        </tr>
+        {% for row in selection_list %}
+        <tr>
+            <td>{{ row.phone }}</td>
+            <td>{{ row.convert }}</td>
+            <td>{{ row.uniqname }}</td>
+            <td>{{ row.category }} {{ row.other_category }}</td>
+            {% if row.updated_by %}
+            <td>{{ row.update_date|date:"SHORT_DATE_FORMAT"}} by {{ row.updated_by }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+
+    </table>
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+    $("#deptf").change(function () {
+        console.log(this.value,'log');
+        window.location.href = "/softphone/dept/" + this.value + "/selections/";
+    });
+
+</script>
+{% endblock %}
