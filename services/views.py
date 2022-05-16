@@ -114,7 +114,9 @@ class ServiceChangeView(UserPassesTestMixin, View):
 
         if form.is_valid():
             form.save()
-            create_ticket('Modify', instance, request, title=f'Modify {instance._meta.verbose_name.title()} {model.instance_label}')
+            if not service == 'gcpaccount':
+                create_ticket('Modify', instance, request, title=f'Modify {instance._meta.verbose_name.title()} {model.instance_label}')
+
             return HttpResponseRedirect('/requestsent')
 
         return render(request, self.template,
@@ -148,16 +150,18 @@ def get_service_list(request, service):
     else:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    groups = list(LDAPGroupMember.objects.filter(username=request.user).values_list('ldap_group_id'))
-    service_list = model.objects.filter(status='A',owner__in=groups)
+    groups = list(LDAPGroupMember.objects.filter(username=request.user).values_list('ldap_group_id',flat=True))
 
-    return render(request, 'services/service_list.html', 
+    if service == 'gcp':
+        template = 'gcp_service_list.html'
+        service_list = GCPAccount.objects.filter(status='A',owner__in=groups).order_by('account_id')
+    else:
+        template = 'service_list.html'
+        service_list = model.objects.filter(status='A',owner__in=groups)
+
+    return render(request, f'services/{template}', 
             {'title': model._meta.verbose_name_plural,
+             'instance_label': model.instance_label,
              'service_list': service_list,
+             'groups': groups,
             })
-
-
-
-
-
-    

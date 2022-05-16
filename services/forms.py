@@ -145,8 +145,8 @@ class GcpNewForm(CloudNewForm):
     nih_id = forms.CharField(label='NIH Award/Project/Application ID', required=False)
     nih_officer_name = forms.CharField(label='NIH Program Officer Name', required=False)
     nih_officer_email = forms.CharField(label='NIH Program Officer Email', required=False)
-    
 
+    
     gcp_existing = forms.BooleanField(label='Do you have an existing Google Project?',
                                        help_text='Are you migrating an existing project into MCloud?', widget=NoYes)
     existing_id = forms.CharField(label='Existing Project ID', required=False)
@@ -158,11 +158,12 @@ class GcpNewForm(CloudNewForm):
 
         if self.user:
             groups = list(LDAPGroupMember.objects.filter(username=self.user).values_list('ldap_group_id'))
-            account_list = GCP.objects.filter(status='A',owner__in=groups).distinct().values('gcp_account__id','gcp_account__account_id')
+            account_list = GCPAccount.objects.filter(status='A',owner__in=groups).distinct().values('id','account_id')
 
             choice_list = []
             for account in account_list:
-                choice_list.append((account['gcp_account__id'], account['gcp_account__account_id'],))
+                choice_list.append((account['id'], account['account_id'],))
+                self.fields['gcp_account'].initial = account['id']
 
             choice_list.append((None, 'New'))
 
@@ -181,6 +182,7 @@ class GcpNewForm(CloudNewForm):
             acct = GCPAccount()
             acct.shortcode = self.cleaned_data.get('shortcode')
             acct.billing_contact = self.cleaned_data.get('billing_contact')
+            acct.owner = self.cleaned_data.get('owner')
             acct.save()
             self.instance.gcp_account_id = acct.id
 
@@ -206,3 +208,10 @@ class GcpChangeForm(CloudForm):
     class Meta:
         model = GCP
         fields = ['admin_group','security_contact']
+
+
+class GcpaccountChangeForm(CloudForm):
+
+    class Meta:
+        model = GCPAccount
+        fields = ['owner','shortcode']

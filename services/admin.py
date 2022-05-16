@@ -4,32 +4,31 @@ from .models import *
 
 
 class CloudAdmin(admin.ModelAdmin):
-    list_display = ('account_id','billing_contact','shortcode')
+    list_display = ('account_id','owner','billing_contact','shortcode','created_date')
 
 
 @admin.register(AWS)
-class AWSAccountAdmin(admin.ModelAdmin):
-    list_display = ('account_id','owner','billing_contact','shortcode','created_date')
-    
-
-@admin.register(GCP)
-class GCPAdmin(admin.ModelAdmin):
+class AWSAccountAdmin(CloudAdmin):
     pass
 
-
-class GCPInline(admin.TabularInline):
-    model = GCP
-    fields = ['status','owner']
-    #fk_name = 'parent'
-
-
-@admin.register(GCPAccount)
-class GCPAccountAdmin(admin.ModelAdmin):
-    inlines = [GCPInline]
-    #pass
-    #list_display = ('account_id','billing_contact','shortcode')
-    
 
 @admin.register(Azure)
 class AzureAdmin(CloudAdmin):
     pass
+
+
+@admin.register(GCP)
+class GCPAdmin(CloudAdmin):
+    list_display = ('project_id','account_id','owner','billing_contact','shortcode','created_date')
+
+
+class GCPInline(admin.TabularInline):
+    model = GCP
+    fields = ['status','project_id','owner']
+
+
+@admin.register(GCPAccount)
+class GCPAccountAdmin(CloudAdmin):
+    inlines = [GCPInline]
+    
+

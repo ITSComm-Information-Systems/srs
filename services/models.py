@@ -51,7 +51,6 @@ class AWS(Cloud):
 
 class GCPAccount(Cloud):
     account_id = models.CharField(max_length=30, verbose_name='Billing ID', default='TBD')
-    owner = None
     requestor = None
     security_contact = None
     vpn = None
@@ -65,6 +64,7 @@ class GCPAccount(Cloud):
 
 class GCP(Cloud):
     instance_label = 'Project'
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='project_owner')
     account_id = None
     gcp_account = models.ForeignKey(GCPAccount, on_delete=models.CASCADE)
     shortcode = None
@@ -108,3 +108,4 @@ class Service():
     aws = AWS
     gcp = GCP
     azure = Azure
+    gcpaccount = GCPAccount
