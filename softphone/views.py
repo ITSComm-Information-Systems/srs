@@ -195,7 +195,7 @@ class Selections(View):
 
     def get(self, request, dept_id):
         
-        selection_list = SelectionV.objects.filter(dept_id=dept_id)
+        selection_list = SelectionV.objects.filter(dept_id=dept_id).order_by('update_date','service_number')
         dept_list = get_department_list(dept_id, request.user)
 
         choice_list = {}
