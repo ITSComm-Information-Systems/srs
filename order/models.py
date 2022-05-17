@@ -1211,6 +1211,8 @@ class Item(models.Model):
 
             db = self.data.get('database')
             if db:
+                attributes.append({'ID': 1874, 'Value': 93}) # Dedicated DB
+
                 if self.data.get('volaction') == 'Delete':
                     payload['Title'] = 'Delete MiDatabase'  # TODO Unreachable?
                 else:
