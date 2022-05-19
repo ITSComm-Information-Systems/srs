@@ -1211,6 +1211,8 @@ class Item(models.Model):
 
             db = self.data.get('database')
             if db:
+                attributes.append({'ID': 1874, 'Value': 93}) # Dedicated DB
+
                 if self.data.get('volaction') == 'Delete':
                     payload['Title'] = 'Delete MiDatabase'  # TODO Unreachable?
                 else:
@@ -1218,6 +1220,7 @@ class Item(models.Model):
                     attributes.append({'ID': 1953, 'Value': MCommunity().get_group_email_and_name(group_name)})  # Admin Group
 
                 attributes.append({'ID': 5319, 'Value': db})
+                attributes.append({'ID': 1858, 'Value': db})
                 attributes.append({'ID': 1952, 'Value': 203}) # Managed
 
                 if db == 'MSSQL':
