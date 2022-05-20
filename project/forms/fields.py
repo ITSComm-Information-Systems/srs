@@ -41,6 +41,8 @@ class Uniqname(forms.CharField):
     widget=forms.TextInput(attrs={'class': 'form-control'})
 
     def validate(self, value):
+        if not value and not self.required:
+            return
 
         user = get_mc_user(value)
         if user:
