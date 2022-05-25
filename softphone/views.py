@@ -24,7 +24,7 @@ def get_help(request):
 
 @login_required
 def landing_page(request):
-    user_dept_list = list(AuthUserDeptV.objects.filter(user_id=request.user.id,codename__in=['can_order','add_selection']).values_list('dept', flat=True))
+    user_dept_list = list(AuthUserDeptV.objects.filter(user_id=request.user.id,codename='can_report').values_list('dept', flat=True))
     dept_list = DeptV.objects.filter(dept_id__in=user_dept_list)
 
     return render(request, 'softphone/home.html',
@@ -33,9 +33,7 @@ def landing_page(request):
                         ,'dept_list': dept_list})
 
 def get_department_list(dept_id, user):
-    #user_dept_list = AuthUserDeptV.objects.filter(user_id=user.id,codename__in=['can_order','add_selection'])
-
-    user_dept_list = list(AuthUserDeptV.objects.filter(user_id=user.id,codename__in=['can_order','can_report','add_selection']).values_list('dept', flat=True))
+    user_dept_list = list(AuthUserDeptV.objects.filter(user_id=user.id,codename='can_report').values_list('dept', flat=True))
     dept_list = DeptV.objects.filter(dept_id__in=user_dept_list)
 
 
