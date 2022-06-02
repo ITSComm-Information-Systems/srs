@@ -48,6 +48,19 @@ def get_new(request):
     # Get instructions
     instructions = Page.objects.get(permalink='/nonteleph')
 
+    doc_depts = ''
+    doc_bill_date = ''
+    chartcoms = ''
+    if request.method =='POST':
+        print(request.POST)
+        # Get information from previous page
+        doc_depts = request.POST.get('doc_depts')
+        doc_bill_date = request.POST.get('doc_bill_date')
+        chartcoms = request.POST.get('chartcoms')
+        print(chartcoms)
+        chartcoms = chartcoms[1:-1]
+        print(chartcoms)
+
     context = {
         'title': "Non-Telephony Detail of Charges",
         'form_action': '/reports/nonteleph/report/',
@@ -55,7 +68,11 @@ def get_new(request):
         'dates': billing_dates,
         'instructions': instructions,
         'initial_date':billing_dates[0],
-        'dept_cfs': dept_cfs
+        'dept_cfs': dept_cfs,
+
+        'doc_depts': doc_depts,
+        'doc_bill_date': doc_bill_date,
+        'chartcoms': chartcoms
     }
     return HttpResponse(template.render(context,request))
 
@@ -65,6 +82,7 @@ def generate_report(request):
 
     # Get information from previous page
     selected_dept = request.POST.get('select_dept')
+    doc_depts = request.POST.get('select_dept')
     bill_date = request.POST.get('billing_date')
     chartcoms = request.POST.getlist('chartcoms[]')
 
@@ -242,7 +260,9 @@ def generate_report(request):
         'dept_mgr_uniq': dept_mgr_uniq,
         'billing_date': bill_date,
         'charge_types': charge_types,
-        'chartfields': chartcoms
+        'chartfields': chartcoms,
+
+        'doc_depts': doc_depts,
     }
 
     return HttpResponse(template.render(context, request))

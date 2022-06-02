@@ -2,11 +2,17 @@
 {% block content %}
 <h1>{{title}}</h1>
 <div class="row">
+    <div>
+        <p display="none" data-value="{{ doc_depts }}" id="editDept"></p>
+        <p display="none" data-value="{{ doc_bill_date }}" id="editDate"></p>
+        <p display="none" data-value="{{ chartcoms }}" id="editChartcoms"></p>
+    </div>
     <div class="col-lg-8 col-md-12">
         <form action="{{ form_action }}" method="POST" name="Select">{% csrf_token %}
             <div class="form-group">
                 <label for="doc_depts" id="depts"><strong>Select Department</strong></label>
-                <select class="form-control" name="select_dept" id="doc_depts" aria-labelledby="depts" size='{{ names|length }}' required>
+                <select class="form-control" name="select_dept" id="doc_depts" aria-labelledby="depts"
+                    size='{{ names|length }}' required>
                     {% for dept in names %}
                     <option value="{{ dept.deptid }}">{{ dept.deptid }} - {{ dept.dept_name }}</option>
                     {% endfor %}
@@ -14,7 +20,8 @@
             </div>
             <div class="form-group">
                 <label for="doc_bill_date" id="billingDate"><strong>Select Billing Date</strong></label>
-            	<select class="form-control" name="billing_date" id="doc_bill_date" size='{{ dates|length }}' aria-labelledby="billingDate" required>
+                <select class="form-control" name="billing_date" id="doc_bill_date" size='{{ dates|length }}'
+                    aria-labelledby="billingDate" required>
                     {% for d in dates %}
                     <option value="{{ d }}">{{ d }}</option>
                     {% endfor %}
@@ -25,7 +32,8 @@
                 <div class="mt-0 mb-1">
                     <em class="prv-msgs">Please do not select more than 10 Chartfields at a time</em>
                     <small class="text-muted form-text" id="chartfieldInstructions">
-                        To select multiple, on Mac press and hold “Command” and select. On PC, press and hold “Ctrl” and select.
+                        To select multiple, on Mac press and hold “Command” and select. On PC, press and hold “Ctrl” and
+                        select.
                     </small>
                 </div>
                 <div class="form-check">
@@ -34,7 +42,8 @@
                         <strong>Select All</strong>
                     </label>
                 </div>
-                <select multiple="multiple" class="form-control" required aria-describedby="chartfieldInstructions" aria-labelledby="docChartfield" name="chartcoms[]" id="doc_chartcom" size='10'>
+                <select multiple="multiple" class="form-control" required aria-describedby="chartfieldInstructions"
+                    aria-labelledby="docChartfield" name="chartcoms[]" id="doc_chartcom" size='10'>
                     {% for cf in dept_cfs %}
                     <option value="{{ cf }}">{{ cf }}</option>
                     {% endfor %}
@@ -44,7 +53,7 @@
             <input id="generate" type='submit' value='Generate Report' class="btn btn-primary mt-2" disabled>
         </form>
     </div>
-    
+
     <div class="col-lg-4 col-md-12">
         <div class="alert alert-secondary hlinks">
             <p class="h4 alert-heading">About this Report</p>
@@ -60,7 +69,35 @@
 
 {% block js %}
 
-<script src="/../static/doc.js"></script> 
+<script src="/../static/doc.js"></script>
 <script src="/static/select.js"></script>
 
+<script>
+    // If the edit button was clicked, change dropdown contents
+    document.addEventListener('DOMContentLoaded', function () {
+        var dept = document.getElementById("editDept").getAttribute("data-value")
+        if (dept != '') {
+            $('#doc_depts').val(dept);
+            $('#doc_depts').trigger('change');
+        }
+
+
+        var date = document.getElementById("editDate").getAttribute("data-value")
+        if (date != '') {
+            $('#doc_bill_date').val(date);
+            $('#doc_bill_date').trigger('change');
+        }
+
+        // var chartcoms = document.getElementById("editChartcoms").getAttribute("data-value")
+        // // var list = chartcoms.split(', ')
+        // //     list.forEach(element => document.querySelector(option[value=element]).selected = true)
+        // if (chartcoms != '') {
+        //     Array.from(document.querySelector("#doc_chartcom").options).forEach(function(option_element) {
+        //     console.log(option_element);})
+        //         // $('#doc_bill_date').val(date);
+        //     // $('#doc_bill_date').trigger('change');
+        // }
+
+    });
+</script>
 {% endblock %}
