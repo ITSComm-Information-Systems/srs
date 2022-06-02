@@ -3,9 +3,9 @@
 <h1>{{title}}</h1>
 <div class="row">
     <div>
-        <p display="none" data-value="{{ doc_depts }}" id="editDept"></p>
-        <p display="none" data-value="{{ doc_bill_date }}" id="editDate"></p>
-        <p display="none" data-value="{{ chartcoms }}" id="editChartcoms"></p>
+        <p display="none" data-value="{{ edit_dept }}" id="editDept"></p>
+        <p display="none" data-value="{{ edit_date }}" id="editDate"></p>
+        <p display="none" data-value="{{ edit_chartcom }}" id="editChartcoms"></p>
     </div>
     <div class="col-lg-8 col-md-12">
         <form action="{{ form_action }}" method="POST" name="Select">{% csrf_token %}
@@ -76,20 +76,21 @@
     // If the edit button was clicked, change dropdown contents
     document.addEventListener('DOMContentLoaded', function () {
         var dept = document.getElementById("editDept").getAttribute("data-value")
-        if (dept != '') {
+        if ((dept != '') && (dept != 'None')) {
             $('#doc_depts').val(dept);
             $('#doc_depts').trigger('change');
         }
 
 
         var date = document.getElementById("editDate").getAttribute("data-value")
-        if (date != '') {
+        if ((date != '') && (date != 'None')) {
             $('#doc_bill_date').val(date);
             $('#doc_bill_date').trigger('change');
         }
 
-        // var chartcoms = document.getElementById("editChartcoms").getAttribute("data-value")
-        // // var list = chartcoms.split(', ')
+        var chartcoms = document.getElementById("editChartcoms").getAttribute("data-value")
+        var list = chartcoms.split(', ')
+        console.log(list)
         // //     list.forEach(element => document.querySelector(option[value=element]).selected = true)
         // if (chartcoms != '') {
         //     Array.from(document.querySelector("#doc_chartcom").options).forEach(function(option_element) {

@@ -48,18 +48,19 @@ def get_new(request):
     # Get instructions
     instructions = Page.objects.get(permalink='/nonteleph')
 
-    doc_depts = ''
-    doc_bill_date = ''
-    chartcoms = ''
+    edit_dept = 'None'
+    edit_date = 'None'
+    edit_chartcom = 'None'
     if request.method =='POST':
         print(request.POST)
         # Get information from previous page
-        doc_depts = request.POST.get('doc_depts')
-        doc_bill_date = request.POST.get('doc_bill_date')
-        chartcoms = request.POST.get('chartcoms')
-        print(chartcoms)
-        chartcoms = chartcoms[1:-1]
-        print(chartcoms)
+        edit_dept = request.POST.get('edit_dept')
+        edit_date = request.POST.get('edit_date')
+        # edit_chartcom = request.POST.get('edit_chartcom')
+        # edit_chartcom = edit_chartcom[1:-1]
+        # edit_chartcom = edit_chartcom.split(', ')
+        # for e in edit_chartcom:
+        #     print(e)
 
     context = {
         'title': "Non-Telephony Detail of Charges",
@@ -70,9 +71,9 @@ def get_new(request):
         'initial_date':billing_dates[0],
         'dept_cfs': dept_cfs,
 
-        'doc_depts': doc_depts,
-        'doc_bill_date': doc_bill_date,
-        'chartcoms': chartcoms
+        'edit_dept': edit_dept,
+        'edit_date': edit_date,
+        'edit_chartcom': edit_chartcom
     }
     return HttpResponse(template.render(context,request))
 
