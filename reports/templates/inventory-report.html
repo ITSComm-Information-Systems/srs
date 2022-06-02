@@ -1,11 +1,33 @@
 {% extends 'base.html' %}
 {% load index %}
+{% block styles %}
+<style>
+	#aux-nav {
+		background-color: {{ background_color }}
+	}
+
+	.link {
+		background: none !important;
+		border: none;
+		padding: 0 !important;
+		color: #069;
+		cursor: pointer;
+	}
+
+	.link:hover {
+		text-decoration: underline;
+	}
+</style>
+{% endblock styles %}
 {% block content %}
 <h1>{{ title }}</h1>
 <div>
     <strong>Report Details</strong>
-    <a class="float-right" href="../inventory">Edit your selection</a>
-    <a class="float-right" id="edit-selection" href="../inventory"><i class="fas fa-edit"></i></a>
+    <form action="/reports/inventory/" method="POST" class="float-right" name="inventoryEdit">{% csrf_token %}
+        <input name="edit_dept" type="hidden" value="{{ edit_dept }}">
+        <input name="edit_date" type="hidden" value="{{ bill_period }}">
+        <button class="link" type="submit"><i class="fas fa-edit"></i>Edit Your Selection</button>
+    </form>
 </div>
 
 <div class="mt-2 mb-4">

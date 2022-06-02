@@ -28,6 +28,8 @@ from pages.models import Page
 # Load selection page
 @permission_required('oscauth.can_report', raise_exception=True)
 def get_inventory(request):
+    template = loader.get_template('inventory.html')
+
     # Find all departments user has reporting access to
     names = AuthUserDept.get_report_departments(request)
 
@@ -36,13 +38,22 @@ def get_inventory(request):
 
     # Get instructions
     instructions = Page.objects.get(permalink='/ial')
+    
+    edit_dept = 'None'
+    edit_date = 'None'
+    if request.method =='POST':
+        # Get information from previous page
+        edit_dept = request.POST.get('edit_dept')
+        edit_date = request.POST.get('edit_date')
 
-    template = loader.get_template('inventory.html')
     context = {
         'title': 'Inventory & Location Report',
         'instructions': instructions,
         'depts': names,
         'dates': dates,
+
+        'edit_dept': edit_dept,
+        'edit_date': edit_date
     }
     return HttpResponse(template.render(context,request))
     
@@ -72,7 +83,7 @@ def make_report(request):
     dept_mgr_uniq = dept_info.dept_mgr_uniqname
       
     # Get user-selected billing period & format appropriately
-    bill_period =  request.POST.get('bill_period') 
+    bill_period = request.POST.get('bill_period')
     date = bill_period.replace('.', '')
     date = date.replace(',', '')
     date = date.split(' ')
@@ -132,6 +143,8 @@ def make_report(request):
         'chartfields': list(chartfields),
         'first': first,
         'months_list': filter_months,
+
+        'edit_dept': total
     }
     return HttpResponse(template.render(context,request))
 

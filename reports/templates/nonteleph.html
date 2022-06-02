@@ -2,271 +2,274 @@
 {% load descr %}
 {% block styles %}
 <style>
-    #aux-nav {
-        background-color: {{ background_color }}
-    }
+	#aux-nav {
+		background-color: {{ background_color }}
+	}
 
-    .link {
-        background: none !important;
-        border: none;
-        padding: 0 !important;
-        color: #069;
-        cursor: pointer;
-    }
-	.link:hover{
-	text-decoration: underline;
+	.link {
+		background: none !important;
+		border: none;
+		padding: 0 !important;
+		color: #069;
+		cursor: pointer;
+	}
+
+	.link:hover {
+		text-decoration: underline;
 	}
 </style>
 {% endblock styles %}
 {% block content %}
-	<h1>{{title}}</h1>
-	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
-		<strong class="d-inline">Report Selection</strong>
-		<form action="/reports/nonteleph/" method="POST" class="d-inline offset-md-3" name="nontelephEdit">{% csrf_token %}
-			<input name="doc_depts" type="hidden" value="{{ doc_depts }}">
-			<input name="doc_bill_date" type="hidden" value="{{ billing_date }}">
-			<input name="chartcoms" type="hidden" value="{{ chartfields }}">
-		<button class="link" type="submit"><i class="fas fa-edit"></i>Edit Your Selection</button>
-	</form>
-		<div class="row">
-		    <div class="col-12">
-			<div class="card border-dark col-md-6 mt-1">
-				<div class="card-body card-bottom">
-					<div id="selected_dept"><strong>Department: </strong>{{ dept }}</div>
-					<div id="billing_date"><strong>Billing Date: </strong>{{ billing_date }}</div>
-					<div id="department_manager"><strong>Department Manager: </strong>{{ dept_mgr }} ({{ dept_mgr_uniq }})</div>
-					<strong class="floatleft">Chartfields:&nbsp;&nbsp;</strong>
-					<p id="chartcoms" class="floatleft">
+<h1>{{title}}</h1>
+<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to
+	top</button>
+<strong class="d-inline">Report Selection</strong>
+<form action="/reports/nonteleph/" method="POST" class="d-inline offset-md-3" name="nontelephEdit">{% csrf_token %}
+	<input name="edit_dept" type="hidden" value="{{ doc_depts }}">
+	<input name="edit_date" type="hidden" value="{{ billing_date }}">
+	<input name="edit_chartcom" type="hidden" value="{{ chartfields }}">
+	<button class="link" type="submit"><i class="fas fa-edit"></i>Edit Your Selection</button>
+</form>
+<div class="row">
+	<div class="col-12">
+		<div class="card border-dark col-md-6 mt-1">
+			<div class="card-body card-bottom">
+				<div id="selected_dept"><strong>Department: </strong>{{ dept }}</div>
+				<div id="billing_date"><strong>Billing Date: </strong>{{ billing_date }}</div>
+				<div id="department_manager"><strong>Department Manager: </strong>{{ dept_mgr }} ({{ dept_mgr_uniq }})
+				</div>
+				<strong class="floatleft">Chartfields:&nbsp;&nbsp;</strong>
+				<p id="chartcoms" class="floatleft">
 					{% for c in charge_types %}
-						{{ c.account_number }}<br>
+					{{ c.account_number }}<br>
 					{% endfor %}
-					</p>
-				</div>
-			</div>
+				</p>
 			</div>
 		</div>
+	</div>
+</div>
 
 
-		{% for c in charge_types %}
-		{% if c.data %}
-		<div class="row mt-5">
-		    <div class="col-12">
-			<div class="card border-dark card-width">
-				<div class="card-header">
-					<strong>Chartfield:</strong>&nbsp;{{ c.account_number }}
-				</div>
-				<div class="card-body">
-					{% for key, value in c.charge_tables.items %}
-						<strong>{{ key }}</strong>
-						<table class="table-responsive table table-sm table-striped mt-2" id='charge_table'>
-							<thead>
-								<tr class="thead-dark">
-									{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' %}
-										<th scope='col' class='first-col'>Share</th>
-										<th scope='col'>MCommunity Group</th>
-										<th scope='col'>Size</th>
-										<th scope='col'>Options</th>
-										<th scope='col'>Date</th>
-										<th scope='col'>Shortcode</th>
-										<th scope='col'>Protocol</th>
-										<th scope='col' class='total-col'>Bill Amount</th>
-									{% elif key == 'MiServer' or key == 'MiDatabase' %}
-										<th scope='col' class='first-col'>Server Name</th>
-										<th scope='col'>MCommunity Group</th>
-										<th scope='col'>Date</th>
-										<th scope='col'>Shortcode</th>
-										<th scope='col' style="width: 100%;">Charge Description</th>
-										<th scope='col'>Quantity</th>
-										<th scope='col'>Unit Rate</th>
-										<th scope='col' class='total-col'>Total Amount</th>
-									{% elif key == 'Data Den Research Storage' %}
-										<th scope='col' class='first-col'>Share</th>
-										<th scope='col'>MCommunity Group</th>
-										<th scope='col'>Size</th>
-										<th scope='col'>Date</th>
-										<th scope='col'>Shortcode</th>
-										<th scope='col' class='total-col'>Bill Amount</th>
-									{% elif key == 'MiBackup' %}
-										<th scope='col' class='first-col'>Policy Domain</th>
-										<th scope='col'>MCommunity Group</th>
-										<th scope='col'>Shortcode</th>
-										<th scope='col'>Transaction Type</th>
-										<th scope='col' class='total-col'>Total Charge</th>
-									{% elif key == 'Container Services' %}
-										<th scope='col' class='first-col'>Project Name</th>
-										<th scope='col'>Description</th>
-										<th scope='col'>Date</th>
-										<th scope="col">Transaction Type</th>
-										<th scope="col">Unit Price</th>
-										<th scope="col">Quantity</th>
-										<th scope='col' class='total-col'>Total Charge</th>
-									{% else %}
-										<th scope='col' class="first-col">Billing ID</th>
-										<th scope="col">Description</th>
-										<th scope="col">Transaction Type</th>
-										<th scope="col">Unit Price</th>
-										<th scope="col">Quantity</th>
-										<th scope="col" class='total-col'>Total Charge</th>
-									{% endif %}
-								</tr>
-							</thead>
-							<tbody>
-								{% for v in value.rows %}
-								<tr>
-									{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' %}
-										<td class='first-col'>{{ v.unique_id }}</td>
-										<td>{{ v.voucher_comment }}</td>
-										<td>{{ v.quantity_vouchered }}</td>
-										<td>{{ v.descr|options }}</td>
-										<td>{{ v.date }}</td>
-										<td>{{ v.shortcode }}</td>
-										<td>{{ v.descr|protocol }}</td>
-										<td class='total-col'>{{ v.total_charges }}</td>
-									{% elif key == 'MiServer' or key == 'MiDatabase' %}
-										<td class='first-col'>{{ v.unique_id }}</td>
-										<td>{{ v.voucher_comment }}</td>
-										<td>{{ v.date }}</td>
-										<td>{{ v.shortcode }}</td>
-										
-										<td style="white-space: nowrap;">
-											{% for server in v.descr_jh %}
-											{{server}}<br>
-											{% endfor %}
-										</td>
+{% for c in charge_types %}
+{% if c.data %}
+<div class="row mt-5">
+	<div class="col-12">
+		<div class="card border-dark card-width">
+			<div class="card-header">
+				<strong>Chartfield:</strong>&nbsp;{{ c.account_number }}
+			</div>
+			<div class="card-body">
+				{% for key, value in c.charge_tables.items %}
+				<strong>{{ key }}</strong>
+				<table class="table-responsive table table-sm table-striped mt-2" id='charge_table'>
+					<thead>
+						<tr class="thead-dark">
+							{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' %}
+							<th scope='col' class='first-col'>Share</th>
+							<th scope='col'>MCommunity Group</th>
+							<th scope='col'>Size</th>
+							<th scope='col'>Options</th>
+							<th scope='col'>Date</th>
+							<th scope='col'>Shortcode</th>
+							<th scope='col'>Protocol</th>
+							<th scope='col' class='total-col'>Bill Amount</th>
+							{% elif key == 'MiServer' or key == 'MiDatabase' %}
+							<th scope='col' class='first-col'>Server Name</th>
+							<th scope='col'>MCommunity Group</th>
+							<th scope='col'>Date</th>
+							<th scope='col'>Shortcode</th>
+							<th scope='col' style="width: 100%;">Charge Description</th>
+							<th scope='col'>Quantity</th>
+							<th scope='col'>Unit Rate</th>
+							<th scope='col' class='total-col'>Total Amount</th>
+							{% elif key == 'Data Den Research Storage' %}
+							<th scope='col' class='first-col'>Share</th>
+							<th scope='col'>MCommunity Group</th>
+							<th scope='col'>Size</th>
+							<th scope='col'>Date</th>
+							<th scope='col'>Shortcode</th>
+							<th scope='col' class='total-col'>Bill Amount</th>
+							{% elif key == 'MiBackup' %}
+							<th scope='col' class='first-col'>Policy Domain</th>
+							<th scope='col'>MCommunity Group</th>
+							<th scope='col'>Shortcode</th>
+							<th scope='col'>Transaction Type</th>
+							<th scope='col' class='total-col'>Total Charge</th>
+							{% elif key == 'Container Services' %}
+							<th scope='col' class='first-col'>Project Name</th>
+							<th scope='col'>Description</th>
+							<th scope='col'>Date</th>
+							<th scope="col">Transaction Type</th>
+							<th scope="col">Unit Price</th>
+							<th scope="col">Quantity</th>
+							<th scope='col' class='total-col'>Total Charge</th>
+							{% else %}
+							<th scope='col' class="first-col">Billing ID</th>
+							<th scope="col">Description</th>
+							<th scope="col">Transaction Type</th>
+							<th scope="col">Unit Price</th>
+							<th scope="col">Quantity</th>
+							<th scope="col" class='total-col'>Total Charge</th>
+							{% endif %}
+						</tr>
+					</thead>
+					<tbody>
+						{% for v in value.rows %}
+						<tr>
+							{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' %}
+							<td class='first-col'>{{ v.unique_id }}</td>
+							<td>{{ v.voucher_comment }}</td>
+							<td>{{ v.quantity_vouchered }}</td>
+							<td>{{ v.descr|options }}</td>
+							<td>{{ v.date }}</td>
+							<td>{{ v.shortcode }}</td>
+							<td>{{ v.descr|protocol }}</td>
+							<td class='total-col'>{{ v.total_charges }}</td>
+							{% elif key == 'MiServer' or key == 'MiDatabase' %}
+							<td class='first-col'>{{ v.unique_id }}</td>
+							<td>{{ v.voucher_comment }}</td>
+							<td>{{ v.date }}</td>
+							<td>{{ v.shortcode }}</td>
 
-										<td>
-											{% for server in v.quantity_vouchered_jh %}
-											{{server}}<br>
-											{% endfor %}
-										</td>
-
-										<td>{% for server in v.rate_jh %}
-											{{server}}<br>
-											{% endfor %}
-										</td>
-
-										<td class='total-col'>
-											{% for server in v.total_charges_jh %}
-											{{server | currency}}<br>
-											{% endfor %}
-										</td>
-
-									{% elif key == 'Data Den Research Storage' %}
-										<td class='first-col'>{{ v.unique_id }}</td>
-										<td>{{ v.voucher_comment }}</td>
-										<td>{{ v.quantity_vouchered }}</td>
-										<td>{{ v.date }}</td>
-										<td>{{ v.shortcode }}</td>
-										<td class='total-col'>{{ v.total_charges }}</td>
-									{% elif key == 'MiBackup' %}
-										<td class='first-col'>{{ v.unique_id }}</td>
-										<td>{{ v.voucher_comment }}</td>
-										<td>{{ v.shortcode }}</td>
-										<td>{{ v.type }}</td>
-										<td class='total-col'>{{ v.total_charges }}</td>
-									{% else %}
-										{% if key == 'Container Services' %}
-										<td class='first-col'>{{ v.project_name }}</td>
-										{% else %}
-										<td class='first-col'>{{ v.user_defined_id }}</td>
-										{% endif %}
-
-										<td>{{ v.descr }}</td>
-
-										{% if key == 'Container Services' %}
-										<td>{{ v.date }}</td>
-										{% endif %}
-
-										<td>{{ v.type }}</td>
-
-										{% if v.type == 'Credit' %}
-											<td class="prv-msgs">{{ v.unit_price }}</td>
-										{% else %}
-											<td>{{ v.unit_price }}</td>
-										{% endif %}
-
-										<td>{{ v.qty }}</td>
-
-										{% if v.type == 'Credit' %}
-											<td class='total-col prv-msgs'>{{ v.total_charges }}</td>
-										{% else %}
-											<td class='total-col'>{{ v.total_charges }}</td>
-										{% endif %}
-									{% endif %}
-								</tr>
+							<td style="white-space: nowrap;">
+								{% for server in v.descr_jh %}
+								{{server}}<br>
 								{% endfor %}
-								<tr class='table-total bg-warning'>
-									<td class='first-col'><strong>Total</strong></td>
-									<td></td>
-									{% if key == 'Container Services' %}
-									{% endif %}
-									{% if key == 'MiServer' or key == 'MiDatabase' %}
-									<td></td>
-									<td></td>
-									{% endif %}
-									{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' %}
-									<td></td>
-									<td></td>
-									{% endif %}
-									<td></td>
-									<td></td>
-									{% if key != 'MiBackup' %}
-									<td></td>
-									{% endif %}
-									{% if '-'|first in value.total %}
-										<td class='total-col prv-msgs'><strong>{{ value.total }}</strong></td>
-									{% else %}
-										<td class='total-col'><strong>{{ value.total }}</strong></td>
-									{% endif %}
-								</tr>
-							</tbody>
-						</table>
-					{% endfor %}
-				</div>
-			</div>
+							</td>
+
+							<td>
+								{% for server in v.quantity_vouchered_jh %}
+								{{server}}<br>
+								{% endfor %}
+							</td>
+
+							<td>{% for server in v.rate_jh %}
+								{{server}}<br>
+								{% endfor %}
+							</td>
+
+							<td class='total-col'>
+								{% for server in v.total_charges_jh %}
+								{{server | currency}}<br>
+								{% endfor %}
+							</td>
+
+							{% elif key == 'Data Den Research Storage' %}
+							<td class='first-col'>{{ v.unique_id }}</td>
+							<td>{{ v.voucher_comment }}</td>
+							<td>{{ v.quantity_vouchered }}</td>
+							<td>{{ v.date }}</td>
+							<td>{{ v.shortcode }}</td>
+							<td class='total-col'>{{ v.total_charges }}</td>
+							{% elif key == 'MiBackup' %}
+							<td class='first-col'>{{ v.unique_id }}</td>
+							<td>{{ v.voucher_comment }}</td>
+							<td>{{ v.shortcode }}</td>
+							<td>{{ v.type }}</td>
+							<td class='total-col'>{{ v.total_charges }}</td>
+							{% else %}
+							{% if key == 'Container Services' %}
+							<td class='first-col'>{{ v.project_name }}</td>
+							{% else %}
+							<td class='first-col'>{{ v.user_defined_id }}</td>
+							{% endif %}
+
+							<td>{{ v.descr }}</td>
+
+							{% if key == 'Container Services' %}
+							<td>{{ v.date }}</td>
+							{% endif %}
+
+							<td>{{ v.type }}</td>
+
+							{% if v.type == 'Credit' %}
+							<td class="prv-msgs">{{ v.unit_price }}</td>
+							{% else %}
+							<td>{{ v.unit_price }}</td>
+							{% endif %}
+
+							<td>{{ v.qty }}</td>
+
+							{% if v.type == 'Credit' %}
+							<td class='total-col prv-msgs'>{{ v.total_charges }}</td>
+							{% else %}
+							<td class='total-col'>{{ v.total_charges }}</td>
+							{% endif %}
+							{% endif %}
+						</tr>
+						{% endfor %}
+						<tr class='table-total bg-warning'>
+							<td class='first-col'><strong>Total</strong></td>
+							<td></td>
+							{% if key == 'Container Services' %}
+							{% endif %}
+							{% if key == 'MiServer' or key == 'MiDatabase' %}
+							<td></td>
+							<td></td>
+							{% endif %}
+							{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' %}
+							<td></td>
+							<td></td>
+							{% endif %}
+							<td></td>
+							<td></td>
+							{% if key != 'MiBackup' %}
+							<td></td>
+							{% endif %}
+							{% if '-'|first in value.total %}
+							<td class='total-col prv-msgs'><strong>{{ value.total }}</strong></td>
+							{% else %}
+							<td class='total-col'><strong>{{ value.total }}</strong></td>
+							{% endif %}
+						</tr>
+					</tbody>
+				</table>
+				{% endfor %}
 			</div>
 		</div>
-		{% else %}
-		<div class="row mt-5">
-		    <div class="col-12">
-			<div class="card border-dark card-width">
-				<div class="card-header">
-					<strong>Chartfield:&nbsp;</strong>{{ c.account_number }}
-				</div>
-				<div class="card-body">
-					<div class="col-md-9">
-				        <div class="alert alert-danger col-md-9" role="alert">
-				            <i class="fas fa-exclamation-triangle prv-msgs"></i>
-				            This chartfield does not have any data this month.
-				        </div>
-				    </div>
+	</div>
+</div>
+{% else %}
+<div class="row mt-5">
+	<div class="col-12">
+		<div class="card border-dark card-width">
+			<div class="card-header">
+				<strong>Chartfield:&nbsp;</strong>{{ c.account_number }}
+			</div>
+			<div class="card-body">
+				<div class="col-md-9">
+					<div class="alert alert-danger col-md-9" role="alert">
+						<i class="fas fa-exclamation-triangle prv-msgs"></i>
+						This chartfield does not have any data this month.
+					</div>
 				</div>
 			</div>
 		</div>
-		</div>
-		{% endif %}
-		{% endfor %}
+	</div>
+</div>
+{% endif %}
+{% endfor %}
 </div>
 
 {% endblock %}
 
 {% block js %}
 <script>
-// When the user scrolls down 20px from the top of the document, show the button
-window.onscroll = function() {scrollFunction()};
+	// When the user scrolls down 20px from the top of the document, show the button
+	window.onscroll = function () { scrollFunction() };
 
-function scrollFunction() {
-  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    document.getElementById("scrollTop").style.display = "block";
-  } else {
-    document.getElementById("scrollTop").style.display = "none";
-  }
-}
+	function scrollFunction() {
+		if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+			document.getElementById("scrollTop").style.display = "block";
+		} else {
+			document.getElementById("scrollTop").style.display = "none";
+		}
+	}
 
-// When the user clicks on the button, scroll to the top of the document
-function topFunction() {
-  document.body.scrollTop = 0;
-  document.documentElement.scrollTop = 0;
-}
+	// When the user clicks on the button, scroll to the top of the document
+	function topFunction() {
+		document.body.scrollTop = 0;
+		document.documentElement.scrollTop = 0;
+	}
 </script>
 {% endblock %}
