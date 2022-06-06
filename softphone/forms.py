@@ -26,7 +26,7 @@ class SelectionForm(forms.ModelForm):
     location_correct = forms.ChoiceField(choices=yn_choices, required=False)
     migrate = forms.ChoiceField(choices=migrate_choices)
     other_category = forms.CharField(required=False)
-    notes = forms.CharField(widget=forms.Textarea(), required=False)
+    notes = forms.CharField(widget=forms.Textarea(), max_length=200, required=False)
 
     class Meta:
         model = Selection
