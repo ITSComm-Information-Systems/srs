@@ -157,7 +157,7 @@
                 <div class="row" id="div_{{ form.notes.id_for_label }}" {% if not form.notes.value %}style="display: none;"{% endif %}>
 
                     <div class="form-group col-sm upgrade_to_softphone" >
-                        <label>Notes</label>
+                        <label>Notes<br><small>(Limit 200 characters)</small></label>
                         <div>
                             {{ form.notes }}
                             {{ form.notes.errors }}
