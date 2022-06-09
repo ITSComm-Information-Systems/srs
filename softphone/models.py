@@ -6,6 +6,7 @@ from django.db.models.fields import IntegerField
 
 class Category(models.Model):
     OTHER = 49
+    CONFERENCE_ROOM = 47
     
     sequence = models.PositiveSmallIntegerField(null=True, blank=True)
     code = models.CharField(max_length=20)

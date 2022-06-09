@@ -121,7 +121,7 @@
                             <label>Category</label>
                             {{ form.category }}
                             {{ form.category.errors }}
-                            <span><i class="fas fa-exclamation-circle"></i>Please add note with conference room details.</span>
+                            <span style="display: none;" id="div_id_{{ form.prefix }}-conference_note"><i class="fas fa-exclamation-circle"></i>&nbsp; Please add note of current telephone device type.</span>
                         </div>
                         <br>
                         <div id="div_{{ form.category.id_for_label }}" style="display: none;">
@@ -157,7 +157,6 @@
                 &nbsp;
                 <div class="row" id="div_{{ form.notes.id_for_label }}" {% if not form.notes.value %}style="display: none;"{% endif %}>
                     <div class="form-group col-sm upgrade_to_softphone" >
-                        <span><i class="fas fa-exclamation-circle"></i>Please add conference room details below <br></span>
                         <label>Notes<br><small>(Limit 200 characters)</small></label>
 
                         <div>
@@ -349,13 +348,13 @@
                 $(target).hide();
             }
 
-            //target = "#div_" + $(this).attr('id')
             target = target.replace('category', 'notes')
-            console.log(target)
-
             if (this.value === '47') {  // Conference Room
                 $(target).show();
+                target = target.replace('notes', 'conference_note')
+                $(target).show();
             } else {
+                target = target.replace('notes', 'conference_note')
                 $(target).hide();
             }
 
