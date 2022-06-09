@@ -109,7 +109,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <!----TODO Debug deleting-->
+            <!--TODO Debug deleting-->
             <form method="POST" action="none">
                 {% if form.errors %}
                 {% for field in form %}
@@ -190,16 +190,17 @@
                         <input id="new_manufacturer_part_number" type="text" class="form-control" name="item_manufacturer_part_number">
                     </div>
                     <div class="form-group">
-                        <label for="formGroupExampleInput2">Item Description</label>
-                        <input id="new_item_description" type="text" class="form-control" name="item_description">
+                        <label for="formGroupExampleInput2">Item Description<p style="color:red; display: inline">*</p></label>
+                        <input id="new_item_description" type="text" class="form-control" name="item_description" maxlength='100' onkeyup="countChar(this)" required/>
+                        <small id='charNum'>100 characters left</small>
                     </div>
                     <div class="form-group">
-                        <label for="formGroupExampleInput2">Price</label>
-                        <input id="new_price" type="number" step="any" class="form-control" name="item_price">
+                        <label for="formGroupExampleInput2">Price<p style="color:red; display: inline">*</p></label>
+                        <input id="new_price" type="number" step="any" class="form-control" name="item_price"required/>
                     </div>
                     <div class="form-group">
-                        <label for="formGroupExampleInput2">Quantity</label>
-                        <input id="new_quantity" type="number" class="form-control" name="item_quantity">
+                        <label for="formGroupExampleInput2">Quantity<p style="color:red; display: inline">*</p></label>
+                        <input id="new_quantity" type="number" class="form-control" name="item_quantity" required/>
                     </div>
 
                 </div>
@@ -318,3 +319,16 @@
         </div>
     </div>
 </div>
+
+<script>
+    function countChar(val) {
+        var len = val.value.length;
+        if (len >= 100) {
+          val.value = val.value.substring(0, 100);
+          document.querySelector("#charNum").textContent = "Character limit reached";
+        } else {
+            message = String(100 - len)+' characters left'
+            document.querySelector("#charNum").textContent = message;
+        }
+      };
+</script>
