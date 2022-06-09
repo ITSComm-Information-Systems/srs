@@ -70,9 +70,18 @@ class SelectionForm(forms.ModelForm):
             if cleaned_data.get("uniqname") == '':
                 self.add_error('uniqname', self.REQUIRED)
 
-        if cleaned_data.get('category') == str(Category.OTHER):
+        try:
+            cat = getattr(cleaned_data.get('category'),'id')
+        except:
+            cat = 0
+
+        if cat == Category.OTHER:
             if cleaned_data.get('other_category') == '':
                 self.add_error('other_category', self.REQUIRED)
+
+        if cat == Category.CONFERENCE_ROOM:
+            if cleaned_data.get('notes') == '':
+                self.add_error('notes', self.REQUIRED)
 
         for field in self.fields:
             if self.has_error(field):
