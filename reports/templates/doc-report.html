@@ -1,5 +1,24 @@
 {% extends 'base.html' %}
 {% block content %}
+{% block styles %}
+<style>
+	#aux-nav {
+		background-color: {{ background_color }}
+	}
+
+	.link {
+		background: none !important;
+		border: none;
+		padding: 0 !important;
+		color: #069;
+		cursor: pointer;
+	}
+
+	.link:hover {
+		text-decoration: underline;
+	}
+</style>
+{% endblock styles %}
 <div class="container">	
 	<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fas fa-chevron-up"></i><br>Scroll to top</button>
 	<div class='row'>
@@ -14,8 +33,12 @@
 	</div>
 
 	<strong class="d-inline">Report Selection</strong>
-	<a class="d-inline offset-md-3" href='..'><i class="fas fa-edit"></i>Edit Your Selection</a>
-
+	<form action="/reports/nonteleph/" method="POST" class="d-inline offset-md-3" name="telephEdit">{% csrf_token %}
+		<input name="edit_dept" type="hidden" value="{{ doc_depts }}">
+		<input name="edit_date" type="hidden" value="{{ billing_date }}">
+		<input name="edit_chartcom" type="hidden" value="{{ chartfields }}">
+		<button class="link" type="submit"><i class="fas fa-edit"></i>Edit Your Selection</button>
+	</form>
 		<div class="row">
 			<div class="card border-dark col-md-6">
 				<div class="card-body card-bottom">
