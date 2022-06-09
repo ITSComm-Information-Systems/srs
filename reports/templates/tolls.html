@@ -2,6 +2,10 @@
 {% block content %}
 <h1>{{ title }}</h1>
 <div class='row'>
+    <div>
+        <p display="none" data-value="{{ edit_dept }}" id="editDept"></p>
+        <p display="none" data-value="{{ edit_date }}" id="editDate"></p>
+    </div>
     <div class='col-lg-8 col-md-12'>
         <form action="/reports/tolls/downloads" method="POST" name="Select">{% csrf_token %}
             <div class="form-group">
@@ -48,4 +52,22 @@
 {% block js %}
 <script src="/../static/toll.js"></script>
 <script src="/static/select.js"></script>
+
+<script>
+    // If the edit button was clicked on the report page
+    // change dropdown contents
+    document.addEventListener('DOMContentLoaded', function () {
+        var dept = document.getElementById("editDept").getAttribute("data-value")
+        if ((dept != '') && (dept != 'None')){
+            $('#tolls_deptids').val(dept);
+            $('#tolls_deptids').trigger('change');
+        }
+
+        var date = document.getElementById("editDate").getAttribute("data-value")
+        if ((date != '') && (date != 'None')) {
+            $('#tolls_billing').val(date);
+            $('#tolls_billing').trigger('change');
+        }
+    });
+</script>
 {% endblock %}
