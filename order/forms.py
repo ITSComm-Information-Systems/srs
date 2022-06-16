@@ -987,7 +987,7 @@ class ServerSpecForm(TabForm):
         if database == 'MSSQL':
             self.fields['cpu'].widget.attrs.update({'data-server': 99, 'min': 2})
             self.fields['cpu'].initial = 2
-            self.fields['misevos'].initial = 4
+            self.fields['misevos'].initial = 129 # Windows 2022 - Managed
 
             base_size = float(database_size) / 10
             fifteen_percent = math.ceil(base_size * .15) * 10

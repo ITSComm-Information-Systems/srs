@@ -1225,7 +1225,7 @@ class Item(models.Model):
 
                 if db == 'MSSQL':
                     attributes.append({'ID': 1994, 'Value': 215}) # Windows
-                    os = Choice.objects.get(code='Windows2019managed')
+                    os = Choice.objects.get(code='Windows2022managed')
                 else:
                     attributes.append({'ID': 1994, 'Value': 216}) # Linux
                     os = Choice.objects.get(code='RedHatEnterpriseLinux8')
@@ -1343,7 +1343,7 @@ class Item(models.Model):
         elif self.data.get('database'):
             rec.on_call = 1   # Server is on call even if DB is not
             if self.data.get('database') == 'MSSQL':
-                rec.os = Choice.objects.get(code='Windows2019managed')
+                rec.os = Choice.objects.get(code='Windows2022managed')
                 rec.backup = True
                 rec.backup_time_id = 13  # 6:00 PM
                 rec.patch_day_id = 98    # Saturday
