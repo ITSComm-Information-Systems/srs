@@ -7,7 +7,7 @@ from django.db.models.fields import IntegerField
 class Category(models.Model):
     OTHER = 49
     CONFERENCE_ROOM = 47
-    
+
     sequence = models.PositiveSmallIntegerField(null=True, blank=True)
     code = models.CharField(max_length=20)
     label = models.CharField(max_length=80)
@@ -22,6 +22,18 @@ class Category(models.Model):
         return self.label
 
 
+class DuoUser(models.Model):
+    service_number = models.CharField(primary_key=True, max_length=60) 
+    uniqname = models.CharField(max_length=8)
+
+    class Meta:
+        db_table = 'PINN_CUSTOM\".\"um_softphone_duo'
+        managed = False
+
+    def __str__(self):
+        return self.service_number
+
+
 class SelectionManager(models.Manager):
 
     def selections_made(self, dept_id):
@@ -33,12 +45,13 @@ class SelectionManager(models.Manager):
         phone = {}
         subid = 0
 
+        duo_users = DuoUser.objects.all().values_list('service_number', flat=True)
+
         if 'subscribers' in kwargs:
             subscriber_list = kwargs['subscribers']
             qry = SubscriberCharges.objects.filter(dept_id=dept_id, subscriber_id__in=subscriber_list).order_by('user_defined_id')
         else:
             qry = SubscriberCharges.objects.filter(dept_id=dept_id).order_by('user_defined_id')
-
 
         for charge in qry:
             if charge.subscriber_id != subid and subid != 0:
@@ -54,6 +67,9 @@ class SelectionManager(models.Manager):
 
             phone['service_id'] = charge.service_id
             phone['service_number'] = charge.service_number
+
+            if charge.service_number in duo_users:
+                phone['duo'] = 'Yes'
 
             if charge.building:                
                 phone['location_id'] = charge.location_id
