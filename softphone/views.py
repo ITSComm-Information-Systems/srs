@@ -9,6 +9,7 @@ from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
 from project.pinnmodels import UmOscDeptProfileV
 from project.models import Choice
+from project.utils import download_csv_from_queryset
 from pages.models import Page
 from .models import SubscriberCharges, Selection, SelectionV, DeptV
 from .forms import SelectionForm
@@ -210,3 +211,9 @@ class Selections(View):
                        'selection_list': selection_list,
                        'dept_list': dept_list,
                        'dept_id': dept_id})
+
+
+def download_csv(request, dept_id):
+    qs = SelectionV.objects.filter(dept_id='481091').order_by('-update_date','service_number')
+    #qs = Selection.
+    return download_csv_from_queryset(qs)
