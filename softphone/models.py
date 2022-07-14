@@ -125,7 +125,7 @@ class SelectionAbstract(models.Model):
     migrate = models.CharField(max_length=12) #, choices=MIGRATE_CHOICES)
     location_correct = models.BooleanField(null=True)
     notes = models.TextField(max_length=200, blank=True, null=True)
-    category = models.ForeignKey(Category, limit_choices_to={'sequence__isnull': False} ,on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, null=True, limit_choices_to={'sequence__isnull': False} ,on_delete=models.CASCADE)
     other_category = models.CharField(max_length=80, blank=True, null=True)
     update_date = models.DateTimeField(null=True)
     updated_by = models.CharField(null=True, max_length=8)
