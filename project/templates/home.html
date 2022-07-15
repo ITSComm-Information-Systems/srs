@@ -1,27 +1,64 @@
 {% extends 'base.html' %}
+
+{% block styles %}
+<style>
+    .notification {
+        color: white;
+        text-decoration: none;
+        padding: 20px 30px;
+        position: relative;
+    }
+
+    .notification .badge {
+        position: absolute;
+        top: 0px;
+        right: -10px;
+        padding: 5px 10px;
+        border-radius: 16px;
+        background: rgb(255, 187, 0);
+        color: rgb(0, 0, 0);
+        font-size: small;
+    }
+
+    .card {
+        border-radius: 10px;
+        height: 90%;
+        width: 100%;
+        /* margin: 3px; */
+    }
+</style>
+{% endblock styles %}
+
 {% block content %}
 
-<h1>Welcome to the Service Request System</h1>
+<h1>Welcome to the Service Request System (SRS)</h1>
 <div class="row">
     <div class="col-lg-8">
-        <div class="jumbotron">
-            <h2 class="lead"><strong>About the SRS</strong></h2>
-            <p class="lead">The Service Request System is your one-stop-shop for ordering and managing ITS
-                telecommunications and infrastructure products and services like phone lines, phone features,
-                videoconferencing, and more.</p>
+        <!-- <div class="jumbotron"> -->
+        <p class="lead">The Service Request System is your one-stop-shop for ordering and managing ITS
+            telecommunications and infrastructure products and services like phone lines, phone features,
+            videoconferencing, and more.</p>
+        <p class="lead">Learn more: <a href="//documentation.its.umich.edu/node/1206"><u>Using the Service Request
+                    System</u></a> </p>
+        <div class="row">
+            <div class="col-md-3">
+                <a href="/oidc/authenticate/" class="btn btn-primary btn-lg active btn-block"
+                    style="background-color: rgba(0,39,76,1);" role="button" aria-pressed="true"><b>Log In</b></a>
+            </div>
         </div>
 
         <!--Show this div if user has an access role-->
         {% if user.is_authenticated %}
         {% if perms.oscauth.can_order or perms.oscauth.can_report %}
-        <div class="alert alert-success" id="osc-users-msg">
+        <!-- <div class="alert alert-success" id="osc-users-msg">
             <h2 class="lead"><strong>New to the SRS?</strong></h2>
             <p>Refer to <a href="https://documentation.its.umich.edu/node/1206" target="new" class="alert-link">Using
                     the Service Request System.</a> </p>
-        </div>
+        </div> -->
+
         {% else %}
         <!--Show this div if user does not have an access role-->
-        <div class="alert alert-danger" id="non-user-msg">
+        <!-- <div class="alert alert-danger" id="non-user-msg">
             <h2 class="lead"><strong>You have limited access to this system.</strong></h2>
             <p>Based on your current access levels, you only have access to <strong>order MiStorage, MiBackup, Turbo
                     Storage, Locker, Data Den, MiServer, and MiDatabase as well as the help pages</strong>. To gain
@@ -29,18 +66,62 @@
                 Telephones, Data, and Video lines, and/or view financial reports, contact your Department Manager.</p>
             <p><a target="_blank" href="https://documentation.its.umich.edu/node/2907">Requesting Telephony and Reporting Access <i class="fas fa-chevron-right"></i></a></p>
             <p><a href="/auth/deptpriv/">Look up your Department Manager <i class="fas fa-chevron-right"></i></a></p>
-        </div>
+        </div> -->
         {% endif %}
         {% else %}
-        <div class="alert alert-danger" id="non-user-msg">
-            <h2 class="lead"><strong>You are not logged in.</strong></h2>
-            <a href="/oidc/authenticate/" class="alert-link">Click Here to Log In</a>
+        <!-- <div class="col-lg-4" id="bulletins"> -->
+        <br>
+        <h2>System Notices: <a class="notification">
+                <span id="NotificationBadge" class="badge">1 unread</span> </a> </h2>
+
+        <div class="row">
+            <div class="col-md-4" style="width:30%;">
+                <div class="card" style="background-color:rgba(255,233,163,1);">
+                    <div class="card-body">
+                        <p class="card-title"> <b style="font-size:large">Fax Line <br> unavailable </b></p>
+                        <p class="card-text">Adding a fax line is temporarily unavailable</p>
+                        
+                        <h5> <a href="//documentation.its.umich.edu/node/1206" style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" style="width:30%;">
+                <div class="card" style="background-color: rgba(236,240,247,1);">
+                    <div class="card-body">
+                        <p class="card-title"> <b style="font-size:large">General tips for collaborating remotely</b></p>
+                        <p class="card-text">Gather cell or home phone numbers for key team...</p>
+                        <h5> <a href="//documentation.its.umich.edu/node/1206" style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" style="width:30%;">
+                <div class="card" style="background-color: rgba(236,240,247,1);">
+                    <div class="card-body">
+                        <p class="card-title"><b style="font-size:large">Michigan Medicine Departments</b></p>
+                        <p class="card-text">Most users have been moved to Michigan...</p>
+                        <h5> <a href="//documentation.its.umich.edu/node/1206" style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
+                    </div>
+                </div>
+            </div>
         </div>
-        {% endif %}
     </div>
-    {% autoescape off %}
-    {{notices.bodytext}}
-    {% endautoescape %}
+
+    <br>
+    <div class="col-lg-8">
+        <br>
+        <h2>Need additional permissions?</h2>
+        <p class="lead">To order Telephones, Data and Video Lines, and/or view Financial Reports,<br>
+            contact your Department Manager on <a target="_blank"
+                href="https://documentation.its.umich.edu/node/2907"><u>Requesting Telephony and Reporting
+                    Access.</u></a></p>
+    </div>
+    {% endif %}
+</div>
+{% autoescape off %}
+<!-- {{notices.bodytext}} -->
+{% endautoescape %}
 </div>
 
 {% endblock %}
