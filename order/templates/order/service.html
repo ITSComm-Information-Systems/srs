@@ -1,4 +1,28 @@
 {% extends 'base.html' %}
+
+{% block styles %}
+<style>
+
+.notification {
+  color: white;
+  text-decoration: none;
+  padding: 20px 30px;
+  position: relative;
+}
+
+.notification .badge {
+  position: absolute;
+  top: 0px;
+  right: -10px;
+  padding: 5px 10px;
+  border-radius: 16px;
+  background: rgb(255, 187, 0);
+  color: rgb(0, 0, 0);
+  font-size: small;
+}
+</style>
+{% endblock styles %}
+
 {% block content %}
 
 <h1>{{title}}</h1>
@@ -12,19 +36,30 @@
             {% endfor %}
         </div>
         <div class="alert alert-primary large-order">
+            <strong>Need additional permissions?</strong><br>
+            Contact  <strong><a href="https://documentation.its.umich.edu/node/2907" class="alert-link">Department Manager</a></strong><br><br>
             <strong>Have a question or Feedback?</strong><br>
             Use the form below to <strong><a href="/help" class="alert-link">contact us.</a></strong>
         </div>
+        <div class="alert alert-secondary hlinks" role="alert">
+            <h3 class="alert-heading">
+                Helpful ITS Links
+            </h3>
+            {% autoescape off %}
+            {{ link_list.bodytext }}
+            {% endautoescape %}
+
+        </div>
     </div>
 
-    <div class="tab-content col-xl-6 col-md-9 col-12" id="v-pills-tabContent">
+    <div class="tab-content col-xl-9 col-md-9 col-12" id="v-pills-tabContent">
         {% for service in service_list %}
         <div class="tab-pane fade {{ service.active }}" id="{{ service.name }}" role="tabpanel" aria-labelledby="v-pills-profile-tab">
             <div class="row service" id="{{service.name}}" name="serviceCards">
                 <h3 class="lead">{{ service }}</h3>
                 <div class="col-md-12 card-deck">
                     {% for action in service.actions %}
-                    <div class="card col-12">
+                    <div class="card" style="width: 17rem">
                         <div class="card-body">
                             <strong>
                                 <a href="/orders/wf/{{action.id}}">
@@ -45,13 +80,48 @@
             </div>
         </div>
         {% endfor %}
+
+        <h4>Telephony Bulletin: <a class="notification">
+            <span id="NotificationBadge" class="badge">1 unread</span></a> </h4>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card" style="background-color:rgba(255,233,163,1); border-radius: 10px; border: 0.5px; height: 90%; width: 100%;">               
+                    <div class="card-body">
+                        <p class="card-title"><b style="font-size:large">Fax Line <br> unavailable </b></p>
+                        <p class="card-text">Adding a fax line is temporarily unavailable.</p>
+                        <h5> <a href="/help" style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card" style="background:rgba(236,240,247,1); border-radius: 10px; border: 0.5px; height: 90%; width: 100%;" >
+                    <div class="card-body">
+                        <p class="card-title"><b style="font-size:large"> General tips for collaborating remotely </b></p>
+                        <p class="card-text">Gather cell or home phone numbers for key team...</p>
+                        <h5> <a href="//documentation.its.umich.edu/node/1206" style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4" >
+                <div class="card" style="background:rgba(236,240,247,1); border-radius: 10px; border: 0.5px; height: 90%; width: 100%;">
+                    <div class="card-body">
+                        <p class="card-title"> <b style="font-size:large">Michigan Medicine<br> Departments </b></p>
+                        <p class="card-text">Most users have been moved to Michigan...</p>
+                        <h5> <a href="//documentation.its.umich.edu/node/1206" style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="col-xl-3 col-md-6 col-12 helpful-links">
+    <div class="col-xl-3 col-md-3 col-12 helpful-links">
         {% autoescape off %}
-        {{ notices.bodytext }}
+        <!-- {{ notices.bodytext }} -->
         {% endautoescape %}
-        <div class="alert alert-secondary hlinks" role="alert">
+        <!-- <div class="alert alert-secondary hlinks" role="alert">
             <h3 class="alert-heading">
                 Helpful ITS Links
             </h3>
@@ -59,7 +129,7 @@
             {{ link_list.bodytext }}
             {% endautoescape %}
 
-        </div>
+        </div> -->
     </div>
 </div>
 
