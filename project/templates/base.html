@@ -60,6 +60,8 @@
 					<div class="collapse navbar-collapse navbars" aria-labelledby="aux-nav" role="navigation">
 						<ul class="navbar-nav ml-auto">
 
+
+							{% if user.is_authenticated %}
 							<!-- search bar-->
 							<div class="wrapper">
 								<div class="input-group">
@@ -75,7 +77,6 @@
 								</div>
 							</div>
 
-							{% if user.is_authenticated %}
 							<li class="nav-item dropdown">
 								<a class="nav-link dropdown-toggle {% if title == 'Chartfield Change Request' or title == 'Manage User Access' or title == 'Department Look Up' or title == 'Manage Chartfields' or title == 'VoIP Location Change' %}active{% endif %}"
 									href="javascript;" id="toolsDropdown" role="button" data-toggle="dropdown"
