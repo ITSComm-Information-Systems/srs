@@ -40,12 +40,8 @@
             videoconferencing, and more.</p>
         <p class="lead">Learn more: <a href="//documentation.its.umich.edu/node/1206"><u>Using the Service Request
                     System</u></a> </p>
-        <div class="row">
-            <div class="col-md-3">
-                <a href="/oidc/authenticate/" class="btn btn-primary btn-lg active btn-block"
-                    style="background-color: rgba(0,39,76,1);" role="button" aria-pressed="true"><b>Log In</b></a>
-            </div>
-        </div>
+
+
 
         <!--Show this div if user has an access role-->
         {% if user.is_authenticated %}
@@ -56,21 +52,6 @@
                     the Service Request System.</a> </p>
         </div> -->
 
-        {% else %}
-        <!--Show this div if user does not have an access role-->
-        <!-- <div class="alert alert-danger" id="non-user-msg">
-            <h2 class="lead"><strong>You have limited access to this system.</strong></h2>
-            <p>Based on your current access levels, you only have access to <strong>order MiStorage, MiBackup, Turbo
-                    Storage, Locker, Data Den, MiServer, and MiDatabase as well as the help pages</strong>. To gain
-                additional permissions to order
-                Telephones, Data, and Video lines, and/or view financial reports, contact your Department Manager.</p>
-            <p><a target="_blank" href="https://documentation.its.umich.edu/node/2907">Requesting Telephony and Reporting Access <i class="fas fa-chevron-right"></i></a></p>
-            <p><a href="/auth/deptpriv/">Look up your Department Manager <i class="fas fa-chevron-right"></i></a></p>
-        </div> -->
-        {% endif %}
-        {% else %}
-        <!-- <div class="col-lg-4" id="bulletins"> -->
-        <br>
         <h2>System Notices: <a class="notification">
                 <span id="NotificationBadge" class="badge">1 unread</span> </a> </h2>
 
@@ -80,8 +61,9 @@
                     <div class="card-body">
                         <p class="card-title"> <b style="font-size:large">Fax Line <br> unavailable </b></p>
                         <p class="card-text">Adding a fax line is temporarily unavailable</p>
-                        
-                        <h5> <a href="//documentation.its.umich.edu/node/1206" style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
+
+                        <h5> <a href="//documentation.its.umich.edu/node/1206"
+                                style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
                     </div>
                 </div>
             </div>
@@ -89,9 +71,11 @@
             <div class="col-md-4" style="width:30%;">
                 <div class="card" style="background-color: rgba(236,240,247,1);">
                     <div class="card-body">
-                        <p class="card-title"> <b style="font-size:large">General tips for collaborating remotely</b></p>
+                        <p class="card-title"> <b style="font-size:large">General tips for collaborating remotely</b>
+                        </p>
                         <p class="card-text">Gather cell or home phone numbers for key team...</p>
-                        <h5> <a href="//documentation.its.umich.edu/node/1206" style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
+                        <h5> <a href="//documentation.its.umich.edu/node/1206"
+                                style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
                     </div>
                 </div>
             </div>
@@ -101,7 +85,8 @@
                     <div class="card-body">
                         <p class="card-title"><b style="font-size:large">Michigan Medicine Departments</b></p>
                         <p class="card-text">Most users have been moved to Michigan...</p>
-                        <h5> <a href="//documentation.its.umich.edu/node/1206" style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
+                        <h5> <a href="//documentation.its.umich.edu/node/1206"
+                                style="color: black; font-size: medium;"><u>Learn more</u></a> </h5>
                     </div>
                 </div>
             </div>
@@ -117,6 +102,39 @@
                 href="https://documentation.its.umich.edu/node/2907"><u>Requesting Telephony and Reporting
                     Access.</u></a></p>
     </div>
+
+    {% else %}
+    Show this div if user does not have an access role
+    <div class="alert alert-danger" id="non-user-msg">
+        <h2 class="lead"><strong>You have limited access to this system.</strong></h2>
+        <p>Based on your current access levels, you only have access to <strong>order MiStorage, MiBackup, Turbo
+                Storage, Locker, Data Den, MiServer, and MiDatabase as well as the help pages</strong>. To gain
+            additional permissions to order
+            Telephones, Data, and Video lines, and/or view financial reports, contact your Department Manager.</p>
+        <p><a target="_blank" href="https://documentation.its.umich.edu/node/2907">Requesting Telephony and Reporting
+                Access <i class="fas fa-chevron-right"></i></a></p>
+        <p><a href="/auth/deptpriv/">Look up your Department Manager <i class="fas fa-chevron-right"></i></a></p>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="row">
+        <div class="col-md-3">
+            <a href="/oidc/authenticate/" class="btn btn-primary btn-lg active btn-block"
+                style="background-color: rgba(0,39,76,1);" role="button" aria-pressed="true"><b>Log In</b></a>
+        </div>
+    </div>
+
+    <br>
+    <h2>Need additional permissions?</h2>
+    <p class="lead">To order Telephones, Data and Video Lines, and/or view Financial Reports,<br>
+        contact your Department Manager on <a target="_blank"
+            href="https://documentation.its.umich.edu/node/2907"><u>Requesting Telephony and Reporting
+                Access.</u></a></p>
+
+
+    <!-- <div class="col-lg-4" id="bulletins"> -->
+
     {% endif %}
 </div>
 {% autoescape off %}

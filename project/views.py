@@ -42,8 +42,6 @@ from django.core.mail import EmailMessage
 from django.conf import settings
     
 def homepage(request):
-	if request.user.is_authenticated:
-		return HttpResponseRedirect("/orders/services/2")
 
 	notices = Page.objects.get(permalink='/notices')
 
