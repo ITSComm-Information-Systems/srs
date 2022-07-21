@@ -61,7 +61,7 @@
 			<div class="card-body">
 				{% for key, value in c.charge_tables.items %}
 				<strong>{{ key }}</strong>
-				<table class="table-responsive table table-sm table-striped mt-2" id='charge_table'>
+				<table class="table-responsive table table-sm table-striped mt-2" id='charge_table' style="display: table;">
 					<thead>
 						<tr class="thead-dark">
 							{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' %}
@@ -181,6 +181,7 @@
 							<td>{{ v.unique_id }}</td>
 							<td>{{ v.voucher_comment }}</td>
 							<td></td>
+
 							{% else %}
 							<td class='first-col'>{{ v.user_defined_id }}</td>
 							{% endif %}
@@ -215,6 +216,7 @@
 							<td class='first-col'><strong>Total</strong></td>
 							<td></td>
 							{% if key == 'Container Services' %}
+							<td></td>
 							{% endif %}
 							{% if key == 'MiServer' or key == 'MiDatabase' %}
 							<td></td>
