@@ -29,7 +29,10 @@
 
         <button type="submit" class="btn btn-primary">Save</button>
 
+
+        {% if estimate.folder %}
         <a class='ml-auto mr-3' href="{{ estimate.folder }}" target="_blank" ><i class="fas fa-link"></i>&nbsp; Drive Folder</a>
+        {% endif %}
 
         <a class='ml-auto mr-3' style="align-content: flex-end" href='/apps/bom/estimate/{{ estimate.id }}'>Return to
             Main</a>
