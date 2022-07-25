@@ -16,10 +16,10 @@ class Command(BaseCommand):
         #html = '<h1>SF Email</h1>'
 
         send_mail(
-            'Subject here',
-            'Here is the message.',
-            'softphone@umich.edu',
-            ['djamison@umich.edu'],
+            'Your U-M phone number is scheduled to transition to U-M Zoom Phone on Thursday',
+            'See attachment.',
+            'Testy McTestface',
+            ['djamison@umich.edu','jwalfish@umich.edu'],
             fail_silently=False,
             html_message=html.bodytext
         )
