@@ -1,0 +1,12 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+  <li>
+    <a href="/admin/project/email/{{ object_id }}/send_email" class="viewlink">
+     TEST (send to {{ user }})
+    </a>
+  </li>
+  {{ block.super }}
+{% endblock %}
+
