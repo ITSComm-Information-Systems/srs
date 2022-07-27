@@ -1068,8 +1068,8 @@ class ServerSpecForm(TabForm):
                     os = self.cleaned_data.get('misevos', False)
                     if os:
                         os_name = Choice.objects.get(id=int(os)).label
-                        if os_name.startswith('Windows'):
-                            self.add_error('serverName', 'Name for a managed Windows server cannot exceed 15 characters (including prefix).')
+                        #if os_name.startswith('Windows'):
+                        self.add_error('serverName', 'Server name cannot exceed 15 characters (including prefix).')
 
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)
