@@ -138,6 +138,10 @@ class SelectionAbstract(models.Model):
     room = models.CharField(max_length=18, null=True)
     jack = models.CharField(max_length=30, null=True)
     cable_path_id = models.IntegerField(null=True)
+    processing_status = models.CharField(max_length=50) 
+    cut_date = models.DateField(null=True)                              
+    reviewed_by = models.CharField(max_length=8) 
+    review_date = models.DateField(null=True)
 
     objects = SelectionManager()
 
@@ -158,9 +162,13 @@ class Selection(SelectionAbstract):
 class SelectionV(SelectionAbstract):
     dept_id = models.CharField(max_length=10)
     phone = models.CharField(max_length=20)
+    duo_phone = models.CharField(max_length=1)
+    zoom_login = models.CharField(max_length=1)
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection_v'
+        verbose_name = 'Selection'
+        verbose_name_plural = 'Selection Report'
         managed = False
 
 
