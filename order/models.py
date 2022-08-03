@@ -998,9 +998,11 @@ class Order(models.Model):
 
         LogItem().add_log_entry('JSON', self.id, json_data)
 
+        cursor = connections['pinnacle'].cursor()
+
         try: 
-            with connections['pinnacle'].cursor() as cursor:
-                ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
+            cursor.callproc("dbms_output.enable")
+            ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
 
             self.order_reference = ponum
             self.save()
@@ -1008,12 +1010,24 @@ class Order(models.Model):
             self.add_attachments()
 
         except cx_Oracle.DatabaseError as e:
-        #except Exception as e:
             LogItem().add_log_entry('Error', self.id, e)
             num = str(self.id)
             url = settings.SITE_URL + '/orders/integration/'  + num
             send_mail('SRS Order # ' + num + ' failed to submit', url, 'itscomm.information.systems@umich.edu', ['itscomm.information.systems@umich.edu'])
 
+        finally:
+            dbms_output = ''
+
+            while True:
+                out = cursor.callproc("dbms_output.get_line", ('',0)) 
+                print('out', out)
+                if out[1] > 0:
+                    break
+                
+                dbms_output = dbms_output + out[0] + '\n'
+            
+            LogItem().add_log_entry('DBMS_OUTPUT', self.id, dbms_output)
+            cursor.close()
 
 class Item(models.Model):
     description = models.CharField(max_length=100)
