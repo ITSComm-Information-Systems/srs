@@ -193,6 +193,12 @@ class SubscriberCharges(SelectionAbstract):
     #charge_amount = models.CharField(max_length=10)
     #account = models.CharField(max_length=10)
 
+    # Exclude
+    review_date = None
+    reviewed_by = None
+    cut_date = None
+    processing_status = None
+
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_v'
         managed = False
