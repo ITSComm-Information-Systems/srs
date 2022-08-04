@@ -499,7 +499,6 @@ class VolumeSelectionForm(TabForm):
 
         instance = self.vol.objects.get(id=self.data['instance_id'])
         service = Action.objects.get(id=self.request.POST.get('action_id')).service
-        
         if service.id == 13:
             label = 'Server'
         elif service.id == 14:
@@ -549,6 +548,10 @@ class VolumeSelectionForm(TabForm):
                     self.template = 'order/database_review.html'
                 else:
                     self.template = 'order/database_modify.html'
+            elif service.id == 9:
+                self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
+                self.template = 'order/volume_review_turbo.html'
+
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
                     
