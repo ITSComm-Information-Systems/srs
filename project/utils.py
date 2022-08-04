@@ -1,10 +1,10 @@
 import csv
 from django.http import HttpResponse 
 
-def download_csv_from_queryset(queryset):
+def download_csv_from_queryset(queryset, file_name='full_list'):
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="full_list.csv"'
+    response['Content-Disposition'] = f'attachment; filename="{file_name}.csv"'
 
     writer = csv.writer(response)
     fields = queryset.model._meta.fields
