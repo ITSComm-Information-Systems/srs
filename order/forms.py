@@ -1057,10 +1057,28 @@ class ServerSpecForm(TabForm):
             self.add_error('diskSize', '')
 
         name = self.request.POST.get('name')
+        
+
         if name:
+
             servername = Server.objects.filter(name__iexact=name)
+
             if len(servername) > 0:
                 self.add_error('serverName', f'A server named {name.lower()} already exists. Please choose a different name.')
+                
+            #data sanitization
+            for i in range(len(name)):
+                #server names can only have one dash  
+                if name[i] == "-" and name[i+1] == '-':
+                    self.add_error('serverName', 'This server can only have one dash in the name.')
+                    break
+                
+                #server names cannot contain underscores
+                if name[i] == '_':
+                    self.add_error('serverName', 'Server names cannot contain underscores.')
+                    break
+            
+            
 
             # managed windows name can't exceed 15 char:
             if len(name) > 15:
