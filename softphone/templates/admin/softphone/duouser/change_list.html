@@ -1,0 +1,14 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block search %}
+{{ block.super }}
+
+<form style="float: right;" method="post" enctype="multipart/form-data" action="upload_csv/">
+  {% csrf_token %}
+  <input type="file" name="duo_file">
+  <button type="submit">Upload</button>
+</form>
+
+{% endblock %}
+
