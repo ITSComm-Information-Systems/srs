@@ -484,6 +484,8 @@ class Integration(PermissionRequiredMixin, View):
 
         order_list = LogItem.objects.filter(local_key = str(order.id))
 
+        preorder = UmOscPreorderApiV.objects.filter(add_info_text_3=order_id)
+
         for ord in order_list:
             if ord.transaction == 'JSON':
                 parsed = json.loads(ord.description)
@@ -500,6 +502,7 @@ class Integration(PermissionRequiredMixin, View):
 
         return render(request, 'order/integration.html', 
             {'order': order,
+            'preorder': preorder,
             'order_list': order_list,
             'item_list': item_list,})
 

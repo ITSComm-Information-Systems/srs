@@ -214,6 +214,6 @@ class Selections(View):
 
 
 def download_csv(request, dept_id):
-    qs = SelectionV.objects.filter(dept_id='481091').order_by('-update_date','service_number')
-    #qs = Selection.
-    return download_csv_from_queryset(qs)
+    qs = SelectionV.objects.filter(dept_id=dept_id).order_by('-update_date','service_number')
+    return download_csv_from_queryset(qs, file_name=f'dept_{dept_id}')
+
