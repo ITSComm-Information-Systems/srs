@@ -1020,7 +1020,6 @@ class Order(models.Model):
 
             while True:
                 out = cursor.callproc("dbms_output.get_line", ('',0)) 
-                print('out', out)
                 if out[1] > 0:
                     break
                 
