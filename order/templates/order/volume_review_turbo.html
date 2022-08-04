@@ -1,0 +1,67 @@
+{% load humanize %}
+<h2>Volume Selection</h2>
+<p>Please select the storage volume you wish to modify</p>
+<input type="hidden" id="instance_id" name="instance_id" value="0">
+<div class="row mb-4">
+    <div class="table-responsive-lg">
+        <table class="table table-hover table-striped table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Volume Name</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Sensitive</th>
+                    <th scope="col">Shortcode</th>
+                    <th scope="col">Size</th>
+                    <th scope="col">Add Ons</th>
+                    <th scope="col">Total Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for volume in tab.form.volume_list %}
+                    
+                    <tr>
+                        <th data-id="{{volume.id}}" scope="row">{{ volume.name }}</th>
+                        <td>{{ volume.type }}</td>
+                        
+                        {% if volume.sensitive_regulated %}
+                            <td>Yes</td>
+                        {% else %}
+                            <td>No</td>
+                        {% endif %}
+
+
+                        {% if volume.service.id == 7 %}
+                        <td>
+                            {{ volume.shortcode }}
+                        </td>
+                        {% else %}
+                        <td>{% for sc in volume.shortcode_list %}
+                            {{ sc.shortcode }} ({{sc.size}}TB)<br>
+                    
+                            {% endfor %}
+                        </td>
+                        {% endif %}
+
+
+
+                        <td>{{ volume.size|intcomma }} {{ volume.rate.unit_of_measure }}</td>
+                        <td>{{ volume.rate.label }}</td>
+                        <td style="text-align:right">{{ volume.total_cost }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Total Cost</th>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align:right">{{ tab.form.total_cost }}</td>
+                    <td></td>                    
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
