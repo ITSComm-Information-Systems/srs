@@ -274,6 +274,8 @@
                 $(target).show();
             } else {
                 $(target).hide();
+                uniqname = target.replace('#div_id', '#id')
+                $(uniqname).val('');
             }
         });
         $(".verify-uniqname").trigger('change');
@@ -314,7 +316,7 @@
             }
 
             if (sel=='YES') {
-                $("#" + form + "uniqname_correct option[value='NA']").attr('disabled','disabled');
+                $("#" + form + "uniqname_correct option[value='NA']").attr('disabled','disabled').removeAttr("selected");
                 $("#" + form + "category option:gt(2)").attr('disabled','disabled');
             } else {
                 $("#" + form + "uniqname_correct option[value='NA']").removeAttr('disabled');
@@ -369,6 +371,7 @@
 
             if (this.value === 'CANCEL') {
                 $(target + 'uniqname_correct').prop("disabled", true);
+                $(target + 'uniqname').val('');
                 //$(target + 'physical_phone_required').prop("disabled", true);
                 $(target + 'category').prop("disabled", true);
             } else {
