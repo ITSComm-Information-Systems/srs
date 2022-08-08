@@ -22,7 +22,7 @@ class SelectionVAdmin(admin.ModelAdmin):
     list_display = ['service_number','subscriber','uniqname','migrate','updated_by','update_date','processing_status','zoom_login','duo_phone']
     ordering = ['-update_date']
     search_fields = ['service_number','uniqname','updated_by']
-    list_filter = ['processing_status','duo_phone','zoom_login']
+    list_filter = ['processing_status','duo_phone','zoom_login','migrate']
     #readonly_fields = SelectionV._meta.get_all_field_names()
 
     def has_add_permission(self, request, obj=None):
