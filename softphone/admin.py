@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import Category, Selection, SelectionV, DuoUser
 from django.urls import path
 from django.http import HttpResponseRedirect
+from django.utils.translation import gettext_lazy as _
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -17,12 +18,36 @@ class SelectionAdmin(admin.ModelAdmin):
     list_filter = ['processing_status']
 
 
+class ProcessingStatusListFilter(admin.SimpleListFilter):
+    title = 'Processing Status'
+    parameter_name = 'processing_status'
+    def lookups(self, request, model_admin):
+        return (
+                ('On-Hold', _('On Hold')),
+                ('Selected', _('Selected')),
+                ('none', _('None')),
+            )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'none':
+            return queryset.filter(
+                processing_status=None
+            )
+        if self.value() == 'On-Hold':
+            return queryset.filter(
+                processing_status='On Hold'
+            )
+
+        if self.value() == 'Selected':
+            return queryset.filter(
+                processing_status='Selected'
+            )
 @admin.register(SelectionV)
 class SelectionVAdmin(admin.ModelAdmin):
     list_display = ['service_number','subscriber','uniqname','migrate','updated_by','update_date','processing_status','zoom_login','duo_phone']
     ordering = ['-update_date']
     search_fields = ['service_number','uniqname','updated_by']
-    list_filter = ['processing_status','duo_phone','zoom_login','migrate']
+    list_filter = (ProcessingStatusListFilter,'duo_phone','zoom_login','migrate')
     #readonly_fields = SelectionV._meta.get_all_field_names()
 
     def has_add_permission(self, request, obj=None):
