@@ -26,7 +26,8 @@ class Command(BaseCommand):
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(['id','cpu','created_date','os_id','os_code','managed','ad_group','shortcode','size','name','rate_name','total_cost','owner'])
 
-        URL = 'https://admin.beta.github.umich.edu/api/v1/billing/srs'
+        URL = 'https://admin.github.umich.edu/api/v1/billing/srs'
+        DEV_URL = 'https://admin.beta.github.umich.edu/api/v1/billing/srs'
 
         r = requests.get(URL)
         data = r.json()
@@ -64,10 +65,10 @@ class Command(BaseCommand):
 
     def run_pinnacle_job(self):
 
-        print(datetime.now(), 'Load Infrastructure Billing')
+        print(datetime.now(), 'Load GitHub Billing')
 
         with connections['pinnacle'].cursor() as cursor:
-            result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load Infrastructure Billings'
+            result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load GitHub Billings'
                                    , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'GitHub',{TODAY}"] )
         
         print(datetime.now(), result)
@@ -91,6 +92,6 @@ class Command(BaseCommand):
             []
         )
 
-        email.attach(f'{self.service}.csv', csvfile.getvalue(), 'text/csv')
+        email.attach('github_billing.csv', csvfile.getvalue(), 'text/csv')
 
         email.send()
