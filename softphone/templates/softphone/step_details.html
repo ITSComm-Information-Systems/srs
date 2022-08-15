@@ -274,6 +274,8 @@
                 $(target).show();
             } else {
                 $(target).hide();
+                uniqname = target.replace('#div_id', '#id')
+                $(uniqname).val('');
             }
         });
         $(".verify-uniqname").trigger('change');
@@ -314,11 +316,14 @@
             }
 
             if (sel=='YES') {
-                $("#" + form + "uniqname_correct option[value='NA']").attr('disabled','disabled');
-                $("#" + form + "category option:gt(2)").attr('disabled','disabled');
+                $("#" + form + "uniqname_correct option[value='NA']").attr('disabled','disabled').removeAttr("selected");
+                $("#" + form + "category option:gt(2)").attr('disabled','disabled').removeAttr("selected");
+                $("#" + form + "other_category").val("");
+                $("#" + form + "category").trigger('change');
             } else {
                 $("#" + form + "uniqname_correct option[value='NA']").removeAttr('disabled');
                 $("#" + form + "category option:gt(2)").removeAttr('disabled');
+                $("#" + form + "category").trigger('change');
             }
 
        });
@@ -369,6 +374,7 @@
 
             if (this.value === 'CANCEL') {
                 $(target + 'uniqname_correct').prop("disabled", true);
+                $(target + 'uniqname').val('');
                 //$(target + 'physical_phone_required').prop("disabled", true);
                 $(target + 'category').prop("disabled", true);
             } else {
