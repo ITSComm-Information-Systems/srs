@@ -1,13 +1,22 @@
 from django.contrib import admin
+from django import forms
 from .models import Category, Selection, SelectionV, DuoUser
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _
+from .forms import migrate_choices
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display  = ['sequence','code','label']
     ordering = ('sequence',)
+
+class SelectionForm(forms.ModelForm):
+    migrate = forms.ChoiceField(choices = migrate_choices)
+
+    class Meta:
+        model = Selection
+        exclude = []
 
 
 @admin.register(Selection)
@@ -16,6 +25,7 @@ class SelectionAdmin(admin.ModelAdmin):
     ordering = ['-update_date']
     search_fields = ['service_number','uniqname','updated_by']
     list_filter = ['processing_status']
+    form = SelectionForm
 
 
 class ProcessingStatusListFilter(admin.SimpleListFilter):
