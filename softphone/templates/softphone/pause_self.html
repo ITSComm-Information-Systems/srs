@@ -1,0 +1,45 @@
+{% extends 'softphone/base_softphone.html' %}
+{% block content %}
+
+{% load humanize %}
+
+<h1>{{ title }}</h1>
+<div id="form-0" class="col-6 card border-primary shadow p-3 my-3">
+    <input type="hidden" name="form-0-subscriber" value="4225902" id="id_form-0-subscriber" class="form-control">
+
+    <div class="row ">
+        <div class="col-sm">
+            <strong>Phone</strong><br>
+            {{ phone.service_number }}<br>
+            Uniqname: tutone<br>
+            Jenny Blaze
+        </div>
+
+
+        <div class="form-group col-sm upgrade_to_softphone" id="div_id_form-0-migrate" data-location="ARBOR LAKES 3">
+            <label>Pause Deployment?</label>
+            <div>
+                <select name="form-0-migrate" class="convert-softphone form-control custom-select"
+                    id="id_form-0-migrate">
+                    <option value="" selected="">---</option>
+
+                    <option value="YES">Until August 18, 2022</option>
+
+                    <option value="YES_SET">Until August 25, 2022</option>
+
+                    <option value="NOT_YET">Until September 1, 2022</option>
+
+                    <option value="NO">Do not implement softphone</option>
+
+                    <option value="CANCEL" class="__web-inspector-hide-shortcut__"></option>
+
+                </select>
+
+            </div>
+        </div>
+    </div>
+</div>
+<button type="submit" class="btn btn-primary">Save</button>
+{% endblock %}
+
+
