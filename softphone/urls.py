@@ -3,6 +3,9 @@ from . import views
 
 urlpatterns = [
     path('help', views.get_help),
+    path('pause/<str:uniqname>', views.PauseSelf.as_view(), name='pause_self'),
+    path('pause_users/<str:uniqname>', views.PauseUsers.as_view(), name='pause_users'),
+    path('dept/<int:dept_id>/', views.StepSubscribers.as_view(), name='subscribers'),
     path('dept/<int:dept_id>/', views.StepSubscribers.as_view(), name='subscribers'),
     path('dept/<int:dept_id>/details/', views.StepDetails.as_view(), name='details'),
     path('dept/<int:dept_id>/confirmation/', views.StepConfirmation.as_view(), name='confirmation'),

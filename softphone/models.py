@@ -164,6 +164,9 @@ class SelectionV(SelectionAbstract):
     phone = models.CharField(max_length=20)
     duo_phone = models.CharField(max_length=1)
     zoom_login = models.CharField(max_length=1)
+    subscriber_uniqname = models.CharField(max_length=20)
+    subscriber_first_name = models.CharField(max_length=50)    
+    subscriber_last_name = models.CharField(max_length=50)
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection_v'

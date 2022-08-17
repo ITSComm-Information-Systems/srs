@@ -52,6 +52,19 @@ def get_department_list(dept_id, user):
 
     return dept_list
 
+
+class PauseSelf(View):
+    def get(self, request, uniqname):
+        print('self', uniqname)
+        phone = SelectionV.objects.get(subscriber_uniqname=uniqname)
+
+        return render(request, 'softphone/pause_self.html',
+                      {'title': 'Pause Softphone',
+                       'phone': phone})
+
+class PauseUsers(View):
+    pass
+
 class StepSubscribers(LoginRequiredMixin, View):
 
     def post(self, request, dept_id):
