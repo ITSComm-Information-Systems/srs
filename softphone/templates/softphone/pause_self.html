@@ -57,7 +57,7 @@
 
             if (this.value=='Never') {
                 $(target_div).show();
-                $(target).addAttr("required");
+                $(target).attr("required", true);
             } else {
                 $(target_div).hide();
                 $(target).removeAttr("required");
