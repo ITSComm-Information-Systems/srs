@@ -56,11 +56,24 @@ def get_department_list(dept_id, user):
     return dept_list
 
 
-class PauseSelf(View):
+class PauseUser(View):
     def get(self, request, uniqname):
-        phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname) | Q(uniqname=uniqname)).values('subscriber'
-            ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+        if uniqname == 'ua':
+            phone_list = SelectionV.objects.filter(uniqname='mafaith').values('subscriber'
+                ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+        else:
+            if self.request.user.username != uniqname:
+                if not self.request.user.is_superuser:
+                    return HttpResponseRedirect(f'/softphone/pause/{self.request.user.username}')
 
+            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname) | Q(uniqname=uniqname)).values('subscriber'
+                ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+
+            if len(phone_list) == 0:
+                return render(request, 'softphone/pause_message.html',
+                                {'title': 'Pause Softphone',
+                                'message': 'User not scheduled for migration.'})
+        
         OptOutFormSet = formset_factory(OptOutForm, extra=0)
         formset = OptOutFormSet(initial=phone_list)
 
@@ -96,8 +109,6 @@ class PauseSelf(View):
 
         return HttpResponseRedirect(f'/softphone/pause/{uniqname}')
 
-class PauseUsers(View):
-    pass
 
 class StepSubscribers(LoginRequiredMixin, View):
 
