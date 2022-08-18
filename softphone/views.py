@@ -4,7 +4,10 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View
 from django.core.paginator import Paginator
+from django.db.models import Q
+from django.forms import formset_factory
 
+import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
 from project.pinnmodels import UmOscDeptProfileV
@@ -12,7 +15,7 @@ from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
 from .models import SubscriberCharges, Selection, SelectionV, DeptV
-from .forms import SelectionForm
+from .forms import SelectionForm, OptOutForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 
@@ -55,12 +58,43 @@ def get_department_list(dept_id, user):
 
 class PauseSelf(View):
     def get(self, request, uniqname):
-        print('self', uniqname)
-        phone = SelectionV.objects.get(subscriber_uniqname=uniqname)
+        phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname) | Q(uniqname=uniqname)).values('subscriber'
+            ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+
+        OptOutFormSet = formset_factory(OptOutForm, extra=0)
+        formset = OptOutFormSet(initial=phone_list)
+
+        thursday = 3
+        today = datetime.date.today()
+        days = (thursday - today.weekday() + 7) % 7
+
+        date_list = [(None,'---')]
+        for i in range(1, 4):
+            convert_date = today + datetime.timedelta(days=i*7+days)
+            date_list.append((convert_date.strftime("%Y-%m-%d"), f'Until {convert_date.strftime("%B %d, %Y")}'))
+
+        date_list.append(('Never', 'Do not implement softphone'))
 
         return render(request, 'softphone/pause_self.html',
                       {'title': 'Pause Softphone',
-                       'phone': phone})
+                       'date_list': date_list,
+                       'formset': formset, 
+                       'phone_list': phone_list})
+
+    def post(self, request, uniqname):
+        OptOutFormSet = formset_factory(OptOutForm, extra=0)
+        formset = OptOutFormSet(request.POST)
+
+        formset.is_valid()
+        for form in formset:
+            pause_date = form.cleaned_data.get('pause_until', 'None')
+
+            if pause_date != 'None':
+                subscriber = form.cleaned_data.get('subscriber')
+                print('pause this phone', form.cleaned_data)
+                
+
+        return HttpResponseRedirect(f'/softphone/pause/{uniqname}')
 
 class PauseUsers(View):
     pass
