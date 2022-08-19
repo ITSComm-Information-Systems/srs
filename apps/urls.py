@@ -5,6 +5,7 @@ urlpatterns = [
     path('rte/', include('apps.rte.urls')),
     path('bom/', include('apps.bom.urls')),
     path('mbid/', include('apps.mbid.urls')),
+    path('inv/', include('apps.inv.urls')),
     path('', include('pages.urls'))
 ]
 
