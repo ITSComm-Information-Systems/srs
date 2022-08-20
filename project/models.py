@@ -116,3 +116,16 @@ class Webhooks(models.Model):
      timestamp = models.DateTimeField(auto_now_add=True)
      added = models.CharField(max_length=255, null=True)
      skipped = models.CharField(max_length=255, null=True)
+
+
+class Email(models.Model):
+     code = models.CharField(max_length=20)
+     sender = models.CharField(max_length=100)
+     to = models.CharField(max_length=100)
+     cc = models.CharField(max_length=100, blank=True, null=True)
+     bcc = models.CharField(max_length=100, blank=True, null=True)
+     subject = models.CharField(max_length=100)
+     body = models.TextField()
+
+     def __str__(self):
+          return self.code
