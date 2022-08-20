@@ -138,10 +138,10 @@ class SelectionAbstract(models.Model):
     room = models.CharField(max_length=18, null=True)
     jack = models.CharField(max_length=30, null=True)
     cable_path_id = models.IntegerField(null=True)
-    processing_status = models.CharField(max_length=50) 
-    cut_date = models.DateField(null=True)                              
-    reviewed_by = models.CharField(max_length=8) 
-    review_date = models.DateField(null=True)
+    processing_status = models.CharField(max_length=50, blank=True) 
+    cut_date = models.DateField(null=True, blank=True)                              
+    reviewed_by = models.CharField(max_length=8, blank=True) 
+    review_date = models.DateField(null=True, blank=True)
 
     objects = SelectionManager()
 
