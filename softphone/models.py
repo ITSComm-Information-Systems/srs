@@ -143,6 +143,14 @@ class SelectionAbstract(models.Model):
     reviewed_by = models.CharField(max_length=8, blank=True) 
     review_date = models.DateField(null=True, blank=True)
 
+    call_plan = models.CharField(max_length=50, blank=True)                   #VARCHAR2(50 CHAR) 
+    request_no = models.IntegerField(blank=True)                           #NUMBER(16)        
+    preorder_number = models.IntegerField(blank=True)                      #NUMBER(16)        
+    has_voicemail = models.CharField(max_length=1, blank=True)              #VARCHAR2(1 CHAR)  
+    ncos = models.CharField(max_length=10, blank=True)                        #VARCHAR2(10 CHAR) 
+    linecss = models.CharField(max_length=50, blank=True)                     #VARCHAR2(50 CHAR) 
+    admin_notes = models.TextField(blank=True)
+
     objects = SelectionManager()
 
     class Meta:
@@ -201,6 +209,13 @@ class SubscriberCharges(SelectionAbstract):
     reviewed_by = None
     cut_date = None
     processing_status = None
+    call_plan = None
+    request_no = None
+    preorder_number = None
+    has_voicemail = None
+    ncos = None
+    linecss = None
+    admin_notes = None
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_v'
