@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Category, Selection, SelectionV, DuoUser
+from .models import Category, Selection, SelectionV, DuoUser, Ambassador
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _
@@ -95,4 +95,6 @@ class DuoAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-
+@admin.register(Ambassador)
+class AmbassadorAdmin(admin.ModelAdmin):
+    list_display = ['user','dept_group']

@@ -1277,6 +1277,12 @@ class UmEcommMbidVendorV(models.Model):
         db_table = 'PINN_CUSTOM\".\"UM_ECOMM_MBID_VENDOR_V'
 
 
+class DepartmentManager(models.Manager):
+
+    def group_dropdown(self):
+        return list(UmMpathDwCurrDepartment.objects.values_list('dept_grp', 'dept_grp_descr').distinct().order_by('dept_grp_descr'))
+
+
 class UmMpathDwCurrDepartment(models.Model):
     deptid = models.CharField(max_length=10)
     dept_effdt = models.DateField()
@@ -1292,9 +1298,13 @@ class UmMpathDwCurrDepartment(models.Model):
     dept_bud_seq = models.CharField(max_length=20, blank=True, null=True)
     dept_bud_seq_descr = models.CharField(max_length=30, blank=True, null=True)
 
+    objects = DepartmentManager()
+
     class Meta:
         managed = False
         db_table = 'PINN_CUSTOM\".\"UM_MPATHDW_CURR_DEPARTMENT'
+
+
 
 
 class UmOscAuthUsersApi(models.Model):
