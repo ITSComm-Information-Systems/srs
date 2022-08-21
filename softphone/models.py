@@ -1,4 +1,5 @@
-from django.db import models
+from datetime import datetime
+from django.db import models, connections
 import json
 
 from django.db.models.fields import IntegerField
@@ -166,6 +167,23 @@ class Selection(SelectionAbstract):
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection'
         managed = False
 
+    def pause(self, current_user, pause_date):
+        self.processing_status = 'On Hold'
+        self.cut_date = pause_date  
+        self.review_date = datetime.today()
+        self.reviewed_by = current_user.username
+        self.save()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+        if self.processing_status == 'On Hold':
+            sql = "update telecom.subscriber_api_v set add_info_list_value_code_1 = 'On Hold' where subscriber_id = %s"
+
+            with connections['pinnacle'].cursor() as cursor:
+                cursor.execute(sql, (self.subscriber,))
+
+            print(cursor.rowcount, 'update subscriber_id')
+
 
 class SelectionV(SelectionAbstract):
     dept_id = models.CharField(max_length=10)
@@ -232,3 +250,25 @@ class DeptV(models.Model):
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_dept_v'
         managed = False
+
+
+def pause_user(subscriber_id):
+    print('pause', subscriber_id)
+    sql = "update telecom.subscriber_api_v set add_info_list_value_code_1 = 'On Hold' where subscriber_id = %s"
+
+    with connections['pinnacle'].cursor() as cursor:
+        cursor.execute(sql, (subscriber_id,))
+
+    print(cursor.rowcount, 'update subscriber_id')
+
+    #with connections['pinnacle'].cursor() as cursor:
+    #    result = cursor.callproc('um_osc_util_k.um_update_subscriber_name_p',  [subscriber_id, str(user.givenName), '', str(user.umichDisplaySn), str(user.mail)])
+    #    messages = ['Name updated successfully.']
+
+    #Use name change proc.
+        #procedure um_update_subscriber_name_p(
+        #    p_subscriber_id  IN number,
+        #    p_first_name     IN varchar2,
+        #    p_middle_initial IN varchar2,
+        #    p_last_name      IN varchar2,
+        #    p_email_address  IN varchar2 )
