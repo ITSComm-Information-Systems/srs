@@ -10,11 +10,11 @@ from django.forms import formset_factory
 import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmOscDeptProfileV
+from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
-from .models import SubscriberCharges, Selection, SelectionV, DeptV
+from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador
 from .forms import SelectionForm, OptOutForm
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -59,7 +59,13 @@ def get_department_list(dept_id, user):
 class PauseUser(View):
     def get(self, request, uniqname):
         if uniqname == 'ua':
-            phone_list = SelectionV.objects.filter(uniqname='mafaith').values('subscriber'
+            try:
+                a = Ambassador.objects.get(user=request.user)
+            except Ambassador.DoesNotExist:
+                return HttpResponseRedirect(f'/softphone/pause/{request.user.username}')
+            
+            dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp=a.dept_group).values_list('deptid', flat=True)
+            phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected').values('subscriber'
                 ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
         else:
             if self.request.user.username != uniqname:
