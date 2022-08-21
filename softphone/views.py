@@ -66,13 +66,21 @@ class PauseUser(View):
                 if not self.request.user.is_superuser:
                     return HttpResponseRedirect(f'/softphone/pause/{self.request.user.username}')
 
-            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname) | Q(uniqname=uniqname)).values('subscriber'
+            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='Selected') | Q(uniqname=uniqname, processing_status='Selected')).values('subscriber'
                 ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
 
             if len(phone_list) == 0:
+                message =  'User not scheduled for migration.'
+                # Check for on hold record:
+                phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='On Hold') | Q(uniqname=uniqname, processing_status='On Hold'))
+
+                for phone in phone_list:
+                    if phone.cut_date:
+                        message = 'Migration paused until ' + phone.cut_date.strftime("%B %d, %Y")
+
                 return render(request, 'softphone/pause_message.html',
                                 {'title': 'Pause Softphone',
-                                'message': 'User not scheduled for migration.'})
+                                'message': message})
         
         OptOutFormSet = formset_factory(OptOutForm, extra=0)
         formset = OptOutFormSet(initial=phone_list)
