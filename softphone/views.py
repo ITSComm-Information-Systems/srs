@@ -104,8 +104,8 @@ class PauseUser(View):
 
             if pause_date != 'None':
                 subscriber = form.cleaned_data.get('subscriber')
-                print('pause this phone', form.cleaned_data)
-                
+                rec = Selection.objects.get(subscriber=subscriber)
+                rec.pause(request.user, pause_date)
 
         return HttpResponseRedirect(f'/softphone/pause/{uniqname}')
 
