@@ -1,9 +1,8 @@
 from datetime import datetime
 from django.db import models, connections
-import json
-
+from django.conf import settings
 from django.db.models.fields import IntegerField
-
+from project.pinnmodels import UmMpathDwCurrDepartment
 
 class Category(models.Model):
     OTHER = 49
@@ -251,24 +250,16 @@ class DeptV(models.Model):
         db_table = 'PINN_CUSTOM\".\"um_softphone_dept_v'
         managed = False
 
+#DEPT_GROUP_CHOICES = list(UmMpathDwCurrDepartment.objects.values_list('dept_grp', 'dept_grp_descr').distinct().order_by('dept_grp'))
 
-def pause_user(subscriber_id):
-    print('pause', subscriber_id)
-    sql = "update telecom.subscriber_api_v set add_info_list_value_code_1 = 'On Hold' where subscriber_id = %s"
+#LABOR_GROUP_CHOICES = [('','----')] + list(LaborGroup.objects.all().values_list('id', 'name'))
 
-    with connections['pinnacle'].cursor() as cursor:
-        cursor.execute(sql, (subscriber_id,))
+#for c in DEPT_GROUP_CHOICES:
+#    print(c)
 
-    print(cursor.rowcount, 'update subscriber_id')
+class Ambassador(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    dept_group = models.CharField(max_length=20, choices=UmMpathDwCurrDepartment.objects.group_dropdown())
 
-    #with connections['pinnacle'].cursor() as cursor:
-    #    result = cursor.callproc('um_osc_util_k.um_update_subscriber_name_p',  [subscriber_id, str(user.givenName), '', str(user.umichDisplaySn), str(user.mail)])
-    #    messages = ['Name updated successfully.']
-
-    #Use name change proc.
-        #procedure um_update_subscriber_name_p(
-        #    p_subscriber_id  IN number,
-        #    p_first_name     IN varchar2,
-        #    p_middle_initial IN varchar2,
-        #    p_last_name      IN varchar2,
-        #    p_email_address  IN varchar2 )
+    def __str__(self):
+        return self.user.username
