@@ -166,11 +166,15 @@ class Selection(SelectionAbstract):
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection'
         managed = False
 
-    def pause(self, current_user, pause_date):
+    def pause(self, current_user, pause_date, comment):
+        if pause_date == 'Never':
+            pause_date = '2030-01-01'
+
         self.processing_status = 'On Hold'
         self.cut_date = pause_date  
         self.review_date = datetime.today()
         self.reviewed_by = current_user.username
+        self.admin_notes = comment
         self.save()
 
     def save(self, *args, **kwargs):
