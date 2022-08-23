@@ -4,15 +4,18 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View
 from django.core.paginator import Paginator
+from django.db.models import Q
+from django.forms import formset_factory
 
+import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmOscDeptProfileV
+from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
-from .models import SubscriberCharges, Selection, SelectionV, DeptV
-from .forms import SelectionForm
+from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador
+from .forms import SelectionForm, OptOutForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 
@@ -51,6 +54,75 @@ def get_department_list(dept_id, user):
         dept_list.access_error = f'NO ACCESS TO {current_department}'
 
     return dept_list
+
+
+class PauseUser(View):
+    def get(self, request, uniqname):
+        if uniqname == 'ua':
+            try:
+                a = Ambassador.objects.get(user=request.user)
+            except Ambassador.DoesNotExist:
+                return HttpResponseRedirect(f'/softphone/pause/{request.user.username}')
+            
+            dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp=a.dept_group).values_list('deptid', flat=True)
+            phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected').values('subscriber'
+                ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+        else:
+            if self.request.user.username != uniqname:
+                if not self.request.user.is_superuser:
+                    return HttpResponseRedirect(f'/softphone/pause/{self.request.user.username}')
+
+            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='Selected') | Q(uniqname=uniqname, processing_status='Selected')).values('subscriber'
+                ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+
+            if len(phone_list) == 0:
+                message =  'User not scheduled for migration.'
+                # Check for on hold record:
+                phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='On Hold') | Q(uniqname=uniqname, processing_status='On Hold'))
+
+                for phone in phone_list:
+                    if phone.cut_date:
+                        message = 'Migration paused until ' + phone.cut_date.strftime("%B %d, %Y")
+
+                return render(request, 'softphone/pause_message.html',
+                                {'title': 'Pause Softphone',
+                                'message': message})
+        
+        OptOutFormSet = formset_factory(OptOutForm, extra=0)
+        formset = OptOutFormSet(initial=phone_list)
+
+        thursday = 3
+        today = datetime.date.today()
+        days = (thursday - today.weekday() + 7) % 7
+
+        date_list = [(None,'---')]
+        for i in range(1, 4):
+            convert_date = today + datetime.timedelta(days=i*7+days)
+            date_list.append((convert_date.strftime("%Y-%m-%d"), f'Until {convert_date.strftime("%B %d, %Y")}'))
+
+        date_list.append(('Never', 'Do not implement softphone'))
+
+        return render(request, 'softphone/pause_self.html',
+                      {'title': 'Pause Softphone',
+                       'date_list': date_list,
+                       'formset': formset, 
+                       'phone_list': phone_list})
+
+    def post(self, request, uniqname):
+        OptOutFormSet = formset_factory(OptOutForm, extra=0)
+        formset = OptOutFormSet(request.POST)
+
+        formset.is_valid()
+        for form in formset:
+            pause_date = form.cleaned_data.get('pause_until', 'None')
+
+            if pause_date != 'None':
+                subscriber = form.cleaned_data.get('subscriber')
+                rec = Selection.objects.get(subscriber=subscriber)
+                rec.pause(request.user, pause_date)
+
+        return HttpResponseRedirect(f'/softphone/pause/{uniqname}')
+
 
 class StepSubscribers(LoginRequiredMixin, View):
 

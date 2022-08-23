@@ -1,8 +1,8 @@
-from django.db import models
-import json
-
+from datetime import datetime
+from django.db import models, connections
+from django.conf import settings
 from django.db.models.fields import IntegerField
-
+from project.pinnmodels import UmMpathDwCurrDepartment
 
 class Category(models.Model):
     OTHER = 49
@@ -166,12 +166,32 @@ class Selection(SelectionAbstract):
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection'
         managed = False
 
+    def pause(self, current_user, pause_date):
+        self.processing_status = 'On Hold'
+        self.cut_date = pause_date  
+        self.review_date = datetime.today()
+        self.reviewed_by = current_user.username
+        self.save()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+        if self.processing_status == 'On Hold':
+            sql = "update telecom.subscriber_api_v set add_info_list_value_code_1 = 'On Hold' where subscriber_id = %s"
+
+            with connections['pinnacle'].cursor() as cursor:
+                cursor.execute(sql, (self.subscriber,))
+
+            print(cursor.rowcount, 'update subscriber_id')
+
 
 class SelectionV(SelectionAbstract):
     dept_id = models.CharField(max_length=10)
     phone = models.CharField(max_length=20)
     duo_phone = models.CharField(max_length=1)
     zoom_login = models.CharField(max_length=1)
+    subscriber_uniqname = models.CharField(max_length=20)
+    subscriber_first_name = models.CharField(max_length=50)    
+    subscriber_last_name = models.CharField(max_length=50)
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection_v'
@@ -228,4 +248,32 @@ class DeptV(models.Model):
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_dept_v'
+        managed = False
+
+
+class Ambassador(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    dept_group = models.CharField(max_length=20, choices=UmMpathDwCurrDepartment.objects.group_dropdown())
+
+    def __str__(self):
+        return self.user.username
+
+
+class Zoom(models.Model):
+    elg = models.CharField(max_length=1)                     # varchar2(1 char)   
+    elg_code = models.CharField(max_length=100)              # varchar2(100 char) 
+    id = models.CharField(max_length=50, primary_key=True)   # varchar2(50 char)  
+    first_name = models.CharField(max_length=50)             # varchar2(50 char)  
+    last_name = models.CharField(max_length=50)              # varchar2(50 char)  
+    email = models.CharField(max_length=50)                  # varchar2(50 char)  
+    type = models.IntegerField(null=True)                    # number             
+    timezone = models.CharField(max_length=50)               # varchar2(50 char)  
+    created_at = models.DateTimeField()                      # date               
+    last_login_time = models.DateTimeField()                 # date               
+    phone_country = models.CharField(max_length=50)          # varchar2(50 char)  
+    phone_number = models.CharField(max_length=20)           # varchar2(20 char)  
+    status = models.CharField(max_length=20)                 # varchar2(20 char)  
+
+    class Meta:
+        db_table = 'PINN_CUSTOM\".\"um_softphone_zoom'
         managed = False
