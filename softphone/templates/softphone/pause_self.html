@@ -1,0 +1,72 @@
+{% extends 'softphone/base_softphone.html' %}
+{% block content %}
+
+{% load humanize %}
+
+<h1>{{ title }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% for form in formset %}
+    <div id="{{ form.prefix }}" class="col-6 card border-primary shadow p-3 my-3">    
+        {{ form.subscriber }}
+
+        <div class="row">
+            <div class="col-sm">
+                {{ form.subscriber.id }}
+                <strong>Phone</strong><br>
+                {{ form.initial.service_number }}<br>
+                Uniqname: {{ form.initial.subscriber_uniqname }}{{ form.initial.uniqname }}<br>
+                {{ form.initial.subscriber_first_name }} {{ sform.initial.subscriber_last_name }}
+            </div>
+
+            <div class="form-group col-sm upgrade_to_softphone" id="div_id_form-0-migrate" data-location="ARBOR LAKES 3">
+                <label>Pause Deployment?</label>
+                <div>
+                    <select name="{{ form.prefix }}-pause_until" class="form-control custom-select pause_until" id="id_{{ form.prefix }}-pause_until">
+                        {% for option in date_list %}
+                            <option value="{{ option|first }}">{{ option|last }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div id="div_{{ form.prefix }}-comment" class="row" style="display: none;">
+            <div class="form-group col-sm">
+                <label for="exampleFormControlTextarea1">Please explain.</label>
+                <textarea name="{{ form.prefix }}-comment" class="form-control" id="id_{{ form.prefix }}-comment" rows="3"></textarea>
+              </div>
+        </div>
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+{% endblock %}
+
+
+{% block js %}
+
+<script>
+
+    $(document).ready(function () {
+
+        $(".pause_until").change(function () {
+            target = '#' + $(this).attr('id').replace("pause_until", "comment")
+            target_div = target.replace("id_", "div_"); 
+
+            if (this.value=='Never') {
+                $(target_div).show();
+                $(target).attr("required", true);
+            } else {
+                $(target_div).hide();
+                $(target).removeAttr("required");
+            }
+        });
+
+
+    });
+
+</script>
+
+{% endblock %}
