@@ -166,22 +166,28 @@ class Selection(SelectionAbstract):
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection'
         managed = False
 
-    def pause(self, current_user, pause_date):
+    def pause(self, current_user, pause_date, comment):
+        if pause_date == 'Never':
+            pause_date = '2030-01-01'
+
         self.processing_status = 'On Hold'
         self.cut_date = pause_date  
         self.review_date = datetime.today()
         self.reviewed_by = current_user.username
+        self.admin_notes = comment
         self.save()
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # Call the "real" save() method.
-        if self.processing_status == 'On Hold':
-            sql = "update telecom.subscriber_api_v set add_info_list_value_code_1 = 'On Hold' where subscriber_id = %s"
+        try:
+            sql = "update telecom.subscriber_api_v set add_info_list_value_code_1 = %s where subscriber_id = %s"
 
             with connections['pinnacle'].cursor() as cursor:
-                cursor.execute(sql, (self.subscriber,))
+                cursor.execute(sql, (self.processing_status, self.subscriber,))
 
             print(cursor.rowcount, 'update subscriber_id')
+        except:
+            print('error updating subscriber_api_v')
 
 
 class SelectionV(SelectionAbstract):
