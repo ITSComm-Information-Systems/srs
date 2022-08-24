@@ -58,14 +58,30 @@ class DuoListFilter(admin.SimpleListFilter):
             return queryset.exclude(service_number__in=service_number_list)
 
 
+class CutDateListFilter(admin.SimpleListFilter):
+    title = 'Cut Date'
+    parameter_name = 'cut_date'
+
+    def lookups(self, request, model_admin):
+        cut_date_list = []
+        for cut_date in Selection.objects.distinct().order_by('cut_date').values_list('cut_date', flat=True):
+            cut_date_list.append((cut_date,cut_date))
+
+        return cut_date_list
+
+    def queryset(self, request, queryset):
+        return queryset.filter(cut_date=self.value())
+
+
 @admin.register(Selection)
 class SelectionAdmin(admin.ModelAdmin):
-    list_display = ['service_number','subscriber','uniqname','migrate','updated_by','update_date','processing_status','cut_date']
+    list_display = ['service_number','subscriber','uniqname','migrate','updated_by','update_date','processing_status','cut_date','building_code']
     ordering = ['-update_date']
-    search_fields = ['service_number','uniqname','updated_by']
-    list_filter = ['processing_status','migrate','cut_date',DuoListFilter,ZoomListFilter]
+    search_fields = ['service_number','uniqname','updated_by','building_code']
+    list_filter = ['processing_status','migrate',CutDateListFilter, DuoListFilter,ZoomListFilter]
+        #('cut_date', admin.RelatedOnlyFieldListFilter),]
     form = SelectionForm
-
+    #date_hierarchy = 'cut_date'
 
 
 @admin.register(DuoUser)
