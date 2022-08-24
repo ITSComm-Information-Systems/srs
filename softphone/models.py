@@ -179,13 +179,15 @@ class Selection(SelectionAbstract):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # Call the "real" save() method.
-        if self.processing_status == 'On Hold':
-            sql = "update telecom.subscriber_api_v set add_info_list_value_code_1 = 'On Hold' where subscriber_id = %s"
+        try:
+            sql = "update telecom.subscriber_api_v set add_info_list_value_code_1 = %s where subscriber_id = %s"
 
             with connections['pinnacle'].cursor() as cursor:
-                cursor.execute(sql, (self.subscriber,))
+                cursor.execute(sql, (self.processing_status, self.subscriber,))
 
             print(cursor.rowcount, 'update subscriber_id')
+        except:
+            print('error updating subscriber_api_v')
 
 
 class SelectionV(SelectionAbstract):
