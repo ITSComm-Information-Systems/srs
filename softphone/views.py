@@ -58,21 +58,36 @@ def get_department_list(dept_id, user):
 
 class PauseUser(View):
     def get(self, request, uniqname):
+        cut_date = datetime.datetime(2022, 9, 1)
+        
         if uniqname == 'ua':
             try:
                 a = Ambassador.objects.get(user=request.user)
             except Ambassador.DoesNotExist:
-                return HttpResponseRedirect(f'/softphone/pause/{request.user.username}')
-            
-            dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp=a.dept_group).values_list('deptid', flat=True)
-            phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected').values('subscriber'
-                ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+                print('ambassador not found')
+                a = None
+                #return HttpResponseRedirect(f'/softphone/pause/{request.user.username}')
+
+            message = 'There are no users in your unit scheduled to transition'             
+            if a == None:  # Get submissions by user
+                phone_list = SelectionV.objects.filter(updated_by=self.request.user.username, processing_status='Selected', cut_date=cut_date).values('subscriber'
+                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+            else:
+                dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp=a.dept_group).values_list('deptid', flat=True)
+                phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values('subscriber'
+                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+
+            if len(phone_list) == 0:
+                return render(request, 'softphone/pause_message.html',
+                                {'title': 'Pause Transition',
+                                'message': message})
+
         else:
             if self.request.user.username != uniqname:
                 if not self.request.user.is_superuser:
                     return HttpResponseRedirect(f'/softphone/pause/{self.request.user.username}')
 
-            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='Selected') | Q(uniqname=uniqname, processing_status='Selected')).values('subscriber'
+            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='Selected', cut_date=cut_date) | Q(uniqname=uniqname, processing_status='Selected', cut_date=cut_date)).values('subscriber'
                 ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
 
             if len(phone_list) == 0:
@@ -85,25 +100,27 @@ class PauseUser(View):
                         message = 'Migration paused until ' + phone.cut_date.strftime("%B %d, %Y")
 
                 return render(request, 'softphone/pause_message.html',
-                                {'title': 'Pause Softphone',
+                                {'title': 'Pause Transition',
                                 'message': message})
         
         OptOutFormSet = formset_factory(OptOutForm, extra=0)
         formset = OptOutFormSet(initial=phone_list)
 
-        thursday = 3
-        today = datetime.date.today()
-        days = (thursday - today.weekday() + 7) % 7
+        #thursday = 3
+        #today = datetime.date.today()
+        #today = datetime.date(22,23,8)
+        #days = (thursday - today.weekday() + 7) % 7
 
         date_list = [(None,'---')]
         for i in range(1, 4):
-            convert_date = today + datetime.timedelta(days=i*7+days)
-            date_list.append((convert_date.strftime("%Y-%m-%d"), f'Until {convert_date.strftime("%B %d, %Y")}'))
+            #convert_date = today + datetime.timedelta(days=i*7+days)
+            cut_date = cut_date + datetime.timedelta(7)
+            date_list.append((cut_date.strftime("%Y-%m-%d"), f'Until {cut_date.strftime("%B %d, %Y")}'))
 
         date_list.append(('Never', 'Do not implement softphone'))
 
         return render(request, 'softphone/pause_self.html',
-                      {'title': 'Pause Softphone',
+                      {'title': 'Pause Transition',
                        'date_list': date_list,
                        'formset': formset, 
                        'phone_list': phone_list})
