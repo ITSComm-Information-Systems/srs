@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
         if options['file']:
             filename = options['file']
-            with open(f'/Users/djamison/Downloads/{filename}', encoding='mac_roman') as csv_file:
+            with open(f'{filename}', encoding='mac_roman') as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
                 for row in csv_reader:
                     user = row[0]
