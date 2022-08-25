@@ -65,12 +65,20 @@ class CutDateListFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         cut_date_list = []
         for cut_date in Selection.objects.distinct().order_by('cut_date').values_list('cut_date', flat=True):
-            cut_date_list.append((cut_date,cut_date))
+            if cut_date == None:
+                cut_date_list.append(('None',cut_date))            
+            else:
+                cut_date_list.append((cut_date,cut_date))
 
         return cut_date_list
 
     def queryset(self, request, queryset):
-        return queryset.filter(cut_date=self.value())
+        if self.value() == None:
+            return queryset
+        elif self.value() == 'None':
+            return queryset.filter(cut_date__isnull=True)
+        else:
+            return queryset.filter(cut_date=self.value())
 
 
 @admin.register(Selection)
