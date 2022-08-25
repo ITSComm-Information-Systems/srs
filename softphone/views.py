@@ -79,7 +79,7 @@ class PauseUser(View):
 
             if len(phone_list) == 0:
                 return render(request, 'softphone/pause_message.html',
-                                {'title': 'Pause Softphone',
+                                {'title': 'Pause U-M Zoom Phone',
                                 'message': message})
 
         else:
@@ -100,7 +100,7 @@ class PauseUser(View):
                         message = 'Migration paused until ' + phone.cut_date.strftime("%B %d, %Y")
 
                 return render(request, 'softphone/pause_message.html',
-                                {'title': 'Pause Softphone',
+                                {'title': 'Pause U-M Zoom Phone',
                                 'message': message})
         
         OptOutFormSet = formset_factory(OptOutForm, extra=0)
@@ -120,7 +120,7 @@ class PauseUser(View):
         date_list.append(('Never', 'Do not implement softphone'))
 
         return render(request, 'softphone/pause_self.html',
-                      {'title': 'Pause Softphone',
+                      {'title': 'Pause U-M Zoom Phone',
                        'date_list': date_list,
                        'formset': formset, 
                        'phone_list': phone_list})
