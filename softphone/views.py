@@ -56,7 +56,7 @@ def get_department_list(dept_id, user):
     return dept_list
 
 
-class PauseUser(View):
+class PauseUser(LoginRequiredMixin, View):
     def get(self, request, uniqname):
         cut_date = datetime.datetime(2022, 9, 1)
         
