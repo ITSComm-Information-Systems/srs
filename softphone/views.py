@@ -57,6 +57,8 @@ def get_department_list(dept_id, user):
 
 
 class PauseUser(LoginRequiredMixin, View):
+    title = 'Pause U-M Zoom Phone'
+
     def get(self, request, uniqname):
         cut_date = datetime.datetime(2022, 9, 1)
         
@@ -79,7 +81,7 @@ class PauseUser(LoginRequiredMixin, View):
 
             if len(phone_list) == 0:
                 return render(request, 'softphone/pause_message.html',
-                                {'title': 'Pause U-M Zoom Phone',
+                                {'title': self.title,
                                 'message': message})
 
         else:
@@ -100,7 +102,7 @@ class PauseUser(LoginRequiredMixin, View):
                         message = 'Migration paused until ' + phone.cut_date.strftime("%B %d, %Y")
 
                 return render(request, 'softphone/pause_message.html',
-                                {'title': 'Pause U-M Zoom Phone',
+                                {'title': self.title,
                                 'message': message})
         
         OptOutFormSet = formset_factory(OptOutForm, extra=0)
@@ -120,7 +122,7 @@ class PauseUser(LoginRequiredMixin, View):
         date_list.append(('Never', 'Do not implement softphone'))
 
         return render(request, 'softphone/pause_self.html',
-                      {'title': 'Pause U-M Zoom Phone',
+                      {'title': self.title,
                        'date_list': date_list,
                        'formset': formset, 
                        'phone_list': phone_list})
