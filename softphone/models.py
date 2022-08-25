@@ -4,6 +4,12 @@ from django.conf import settings
 from django.db.models.fields import IntegerField
 from project.pinnmodels import UmMpathDwCurrDepartment
 
+# Selection = um_softphone_selection - Main table with user selections and processing data.
+# SelectionV = um_softphone_selection_v - Selects off above table, does not have CANCEL records but has extra fields from subscriber
+# SubscriberCharges = um_softphone_v
+# um_softphone_all_v - All eligible records with null in selection fields
+
+
 class Category(models.Model):
     OTHER = 49
     CONFERENCE_ROOM = 47

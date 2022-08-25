@@ -42,6 +42,21 @@ class ZoomListFilter(admin.SimpleListFilter):
             return queryset.filter(subscriber__in=subscriber_list)
  
 
+class ProcessingStatusListFilter(admin.SimpleListFilter):
+    title = 'Processing Status'
+    parameter_name = 'processing_status'
+
+    def lookups(self, request, model_admin):
+        return (('Selected', 'Selected'), ('Completed', 'Completed'),  ('On Hold', 'On Hold'),  ('None', 'None'), )
+
+    def queryset(self, request, queryset):
+        if self.value() == None:
+            return queryset
+        elif self.value() == 'None':
+            return queryset.filter(processing_status__isnull=True)
+        else:
+            return queryset.filter(processing_status=self.value())
+
 
 class DuoListFilter(admin.SimpleListFilter):
     title = 'Duo User'
@@ -65,12 +80,20 @@ class CutDateListFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         cut_date_list = []
         for cut_date in Selection.objects.distinct().order_by('cut_date').values_list('cut_date', flat=True):
-            cut_date_list.append((cut_date,cut_date))
+            if cut_date == None:
+                cut_date_list.append(('None',cut_date))            
+            else:
+                cut_date_list.append((cut_date,cut_date))
 
         return cut_date_list
 
     def queryset(self, request, queryset):
-        return queryset.filter(cut_date=self.value())
+        if self.value() == None:
+            return queryset
+        elif self.value() == 'None':
+            return queryset.filter(cut_date__isnull=True)
+        else:
+            return queryset.filter(cut_date=self.value())
 
 
 @admin.register(Selection)
@@ -78,7 +101,7 @@ class SelectionAdmin(admin.ModelAdmin):
     list_display = ['service_number','subscriber','uniqname','migrate','updated_by','update_date','processing_status','cut_date','building_code']
     ordering = ['-update_date']
     search_fields = ['service_number','uniqname','updated_by','building_code']
-    list_filter = ['processing_status','migrate',CutDateListFilter, DuoListFilter,ZoomListFilter]
+    list_filter = [ProcessingStatusListFilter,'migrate',CutDateListFilter, DuoListFilter,ZoomListFilter]
         #('cut_date', admin.RelatedOnlyFieldListFilter),]
     form = SelectionForm
     #date_hierarchy = 'cut_date'
