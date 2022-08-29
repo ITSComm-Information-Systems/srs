@@ -2,7 +2,7 @@ from datetime import datetime
 from django.db import models, connections
 from django.conf import settings
 from django.db.models.fields import IntegerField
-from project.pinnmodels import UmMpathDwCurrDepartment
+from project.pinnmodels import UmMpathDwCurrDepartment, DepartmentGroup
 
 # Selection = um_softphone_selection - Main table with user selections and processing data.
 # SelectionV = um_softphone_selection_v - Selects off above table, does not have CANCEL records but has extra fields from subscriber
@@ -264,11 +264,14 @@ class DeptV(models.Model):
 
 
 class Ambassador(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    dept_group = models.CharField(max_length=20, choices=UmMpathDwCurrDepartment.objects.group_dropdown())
+    user = models.CharField(max_length=8)
+    dept_group = models.ForeignKey(DepartmentGroup, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username
+
+    class Meta:
+        db_table = 'srs_ambassador'
 
 
 class Zoom(models.Model):
