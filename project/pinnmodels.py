@@ -1283,16 +1283,6 @@ class DepartmentManager(models.Manager):
         return list(UmMpathDwCurrDepartment.objects.values_list('dept_grp', 'dept_grp_descr').distinct().order_by('dept_grp_descr'))
 
 
-class DepartmentGroup(models.Model):
-     status = models.CharField(max_length=1)
-     code = models.CharField(max_length=20, primary_key=True)
-     description = models.CharField(max_length=20)
-
-     class Meta:
-          managed = False
-          db_table = 'srs_dept_group_v'
-
-
 class UmMpathDwCurrDepartment(models.Model):
     deptid = models.CharField(max_length=10)
     dept_effdt = models.DateField()
