@@ -9,6 +9,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--file')  
+        parser.add_argument('--user')  
 
     def handle(self, *args, **options):
 
@@ -33,3 +34,24 @@ class Command(BaseCommand):
                     print('sent to', user)
 
 
+        elif options['user']:
+            cut_date = options['user']
+
+            for user in SelectionV.objects.filter(cut_date=cut_date):
+                if user.uniqname:
+                    user = user.uniqname + '@umich.edu'
+                elif user.subscriber_uniqname:
+                    user = user.subscriber_uniqname + '@umich.edu'
+                else:
+                    user = 'djamison@umich.edu'
+
+                send_mail(
+                    email.subject,
+                    'See attachment.',
+                    email.sender,
+                    [user],    # user
+                    fail_silently=False,
+                    html_message=email.body
+                )
+
+                print('sent to', user)
