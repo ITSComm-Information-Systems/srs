@@ -35,6 +35,7 @@ class Command(BaseCommand):
 
 
         elif options['user']:
+            email = Email.objects.get(code='SOFTPHONE_MIGRATE')
             cut_date = options['user']
 
             for user in SelectionV.objects.filter(cut_date=cut_date):
