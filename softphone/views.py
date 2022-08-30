@@ -60,6 +60,12 @@ class PauseUser(LoginRequiredMixin, View):
     title = 'Pause U-M Zoom Phone'
 
     def get(self, request, uniqname):
+        now = datetime.datetime.now() 
+        if now.isoweekday() == 3 and int(now.strftime('%H')) > 11:
+            return render(request, 'softphone/pause_message.html',  # Lockout wednesday at noon.
+                {'title': self.title,
+                'message': 'No selections are available to pause.'})
+
         cut_date = datetime.datetime(2022, 9, 1)
         
         if uniqname == 'ua':
