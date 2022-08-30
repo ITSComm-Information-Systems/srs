@@ -14,7 +14,7 @@ from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
-from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador
+from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, next_cut_date
 from .forms import SelectionForm, OptOutForm
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -60,6 +60,14 @@ class PauseUser(LoginRequiredMixin, View):
     title = 'Pause U-M Zoom Phone'
 
     def get(self, request, uniqname):
+        now = datetime.datetime.now() 
+        if now.weekday() == 2 and int(now.strftime('%H')) > 11:
+            return render(request, 'softphone/pause_message.html',  # Lockout wednesday at noon.
+                {'title': self.title,
+                'message': 'No selections are available to pause.'})
+
+        print('calculated cut date', next_cut_date())
+
         cut_date = datetime.datetime(2022, 9, 1)
         
         if uniqname == 'ua':

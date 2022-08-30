@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db import models, connections
 from django.conf import settings
 from django.db.models.fields import IntegerField
@@ -8,6 +8,14 @@ from project.pinnmodels import UmMpathDwCurrDepartment
 # SelectionV = um_softphone_selection_v - Selects off above table, does not have CANCEL records but has extra fields from subscriber
 # SubscriberCharges = um_softphone_v
 # um_softphone_all_v - All eligible records with null in selection fields
+
+def next_cut_date():    # return next Thursday's date.
+    today = datetime.today()
+    days = (3 - today.weekday() + 7) % 7  # Days until Thursday
+    if days == 0:  # Today is thursday
+        days = 7
+
+    return today + timedelta(days=days)
 
 
 class Category(models.Model):
