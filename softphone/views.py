@@ -71,19 +71,21 @@ class PauseUser(LoginRequiredMixin, View):
         cut_date = datetime.datetime(2022, 9, 8)
         
         if uniqname == 'ua':
-            try:
-                a = Ambassador.objects.get(user=request.user)
-            except Ambassador.DoesNotExist:
-                print('ambassador not found')
-                a = None
-                #return HttpResponseRedirect(f'/softphone/pause/{request.user.username}')
+            if self.request.user.is_superuser and request.GET.get('user'):
+                print('impersonate', self.request.GET.get('user'))
+                username = self.request.GET.get('user')
+            else:
+                username = self.request.user.username
+
+            dept_group_list = list(Ambassador.objects.filter(user__username=username).values_list('dept_group', flat=True))
 
             message = 'There are no users in your unit scheduled to transition'             
-            if a == None:  # Get submissions by user
-                phone_list = SelectionV.objects.filter(updated_by=self.request.user.username, processing_status='Selected', cut_date=cut_date).values('subscriber'
+            if len(dept_group_list) == 0:  # Get submissions by user
+                phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=cut_date).values('subscriber'
                     ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+                print('no depts')
             else:
-                dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp=a.dept_group).values_list('deptid', flat=True)
+                dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp__in=dept_group_list).values_list('deptid', flat=True)
                 phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values('subscriber'
                     ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
 
@@ -93,7 +95,9 @@ class PauseUser(LoginRequiredMixin, View):
                                 'message': message})
 
         else:
-            if self.request.user.username != uniqname:
+            if uniqname == None:
+                uniqname = self.request.user.username
+            elif self.request.user.username != uniqname:
                 if not self.request.user.is_superuser:
                     return HttpResponseRedirect(f'/softphone/pause/{self.request.user.username}')
 
@@ -116,14 +120,8 @@ class PauseUser(LoginRequiredMixin, View):
         OptOutFormSet = formset_factory(OptOutForm, extra=0)
         formset = OptOutFormSet(initial=phone_list)
 
-        #thursday = 3
-        #today = datetime.date.today()
-        #today = datetime.date(22,23,8)
-        #days = (thursday - today.weekday() + 7) % 7
-
         date_list = [(None,'---')]
         for i in range(1, 4):
-            #convert_date = today + datetime.timedelta(days=i*7+days)
             cut_date = cut_date + datetime.timedelta(7)
             date_list.append((cut_date.strftime("%Y-%m-%d"), f'Until {cut_date.strftime("%B %d, %Y")}'))
 
