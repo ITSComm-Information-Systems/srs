@@ -635,6 +635,7 @@ def userid(request):
 
     if request.method=='POST':
         user_param = request.POST.get('user_param').strip()
+        user_param = ''.join(char for char in user_param if char.isalnum())
 
     if user_param == '':
         context = {
