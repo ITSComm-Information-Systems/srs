@@ -68,7 +68,7 @@ class PauseUser(LoginRequiredMixin, View):
 
         print('calculated cut date', next_cut_date())
 
-        cut_date = datetime.datetime(2022, 9, 1)
+        cut_date = datetime.datetime(2022, 9, 8)
         
         if uniqname == 'ua':
             try:
