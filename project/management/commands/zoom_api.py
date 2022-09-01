@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from softphone.models import Zoom, SelectionV, SubscriberCharges
+from softphone.models import Zoom, SelectionV, SubscriberCharges, next_cut_date
 import os, requests
 
 import datetime, csv
@@ -15,6 +15,7 @@ class Command(BaseCommand):
         parser.add_argument('--uniqname')  # Run for one user
         parser.add_argument('--start')     # Run all users starting with this one
         parser.add_argument('--file')      # Run for everyone in a file
+        parser.add_argument('--cut_date')      # Run for everyone in a file
         parser.add_argument('--report')    # Report of all active zoom phones
 
     def handle(self, *args, **options):
@@ -37,7 +38,14 @@ class Command(BaseCommand):
                     elif not r.get('zoom'):
                         print(row[0], 'no login')
                         print(r)
+        elif options['cut_date']:
+            if options['cut_date'] == 'next':
+                cut_date = next_cut_date()
+            else:
+                cut_date = options['cut_date']
 
+            for user in SelectionV.objects.filter(uniqname__isnull=False,cut_date=cut_date).order_by('uniqname'):
+                self.process_user(user.uniqname)
         elif options['start']:
             for user in SubscriberCharges.objects.filter(current_uniqname__isnull=False,current_uniqname__gt=options['start']).order_by('current_uniqname'):
                 self.process_user(user.current_uniqname)        
@@ -72,6 +80,8 @@ class Command(BaseCommand):
                         value = datetime.datetime.strptime(value, "%m-%d-%Y %H:%M:%S %p %Z").date()
 
                     setattr(z, key, value)
+            else:
+                print('no login for', uniqname)
             
             z.id = uniqname
             z.save()
