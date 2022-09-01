@@ -1,7 +1,9 @@
 from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
 from project.models import Email
-from softphone.models import SelectionV, next_cut_date
+from project.pinnmodels import UmMpathDwCurrDepartment
+from softphone.models import Ambassador, SelectionV, next_cut_date
+from django.conf import settings
 import csv
 
 class Command(BaseCommand):
@@ -33,16 +35,22 @@ class Command(BaseCommand):
             user_list = user_query
         elif email.code == 'UA_WEEKLY':
             dept_list = SelectionV.objects.filter(cut_date=cut_date).values_list('dept_id', flat=True).distinct()
-            #todo UA
+            dept_groups = list(UmMpathDwCurrDepartment.objects.filter(deptid__in=dept_list).values_list('dept_grp', flat=True).distinct())
+            amb = Ambassador.objects.filter(dept_group__in=dept_groups).values_list('user__username')
+            print(amb)
 
         for user in user_list:
             if user:
                 user = user + '@umich.edu'
-                send_mail(email.subject,'See attachment.', email.sender, [user], fail_silently=False, html_message=body)
-                print('sent to', user)
+                if settings.ENVIRONMENT == 'Production':
+                    send_mail(email.subject,'See attachment.', email.sender, [user], fail_silently=False, html_message=body)
+                    print('sent to', user)
+                else:
+                    print('audit', user)
 
         if email.cc:
-            send_mail(email.subject,'See attachment.', email.sender, [email.cc], fail_silently=False, html_message=body)
+            if settings.ENVIRONMENT == 'Production':
+                send_mail(email.subject,'See attachment.', email.sender, [email.cc], fail_silently=False, html_message=body)
 
 
 
