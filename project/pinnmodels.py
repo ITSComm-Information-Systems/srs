@@ -1284,7 +1284,7 @@ class DepartmentManager(models.Manager):
 
 
 class UmMpathDwCurrDepartment(models.Model):
-    deptid = models.CharField(max_length=10)
+    deptid = models.CharField(max_length=10, primary_key=True)
     dept_effdt = models.DateField()
     dept_eff_status = models.CharField(max_length=1)
     dept_descr = models.CharField(max_length=30)
