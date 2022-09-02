@@ -66,10 +66,11 @@ class PauseUser(LoginRequiredMixin, View):
                 {'title': self.title,
                 'message': 'No selections are available to pause.'})
 
-        print('calculated cut date', next_cut_date())
+        #cut_date = datetime.datetime(2022, 9, 8)
+        cut_date = next_cut_date()
 
-        cut_date = datetime.datetime(2022, 9, 8)
-        
+        print('calculated cut date', cut_date)
+
         if uniqname == 'ua':
             if self.request.user.is_superuser and request.GET.get('user'):
                 print('impersonate', self.request.GET.get('user'))
@@ -82,12 +83,12 @@ class PauseUser(LoginRequiredMixin, View):
             message = 'There are no users in your unit scheduled to transition'             
             if len(dept_group_list) == 0:  # Get submissions by user
                 phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=cut_date).values('subscriber'
-                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
                 print('no depts')
             else:
                 dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp__in=dept_group_list).values_list('deptid', flat=True)
                 phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values('subscriber'
-                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
 
             if len(phone_list) == 0:
                 return render(request, 'softphone/pause_message.html',
@@ -126,6 +127,17 @@ class PauseUser(LoginRequiredMixin, View):
             date_list.append((cut_date.strftime("%Y-%m-%d"), f'Until {cut_date.strftime("%B %d, %Y")}'))
 
         date_list.append(('Never', 'Do not implement softphone'))
+
+        for phone in phone_list:
+            try:
+                dept_name = UmMpathDwCurrDepartment.objects.filter(deptid=phone['dept_id'])
+                phone['dept_name'] = dept_name[0].dept_descr
+            except:
+                print('error getting dept')
+
+        if self.request.GET.get('file') == 'CSV':
+            return download_csv_from_queryset(phone_list)
+
 
         return render(request, 'softphone/pause_self.html',
                       {'title': self.title,

@@ -5,7 +5,16 @@
 
 <h1>{{ title }}</h1>
 
+<ul>
+    <li>Refer to this <a href="https://documentation.its.umich.edu/node/3514">guide </a> for more information regarding pausing transitions for your Unit</li>
+    <li>Read more about the <a href="https://record.umich.edu/articles/new-zoom-phone-service-to-offer-greater-flexibility-mobility/">Telephone Service Upgrade Project</a></li>
+</ul>
+
+<div class="container">
+
+
 <form method="post">
+    <a class="float-right col-6" href="?file=CSV">Download CSV</a>
     {% csrf_token %}
     {{ formset.management_form }}
     {% for form in formset %}
@@ -18,7 +27,8 @@
                 <strong>Phone</strong><br>
                 {{ form.initial.service_number }}<br>
                 Uniqname: {{ form.initial.subscriber_uniqname }}{{ form.initial.uniqname }}<br>
-                {{ form.initial.subscriber_first_name }} {{ form.initial.subscriber_last_name }}
+                {{ form.initial.subscriber_first_name }} {{ form.initial.subscriber_last_name }}<br>
+                {{ form.initial.dept_id }} &nbsp; {{ form.initial.dept_name }}
             </div>
 
             <div class="form-group col-sm upgrade_to_softphone" id="div_id_form-0-migrate" data-location="ARBOR LAKES 3">
@@ -41,7 +51,14 @@
         </div>
     </div>
     {% endfor %}
-    <button type="submit" class="btn btn-primary">Save</button>
+    <div id="footered" class="container-fluid fixed-bottom border border-top-primary" style="background-color: #E2E4E4">
+
+        <div class="container mt-1 mb-1">
+
+                <button type="submit" class="btn" style="background-color: #0068A8; color:white">Save</button>
+        </div>
+
+    </div>
 </form>
 
 {% endblock %}
@@ -73,5 +90,5 @@
     });
 
 </script>
-
+</div>
 {% endblock %}
