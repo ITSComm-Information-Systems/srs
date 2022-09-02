@@ -10,7 +10,11 @@
     <li>Read more about the <a href="https://record.umich.edu/articles/new-zoom-phone-service-to-offer-greater-flexibility-mobility/">Telephone Service Upgrade Project</a></li>
 </ul>
 
+<div class="container">
+
+
 <form method="post">
+    <a class="float-right col-6" href="?file=CSV">Download CSV</a>
     {% csrf_token %}
     {{ formset.management_form }}
     {% for form in formset %}
@@ -86,5 +90,5 @@
     });
 
 </script>
-
+</div>
 {% endblock %}

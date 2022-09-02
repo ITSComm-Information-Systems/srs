@@ -66,10 +66,11 @@ class PauseUser(LoginRequiredMixin, View):
                 {'title': self.title,
                 'message': 'No selections are available to pause.'})
 
-        print('calculated cut date', next_cut_date())
+        #cut_date = datetime.datetime(2022, 9, 8)
+        cut_date = next_cut_date()
 
-        cut_date = datetime.datetime(2022, 9, 8)
-        
+        print('calculated cut date', cut_date)
+
         if uniqname == 'ua':
             if self.request.user.is_superuser and request.GET.get('user'):
                 print('impersonate', self.request.GET.get('user'))
@@ -128,12 +129,15 @@ class PauseUser(LoginRequiredMixin, View):
         date_list.append(('Never', 'Do not implement softphone'))
 
         for phone in phone_list:
-            print(phone['dept_id'])
-            dept_name = UmMpathDwCurrDepartment.objects.filter(deptid=phone['dept_id'])
             try:
+                dept_name = UmMpathDwCurrDepartment.objects.filter(deptid=phone['dept_id'])
                 phone['dept_name'] = dept_name[0].dept_descr
             except:
                 print('error getting dept')
+
+        if self.request.GET.get('file') == 'CSV':
+            return download_csv_from_queryset(phone_list)
+
 
         return render(request, 'softphone/pause_self.html',
                       {'title': self.title,
