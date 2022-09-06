@@ -3,6 +3,7 @@ from .models import Test, Choice, ChoiceTag, Email
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.core.mail import send_mail
+from django.core.management import call_command
 
 @admin.register(Email)
 class EmailAdmin(admin.ModelAdmin):
@@ -18,14 +19,7 @@ class EmailAdmin(admin.ModelAdmin):
     def send_email(self, request, object_id):
         email = Email.objects.get(id=object_id)
 
-        send_mail(
-            email.subject,
-            'See attachment.',
-            email.sender,
-            [request.user.email],
-            fail_silently=False,
-            html_message=email.body
-        )
+        call_command('softphone_email', email=email.code, audit=1)
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
