@@ -1,10 +1,13 @@
+from calendar import week
 from django.core.management.base import BaseCommand
 from django.core.mail import EmailMultiAlternatives
 from project.models import Email
 from project.pinnmodels import UmMpathDwCurrDepartment
 from softphone.models import Ambassador, SelectionV, next_cut_date
 from django.conf import settings
-import csv
+from django.template import Template, Context
+from datetime import timedelta
+import csv, io
 
 class Command(BaseCommand):
     help = 'Send Email to Softphone Users'
@@ -16,10 +19,13 @@ class Command(BaseCommand):
         parser.add_argument('--audit')  
 
     def handle(self, *args, **options):
-
         email = Email.objects.get(code=options['email'])
         cut_date = next_cut_date()
-        email.body = email.body.replace('{%%date%%}', cut_date.strftime('%B %-d, %Y'))
+        week_of = cut_date - timedelta(days = 3)
+
+        context = {'cut_date': cut_date, 'week_of': week_of}
+        email.body = Template(email.body).render(Context(context))
+        email.subject = Template(email.subject).render(Context(context))
 
         user_query = SelectionV.objects.filter(cut_date=cut_date).values_list('uniqname', flat=True)
         user_list = []
@@ -36,22 +42,27 @@ class Command(BaseCommand):
             user_list = user_query
         elif email.code == 'UA_WEEKLY':
             #TO DO ADD UA
-            email.subject = email.subject.replace('{%%date%%}', cut_date.strftime('%B %-d, %Y'))
+            user_list = []
 
         if options['audit']:
             print('AUDIT ONLY****')
             for user in user_list:
                 print(user)
-            return
+            user_list = ['djamison@umich.edu']
 
         self.send_email(email, user_list)
 
     def send_email(self, email, user_list, cc=[]):
         text_message = email.subject
 
+        csvfile = io.StringIO()
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(['to','cc'])
+
         if settings.ENVIRONMENT != 'Production':
             print('Non-prod, do not send to:', user_list)
             user_list = ['djamison']
+            email.cc = 'djamison@umich.edu'
 
         for user in user_list:
             if type(user)==tuple:
@@ -59,6 +70,9 @@ class Command(BaseCommand):
                 cc = user[1]
             else:
                 to = user
+                cc = None
+
+            csvwriter.writerow([to, cc])
 
             if to or cc:
                 if to:
@@ -72,3 +86,8 @@ class Command(BaseCommand):
 
                 print('Sent to', to, 'cc', cc)
 
+        # Send Distribution List to Leads
+        msg = EmailMultiAlternatives(email.subject, text_message, email.sender, [email.cc], bcc=[self.bcc], cc=[cc])
+        msg.attach_alternative(email.body, "text/html")
+        msg.attach('distribution_list.csv', csvfile.getvalue(), 'text/csv')
+        msg.send()
