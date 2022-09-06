@@ -70,7 +70,6 @@ class Command(BaseCommand):
                 cc = user[1]
             else:
                 to = user
-                cc = None
 
             csvwriter.writerow([to, cc])
 
