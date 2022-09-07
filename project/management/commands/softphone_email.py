@@ -63,6 +63,7 @@ class Command(BaseCommand):
             print('Non-prod, do not send to:', user_list)
             user_list = ['djamison']
             email.cc = 'djamison@umich.edu'
+            email.subject = settings.ENVIRONMENT + email.subject
 
         for user in user_list:
             if type(user)==tuple:
