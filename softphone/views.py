@@ -78,7 +78,7 @@ class PauseUser(LoginRequiredMixin, View):
             else:
                 username = self.request.user.username
 
-            dept_group_list = list(Ambassador.objects.filter(user__username=username).values_list('dept_group', flat=True))
+            dept_group_list = list(Ambassador.objects.filter(uniqname=username).values_list('dept_grp', flat=True))
 
             message = 'There are no users in your unit scheduled to transition'             
             if len(dept_group_list) == 0:  # Get submissions by user
