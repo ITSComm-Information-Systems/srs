@@ -1,9 +1,8 @@
-from calendar import week
 from django.core.management.base import BaseCommand
 from django.core.mail import EmailMultiAlternatives
 from project.models import Email
-from project.pinnmodels import UmMpathDwCurrDepartment
-from softphone.models import Ambassador, SelectionV, next_cut_date
+from django.db import connections
+from softphone.models import SelectionV, next_cut_date
 from django.conf import settings
 from django.template import Template, Context
 from datetime import timedelta
@@ -41,8 +40,7 @@ class Command(BaseCommand):
         elif email.code == 'USER_MIGRATE':
             user_list = user_query
         elif email.code == 'UA_WEEKLY':
-            #TO DO ADD UA
-            user_list = []
+            user_list = self.get_ua_list(cut_date)
 
         if options['audit']:
             print('AUDIT ONLY****')
@@ -63,7 +61,7 @@ class Command(BaseCommand):
             print('Non-prod, do not send to:', user_list)
             user_list = ['djamison']
             email.cc = 'djamison@umich.edu'
-            email.subject = settings.ENVIRONMENT + email.subject
+            email.subject = f'{settings.ENVIRONMENT} - {email.subject}'
 
         for user in user_list:
             if type(user)==tuple:
@@ -91,3 +89,21 @@ class Command(BaseCommand):
         msg.attach_alternative(email.body, "text/html")
         msg.attach('distribution_list.csv', csvfile.getvalue(), 'text/csv')
         msg.send()
+
+    def get_ua_list(self, cut_date):
+        # For the next cut date, get a list of:
+        # - Everyone that submitted an update
+        # - Ambassadors for the department groups of the users
+        # This is the same population that has access to the pause page.
+
+        sql = 'select distinct amb.uniqname ' \
+        'from um_softphone_selection_v sel, ' \
+        'um_mpathdw_curr_department dept, ' \
+        'srs_ambassador amb ' \
+        "where sel.cut_date = %s " \
+        'and sel.dept_id = dept.deptid ' \
+        'and dept.dept_grp = amb.dept_grp '
+
+        with connections['pinnacle'].cursor() as cursor:
+            cursor.execute(sql, (cut_date.date(),))
+            return cursor.fetchall()
