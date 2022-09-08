@@ -272,11 +272,15 @@ class DeptV(models.Model):
 
 
 class Ambassador(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    dept_group = models.CharField(max_length=20, choices=UmMpathDwCurrDepartment.objects.group_dropdown())
+    uniqname = models.CharField(max_length=8)
+    dept_grp = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.user.username
+        return self.uniqname
+
+    class Meta:
+        db_table = 'PINN_CUSTOM\".\"srs_ambassador'
+        managed = False
 
 
 class Zoom(models.Model):
