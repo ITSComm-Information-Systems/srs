@@ -96,7 +96,9 @@ class Command(BaseCommand):
         # - Ambassadors for the department groups of the users
         # This is the same population that has access to the pause page.
 
-        sql = 'select distinct amb.uniqname ' \
+        sql = 'select updated_by from um_softphone_selection_v where cut_date = %s ' \
+        'union ' \
+        'select distinct amb.uniqname ' \
         'from um_softphone_selection_v sel, ' \
         'um_mpathdw_curr_department dept, ' \
         'srs_ambassador amb ' \
@@ -104,6 +106,11 @@ class Command(BaseCommand):
         'and sel.dept_id = dept.deptid ' \
         'and dept.dept_grp = amb.dept_grp '
 
+        user_list = []
+
         with connections['pinnacle'].cursor() as cursor:
-            cursor.execute(sql, (cut_date.date(),))
-            return cursor.fetchall()
+            cursor.execute(sql, (cut_date.date(),cut_date.date()))
+            for user in cursor.fetchall():
+                user_list.append(user[0])
+
+        return user_list
