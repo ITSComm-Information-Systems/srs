@@ -188,4 +188,5 @@ class DuoAdmin(admin.ModelAdmin):
 
 @admin.register(Ambassador)
 class AmbassadorAdmin(admin.ModelAdmin):
-    list_display = ['user','dept_group']
+    list_display = ['dept_grp','uniqname']
+    ordering = list_display
