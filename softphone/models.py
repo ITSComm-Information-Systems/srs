@@ -272,11 +272,11 @@ class DeptV(models.Model):
 
 
 class Ambassador(models.Model):
-    uniqname = models.CharField(max_length=8, primary_key=True)
+    uniqname = models.CharField(max_length=8)
     dept_grp = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.user.username
+        return self.uniqname
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"srs_ambassador'
