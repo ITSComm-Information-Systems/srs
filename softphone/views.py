@@ -78,17 +78,18 @@ class PauseUser(LoginRequiredMixin, View):
             else:
                 username = self.request.user.username
 
+            phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=cut_date).values('subscriber'
+                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
+
             dept_group_list = list(Ambassador.objects.filter(uniqname=username).values_list('dept_grp', flat=True))
 
             message = 'There are no users in your unit scheduled to transition'             
-            if len(dept_group_list) == 0:  # Get submissions by user
-                phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=cut_date).values('subscriber'
-                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
-                print('no depts')
-            else:
+            if len(dept_group_list) != 0:  # Get submissions by user
                 dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp__in=dept_group_list).values_list('deptid', flat=True)
-                phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values('subscriber'
+                amb_phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values('subscriber'
                     ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
+
+                phone_list = phone_list.union(amb_phone_list)
 
             if len(phone_list) == 0:
                 return render(request, 'softphone/pause_message.html',
