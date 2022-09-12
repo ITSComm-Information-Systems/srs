@@ -16,9 +16,9 @@ spec:
           containers:
             -
               name: batch
-              image: 'docker-registry.default.svc:5000/srs/qa'
+              image: 'docker-registry.default.svc:5000/srs/production'
               envFrom:
               - configMapRef:
-                  name: qa
+                  name: production
               command: ["python3",  "manage.py", "softphone_email", "--email", "UA_WEEKLY"]
           restartPolicy: Never
