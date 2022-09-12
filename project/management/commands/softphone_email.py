@@ -46,7 +46,8 @@ class Command(BaseCommand):
             print('AUDIT ONLY****')
             for user in user_list:
                 print(user)
-            user_list = ['djamison@umich.edu']
+            user_list = ['djamison']
+            email.cc = 'djamison'
 
         self.send_email(email, user_list)
 
@@ -60,7 +61,7 @@ class Command(BaseCommand):
         if settings.ENVIRONMENT != 'Production':
             print('Non-prod, do not send to:', user_list)
             user_list = ['djamison']
-            email.cc = 'djamison@umich.edu'
+            email.cc = 'djamison'
             email.subject = f'{settings.ENVIRONMENT} - {email.subject}'
 
         for user in user_list:
