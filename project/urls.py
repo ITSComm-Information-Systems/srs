@@ -45,20 +45,9 @@ urlpatterns = [
     path('tools/',include('tools.urls'))
 ]
 
-if settings.SRS_OUTAGE:
-    from django.views.generic import TemplateView 
-    urlpatterns = [
-        #re_path(r'^', views.homepage, name='bio')
-
-        path(r'^', TemplateView.as_view(template_name="outage.html"))
-        #re_path('<str:pagename>', views.index, name='index'),
-    ]
-
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [
-        path(r'^__debug__/', include(debug_toolbar.urls)),
-        
+        path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
