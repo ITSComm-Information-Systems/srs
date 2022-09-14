@@ -14,7 +14,7 @@ except ImportError:
 from django.contrib import auth
 from django.http import HttpResponseRedirect
 from django.utils.crypto import get_random_string
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.module_loading import import_string
 from django.views.generic import View
 from oscauth.views import add_custom_permissions
@@ -118,7 +118,7 @@ def get_next_url(request, redirect_field_name):
         hosts.append(request.get_host())
         kwargs['allowed_hosts'] = hosts
 
-        is_safe = is_safe_url(**kwargs)
+        is_safe = url_has_allowed_host_and_scheme(**kwargs)
         if is_safe:
             return next_url
     return None
