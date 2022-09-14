@@ -13,7 +13,7 @@ try:
 except ImportError:
     # Django < 2.0.0
     from django.core.urlresolvers import reverse
-from django.utils.encoding import force_bytes, smart_text, smart_bytes
+from django.utils.encoding import force_bytes, smart_str, smart_bytes
 from django.utils.module_loading import import_string
 #from django.utils import six
 
@@ -43,7 +43,7 @@ def default_username_algo(email):
         hashlib.sha1(force_bytes(email)).digest()
     ).rstrip(b'=')
 
-    return smart_text(username)
+    return smart_str(username)
 
 
 class OIDCAuthenticationBackend(ModelBackend):
@@ -153,9 +153,9 @@ class OIDCAuthenticationBackend(ModelBackend):
 
         key = None
         for jwk in jwks['keys']:
-            if jwk['kid'] != smart_text(header.kid):
+            if jwk['kid'] != smart_str(header.kid):
                 continue
-            if 'alg' in jwk and jwk['alg'] != smart_text(header.alg):
+            if 'alg' in jwk and jwk['alg'] != smart_str(header.alg):
                 raise SuspiciousOperation('alg values do not match.')
             key = jwk
         if key is None:
@@ -166,7 +166,7 @@ class OIDCAuthenticationBackend(ModelBackend):
         """Helper method to get the payload of the JWT token."""
         if import_from_settings('OIDC_ALLOW_UNSECURED_JWT', False):
             header, payload_data, signature = token.split(b'.')
-            header = json.loads(smart_text(b64decode(header)))
+            header = json.loads(smart_str(b64decode(header)))
 
             # If config allows unsecured JWTs check the header and return the decoded payload
             if 'alg' in header and header['alg'] == 'none':
