@@ -1,4 +1,4 @@
-from django.conf.urls import path
+from django.urls import path
 from django.utils.module_loading import import_string
 
 from mozilla_django_oidc import views
