@@ -755,6 +755,16 @@ class ServerInfoForm(TabForm):
             self.fields.pop('database') 
             self.fields.pop('ad_group') 
 
+    def get_summary(self, *args, **kwargs):
+        summary = super().get_summary(*args, **kwargs)
+        for rec in summary:
+            if rec.get('name') == 'owner':
+                email = MCommunity().get_group_email(rec['value'])
+                if email:
+                    rec['value'] = rec['value'] + ' | ' + email
+
+        return summary
+        
 class ServerSupportForm(TabForm):
     template = 'order/server_support.html'
 
