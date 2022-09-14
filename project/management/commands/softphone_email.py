@@ -86,7 +86,7 @@ class Command(BaseCommand):
                 print('Sent to', to, 'cc', cc)
 
         # Send Distribution List to Leads
-        msg = EmailMultiAlternatives(email.subject, text_message, email.sender, [email.cc], bcc=[self.bcc], cc=[cc])
+        msg = EmailMultiAlternatives(email.subject, text_message, email.sender, [email.cc], bcc=[self.bcc])
         msg.attach_alternative(email.body, "text/html")
         msg.attach('distribution_list.csv', csvfile.getvalue(), 'text/csv')
         msg.send()
