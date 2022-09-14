@@ -7,7 +7,7 @@ except ImportError:
 
 from django.core.exceptions import SuspiciousOperation
 
-from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import auth
 from django.http import HttpResponseRedirect
 from django.utils.crypto import get_random_string
