@@ -8,6 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from .forms import migrate_choices
 from django.contrib import messages
 from project.utils import download_csv_from_queryset
+from datetime import date
 
 
 @admin.register(Category)
@@ -143,16 +144,17 @@ class SelectionAdmin(admin.ModelAdmin):
     def bulk_update(self, request):
         cut_date = request.POST.get('cut_date')
         procesing_status = request.POST.get('processing_status')
-        fields = {}
-        if cut_date != '':
-            fields['cut_date'] = cut_date
-
-        if procesing_status != '':
-            fields['processing_status'] = procesing_status
 
         sub_list = request.POST.getlist('subscriber')
         
-        Selection.objects.filter(subscriber__in=sub_list).update(**fields)
+        for sub in Selection.objects.filter(subscriber__in=sub_list):
+            if cut_date != '':
+                sub.cut_date = cut_date
+
+            if procesing_status != '':
+                sub.procesing_status = procesing_status
+
+            sub.save()
  
         return HttpResponseRedirect('/admin/softphone/selection/')
 
