@@ -193,11 +193,17 @@ class Selection(SelectionAbstract):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # Call the "real" save() method.
-        try:
-            sql = "update telecom.subscriber_api_v set add_info_list_value_code_1 = %s where subscriber_id = %s"
 
+        if self.processing_status == '':
+            sql = "update telecom.subscriber_api_v set add_info_list_value_id_1 = Null where subscriber_id = %s"
+            parms = (self.subscriber,)
+        else:
+            sql = "update telecom.subscriber_api_v set add_info_list_value_code_1 = %s where subscriber_id = %s"
+            parms = (self.processing_status, self.subscriber,)
+
+        try:
             with connections['pinnacle'].cursor() as cursor:
-                cursor.execute(sql, (self.processing_status, self.subscriber,))
+                cursor.execute(sql, parms)
 
             print(cursor.rowcount, 'update subscriber_id')
         except:
