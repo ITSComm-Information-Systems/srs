@@ -143,16 +143,15 @@ class SelectionAdmin(admin.ModelAdmin):
 
     def bulk_update(self, request):
         cut_date = request.POST.get('cut_date')
-        procesing_status = request.POST.get('processing_status')
+
+        if cut_date == '':
+            cut_date = None
 
         sub_list = request.POST.getlist('subscriber')
         
         for sub in Selection.objects.filter(subscriber__in=sub_list):
-            if cut_date != '':
-                sub.cut_date = cut_date
-
-            if procesing_status != '':
-                sub.procesing_status = procesing_status
+            sub.cut_date = cut_date
+            sub.processing_status = request.POST.get('processing_status')
 
             sub.save()
  
