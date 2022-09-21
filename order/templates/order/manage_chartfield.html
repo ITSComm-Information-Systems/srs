@@ -171,7 +171,7 @@
                                     Associated Name
                                 </label>
                                 <input type="text" class="form-control" id="chartfieldDescription"
-                                    placeholder="Enter a description or nickname..." name="description">
+                                    placeholder="Enter a description or nickname..." name="description" onchange="updateButton()">
                             </div>
                             <input type="hidden" name="action" value="add">
                             <input type="hidden" name="deptid" value="{{department.id}}">
@@ -184,7 +184,7 @@
                         <!-- Submit Form button -->
                         <label for="submitBtn" hidden>Save to List</label>
                         <input type="submit" form="addChartfieldForm" id="submitBtn" class="btn btn-primary"
-                            value="Add to List">
+                            value="Add to List" disabled>
                     </div>
                 </div>
             </div>
@@ -300,6 +300,16 @@
 
 {% block js %}
 <script>
+const modalButton = document.getElementById('submitBtn');
+const chartfieldDescription = document.getElementById('chartfieldDescription');
+function updateButton() {
+    console.log('button');
+        if(chartfieldDescription.value){
+            modalButton.disabled = false
+        }else{
+            modalButton.disabled = true
+        }
+    }
 
 $(document).ready(function () {
     dept = $("#deptSubmit").val();
