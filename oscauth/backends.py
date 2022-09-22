@@ -52,7 +52,7 @@ class UMAuthenticationBackend(OIDCAuthenticationBackend):
         """Return object for a newly created user account."""
         user = upsert_user(claims['sub'])  # Create or Update User
         if user == None:
-            if '@' in claims['sub']:
+            if '@' in claims['sub']:  # Create Friend Account
 
                 user = get_user_model()
                 user.username = claims['sub']
