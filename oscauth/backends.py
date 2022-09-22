@@ -62,3 +62,7 @@ class UMAuthenticationBackend(OIDCAuthenticationBackend):
                 user.save()
 
         return user
+
+    def update_user(self, user, claims):
+        user = upsert_user(user.username)  # Create or Update User
+        return user
