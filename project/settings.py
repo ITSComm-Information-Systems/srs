@@ -190,8 +190,10 @@ DATABASES = {
     },
 }
 
-
-DATABASE_ROUTERS = ['project.settings.DBRouter']
+# Move to Oracle - Deprecate DBRouter
+DATABASES['postgres'] = DATABASES['default']
+DATABASES['default'] = DATABASES['pinnacle']
+#DATABASE_ROUTERS = ['project.settings.DBRouter']
 
 
 class DBRouter(object):
