@@ -35,8 +35,9 @@ ADMINS = [('Admins', 'srs-exception@umich.edu')]
 # Application definition
 
 INSTALLED_APPS = [
-    'oscauth',
+    'pages',
     'project',
+    'oscauth',
     'django.forms', # try to override widgets
     'django.contrib.admin',
     'django.contrib.auth',
@@ -50,7 +51,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'debug_toolbar',
     'order',
-    'pages',
+    #'pages',
     'reports',
     'tools',
     'softphone',
