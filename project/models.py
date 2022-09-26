@@ -27,7 +27,7 @@ def add_db_prefix(sender, **kwargs):
                print('um_', sender._meta.db_table[:3])
                sender._meta.db_table = prefix + sender._meta.db_table
 
-class_prepared.connect(add_db_prefix)
+#class_prepared.connect(add_db_prefix)
 
 
 def validate_shortcode(value):
