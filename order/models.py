@@ -260,7 +260,7 @@ class Chartcom(models.Model):
         return chartcom_list
 
     def get_user_chartcom_depts(self):
-        dept_list = UserChartcomV.objects.filter(user=self).order_by('dept').distinct('dept')
+        dept_list = UserChartcomV.objects.filter(user=self).order_by('dept').values('dept').distinct()
         user_chartcom_depts = []
         
         for chartcom in dept_list:

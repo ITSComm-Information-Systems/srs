@@ -17,7 +17,7 @@ class Command(BaseCommand):
         print(datetime.datetime.now(), 'end')
 
     def update_members(self):
-        groups = StorageInstance.objects.distinct('owner_name')
+        groups = StorageInstance.objects.values('owner_name').distinct()
 
         all_users = []
         for group in groups:  # Loop through distinct groups
