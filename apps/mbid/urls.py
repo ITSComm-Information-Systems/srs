@@ -1,5 +1,4 @@
 from django.urls import path
-from django.conf.urls import url
 from . import views
 
 app_name = 'mbid'
@@ -18,6 +17,6 @@ urlpatterns = [
 
     # All
     path('faq/', views.faq, name='faq'),
-    url(r'', views.home, name='home'), #keep at bottom
+    path(r'', views.home, name='home'), #keep at bottom
 
 ]
