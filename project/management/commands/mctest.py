@@ -1,8 +1,10 @@
+from ast import Str
 from re import M
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from ldap3.extend.microsoft.addMembersToGroups import ad_add_members_to_groups
 
+from django.contrib.auth.models import User, Group
 from oscauth.utils import get_mc_group, McGroup
 from order.models import BackupDomain, BackupNode, Item, Ticket, Server
 from oscauth.models import LDAPGroup
@@ -15,10 +17,22 @@ class Command(BaseCommand):
     help = 'Add Backup Domain'
 
     def add_arguments(self, parser):
-        parser.add_argument('id',type=int)
+        parser.add_argument('username',type=Str)
 
 
     def handle(self, *args, **options):
+        #u = User.objects.get(username=options['username'])
+        user = User.objects.get(username='djamison')
+
+        print(user)
+        for perm in user.user_permissions.all():
+            print(perm)
+
+        return
+
+
+
+
         mc = MCommunity()
 
         x = 0
