@@ -20,7 +20,7 @@ def add_db_prefix(sender, **kwargs):
                prefix = prefix.get(None, None)
      if prefix:
           if not sender._meta.db_table[:3] in ['um_','PS_','PIN']:
-               print('um_', sender._meta.db_table[:3])
+               #print('um_', sender._meta.db_table[:3])
                sender._meta.db_table = prefix + sender._meta.db_table
 
 class_prepared.connect(add_db_prefix)
