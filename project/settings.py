@@ -253,7 +253,7 @@ USE_TZ = False
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
