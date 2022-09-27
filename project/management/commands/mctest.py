@@ -17,16 +17,22 @@ class Command(BaseCommand):
     help = 'Add Backup Domain'
 
     def add_arguments(self, parser):
-        parser.add_argument('username',type=Str)
+        parser.add_argument('username',type=str)
 
 
     def handle(self, *args, **options):
-        #u = User.objects.get(username=options['username'])
-        user = User.objects.get(username='djamison')
-
+        user = User.objects.get(username=options['username'])
         print(user)
+
         for perm in user.user_permissions.all():
-            print(perm)
+            print(perm, perm.codename)
+
+        print( user.has_perm('oscauth.can_order') )
+        print( user.has_perm('can_report') )
+        print( user.has_perm('project.can_order') )
+        print( user.has_perm('oscauth.can_administer_access') )
+        print( user.has_perm('can_administer_access') )
+
 
         return
 

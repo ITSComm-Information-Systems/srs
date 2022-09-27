@@ -632,7 +632,7 @@ class Cart(PermissionRequiredMixin, View):
 
         first= {}
 
-        dept_list = Item.objects.filter(deptid__in=depts).exclude(order_id__gt=0).distinct('deptid')
+        dept_list = Item.objects.filter(deptid__in=depts).exclude(order_id__gt=0).values('deptid').distinct()
         if deptid == 0 and len(dept_list) > 0:
             deptid = int(dept_list[0].deptid)
 
@@ -689,7 +689,7 @@ class Review(PermissionRequiredMixin, View):
         dept = request.POST.get('deptSubmit')
         items_selected = request.POST.getlist('includeInOrder')
         item_list = Item.objects.filter(id__in=items_selected)
-        order_list = item_list.distinct('chartcom')
+        order_list = item_list.values('chartcom').distinct()
 
         for num, order in enumerate(order_list, start=1):
             order.items = item_list.filter(chartcom=order.chartcom)
