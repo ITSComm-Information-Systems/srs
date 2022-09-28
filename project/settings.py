@@ -180,7 +180,7 @@ DATABASES = {
     },
     'pinnacle': {
         'NAME': os.getenv('ORACLE_DATABASE','pinntst.dsc.umich.edu:1521/pinndev.world'),
-        'ENGINE': 'django.db.backends.oracle',
+        'ENGINE': 'umoraengine',
         'USER': os.getenv('ORACLE_USER','PINN_CUSTOM'),
         'PASSWORD': os.getenv('ORACLE_PASSWORD','N/A'),
         'TEST': {
