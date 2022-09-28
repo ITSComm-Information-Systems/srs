@@ -30,7 +30,10 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ALLOWED_HOSTS = [os.getenv('ALLOWED_HOST')]
 DEBUG = os.getenv('DEBUG', False)
 
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'DEV')
 ADMINS = [('Admins', 'srs-exception@umich.edu')]
+SERVER_EMAIL = f'{ ENVIRONMENT }-SRS@localhost'
+
 
 # Application definition
 
