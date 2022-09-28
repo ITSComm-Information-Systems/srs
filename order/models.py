@@ -263,8 +263,10 @@ class Chartcom(models.Model):
         dept_list = UserChartcomV.objects.filter(user=self).order_by('dept').values('dept').distinct()
         user_chartcom_depts = []
         
+
+
         for chartcom in dept_list:
-            user_chartcom_depts.append((chartcom.dept))
+            user_chartcom_depts.append((chartcom.get('dept')))
 
         return user_chartcom_depts
 
@@ -296,7 +298,7 @@ class UserChartcomV(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'order_user_chartcom'
+        db_table = 'order_user_chartcom_v'
 
 
 class LogItem(models.Model):
