@@ -647,8 +647,8 @@ class Cart(PermissionRequiredMixin, View):
 
         status = ['Ready to Order','Saved for Later']
         item_list = Item.objects.filter(deptid=deptid).exclude(order_id__gt=0).order_by('chartcom','-create_date')
-        chartcoms = item_list.distinct().values('chartcom','chartcom_id') #, 'chartcom_id')
-        saved = item_list.distinct().values('chartcom')
+        chartcoms = item_list.distinct().values('chartcom','chartcom_id','chartcom__name') #, 'chartcom_id')
+        saved = item_list.distinct().values('chartcom','chartcom_id','chartcom__name') #, 'chartcom_id')
 
         #item_list = Item.objects.filter(deptid=deptid,order__isnull=True).order_by('chartcom','-create_date')
 
@@ -692,8 +692,8 @@ class Review(PermissionRequiredMixin, View):
         order_list = item_list.values('chartcom').distinct()
 
         for num, order in enumerate(order_list, start=1):
-            order.items = item_list.filter(chartcom=order.chartcom)
-            order.num = num
+            order['items'] = item_list.filter(chartcom=order.get('chartcom'))
+            order['num'] = num
 
         template = loader.get_template('order/review_order.html')
         context = {
