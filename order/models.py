@@ -389,35 +389,20 @@ class Volume(models.Model):
         return checkboxes
 
     def get_tickets(self):
-
-        cur = connections['default'].cursor()
-        cur.execute("select external_reference_id, create_date, data from srs_order_item oi "
-                    "where oi.data.action_id in (select id from srs_order_action where service_id = %s) "
-                    "  and oi.data.instance_id = %s "
-                    "  and external_reference_id is not null "
-                    "order by create_date desc"
-                    ,[self.service_id, self.id])
-
+        actions = Action.objects.filter(service=self.service).values_list('id', flat=True)
+        tickets = Item.objects.filter(data__instance_id=self.id
+            , external_reference_id__isnull=False
+            , data__action_id__in=actions)
         ticket_list = []
-        for row in cur.fetchall():
-
-            fulfill = ''
-
-            try:
-                data = json.loads(row[2])
-                note = render_to_string('order/pinnacle_note.html', {'text': data['reviewSummary'], 'description': 'Review Summary'})
-                if 'fulfill' in data:
-                    fulfill = data['fulfill']
-            except:
-                note = ''
-
-
-            ticket_list.append({'id': row[0]
-                              , 'url': f'{TDX_URL}{row[0]}'
-                              , 'create_date': row[1]
-                              , 'fulfill': fulfill
-                              , 'note': note})
-
+        for ticket in tickets: 
+            ticket_list.append({'id': ticket.external_reference_id
+                              , 'url': f'{TDX_URL}{ticket.external_reference_id}'
+                              , 'create_date': ticket.create_date
+                              , 'fulfill': ticket.data.get('fulfill')
+                              , 'note': render_to_string('order/pinnacle_note.html',
+                                        {'text': ticket.data.get('reviewSummary')
+                                        ,'description': 'Review Summary'})
+                              })
         return ticket_list
 
     def get_owner_instance(self, name):
