@@ -391,9 +391,9 @@ class Volume(models.Model):
     def get_tickets(self):
 
         cur = connections['default'].cursor()
-        cur.execute("select external_reference_id, create_date, data from order_item "
-                    "where cast(data->>'action_id' as INTEGER) in (select id from order_action where service_id = %s) "
-                    "  and cast(data->>'instance_id' as INTEGER) = %s "
+        cur.execute("select external_reference_id, create_date, data from srs_order_item oi "
+                    "where oi.data.action_id in (select id from srs_order_action where service_id = %s) "
+                    "  and oi.data.instance_id = %s "
                     "  and external_reference_id is not null "
                     "order by create_date desc"
                     ,[self.service_id, self.id])
