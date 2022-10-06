@@ -5,6 +5,10 @@ from django.db.models.signals import class_prepared
 # Create your models here.
 
 def add_db_prefix(sender, **kwargs):
+     if sender._meta.db_table == 'django_migrations' or \
+          sender._meta.db_table[:3] in ['um_','PS_','PIN']:
+               return
+
      # Add SRS_ prefix to all table in PINN_CUSTOM
      prefix = 'SRS_'
 
@@ -19,9 +23,7 @@ def add_db_prefix(sender, **kwargs):
           else:
                prefix = prefix.get(None, None)
      if prefix:
-          if not sender._meta.db_table[:3] in ['um_','PS_','PIN']:
-               #print('um_', sender._meta.db_table[:3])
-               sender._meta.db_table = prefix + sender._meta.db_table
+          sender._meta.db_table = prefix + sender._meta.db_table
 
 class_prepared.connect(add_db_prefix)
 
