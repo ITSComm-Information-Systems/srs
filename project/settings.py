@@ -30,13 +30,17 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ALLOWED_HOSTS = [os.getenv('ALLOWED_HOST')]
 DEBUG = os.getenv('DEBUG', False)
 
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'DEV')
 ADMINS = [('Admins', 'srs-exception@umich.edu')]
+SERVER_EMAIL = f'{ ENVIRONMENT }-SRS@localhost'
+
 
 # Application definition
 
 INSTALLED_APPS = [
-    'oscauth',
+    'pages',
     'project',
+    'oscauth',
     'django.forms', # try to override widgets
     'django.contrib.admin',
     'django.contrib.auth',
@@ -50,7 +54,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'debug_toolbar',
     'order',
-    'pages',
+    #'pages',
     'reports',
     'tools',
     'softphone',
@@ -179,7 +183,7 @@ DATABASES = {
     },
     'pinnacle': {
         'NAME': os.getenv('ORACLE_DATABASE','pinntst.dsc.umich.edu:1521/pinndev.world'),
-        'ENGINE': 'django.db.backends.oracle',
+        'ENGINE': 'umoraengine',
         'USER': os.getenv('ORACLE_USER','PINN_CUSTOM'),
         'PASSWORD': os.getenv('ORACLE_PASSWORD','N/A'),
         'TEST': {
@@ -192,8 +196,10 @@ DATABASES = {
     },
 }
 
-
-DATABASE_ROUTERS = ['project.settings.DBRouter']
+# Move to Oracle - Deprecate DBRouter
+DATABASES['postgres'] = DATABASES['default']
+DATABASES['default'] = DATABASES['pinnacle']
+#DATABASE_ROUTERS = ['project.settings.DBRouter']
 
 
 class DBRouter(object):
@@ -250,7 +256,7 @@ USE_TZ = False
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
