@@ -167,21 +167,6 @@ WSGI_APPLICATION = 'wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
-        'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
-        'USER': os.getenv('DATABASE_USER','pgoscdevweb'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD','N/A'),
-        'HOST': os.getenv('DATABASE_SERVICE_NAME','containernp-pg.aws.vdc.it.umich.edu'),
-        'TEST':
-        {
-        'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
-        'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
-        'USER': os.getenv('DATABASE_USER','pgoscdevweb'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD','N/A'),
-        'HOST': os.getenv('DATABASE_SERVICE_NAME','containernp-pg.aws.vdc.it.umich.edu'),
-        },
-    },
-    'pinnacle': {
         'NAME': os.getenv('ORACLE_DATABASE','pinntst.dsc.umich.edu:1521/pinndev.world'),
         'ENGINE': 'umoraengine',
         'USER': os.getenv('ORACLE_USER','PINN_CUSTOM'),
@@ -196,35 +181,8 @@ DATABASES = {
     },
 }
 
-# Move to Oracle - Deprecate DBRouter
-DATABASES['postgres'] = DATABASES['default']
-DATABASES['default'] = DATABASES['pinnacle']
-#DATABASE_ROUTERS = ['project.settings.DBRouter']
-
-
-class DBRouter(object):
-  def db_for_read(self, model, **hints):
-
-    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING') or model._meta.db_table.startswith('um_bom'):
-      return 'pinnacle'
-    return 'default'
-
-  def db_for_write(self, model, **hints):
-   
-    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING') or model._meta.db_table.startswith('um_bom'):
-      return 'pinnacle'
-    return 'default'
-
-  def allow_migrate(self, db, app_label, **hints):
-    if app_label == "bom":
-        return True
-
-    if db == "pinnacle":
-      return False
-    else:
-      return True
-
-
+# Deprecate 'Pinnacle' always use default going forward
+DATABASES['pinnacle'] = DATABASES['default']
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
