@@ -205,7 +205,8 @@ class DatabaseAdmin(ServiceInstanceAdmin):
     readonly_fields = ('legacy_data','server','shared')
     search_fields = ['name','owner__name']
     autocomplete_fields = ['owner']
-
+    list_select_related = ['owner','type','server']
+    
     fieldsets = (
         (None, {
             'fields': (('name', 'in_service'), 'owner', 'shortcode', 'type', 'url', 'on_call',
@@ -239,7 +240,7 @@ class ServerAdmin(ServiceInstanceAdmin):
     ordering = ('name',)
     search_fields = ['name','owner__name']
     autocomplete_fields = ['owner','admin_group']
-
+    list_select_related = ['owner','os']
     inlines = [ServerDiskInline,]
 
     readonly_fields = ('legacy_data','created_date')
@@ -394,6 +395,7 @@ class ArcInstanceAdmin(VolumeAdmin):
     child_record = ArcHost
     child_key = 'arc_instance_id'
     service_list = [9,10,11]
+    list_select_related = ['owner','rate']
     fieldsets = (
         (None, {'fields': ('service', 'name','owner',('type','multi_protocol','ad_group'),'rate','size',('uid','nfs_group_id'),'research_computing_package','amount_used','created_date','sensitive_regulated')
         }),
@@ -409,6 +411,7 @@ class StorageInstanceAdmin(VolumeAdmin):
     child_record = StorageHost
     child_key = 'storage_instance_id'
     service_list = [7]
+    list_select_related = ['owner','rate']
     exclude = ['owner_name', 'owner_bak']
 
 
