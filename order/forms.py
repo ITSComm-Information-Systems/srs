@@ -530,7 +530,10 @@ class VolumeSelectionForm(TabForm):
 
             if 'storage_type' in action.override:
                 vol_type = action.override['storage_type']
-                self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service').prefetch_related('shortcodes')
+                if service.id == 7:
+                    self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service')
+                else:  #Prefetch shortcodes
+                    self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service').prefetch_related('shortcodes')
                 return
             elif service.id == 13:
                 self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name')
