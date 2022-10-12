@@ -10,3 +10,16 @@
   {{ block.super }}
 {% endblock %}
 
+
+{% block content %}
+{{ block.super }}
+
+{% autoescape off %}
+
+<b>From: </b>{{ email.sender }} <br><br>
+<b>Subject: </b>{{ email.render_subject }} <br>
+{{ email.render_body }}
+
+{% endautoescape %}
+
+{% endblock %}

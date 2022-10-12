@@ -35,7 +35,7 @@
                             {{ volume.shortcode }}
                         </td>
                         {% else %}
-                        <td>{% for sc in volume.shortcode_list %}
+                        <td>{% for sc in volume.shortcodes.all %}
                             {{ sc.shortcode }} ({{sc.size}}TB)<br>
                     
                             {% endfor %}
