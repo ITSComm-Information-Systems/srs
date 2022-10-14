@@ -74,7 +74,7 @@ class Command(BaseCommand):
                 "where  c.name = 'MB-MCOMM' " \
                 "  and a.owner_id = d.id  order by a.name  "
 
-        miserver_query = 'select shortcode from srs_order_miserver_billing_v order by name'
+        miserver_query = 'select a.*, a."SIZE" as total_size from srs_order_miserver_billing_v a order by name'
 
         self.owner_email = 'arcts-storage-billing@umich.edu'
 
