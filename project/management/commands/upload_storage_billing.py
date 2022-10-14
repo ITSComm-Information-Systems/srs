@@ -64,7 +64,7 @@ class Command(BaseCommand):
                     "  and a.owner_id = d.id " \
                     "  and a.service_id = 9 order by a.name, a.created_date "
 
-        mistorage_query = 'select a.shortcode, a.\"SIZE\" as total_size, a.name, a.created_date, c.name as rate_name, round(c.rate * a."SIZE",2) as total_cost, d.name as owner ' \
+        mistorage_query = 'select a.shortcode, a."SIZE" as total_size, a.name, a.created_date, c.name as rate_name, round(c.rate * a."SIZE",2) as total_cost, d.name as owner ' \
                 'from srs_order_storageinstance a, srs_order_storagerate c, srs_oscauth_ldapgroup d ' \
                 'where  a.rate_id = c.id ' \
                 '  and a.owner_id = d.id order by a.name, a.created_date ' \
@@ -133,14 +133,14 @@ class Command(BaseCommand):
 
             rec = UmBillInputApiV()
             rec.data_source = self.service #'MiStorage'
-            rec.assign_date = instance['created_date'].strftime('%m%d%Y')
-            rec.unique_identifier = instance['name'].strip()
-            rec.short_code = instance['shortcode']
-            rec.charge_identifier = instance['rate_name']
-            rec.quantity_vouchered = instance['total_size']
-            rec.total_amount = instance['total_cost']
+            rec.assign_date = instance['CREATED_DATE'].strftime('%m%d%Y')
+            rec.unique_identifier = instance['NAME'].strip()
+            rec.short_code = instance['SHORTCODE']
+            rec.charge_identifier = instance['RATE_NAME']
+            rec.quantity_vouchered = instance['TOTAL_SIZE']
+            rec.total_amount = instance['TOTAL_COST']
             total_cost = total_cost + rec.total_amount
-            rec.voucher_comment = instance['owner']
+            rec.voucher_comment = instance['OWNER']
             rec.bill_input_file_id = today
             rec.save()
             x+=1
