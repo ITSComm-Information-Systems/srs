@@ -512,7 +512,7 @@ class ArcInstance(Volume):
             if host != '':
                 ah = ArcHost()
                 ah.arc_instance = self
-                ah.name = host
+                ah.name = host.strip()
                 ah.save()
             
     def get_shortcodes(self):
@@ -1099,7 +1099,7 @@ class Item(models.Model):
             else:
                 rec.owner = LDAPGroup().lookup( self.data['owner'] )
                 rec.service = action.service
-                rec.name = self.data.get('name','')
+                rec.name = self.data.get('name','').strip()
                 rec.owner = LDAPGroup().lookup( self.data['owner'] )
                 rec.size = self.data.get('size',0)
                 rec.service = action.service
@@ -1120,7 +1120,7 @@ class Item(models.Model):
                 rec.type = action.override['storage_type']
                 rec.shortcode = self.data.get('shortcode')
                 rec.uid = self.data.get('uid')
-                rec.ad_group = self.data.get('ad_group')    
+                rec.ad_group = self.data.get('ad_group').strip()
                 if action.service.id == 7:
                     self.update_mistorage(rec)
                 else:
@@ -1413,7 +1413,7 @@ class Item(models.Model):
 
     def update_arcts(self, rec):
 
-        rec.nfs_group_id = self.data.get('nfs_group_id')
+        rec.nfs_group_id = self.data.get('nfs_group_id').strip()
 
         if self.data.get('sensitive_regulated') == 'yessen':
             rec.sensitive_regulated = True
@@ -1460,7 +1460,7 @@ class Item(models.Model):
         rec.save()
         self.internal_reference_id = rec.id
         self.save() # Save the instance ID on the item 
-        bill_size_list = self.data.get('terabytes') 
+        bill_size_list = self.data.get('terabytes')
 
         ArcBilling.objects.filter(arc_instance=rec).delete()
 
