@@ -536,7 +536,7 @@ class VolumeSelectionForm(TabForm):
                     self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service').prefetch_related('shortcodes')
                 return
             elif service.id == 13:
-                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name')
+                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name').select_related('owner')
                 self.detail = [{'name': 'CPU', 'quantity': 2, 'cost': 14.33},{'name': 'RAM', 'quantity': 4, 'cost': 4.20},{'name': 'DISK', 'quantity': 55, 'cost': 1.69}]
                 self.cost_types = ['CPU', 'RAM', 'QUANTITY']
 

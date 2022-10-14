@@ -21,6 +21,7 @@ import cx_Oracle
 from django.core.exceptions import ValidationError
 from oscauth.utils import get_mc_user, get_mc_group
 from decimal import Decimal
+from django.utils.functional import cached_property
 
 
 if settings.ENVIRONMENT == 'Production':
@@ -660,7 +661,7 @@ class Server(models.Model):
     firewall_requests = models.CharField(max_length=100)
     legacy_data = models.TextField()
 
-    @property
+    @cached_property
     def total_disk_size(self):
         disk = ServerDisk.objects.filter(server=self).aggregate(models.Sum('size'))
         if disk:
