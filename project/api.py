@@ -188,7 +188,7 @@ class DefaultViewSet(viewsets.ModelViewSet):
         if self.serializer_class.Meta.model.__name__ == 'Server':
             print('server')
             queryset = Server.objects.all().select_related('os','admin_group','owner'
-                ,'patch_time','patch_day','reboot_time','reboot_day','backup_time','database_type').prefetch_related('regulated_data','non_regulated_data').order_by('id')
+                ,'patch_time','patch_day','reboot_time','reboot_day','backup_time','database_type').prefetch_related('regulated_data','non_regulated_data','disks').order_by('id')
         else:
             queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
 
