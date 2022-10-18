@@ -105,6 +105,7 @@
 							<th scope='col' class='total-col'>Total Charge</th>
 							{% elif key == 'Cloud Hosting' %}  <!--- Unique ID, Description, voucher_comment, transaction type, total charge -->
 							<th scope='col' class='first-col'>Unique ID</th>
+							<th scope="col">Invoice ID</th>
 							<th scope="col">Charge Detail</th>
 							<th></th>
 							<th scope='col'>Description</th>
@@ -179,6 +180,7 @@
 							<td class='first-col'>{{ v.project_name }}</td>
 							{% elif key == 'Cloud Hosting' %}
 							<td>{{ v.unique_id }}</td>
+							<td>{{ v.invoice_id }}</td>
 							<td>{{ v.voucher_comment }}</td>
 							<td></td>
 
@@ -229,6 +231,9 @@
 							<td></td>
 							<td></td>
 							{% if key != 'MiBackup' %}
+							<td></td>
+							{% endif %}
+							{% if key == 'Cloud Hosting' %}
 							<td></td>
 							{% endif %}
 							{% if '-'|first in value.total %}
