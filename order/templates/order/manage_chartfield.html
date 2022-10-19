@@ -168,10 +168,10 @@
                             <!-- user enters description/nickname in following text input field -->
                             <div class="form-group">
                                 <label for="chartfieldDescription">
-                                    Associated Name
+                                    Associated Name<span style="color:red;">*</span> <span style="color:red; font-size: 8px;">(This is a required field)</span>
                                 </label>
-                                <input type="text" class="form-control" id="chartfieldDescription"
-                                    placeholder="Enter a description or nickname..." name="description" onchange="updateButton()">
+                                <input type="text" class="form-control" id="chartfieldDescription" maxlength="120"
+                                    placeholder="Enter a description or nickname (120 character limit)..." name="description" onchange="updateButton()">
                             </div>
                             <input type="hidden" name="action" value="add">
                             <input type="hidden" name="deptid" value="{{department.id}}">
