@@ -66,16 +66,17 @@ class AuthUserDeptAdmin(admin.ModelAdmin):
 
                 count = 0
                 if form.cleaned_data['action'] == 'Add':
-                    record_list = []
                     for dept in dept_list:
                         rec = AuthUserDept()
                         rec.user = form.user
                         rec.group_id = group_id
                         rec.dept = dept
-                        record_list.append(rec)
 
-                    result = AuthUserDept.objects.bulk_create(record_list, ignore_conflicts=True)
-                    count = len(result)
+                        try:
+                            rec.save()
+                            count += 1
+                        except:
+                            print('Unique Constraint')
                 else:
                     result = AuthUserDept.objects.filter(dept__in=dept_list, user=form.user, group_id=group_id).delete()
                     count = result[0]

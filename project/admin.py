@@ -7,6 +7,7 @@ from django.core.management import call_command
 
 @admin.register(Email)
 class EmailAdmin(admin.ModelAdmin):
+    list_display = ['code','subject']
 
     def get_urls(self):
         urls = super().get_urls()
@@ -15,6 +16,13 @@ class EmailAdmin(admin.ModelAdmin):
             path('<int:object_id>/send_email/', self.send_email),
         ]
         return download_url + urls
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        email = Email.objects.get(id=object_id)
+
+        return super().change_view(
+            request, object_id, form_url, extra_context={'email': email},
+        )
 
     def send_email(self, request, object_id):
         email = Email.objects.get(id=object_id)
