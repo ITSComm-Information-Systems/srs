@@ -6,6 +6,12 @@ import re
 
 from django.forms import CharField, JSONField
 from project.integrations import ShortCodesAPI
+from django.db.models.signals import class_prepared
+
+from django.template import Template, Context
+from datetime import timedelta
+from softphone.models import next_cut_date
+
 
 def validate_shortcode(value):
 
@@ -129,3 +135,17 @@ class Email(models.Model):
 
      def __str__(self):
           return self.code
+
+     def render_subject(self):
+          cut_date = next_cut_date()
+          week_of = cut_date - timedelta(days = 3)
+
+          context = {'cut_date': cut_date, 'week_of': week_of}
+          return Template(self.subject).render(Context(context))
+
+     def render_body(self):
+          cut_date = next_cut_date()
+          week_of = cut_date - timedelta(days = 3)
+
+          context = {'cut_date': cut_date, 'week_of': week_of}
+          return Template(self.body).render(Context(context))
