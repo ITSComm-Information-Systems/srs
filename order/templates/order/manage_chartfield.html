@@ -171,7 +171,7 @@
                                     Associated Name<span style="color:red;">*</span> <span style="color:red; font-size: 8px;">(This is a required field)</span>
                                 </label>
                                 <input type="text" class="form-control" id="chartfieldDescription" maxlength="120"
-                                    placeholder="Enter a description or nickname (120 character limit)..." name="description" onchange="updateButton()">
+                                    placeholder="Enter a description or nickname (120 character limit)..." name="description" onchange="updateAddButton()">
                             </div>
                             <input type="hidden" name="action" value="add">
                             <input type="hidden" name="deptid" value="{{department.id}}">
@@ -220,10 +220,11 @@
 
                             <div class="form-group">
                                 <label for="newChartfieldDescription" id="chartComDescr1">
-                                    Enter a New Associated Name
+                                    Enter a New Associated Name<span style="color:red;">*</span> <span style="color:red; font-size: 8px;">(This is a required field)</span>
+
                                 </label>
                                 <!-- Replace the value of the input form below to be the description of the chartfield that the user selected to edit -->
-                                <input type="text" class="form-control" id="newChartfieldDescription" name="newDescription">
+                                <input type="text" class="form-control" id="newChartfieldDescription" name="newDescription" maxlength="120" onchange="updateEditButton()">
                             </div>
                             <input type="hidden" name="action" value="edit">
                             <input type="hidden" name="deptid" value="{{department.id}}">
@@ -234,9 +235,9 @@
                         <!-- cancel Form button -->
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <!-- Submit Form button -->
-                        <label for="submitBtn" hidden>Update</label>
-                        <input type="submit" form="editChartfieldForm" id="submitBtn" class="btn btn-primary"
-                            value="Update">
+                        <label for="editBtn" hidden>Update</label>
+                        <input type="submit" form="editChartfieldForm" id="editBtn" class="btn btn-primary"
+                            value="Update" enabled>
                     </div>
                 </div>
             </div>
@@ -302,14 +303,26 @@
 <script>
 const modalButton = document.getElementById('submitBtn');
 const chartfieldDescription = document.getElementById('chartfieldDescription');
-function updateButton() {
-    console.log('button');
+
+const editBtn = document.getElementById('editBtn')
+const newChartfieldDescription = document.getElementById('newChartfieldDescription');
+function updateAddButton() {
         if(chartfieldDescription.value){
             modalButton.disabled = false
         }else{
             modalButton.disabled = true
         }
     }
+
+function updateEditButton() {
+    console.log(newChartfieldDescription)
+    console.log('edit')
+    if(newChartfieldDescription.value){
+        editBtn.disabled = false
+    }else{
+        editBtn.disabled = true
+    }
+}
 
 $(document).ready(function () {
     dept = $("#deptSubmit").val();

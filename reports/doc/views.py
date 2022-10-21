@@ -385,10 +385,10 @@ def show_detail(request):
 						c['monthly'].append(monthly_row)
 					# Roll up by item code
 					else:
-						for m in monthly:
-							if m['item_code'] == m.item_code:
-								m['quantity'] += int(m.quantity)
-								m['total_charge'] += m.charge_amount
+						for x in c['monthly']:
+							if x['item_code'] == m.item_code:
+								x['quantity'] += int(m.quantity)
+								x['total_charge'] += m.charge_amount
 					c['monthly_total'] += m.charge_amount
 					c['cf_total'] += m.charge_amount
 		total += m.charge_amount
