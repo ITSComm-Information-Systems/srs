@@ -217,7 +217,7 @@
 						<tr class='table-total bg-warning'>
 							<td class='first-col'><strong>Total</strong></td>
 							<td></td>
-							{% if key == 'Container Services' %}
+							{% if key == 'Container Services' or key == 'Cloud Hosting' %}
 							<td></td>
 							{% endif %}
 							{% if key == 'MiServer' or key == 'MiDatabase' %}
@@ -231,9 +231,6 @@
 							<td></td>
 							<td></td>
 							{% if key != 'MiBackup' %}
-							<td></td>
-							{% endif %}
-							{% if key == 'Cloud Hosting' %}
 							<td></td>
 							{% endif %}
 							{% if '-'|first in value.total %}
