@@ -1,7 +1,6 @@
 from typing import Sequence
 from django.conf import settings
 from django.core.mail import send_mail
-from django.contrib.postgres.fields import JSONField
 from django.contrib.admin.models import LogEntry, ADDITION
 from django.db import models
 from django.forms.fields import DecimalField
@@ -1120,7 +1119,7 @@ class Item(models.Model):
                 rec.type = action.override['storage_type']
                 rec.shortcode = self.data.get('shortcode')
                 rec.uid = self.data.get('uid')
-                rec.ad_group = self.data.get('ad_group').strip()
+                rec.ad_group = self.data.get('ad_group','').strip()
                 if action.service.id == 7:
                     self.update_mistorage(rec)
                 else:
@@ -1413,7 +1412,7 @@ class Item(models.Model):
 
     def update_arcts(self, rec):
 
-        rec.nfs_group_id = self.data.get('nfs_group_id').strip()
+        rec.nfs_group_id = self.data.get('nfs_group_id','').strip()
 
         if self.data.get('sensitive_regulated') == 'yessen':
             rec.sensitive_regulated = True
