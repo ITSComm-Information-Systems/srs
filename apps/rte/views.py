@@ -1,6 +1,7 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput
+from project.models import ActionLog
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
 from django.db import connections
@@ -16,6 +17,16 @@ def load_rte(request):
     context = {
         'title': 'Rapid Time Entry'
     }
+    return HttpResponse(template.render(context, request))
+
+
+def get_confirmation(request):
+    template = loader.get_template('rte/submitted.html')
+
+    context = {
+        'title': 'Rapid Time Entry Submit',
+    }
+
     return HttpResponse(template.render(context, request))
 
 # Single technician, multiple orders
@@ -86,8 +97,14 @@ def single_tech(request):
 @permission_required('rte.add_umrteinput', raise_exception=True)
 def single_submit(request):
     template = loader.get_template('rte/submitted.html')
+    now = datetime.now()
 
     if request.method == 'POST':
+        try:
+            ActionLog.objects.create(user=request.user.username, url=request.path, data=request.POST, timestamp=now)
+        except:
+            print('error adding action single_submit')
+
         num_entries = request.POST.get('num_entries')
         tech_id = request.POST.get('tech_id')
         assigned_group = request.POST.get('assigned_group')
@@ -122,7 +139,7 @@ def single_submit(request):
                     rate_number=rate_level,
                     actual_mins_display=duration,
                     notes=notes,
-                    date_added=date.today(),
+                    date_added=now, # date.today(),
                     date_processed=None,
                     messages=None,
                     request_no=None)
@@ -131,15 +148,55 @@ def single_submit(request):
         # Add record to Pinnacle
         curr = connections['pinnacle'].cursor()
         uniqname = request.user.username
-        datetime_added = date.today()
         try:
-            curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, datetime_added])
+            curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, now])
         except:
             print('error')
         curr.close()
 
+    return HttpResponseRedirect('/apps/rte/confirmation/') 
+
+
+# Log
+@permission_required('rte.add_submitalltechs', raise_exception=True)
+def get_action_log(request):
+    template = loader.get_template('rte/actionlog.html')
+
+    action_list = ActionLog.objects.all().order_by('-timestamp')
+
     context = {
-        'title': 'Rapid Time Entry Submit'
+        'title': 'RTE Action Log',
+        'action_list': action_list,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+@permission_required('rte.add_submitalltechs', raise_exception=True)
+def get_action_log_entry(request, id):
+    template = loader.get_template('rte/actionlogentry.html')
+
+    action = ActionLog.objects.get(id=id)
+
+    entry_list = []
+    for key, value in action.data.items():
+
+        pos = key.find('_')
+        if pos > 0:
+            x = key[0:pos]
+            if x.isnumeric():
+                x = int(x) - 1
+                if len(entry_list) < x+1:
+                    entry_list.append({})
+                entry_list[x][key[pos+1:]] = value
+
+    start = action.timestamp - timedelta(milliseconds=800)
+    input_list = UmRteInput.objects.filter(date_added__range=[start, action.timestamp])
+
+    context = {
+        'title': 'RTE Action Log Entry',
+        'action': action,
+        'entry_list': entry_list,
+        'input_list': input_list,
     }
 
     return HttpResponse(template.render(context, request))
@@ -209,8 +266,14 @@ def get_assigned_group(request):
 @permission_required('rte.add_submitalltechs', raise_exception=True)
 def multiple_submit(request):
     template = loader.get_template('rte/submitted.html')
+    now = datetime.now()
 
     if request.method == 'POST':
+        try:
+            ActionLog.objects.create(user=request.user.username, url=request.path, data=request.POST, timestamp=now)
+        except:
+            print('error adding action single_submit')
+
         num_entries = request.POST.get('num_entries')
         work_order = request.POST.get('work_order')
 
@@ -245,7 +308,7 @@ def multiple_submit(request):
                     rate_number=rate_level,
                     actual_mins_display=duration,
                     notes=notes,
-                    date_added=date.today(),
+                    date_added=now, #date.today(),
                     date_processed=None,
                     messages=None,
                     request_no=None)
@@ -254,15 +317,10 @@ def multiple_submit(request):
         # Add record to Pinnacle
         curr = connections['pinnacle'].cursor()
         uniqname = request.user.username
-        datetime_added = date.today()
-        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, datetime_added])
+        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, now])
         curr.close()
 
-    context = {
-        'title': 'Rapid Time Entry Submit',
-    }
-
-    return HttpResponse(template.render(context, request))
+    return HttpResponseRedirect('/apps/rte/confirmation/') 
 
 
 # Modify time
@@ -384,9 +442,15 @@ def get_update_entries(request):
 # Submit updated times
 @permission_required('rte.add_umrteinput', raise_exception=True)
 def update_submit(request):
+    now = datetime.now()
     template = loader.get_template('rte/submitted.html')
 
     if request.method == 'POST':
+        try:
+            ActionLog.objects.create(user=request.user.username, url=request.path, data=request.POST, timestamp=now)
+        except:
+            print('error adding action single_submit')
+
         num_entries = request.POST.get('num_entries')
         tech_id = request.POST.get('tech_id')
 
@@ -422,7 +486,7 @@ def update_submit(request):
                 rate_number=rate_level,
                 actual_mins_display=duration,
                 notes=notes,
-                date_added=date.today(),
+                date_added=now, #date.today(),
                 date_processed=None,
                 messages=None,
                 request_no=None)
@@ -431,15 +495,10 @@ def update_submit(request):
         # Add record to Pinnacle
         curr = connections['pinnacle'].cursor()
         uniqname = request.user.username
-        datetime_added = date.today()
-        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, datetime_added])
+        curr.callproc('UM_RTE_INTERFACE_K.UM_MAINTAIN_WO_LABOR_P',[uniqname, now])
         curr.close()
 
-    context = {
-        'title': 'Rapid Time Entry Submit',
-    }
-
-    return HttpResponse(template.render(context, request))
+    return HttpResponseRedirect('/apps/rte/confirmation/') 
 
 
 # Find open, unbilled entries based on tech ID
@@ -540,11 +599,15 @@ def get_date_range(date_range):
         date_start = today - timedelta(7+idx)
         date_end = today - timedelta(7+idx-6)
 
-    if date_range == 'Last 3 Months':
+    elif date_range == 'Last 3 Months':
         date_start = date_end - timedelta(days=92)
 
-    if date_range == 'Last 6 Months':
+    elif date_range == 'Last 6 Months':
         date_start = date_end - timedelta(days=183)
+
+    else:
+        print('unknown date range', date_range)
+        date_start = None
 
     return date_start, date_end
 

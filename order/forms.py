@@ -499,7 +499,6 @@ class VolumeSelectionForm(TabForm):
 
         instance = self.vol.objects.get(id=self.data['instance_id'])
         service = Action.objects.get(id=self.request.POST.get('action_id')).service
-        
         if service.id == 13:
             label = 'Server'
         elif service.id == 14:
@@ -531,9 +530,13 @@ class VolumeSelectionForm(TabForm):
 
             if 'storage_type' in action.override:
                 vol_type = action.override['storage_type']
-                self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name')
+                if service.id == 7:
+                    self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service')
+                else:  #Prefetch shortcodes
+                    self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service').prefetch_related('shortcodes')
+                return
             elif service.id == 13:
-                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name')
+                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name').select_related('owner')
                 self.detail = [{'name': 'CPU', 'quantity': 2, 'cost': 14.33},{'name': 'RAM', 'quantity': 4, 'cost': 4.20},{'name': 'DISK', 'quantity': 55, 'cost': 1.69}]
                 self.cost_types = ['CPU', 'RAM', 'QUANTITY']
 
@@ -549,6 +552,14 @@ class VolumeSelectionForm(TabForm):
                     self.template = 'order/database_review.html'
                 else:
                     self.template = 'order/database_modify.html'
+            elif service.id == 9:
+                self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name').select_related('rate','owner','service').prefetch_related('shortcodes')
+                #self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
+                self.template = 'order/volume_review_turbo.html'
+                for volume in self.volume_list:
+                    self.total_cost = self.total_cost + volume.total_cost
+                return
+
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
                     
@@ -713,6 +724,23 @@ class ServerInfoForm(TabForm):
     def __init__(self, *args, **kwargs):
         super(ServerInfoForm, self).__init__(*args, **kwargs)
 
+        mc = MCommunity()
+        hr = mc.get_user(self.request.user.username)   #EXEC_VP_MED_AFF
+        michmed = False
+        self.fields['michmed_flag'].initial = 'No'
+
+        for afil in hr['umichHR']:
+            if afil.find('deptVPArea=EXEC_VP_MED_AFF') > 0:
+                michmed = True
+                self.fields['michmed_flag'].initial = 'Yes'
+                break
+
+        if len(hr['umichHR']) > 1 and michmed:   # Hide field unless user has multiple appointments
+            print('ask')
+        else:
+            self.fields['michmed_flag'].widget = forms.HiddenInput()
+            self.fields['michmed_flag'].label = ' '          
+
         if self.request.method == 'GET':
             type = self.request.GET.get('type', None)
             #version = self.request.GET.get('version', None)
@@ -727,7 +755,7 @@ class ServerInfoForm(TabForm):
             self.fields['database'].initial = type
             self.fields['size'].widget.attrs.update({'readonly': True}) 
             self.fields['size'].initial = size
-            self.fields.pop('misevexissev')
+            #self.fields.pop('misevexissev')
             self.fields['ad_group'].initial = 'MiDatabase Support Team'
             self.fields['ad_group'].widget.attrs.update({'readonly': True})
         else:
@@ -735,6 +763,16 @@ class ServerInfoForm(TabForm):
             self.fields.pop('database') 
             self.fields.pop('ad_group') 
 
+    def get_summary(self, *args, **kwargs):
+        summary = super().get_summary(*args, **kwargs)
+        for rec in summary:
+            if rec.get('name') == 'owner':
+                email = MCommunity().get_group_email(rec['value'])
+                if email:
+                    rec['value'] = rec['value'] + ' | ' + email
+
+        return summary
+        
 class ServerSupportForm(TabForm):
     template = 'order/server_support.html'
 
@@ -837,7 +875,7 @@ class ServerDataForm(TabForm):
 class DiskForm(forms.ModelForm):
     id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     name = forms.CharField()
-    name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
+    name.widget.attrs.update({'class': 'form-control col-2', 'readonly': True})  
 
     size = forms.IntegerField(initial=10)
     size.widget.attrs.update({'class': 'form-control disk-size validate-integer', 'step': 10, 'min': '10'})  
@@ -871,7 +909,7 @@ class DiskForm(forms.ModelForm):
 
 class DiskDisplayForm(forms.ModelForm):
     name = forms.CharField()
-    name.widget.attrs.update({'class': 'form-control', 'readonly': True})  
+    name.widget.attrs.update({'class': 'form-control col-2', 'readonly': True})  
 
     size = forms.IntegerField(min_value=1, initial=10)
     size.widget.attrs.update({'class': 'form-control disk-size', 'readonly': True})  
@@ -910,8 +948,12 @@ class ServerSpecForm(TabForm):
             self.initial['backup'] = str(self.instance.backup)
             self.initial['replicated'] = str(self.instance.replicated)
 
-            if self.instance.os.label.startswith('Windows'):
+            if 'indows' in self.instance.os.label:  # Managed Linux can't edit disk
+                print('windos')
                 self.fields['size_edit'].initial = 1
+            elif 'anaged' not in self.instance.os.label: 
+                self.fields['size_edit'].initial = 1
+                print('not managed')
 
         if self.request.POST.get('database'):
             self.set_database_defaults()
@@ -926,7 +968,7 @@ class ServerSpecForm(TabForm):
         if self.is_bound:
             self.disk_formset = self.DiskFormSet(self.request.POST, initial=ServerDisk.objects.filter(server_id=instance_id).order_by('name').values())
             #x = self.disk_formset.is_valid()
-        elif self.request.POST.get('action_type') == 'M':          
+        elif self.request.POST.get('action_type') == 'M':        
             self.disk_formset = self.DiskFormSet(initial=ServerDisk.objects.filter(server_id=instance_id).order_by('name').values())
         else:
             self.fields['size_edit'].initial = 1
@@ -966,7 +1008,7 @@ class ServerSpecForm(TabForm):
         if database == 'MSSQL':
             self.fields['cpu'].widget.attrs.update({'data-server': 99, 'min': 2})
             self.fields['cpu'].initial = 2
-            self.fields['misevos'].initial = 4
+            self.fields['misevos'].initial = 129 # Windows 2022 - Managed
 
             base_size = float(database_size) / 10
             fifteen_percent = math.ceil(base_size * .15) * 10
@@ -1036,10 +1078,28 @@ class ServerSpecForm(TabForm):
             self.add_error('diskSize', '')
 
         name = self.request.POST.get('name')
+        
+
         if name:
+
             servername = Server.objects.filter(name__iexact=name)
+
             if len(servername) > 0:
                 self.add_error('serverName', f'A server named {name.lower()} already exists. Please choose a different name.')
+                
+            #data sanitization
+            for i in range(len(name)):
+                #server names can only have one dash  
+                if name[i] == "-" and name[i+1] == '-':
+                    self.add_error('serverName', 'This server can only have one dash in the name.')
+                    break
+                
+                #server names cannot contain underscores
+                if name[i] == '_':
+                    self.add_error('serverName', 'Server names cannot contain underscores.')
+                    break
+            
+            
 
             # managed windows name can't exceed 15 char:
             if len(name) > 15:
@@ -1047,8 +1107,8 @@ class ServerSpecForm(TabForm):
                     os = self.cleaned_data.get('misevos', False)
                     if os:
                         os_name = Choice.objects.get(id=int(os)).label
-                        if os_name.startswith('Windows'):
-                            self.add_error('serverName', 'Name for a managed Windows server cannot exceed 15 characters (including prefix).')
+                        #if os_name.startswith('Windows'):
+                        self.add_error('serverName', 'Server name cannot exceed 15 characters (including prefix).')
 
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)
@@ -1371,7 +1431,7 @@ class DatabaseForm(ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(DatabaseForm, self).__init__(*args, **kwargs)
-
+        print('here')
         self.user = user
         group_list = MCommunity().get_groups(user.username)
 

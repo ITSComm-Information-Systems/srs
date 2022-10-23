@@ -2,23 +2,40 @@ from project.integrations import MCommunity
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from oscauth.models import AuthUserDept
-
-import datetime
+import csv, io, datetime
 
 class Command(BaseCommand):
     help = 'Deactivate Users'
 
+    def add_arguments(self, parser):
+        parser.add_argument('--update')
+
     def handle(self, *args, **options):
+
+        update = False
+        if options['update']:
+            if options['update'] == 'True':
+                update = True
 
         mc = MCommunity()
         u = 0
 
-        for user in User.objects.filter(password='').order_by('username'):   # Don't select system accounts.
+        csvfile =  open(f'/Users/djamison/Downloads/user_access.csv','w', encoding='mac_roman')
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(['uniqname', 'afil', 'last login','srs groups', 'srs permissions','dept permissions'])
+
+        for user in User.objects.filter(password='',is_active=True).order_by('username'):   # Don't select system accounts.
             mc_user = mc.get_user(user.username)
 
             if not self.is_active(mc_user, user.username):
 
-                print('    last login:', user.last_login)
+                if mc_user == None:
+                    afil = 'Not in MCommunity'
+                else:
+                    afil = mc_user.umichInstRoles
+
+                print(user.username, '    last login:', user.last_login, '  affiliations:', afil)
+
                 if user.is_staff:
                     print('    Staff')
 
@@ -40,6 +57,12 @@ class Command(BaseCommand):
                 for perm in department_perms:
                     print('   ', perm.dept, perm.group)
 
+                csvwriter.writerow([user.username, afil, user.last_login, user.groups.count(), user.user_permissions.count(), len(department_perms)])
+
+                if update == True:
+                    department_perms.delete()
+                    self.remove_security(user)
+
                 print(' ')
 
             u+=1
@@ -51,7 +74,6 @@ class Command(BaseCommand):
 
     def is_active(self, mc_user, username):
         if mc_user == None:
-            print(username, 'not in MCommunity')
             return False
         
         for role in mc_user.umichInstRoles:
@@ -64,7 +86,6 @@ class Command(BaseCommand):
             if 'Faculty' in role:
                 return True
 
-        print(username, 'Affiliations ', mc_user.umichInstRoles)
         return False
 
     def remove_security(self, user):
@@ -76,11 +97,6 @@ class Command(BaseCommand):
         user.is_superuser = False
         user.save()
 
-        department_perms = AuthUserDept.objects.filter(user=user)
 
-        for perm in department_perms:
-            print('   ', perm.dept, perm.group)
-        
-        #print(department_perms.count(), 'depts removed')
 
 

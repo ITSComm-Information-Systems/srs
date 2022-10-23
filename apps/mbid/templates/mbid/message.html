@@ -1,12 +1,33 @@
 {% extends 'baseapps.html' %}
 
+{% block styles %}
+<style>
+	#aux-nav {
+		background-color: {{ background_color }}
+	}
+
+	@media (min-width:992px) {
+		.nav-bar-links {
+			width: 100%;
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+    a {
+        display:revert;
+    }
+    a, a:link, a:visited {
+        color:white;
+    }
+</style>
+{% endblock styles %}
 {% block content %}
 <div class="container" role="main">
     <div class="row">
         <div class="col-lg-12">
             <div class="message">
                 <h1>{{ message }}</h1>
-                <a class="lead" href='/apps/mbid/'>Return to MBid</a>
+                <a class="btn btn-primary" role="button" href='/apps/mbid/'>Return to MBid</a>
             </div>
         </div>
     </div>

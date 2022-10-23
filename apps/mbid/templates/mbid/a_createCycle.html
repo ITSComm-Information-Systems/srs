@@ -19,7 +19,7 @@
 			<b>{{form.closeDate.label}}</b>: {{form.closeDate}}
 			<br>
 			<br>
-			<input type="submit" name='makeCycle' value="Review" class='btn btn-primary'>
+			<input type="submit" name='makeCycle' value="Create" class='btn btn-primary'>
 		</form>
 	</div>
 
@@ -37,42 +37,25 @@
 {% endif %}
 
 {% if confirm %}
-<form method="POST">
-	{% csrf_token %}
-	<div class="alert alert-info">
-		<section id='cycleInfo' style='display: grid; grid-template-columns: 2 ;grid-template-rows: 2;'>
-			<div style="grid-row: 1/-1; grid-column: 1;">
-				<p id='monthyear' class='h4' style="display: flex; align-items: center; justify-content: center;">
-					{{bidMonth}} {{bidYear}}</p>
-			</div>
-			<div style="grid-row: 1; grid-column: 2;">
-				<p>OPENS: <b class='h4'>{{openDate}} @ 12:00 AM</b></p>
-			</div>
-
-			<div style="grid-row: 2; grid-column: 2;">
-				<p>CLOSES: <b class='h4'>{{closeDate}} @ 11:59 PM</b></p>
-			</div>
-		</section>
-	</div>
-
-	<div class="row">
-		<div class="col-4">
-			<label style="text-align: left" for='searchitems'>Search items: </label> <input id='searchitems'
-				type='text'>
+<div class="alert alert-info">
+	<section id='cycleInfo' style='display: grid; grid-template-columns: 2 ;grid-template-rows: 2;'>
+		<div style="grid-row: 1/-1; grid-column: 1;">
+			<p id='monthyear' class='h4' style="display: flex; align-items: center; justify-content: center;">
+				{{bidMonth}} {{bidYear}}</p>
 		</div>
-		<div class="col-4">
+		<div style="grid-row: 1; grid-column: 2;">
+			<p>OPENS: <b class='h4'>{{openDate}} @ 12:00 AM</b></p>
 		</div>
-		<div class="col-4">
-			<h4 style="text-align:right">Items open for bidding: {{totalItems}}</h4>
+
+		<div style="grid-row: 2; grid-column: 2;">
+			<p>CLOSES: <b class='h4'>{{closeDate}} @ 11:59 PM</b></p>
 		</div>
-	</div>
+	</section>
+</div>
 
-	{% include "mbid/a_table.html" %}
+{% include "mbid/a_table.html" %}
 
-	<input style="float:right;" name='infopage' type="submit" value="Create Cycle" class='btn btn-primary'>
-	<br>
-	<br>
-</form>
+<a href="{% url 'mbid:home' %}"><button class='btn btn-secondary'>Done</button></a>
 
 {% endif %}
 

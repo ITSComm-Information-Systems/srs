@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 from django.contrib.admin.models import LogEntry, ADDITION
 from django.db import models
 from django.forms.fields import DecimalField
+from ldap3.protocol.rfc4511 import Control
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
 from project.integrations import MCommunity, TDx
@@ -20,6 +21,7 @@ import cx_Oracle
 from django.core.exceptions import ValidationError
 from oscauth.utils import get_mc_user, get_mc_group
 from decimal import Decimal
+from django.utils.functional import cached_property
 
 
 if settings.ENVIRONMENT == 'Production':
@@ -259,11 +261,13 @@ class Chartcom(models.Model):
         return chartcom_list
 
     def get_user_chartcom_depts(self):
-        dept_list = UserChartcomV.objects.filter(user=self).order_by('dept').distinct('dept')
+        dept_list = UserChartcomV.objects.filter(user=self).order_by('dept').values('dept').distinct()
         user_chartcom_depts = []
         
+
+
         for chartcom in dept_list:
-            user_chartcom_depts.append((chartcom.dept))
+            user_chartcom_depts.append((chartcom.get('dept')))
 
         return user_chartcom_depts
 
@@ -295,7 +299,7 @@ class UserChartcomV(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'order_user_chartcom'
+        db_table = 'order_user_chartcom_v'
 
 
 class LogItem(models.Model):
@@ -386,35 +390,20 @@ class Volume(models.Model):
         return checkboxes
 
     def get_tickets(self):
-
-        cur = connections['default'].cursor()
-        cur.execute("select external_reference_id, create_date, data from order_item "
-                    "where cast(data->>'action_id' as INTEGER) in (select id from order_action where service_id = %s) "
-                    "  and cast(data->>'instance_id' as INTEGER) = %s "
-                    "  and external_reference_id is not null "
-                    "order by create_date desc"
-                    ,[self.service_id, self.id])
-
+        actions = Action.objects.filter(service=self.service).values_list('id', flat=True)
+        tickets = Item.objects.filter(data__instance_id=self.id
+            , external_reference_id__isnull=False
+            , data__action_id__in=actions)
         ticket_list = []
-        for row in cur.fetchall():
-
-            fulfill = ''
-
-            try:
-                data = json.loads(row[2])
-                note = render_to_string('order/pinnacle_note.html', {'text': data['reviewSummary'], 'description': 'Review Summary'})
-                if 'fulfill' in data:
-                    fulfill = data['fulfill']
-            except:
-                note = ''
-
-
-            ticket_list.append({'id': row[0]
-                              , 'url': f'{TDX_URL}{row[0]}'
-                              , 'create_date': row[1]
-                              , 'fulfill': fulfill
-                              , 'note': note})
-
+        for ticket in tickets: 
+            ticket_list.append({'id': ticket.external_reference_id
+                              , 'url': f'{TDX_URL}{ticket.external_reference_id}'
+                              , 'create_date': ticket.create_date
+                              , 'fulfill': ticket.data.get('fulfill')
+                              , 'note': render_to_string('order/pinnacle_note.html',
+                                        {'text': ticket.data.get('reviewSummary')
+                                        ,'description': 'Review Summary'})
+                              })
         return ticket_list
 
     def get_owner_instance(self, name):
@@ -523,7 +512,7 @@ class ArcInstance(Volume):
             if host != '':
                 ah = ArcHost()
                 ah.arc_instance = self
-                ah.name = host
+                ah.name = host.strip()
                 ah.save()
             
     def get_shortcodes(self):
@@ -672,7 +661,7 @@ class Server(models.Model):
     firewall_requests = models.CharField(max_length=100)
     legacy_data = models.TextField()
 
-    @property
+    @cached_property
     def total_disk_size(self):
         disk = ServerDisk.objects.filter(server=self).aggregate(models.Sum('size'))
         if disk:
@@ -718,12 +707,48 @@ class Server(models.Model):
 
 
 class ServerDisk(models.Model):
+    CONTROLLER_LIST = [(0,0),(1,1),(2,2),(3,3),]
+    DEVICE_LIST = []
+    for i in range(0,16):
+        if i != 7:  # VMWare hates 7's
+            DEVICE_LIST.append((i,i))
+
     server = models.ForeignKey(Server, related_name='disks', on_delete=models.CASCADE)
     name = models.CharField(max_length=10)
+    controller = models.IntegerField(choices=CONTROLLER_LIST)
+    device = models.IntegerField(choices=DEVICE_LIST)
     size = models.IntegerField()
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+
+        if self.controller == None or self.device == None:
+            self.set_scsi_id()
+
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+
+
+    def set_scsi_id(self):   # Set controller/device defaults based on name
+        num = int(self.name[4:])
+
+        controller = 0
+        device = 0
+
+        for i in range(0, num):
+            device += 1
+            if device == 7:
+                device = 8
+            elif device == 16:
+                device = 0
+                controller += 1
+
+        self.controller = controller
+        self.device = device
+
+        return 
+
 
 def get_disk_size(server):
     size = ServerDisk.objects.filter(server=server)
@@ -893,7 +918,10 @@ class Order(models.Model):
                 }
 
         if self.due_date:
-            data['due_date'] = self.due_date
+            if type(self.due_date) == str:   # If resubmitting this is in date format
+                data['due_date'] = self.due_date
+            else:
+                data['due_date'] = self.due_date.strftime('%Y-%m-%d')
 
         item_list = Item.objects.filter(order_id=self.id)
         elements = Element.objects.exclude(target__isnull=True).exclude(target__exact='')
@@ -958,9 +986,11 @@ class Order(models.Model):
 
         LogItem().add_log_entry('JSON', self.id, json_data)
 
+        cursor = connections['pinnacle'].cursor()
+
         try: 
-            with connections['pinnacle'].cursor() as cursor:
-                ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
+            cursor.callproc("dbms_output.enable")
+            ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
 
             self.order_reference = ponum
             self.save()
@@ -968,12 +998,23 @@ class Order(models.Model):
             self.add_attachments()
 
         except cx_Oracle.DatabaseError as e:
-        #except Exception as e:
             LogItem().add_log_entry('Error', self.id, e)
             num = str(self.id)
             url = settings.SITE_URL + '/orders/integration/'  + num
             send_mail('SRS Order # ' + num + ' failed to submit', url, 'itscomm.information.systems@umich.edu', ['itscomm.information.systems@umich.edu'])
 
+        finally:
+            dbms_output = ''
+
+            while True:
+                out = cursor.callproc("dbms_output.get_line", ('',0)) 
+                if out[1] > 0:
+                    break
+                
+                dbms_output = dbms_output + out[0] + '\n'
+            
+            LogItem().add_log_entry('DBMS_OUTPUT', self.id, dbms_output)
+            cursor.close()
 
 class Item(models.Model):
     description = models.CharField(max_length=100)
@@ -1058,7 +1099,7 @@ class Item(models.Model):
             else:
                 rec.owner = LDAPGroup().lookup( self.data['owner'] )
                 rec.service = action.service
-                rec.name = self.data.get('name','')
+                rec.name = self.data.get('name','').strip()
                 rec.owner = LDAPGroup().lookup( self.data['owner'] )
                 rec.size = self.data.get('size',0)
                 rec.service = action.service
@@ -1079,7 +1120,7 @@ class Item(models.Model):
                 rec.type = action.override['storage_type']
                 rec.shortcode = self.data.get('shortcode')
                 rec.uid = self.data.get('uid')
-                rec.ad_group = self.data.get('ad_group')    
+                rec.ad_group = self.data.get('ad_group').strip()
                 if action.service.id == 7:
                     self.update_mistorage(rec)
                 else:
@@ -1134,6 +1175,14 @@ class Item(models.Model):
 
         elif action.service.name == 'miServer':
             attributes.append({'ID': 1954, 'Value': self.data.get('shortcode')})
+
+            if self.data.get('michmed_flag') == 'Yes':
+                michmed = 21619  # Yes
+            else:
+                michmed = 21618  # No
+
+            attributes.append({'ID': 8480, 'Value': michmed})
+
             if action.type == 'M':
                 instance_id = self.data.get('instance_id')
                 instance = Server.objects.get(id=instance_id)
@@ -1163,6 +1212,8 @@ class Item(models.Model):
 
             db = self.data.get('database')
             if db:
+                attributes.append({'ID': 1874, 'Value': 93}) # Dedicated DB
+
                 if self.data.get('volaction') == 'Delete':
                     payload['Title'] = 'Delete MiDatabase'  # TODO Unreachable?
                 else:
@@ -1170,11 +1221,12 @@ class Item(models.Model):
                     attributes.append({'ID': 1953, 'Value': MCommunity().get_group_email_and_name(group_name)})  # Admin Group
 
                 attributes.append({'ID': 5319, 'Value': db})
+                attributes.append({'ID': 1858, 'Value': db})
                 attributes.append({'ID': 1952, 'Value': 203}) # Managed
 
                 if db == 'MSSQL':
                     attributes.append({'ID': 1994, 'Value': 215}) # Windows
-                    os = Choice.objects.get(code='Windows2019managed')
+                    os = Choice.objects.get(code='Windows2022managed')
                 else:
                     attributes.append({'ID': 1994, 'Value': 216}) # Linux
                     os = Choice.objects.get(code='RedHatEnterpriseLinux8')
@@ -1261,7 +1313,10 @@ class Item(models.Model):
         if self.data.get('ad_group'):
             rec.admin_group = LDAPGroup().lookup( self.data['ad_group'] )
         else:
-            rec.admin_group = rec.owner
+            if not rec.admin_group:
+                rec.admin_group = rec.owner                
+            elif rec.admin_group.name != 'MiDatabase Support Team':
+                rec.admin_group = rec.owner
 
         MCommunity().add_entitlement(rec.admin_group.name)
 
@@ -1289,7 +1344,7 @@ class Item(models.Model):
         elif self.data.get('database'):
             rec.on_call = 1   # Server is on call even if DB is not
             if self.data.get('database') == 'MSSQL':
-                rec.os = Choice.objects.get(code='Windows2019managed')
+                rec.os = Choice.objects.get(code='Windows2022managed')
                 rec.backup = True
                 rec.backup_time_id = 13  # 6:00 PM
                 rec.patch_day_id = 98    # Saturday
@@ -1358,7 +1413,7 @@ class Item(models.Model):
 
     def update_arcts(self, rec):
 
-        rec.nfs_group_id = self.data.get('nfs_group_id')
+        rec.nfs_group_id = self.data.get('nfs_group_id').strip()
 
         if self.data.get('sensitive_regulated') == 'yessen':
             rec.sensitive_regulated = True
@@ -1405,7 +1460,7 @@ class Item(models.Model):
         rec.save()
         self.internal_reference_id = rec.id
         self.save() # Save the instance ID on the item 
-        bill_size_list = self.data.get('terabytes') 
+        bill_size_list = self.data.get('terabytes')
 
         ArcBilling.objects.filter(arc_instance=rec).delete()
 

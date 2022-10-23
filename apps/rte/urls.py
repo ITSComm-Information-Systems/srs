@@ -1,5 +1,4 @@
 from django.urls import path
-from django.conf.urls import url
 from . import views
 
 urlpatterns = [
@@ -14,6 +13,9 @@ urlpatterns = [
     path('update/', views.update),
     path('view-time/display/', views.view_time_display),
     path('view-time/', views.view_time_load),
-    url(r'', views.load_rte),
+    path('actionlog/', views.get_action_log),
+    path('actionlog/<int:id>/', views.get_action_log_entry),
+    path('confirmation/', views.get_confirmation),
+    path(r'', views.load_rte),
     
 ]

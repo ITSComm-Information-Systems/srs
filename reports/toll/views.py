@@ -43,6 +43,13 @@ def select(request):
 
 	# Get instructions
 	instructions = Page.objects.get(permalink='/toll')
+	
+	edit_dept = 'None'
+	edit_date = 'None'
+	if request.method =='POST':
+        # Get information from previous page
+		edit_dept = request.POST.get('edit_dept')
+		edit_date = request.POST.get('edit_date')
 
 	context = {
 		'title': 'Toll Statements',
@@ -50,6 +57,9 @@ def select(request):
 		'depts': depts,	
 		'instructions': instructions,
 		'dept_names': dept_names,
+
+		'edit_dept': edit_dept,
+        'edit_date': edit_date
 	}
 
 	return HttpResponse(template.render(context, request))
@@ -94,6 +104,9 @@ def generate(request):
 		'bill_month': month,
 		'bill_year': year,
 		'submit': submit,
+
+		'edit_dept': dept_id,
+		'edit_date': bill_period
 	}
 
 	return HttpResponse(template.render(context, request))

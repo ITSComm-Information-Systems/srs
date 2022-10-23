@@ -1,11 +1,12 @@
-# osc\pages\view
+# osc\pages\view 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 from . models import Page
 
-
+@login_required
 def index(request, pagename):
     pagename = '/' + pagename
     pg = get_object_or_404(Page, permalink=pagename)

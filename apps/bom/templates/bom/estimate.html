@@ -81,7 +81,7 @@
           {{ form.assigned_engineer }}
         </div>
 
-        <a href="{{ estimate.folder }}" target="_blank"><i class="fas fa-link"></i>&nbsp; Drive Folder</a> 
+        <a href="{{ estimate.folder }}" target="_blank"><i class="fas fa-link"></i>&nbsp; Drive Folder</a>
         {{ form.folder }}
 
         <br>
@@ -145,7 +145,7 @@
         <div class="btn-group">
           <button type="submit" class="btn btn-primary">Save</button>
           <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split always-enabled" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">Actions
+          aria-haspopup="true" aria-expanded="false">Actions
             <span class="sr-only">Toggle Dropdown</span>
           </button>
           <div class="dropdown-menu">
@@ -165,7 +165,7 @@
         <div>
           <p>
             {% if perms.bom.can_update_bom_ordered %}
-            <a class="float-right" href="/apps/bom/warehouse/{{ estimate.id }}">Warehouse View</a><br>
+            <a class="float-right" href="/apps/bom/warehouse/{{ estimate.id }}" style="padding-right: 10px">Warehouse View</a><br>
             {% endif %}
             <strong>Created on</strong>&nbsp{{ estimate.create_date|date:"SHORT_DATETIME_FORMAT" }}<br>
             <strong>Created by</strong>&nbsp;{{ estimate.created_by }}<br><br>
@@ -203,7 +203,7 @@
       <div class="tab-pane fade" id="nav-labor" role="tabpanel" aria-labelledby="nav-labor-tab">
         {% include "bom/tab_labor_detail.html" %}</div>
       <div class="tab-pane fade" id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab">
-       {% include "bom/tab_notes.html" %}</div>   
+        {% include "bom/tab_notes.html" %}</div>
     </div>
   </form>
 </div>
@@ -229,40 +229,40 @@
 
 <div class="modal" tabindex="-1" role="dialog" id="pinNote">
   <div class="modal-dialog" role="document">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title">Add Pinnacle Note</h5>
-              <button type="button" class="close always-enabled" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Pinnacle Note</h5>
+        <button type="button" class="close always-enabled" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form method="POST" action="/apps/bom/add_pinnacle_note/" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input class="always-enabled" type="hidden" id="note_estimate_id" name="note_estimate_id" value="{{ estimate.id }}">
+        <input class="always-enabled" type="hidden" id="note_woid" name="note_woid" value="{{ estimate.woid }}">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="formGroupExampleInput">Subject</label>
+            <select required class="form-control always-enabled" id="note_subject" name="note_subject">
+              <option value="" disabled selected>---</option>
+              {% for note_type in form.note_type_list %}
+              <option>{{ note_type|last }}</option>
+              {% endfor %}
+            </select>
           </div>
 
-          <form method="POST" action="/apps/bom/add_pinnacle_note/" enctype="multipart/form-data">
-              {% csrf_token %}
-              <input class="always-enabled" type="hidden" id="note_estimate_id" name="note_estimate_id" value="{{ estimate.id }}">
-              <input class="always-enabled" type="hidden" id="note_woid" name="note_woid" value="{{ estimate.woid }}">
-              <div class="modal-body">
-                  <div class="form-group">
-                      <label for="formGroupExampleInput">Subject</label>
-                      <select required class="form-control always-enabled" id="note_subject" name="note_subject">
-                        <option value="" disabled selected>---</option>
-                        {% for note_type in form.note_type_list %}
-                          <option>{{ note_type|last }}</option>
-                        {% endfor %}
-                      </select>
-                  </div>
-
-                  <div class="form-group">
-                      <label for="formGroupExampleInput">Body</label>
-                      <textarea required class="form-control always-enabled" id="note_body" name="note_body"></textarea>
-                  </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="submit" class="btn btn-primary always-enabled">Submit</button>
-                  <button type="button" class="btn btn-secondary always-enabled" data-dismiss="modal">Cancel</button>
-              </div>
-          </form>
-      </div>
+          <div class="form-group">
+            <label for="formGroupExampleInput">Body</label>
+            <textarea required class="form-control always-enabled" id="note_body" name="note_body"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary always-enabled">Submit</button>
+          <button type="button" class="btn btn-secondary always-enabled" data-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -319,6 +319,22 @@
       $("#pinNote :input").prop("disabled", false)
       $('#notifyWarehouse').hide();
       $('#routeToProjectManager').hide();
+
+      // Specifically keep netops module open all the time anyways
+      const modalUMNETinput = document.querySelectorAll('#modalUMNET input');
+      modalUMNETinput.forEach(function (inputfield) {
+        inputfield.disabled = false;
+      });
+
+      const modalUMNETselect = document.querySelectorAll('#modalUMNET select');
+      modalUMNETselect.forEach(function (inputfield) {
+        inputfield.disabled = false;
+      });
+      
+      const modalUMNETbutton = document.querySelectorAll('#modalUMNET button');
+      modalUMNETbutton.forEach(function (inputfield) {
+        inputfield.disabled = false;
+      });
     }
     // One ITS
     if (status != 1) {

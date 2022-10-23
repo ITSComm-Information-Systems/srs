@@ -5,6 +5,10 @@
 #   * Made sure each ForeignKey has `on_delete` set to the desired behavior.
 #   * Kept `managed = False` lines if you wish to not  allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+# Generate the soource code as follows:
+# python3 manage.py inspectdb um_osc_name_change_v --database=pinndev
+
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -1139,7 +1143,7 @@ class UmRteInput(models.Model):
                                     on_delete=models.CASCADE)
   actual_mins_display = models.CharField(max_length=10, blank=True, null=True)
   notes = models.CharField(max_length=4000, blank=True, null=True)
-  date_added = models.DateField(blank=True, null=True)
+  date_added = models.DateTimeField(blank=True, null=True)
   date_processed = models.DateField(blank=True, null=True)
   messages = models.CharField(max_length=2000, blank=True, null=True)
   request_no = models.BigIntegerField(primary_key=True)
@@ -1273,8 +1277,14 @@ class UmEcommMbidVendorV(models.Model):
         db_table = 'PINN_CUSTOM\".\"UM_ECOMM_MBID_VENDOR_V'
 
 
+class DepartmentManager(models.Manager):
+
+    def group_dropdown(self):
+        return list(UmMpathDwCurrDepartment.objects.values_list('dept_grp', 'dept_grp_descr').distinct().order_by('dept_grp_descr'))
+
+
 class UmMpathDwCurrDepartment(models.Model):
-    deptid = models.CharField(max_length=10)
+    deptid = models.CharField(max_length=10, primary_key=True)
     dept_effdt = models.DateField()
     dept_eff_status = models.CharField(max_length=1)
     dept_descr = models.CharField(max_length=30)
@@ -1288,9 +1298,13 @@ class UmMpathDwCurrDepartment(models.Model):
     dept_bud_seq = models.CharField(max_length=20, blank=True, null=True)
     dept_bud_seq_descr = models.CharField(max_length=30, blank=True, null=True)
 
+    objects = DepartmentManager()
+
     class Meta:
         managed = False
         db_table = 'PINN_CUSTOM\".\"UM_MPATHDW_CURR_DEPARTMENT'
+
+
 
 
 class UmOscAuthUsersApi(models.Model):
@@ -1302,3 +1316,42 @@ class UmOscAuthUsersApi(models.Model):
      class Meta:
           managed = False
           db_table = 'PS_RATING\".\"UM_OSC_AUTH_USERS_API_V'
+
+
+class UmOscNameChangeV(models.Model):
+    deptid = models.CharField(max_length=15, blank=True, null=True)
+    service_number = models.CharField(max_length=60)
+    service_status_code = models.CharField(max_length=15)
+    service_type = models.CharField(max_length=20)
+    subscriber_id = models.CharField(max_length=7, primary_key=True)
+    first_name = models.CharField(max_length=50, blank=True, null=True)
+    mi = models.CharField(max_length=1, blank=True, null=True)
+    last_name = models.CharField(max_length=50, blank=True, null=True)
+    email_address = models.CharField(max_length=320, blank=True, null=True)
+    uniqname = models.CharField(max_length=320, blank=True, null=True)
+    subscriber_status = models.CharField(max_length=20, blank=True, null=True)
+    user_defined_id = models.CharField(max_length=20, blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    location_id = models.FloatField()
+    building_code = models.CharField(max_length=10, blank=True, null=True)
+    building_name = models.CharField(max_length=25, blank=True, null=True)
+    floor_name = models.CharField(max_length=18, blank=True, null=True)
+    room_name = models.CharField(max_length=18, blank=True, null=True)
+    jack_name = models.CharField(max_length=30, blank=True, null=True)
+    cable_path_id = models.FloatField(blank=True, null=True)
+    dept_default_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
+    occ_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
+    mrc_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
+    toll_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
+    local_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
+    other_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
+
+    @property
+    def full_name(self):
+        "Returns the person's full name."
+        return ' '.join([self.first_name, self.mi, self.last_name])
+
+    class Meta:
+        managed = False  # Created from a view. Don't remove.
+        db_table = 'PINN_CUSTOM\".\"um_osc_name_change_v'

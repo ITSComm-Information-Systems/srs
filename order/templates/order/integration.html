@@ -10,6 +10,11 @@ ul, #myUL {
   padding: 0;
 }
 
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
 /* Style the caret/arrow */
 .caret {
   cursor: pointer; 
@@ -62,6 +67,28 @@ ul, #myUL {
     <li>Chartcom: {{ order.chartcom }}</li>
     <li>{{ order.created_by }}</li>
 </ul>
+
+<h5>Pinnacle Records</h5>
+<table>
+    <tr>
+      <th>SRS Item ID</th>
+      <th>Preorder</th>
+      <th>Workorder</th>
+      <th>Action</th>
+      <th>Status</th>
+      <th>Comment (Truncated)</th>
+    </tr>
+    {% for rec in preorder %}
+    <tr>
+      <td>{{ rec.add_info_text_4 }}</td>
+      <td>{{ rec.pre_order_number_display }}</td>
+      <td>{{ rec.wo_number_display }}</td>
+      <td>{{ rec.action_name }}</td>
+      <td>{{ rec.status_name }}</td>
+      <td>{{ rec.comment_text|slice:":40" }}</td>
+    </tr>
+    {% endfor %}
+</table>
 
 <ul>
 {% for order in order_list %}

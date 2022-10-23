@@ -3,6 +3,10 @@
 {% block content %}
 <h1>{{ title }}</h1>
 <div class='row'>
+    <div>
+        <p display="none" data-value="{{ edit_dept }}" id="editDept"></p>
+        <p display="none" data-value="{{ edit_date }}" id="editDate"></p>
+    </div>
     <div class='col-lg-8 col-md-12'>
         <form action="/reports/inventory/report" method="POST" name="Select"> {% csrf_token %}
                 <div class="form-group">
@@ -47,4 +51,21 @@
 <script src="/../static/inv_loc.js"></script>
 <script src="/static/select.js"></script>
 
+<script>
+    // If the edit button was clicked on the report page
+    // change dropdown contents
+    document.addEventListener('DOMContentLoaded', function () {
+        var dept = document.getElementById("editDept").getAttribute("data-value")
+        if ((dept != '') && (dept != 'None')){
+            $('#dept_id').val(dept);
+            $('#dept_id').trigger('change');
+        }
+
+        var date = document.getElementById("editDate").getAttribute("data-value")
+        if ((date != '') && (date != 'None')) {
+            $('#bill_period').val(date);
+            $('#bill_period').trigger('change');
+        }
+    });
+</script>
 {% endblock %}

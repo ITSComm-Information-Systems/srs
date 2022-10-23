@@ -1,0 +1,399 @@
+{% extends 'softphone/base_softphone.html' %}
+
+
+{% block styles %}
+{{ block.super }}
+<style>
+    .errorlist {
+        color: red;
+    }
+</style>
+
+{% endblock styles %}
+
+
+
+{% block body %}
+
+{% load humanize %}
+<div id="softphone-navigation" class='container-fluid' style="background-color: white;">
+
+    <div class='container'>
+        <h1>Telephone Upgrade Request Form</h1>
+    </div>
+
+</div>
+
+<form id="card-deck" method="post">
+    <div class='container-fluid'>
+
+
+        {% csrf_token %}
+        {{ selection_formset.management_form }}
+
+        <div id="card-deck" class='container'>
+            &nbsp;
+
+            {% for form in selection_formset %}
+            {% with phone=form.initial %}
+
+
+            <div id="{{ form.prefix }}" class="card border-primary shadow p-3 my-3">
+                {{ form.subscriber }}
+
+                <div class="row">
+                    <div class="col-sm">
+                        <strong>Phone</strong><br>
+                        {{ phone.number}}<br>
+                        Uniqname: {{ phone.user }}<br>
+                        {{ phone.name}}
+                    </div>
+                    <div class="col-sm">
+                        <strong>Location</strong><br>
+                        {{ phone.building }}<br>
+                        Floor: {{ phone.floor }}<br>
+                        Room: {{ phone.room }}<br>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="container">
+                            <div class="text-center">
+                                <strong class="text-center">Charges</strong>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">
+                                    <small><strong>Service</strong></small>
+                                </div>
+                                <div class="col-sm text-right">
+                                    <small><strong>Total</strong></small>
+                                </div>
+                            </div>
+                            {% for charge in phone.charges %}
+                            <div class="row">
+                                <div class="col-sm">
+                                    {{ charge.charge_name }}
+                                </div>
+
+                                <div class="col-sm text-right">
+                                    ${{ charge.recurring_amount|floatformat:2 }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+
+
+                </div>
+                &nbsp;
+                <div class="row">
+
+                    <div class="form-group col-sm upgrade_to_softphone" id="div_{{ form.migrate.id_for_label }}" data-location="{{ phone.building }}">
+                        <label>Upgrade to New Softphone?</label>
+                        <div>
+                            {{ form.migrate }}
+                            {{ form.migrate.errors }}
+                        </div>
+                    </div>
+
+                    <div class="form-group col-sm">
+                        {% if phone.user %}
+                        <label for="uniqname_correct">Is uniqname <b>{{ phone.user }}</b> correct?</label>
+                        {% else %}
+                        <label for="uniqname_correct">Is there a uniqname?</label>
+                        {% endif %}
+                        <div>
+                            {{ form.uniqname_correct }}
+                            {{ form.uniqname_correct.errors }}
+                        </div>
+                        <br>
+                        <div id="div_{{ form.uniqname.id_for_label }}" style="display: none;">
+                            <label for="uniqname">Please provide a uniqname:</label>
+                            <div>
+                                {{ form.uniqname }}
+                                {{ form.uniqname.errors }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-sm">
+                        <div>
+                            <label>Category</label>
+                            {{ form.category }}
+                            {{ form.category.errors }}
+                            <span style="display: none;" id="div_id_{{ form.prefix }}-conference_note"><i class="fas fa-exclamation-circle"></i>&nbsp; Please add note of current telephone device type.</span>
+                        </div>
+                        <br>
+                        <div id="div_{{ form.category.id_for_label }}" style="display: none;">
+                            <label>Enter Category</label>
+                            {{ form.other_category }}
+                            {{ form.other_category.errors }}
+                        </div>
+                    </div>
+
+                    <div class="form-group col-sm" id="div_{{ form.location_correct.id_for_label }}" style="display: none;">
+                        <div>
+                            <label>Is Location Correct?</label>
+                            {{ form.location_correct }}
+                            {{ form.location_correct.errors }}
+                            <span id="id_{{ form.prefix }}-wrong_location" style="display: none;"><small><strong><i class="fas fa-info-circle"></i>&nbsp;You will be contacted by the softphone upgrade team to get the correct location.</strong></small></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-2">
+                        <br>
+                        <a id="{{ form.prefix }}_clear" class="clear-selections" style="float: right"
+                            href="javascript:void(0);">Clear Responses</a>
+                        <a id="{{ form.notes.id_for_label }}_link" class="add-notes" style="float: right"
+                            href="javascript:void(0);">Add Notes</a><br><br>
+                        <a id="{{ form.prefix }}_remove_card" class="remove-card" style="float: right"
+                            href="javascript:void(0);">Deselect</a>
+                    </div>
+
+                </div>
+
+
+
+                &nbsp;
+                <div class="row" id="div_{{ form.notes.id_for_label }}" {% if not form.notes.value %}style="display: none;"{% endif %}>
+                    <div class="form-group col-sm upgrade_to_softphone" >
+                        <label>Notes<br><small>(Limit 200 characters)</small></label>
+
+                        <div>
+                            {{ form.notes }}
+                            {{ form.notes.errors }}
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+            {% endwith %}
+            {% endfor %}
+            &nbsp;
+        </div> <!-- Card Deck -->
+        &nbsp;
+    </div>
+
+    <div id="footered" class="container-fluid fixed-bottom bg-light border border-top-primary">
+
+        <div class="container">
+            <input type="hidden" name="calling_page" value="{{ page }}">
+            <a id="id_previous" class="btn btn-primary text-white" href="/softphone/dept/{{ dept_id }}/?nav=prev&page={{ page }}" role="button">Previous</a>
+
+            <div class="float-right">
+                <button id="id_next" type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+
+    </div>
+
+
+</form>
+
+
+
+{% endblock body %}
+
+
+{% block footer %}
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+    $(document).ready(function () {
+
+
+        $(document).on("click", "#id_previous", function (e) {
+            console.log('check for deletey');
+            e.preventDefault();
+            f = $('#card-deck')
+            //f = $("#share").append('<form action="sharer.php" method="POST">');
+            tar = $(this).attr("href").replace("?page=", "");
+            var target_page = $("<input>")
+                .attr("type", "hidden")
+                .attr("name", "target_page").val(tar);
+            f.append(target_page)
+            f.submit();
+        });
+
+        // Reorder form-x tags if needed
+        $(document).on("click", "#id_next", function (e) {
+            //e.preventDefault();
+
+
+            $( ".card" ).each(function( i ) {
+                console.log( i + ": " + this.id );
+                $(this).attr('name', $(this).attr('name') + i);
+                //$(this).find('input').attr('name', 'song' + i);
+                //$(this).replace("form-1-", "form-7-");
+                //this.replace("input")
+                if (this.id != "form-" + i) {
+                    inps = $(this).find(':input');
+
+                    for (let x = 0, len = inps.length, text = ""; x < len; x++) {
+                        //text += inps[x] + "<br>";
+                        id = inps[x].id;
+                        name = $(inps[x]).attr('name');
+                        console.log('test', id, name);
+                        newname = name.replace(this.id, "form-" + i);
+                        $('#' + id).attr('name', newname)
+                    }
+                } else {
+                    console.log('match', this.id);
+                }
+            });
+
+
+        });
+
+
+
+
+        $('#confirm-model').modal()
+
+        $.fn.select2.defaults.set("theme", "bootstrap4");
+        $('#id_phone_search').select2({
+            placeholder: "Search",
+            display: "inline",
+        });
+
+        // Class form up with bootstrap
+        $("select").addClass("form-control custom-select");
+        $('input:not(:checkbox)').addClass("form-control");
+
+        $(".verify-uniqname").bind('change', function () {
+            target = "#div_" + $(this).attr('id').replace("_correct", "");
+
+            if (this.value === 'CHANGE') {
+                $(target).show();
+            } else {
+                $(target).hide();
+                uniqname = target.replace('#div_id', '#id')
+                $(uniqname).val('');
+            }
+        });
+        $(".verify-uniqname").trigger('change');
+
+        $(".add-notes").click(function () {
+            target = "#div_" + $(this).attr('id').replace("_link", "");
+            $(target).show();
+        });
+
+        $(".location-correct").change(function () {
+            source = '#' + $(this).attr('id').replace("div_", "");    
+            target = '#' + $(this).attr('id').replace("location_correct", "wrong_location");
+
+            sel = $(source).val();
+
+            if (sel=='True') {
+                $(target).hide();
+            } else {
+                $(target).show();
+            }
+        });
+
+
+        $(".upgrade_to_softphone").change(function () {
+            if (this.dataset.location == "") {
+                return;
+            }
+
+            source = $(this).attr('id').replace("div_", "");    
+            form = source.replace("migrate", "");
+
+            sel = $("#" + source).val();
+
+            if (sel=='YES_SET' || sel=='NOT_YET') {
+                $("#div_" + form + "location_correct").show();
+            } else {
+                $("#div_" + form + "location_correct").hide();
+            }
+
+            if (sel=='YES') {
+                $("#" + form + "uniqname_correct option[value='NA']").attr('disabled','disabled').removeAttr("selected");
+                $("#" + form + "category option:gt(2)").attr('disabled','disabled').removeAttr("selected");
+                $("#" + form + "other_category").val("");
+                $("#" + form + "category").trigger('change');
+            } else {
+                $("#" + form + "uniqname_correct option[value='NA']").removeAttr('disabled');
+                $("#" + form + "category option:gt(2)").removeAttr('disabled');
+                $("#" + form + "category").trigger('change');
+            }
+
+       });
+
+        $(".remove-card").click(function () {
+            target = $(this).attr('id').replace("_remove_card", "");
+            $('#' + target).remove();
+
+            count = $('#id_form-TOTAL_FORMS').val()
+            $('#id_form-TOTAL_FORMS').val(count - 1)
+        });
+
+        $(".clear-selections").click(function () {
+            target = $(this).attr('id').replace("_clear", "");
+            $('#' + target).find(":input:not([type=hidden])").val('');
+            $('#id_' + target + '-uniqname_correct').prop("disabled", false);
+            //$('#id_' + target + '-physical_phone_required').prop("disabled", false);
+            $('#id_' + target + '-category').prop("disabled", false);
+        });
+
+        $(".phone-category").change(function () {
+            target = "#div_" + $(this).attr('id')
+
+            if (this.value === '49') {
+                $(target).show();
+            } else {
+                $(target).hide();
+            }
+
+            target = target.replace('category', 'notes')
+            if (this.value === '47') {  // Conference Room
+                $(target).show();
+                target = target.replace('notes', 'conference_note')
+                $(target).show();
+            } else {
+                target = target.replace('notes', 'conference_note')
+                $(target).hide();
+            }
+
+
+
+
+        });
+        $(".phone-category").trigger('change');
+
+        $(".convert-softphone").change(function () {
+            target = '#' + $(this).attr('id').replace('migrate', '')
+
+            if (this.value === 'CANCEL') {
+                $(target + 'uniqname_correct').prop("disabled", true);
+                $(target + 'uniqname').val('');
+                //$(target + 'physical_phone_required').prop("disabled", true);
+                $(target + 'category').prop("disabled", true);
+            } else {
+                $(target + 'uniqname_correct').prop("disabled", false);
+                //$(target + 'physical_phone_required').prop("disabled", false);
+                $(target + 'category').prop("disabled", false);
+            }
+        });
+        $(".convert-softphone").trigger('change');
+
+        // Enable navigation prompt
+        //$('select').not('#id_phone_search').on('change', function() { 
+        //    window.onbeforeunload = function() {
+        //        return true;
+        //    };
+        //}); 
+
+    });
+</script>
+
+
+{% endblock %}
