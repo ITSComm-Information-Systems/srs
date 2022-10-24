@@ -1,0 +1,47 @@
+<div class="form-group {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
+    <label for="exampleInputEmail1"><strong>{{ field.label }}</strong></label>
+    <small id="emailHelp" class="form-text text-muted">{{ field.help_text }}</small>
+    {{ field }}
+    
+    {% for error in field.errors %}
+    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+    {% endfor %}
+</div>
+
+<div class="row" style="padding-left: 50px; display: none;" id="div_nih_info">
+    <div class="form-group col-3" id="div_{{ form.nih_id.name }}">
+        <small id="emailHelp" class="form-text text-muted">{{ form.nih_id.label }}</small>
+        {{ form.nih_id }}
+        
+        {% for error in form.nih_id.errors %}
+        <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+        {% endfor %}
+    </div>
+
+    <div class="form-group col-3" id="div_{{ form.nih_officer_name.name }}">
+        <small id="emailHelp" class="form-text text-muted">{{ form.nih_officer_name.label }}</small>
+        {{ form.nih_officer_name }}
+        
+        {% for error in form.nih_officer_name.errors %}
+        <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+        {% endfor %}
+    </div>
+
+
+    <div class="form-group col-3" id="div_{{ form.nih_officer_email.name }}">
+        <small id="emailHelp" class="form-text text-muted">{{ form.nih_officer_email.label }}</small>
+        {{ form.nih_officer_email }}
+        
+        {% for error in form.nih_officer_email.errors %}
+        <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+        {% endfor %}
+    </div>
+
+
+</div>
+
+<hr>

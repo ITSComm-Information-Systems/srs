@@ -1,0 +1,22 @@
+<div class="form-group {{ form.vpn.div_class }} col-6" id="div_{{ form.vpn.name }}">
+    <label for="exampleInputEmail1"><strong>{{ form.vpn.label }}</strong></label>
+    <small id="emailHelp" class="form-text text-muted">{{ form.vpn.help_text }}</small>
+    {{ form.vpn }}
+    
+    {% for error in form.vpn.errors %}
+    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+    {% endfor %}
+</div>
+
+
+<div class="form-group {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
+    <label for="exampleInputEmail1"><strong>{{ field.label }}</strong></label>
+    <small id="emailHelp" class="form-text text-muted">{{ field.help_text }}</small>
+    {{ field }}
+    
+    {% for error in field.errors %}
+    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+    {% endfor %}
+</div>

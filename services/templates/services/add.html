@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="container">
+
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+            {% if field.name in form.skip %}
+            {% elif field.name in form.custom %}
+                {% include 'services/'|add:field.name|add:'.html' %}
+            {% else %}
+                <div class="form-group {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
+                    <label for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {{ field }}
+                    
+                    {% for error in field.errors %}
+                    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        {% endfor %}
+
+        <div class="form-check">
+            {{ form.acknowledge_sle}}
+            <label class="form-check-label" for="id_acknowledge_sle">I have read and awknowledge the 
+                <a target="_blank" href="https://docs.google.com/document/d/1m401diwNcS70iFEWd861XW7dtKcoAOZfTupgFDs8cEI/edit?usp=sharing">
+                    Service Charter
+                </a>
+            </label>
+        </div>
+
+        <div class="form-check">
+            {{ form.acknowledge_srd}}
+            <label class="form-check-label" for="id_acknowledge_srd">I have read and awknowledge the 
+                <a target="_blank" href="https://docs.google.com/spreadsheets/d/1UwNYBqUPeMABrYb6OeEdlzY6hZn5mNrT_mW9B_2yV2U/edit#gid=1259966563">
+                    Shared Responsibility Document
+                </a>
+            </label>
+        </div>
+
+
+        <hr>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+
+
+        $("#id_migrate_existing").change(function () {
+            if (this.value == "Yes") {
+                $("#div_aws_account_info").show();
+            } else {
+                $("#div_aws_account_info").hide();
+            }
+        });
+
+        $("#id_sensitive_data_yn").change(function () {
+            if (this.value == "Yes") {
+                $("#div_sensitive_data").show();
+            } else {
+                $("#div_sensitive_data").hide();
+            }
+        });
+
+        $("#id_gcp_existing").change(function () {
+            if (this.value == "Yes") {
+                $("#div_gcp_account_info").show();
+            } else {
+                $("#div_gcp_account_info").hide();
+            }
+        });
+
+        $("#id_vpn").change(function () {
+            if (this.value == "Yes") {
+                $("#div_vpn_tier").show();
+            } else {
+                $("#div_vpn_tier").hide();
+            }
+        });
+
+        $("#id_nih_yn").change(function () {
+            if (this.value == "Yes") {
+                $("#div_nih_info").show();
+            } else {
+                $("#div_nih_info").hide();
+            }
+        });
+
+        $('#id_migrate_existing').trigger('change')
+        $('#id_sensitive_data_yn').trigger('change')
+        $('#id_gcp_existing').trigger('change')
+        $('#id_vpn').trigger('change')
+        $('#id_nih_yn').trigger('change')
+
+    });
+
+</script>
+{% endblock js %}
