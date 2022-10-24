@@ -94,7 +94,32 @@ class CutDateListFilter(admin.SimpleListFilter):
             if cut_date == None:
                 cut_date_list.append(('None',cut_date))            
             else:
-                cut_date_list.append((cut_date,cut_date))
+                if(cut_date > date.today()):
+                    cut_date_list.append((cut_date,cut_date))
+
+        #cut_date_list.filter(cut_date < date.now())
+        return cut_date_list
+
+    def queryset(self, request, queryset):
+        if self.value() == None:
+            return queryset
+        elif self.value() == 'None':
+            return queryset.filter(cut_date__isnull=True)
+        else:
+            return queryset.filter(cut_date=self.value())
+
+class OldCutDateListFilter(admin.SimpleListFilter):
+    title = 'Past Cut Dates'
+    parameter_name = 'cut_date'
+
+    def lookups(self, request, model_admin):
+        cut_date_list = []
+        for cut_date in Selection.objects.distinct().order_by('cut_date').values_list('cut_date', flat=True):
+            if cut_date == None:
+                cut_date_list.append(('None',cut_date))            
+            else:
+                if(cut_date < date.today()):
+                    cut_date_list.append((cut_date,cut_date))
 
         return cut_date_list
 
@@ -112,7 +137,7 @@ class SelectionAdmin(admin.ModelAdmin):
     list_display = ['service_number','subscriber','uniqname','migrate','updated_by','update_date','processing_status','cut_date','building_code']
     ordering = ['-update_date']
     search_fields = ['service_number','uniqname','updated_by','building_code']
-    list_filter = [ProcessingStatusListFilter,'migrate',CutDateListFilter, DuoListFilter,ZoomListFilter]
+    list_filter = [ProcessingStatusListFilter,'migrate',OldCutDateListFilter,CutDateListFilter, DuoListFilter,ZoomListFilter]
     form = SelectionForm
     actions = ['update_selections','download_csv']
 
