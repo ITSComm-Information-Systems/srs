@@ -735,7 +735,18 @@ class Services(UserPassesTestMixin, View):
             selected_service = request.session.get('backupStorage','miBackup')
 
         for service in service_list:
-            service.actions = action_list.filter(service=service)
+            if service.name == 'cloud':
+                service.actions = [{'label': 'Order Google Cloud Platform', 'target': '/services/gcp/add/'},
+                                   {'label': 'View/Change GCP Project', 'target': '/services/gcp'},
+                                   {'label': 'Order Microsoft Azure', 'target': '/services/azure/add/'},
+                                   {'label': 'View/Change Microsoft Azure', 'target': '/services/azure'},
+                                   {'label': 'Order AWS', 'target': '/services/aws/add/'},
+                                   {'label': 'View/Change AWS', 'target': '/services/aws/'} ]
+            else:
+                service.actions = action_list.filter(service=service)
+                for action in service.actions:
+                    action.target = f'/orders/wf/{action.id}'
+
             if service.name == selected_service:
                 service.active = 'active show'
 
