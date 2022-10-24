@@ -1,0 +1,32 @@
+<div class="form-group {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
+    <label for="exampleInputEmail1"><strong>{{ field.label }}</strong></label>
+    <small id="emailHelp" class="form-text text-muted">{{ field.help_text }}</small>
+    {{ field }}
+    
+    {% for error in field.errors %}
+    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+    {% endfor %}
+</div>
+
+<div class="row" style="padding-left: 50px; display: none;" id="div_gcp_account_info">
+    <div class="form-group col-3" id="div_{{ form.existing_id.name }}">
+        <small id="emailHelp" class="form-text text-muted">{{ form.existing_id.label }}</small>
+        {{ form.existing_id }}
+        
+        {% for error in form.existing_id.errors %}
+        <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+        {% endfor %}
+    </div>
+
+    <div class="form-group col-3" id="div_{{ form.existing_project.name }}">
+        <small id="emailHelp" class="form-text text-muted">{{ form.existing_project.label }}</small>
+        {{ form.existing_project }}
+        
+        {% for error in form.existing_project.errors %}
+        <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+        {% endfor %}
+    </div>
+</div>
