@@ -86,17 +86,21 @@ class DuoListFilter(admin.SimpleListFilter):
 
 class CutDateListFilter(admin.SimpleListFilter):
     title = 'Cut Date'
+    template = "admin/softphone/selection/custom_filter.html"
     parameter_name = 'cut_date'
 
     def lookups(self, request, model_admin):
         cut_date_list = []
+        past_cut_date_list = []
         for cut_date in Selection.objects.distinct().order_by('cut_date').values_list('cut_date', flat=True):
             if cut_date == None:
                 cut_date_list.append(('None',cut_date))            
+            elif cut_date < date.today():
+                past_cut_date_list.append((cut_date,cut_date))        
             else:
                 cut_date_list.append((cut_date,cut_date))
 
-        return cut_date_list
+        return cut_date_list + past_cut_date_list
 
     def queryset(self, request, queryset):
         if self.value() == None:
@@ -109,6 +113,8 @@ class CutDateListFilter(admin.SimpleListFilter):
 
 @admin.register(Selection)
 class SelectionAdmin(admin.ModelAdmin):
+    date_hierarchy = 'cut_date'
+
     list_display = ['service_number','subscriber','uniqname','migrate','updated_by','update_date','processing_status','cut_date','building_code']
     ordering = ['-update_date']
     search_fields = ['service_number','uniqname','updated_by','building_code']
@@ -143,6 +149,7 @@ class SelectionAdmin(admin.ModelAdmin):
 
     def bulk_update(self, request):
         cut_date = request.POST.get('cut_date')
+        
 
         if cut_date == '':
             cut_date = None
