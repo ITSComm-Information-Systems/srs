@@ -58,7 +58,7 @@ class ProcessingStatusListFilter(admin.SimpleListFilter):
     parameter_name = 'processing_status'
 
     def lookups(self, request, model_admin):
-        return (('Selected', 'Selected'), ('Completed', 'Completed'),  ('On Hold', 'On Hold'),  ('None', 'None'), )
+        return (('Selected', 'Selected'), ('Completed', 'Completed'),  ('On Hold', 'On Hold'), ('Disconnected', 'Disconnected'), ('None', 'None'), )
 
     def queryset(self, request, queryset):
         if self.value() == None:
