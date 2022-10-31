@@ -10,12 +10,7 @@ from project.pinnmodels import UmMpathDwCurrDepartment
 # um_softphone_all_v - All eligible records with null in selection fields
 
 def next_cut_date():    # return next Thursday's date.
-    today = datetime.today()
-    days = (3 - today.weekday() + 7) % 7  # Days until Thursday
-    if days == 0:  # Today is thursday
-        days = 7
-
-    return today + timedelta(days=days)
+    return CutDate.objects.filter(cut_date__gt=datetime.today()).first().cut_date
 
 
 class Category(models.Model):
@@ -275,6 +270,13 @@ class DeptV(models.Model):
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_dept_v'
         managed = False
+
+
+class CutDate(models.Model):
+    cut_date = models.DateField(primary_key=True)
+
+    def __str__(self):
+        return self.cut_date
 
 
 class Ambassador(models.Model):
