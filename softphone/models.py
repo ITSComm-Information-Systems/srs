@@ -277,6 +277,13 @@ class DeptV(models.Model):
         managed = False
 
 
+class CutDate(models.Model):
+    cut_date = models.DateField(primary_key=True)
+
+    def __str__(self):
+        return self.cut_date
+
+
 class Ambassador(models.Model):
     uniqname = models.CharField(max_length=8)
     dept_grp = models.CharField(max_length=30)
