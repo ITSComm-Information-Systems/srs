@@ -14,7 +14,7 @@ from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
-from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, next_cut_date
+from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date
 from .forms import SelectionForm, OptOutForm
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -60,16 +60,17 @@ class PauseUser(LoginRequiredMixin, View):
     title = 'Pause U-M Zoom Phone'
 
     def get(self, request, uniqname):
+        cut_date = next_cut_date()
+        print('selected cut date', cut_date)
+
         now = datetime.datetime.now() 
-        if now.weekday() == 2 and int(now.strftime('%H')) > 11:
-            return render(request, 'softphone/pause_message.html',  # Lockout wednesday at noon.
+        today = datetime.date.today()
+
+        # If tomorrow is the cut date, cut off at noon today.
+        if cut_date == today+datetime.timedelta(1) and int(now.strftime('%H')) > 11:
+            return render(request, 'softphone/pause_message.html',  
                 {'title': self.title,
                 'message': 'No selections are available to pause.'})
-
-        #cut_date = datetime.datetime(2022, 9, 8)
-        cut_date = next_cut_date()
-
-        print('calculated cut date', cut_date)
 
         if uniqname == 'ua':
             if self.request.user.is_superuser and request.GET.get('user'):
@@ -123,9 +124,9 @@ class PauseUser(LoginRequiredMixin, View):
         formset = OptOutFormSet(initial=phone_list)
 
         date_list = [(None,'---')]
-        for i in range(1, 4):
-            cut_date = cut_date + datetime.timedelta(7)
-            date_list.append((cut_date.strftime("%Y-%m-%d"), f'Until {cut_date.strftime("%B %d, %Y")}'))
+
+        for rec in CutDate.objects.filter(cut_date__gt=cut_date).order_by('cut_date')[:3]:
+            date_list.append((rec.cut_date.strftime("%Y-%m-%d"), f'Until {rec.cut_date.strftime("%B %d, %Y")}'))
 
         date_list.append(('Never', 'Do not implement softphone'))
 
