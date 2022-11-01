@@ -35,7 +35,7 @@ def get_voip(request):
     choice = ''
     if phone_number!= None:
         submit = True
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         choice = request.GET.get('jacks',None)
         selected = UmOscLocationsInUseV.objects.filter(service_number__exact = phone_number, jack__exact = choice).order_by('room').values().distinct()
         
@@ -50,7 +50,7 @@ def get_voip(request):
         
 
     }
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse(context)
     return HttpResponse(template.render(context,request))
     #return JsonResponse(context)
@@ -108,7 +108,10 @@ def confirm(request):
     new_floor = request.GET.get('buildingFloor',None)
     new_room = request.GET.get('buildingRoom', None)
     new_jack = request.GET.get('buildingJack',None)
-    new_location = UmOscAvailableLocsV.objects.filter(building_name__exact = new_name, building_id__exact = new_code, floor__exact = new_floor, room__exact = new_room, jack__exact = new_jack).values_list().distinct()
+    new_location = UmOscAvailableLocsV.objects.filter(building_name__exact = new_name, building_id__exact = new_code, floor__exact = new_floor, room__exact = new_room).values_list().distinct()
+
+    if new_jack != '%':
+        new_location = new_location.filter(jack__exact = new_jack)
 
     p = UmOscVoipLocChangeInput(uniqname = unique_name, service_id = selected[0]['service_id'], service_number = phone_number, # service_subscrib_id = selected[0]['service_subscrib_id'],
         old_campuscd = selected[0]['campuscd'], old_campus_desc = selected[0]['campus_desc'], old_location_id = selected[0]['location_id'], 
