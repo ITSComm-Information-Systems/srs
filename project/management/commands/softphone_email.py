@@ -110,7 +110,7 @@ class Command(BaseCommand):
         user_list = []
 
         with connections['pinnacle'].cursor() as cursor:
-            cursor.execute(sql, (cut_date.date(),cut_date.date()))
+            cursor.execute(sql, (cut_date, cut_date))
             for user in cursor.fetchall():
                 user_list.append(user[0])
 
