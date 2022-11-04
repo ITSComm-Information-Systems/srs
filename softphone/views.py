@@ -15,7 +15,7 @@ from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
 from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date
-from .forms import SelectionForm, OptOutForm
+from .forms import SelectionForm, OptOutForm, ChangeUserForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 
@@ -54,6 +54,33 @@ def get_department_list(dept_id, user):
         dept_list.access_error = f'NO ACCESS TO {current_department}'
 
     return dept_list
+
+
+class ChangeUser(LoginRequiredMixin, View):
+    title = 'Change User - Softphone'
+
+    def get(self, request):
+        print(self.request.GET)
+        f = ChangeUserForm()    
+
+        return render(request, 'softphone/change_user.html',
+                      {'title': self.title,
+                       'form': f
+                       #'formset': formset, 
+                       #'phone_list': phone_list
+                       })
+
+    def post(self, request):
+        print(self.request.POST)
+        f = ChangeUserForm(self.request.POST)    
+        print('leaps', f.is_bound)
+
+        return render(request, 'softphone/change_user.html',
+                      {'title': self.title,
+                       'form': f
+                       #'formset': formset, 
+                       #'phone_list': phone_list
+                       })
 
 
 class PauseUser(LoginRequiredMixin, View):
