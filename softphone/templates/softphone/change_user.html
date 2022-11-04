@@ -1,0 +1,83 @@
+{% extends 'softphone/base_softphone.html' %}
+{% block content %}
+
+{% load humanize %}
+
+<h1>{{ title }}</h1>
+
+<div class="container">
+
+<form method="post">
+    {% csrf_token %}
+    <h6 class="d-inline">Search by phone number or uniqname</h6>
+
+    <div class="form-row mt-2">
+        <div class="xinput-group xcol-md-4">
+            {{ form.search }}
+        </div>
+
+        <input type="submit" value="Search" class="btn btn-primary">
+    </div>
+    <div class='p-3'>
+        734-764-2793<br>
+        jwalfish - Jared Walfish<br>
+        ITS Infra Net Pinnacle<br>
+        4251 Plymouth Rd. - AL2 1806<br>
+        Ann Arbor MI 48105-3640<br>
+    </div>
+
+    <div class="form-row mt-2">
+        <div class="input-group col-md-4">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Enter new Uniqname</span>
+            </div>
+            <input type="text" name="uniqname" id="id_uniqname" class="form-control">
+        </div>
+        <input type="submit" value="Search" class="btn btn-primary">
+
+    </div>
+    <div class='p-3'>
+        djamison<br>
+        David Jamison<br>
+    </div>
+    <div class='p-3'>
+        User for phone number 734-764-2793 will be changed to djamison<br>
+        <b>Submit change?</b><br>
+
+        <input type="submit" value="Yes" class="btn btn-primary">
+    </div>
+
+
+</form>
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+    $(document).ready(function () {
+
+        $(".pause_until").change(function () {
+            target = '#' + $(this).attr('id').replace("pause_until", "comment")
+            target_div = target.replace("id_", "div_"); 
+
+            if (this.value=='Never') {
+                $(target_div).show();
+                $(target).attr("required", true);
+            } else {
+                $(target_div).hide();
+                $(target).removeAttr("required");
+            }
+        });
+
+
+    });
+
+</script>
+</div>
+{% endblock %}
