@@ -11,6 +11,11 @@
     {% csrf_token %}
     <h6 class="d-inline">Search by phone number or uniqname</h6>
 
+    <ul>
+        <li>{{ form.search.value }}</li>
+        <li>{{ form.uniqname.value }}</li>
+    </ul>
+
     <div class="form-row mt-2">
         <div class="xinput-group xcol-md-4">
             {{ form.search }}
@@ -18,6 +23,8 @@
 
         <input type="submit" value="Search" class="btn btn-primary">
     </div>
+
+    {% if address %}
     <div class='p-3'>
         734-764-2793<br>
         jwalfish - Jared Walfish<br>
@@ -26,27 +33,30 @@
         Ann Arbor MI 48105-3640<br>
     </div>
 
+
     <div class="form-row mt-2">
         <div class="input-group col-md-4">
             <div class="input-group-prepend">
                 <span class="input-group-text">Enter new Uniqname</span>
             </div>
-            <input type="text" name="uniqname" id="id_uniqname" class="form-control">
+            <input type="text" name="uniqname" id="id_uniqname" {% if value="{{ form.uniqname.value|default_if_none:'' }}" class="form-control"></input>
         </div>
         <input type="submit" value="Search" class="btn btn-primary">
 
     </div>
-    <div class='p-3'>
-        djamison<br>
-        David Jamison<br>
-    </div>
-    <div class='p-3'>
-        User for phone number 734-764-2793 will be changed to djamison<br>
-        <b>Submit change?</b><br>
+        {% if uniqname %}
+        <div class='p-3'>
+            djamison<br>
+            David Jamison<br>
+        </div>
+        <div class='p-3'>
+            User for phone number 734-764-2793 will be changed to djamison<br>
+            <b>Submit change?</b><br>
 
-        <input type="submit" value="Yes" class="btn btn-primary">
-    </div>
-
+            <input type="submit" value="Yes" class="btn btn-primary">
+        </div>
+        {% endif %}    
+    {% endif %}
 
 </form>
 
