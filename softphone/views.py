@@ -74,10 +74,20 @@ class ChangeUser(LoginRequiredMixin, View):
         print(self.request.POST)
         f = ChangeUserForm(self.request.POST)    
         print('leaps', f.is_bound)
+        
+        subscriber_id = self.request.POST.get('subscriber')
+        search = self.request.POST.get('search')
+        uniqname = self.request.POST.get('uniqname')
+
+        address = 'x'
+        #print(subscriber_id, search)
+
 
         return render(request, 'softphone/change_user.html',
                       {'title': self.title,
-                       'form': f
+                       'form': f,
+                       'address': address,
+                       'uniqname': uniqname
                        #'formset': formset, 
                        #'phone_list': phone_list
                        })
