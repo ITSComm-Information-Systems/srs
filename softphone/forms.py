@@ -111,9 +111,3 @@ class ChangeUserForm(forms.Form):
     subscriber = forms.CharField(widget=forms.HiddenInput())
     search = forms.CharField(required=False)
     uniqname = forms.CharField(required=False)
-
-    def __init__(self, *args, **kwargs):
-        super(ChangeUserForm, self).__init__(*args, **kwargs)
-
-        if self.is_bound:
-            print('bound', self.is_bound)
