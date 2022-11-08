@@ -3,14 +3,8 @@
 {% block content %}
 
 <h1>{{title}}</h1>
-{% for tab in tab_list %}
-  {% for volume in tab.form.volume_list %}
 
-  
-  {% endfor %}
-{% endfor %}
 
-{{ tab.form.instance.name }}
 
 
 <form action="/orders/addtocart/" method="post" id="workflowForm" enctype="multipart/form-data">
