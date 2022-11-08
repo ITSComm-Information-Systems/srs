@@ -81,7 +81,7 @@ class ChangeUser(LoginRequiredMixin, View):
         uniqname = self.request.POST.get('uniqname')
 
         num_search = re.sub(r'[^0-9]', '', search)
-        if len(num_search)=='10':
+        if len(num_search)==10:
             address = UmOscNameChangeV.objects.filter(service_number=num_search)
         else:
             address = UmOscNameChangeV.objects.filter(uniqname=search)
