@@ -76,7 +76,11 @@ var update_total_cost = function() {
   $("#total_cost_field").val(total_cost.toFixed(2));
 }
 
-
+window.onload = function(){
+  payload = document.getElementById("id_midatatype");
+  payload.options[0].text = 'Microsoft SQL Server';
+  console.log(payload)
+};
 
 
 $(document).ready(function() {
@@ -380,8 +384,8 @@ $(document).ready(function() {
       type = $('#id_midatatype option:selected').text();
       size=$('#id_size').val();
       size = Math.trunc(size)
-      if (type=='Oracle' && size < 30) {
-        size = 30;
+      if (type=='Oracle' && size < 50) {
+        size = 50;
       }
       link = "location.href='67?type=" + type + "&size=" + size +"';"; 
       $('#go_button').attr('onclick', link)
