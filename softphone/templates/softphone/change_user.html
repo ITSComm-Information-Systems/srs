@@ -39,19 +39,32 @@
             <input type="text" name="uniqname" id="id_uniqname" {% if value="{{ form.uniqname.value|default_if_none:'' }}" class="form-control"></input>
         </div>
         <input type="submit" value="Search" class="btn btn-primary">
+        
+        <br>
+
 
     </div>
-        {% if uniqname %}
-        <div class='p-3'>
-            {{ new_user }}<br>
-        </div>
-        <div class='p-3'>
-            User for phone number {{ address.0.service_number }} will be changed to {{ uniqname }}<br>
-            <b>Submit change?</b><br>
+    
+    {% for error in form.uniqname.errors %}
+    <div role="alert" class="ml-4"><i class="fas fa-exclamation-triangle"
+            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+    {% empty %}
+            {% if uniqname %}
+            <div class='p-3'>
+                {{ new_user }}<br>
+            </div>
+            <div class='p-3'>
+                User for phone number {{ address.0.service_number }} will be changed to {{ uniqname }}<br>
+                <b>Submit change?</b><br>
+                <input type="hidden" name="request_action" value="{{ uniqname }}">
+                <input type="submit" value="Yes" class="btn btn-primary">
+            </div>
+            {% endif %}    
 
-            <input type="submit" value="Yes" class="btn btn-primary">
-        </div>
-        {% endif %}    
+    {% endfor %}
+
+
+
     {% endif %}
 
 </form>

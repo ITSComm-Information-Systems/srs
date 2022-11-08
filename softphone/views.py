@@ -72,9 +72,10 @@ class ChangeUser(LoginRequiredMixin, View):
                        })
 
     def post(self, request):
-        print(self.request.POST)
+        if self.request.POST.get('request_action'):
+            return HttpResponseRedirect('/requestsent') 
+        
         f = ChangeUserForm(self.request.POST)    
-        print('leaps', f.is_bound)
         
         subscriber_id = self.request.POST.get('subscriber')
         search = self.request.POST.get('search')
@@ -88,7 +89,11 @@ class ChangeUser(LoginRequiredMixin, View):
 
         if uniqname:
             mc = MCommunity().get_user(uniqname)
-            new_user = f"{mc['givenName']} {mc['umichDisplaySn']}"
+            if mc:
+                new_user = f"{mc['givenName']} {mc['umichDisplaySn']}"
+            else:
+                f.add_error('uniqname', 'Uniqname not found.') 
+                new_user = 'Not Found'
         else:
             new_user = ''
 
