@@ -7,10 +7,11 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.forms import formset_factory
 
-import datetime
+from project.integrations import MCommunity
+import datetime, re
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment
+from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment, UmOscNameChangeV
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
@@ -79,17 +80,24 @@ class ChangeUser(LoginRequiredMixin, View):
         search = self.request.POST.get('search')
         uniqname = self.request.POST.get('uniqname')
 
-        address = 'x'
-        #print(subscriber_id, search)
+        num_search = re.sub(r'[^0-9]', '', search)
+        if len(num_search)=='10':
+            address = UmOscNameChangeV.objects.filter(service_number=num_search)
+        else:
+            address = UmOscNameChangeV.objects.filter(uniqname=search)
 
+        if uniqname:
+            mc = MCommunity().get_user(uniqname)
+            new_user = f"{mc['givenName']} {mc['umichDisplaySn']}"
+        else:
+            new_user = ''
 
         return render(request, 'softphone/change_user.html',
                       {'title': self.title,
                        'form': f,
                        'address': address,
-                       'uniqname': uniqname
-                       #'formset': formset, 
-                       #'phone_list': phone_list
+                       'uniqname': uniqname,
+                       'new_user': new_user
                        })
 
 
