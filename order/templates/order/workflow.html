@@ -4,7 +4,6 @@
 
 <h1>{{title}}</h1>
 
-
 <form action="/orders/addtocart/" method="post" id="workflowForm" enctype="multipart/form-data">
   {% csrf_token %}
   <input type="hidden" id="wfid" name="action_id" value="{{action.id}}">
