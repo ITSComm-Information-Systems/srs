@@ -82,15 +82,15 @@ window.onload = function(){
   console.log(payload)
 };
 
-idSize = document.getElementById("id_size")
-datatype = document.getElementById("id_midatatype")
-datatype.onchange = function(){
-  if(datatype.options[datatype.selectedIndex].text == "Oracle"){
-    if(idSize.value < 50){
-      idSize.value = 50
-    } 
-  } 
-}
+// idSize = document.getElementById("id_size")
+//   datatype = document.getElementById("id_midatatype")
+// datatype.onchange = function(){
+//   if(datatype.options[datatype.selectedIndex].text == "Oracle"){
+//     if(idSize.value < 50){
+//       idSize.value = 50
+//     } 
+//   } 
+// }
 
 $(document).ready(function() {
 
