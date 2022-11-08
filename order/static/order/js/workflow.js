@@ -384,8 +384,8 @@ $(document).ready(function() {
       type = $('#id_midatatype option:selected').text();
       size=$('#id_size').val();
       size = Math.trunc(size)
-      if (type=='Oracle' && size < 30) {
-        size = 30;
+      if (type=='Oracle' && size < 50) {
+        size = 50;
       }
       link = "location.href='67?type=" + type + "&size=" + size +"';"; 
       $('#go_button').attr('onclick', link)
