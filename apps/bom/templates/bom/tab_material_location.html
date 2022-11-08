@@ -6,6 +6,8 @@
             <th></th>
             <th scope="col">Item</th>
             <th scope="col">Description</th>
+            <th scope="col">Staged</th>
+            <th scope="col">Est Received Date</th>
             <th scope="col">Status</th>
             <th class="text-center" style="width: 10%">Quantity</th>
             <th class="text-right">Unit Price</th>
@@ -47,6 +49,13 @@
             <td>{{ record.item_description }}<br>
                 <em>{{ record.manufacturer }} - {{ record.manufacturer_part_number }}</em>
             </td>
+            <td> {% if record.staged %}
+                Yes
+                {% else %}
+                No
+                {% endif %}    
+            </td>
+            <td>{{ record.estimated_receive_date }}</td>
             <td>{{ record.get_status_display }}</td>
             <td class="text-center">{{ form.quantity }}</td>
             <td class="text-right">{{ record.price }}</td>
@@ -90,6 +99,8 @@
                 </div>
 
             </td>
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
