@@ -1,6 +1,10 @@
 <span id="server_rates" data-ram_rate="{{ tab.form.ram_rate }}" data-disk_replicated="{{ tab.form.disk_replicated }}"
     data-disk_no_replication="{{ tab.form.disk_no_replication }}" data-disk_backup="{{ tab.form.disk_backup }}"></span>
 
+{% for instance in tab.form %}
+    {{instance}}
+{% endfor %}
+
 {% for field in tab.form %}
 
 {% if field.name == 'serverName' %}
@@ -128,3 +132,4 @@
     <strong class="float-center">Monthly Cost</strong>&nbsp;&nbsp;
 </div>
 <input type="hidden" name="total_cost" id="total_cost_field">
+
