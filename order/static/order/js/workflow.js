@@ -77,21 +77,19 @@ var update_total_cost = function() {
 }
 
 window.onload = function(){
-  payload = document.getElementById("id_midatatype");
-  payload.options[0].text = 'Microsoft SQL Server';
-  console.log(payload)
-};
+  
+  databaseOS = document.getElementById("id_midatatype");
+  databaseOS.options[0].text = 'Microsoft SQL Server';
 
-// idSize = document.getElementById("id_size")
-//   datatype = document.getElementById("id_midatatype")
-// datatype.onchange = function(){
-//   if(datatype.options[datatype.selectedIndex].text == "Oracle"){
-//     if(idSize.value < 50){
-//       idSize.value = 50
-//     } 
-//   } 
-// }
-//
+  databaseOS.onchange = function(){
+    idSize = document.getElementById("id_size")
+    if(databaseOS.options[databaseOS.selectedIndex].text == "Oracle"){
+      if(idSize.value < 50){
+        idSize.value = 50;
+        } 
+      }
+  }
+};
 
 $(document).ready(function() {
 
