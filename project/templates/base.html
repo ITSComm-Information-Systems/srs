@@ -59,35 +59,6 @@
 					aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 					<i class="fas fa-bars text-light"></i>
 				</button>
-				<div class="collapse navbar-collapse navbars" aria-labelledby="aux-nav" role="navigation">
-					<ul class="navbar-nav ml-auto">
-						{% if user.is_authenticated %}
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle {% if title == 'Chartfield Change Request' or title == 'Manage User Access' or title == 'Department Look Up' or title == 'Manage Chartfields' or title == 'VoIP Location Change' %}active{% endif %}"
-								href="javascript;" id="toolsDropdown" role="button" data-toggle="dropdown"
-								aria-haspopup="true" aria-expanded="false">
-								Permissions &amp; Billing
-							</a>
-							<div class="dropdown-menu" aria-labelledby="toolsDropdown">
-								{% if perms.oscauth.can_order or perms.oscauth_can_report %}
-								<a class="dropdown-item" href="/chartchangeoptions/">Chartfield Change Request</a>
-								{% endif %}
-								{% if perms.oscauth.can_administer_access %}
-								<a class="dropdown-item" href="/auth/get_uniqname/">Manage User Access</a>
-								{% endif %}
-								<a class="dropdown-item" href="/auth/deptpriv/">Department Look Up</a>
-								<a class="dropdown-item" href="/auth/userid/">User ID Look Up</a>
-								{% if perms.oscauth.can_administer_access %}
-								<a class="dropdown-item" href="/orders/chartcom/0">Manage Chartfields</a>
-								{% endif %}
-								<!-- <a class="dropdown-item" href="/tools/costestimator">Cost Estimator</a> -->
-								{% if perms.oscauth.can_move_voip %}
-								<a class="dropdown-item" href="/tools/voip/">VoIP Location Change</a>
-								{% endif %}
-							</div>
-						</li>
-						{% endif %}
-					</div>
 					<button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target=".navbars"
 						aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<i class="fas fa-bars text-light"></i>
