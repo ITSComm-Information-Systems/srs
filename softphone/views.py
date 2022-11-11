@@ -4,14 +4,19 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View
 from django.core.paginator import Paginator
+from django.db.models import Q
+from django.forms import formset_factory
 
+from project.integrations import MCommunity
+import datetime, re
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmOscDeptProfileV
+from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment, UmOscNameChangeV
 from project.models import Choice
+from project.utils import download_csv_from_queryset
 from pages.models import Page
-from .models import SubscriberCharges, Selection, SelectionV, DeptV
-from .forms import SelectionForm
+from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date
+from .forms import SelectionForm, OptOutForm, ChangeUserForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 
@@ -50,6 +55,164 @@ def get_department_list(dept_id, user):
         dept_list.access_error = f'NO ACCESS TO {current_department}'
 
     return dept_list
+
+
+class ChangeUser(LoginRequiredMixin, View):
+    title = 'Change User - Softphone'
+
+    def get(self, request):
+        print(self.request.GET)
+        f = ChangeUserForm()    
+
+        return render(request, 'softphone/change_user.html',
+                      {'title': self.title,
+                       'form': f
+                       #'formset': formset, 
+                       #'phone_list': phone_list
+                       })
+
+    def post(self, request):
+        if self.request.POST.get('request_action'):
+            return HttpResponseRedirect('/requestsent') 
+        
+        f = ChangeUserForm(self.request.POST)    
+        
+        subscriber_id = self.request.POST.get('subscriber')
+        search = self.request.POST.get('search')
+        uniqname = self.request.POST.get('uniqname')
+
+        num_search = re.sub(r'[^0-9]', '', search)
+        if len(num_search)==10:
+            address = UmOscNameChangeV.objects.filter(service_number=num_search)
+        else:
+            address = UmOscNameChangeV.objects.filter(uniqname=search)
+
+        if uniqname:
+            mc = MCommunity().get_user(uniqname)
+            if mc:
+                new_user = f"{mc['givenName']} {mc['umichDisplaySn']}"
+            else:
+                f.add_error('uniqname', 'Uniqname not found.') 
+                new_user = 'Not Found'
+        else:
+            new_user = ''
+
+        return render(request, 'softphone/change_user.html',
+                      {'title': self.title,
+                       'form': f,
+                       'address': address,
+                       'uniqname': uniqname,
+                       'new_user': new_user
+                       })
+
+
+class PauseUser(LoginRequiredMixin, View):
+    title = 'Pause U-M Zoom Phone'
+
+    def get(self, request, uniqname):
+        cut_date = next_cut_date()
+        print('selected cut date', cut_date)
+
+        now = datetime.datetime.now() 
+        today = datetime.date.today()
+
+        # If tomorrow is the cut date, cut off at noon today.
+        if cut_date == today+datetime.timedelta(1) and int(now.strftime('%H')) > 11:
+            return render(request, 'softphone/pause_message.html',  
+                {'title': self.title,
+                'message': 'No selections are available to pause.'})
+
+        if uniqname == 'ua':
+            if self.request.user.is_superuser and request.GET.get('user'):
+                print('impersonate', self.request.GET.get('user'))
+                username = self.request.GET.get('user')
+            else:
+                username = self.request.user.username
+
+            phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=cut_date).values('subscriber'
+                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
+
+            dept_group_list = list(Ambassador.objects.filter(uniqname=username).values_list('dept_grp', flat=True))
+
+            message = 'There are no users in your unit scheduled to transition'             
+            if len(dept_group_list) != 0:  # Get submissions by user
+                dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp__in=dept_group_list).values_list('deptid', flat=True)
+                amb_phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values('subscriber'
+                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
+
+                phone_list = phone_list.union(amb_phone_list)
+
+            if len(phone_list) == 0:
+                return render(request, 'softphone/pause_message.html',
+                                {'title': self.title,
+                                'message': message})
+
+        else:
+            if uniqname == None:
+                uniqname = self.request.user.username
+            elif self.request.user.username != uniqname:
+                if not self.request.user.is_superuser:
+                    return HttpResponseRedirect(f'/softphone/pause/{self.request.user.username}')
+
+            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='Selected', cut_date=cut_date) | Q(uniqname=uniqname, processing_status='Selected', cut_date=cut_date)).values('subscriber'
+                ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+
+            if len(phone_list) == 0:
+                message =  'User not scheduled for migration.'
+                # Check for on hold record:
+                phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='On Hold') | Q(uniqname=uniqname, processing_status='On Hold'))
+
+                for phone in phone_list:
+                    if phone.cut_date:
+                        message = 'Migration paused until ' + phone.cut_date.strftime("%B %d, %Y")
+
+                return render(request, 'softphone/pause_message.html',
+                                {'title': self.title,
+                                'message': message})
+        
+        OptOutFormSet = formset_factory(OptOutForm, extra=0)
+        formset = OptOutFormSet(initial=phone_list)
+
+        date_list = [(None,'---')]
+
+        for rec in CutDate.objects.filter(cut_date__gt=cut_date).order_by('cut_date')[:3]:
+            date_list.append((rec.cut_date.strftime("%Y-%m-%d"), f'Until {rec.cut_date.strftime("%B %d, %Y")}'))
+
+        date_list.append(('Never', 'Do not implement softphone'))
+
+        for phone in phone_list:
+            try:
+                dept_name = UmMpathDwCurrDepartment.objects.filter(deptid=phone['dept_id'])
+                phone['dept_name'] = dept_name[0].dept_descr
+            except:
+                print('error getting dept')
+
+        if self.request.GET.get('file') == 'CSV':
+            return download_csv_from_queryset(phone_list)
+
+
+        return render(request, 'softphone/pause_self.html',
+                      {'title': self.title,
+                       'date_list': date_list,
+                       'formset': formset, 
+                       'phone_list': phone_list})
+
+    def post(self, request, uniqname):
+        OptOutFormSet = formset_factory(OptOutForm, extra=0)
+        formset = OptOutFormSet(request.POST)
+
+        formset.is_valid()
+        for form in formset:
+            pause_date = form.cleaned_data.get('pause_until', 'None')
+
+            if pause_date != 'None':
+                subscriber = form.cleaned_data.get('subscriber')
+                rec = Selection.objects.get(subscriber=subscriber)
+                comment = form.cleaned_data.get('comment')
+                rec.pause(request.user, pause_date, comment)
+
+        return HttpResponseRedirect(f'/softphone/pause/{uniqname}')
+
 
 class StepSubscribers(LoginRequiredMixin, View):
 
@@ -210,3 +373,9 @@ class Selections(View):
                        'selection_list': selection_list,
                        'dept_list': dept_list,
                        'dept_id': dept_id})
+
+
+def download_csv(request, dept_id):
+    qs = SelectionV.objects.filter(dept_id=dept_id).order_by('-update_date','service_number')
+    return download_csv_from_queryset(qs, file_name=f'dept_{dept_id}')
+

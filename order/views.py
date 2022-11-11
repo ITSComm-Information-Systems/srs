@@ -484,6 +484,8 @@ class Integration(PermissionRequiredMixin, View):
 
         order_list = LogItem.objects.filter(local_key = str(order.id))
 
+        preorder = UmOscPreorderApiV.objects.filter(add_info_text_3=order_id)
+
         for ord in order_list:
             if ord.transaction == 'JSON':
                 parsed = json.loads(ord.description)
@@ -500,6 +502,7 @@ class Integration(PermissionRequiredMixin, View):
 
         return render(request, 'order/integration.html', 
             {'order': order,
+            'preorder': preorder,
             'order_list': order_list,
             'item_list': item_list,})
 
@@ -629,29 +632,29 @@ class Cart(PermissionRequiredMixin, View):
 
         first= {}
 
-        dept_list = Item.objects.filter(deptid__in=depts).exclude(order_id__gt=0).distinct('deptid')
+        dept_list = Item.objects.filter(deptid__in=depts).exclude(order_id__gt=0).values('deptid').distinct()
         if deptid == 0 and len(dept_list) > 0:
-            deptid = int(dept_list[0].deptid)
+            deptid = int(dept_list[0].get('deptid'))
 
         for dept in dept_list:
-            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.deptid)
-            dept.active = deptinfo.dept_eff_status
-            dept.name = deptinfo.dept_name
+            deptinfo = UmOscDeptProfileV.objects.get(deptid=dept.get('deptid'))
+            dept['active'] = deptinfo.dept_eff_status
+            dept['name'] = deptinfo.dept_name
 
-            if deptid == int(dept.deptid):
-                first = {'id': dept.deptid, 'name': deptinfo.dept_name}
+            if deptid == int(dept.get('deptid')):
+                first = {'id': dept.get('deptid'), 'name': deptinfo.dept_name}
 
 
         status = ['Ready to Order','Saved for Later']
         item_list = Item.objects.filter(deptid=deptid).exclude(order_id__gt=0).order_by('chartcom','-create_date')
-        chartcoms = item_list.distinct('chartcom') #, 'chartcom_id')
-        saved = item_list.distinct('chartcom')
+        chartcoms = item_list.distinct().values('chartcom','chartcom_id','chartcom__name') #, 'chartcom_id')
+        saved = item_list.distinct().values('chartcom','chartcom_id','chartcom__name') #, 'chartcom_id')
 
         #item_list = Item.objects.filter(deptid=deptid,order__isnull=True).order_by('chartcom','-create_date')
 
         for acct in chartcoms:
-            acct.items = item_list.filter(chartcom=acct.chartcom,order__isnull=True) #.order_by('create_date')
-            acct.table = 'tableReady' + str(acct.chartcom_id)
+            acct['items'] = item_list.filter(chartcom=acct.get('chartcom'),order__isnull=True) #.order_by('create_date')
+            acct['table'] = 'tableReady' + str(acct.get('chartcom_id'))
 
         status[0] = chartcoms
         status[0].label = 'Ready to Order'
@@ -661,8 +664,8 @@ class Cart(PermissionRequiredMixin, View):
         #saved_later = item_list.distinct('chartcom')
 
         for acct in saved:
-            acct.items = item_list.filter(chartcom=acct.chartcom) #.order_by('create_date')
-            acct.table = 'tableSaved' + str(acct.chartcom_id)
+            acct['items'] = item_list.filter(chartcom=acct.get('chartcom')) #.order_by('create_date')
+            acct['table'] = 'tableSaved' + str(acct.get('chartcom_id'))
 
         status[1] = saved
         status[1].label = 'Saved for Later'
@@ -686,11 +689,11 @@ class Review(PermissionRequiredMixin, View):
         dept = request.POST.get('deptSubmit')
         items_selected = request.POST.getlist('includeInOrder')
         item_list = Item.objects.filter(id__in=items_selected)
-        order_list = item_list.distinct('chartcom')
+        order_list = item_list.values('chartcom').distinct()
 
         for num, order in enumerate(order_list, start=1):
-            order.items = item_list.filter(chartcom=order.chartcom)
-            order.num = num
+            order['items'] = item_list.filter(chartcom=order.get('chartcom'))
+            order['num'] = num
 
         template = loader.get_template('order/review_order.html')
         context = {
@@ -732,7 +735,18 @@ class Services(UserPassesTestMixin, View):
             selected_service = request.session.get('backupStorage','miBackup')
 
         for service in service_list:
-            service.actions = action_list.filter(service=service)
+            if service.name == 'cloud':
+                service.actions = [{'label': 'Order Google Cloud Platform', 'target': '/services/gcp/add/'},
+                                   {'label': 'View/Change GCP Project', 'target': '/services/gcp'},
+                                   {'label': 'Order Microsoft Azure', 'target': '/services/azure/add/'},
+                                   {'label': 'View/Change Microsoft Azure', 'target': '/services/azure'},
+                                   {'label': 'Order AWS', 'target': '/services/aws/add/'},
+                                   {'label': 'View/Change AWS', 'target': '/services/aws/'} ]
+            else:
+                service.actions = action_list.filter(service=service)
+                for action in service.actions:
+                    action.target = f'/orders/wf/{action.id}'
+
             if service.name == selected_service:
                 service.active = 'active show'
 

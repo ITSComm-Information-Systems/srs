@@ -1,13 +1,22 @@
-from django.db import models
-import json
-
+from datetime import datetime, timedelta
+from django.db import models, connections
+from django.conf import settings
 from django.db.models.fields import IntegerField
+from project.pinnmodels import UmMpathDwCurrDepartment
+
+# Selection = um_softphone_selection - Main table with user selections and processing data.
+# SelectionV = um_softphone_selection_v - Selects off above table, does not have CANCEL records but has extra fields from subscriber
+# SubscriberCharges = um_softphone_v
+# um_softphone_all_v - All eligible records with null in selection fields
+
+def next_cut_date():    # return next Thursday's date.
+    return CutDate.objects.filter(cut_date__gt=datetime.today()).first().cut_date
 
 
 class Category(models.Model):
     OTHER = 49
     CONFERENCE_ROOM = 47
-    
+
     sequence = models.PositiveSmallIntegerField(null=True, blank=True)
     code = models.CharField(max_length=20)
     label = models.CharField(max_length=80)
@@ -22,6 +31,18 @@ class Category(models.Model):
         return self.label
 
 
+class DuoUser(models.Model):
+    service_number = models.CharField(primary_key=True, max_length=60) 
+    uniqname = models.CharField(max_length=8)
+
+    class Meta:
+        db_table = 'PINN_CUSTOM\".\"um_softphone_duo'
+        managed = False
+
+    def __str__(self):
+        return self.service_number
+
+
 class SelectionManager(models.Manager):
 
     def selections_made(self, dept_id):
@@ -33,12 +54,13 @@ class SelectionManager(models.Manager):
         phone = {}
         subid = 0
 
+        duo_users = DuoUser.objects.all().values_list('service_number', flat=True)
+
         if 'subscribers' in kwargs:
             subscriber_list = kwargs['subscribers']
             qry = SubscriberCharges.objects.filter(dept_id=dept_id, subscriber_id__in=subscriber_list).order_by('user_defined_id')
         else:
             qry = SubscriberCharges.objects.filter(dept_id=dept_id).order_by('user_defined_id')
-
 
         for charge in qry:
             if charge.subscriber_id != subid and subid != 0:
@@ -54,6 +76,9 @@ class SelectionManager(models.Manager):
 
             phone['service_id'] = charge.service_id
             phone['service_number'] = charge.service_number
+
+            if charge.service_number in duo_users:
+                phone['duo'] = 'Yes'
 
             if charge.building:                
                 phone['location_id'] = charge.location_id
@@ -109,7 +134,7 @@ class SelectionAbstract(models.Model):
     migrate = models.CharField(max_length=12) #, choices=MIGRATE_CHOICES)
     location_correct = models.BooleanField(null=True)
     notes = models.TextField(max_length=200, blank=True, null=True)
-    category = models.ForeignKey(Category, limit_choices_to={'sequence__isnull': False} ,on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, null=True, limit_choices_to={'sequence__isnull': False} ,on_delete=models.CASCADE)
     other_category = models.CharField(max_length=80, blank=True, null=True)
     update_date = models.DateTimeField(null=True)
     updated_by = models.CharField(null=True, max_length=8)
@@ -122,6 +147,18 @@ class SelectionAbstract(models.Model):
     room = models.CharField(max_length=18, null=True)
     jack = models.CharField(max_length=30, null=True)
     cable_path_id = models.IntegerField(null=True)
+    processing_status = models.CharField(max_length=50, blank=True) 
+    cut_date = models.DateField(null=True, blank=True)                              
+    reviewed_by = models.CharField(max_length=8, blank=True) 
+    review_date = models.DateField(null=True, blank=True)
+
+    call_plan = models.CharField(max_length=50, blank=True)                   #VARCHAR2(50 CHAR) 
+    request_no = models.IntegerField(blank=True)                           #NUMBER(16)        
+    preorder_number = models.IntegerField(blank=True)                      #NUMBER(16)        
+    has_voicemail = models.CharField(max_length=1, blank=True)              #VARCHAR2(1 CHAR)  
+    ncos = models.CharField(max_length=10, blank=True)                        #VARCHAR2(10 CHAR) 
+    linecss = models.CharField(max_length=50, blank=True)                     #VARCHAR2(50 CHAR) 
+    admin_notes = models.TextField(blank=True)
 
     objects = SelectionManager()
 
@@ -138,13 +175,49 @@ class Selection(SelectionAbstract):
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection'
         managed = False
 
+    def pause(self, current_user, pause_date, comment):
+        if pause_date == 'Never':
+            pause_date = '2030-01-01'
+
+        self.processing_status = 'On Hold'
+        self.cut_date = pause_date  
+        self.review_date = datetime.today()
+        self.reviewed_by = current_user.username
+        self.admin_notes = comment
+        self.save()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+
+        if self.processing_status == '':
+            sql = "update telecom.subscriber_api_v set add_info_list_value_id_1 = Null where subscriber_id = %s"
+            parms = (self.subscriber,)
+        else:
+            sql = "update telecom.subscriber_api_v set add_info_list_value_code_1 = %s where subscriber_id = %s"
+            parms = (self.processing_status, self.subscriber,)
+
+        try:
+            with connections['pinnacle'].cursor() as cursor:
+                cursor.execute(sql, parms)
+
+            print(cursor.rowcount, 'update subscriber_id')
+        except:
+            print('error updating subscriber_api_v')
+
 
 class SelectionV(SelectionAbstract):
     dept_id = models.CharField(max_length=10)
     phone = models.CharField(max_length=20)
+    duo_phone = models.CharField(max_length=1)
+    zoom_login = models.CharField(max_length=1)
+    subscriber_uniqname = models.CharField(max_length=20)
+    subscriber_first_name = models.CharField(max_length=50)    
+    subscriber_last_name = models.CharField(max_length=50)
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection_v'
+        verbose_name = 'Selection'
+        verbose_name_plural = 'Selection Report'
         managed = False
 
 
@@ -169,6 +242,19 @@ class SubscriberCharges(SelectionAbstract):
     #charge_amount = models.CharField(max_length=10)
     #account = models.CharField(max_length=10)
 
+    # Exclude
+    review_date = None
+    reviewed_by = None
+    cut_date = None
+    processing_status = None
+    call_plan = None
+    request_no = None
+    preorder_number = None
+    has_voicemail = None
+    ncos = None
+    linecss = None
+    admin_notes = None
+
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_v'
         managed = False
@@ -183,4 +269,43 @@ class DeptV(models.Model):
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_dept_v'
+        managed = False
+
+
+class CutDate(models.Model):
+    cut_date = models.DateField(primary_key=True)
+
+    def __str__(self):
+        return self.cut_date
+
+
+class Ambassador(models.Model):
+    uniqname = models.CharField(max_length=8)
+    dept_grp = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.uniqname
+
+    class Meta:
+        db_table = 'PINN_CUSTOM\".\"srs_ambassador'
+        managed = False
+
+
+class Zoom(models.Model):
+    elg = models.CharField(max_length=1)                     # varchar2(1 char)   
+    elg_code = models.CharField(max_length=100)              # varchar2(100 char) 
+    id = models.CharField(max_length=50, primary_key=True)   # varchar2(50 char)  
+    first_name = models.CharField(max_length=50)             # varchar2(50 char)  
+    last_name = models.CharField(max_length=50)              # varchar2(50 char)  
+    email = models.CharField(max_length=50)                  # varchar2(50 char)  
+    type = models.IntegerField(null=True)                    # number             
+    timezone = models.CharField(max_length=50)               # varchar2(50 char)  
+    created_at = models.DateTimeField()                      # date               
+    last_login_time = models.DateTimeField()                 # date               
+    phone_country = models.CharField(max_length=50)          # varchar2(50 char)  
+    phone_number = models.CharField(max_length=20)           # varchar2(20 char)  
+    status = models.CharField(max_length=20)                 # varchar2(20 char)  
+
+    class Meta:
+        db_table = 'PINN_CUSTOM\".\"um_softphone_zoom'
         managed = False

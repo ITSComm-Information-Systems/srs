@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+<table class="table table-hover table-striped table-sm">
+    <tr>
+        <th>GCP Account</th>
+        <th>Owner</th>
+        <th>Shortcode</th>
+        <th></th>
+    </tr>
+
+    {% for rec in service_list %}
+    <tr>
+        <td>{{ rec.account_id }}</td>  
+        <td>{{ rec.owner }}</td>  
+        <td>{{ rec.shortcode }}</td>   
+        <td>
+            <a href="/services/gcpaccount/{{ rec.id }}/change/">
+                <i class="fas fa-edit"></i>
+            </a>
+            &nbsp;
+            <a href="/services/gcpaccount/{{ rec.id }}/delete/">
+                <i class="fas fa-trash"></i>
+            </a>
+        </td>
+    </tr>
+
+    {% for project in rec.gcp_set.all %}
+    <tr>
+        <td style="text-indent: 50px;"><strong>Project: </strong>{{ project.project_id }}</td>
+        <td>{{ project.owner }}</td>
+        <td></td>
+        <td>
+            {% if project.owner.id in groups %}
+            <a href="{{ project.id }}/change/">
+                <i class="fas fa-edit"></i>
+            </a>
+            &nbsp;
+            <a href="{{ project.id }}/delete/">
+                <i class="fas fa-trash"></i>
+            </a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+
+    {% endfor %}
+
+</table>
+{% endblock %}

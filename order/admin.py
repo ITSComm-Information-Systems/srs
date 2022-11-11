@@ -205,7 +205,8 @@ class DatabaseAdmin(ServiceInstanceAdmin):
     readonly_fields = ('legacy_data','server','shared')
     search_fields = ['name','owner__name']
     autocomplete_fields = ['owner']
-
+    list_select_related = ['owner','type','server']
+    
     fieldsets = (
         (None, {
             'fields': (('name', 'in_service'), 'owner', 'shortcode', 'type', 'url', 'on_call',
@@ -239,7 +240,7 @@ class ServerAdmin(ServiceInstanceAdmin):
     ordering = ('name',)
     search_fields = ['name','owner__name']
     autocomplete_fields = ['owner','admin_group']
-
+    list_select_related = ['owner','os']
     inlines = [ServerDiskInline,]
 
     readonly_fields = ('legacy_data','created_date')
@@ -342,7 +343,10 @@ class VolumeAdmin(ServiceInstanceAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "rate":
-            kwargs["queryset"] = StorageRate.objects.filter(service_id=self.service_id,type=self.type)
+            try:
+                kwargs["queryset"] = StorageRate.objects.filter(service_id=self.service_id,type=self.type)
+            except:
+                kwargs["queryset"] = StorageRate.objects.filter(service_id__in=self.service_list)
         if db_field.name == "service":
             kwargs["queryset"] = Service.objects.filter(id__in=self.service_list)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
@@ -394,6 +398,7 @@ class ArcInstanceAdmin(VolumeAdmin):
     child_record = ArcHost
     child_key = 'arc_instance_id'
     service_list = [9,10,11]
+    list_select_related = ['owner','rate']
     fieldsets = (
         (None, {'fields': ('service', 'name','owner',('type','multi_protocol','ad_group'),'rate','size',('uid','nfs_group_id'),'research_computing_package','amount_used','created_date','sensitive_regulated')
         }),
@@ -401,14 +406,30 @@ class ArcInstanceAdmin(VolumeAdmin):
         }),
         ('No Regulated/Sensitive', {'fields':(('lighthouse','globus','thunder_x','great_lakes'),)
         })
- 
     )
+
+    class Media:
+        js = ('order/js/admin_arc.js',)
+
+    def bak_formfield_for_foreignkey(self, db_field, request, **kwargs):
+        self.service_id = None
+        self.type = None
+        if db_field.name == "rate":
+            kwargs["queryset"] = StorageRate.objects.filter(service_id__in=self.service_list)
+            return super().formfield_for_foreignkey(db_field, request, **kwargs)
+            #print(self.service_id, self.service_list)
+        #elif db_field.name == "service":
+        #    kwargs["queryset"] = Service.objects.filter(id__in=self.service_list)
+        else:
+            return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 @admin.register(StorageInstance)
 class StorageInstanceAdmin(VolumeAdmin):
     child_record = StorageHost
     child_key = 'storage_instance_id'
     service_list = [7]
+    list_select_related = ['owner','rate']
     exclude = ['owner_name', 'owner_bak']
 
 

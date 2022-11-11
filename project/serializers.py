@@ -67,14 +67,20 @@ class RateSerializer(serializers.ModelSerializer):
         read_only_fields = ['name', 'label', 'rate']
         model = StorageRate
 
-
+class BackupDomainNodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BackupNode
+        fields = ['name']
+        
 class BackupDomainSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField()
-    nodes = serializers.StringRelatedField(many=True)
+    nodes = serializers.SlugRelatedField(many=True, slug_field='name',read_only=True)
+    nodes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
 
     class Meta:
         model = BackupDomain
         fields = ['id','name','shortcode','size','cost_calculated_date','owner','days_extra_versions','days_only_version','versions_after_deleted','versions_while_exists','nodes']
+        depth = 1
 
 
 class VolumeInstanceSerializer(serializers.ModelSerializer):  # Base Serializer for Storage Volumes

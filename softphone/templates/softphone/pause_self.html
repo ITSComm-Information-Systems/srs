@@ -1,0 +1,94 @@
+{% extends 'softphone/base_softphone.html' %}
+{% block content %}
+
+{% load humanize %}
+
+<h1>{{ title }}</h1>
+
+<ul>
+    <li>Refer to this <a href="https://documentation.its.umich.edu/node/3514">guide </a> for more information regarding pausing transitions for your Unit</li>
+    <li>Read more about the <a href="https://record.umich.edu/articles/new-zoom-phone-service-to-offer-greater-flexibility-mobility/">Telephone Service Upgrade Project</a></li>
+</ul>
+
+<div class="container">
+
+
+<form method="post">
+    <a class="float-right col-6" href="?file=CSV">Download CSV</a>
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% for form in formset %}
+    <div id="{{ form.prefix }}" class="col-6 card border-primary shadow p-3 my-3">    
+        {{ form.subscriber }}
+
+        <div class="row">
+            <div class="col-sm">
+                {{ form.subscriber.id }}
+                <strong>Phone</strong><br>
+                {{ form.initial.service_number }}<br>
+                Uniqname: {{ form.initial.subscriber_uniqname }}{{ form.initial.uniqname }}<br>
+                {{ form.initial.subscriber_first_name }} {{ form.initial.subscriber_last_name }}<br>
+                {{ form.initial.dept_id }} &nbsp; {{ form.initial.dept_name }}
+            </div>
+
+            <div class="form-group col-sm upgrade_to_softphone" id="div_id_form-0-migrate" data-location="ARBOR LAKES 3">
+                <label>Pause Transition?</label>
+                <div>
+                    <select name="{{ form.prefix }}-pause_until" class="form-control custom-select pause_until" id="id_{{ form.prefix }}-pause_until">
+                        {% for option in date_list %}
+                            <option value="{{ option|first }}">{{ option|last }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div id="div_{{ form.prefix }}-comment" class="row" style="display: none;">
+            <div class="form-group col-sm">
+                <label for="exampleFormControlTextarea1">Please explain reason for pause in transition</label>
+                <textarea  placeholder="Limit 4,000 Characters" maxlength="4000" name="{{ form.prefix }}-comment" class="form-control" id="id_{{ form.prefix }}-comment" rows="3"></textarea>
+              </div>
+        </div>
+    </div>
+    {% endfor %}
+    <div id="footered" class="container-fluid fixed-bottom border border-top-primary" style="background-color: #E2E4E4">
+
+        <div class="container mt-1 mb-1">
+
+                <button type="submit" class="btn" style="background-color: #0068A8; color:white">Save</button>
+        </div>
+
+    </div>
+</form>
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+    $(document).ready(function () {
+
+        $(".pause_until").change(function () {
+            target = '#' + $(this).attr('id').replace("pause_until", "comment")
+            target_div = target.replace("id_", "div_"); 
+
+            if (this.value=='Never') {
+                $(target_div).show();
+                $(target).attr("required", true);
+            } else {
+                $(target_div).hide();
+                $(target).removeAttr("required");
+            }
+        });
+
+
+    });
+
+</script>
+</div>
+{% endblock %}

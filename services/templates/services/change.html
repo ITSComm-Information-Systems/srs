@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="container">
+    <strong>{{ form.instance.instance_label }}:</strong>&nbsp;{{ form.instance.account_id }}
+    <hr>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <input type="hidden" name="account_id" value="{{ form.instance.account_id }}">
+
+        {% for field in form %}
+            {% if field.name in form.skip %}
+            {% elif field.name in form.custom %}
+                {% include 'services/'|add:field.name|add:'.html' %}
+            {% else %}
+                <div class="form-group {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
+                    <label for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {{ field }}
+                    
+                    {% for error in field.errors %}
+                    <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+</div>
+{% endblock %}

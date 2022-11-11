@@ -24,17 +24,23 @@ SECRET_KEY = os.getenv(
     '9e4@&tw46$l31)zrqe3wi+-slqm(ruvz&se0^%9#6(_w3ui!c0'
 )
 
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 ALLOWED_HOSTS = [os.getenv('ALLOWED_HOST')]
 DEBUG = os.getenv('DEBUG', False)
 
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'DEV')
 ADMINS = [('Admins', 'srs-exception@umich.edu')]
+SERVER_EMAIL = f'{ ENVIRONMENT }-SRS@localhost'
+
 
 # Application definition
 
 INSTALLED_APPS = [
-    'oscauth',
+    'pages',
     'project',
+    'oscauth',
     'django.forms', # try to override widgets
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,7 +54,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'debug_toolbar',
     'order',
-    'pages',
+    'services',
+    #'pages',
     'reports',
     'tools',
     'softphone',
@@ -78,7 +85,7 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
+    'oscauth.backends.UMAuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
     'oscauth.backends.SuBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -161,23 +168,8 @@ WSGI_APPLICATION = 'wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
-        'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
-        'USER': os.getenv('DATABASE_USER','pgoscdevweb'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD','N/A'),
-        'HOST': os.getenv('DATABASE_SERVICE_NAME','containernp-pg.aws.vdc.it.umich.edu'),
-        'TEST':
-        {
-        'ENGINE': os.getenv('DATABASE_ENGINE','django.db.backends.postgresql_psycopg2'),
-        'NAME': os.getenv('DATABASE_NAME','pgoscdev'),
-        'USER': os.getenv('DATABASE_USER','pgoscdevweb'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD','N/A'),
-        'HOST': os.getenv('DATABASE_SERVICE_NAME','containernp-pg.aws.vdc.it.umich.edu'),
-        },
-    },
-    'pinnacle': {
         'NAME': os.getenv('ORACLE_DATABASE','pinntst.dsc.umich.edu:1521/pinndev.world'),
-        'ENGINE': 'django.db.backends.oracle',
+        'ENGINE': 'umoraengine',
         'USER': os.getenv('ORACLE_USER','PINN_CUSTOM'),
         'PASSWORD': os.getenv('ORACLE_PASSWORD','N/A'),
         'TEST': {
@@ -190,33 +182,8 @@ DATABASES = {
     },
 }
 
-
-DATABASE_ROUTERS = ['project.settings.DBRouter']
-
-
-class DBRouter(object):
-  def db_for_read(self, model, **hints):
-
-    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING') or model._meta.db_table.startswith('um_bom'):
-      return 'pinnacle'
-    return 'default'
-
-  def db_for_write(self, model, **hints):
-   
-    if model._meta.db_table.startswith('PINN_CUSTOM') or model._meta.db_table.startswith('PS_RATING') or model._meta.db_table.startswith('um_bom'):
-      return 'pinnacle'
-    return 'default'
-
-  def allow_migrate(self, db, app_label, **hints):
-    if app_label == "bom":
-        return True
-
-    if db == "pinnacle":
-      return False
-    else:
-      return True
-
-
+# Deprecate 'Pinnacle' always use default going forward
+DATABASES['pinnacle'] = DATABASES['default']
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -248,7 +215,7 @@ USE_TZ = False
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'

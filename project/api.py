@@ -185,7 +185,15 @@ class DefaultViewSet(viewsets.ModelViewSet):
     queryset = StorageRate.objects.all()
 
     def get_queryset(self):
-        queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
+        if self.serializer_class.Meta.model.__name__ == 'Server':
+            print('server')
+            queryset = Server.objects.all().select_related('os','admin_group','owner'
+                ,'patch_time','patch_day','reboot_time','reboot_day','backup_time','database_type').prefetch_related('regulated_data','non_regulated_data','disks').order_by('id')
+        elif self.serializer_class.Meta.model.__name__ == 'ArcInstance':
+            print('arcinstance')
+            queryset = ArcInstance.objects.all().select_related('owner','service').prefetch_related('rate','shortcodes','hosts').order_by('id')
+        else:
+            queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
 
         kwargs = {}
 

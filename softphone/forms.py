@@ -1,9 +1,8 @@
+import datetime
 from django import forms
 from .models import Category, Selection
-from datetime import datetime
 from project.forms.fields import Uniqname
 from project.models import Choice
-
 
 unselected = (None,'---',)
 
@@ -98,6 +97,17 @@ class SelectionForm(forms.ModelForm):
         if not obj.uniqname and self.initial['user']:
             obj.uniqname = self.initial['user']
 
-        obj.update_date = datetime.now()
+        obj.update_date = datetime.datetime.now()
         obj.updated_by = username
         obj.save()
+
+class OptOutForm(forms.Form):
+    subscriber = forms.CharField(widget=forms.HiddenInput())
+    pause_until = forms.CharField(required=False)
+    comment = forms.CharField(required=False)
+
+
+class ChangeUserForm(forms.Form):
+    subscriber = forms.CharField(widget=forms.HiddenInput())
+    search = forms.CharField(required=False)
+    uniqname = forms.CharField(required=False)

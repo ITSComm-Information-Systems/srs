@@ -61,7 +61,7 @@
 			<div class="card-body">
 				{% for key, value in c.charge_tables.items %}
 				<strong>{{ key }}</strong>
-				<table class="table-responsive table table-sm table-striped mt-2" id='charge_table'>
+				<table class="table-responsive table table-sm table-striped mt-2" id='charge_table' style="display: table;">
 					<thead>
 						<tr class="thead-dark">
 							{% if key == 'MiStorage' or key == 'Turbo Research Storage' or key == 'Locker Research Storage' %}
@@ -102,6 +102,14 @@
 							<th scope="col">Transaction Type</th>
 							<th scope="col">Unit Price</th>
 							<th scope="col">Quantity</th>
+							<th scope='col' class='total-col'>Total Charge</th>
+							{% elif key == 'Cloud Hosting' %}  <!--- Unique ID, Description, voucher_comment, transaction type, total charge -->
+							<th scope='col' class='first-col'>Unique ID</th>
+							<th scope="col">Invoice ID</th>
+							<th scope="col">Charge Detail</th>
+							<th></th>
+							<th scope='col'>Description</th>
+							<th scope="col">Transaction Type</th>
 							<th scope='col' class='total-col'>Total Charge</th>
 							{% else %}
 							<th scope='col' class="first-col">Billing ID</th>
@@ -170,6 +178,12 @@
 							{% else %}
 							{% if key == 'Container Services' %}
 							<td class='first-col'>{{ v.project_name }}</td>
+							{% elif key == 'Cloud Hosting' %}
+							<td>{{ v.unique_id }}</td>
+							<td>{{ v.invoice_id }}</td>
+							<td>{{ v.voucher_comment }}</td>
+							<td></td>
+
 							{% else %}
 							<td class='first-col'>{{ v.user_defined_id }}</td>
 							{% endif %}
@@ -182,13 +196,15 @@
 
 							<td>{{ v.type }}</td>
 
-							{% if v.type == 'Credit' %}
-							<td class="prv-msgs">{{ v.unit_price }}</td>
-							{% else %}
-							<td>{{ v.unit_price }}</td>
-							{% endif %}
+							{% if key != 'Cloud Hosting' %}
+								{% if v.type == 'Credit' %}
+								<td class="prv-msgs">{{ v.unit_price }}</td>
+								{% else %}
+								<td>{{ v.unit_price }}</td>
+								{% endif %}
 
-							<td>{{ v.qty }}</td>
+								<td>{{ v.qty }}</td>
+							{% endif %}
 
 							{% if v.type == 'Credit' %}
 							<td class='total-col prv-msgs'>{{ v.total_charges }}</td>
@@ -201,7 +217,8 @@
 						<tr class='table-total bg-warning'>
 							<td class='first-col'><strong>Total</strong></td>
 							<td></td>
-							{% if key == 'Container Services' %}
+							{% if key == 'Container Services' or key == 'Cloud Hosting' %}
+							<td></td>
 							{% endif %}
 							{% if key == 'MiServer' or key == 'MiDatabase' %}
 							<td></td>
