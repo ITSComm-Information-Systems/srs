@@ -1277,8 +1277,14 @@ class UmEcommMbidVendorV(models.Model):
         db_table = 'PINN_CUSTOM\".\"UM_ECOMM_MBID_VENDOR_V'
 
 
+class DepartmentManager(models.Manager):
+
+    def group_dropdown(self):
+        return list(UmMpathDwCurrDepartment.objects.values_list('dept_grp', 'dept_grp_descr').distinct().order_by('dept_grp_descr'))
+
+
 class UmMpathDwCurrDepartment(models.Model):
-    deptid = models.CharField(max_length=10)
+    deptid = models.CharField(max_length=10, primary_key=True)
     dept_effdt = models.DateField()
     dept_eff_status = models.CharField(max_length=1)
     dept_descr = models.CharField(max_length=30)
@@ -1292,9 +1298,13 @@ class UmMpathDwCurrDepartment(models.Model):
     dept_bud_seq = models.CharField(max_length=20, blank=True, null=True)
     dept_bud_seq_descr = models.CharField(max_length=30, blank=True, null=True)
 
+    objects = DepartmentManager()
+
     class Meta:
         managed = False
         db_table = 'PINN_CUSTOM\".\"UM_MPATHDW_CURR_DEPARTMENT'
+
+
 
 
 class UmOscAuthUsersApi(models.Model):
@@ -1309,33 +1319,33 @@ class UmOscAuthUsersApi(models.Model):
 
 
 class UmOscNameChangeV(models.Model):
-    deptid = models.CharField(max_length=15, db_collation='USING_NLS_COMP', blank=True, null=True)
-    service_number = models.CharField(max_length=60, db_collation='USING_NLS_COMP')
-    service_status_code = models.CharField(max_length=15, db_collation='USING_NLS_COMP')
-    service_type = models.CharField(max_length=20, db_collation='USING_NLS_COMP')
-    subscriber_id = models.CharField(max_length=7, db_collation='USING_NLS_COMP', primary_key=True)
-    first_name = models.CharField(max_length=50, db_collation='USING_NLS_COMP', blank=True, null=True)
-    mi = models.CharField(max_length=1, db_collation='USING_NLS_COMP', blank=True, null=True)
-    last_name = models.CharField(max_length=50, db_collation='USING_NLS_COMP', blank=True, null=True)
-    email_address = models.CharField(max_length=320, db_collation='USING_NLS_COMP', blank=True, null=True)
-    uniqname = models.CharField(max_length=320, db_collation='USING_NLS_COMP', blank=True, null=True)
-    subscriber_status = models.CharField(max_length=20, db_collation='USING_NLS_COMP', blank=True, null=True)
-    user_defined_id = models.CharField(max_length=20, db_collation='USING_NLS_COMP', blank=True, null=True)
+    deptid = models.CharField(max_length=15, blank=True, null=True)
+    service_number = models.CharField(max_length=60)
+    service_status_code = models.CharField(max_length=15)
+    service_type = models.CharField(max_length=20)
+    subscriber_id = models.CharField(max_length=7, primary_key=True)
+    first_name = models.CharField(max_length=50, blank=True, null=True)
+    mi = models.CharField(max_length=1, blank=True, null=True)
+    last_name = models.CharField(max_length=50, blank=True, null=True)
+    email_address = models.CharField(max_length=320, blank=True, null=True)
+    uniqname = models.CharField(max_length=320, blank=True, null=True)
+    subscriber_status = models.CharField(max_length=20, blank=True, null=True)
+    user_defined_id = models.CharField(max_length=20, blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     location_id = models.FloatField()
-    building_code = models.CharField(max_length=10, db_collation='USING_NLS_COMP', blank=True, null=True)
-    building_name = models.CharField(max_length=25, db_collation='USING_NLS_COMP', blank=True, null=True)
-    floor_name = models.CharField(max_length=18, db_collation='USING_NLS_COMP', blank=True, null=True)
-    room_name = models.CharField(max_length=18, db_collation='USING_NLS_COMP', blank=True, null=True)
-    jack_name = models.CharField(max_length=30, db_collation='USING_NLS_COMP', blank=True, null=True)
+    building_code = models.CharField(max_length=10, blank=True, null=True)
+    building_name = models.CharField(max_length=25, blank=True, null=True)
+    floor_name = models.CharField(max_length=18, blank=True, null=True)
+    room_name = models.CharField(max_length=18, blank=True, null=True)
+    jack_name = models.CharField(max_length=30, blank=True, null=True)
     cable_path_id = models.FloatField(blank=True, null=True)
-    dept_default_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
-    occ_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
-    mrc_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
-    toll_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
-    local_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
-    other_exp_chartfield = models.CharField(max_length=100, db_collation='USING_NLS_COMP', blank=True, null=True)
+    dept_default_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
+    occ_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
+    mrc_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
+    toll_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
+    local_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
+    other_exp_chartfield = models.CharField(max_length=100, blank=True, null=True)
 
     @property
     def full_name(self):

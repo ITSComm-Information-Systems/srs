@@ -2,6 +2,7 @@ FROM python:3.9-slim
 
 #ARG ENVIRONMENT="DEVELOPMENT"
 
+RUN rm -r /usr/src/app
 COPY . /usr/src/app
 
 # Workaround for permission issue on OpenShift

@@ -1,0 +1,102 @@
+{% extends 'softphone/base_softphone.html' %}
+{% block content %}
+
+{% load humanize %}
+
+<h1>{{ title }}</h1>
+
+<div class="container">
+
+<form method="post">
+    {% csrf_token %}
+    <h6 class="d-inline">Search by phone number or uniqname</h6>
+
+    <div class="form-row mt-2">
+        <div class="xinput-group xcol-md-4">
+            <input type="text" name="search" id="id_search" {% if value="{{ form.search.value|default_if_none:'' }}" class="form-control"></input>
+        </div>
+
+        <input type="submit" value="Search" class="btn btn-primary">
+    </div>
+
+    {% if address %}
+    <div class='p-3'>
+        {% for addr in address %}
+        {{ addr.user_defined_id }}<br>
+        Uniqname: {{ addr.uniqname }}<br>
+        {{ addr.first_name }} {{ addr.last_name }}<br>
+        {{ addr.building_name }}<br>
+        Floor: {{ addr.floor_name }}<br>
+        Room: {{ addr.room_name }}<br><br>
+        {% endfor %}
+    </div>
+
+    <div class="form-row mt-2">
+        <div class="input-group col-md-4">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Enter new Uniqname</span>
+            </div>
+            <input type="text" name="uniqname" id="id_uniqname" {% if value="{{ form.uniqname.value|default_if_none:'' }}" class="form-control"></input>
+        </div>
+        <input type="submit" value="Search" class="btn btn-primary">
+        
+        <br>
+
+
+    </div>
+    
+    {% for error in form.uniqname.errors %}
+    <div role="alert" class="ml-4"><i class="fas fa-exclamation-triangle"
+            aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+    {% empty %}
+            {% if uniqname %}
+            <div class='p-3'>
+                {{ new_user }}<br>
+            </div>
+            <div class='p-3'>
+                User for phone number {{ address.0.service_number }} will be changed to {{ uniqname }}<br>
+                <b>Submit change?</b><br>
+                <input type="hidden" name="request_action" value="{{ uniqname }}">
+                <input type="submit" value="Yes" class="btn btn-primary">
+            </div>
+            {% endif %}    
+
+    {% endfor %}
+
+
+
+    {% endif %}
+
+</form>
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+    $(document).ready(function () {
+
+        $(".pause_until").change(function () {
+            target = '#' + $(this).attr('id').replace("pause_until", "comment")
+            target_div = target.replace("id_", "div_"); 
+
+            if (this.value=='Never') {
+                $(target_div).show();
+                $(target).attr("required", true);
+            } else {
+                $(target_div).hide();
+                $(target).removeAttr("required");
+            }
+        });
+
+
+    });
+
+</script>
+</div>
+{% endblock %}

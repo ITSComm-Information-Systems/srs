@@ -499,7 +499,6 @@ class VolumeSelectionForm(TabForm):
 
         instance = self.vol.objects.get(id=self.data['instance_id'])
         service = Action.objects.get(id=self.request.POST.get('action_id')).service
-        
         if service.id == 13:
             label = 'Server'
         elif service.id == 14:
@@ -531,9 +530,13 @@ class VolumeSelectionForm(TabForm):
 
             if 'storage_type' in action.override:
                 vol_type = action.override['storage_type']
-                self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name')
+                if service.id == 7:
+                    self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service')
+                else:  #Prefetch shortcodes
+                    self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service').prefetch_related('shortcodes')
+                return
             elif service.id == 13:
-                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name')
+                self.volume_list = self.vol.objects.filter(owner__in=groups, in_service=True).order_by('name').select_related('owner')
                 self.detail = [{'name': 'CPU', 'quantity': 2, 'cost': 14.33},{'name': 'RAM', 'quantity': 4, 'cost': 4.20},{'name': 'DISK', 'quantity': 55, 'cost': 1.69}]
                 self.cost_types = ['CPU', 'RAM', 'QUANTITY']
 
@@ -549,6 +552,14 @@ class VolumeSelectionForm(TabForm):
                     self.template = 'order/database_review.html'
                 else:
                     self.template = 'order/database_modify.html'
+            elif service.id == 9:
+                self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name').select_related('rate','owner','service').prefetch_related('shortcodes')
+                #self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
+                self.template = 'order/volume_review_turbo.html'
+                for volume in self.volume_list:
+                    self.total_cost = self.total_cost + volume.total_cost
+                return
+
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
                     
@@ -752,6 +763,16 @@ class ServerInfoForm(TabForm):
             self.fields.pop('database') 
             self.fields.pop('ad_group') 
 
+    def get_summary(self, *args, **kwargs):
+        summary = super().get_summary(*args, **kwargs)
+        for rec in summary:
+            if rec.get('name') == 'owner':
+                email = MCommunity().get_group_email(rec['value'])
+                if email:
+                    rec['value'] = rec['value'] + ' | ' + email
+
+        return summary
+        
 class ServerSupportForm(TabForm):
     template = 'order/server_support.html'
 
@@ -1057,10 +1078,28 @@ class ServerSpecForm(TabForm):
             self.add_error('diskSize', '')
 
         name = self.request.POST.get('name')
+        
+
         if name:
+
             servername = Server.objects.filter(name__iexact=name)
+
             if len(servername) > 0:
                 self.add_error('serverName', f'A server named {name.lower()} already exists. Please choose a different name.')
+                
+            #data sanitization
+            for i in range(len(name)):
+                #server names can only have one dash  
+                if name[i] == "-" and name[i+1] == '-':
+                    self.add_error('serverName', 'This server can only have one dash in the name.')
+                    break
+                
+                #server names cannot contain underscores
+                if name[i] == '_':
+                    self.add_error('serverName', 'Server names cannot contain underscores.')
+                    break
+            
+            
 
             # managed windows name can't exceed 15 char:
             if len(name) > 15:
@@ -1068,8 +1107,8 @@ class ServerSpecForm(TabForm):
                     os = self.cleaned_data.get('misevos', False)
                     if os:
                         os_name = Choice.objects.get(id=int(os)).label
-                        if os_name.startswith('Windows'):
-                            self.add_error('serverName', 'Name for a managed Windows server cannot exceed 15 characters (including prefix).')
+                        #if os_name.startswith('Windows'):
+                        self.add_error('serverName', 'Server name cannot exceed 15 characters (including prefix).')
 
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)

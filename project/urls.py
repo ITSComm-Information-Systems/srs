@@ -1,7 +1,7 @@
 from django.conf import settings
-from django.conf.urls import include, url, re_path
+from django.conf.urls import include
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.conf.urls.static import static, serve
 from . import views
 from . import api
@@ -18,6 +18,7 @@ urlpatterns = [
 
     path('oidc/', include('mozilla_django_oidc.urls')),
     path('orders/', include('order.urls')),
+    path('services/', include('services.urls')),
     path('pages/', include('pages.urls')),
     path('auth/', include('oscauth.urls')),
     path('apps/', include('apps.urls')),
@@ -39,26 +40,15 @@ urlpatterns = [
     path('managerapproval/', views.managerapproval),
     path('managerapprovalinit/', views.managerapprovalinit), # AJAX
     path('managerapproval/submit/', views.managerapprovalsubmit), # AJAX
-    path('namechange/', views.NameChange.as_view()),
+    #path('namechange/', views.NameChange.as_view()),
     path('', views.homepage),
     path('', include('pages.urls')),
     path('tools/',include('tools.urls'))
 ]
 
-if settings.SRS_OUTAGE:
-    from django.views.generic import TemplateView 
-    urlpatterns = [
-        #re_path(r'^', views.homepage, name='bio')
-
-        re_path(r'^', TemplateView.as_view(template_name="outage.html"))
-        #re_path('<str:pagename>', views.index, name='index'),
-    ]
-
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-        
+        path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

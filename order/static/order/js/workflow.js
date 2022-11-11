@@ -76,7 +76,11 @@ var update_total_cost = function() {
   $("#total_cost_field").val(total_cost.toFixed(2));
 }
 
-
+window.onload = function(){
+  payload = document.getElementById("id_midatatype");
+  payload.options[0].text = 'Microsoft SQL Server';
+  console.log(payload)
+};
 
 
 $(document).ready(function() {

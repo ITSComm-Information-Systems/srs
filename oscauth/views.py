@@ -538,11 +538,11 @@ def logout_view(request):
 def add_custom_permissions(user_id):
     # Add permissions for groups the user is in.  
 
-    groups = AuthUserDept.objects.filter(user=user_id).distinct('group_id')
+    groups = AuthUserDept.objects.filter(user=user_id).distinct().values('group_id')
     u = User.objects.get(id=user_id)
 
     for group in groups:
-        g = Group.objects.get(id=group.group_id)
+        g = Group.objects.get(id=group.get('group_id'))
         for perm in g.permissions.all():
             u.user_permissions.add(perm)
 
@@ -635,6 +635,7 @@ def userid(request):
 
     if request.method=='POST':
         user_param = request.POST.get('user_param').strip()
+        user_param = ''.join(char for char in user_param if char.isalnum())
 
     if user_param == '':
         context = {

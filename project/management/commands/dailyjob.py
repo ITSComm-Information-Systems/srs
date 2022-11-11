@@ -12,10 +12,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print('init')
 
-        sql = '''delete from auth_user_dept a
+        sql = '''delete from srs_auth_user_dept a
                 where group_id in (5,6) -- Orderer, Reporter
                 and exists (select 'x'
-                from auth_user_dept
+                from srs_auth_user_dept
                 where dept = a.dept
                 and user_id = a.user_id
                 and group_id in (3,4) )''' # Department Manager, Proxy
@@ -23,10 +23,10 @@ class Command(BaseCommand):
         with connection.cursor() as cursor:
             cursor.execute(sql)
 
-        sql = '''delete from auth_user_dept a
+        sql = '''delete from srs_auth_user_dept a
                 where group_id = 4  -- Proxy
                 and exists (select 'x'
-                from auth_user_dept
+                from srs_auth_user_dept
                 where dept = a.dept
                 and user_id = a.user_id
                 and group_id = 3 )''' # Manager

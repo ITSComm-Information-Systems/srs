@@ -1,5 +1,4 @@
 from django.urls import path
-from django.conf.urls import url
 from . import views
 
 urlpatterns = [
@@ -17,6 +16,6 @@ urlpatterns = [
     path('actionlog/', views.get_action_log),
     path('actionlog/<int:id>/', views.get_action_log_entry),
     path('confirmation/', views.get_confirmation),
-    url(r'', views.load_rte),
+    path(r'', views.load_rte),
     
 ]
