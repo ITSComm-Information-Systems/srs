@@ -1146,10 +1146,6 @@ class Item(models.Model):
         display_values = {}
         for tab in self.data['reviewSummary']:
             for field in tab['fields']:
-                if action.service.name == 'miServer':
-                    if 'label' in field:
-                        if field.label == 'MCommunity Admin Group':
-                            field.label = 'MCommunity Owner Group'
                 if 'name' in field:
                     if 'list' in field:
                         nl = '\n'
