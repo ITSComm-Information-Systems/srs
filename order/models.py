@@ -1149,7 +1149,7 @@ class Item(models.Model):
                 if action.service.name == 'miServer':
                     if 'label' in field:
                         if field.label == 'MCommunity Admin Group':
-                            field.label == 'MCommunity Owner Group'
+                            field.label = 'MCommunity Owner Group'
 
                 if 'name' in field:
                     if 'list' in field:
