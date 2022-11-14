@@ -1133,6 +1133,12 @@ class Item(models.Model):
     def submit_incident(self, route, action):
 
         text = self.data['reviewSummary']
+        if self.description == 'MiServer':
+            for entry in text:
+                for field in entry['fields']:
+                    if field['label'] == 'MCommunity Admin Group':
+                        field['label'] = 'MCommunity Owner Group'
+            
         note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
  
         payload = route['constants']
@@ -1146,11 +1152,6 @@ class Item(models.Model):
         display_values = {}
         for tab in self.data['reviewSummary']:
             for field in tab['fields']:
-                if action.service.name == 'miServer':
-                    if 'label' in field:
-                        if field.label == 'MCommunity Admin Group':
-                            field.label = 'MCommunity Owner Group'
-
                 if 'name' in field:
                     if 'list' in field:
                         nl = '\n'
