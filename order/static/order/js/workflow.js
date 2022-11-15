@@ -76,8 +76,20 @@ var update_total_cost = function() {
   $("#total_cost_field").val(total_cost.toFixed(2));
 }
 
+window.onload = function(){
+  
+  databaseOS = document.getElementById("id_midatatype");
+  databaseOS.options[0].text = 'Microsoft SQL Server';
 
-
+  databaseOS.onchange = function(){
+    idSize = document.getElementById("id_size")
+    if(databaseOS.options[databaseOS.selectedIndex].text == "Oracle"){
+      if(idSize.value < 50){
+        idSize.value = 50;
+        } 
+      }
+  }
+};
 
 $(document).ready(function() {
 
@@ -380,10 +392,16 @@ $(document).ready(function() {
       type = $('#id_midatatype option:selected').text();
       size=$('#id_size').val();
       size = Math.trunc(size)
-      if (type=='Oracle' && size < 30) {
-        size = 30;
+      if (type=='Oracle' && size < 50) {
+        size = 50;
       }
-      link = "location.href='67?type=" + type + "&size=" + size +"';"; 
+      if (type = 'Microsoft SQL Server'){
+        linktype = "MSSQL"
+      }
+      else{
+        linktype = type
+      }
+      link = "location.href='67?type=" + linktype + "&size=" + size +"';"; 
       $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
     }
