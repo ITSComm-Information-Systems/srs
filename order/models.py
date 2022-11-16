@@ -1133,7 +1133,7 @@ class Item(models.Model):
     def submit_incident(self, route, action):
 
         text = self.data['reviewSummary']
-        if self.description == 'MiServer':
+        if self.description == 'MiServer' or self.description == 'Modify MiServer':
             for entry in text:
                 for field in entry['fields']:
                     if field['label'] == 'MCommunity Admin Group':
