@@ -381,6 +381,7 @@ $(document).ready(function() {
         size = 50;
       }
       link = "location.href='67?type=" + type + "&size=" + size +"';"; 
+      
       $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
     }
@@ -424,6 +425,8 @@ $(document).ready(function() {
 
   }
 
+
+  
   $(document).on("change", "#id_midatatype" , function() {
     if ($('#id_midatatype option:selected').text()=="MSSQL") { // MSSQL
       $("#div_midatasql").show();
