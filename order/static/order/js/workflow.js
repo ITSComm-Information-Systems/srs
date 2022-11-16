@@ -76,23 +76,6 @@ var update_total_cost = function() {
   $("#total_cost_field").val(total_cost.toFixed(2));
 }
 
-window.onload = function(){
-  
-  databaseOS = document.getElementById("id_midatatype");
-  databaseOS.options[0].text = 'Microsoft SQL Server';
-
-  databaseOS.onchange = function(){
-    idSize = document.getElementById("id_size")
-    databaseOS.options[0].text == "MSSQL";
-
-    if(databaseOS.options[databaseOS.selectedIndex].text == "Oracle"){
-      if(idSize.value < 50){
-        idSize.value = 50;
-        } 
-      }
-  }
-};
-
 $(document).ready(function() {
 
   $('#productType_1').attr('disabled', true);
@@ -397,12 +380,7 @@ $(document).ready(function() {
       if (type=='Oracle' && size < 50) {
         size = 50;
       }
-      if (type == 'Microsoft SQL Server'){
-        link = "location.href='67?type=MSSQL&size=" + size +"';"; 
-      }
-      else{
-        link = "location.href='67?type=" + type + "&size=" + size +"';"; 
-      }
+      link = "location.href='67?type=" + type + "&size=" + size +"';"; 
       
       $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
@@ -451,7 +429,6 @@ $(document).ready(function() {
   
   $(document).on("change", "#id_midatatype" , function() {
     if ($('#id_midatatype option:selected').text()=="MSSQL") { // MSSQL
-      $('#id_midatatype option:selected').text()="Microsft SQL Server"
       $("#div_midatasql").show();
     } else {
       $("#div_midatasql").hide();
