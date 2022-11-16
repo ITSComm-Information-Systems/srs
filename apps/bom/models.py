@@ -120,7 +120,8 @@ class PreOrder(models.Model):
     project_code_display = models.CharField(max_length=50)
     add_info_list_value_name_2 = models.CharField(max_length=50)
     add_info_list_value_code_2 = models.CharField(max_length=50)
-    due_date = models.CharField(max_length=50)
+    due_date = models.DateTimeField(null=True, blank=True)
+    estimated_start_date = models.DateTimeField(null=True, blank=True)
     add_info_list_value_name_1 = models.CharField(max_length=50)
     add_info_list_value_code_1 = models.CharField(max_length=50)
     department_name = models.CharField(max_length=50)
@@ -159,6 +160,8 @@ class EstimateView(models.Model):
     project_manager = models.CharField(max_length=20)
     assigned_engineer = models.CharField(max_length=20)
     assigned_netops = models.CharField(max_length=20)
+    due_date = models.DateTimeField(null=True, blank=True)
+    estimated_start_date = models.DateTimeField(null=True, blank=True)
 
     class Meta: 
         db_table = 'um_bom_estimate_search_v'
