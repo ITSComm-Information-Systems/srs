@@ -1359,7 +1359,7 @@ class Item(models.Model):
 
         db_type = self.data.get('database')
         if db_type:
-            rec.database_type = Choice.objects.get(parent__code='DATABASE_TYPE', label=db_type)
+            rec.database_type = Choice.objects.get(parent__code='DATABASE_TYPE', code=db_type.upper())
         
         rec.save()
 
