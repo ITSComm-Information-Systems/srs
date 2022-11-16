@@ -380,7 +380,13 @@ $(document).ready(function() {
       if (type=='Oracle' && size < 50) {
         size = 50;
       }
-      link = "location.href='67?type=" + type + "&size=" + size +"';"; 
+      if (type = 'Microsoft SQL Server'){
+        linktype = "MSSQL"
+      }
+      else{
+        linktype = type
+      }
+      link = "location.href='67?type=" + linktype + "&size=" + size +"';"; 
       
       $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
