@@ -1133,6 +1133,12 @@ class Item(models.Model):
     def submit_incident(self, route, action):
 
         text = self.data['reviewSummary']
+        if self.description == 'MiServer' or self.description == 'Modify MiServer':
+            for entry in text:
+                for field in entry['fields']:
+                    if field['label'] == 'MCommunity Admin Group' or field['label'] == '*MCommunity Admin Group':
+                        field['label'] = 'MCommunity Owner Group'
+            
         note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
  
         payload = route['constants']
