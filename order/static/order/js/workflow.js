@@ -380,7 +380,7 @@ $(document).ready(function() {
       if (type=='Oracle' && size < 50) {
         size = 50;
       }
-      if (type = 'Microsoft SQL Server'){
+      if (type == 'Microsoft SQL Server'){
         linktype = "MSSQL"
       }
       else{
