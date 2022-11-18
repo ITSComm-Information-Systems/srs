@@ -163,6 +163,17 @@ $(document).ready(function() {
     $('#nextBtn').hide();
   }
 
+  parms = new URLSearchParams(window.location.search);
+  server_id = parms.get('server');
+
+  if (server_id) {  // Special Server Modify
+    currTab = 'volumeSelection';
+    currStep = 4
+    $('#instance_id').val(server_id);
+    sendTabData();
+    $('[data-tab="volumeSelection"]').hide();
+  }
+
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
 
   var callback = function() {
