@@ -1,0 +1,23 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: build-base-daily
+spec:
+  schedule: '55 14 * * *'
+  ConcurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            parent: "testcron"
+        spec:
+          containers:
+            -
+              name: batch
+              image: 'docker-registry.default.svc:5000/srs/dev'
+              envFrom:
+              - configMapRef:
+                  name: dev
+              command: ["curl",  "-X", "POST", "-k", "https://containers.it.umich.edu/apis/build.openshift.io/v1/namespaces/srs/buildconfigs/dev/webhooks/secret101/generic"]
+          restartPolicy: OnFailure
