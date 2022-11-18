@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'order',
     #'pages',
+    'services',
     'reports',
     'tools',
     'softphone',
