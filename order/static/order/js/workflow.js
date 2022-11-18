@@ -76,21 +76,6 @@ var update_total_cost = function() {
   $("#total_cost_field").val(total_cost.toFixed(2));
 }
 
-window.onload = function(){
-  
-  databaseOS = document.getElementById("id_midatatype");
-  databaseOS.options[0].text = 'Microsoft SQL Server';
-
-  databaseOS.onchange = function(){
-    idSize = document.getElementById("id_size")
-    if(databaseOS.options[databaseOS.selectedIndex].text == "Oracle"){
-      if(idSize.value < 50){
-        idSize.value = 50;
-        } 
-      }
-  }
-};
-
 $(document).ready(function() {
 
   $('#productType_1').attr('disabled', true);
@@ -176,6 +161,17 @@ $(document).ready(function() {
 
   if (modifyPages.includes(wfid)) {
     $('#nextBtn').hide();
+  }
+
+  parms = new URLSearchParams(window.location.search);
+  server_id = parms.get('server');
+
+  if (server_id) {  // Special Server Modify
+    currTab = 'volumeSelection';
+    currStep = 4
+    $('#instance_id').val(server_id);
+    sendTabData();
+    $('[data-tab="volumeSelection"]').hide();
   }
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
