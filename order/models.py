@@ -1136,8 +1136,10 @@ class Item(models.Model):
         if self.description == 'MiServer' or self.description == 'Modify MiServer':
             for entry in text:
                 for field in entry['fields']:
-                    if field['label'] == 'MCommunity Admin Group' or field['label'] == '*MCommunity Admin Group':
+                    if field['label'] == 'MCommunity Admin Group':
                         field['label'] = 'MCommunity Owner Group'
+                    if field['label'] == '*MCommunity Admin Group':
+                        field['label'] = '*MCommunity Owner Group'
             
         note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
  
