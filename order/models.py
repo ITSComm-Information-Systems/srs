@@ -74,7 +74,8 @@ class Step(Configuration):
         ('ServerSupportForm', 'Server Support'),
         ('ServerSpecForm', 'Server Specification'),
         ('ServerDataForm', 'Server Data Sensitivity'),
-        ('DataDenForm', 'Data Den Form')
+        ('DataDenForm', 'Data Den Form'),
+        ('ChangeSFUserForm', 'Change Softphone User')
     )
 
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)

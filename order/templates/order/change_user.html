@@ -1,0 +1,30 @@
+
+
+<div class="form-group col-lg-6 col-12" data-sequence="20" data-condition="">
+    <label for="id_phone_number">Enter Phone Number (eg: 7341234567):</label>
+    <div class="row">
+        <div class="col">
+            <input data-label="Phone Number" type="tel" class="form-control" id="id_phone_number" name="phone" required>
+            <div role=”alert” class="invalid-feedback" >
+                <i class="fas fa-exclamation-triangle" aria-label="Icon signfying that number was not found"></i><span id="error_msg">Number Not Found</span>
+            </div>
+        </div>
+        <div class="col">
+            <button type="button" class="btn btn-primary findBtn" id="phoneLookup">Find</button>
+        </div>
+    </div>
+</div>
+
+<div id="PhoneInfo" class="form-group col-lg-6 col-12">
+    
+</div>
+
+<div class="form-group row col-md-4" id="NewUniqname" data-sequence="10" data-condition="">
+    <div class="form-check">
+        
+        <label for="id_VoiceUnique">Enter New Uniqname:</label> <input type="text" name="new_uniqname" required id="id_VoiceUnique">
+        <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                aria-label="Icon signfying that user must enter a value"></i>Please enter a value.</div>
+        <div role=”alert” class="valid-feedback">Good.</div>
+    </div>
+</div>
