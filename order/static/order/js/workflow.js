@@ -382,15 +382,13 @@ $(document).ready(function() {
 
     $("#id_midatatype").trigger("change");
     server = $('#id_size').data('server');
+    
 
     if (server) {
       $('#id_size').data('server', '');
       type = $('#id_midatatype option:selected').text();
       size=$('#id_size').val();
       size = Math.trunc(size)
-      if (type=='Oracle' && size < 50) {
-        size = 50;
-      }
       if (type == 'Microsoft SQL Server'){
         linktype = "MSSQL"
       }
@@ -401,6 +399,24 @@ $(document).ready(function() {
       
       $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
+    }
+  });
+
+  $(document).on("change", "#id_midatatype" , function() {
+    type = $('#id_midatatype option:selected').text();
+    size=$('#id_size').val();
+
+    if(type == "Oracle" && size < 50){
+      $('#id_size').val(50)
+    }
+  });
+
+  $(document).on("change", "#id_size" , function() {
+    type = $('#id_midatatype option:selected').text();
+    size=$('#id_size').val();
+
+    if(type == "Oracle" && size < 50){
+      $('#id_size').val(50)
     }
   });
 
