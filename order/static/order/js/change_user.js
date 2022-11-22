@@ -2,6 +2,18 @@ var locations = [];
 
 $(document).ready(function() {
 
+    $('[data-tab="LocationNew"]').hide();
+
+    $("#id_VerifyLocation").change(function() {
+      console.log('clicked', this.value);
+      if (this.value == 1) {
+        $('[data-tab="LocationNew"]').hide();
+      } else {
+        $('[data-tab="LocationNew"]').show();
+      }
+    });
+
+
     $("#id_phone_number").focusout(function () {
       phone_number = $("#id_phone_number").val();
 
@@ -12,6 +24,7 @@ $(document).ready(function() {
           $("#phLocationFields").hide();
           $('#phoneLookup').html('Searching...').addClass(' disabled');
           $("#PhoneInfo").html("");
+          $("#VerifyLocation").hide();
         },
   
         success: function (data) {
@@ -28,6 +41,7 @@ $(document).ready(function() {
               $("#workflowForm").removeClass('was-validated');
               update_location(data[0]);
               $("#NewUniqname").show();
+              $("#VerifyLocation").show();
             } else {
               console.log('not authorized');
               document.getElementById("id_phone_number").setCustomValidity("Not authorized");
