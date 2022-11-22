@@ -7,15 +7,16 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.forms import formset_factory
 
-import datetime
+from project.integrations import MCommunity
+import datetime, re
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment
+from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment, UmOscNameChangeV
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
 from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date
-from .forms import SelectionForm, OptOutForm
+from .forms import SelectionForm, OptOutForm, ChangeUserForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 
@@ -54,6 +55,55 @@ def get_department_list(dept_id, user):
         dept_list.access_error = f'NO ACCESS TO {current_department}'
 
     return dept_list
+
+
+class ChangeUser(LoginRequiredMixin, View):
+    title = 'Change User - Softphone'
+
+    def get(self, request):
+        print(self.request.GET)
+        f = ChangeUserForm()    
+
+        return render(request, 'softphone/change_user.html',
+                      {'title': self.title,
+                       'form': f
+                       #'formset': formset, 
+                       #'phone_list': phone_list
+                       })
+
+    def post(self, request):
+        if self.request.POST.get('request_action'):
+            return HttpResponseRedirect('/requestsent') 
+        
+        f = ChangeUserForm(self.request.POST)    
+        
+        subscriber_id = self.request.POST.get('subscriber')
+        search = self.request.POST.get('search')
+        uniqname = self.request.POST.get('uniqname')
+
+        num_search = re.sub(r'[^0-9]', '', search)
+        if len(num_search)==10:
+            address = UmOscNameChangeV.objects.filter(service_number=num_search)
+        else:
+            address = UmOscNameChangeV.objects.filter(uniqname=search)
+
+        if uniqname:
+            mc = MCommunity().get_user(uniqname)
+            if mc:
+                new_user = f"{mc['givenName']} {mc['umichDisplaySn']}"
+            else:
+                f.add_error('uniqname', 'Uniqname not found.') 
+                new_user = 'Not Found'
+        else:
+            new_user = ''
+
+        return render(request, 'softphone/change_user.html',
+                      {'title': self.title,
+                       'form': f,
+                       'address': address,
+                       'uniqname': uniqname,
+                       'new_user': new_user
+                       })
 
 
 class PauseUser(LoginRequiredMixin, View):

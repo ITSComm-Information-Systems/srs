@@ -422,6 +422,10 @@ class FeaturesForm(TabForm):
         fields = ('name', 'description',) 
 
 
+class ChangeSFUserForm(TabForm):
+    template = 'order/change_user.html'
+
+
 class RestrictionsForm(TabForm):
     res = Restriction.objects.all()
     list = FeatureCategory.objects.all()
