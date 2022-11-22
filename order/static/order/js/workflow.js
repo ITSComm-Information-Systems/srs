@@ -76,9 +76,6 @@ var update_total_cost = function() {
   $("#total_cost_field").val(total_cost.toFixed(2));
 }
 
-
-
-
 $(document).ready(function() {
 
   $('#productType_1').attr('disabled', true);
@@ -384,6 +381,7 @@ $(document).ready(function() {
         size = 30;
       }
       link = "location.href='67?type=" + type + "&size=" + size +"';"; 
+      
       $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
     }
@@ -427,6 +425,8 @@ $(document).ready(function() {
 
   }
 
+
+  
   $(document).on("change", "#id_midatatype" , function() {
     if ($('#id_midatatype option:selected').text()=="MSSQL") { // MSSQL
       $("#div_midatasql").show();
