@@ -139,6 +139,7 @@ class SelectionAdmin(admin.ModelAdmin):
     search_fields = ['service_number','uniqname','updated_by','building_code']
     list_filter = [ProcessingStatusListFilter,'migrate',OldCutDateListFilter,CutDateListFilter, DuoListFilter,ZoomListFilter]
     form = SelectionForm
+    date_hierarchy = 'cut_date'
     actions = ['update_selections','download_csv']
 
     def get_urls(self):
