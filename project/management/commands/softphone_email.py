@@ -5,7 +5,7 @@ from django.db import connections
 from softphone.models import SelectionV, next_cut_date
 from django.conf import settings
 from django.template import Template, Context
-from datetime import timedelta
+from datetime import timedelta, date
 import csv, io
 
 class Command(BaseCommand):
@@ -20,6 +20,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         email = Email.objects.get(code=options['email'])
         cut_date = next_cut_date()
+        
+        if cut_date - date.today() > timedelta(days=7):
+            print('No cut date next week.  Exiting program.')
+            return
+
         week_of = cut_date - timedelta(days = 3)
 
         context = {'cut_date': cut_date, 'week_of': week_of}
