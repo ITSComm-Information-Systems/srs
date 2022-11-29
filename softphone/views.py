@@ -56,6 +56,40 @@ def get_department_list(dept_id, user):
     return dept_list
 
 
+class LocationChange(LoginRequiredMixin, View):
+    title = 'Softphone Location'
+
+    def get(self, request):
+
+
+        if self.request.user.is_superuser and request.GET.get('user'):
+            print('impersonate', self.request.GET.get('user'))
+            username = self.request.GET.get('user')
+        else:
+            username = self.request.user.username
+
+
+        OptOutFormSet = formset_factory(OptOutForm, extra=0)
+        #phone_list = SelectionV.objects.filter(floor='SOFTPHONE')
+        #phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=next_cut_date()).values('subscriber'
+        #            ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
+
+        phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=next_cut_date())
+        print(next_cut_date(), username, len(phone_list))
+
+
+        formset = OptOutFormSet(initial=phone_list)
+
+        return render(request, 'softphone/location_change.html',
+                      {'title': self.title,
+                       #'date_list': date_list,
+                       'formset': formset, 
+                       'phone_list': []})
+
+    def post(self, request, uniqname):
+        pass
+
+
 class PauseUser(LoginRequiredMixin, View):
     title = 'Pause U-M Zoom Phone'
 
