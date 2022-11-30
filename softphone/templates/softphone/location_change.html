@@ -12,7 +12,6 @@
 
 <div class="container">
 
-
 <form method="post">
     <a class="float-right col-6" href="?file=CSV">Download CSV</a>
     {% csrf_token %}
@@ -34,23 +33,23 @@
 
             <div class="form-group col-sm upgrade_to_softphone" id="div_id_form-0-migrate" data-location="ARBOR LAKES 3">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                    <label class="form-check-label" for="defaultCheck1">
+                    <input class="form-check-input change_location" type="checkbox" value="Yes" name="{{ form.prefix }}-update" id="id_{{ form.prefix }}-update">
+                    <label class="form-check-label" for="id_{{ form.prefix }}-update">
                       Update Location?
                     </label>
+                </div><br>
+                
+                <div id="div_{{ form.prefix }}-building" class="form-group" style="display: none;">
+                    <label for="browser">Search by building Name or Number:</label>
+                    <input class='form-control change_building' list="buildings" name="{{ form.prefix }}-building" id="id_{{ form.prefix }}-building">
                 </div>
-
-                <div class="form-group">
-                    <label for="formGroupExampleInput">Building</label>
-                    <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Example input placeholder">
+                <div id="div_{{ form.prefix }}-floor" class="form-group" style="display: none;">
+                    <label for="id_{{ form.prefix }}-floor">Floor</label>
+                    <input type="text" class="form-control change_floor" name="{{ form.prefix }}-floor" id="id_{{ form.prefix }}-floor">
                 </div>
-                <div class="form-group">
-                    <label for="formGroupExampleInput2">Floor</label>
-                    <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="Another input placeholder">
-                </div>
-                <div class="form-group">
-                    <label for="formGroupExampleInput2">Room</label>
-                    <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="Another input placeholder">
+                <div id="div_{{ form.prefix }}-room" class="form-group" style="display: none;">
+                    <label for="id_{{ form.prefix }}-room">Room</label>
+                    <input type="text" class="form-control" name="{{ form.prefix }}-room" id="id_{{ form.prefix }}-room">
                 </div>
 
             </div>
@@ -60,19 +59,24 @@
             <div class="form-group col-sm">
                 <label for="exampleFormControlTextarea1">Please explain reason for pause in transition</label>
                 <textarea  placeholder="Limit 4,000 Characters" maxlength="4000" name="{{ form.prefix }}-comment" class="form-control" id="id_{{ form.prefix }}-comment" rows="3"></textarea>
-              </div>
+            </div>
         </div>
     </div>
     {% endfor %}
     <div id="footered" class="container-fluid fixed-bottom border border-top-primary" style="background-color: #E2E4E4">
-
         <div class="container mt-1 mb-1">
-
-                <button type="submit" class="btn" style="background-color: #0068A8; color:white">Save</button>
+            <button type="submit" class="btn" style="background-color: #0068A8; color:white">Save</button>
         </div>
 
     </div>
 </form>
+</div>
+
+<datalist id="buildings">
+    {% for building in building_list %}
+        <option value="{{ building.building_code }}">{{ building.building_name }}</option>    
+    {% endfor %}
+</datalist>
 
 {% endblock %}
 
@@ -86,11 +90,38 @@
 
     $(document).ready(function () {
 
-        $(".pause_until").change(function () {
-            target = '#' + $(this).attr('id').replace("pause_until", "comment")
+        $(".change_location").change(function () {
+            target = '#' + $(this).attr('id').replace("update", "building")
             target_div = target.replace("id_", "div_"); 
+            if (this.checked) {
+                $(target_div).show();
+                $(target).attr("required", true);
+            } else {
+                $(target_div).hide();
+                $(target).removeAttr("required");
+            }
+        });
 
-            if (this.value=='Never') {
+        $(".change_building").change(function () {
+            target = '#' + $(this).attr('id').replace("building", "floor")
+            target_div = target.replace("id_", "div_"); 
+            myval = this;
+            console.log(this.value);
+            if (this.value) {
+                $(target_div).show();
+                $(target).attr("required", true);
+            } else {
+                $(target_div).hide();
+                $(target).removeAttr("required");
+            }
+        });
+
+        $(".change_floor").on("keyup", function() {
+            target = '#' + $(this).attr('id').replace("floor", "room")
+            target_div = target.replace("id_", "div_"); 
+            myval = this;
+            console.log(this.value);
+            if (this.value) {
                 $(target_div).show();
                 $(target).attr("required", true);
             } else {
@@ -100,8 +131,50 @@
         });
 
 
+        $('input[type=text][name=buildingFloor]').on("keyup", function () {
+            var code = $('#buildingID').val();
+            var floor = $(this).val();
+            $("#roomselect").hide();
+            $("#jackselect").hide();
+            $('#buildingRoom').val('');
+            $('#buildingJack').val('');
+            $.ajax({
+                type: "GET",
+                url: "floor/",
+                data: {
+                    "buildingID": code,
+                    "buildingFloor": floor,
+                },
+                dataType: 'json',
+                success: function (data) {
+
+                    $('#buildingFloor').val(floor);
+                    $('#buildingRoom').empty();
+                    var option = document.createElement("option");
+                    option.value = "%";
+                    option.text = "--Select--";
+                    document.getElementById('buildingRoom').appendChild(option);
+
+                    for (var i = 0; i < data.rooms.length; i++) {
+                        var option = document.createElement("option");
+                        option.value = data.rooms[i];
+                        option.text = data.rooms[i];
+                        document.getElementById('buildingRoom').appendChild(option);
+                    }
+                    if (data.floor != '')
+                        $("#roomselect").show();
+                    console.log(typeof data);
+                },
+                error: function (data) {
+                    alert("ok nice try guy");
+                }
+            });
+        });
+
+
+
+
     });
 
 </script>
-</div>
 {% endblock %}

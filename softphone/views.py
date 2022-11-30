@@ -10,7 +10,7 @@ from django.forms import formset_factory
 import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment
+from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
@@ -60,7 +60,7 @@ class LocationChange(LoginRequiredMixin, View):
     title = 'Softphone Location'
 
     def get(self, request):
-
+        building_list = UmOSCBuildingV.objects.all()
 
         if self.request.user.is_superuser and request.GET.get('user'):
             print('impersonate', self.request.GET.get('user'))
@@ -82,12 +82,13 @@ class LocationChange(LoginRequiredMixin, View):
 
         return render(request, 'softphone/location_change.html',
                       {'title': self.title,
-                       #'date_list': date_list,
+                       'building_list': building_list,
                        'formset': formset, 
                        'phone_list': []})
 
-    def post(self, request, uniqname):
-        pass
+    def post(self, request):
+        print(self.request.POST)
+        return HttpResponseRedirect('/softphone/location')
 
 
 class PauseUser(LoginRequiredMixin, View):
