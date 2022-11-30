@@ -57,7 +57,7 @@ def get_department_list(dept_id, user):
 
 
 class LocationChange(LoginRequiredMixin, View):
-    title = 'Softphone Location'
+    title = 'Location Verification App - Deskset'
 
     def get(self, request):
         building_list = UmOSCBuildingV.objects.all()
