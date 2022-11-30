@@ -6,32 +6,29 @@
 <h1>{{ title }}</h1>
 
 <ul>
-    <li>Refer to this <a href="https://documentation.its.umich.edu/node/3514">guide </a> for more information regarding pausing transitions for your Unit</li>
+    <li>Refer to this <a href="https://documentation.its.umich.edu/node/3514">guide </a> for more information regarding your deskset.</li>
     <li>Read more about the <a href="https://record.umich.edu/articles/new-zoom-phone-service-to-offer-greater-flexibility-mobility/">Telephone Service Upgrade Project</a></li>
 </ul>
 
 <div class="container">
 
 <form method="post">
-    <a class="float-right col-6" href="?file=CSV">Download CSV</a>
     {% csrf_token %}
     {{ formset.management_form }}
     {% for form in formset %}
     <div id="{{ form.prefix }}" class="col-6 card border-primary shadow p-3 my-3">    
-        {{ form.initial.subscriber }}
-
         <div class="row">
             <div class="col-sm">
-                {{ form.subscriber.id }}
+                <input type="hidden" name="{{ form.prefix }}-subscriber_id">{{ form.subscriber.id }}</input>
                 <strong>Phone</strong><br>
                 {{ form.initial.service_number }}<br>
-                Uniqname: {{ form.initial.subscriber_uniqname }}{{ form.initial.uniqname }}<br>
+                Uniqname: {{ form.initial.uniqname }}<br>
                 {{ form.initial.subscriber_first_name }} {{ form.initial.subscriber_last_name }}<br>
                 {{ form.initial.dept_id }} &nbsp; {{ form.initial.dept_name }}<br>
                 {{ form.initial.building }} &nbsp; {{ form.initial.building_name }}
             </div>
 
-            <div class="form-group col-sm upgrade_to_softphone" id="div_id_form-0-migrate" data-location="ARBOR LAKES 3">
+            <div class="col-sm">
                 <div class="form-check">
                     <input class="form-check-input change_location" type="checkbox" value="Yes" name="{{ form.prefix }}-update" id="id_{{ form.prefix }}-update">
                     <label class="form-check-label" for="id_{{ form.prefix }}-update">
@@ -42,6 +39,7 @@
                 <div id="div_{{ form.prefix }}-building" class="form-group" style="display: none;">
                     <label for="browser">Search by building Name or Number:</label>
                     <input class='form-control change_building' list="buildings" name="{{ form.prefix }}-building" id="id_{{ form.prefix }}-building">
+                    <small id="id_{{ form.prefix }}-building-name"></small>
                 </div>
                 <div id="div_{{ form.prefix }}-floor" class="form-group" style="display: none;">
                     <label for="id_{{ form.prefix }}-floor">Floor</label>
@@ -49,16 +47,11 @@
                 </div>
                 <div id="div_{{ form.prefix }}-room" class="form-group" style="display: none;">
                     <label for="id_{{ form.prefix }}-room">Room</label>
-                    <input type="text" class="form-control" name="{{ form.prefix }}-room" id="id_{{ form.prefix }}-room">
+                    <select class="form-control" name="{{ form.prefix }}-room" id="id_{{ form.prefix }}-room">
+                        <option></option>
+                    </select>
                 </div>
 
-            </div>
-        </div>
-        <br>
-        <div id="div_{{ form.prefix }}-comment" class="row" style="display: none;">
-            <div class="form-group col-sm">
-                <label for="exampleFormControlTextarea1">Please explain reason for pause in transition</label>
-                <textarea  placeholder="Limit 4,000 Characters" maxlength="4000" name="{{ form.prefix }}-comment" class="form-control" id="id_{{ form.prefix }}-comment" rows="3"></textarea>
             </div>
         </div>
     </div>
@@ -91,8 +84,12 @@
     $(document).ready(function () {
 
         $(".change_location").change(function () {
+            prefix = get_form_prefix(this.id)
             target = '#' + $(this).attr('id').replace("update", "building")
+            //target = prefix + 'building'
             target_div = target.replace("id_", "div_"); 
+            console.log(prefix, this.id);
+
             if (this.checked) {
                 $(target_div).show();
                 $(target).attr("required", true);
@@ -105,11 +102,13 @@
         $(".change_building").change(function () {
             target = '#' + $(this).attr('id').replace("building", "floor")
             target_div = target.replace("id_", "div_"); 
-            myval = this;
-            console.log(this.value);
+
             if (this.value) {
                 $(target_div).show();
                 $(target).attr("required", true);
+                building_name = '#' + $(this).attr('id').replace("building", "building-name")
+                $(building_name).html('Arbor Lakes 3');
+
             } else {
                 $(target_div).hide();
                 $(target).removeAttr("required");
@@ -119,8 +118,7 @@
         $(".change_floor").on("keyup", function() {
             target = '#' + $(this).attr('id').replace("floor", "room")
             target_div = target.replace("id_", "div_"); 
-            myval = this;
-            console.log(this.value);
+
             if (this.value) {
                 $(target_div).show();
                 $(target).attr("required", true);
@@ -128,53 +126,55 @@
                 $(target_div).hide();
                 $(target).removeAttr("required");
             }
+            update_room_list(target);
         });
-
-
-        $('input[type=text][name=buildingFloor]').on("keyup", function () {
-            var code = $('#buildingID').val();
-            var floor = $(this).val();
-            $("#roomselect").hide();
-            $("#jackselect").hide();
-            $('#buildingRoom').val('');
-            $('#buildingJack').val('');
-            $.ajax({
-                type: "GET",
-                url: "floor/",
-                data: {
-                    "buildingID": code,
-                    "buildingFloor": floor,
-                },
-                dataType: 'json',
-                success: function (data) {
-
-                    $('#buildingFloor').val(floor);
-                    $('#buildingRoom').empty();
-                    var option = document.createElement("option");
-                    option.value = "%";
-                    option.text = "--Select--";
-                    document.getElementById('buildingRoom').appendChild(option);
-
-                    for (var i = 0; i < data.rooms.length; i++) {
-                        var option = document.createElement("option");
-                        option.value = data.rooms[i];
-                        option.text = data.rooms[i];
-                        document.getElementById('buildingRoom').appendChild(option);
-                    }
-                    if (data.floor != '')
-                        $("#roomselect").show();
-                    console.log(typeof data);
-                },
-                error: function (data) {
-                    alert("ok nice try guy");
-                }
-            });
-        });
-
-
-
 
     });
+
+    function get_form_prefix(str) {
+        // return form prefix from a string i.e. id_form-33-field returns form-33
+        return str.match(/form-\d+/);
+    }
+
+
+    function update_room_list(target) {
+        code = $(target.replace("room", "building")).val();
+        floor = $(target.replace("room", "floor")).val();
+
+        $.ajax({
+            type: "GET",
+            url: "/tools/voip/floor/",
+            data: {
+                "buildingID": code,
+                "buildingFloor": floor,
+            },
+            dataType: 'json',
+            success: function (data) {
+
+                //$('#buildingFloor').val(floor);
+                $(target).empty();
+
+                var option = document.createElement("option");
+                option.value = "%";
+                option.text = "--Select--";
+                document.getElementById('id_form-0-room').appendChild(option);
+
+                for (var i = 0; i < data.rooms.length; i++) {
+                    var option = document.createElement("option");
+                    option.value = data.rooms[i];
+                    option.text = data.rooms[i];
+                    document.getElementById('id_form-0-room').appendChild(option);
+                }
+                if (data.floor != '')
+                    $("#roomselect").show();
+            },
+            error: function (data) {
+                console.log("ajax error");
+            }
+        });
+    }
+
+
 
 </script>
 {% endblock %}
