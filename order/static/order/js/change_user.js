@@ -4,18 +4,19 @@ $(document).ready(function() {
 
     $('#nextBtn').prop('disabled', true);
 
-    $("#uniqnameLookup").click(function () {
-      uniqname = $("#id_VoiceUnique").val();
+    $("#id_new_uniqname").change(function () {
+      $('#full_user_name').html("");
+      uniqname = $("#id_new_uniqname").val();
       get_uniqname(uniqname);
       $('#div_new_building').show();
     });
 
     $("#id_building").change(function () {
+      onInput();
       $('#nextBtn').prop('disabled', false);    
     });
 
-
-    $("#id_phone_number").focusout(function () {
+    $("#id_phone_number").change(function () {
       phone_number = $("#id_phone_number").val();
 
       $.ajax({
@@ -25,7 +26,7 @@ $(document).ready(function() {
           $("#phLocationFields").hide();
           $('#phoneLookup').html('Searching...').addClass(' disabled');
           $("#PhoneInfo").html("");
-          $("#VerifyLocation").hide();
+          $("#div_new_uniqname").hide();
         },
   
         success: function (data) {
@@ -41,8 +42,7 @@ $(document).ready(function() {
               $("#id_phone_number").removeClass('is-invalid');
               $("#workflowForm").removeClass('was-validated');
               update_location(data[0]);
-              $("#NewUniqname").show();
-              $("#VerifyLocation").show();
+              $("#div_new_uniqname").show();
             } else {
               console.log('not authorized');
               document.getElementById("id_phone_number").setCustomValidity("Not authorized");
@@ -50,7 +50,6 @@ $(document).ready(function() {
               $("#error_msg").html('You are not authorized for that number');
               $("#workflowForm").addClass('was-validated');
             }
-
           } else {
             console.log('nodata');
             $("#workflowForm").addClass('was-validated');
@@ -101,8 +100,36 @@ function get_uniqname(uniqname) {
       alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
     } else { // show the result
       resp = JSON.parse(xhr.response);
-      $('#full_user_name').html(resp.name);
+      if (resp.message) {
+        console.log('message', resp.message)
+        document.getElementById("id_new_uniqname").setCustomValidity(resp.message);
+        document.getElementById("id_new_uniqname").checkValidity();
+        //$('#full_user_name').html(resp.message);
+        $("#workflowForm").addClass('was-validated');
+      } else {
+        $('#full_user_name').html(resp.name);
+        document.getElementById("id_new_uniqname").setCustomValidity("");
+        document.getElementById("id_new_uniqname").checkValidity();
+        $("#id_new_uniqname").removeClass('is-invalid');
+        $("#workflowForm").removeClass('was-validated');
+
+
+      }
+
+      console.log(resp)
     }
   };
 
+}
+
+
+function onInput() {
+  var val = document.getElementById("id_building").value;
+  var opts = document.getElementById('buildings').childNodes;
+  for (var i = 0; i < opts.length; i++) {
+    if (opts[i].value === val) {
+      $('#building_name').html(opts[i].text);
+      break;
+    }
+  }
 }
