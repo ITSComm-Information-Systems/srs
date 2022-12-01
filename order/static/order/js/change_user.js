@@ -2,15 +2,16 @@ var locations = [];
 
 $(document).ready(function() {
 
-    $('[data-tab="LocationNew"]').hide();
+    $('#nextBtn').prop('disabled', true);
 
-    $("#id_VerifyLocation").change(function() {
-      console.log('clicked', this.value);
-      if (this.value == 1) {
-        $('[data-tab="LocationNew"]').hide();
-      } else {
-        $('[data-tab="LocationNew"]').show();
-      }
+    $("#uniqnameLookup").click(function () {
+      uniqname = $("#id_VoiceUnique").val();
+      get_uniqname(uniqname);
+      $('#div_new_building').show();
+    });
+
+    $("#id_building").change(function () {
+      $('#nextBtn').prop('disabled', false);    
     });
 
 
@@ -86,4 +87,22 @@ function update_location(data) {
        + 'Room: ' + data['room_name'] + '<br>';
 
   $("#PhoneInfo").html(html);
+}
+
+function get_uniqname(uniqname) {
+
+  let xhr = new XMLHttpRequest();
+  xhr.open('GET', '/uniqname/?uniqname=' + uniqname);
+  xhr.send();
+
+  // 4. This will be called after the response is received
+  xhr.onload = function() {
+    if (xhr.status != 200) { // analyze HTTP status of the response
+      alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+    } else { // show the result
+      resp = JSON.parse(xhr.response);
+      $('#full_user_name').html(resp.name);
+    }
+  };
+
 }
