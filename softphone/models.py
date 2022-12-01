@@ -188,7 +188,6 @@ class Selection(SelectionAbstract):
         if pause_date == 'Never':
             pause_date = '2030-01-01'
 
-        self.processing_status = 'On Hold'
         self.cut_date = pause_date  
         self.review_date = datetime.today()
         self.reviewed_by = current_user.username

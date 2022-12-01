@@ -1,8 +1,3 @@
-{% if tab.form.instance.name %}
-<div><strong>Server Name: </strong>{{tab.form.instance.name}}</div><br/>
-{% endif %}
-
-
 {% for field in tab.form %}
 
 {% if field.name == 'backup_time' %}
