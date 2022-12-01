@@ -6,8 +6,8 @@
 <h1>{{ title }}</h1>
 
 <ul>
-    <li>Refer to this <a href="https://documentation.its.umich.edu/node/3514">guide </a> for more information regarding your deskset.</li>
-    <li>Read more about the <a href="https://record.umich.edu/articles/new-zoom-phone-service-to-offer-greater-flexibility-mobility/">Telephone Service Upgrade Project</a></li>
+    <li>Refer to this <a href="https://documentation.its.umich.edu/node/3514" target="_blank">guide </a> for more information regarding your deskset.</li>
+    <li>Read more about the <a href="https://record.umich.edu/articles/new-zoom-phone-service-to-offer-greater-flexibility-mobility/" target="_blank">Telephone Service Upgrade Project</a></li>
 </ul>
 
 <div class="container">
@@ -26,17 +26,21 @@
                 {{ form.initial.subscriber_first_name }} {{ form.initial.subscriber_last_name }}<br>
                 {{ form.initial.dept_id }} &nbsp; {{ form.initial.dept_name }}<br>
                 {{ form.initial.building }} &nbsp; {{ form.initial.building_name }}
+                {{ form.initial.location_correct }}
             </div>
 
             <div class="col-sm">
                 <div class="form-check">
-                    <input class="form-check-input change_location" type="checkbox" value="Yes" name="{{ form.prefix }}-update" id="id_{{ form.prefix }}-update">
+                    <input class="form-check-input change_location" type="checkbox" value="Yes" name="{{ form.prefix }}-update" id="id_{{ form.prefix }}-update"
+                    {% if form.initial.location_correct == False %} disabled checked {% endif %}
+                    >
                     <label class="form-check-label" for="id_{{ form.prefix }}-update">
                       Update Location?
                     </label>
                 </div><br>
                 
-                <div id="div_{{ form.prefix }}-building" class="form-group" style="display: none;">
+                <div id="div_{{ form.prefix }}-building" class="form-group" 
+                        {% if form.initial.location_correct != False %} style="display: none;" {% endif %}>
                     <label for="browser">Search by building Name or Number:</label>
                     <input class='form-control change_building' list="buildings" name="{{ form.prefix }}-building" id="id_{{ form.prefix }}-building">
                     <small id="id_{{ form.prefix }}-building-name"></small>
@@ -107,7 +111,14 @@
                 $(target_div).show();
                 $(target).attr("required", true);
                 building_name = '#' + $(this).attr('id').replace("building", "building-name")
-                $(building_name).html('Arbor Lakes 3');
+                
+                var opts = document.getElementById('buildings').childNodes;
+                for (var i = 0; i < opts.length; i++) {
+                    if (opts[i].value === this.value) {
+                        $(building_name).html(opts[i].text);
+                        break;
+                    }
+                }
 
             } else {
                 $(target_div).hide();

@@ -15,7 +15,7 @@ from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
 from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date
-from .forms import SelectionForm, OptOutForm
+from .forms import SelectionForm, OptOutForm, LocationForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 
@@ -68,17 +68,10 @@ class LocationChange(LoginRequiredMixin, View):
         else:
             username = self.request.user.username
 
-
-        OptOutFormSet = formset_factory(OptOutForm, extra=0)
-        #phone_list = SelectionV.objects.filter(floor='SOFTPHONE')
-        #phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=next_cut_date()).values('subscriber'
-        #            ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
-
-        phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=next_cut_date())
-        print(next_cut_date(), username, len(phone_list))
-
-
-        formset = OptOutFormSet(initial=phone_list)
+        LocationFormSet = formset_factory(LocationForm, extra=0)
+        phone_list = SelectionV.objects.filter(updated_by=username
+                , processing_status='Selected', cut_date=next_cut_date()).order_by('location_correct')
+        formset = LocationFormSet(initial=phone_list)
 
         return render(request, 'softphone/location_change.html',
                       {'title': self.title,
