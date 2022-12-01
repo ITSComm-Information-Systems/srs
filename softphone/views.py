@@ -108,6 +108,8 @@ class ChangeUser(LoginRequiredMixin, View):
 
 class PauseUser(LoginRequiredMixin, View):
     title = 'Pause U-M Zoom Phone'
+    field_list = ['subscriber','service_number','subscriber_uniqname' \
+                ,'subscriber_first_name','subscriber_last_name','dept_id','migrate']
 
     def get(self, request, uniqname):
         cut_date = next_cut_date()
@@ -129,16 +131,14 @@ class PauseUser(LoginRequiredMixin, View):
             else:
                 username = self.request.user.username
 
-            phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=cut_date).values('subscriber'
-                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
+            phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=cut_date).values(*self.field_list)
 
             dept_group_list = list(Ambassador.objects.filter(uniqname=username).values_list('dept_grp', flat=True))
 
             message = 'There are no users in your unit scheduled to transition'             
             if len(dept_group_list) != 0:  # Get submissions by user
                 dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp__in=dept_group_list).values_list('deptid', flat=True)
-                amb_phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values('subscriber'
-                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
+                amb_phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values(*self.field_list)
 
                 phone_list = phone_list.union(amb_phone_list)
 
@@ -154,8 +154,7 @@ class PauseUser(LoginRequiredMixin, View):
                 if not self.request.user.is_superuser:
                     return HttpResponseRedirect(f'/softphone/pause/{self.request.user.username}')
 
-            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='Selected', cut_date=cut_date) | Q(uniqname=uniqname, processing_status='Selected', cut_date=cut_date)).values('subscriber'
-                ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='Selected', cut_date=cut_date) | Q(uniqname=uniqname, processing_status='Selected', cut_date=cut_date)).values(*self.field_list)
 
             if len(phone_list) == 0:
                 message =  'User not scheduled for migration.'
