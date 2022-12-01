@@ -11,12 +11,12 @@ from project.integrations import MCommunity
 import datetime, re
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment, UmOscNameChangeV
+from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
 from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date
-from .forms import SelectionForm, OptOutForm, ChangeUserForm
+from .forms import SelectionForm, OptOutForm, LocationForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 
@@ -57,53 +57,32 @@ def get_department_list(dept_id, user):
     return dept_list
 
 
-class ChangeUser(LoginRequiredMixin, View):
-    title = 'Change User - Softphone'
+class LocationChange(LoginRequiredMixin, View):
+    title = 'Location Verification App - Deskset'
 
     def get(self, request):
-        print(self.request.GET)
-        f = ChangeUserForm()    
+        building_list = UmOSCBuildingV.objects.all()
 
-        return render(request, 'softphone/change_user.html',
+        if self.request.user.is_superuser and request.GET.get('user'):
+            print('impersonate', self.request.GET.get('user'))
+            username = self.request.GET.get('user')
+        else:
+            username = self.request.user.username
+
+        LocationFormSet = formset_factory(LocationForm, extra=0)
+        phone_list = SelectionV.objects.filter(updated_by=username
+                , processing_status='Selected', cut_date=next_cut_date()).order_by('location_correct')
+        formset = LocationFormSet(initial=phone_list)
+
+        return render(request, 'softphone/location_change.html',
                       {'title': self.title,
-                       'form': f
-                       #'formset': formset, 
-                       #'phone_list': phone_list
-                       })
+                       'building_list': building_list,
+                       'formset': formset, 
+                       'phone_list': []})
 
     def post(self, request):
-        if self.request.POST.get('request_action'):
-            return HttpResponseRedirect('/requestsent') 
-        
-        f = ChangeUserForm(self.request.POST)    
-        
-        subscriber_id = self.request.POST.get('subscriber')
-        search = self.request.POST.get('search')
-        uniqname = self.request.POST.get('uniqname')
-
-        num_search = re.sub(r'[^0-9]', '', search)
-        if len(num_search)==10:
-            address = UmOscNameChangeV.objects.filter(service_number=num_search)
-        else:
-            address = UmOscNameChangeV.objects.filter(uniqname=search)
-
-        if uniqname:
-            mc = MCommunity().get_user(uniqname)
-            if mc:
-                new_user = f"{mc['givenName']} {mc['umichDisplaySn']}"
-            else:
-                f.add_error('uniqname', 'Uniqname not found.') 
-                new_user = 'Not Found'
-        else:
-            new_user = ''
-
-        return render(request, 'softphone/change_user.html',
-                      {'title': self.title,
-                       'form': f,
-                       'address': address,
-                       'uniqname': uniqname,
-                       'new_user': new_user
-                       })
+        print(self.request.POST)
+        return HttpResponseRedirect('/softphone/location')
 
 
 class PauseUser(LoginRequiredMixin, View):

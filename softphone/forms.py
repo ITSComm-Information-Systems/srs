@@ -107,7 +107,9 @@ class OptOutForm(forms.Form):
     comment = forms.CharField(required=False)
 
 
-class ChangeUserForm(forms.Form):
+class LocationForm(forms.Form):
     subscriber = forms.CharField(widget=forms.HiddenInput())
-    search = forms.CharField(required=False)
-    uniqname = forms.CharField(required=False)
+    update = forms.BooleanField()
+    building = forms.CharField()
+    floor = forms.CharField()
+    room = forms.CharField()
