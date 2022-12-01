@@ -423,6 +423,7 @@ class FeaturesForm(TabForm):
 
 
 class ChangeSFUserForm(TabForm):
+    building_list = UmOSCBuildingV.objects.all()
     template = 'order/change_user.html'
 
 
