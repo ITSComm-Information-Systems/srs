@@ -105,3 +105,10 @@ class OptOutForm(forms.Form):
     subscriber = forms.CharField(widget=forms.HiddenInput())
     pause_until = forms.CharField(required=False)
     comment = forms.CharField(required=False)
+
+class LocationForm(forms.Form):
+    subscriber = forms.CharField(widget=forms.HiddenInput())
+    update = forms.BooleanField()
+    building = forms.CharField()
+    floor = forms.CharField()
+    room = forms.CharField()
