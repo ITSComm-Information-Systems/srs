@@ -1,41 +1,42 @@
-<div class="form-group col-lg-6 col-12">
+<div class="form-group">
     <label for="id_phone_number">Enter Phone Number (eg: 7341234567):</label>
-    <div class="row">
-        <div class="col">
-            <div class="form-inline">
-                <input data-label="Phone Number" type="tel" class="form-control" id="id_phone_number" name="phone" required>
-                <button type="button" class="btn btn-primary findBtn" id="phoneLookup">Find</button>
-                <div role=”alert” class="invalid-feedback" >
-                    <i class="fas fa-exclamation-triangle" aria-label="Icon signfying that number was not found"></i><span id="error_msg">Number Not Found</span>
-                </div>
-            </div>
+
+    <div class="form-inline">
+        <input data-label="Phone Number" type="tel" class="form-control" id="id_phone_number" name="phone" required>
+        <button type="button" class="btn btn-primary findBtn" id="phoneLookup">Find</button>
+        <div role=”alert” class="invalid-feedback">
+            <i class="fas fa-exclamation-triangle" aria-label="Icon signfying that number was not found"></i><span
+                id="error_msg">Number Not Found</span>
         </div>
     </div>
+
 </div>
 
-<div id="PhoneInfo" class="form-group col-lg-6 col-12">
+<div id="PhoneInfo">
     
 </div>
 
-<div class="form-group row col-md-4" id="NewUniqname" style="display: None;">
-    <div class="form-check">
-        <label for="id_VoiceUnique">Enter New Uniqname:</label> 
-        <div class="form-inline">
-            <input type="text" name="new_uniqname" required id="id_VoiceUnique">
-            <button type="button" class="btn btn-primary findBtn" id="uniqnameLookup">Validate</button>
-        </div>
-        <small id="full_user_name"></small>
+<div class="form-group" id="div_new_uniqname" style="display: None;">
+    <label for="id_new_uniqname">Enter New Uniqname:</label>
+
+    <div class="form-inline">
+        <input type="text" name="new_uniqname" required id="id_new_uniqname">
+        <button type="button" class="btn btn-primary findBtn" id="uniqnameLookup">Validate</button>
         <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle"
-                aria-label="Icon signfying that user must enter a value"></i>Please enter a value.</div>
-        <div role=”alert” class="valid-feedback">Good.</div>
+            aria-label="Icon signfying that user must enter a value"></i>Uniqname not found.</div>
     </div>
+    <small id="full_user_name"></small>
+
+
+
 </div>
 
-<div class="form-group row col-md-6" id="div_new_building" style="display: None;">
-    <div class="form-check">
-        <label for="id_building">Enter User Building:</label> 
+<div class="form-group" id="div_new_building" style="display: None;">
+    <label for="id_building">Enter User Building:</label> 
+    <div class="form-inline">
         <input list="buildings" type="text" name="new_building" required id="id_building">
     </div>
+    <small id="building_name">arbor lakes one</small>
 </div>
 
 <datalist id="buildings">
