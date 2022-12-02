@@ -5,7 +5,9 @@ urlpatterns = [
     path('help', views.get_help),
     path('pause/<str:uniqname>', views.PauseUser.as_view(), name='pause_user'),
     path('pause', views.PauseUser.as_view(), name='pause_user'),
+
     path('changeuser', views.ChangeUser.as_view(), name='change_user'),
+    path('location', views.LocationChange.as_view(), name='location'),
     path('dept/<int:dept_id>/', views.StepSubscribers.as_view(), name='subscribers'),
     path('dept/<int:dept_id>/', views.StepSubscribers.as_view(), name='subscribers'),
     path('dept/<int:dept_id>/details/', views.StepDetails.as_view(), name='details'),

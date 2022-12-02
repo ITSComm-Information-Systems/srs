@@ -12,11 +12,14 @@ import datetime, re
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
 from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment, UmOscNameChangeV
+
+from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
 from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date
 from .forms import SelectionForm, OptOutForm, ChangeUserForm
+from .forms import SelectionForm, OptOutForm, LocationForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 
@@ -104,6 +107,41 @@ class ChangeUser(LoginRequiredMixin, View):
                        'uniqname': uniqname,
                        'new_user': new_user
                        })
+
+class LocationChange(LoginRequiredMixin, View):
+    title = 'Location Verification App - Deskset'
+
+    def get(self, request):
+        building_list = UmOSCBuildingV.objects.all()
+
+        if self.request.user.is_superuser and request.GET.get('user'):
+            print('impersonate', self.request.GET.get('user'))
+            username = self.request.GET.get('user')
+        else:
+            username = self.request.user.username
+
+        LocationFormSet = formset_factory(LocationForm, extra=0)
+        phone_list = SelectionV.objects.filter(updated_by=username, new_building_code__isnull=True
+                , processing_status='Selected', cut_date=next_cut_date()).order_by('location_correct')
+        formset = LocationFormSet(initial=phone_list)
+
+        return render(request, 'softphone/location_change.html',
+                      {'title': self.title,
+                       'building_list': building_list,
+                       'formset': formset, 
+                       'phone_list': []})
+
+    def post(self, request):
+        LocationFormSet = formset_factory(LocationForm, extra=0)
+        formset = LocationFormSet(request.POST)
+
+        formset.is_valid()
+        for form in formset:
+            if form.cleaned_data.get('building_code'):
+                form.save()
+
+        return HttpResponseRedirect('/softphone/location')
+
 
 
 class PauseUser(LoginRequiredMixin, View):
