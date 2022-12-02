@@ -30,7 +30,7 @@
 
             <div class="col-sm">
                 <div class="form-check">
-                    <input class="form-check-input change_location" type="checkbox" value="Yes" name="{{ form.prefix }}-update" id="id_{{ form.prefix }}-update"
+                    <input class="form-check-input change-location" type="checkbox" value="Yes" name="{{ form.prefix }}-update" id="id_{{ form.prefix }}-update"
                     {% if form.initial.location_correct == False %} disabled checked {% endif %}
                     >
                     <label class="form-check-label" for="id_{{ form.prefix }}-update">
@@ -41,13 +41,13 @@
                 <div id="div_{{ form.prefix }}-building" class="form-group" 
                         {% if form.initial.location_correct != False %} style="display: none;" {% endif %}>
                     <label for="browser">Search by building Name or Number:</label>
-                    <input class='form-control change_building' list="buildings" name="{{ form.prefix }}-building_code" id="id_{{ form.prefix }}-building_code">
+                    <input class='form-control change-building' list="buildings" name="{{ form.prefix }}-building_code" id="id_{{ form.prefix }}-building_code">
                     <input class="form-control-plaintext form-control-sm" readonly tabindex="-1" type="text" 
                             name="{{ form.prefix }}-building_name" id="id_{{ form.prefix }}-building_name">
                 </div>
                 <div id="div_{{ form.prefix }}-floor" class="form-group" style="display: none;">
                     <label for="id_{{ form.prefix }}-floor">Floor</label>
-                    <input type="text" class="form-control change_floor" name="{{ form.prefix }}-floor" id="id_{{ form.prefix }}-floor">
+                    <input type="text" class="form-control change-floor" name="{{ form.prefix }}-floor" id="id_{{ form.prefix }}-floor">
                 </div>
                 <div id="div_{{ form.prefix }}-room" class="form-group" style="display: none;">
                     <label for="id_{{ form.prefix }}-room">Room</label>
@@ -87,64 +87,61 @@
 
     $(document).ready(function () {
 
-        $(".change_location").change(function () {
-            prefix = getFormPrefix(this.id)
-            target = '#' + $(this).attr('id').replace("update", "building")
-            //target = prefix + 'building'
-            target_div = target.replace("id_", "div_"); 
-            console.log(prefix, this.id);
+        document.querySelectorAll('.change-location').forEach(widget => {
+            widget.addEventListener('click', function handleClick(event) {
+                prefix = getFormPrefix(this.id)
 
-            if (this.checked) {
-                $(target_div).show();
-                $(target).attr("required", true);
-            } else {
-                hideDivs(prefix, 'building', 'floor', 'room');
-                document.getElementById(`id_${prefix}-building_name`).value = "";
-            }
-        });
-
-        $(".change_building").change(function () {
-            prefix = getFormPrefix(this.id)
-            
-            target = '#' + $(this).attr('id').replace("building_code", "floor")
-            target_div = target.replace("id_", "div_"); 
-
-            if (this.value) {
-                $(target_div).show();
-                $(target).attr("required", true);
-                building_name = '#' + $(this).attr('id').replace("building_code", "building_name")
-                
-                var opts = document.getElementById('buildings').childNodes;
-                for (var i = 0; i < opts.length; i++) {
-                    if (opts[i].value === this.value) {
-                        document.getElementById(`id_${prefix}-building_name`).value = opts[i].text;
-                        break;
-                    }
+                if (this.checked) {
+                    document.getElementById(`div_${prefix}-building`).style.display = "block";
+                    document.getElementById(`id_${prefix}-building_code`).required = true;
+                } else {
+                    hideDivs(prefix, 'building', 'floor', 'room');
+                    document.getElementById(`id_${prefix}-building_name`).value = "";
                 }
-
-            } else {
-                $(target_div).hide();
-                $(target).removeAttr("required");
-                $(building_name).html("");
-
-            }
+            });
         });
 
-        $(".change_floor").on("keyup", function() {
-            prefix = getFormPrefix( this.id )
-            target = '#' + $(this).attr('id').replace("floor", "room")
-            target_div = target.replace("id_", "div_"); 
+        document.querySelectorAll('.change-building').forEach(widget => {
+            widget.addEventListener('change', function handleChange(event) {
+                prefix = getFormPrefix(this.id)
 
-            if (this.value) {
-                $(target_div).show();
-                $(target).attr("required", true);
-            } else {
-                $(target_div).hide();
-                $(target).removeAttr("required");
-            }
-            update_room_list('id_' + prefix + '-room');
+                document.getElementById(`id_${prefix}-building_name`).value = "";
+                document.getElementById(`id_${prefix}-floor`).value = "";
+
+                if (this.value) {
+                    document.getElementById(`div_${prefix}-floor`).style.display = "block";
+                    fld = document.getElementById(`id_${prefix}-floor`).required = true;
+
+                    var opts = document.getElementById('buildings').childNodes;
+                    for (var i = 0; i < opts.length; i++) {
+                        if (opts[i].value === this.value) {
+                            document.getElementById(`id_${prefix}-building_name`).value = opts[i].text;
+                            break;
+                        }
+                    }
+
+                } else {
+                    hideDivs(prefix, 'floor', 'room');
+                }
+            });
         });
 
+        document.querySelectorAll('.change-floor').forEach(widget => {
+            widget.addEventListener('change', function handleChange(event) {
+                prefix = getFormPrefix(this.id)
+                target = '#' + $(this).attr('id').replace("floor", "room")
+                target_div = target.replace("id_", "div_");
+
+                if (this.value) {
+                    $(target_div).show();
+                    $(target).attr("required", true);
+                } else {
+                    $(target_div).hide();
+                    $(target).removeAttr("required");
+                }
+                update_room_list('id_' + prefix + '-room');
+            });
+        });
     });
 
     function getFormPrefix(str) {
@@ -153,22 +150,23 @@
     }
 
     function hideDivs(prefix, ...fieldNames) {
-        for (div of fieldNames) {
+        for (divName of fieldNames) {
             // Hide using template literal i.e. div_form-33-field
-            document.getElementById(`div_${prefix}-${div}`).style.display = "none";
-            fld = document.getElementById(`id_${prefix}-${div}`);
-            if (fld) {
-                fld.value = "";
-                fld.required = false;
+            div = document.getElementById(`div_${prefix}-${divName}`)
+            div.style.display = "none";
+
+            // Remove values from hidden fields and make not required
+            for (input of div.querySelectorAll('input,select') ) {
+                input.value = "";
+                input.removeAttribute("required");
             }
+
         }
     }
 
     function update_room_list(target) {
         code = $('#' + target.replace("room", "building_code")).val();
         floor = $('#' + target.replace("room", "floor")).val();
-
-        console.log('update_room_list', target);
 
         $.ajax({
             type: "GET",
