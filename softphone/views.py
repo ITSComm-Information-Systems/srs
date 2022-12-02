@@ -69,7 +69,7 @@ class LocationChange(LoginRequiredMixin, View):
             username = self.request.user.username
 
         LocationFormSet = formset_factory(LocationForm, extra=0)
-        phone_list = SelectionV.objects.filter(updated_by=username
+        phone_list = SelectionV.objects.filter(updated_by=username, new_building_code__isnull=True
                 , processing_status='Selected', cut_date=next_cut_date()).order_by('location_correct')
         formset = LocationFormSet(initial=phone_list)
 
@@ -80,7 +80,14 @@ class LocationChange(LoginRequiredMixin, View):
                        'phone_list': []})
 
     def post(self, request):
-        print(self.request.POST)
+        LocationFormSet = formset_factory(LocationForm, extra=0)
+        formset = LocationFormSet(request.POST)
+
+        formset.is_valid()
+        for form in formset:
+            if form.cleaned_data.get('building_code'):
+                form.save()
+
         return HttpResponseRedirect('/softphone/location')
 
 
