@@ -12,7 +12,7 @@
 
 </div>
 
-<div id="PhoneInfo">
+<div class="m-3" id="PhoneInfo">
     
 </div>
 
@@ -21,22 +21,21 @@
 
     <div class="form-inline">
         <input type="text" name="new_uniqname" required id="id_new_uniqname">
-        <button type="button" class="btn btn-primary findBtn" id="uniqnameLookup">Validate</button>
         <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle"
             aria-label="Icon signfying that user must enter a value"></i>Uniqname not found.</div>
     </div>
-    <small id="full_user_name"></small>
+    <span id="full_user_name"></span>
 
 
 
 </div>
 
 <div class="form-group" id="div_new_building" style="display: None;">
-    <label for="id_building">Enter User Building:</label> 
+    <label for="id_building">Search for the building name or building ID of where you want the new service to be activated or equipment to be delivered.</label> 
     <div class="form-inline">
         <input list="buildings" type="text" name="new_building" required id="id_building">
     </div>
-    <small id="building_name">arbor lakes one</small>
+    <span id="building_name"></span>
 </div>
 
 <datalist id="buildings">
