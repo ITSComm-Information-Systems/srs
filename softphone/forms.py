@@ -105,9 +105,3 @@ class OptOutForm(forms.Form):
     subscriber = forms.CharField(widget=forms.HiddenInput())
     pause_until = forms.CharField(required=False)
     comment = forms.CharField(required=False)
-
-
-class ChangeUserForm(forms.Form):
-    subscriber = forms.CharField(widget=forms.HiddenInput())
-    search = forms.CharField(required=False)
-    uniqname = forms.CharField(required=False)

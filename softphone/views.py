@@ -7,16 +7,15 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.forms import formset_factory
 
-from project.integrations import MCommunity
-import datetime, re
+import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment, UmOscNameChangeV
+from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
 from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date
-from .forms import SelectionForm, OptOutForm, ChangeUserForm
+from .forms import SelectionForm, OptOutForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 
@@ -57,57 +56,10 @@ def get_department_list(dept_id, user):
     return dept_list
 
 
-class ChangeUser(LoginRequiredMixin, View):
-    title = 'Change User - Softphone'
-
-    def get(self, request):
-        print(self.request.GET)
-        f = ChangeUserForm()    
-
-        return render(request, 'softphone/change_user.html',
-                      {'title': self.title,
-                       'form': f
-                       #'formset': formset, 
-                       #'phone_list': phone_list
-                       })
-
-    def post(self, request):
-        if self.request.POST.get('request_action'):
-            return HttpResponseRedirect('/requestsent') 
-        
-        f = ChangeUserForm(self.request.POST)    
-        
-        subscriber_id = self.request.POST.get('subscriber')
-        search = self.request.POST.get('search')
-        uniqname = self.request.POST.get('uniqname')
-
-        num_search = re.sub(r'[^0-9]', '', search)
-        if len(num_search)==10:
-            address = UmOscNameChangeV.objects.filter(service_number=num_search)
-        else:
-            address = UmOscNameChangeV.objects.filter(uniqname=search)
-
-        if uniqname:
-            mc = MCommunity().get_user(uniqname)
-            if mc:
-                new_user = f"{mc['givenName']} {mc['umichDisplaySn']}"
-            else:
-                f.add_error('uniqname', 'Uniqname not found.') 
-                new_user = 'Not Found'
-        else:
-            new_user = ''
-
-        return render(request, 'softphone/change_user.html',
-                      {'title': self.title,
-                       'form': f,
-                       'address': address,
-                       'uniqname': uniqname,
-                       'new_user': new_user
-                       })
-
-
 class PauseUser(LoginRequiredMixin, View):
     title = 'Pause U-M Zoom Phone'
+    field_list = ['subscriber','service_number','subscriber_uniqname' \
+                ,'subscriber_first_name','subscriber_last_name','dept_id','migrate']
 
     def get(self, request, uniqname):
         cut_date = next_cut_date()
@@ -129,16 +81,14 @@ class PauseUser(LoginRequiredMixin, View):
             else:
                 username = self.request.user.username
 
-            phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=cut_date).values('subscriber'
-                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
+            phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=cut_date).values(*self.field_list)
 
             dept_group_list = list(Ambassador.objects.filter(uniqname=username).values_list('dept_grp', flat=True))
 
             message = 'There are no users in your unit scheduled to transition'             
             if len(dept_group_list) != 0:  # Get submissions by user
                 dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp__in=dept_group_list).values_list('deptid', flat=True)
-                amb_phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values('subscriber'
-                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
+                amb_phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values(*self.field_list)
 
                 phone_list = phone_list.union(amb_phone_list)
 
@@ -154,8 +104,7 @@ class PauseUser(LoginRequiredMixin, View):
                 if not self.request.user.is_superuser:
                     return HttpResponseRedirect(f'/softphone/pause/{self.request.user.username}')
 
-            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='Selected', cut_date=cut_date) | Q(uniqname=uniqname, processing_status='Selected', cut_date=cut_date)).values('subscriber'
-                ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='Selected', cut_date=cut_date) | Q(uniqname=uniqname, processing_status='Selected', cut_date=cut_date)).values(*self.field_list)
 
             if len(phone_list) == 0:
                 message =  'User not scheduled for migration.'
