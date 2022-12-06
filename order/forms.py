@@ -422,6 +422,11 @@ class FeaturesForm(TabForm):
         fields = ('name', 'description',) 
 
 
+class ChangeSFUserForm(TabForm):
+    building_list = UmOSCBuildingV.objects.all()
+    template = 'order/change_user.html'
+
+
 class RestrictionsForm(TabForm):
     res = Restriction.objects.all()
     list = FeatureCategory.objects.all()
