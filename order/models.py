@@ -9,6 +9,7 @@ from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
 from project.integrations import MCommunity, TDx
 from project.models import ShortCodeField, Choice
+from softphone.models import Selection
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from django.utils import timezone
@@ -74,7 +75,8 @@ class Step(Configuration):
         ('ServerSupportForm', 'Server Support'),
         ('ServerSpecForm', 'Server Specification'),
         ('ServerDataForm', 'Server Data Sensitivity'),
-        ('DataDenForm', 'Data Den Form')
+        ('DataDenForm', 'Data Den Form'),
+        ('ChangeSFUserForm', 'Change Softphone User')
     )
 
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
@@ -952,6 +954,9 @@ class Order(models.Model):
             if action_id != '41':
                 wiring_only = False
 
+            if action_id == '74' and item.data.get('verify_location') == '0':
+                item.update_softphone()
+
             if issue['wo_type_category_id'] == '0':
                 if action_id != '37' and action_id != '41':
                     create_bill_only = True
@@ -1483,6 +1488,17 @@ class Item(models.Model):
 
         if self.data.get('flux') == 'yes':
             rec.flux = True
+
+    def update_softphone(self):
+        try:
+            selection = Selection.objects.get(service_number=self.data.get('phone'))
+            selection.new_building = self.data.get('newBuildingName')
+            selection.new_building_code = self.data.get('newBuildingCode')
+            selection.new_floor = self.data.get('newBuildingFloor')
+            selection.new_room = self.data.get('newBuildingRoom')
+            selection.save()
+        except:
+            print('softphone not found')
 
     def leppard(self):
         pour=['me']
