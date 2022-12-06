@@ -109,3 +109,26 @@ class Service():
     gcp = GCP
     azure = Azure
     gcpaccount = GCPAccount
+
+
+class DesktopRequest(models.Model):
+    CUSTOMER_CHOICES = (('N', 'New'),('E', 'Existing'))
+    NETWORK_CHOICES = (('N', 'New'),('E', 'Existing'))
+    BASE_IMAGE_CHOICES = (('N', 'New'),('E', 'Existing'))
+    INITIAL_IMAGE_CHOICES = (('B', 'Base'),('S', 'MiDesktop Standard Image'))
+    OS_CHOICES = (('W10','Windows 10'))
+
+    user = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
+    mcom_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
+    shortcode = models.CharField(max_length=6)
+    customer = models.CharField(max_length=1, choices=CUSTOMER_CHOICES)
+    network = models.CharField(max_length=1, choices=NETWORK_CHOICES)
+    base_image = models.CharField(max_length=1, choices=BASE_IMAGE_CHOICES)
+    initial_image = models.CharField(max_length=1, choices=INITIAL_IMAGE_CHOICES)
+    os = models.CharField(max_length=3, choices=OS_CHOICES)
+
+    cpu = models.PositiveSmallIntegerField()
+    ram = models.PositiveSmallIntegerField()
+    disk_space = models.PositiveSmallIntegerField()
+    gpu = models.BooleanField()
+    pool_display_name = shortcode = models.CharField(max_length=60)
