@@ -3,6 +3,9 @@
 {% include field.field.template_name %}
 {% endfor %}
 </div>
+{% if tab.form.instance.name %}
+<div><strong>Server Name: </strong>{{tab.form.instance.name}}</div><br/>
+{% endif %}
 
 {% for error in tab.form.non_field_errors %}
 <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
