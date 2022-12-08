@@ -125,5 +125,5 @@ class LocationForm(forms.Form):
         selection.new_building = self.cleaned_data.get('building_name')
         selection.new_floor = self.cleaned_data.get('floor')
         selection.new_room = self.cleaned_data.get('room')
+        selection.location_correct = 0
         selection.save()
-
