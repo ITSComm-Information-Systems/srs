@@ -1,0 +1,217 @@
+{% extends 'softphone/base_softphone.html' %}
+{% block content %}
+
+{% load humanize %}
+
+<h1>{{ title }}</h1>
+
+<p>Review the location of each user, update as necessary, press Save. Click 
+    <a href="https://documentation.its.umich.edu/node/3790" target="_blank">here</a>
+     for detailed instructions.
+</p>
+<ul>
+    <li>
+        If Update Location? checkbox is grayed out, the location must be updated before the user can be transitioned. If it is not updated, the user’s transition will be paused.
+    </li>
+    <li>
+        If Update Location? checkbox not grayed out, you may update it by checking the box and entering the new location, if needed.        
+    </li>
+</ul>
+
+<div class="container">
+
+<form method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% for form in formset %}
+    <div id="{{ form.prefix }}" class="col-6 card border-primary shadow p-3 my-3">    
+        <div class="row">
+            <div class="col-sm">
+                <input type="hidden" name="{{ form.prefix }}-subscriber" value="{{ form.initial.subscriber }}">
+                <strong>Phone</strong><br>
+                {{ form.initial.service_number }}<br>
+                Uniqname: {{ form.initial.uniqname }}<br>
+                {{ form.initial.subscriber_first_name }} {{ form.initial.subscriber_last_name }}<br>
+                {{ form.initial.dept_id }} &nbsp; {{ form.initial.dept_name }}<br>
+                {{ form.initial.building }} &nbsp; {{ form.initial.building_name }}
+            </div>
+
+            <div class="col-sm">
+                <div class="form-check">
+                    <input class="form-check-input change-location" type="checkbox" value="Yes" name="{{ form.prefix }}-update" id="id_{{ form.prefix }}-update"
+                    {% if form.initial.location_correct == False %} disabled checked {% endif %}
+                    >
+                    <label class="form-check-label" for="id_{{ form.prefix }}-update">
+                      Update Location?
+                    </label>
+                </div><br>
+                
+                <div id="div_{{ form.prefix }}-building" class="form-group" 
+                        {% if form.initial.location_correct != False %} style="display: none;" {% endif %}>
+                    <label for="browser">Search by building Name or Number:</label>
+                    <input class='form-control change-building' list="buildings" name="{{ form.prefix }}-building_code" id="id_{{ form.prefix }}-building_code">
+                    <input class="form-control-plaintext form-control-sm" readonly tabindex="-1" type="text" 
+                            name="{{ form.prefix }}-building_name" id="id_{{ form.prefix }}-building_name">
+                </div>
+                <div id="div_{{ form.prefix }}-floor" class="form-group" style="display: none;">
+                    <label for="id_{{ form.prefix }}-floor">Floor</label>
+                    <input type="text" class="form-control change-floor" name="{{ form.prefix }}-floor" id="id_{{ form.prefix }}-floor">
+                </div>
+                <div id="div_{{ form.prefix }}-room" class="form-group" style="display: none;">
+                    <label for="id_{{ form.prefix }}-room">Room</label>
+                    <select class="form-control" name="{{ form.prefix }}-room" id="id_{{ form.prefix }}-room">
+                        <option></option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="alert"><i class="fas fa-info-circle">&nbsp; Nothing currently requires verification.</i></p>
+    {% endfor %}
+    <div id="footered" class="container-fluid fixed-bottom border border-top-primary" style="background-color: #E2E4E4">
+        <div class="container mt-1 mb-1">
+            <button type="submit" class="btn" style="background-color: #0068A8; color:white">Save</button>
+        </div>
+
+    </div>
+</form>
+</div>
+
+<datalist id="buildings">
+    {% for building in building_list %}
+        <option value="{{ building.building_code }}">{{ building.building_name }}</option>    
+    {% endfor %}
+</datalist>
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+    $(document).ready(function () {
+
+        document.querySelectorAll('.change-location').forEach(widget => {
+            widget.addEventListener('click', function handleClick(event) {
+                prefix = getFormPrefix(this.id)
+
+                if (this.checked) {
+                    document.getElementById(`div_${prefix}-building`).style.display = "block";
+                    document.getElementById(`id_${prefix}-building_code`).required = true;
+                } else {
+                    hideDivs(prefix, 'building', 'floor', 'room');
+                    document.getElementById(`id_${prefix}-building_name`).value = "";
+                }
+            });
+        });
+
+        document.querySelectorAll('.change-building').forEach(widget => {
+            widget.addEventListener('change', function handleChange(event) {
+                prefix = getFormPrefix(this.id)
+
+                document.getElementById(`id_${prefix}-building_name`).value = "";
+                document.getElementById(`id_${prefix}-floor`).value = "";
+
+                if (this.value) {
+                    document.getElementById(`div_${prefix}-floor`).style.display = "block";
+                    fld = document.getElementById(`id_${prefix}-floor`).required = true;
+
+                    var opts = document.getElementById('buildings').childNodes;
+                    for (var i = 0; i < opts.length; i++) {
+                        if (opts[i].value === this.value) {
+                            document.getElementById(`id_${prefix}-building_name`).value = opts[i].text;
+                            break;
+                        }
+                    }
+
+                } else {
+                    hideDivs(prefix, 'floor', 'room');
+                }
+            });
+        });
+
+        document.querySelectorAll('.change-floor').forEach(widget => {
+            widget.addEventListener('change', function handleChange(event) {
+                prefix = getFormPrefix(this.id)
+                target = '#' + $(this).attr('id').replace("floor", "room")
+                target_div = target.replace("id_", "div_");
+
+                if (this.value) {
+                    $(target_div).show();
+                    $(target).attr("required", true);
+                } else {
+                    $(target_div).hide();
+                    $(target).removeAttr("required");
+                }
+                update_room_list('id_' + prefix + '-room');
+            });
+        });
+    });
+
+    function getFormPrefix(str) {
+        // return form prefix from a string i.e. id_form-33-field returns form-33
+        return str.match(/form-\d+/);
+    }
+
+    function hideDivs(prefix, ...fieldNames) {
+        for (divName of fieldNames) {
+            // Hide using template literal i.e. div_form-33-field
+            div = document.getElementById(`div_${prefix}-${divName}`)
+            div.style.display = "none";
+
+            // Remove values from hidden fields and make not required
+            for (input of div.querySelectorAll('input,select') ) {
+                input.value = "";
+                input.removeAttribute("required");
+            }
+
+        }
+    }
+
+    function update_room_list(target) {
+        code = $('#' + target.replace("room", "building_code")).val();
+        floor = $('#' + target.replace("room", "floor")).val();
+
+        $.ajax({
+            type: "GET",
+            url: "/tools/voip/floor/",
+            data: {
+                "buildingID": code,
+                "buildingFloor": floor,
+            },
+            dataType: 'json',
+            success: function (data) {
+
+                //$('#buildingFloor').val(floor);
+                floor = document.getElementById(target)
+                $('#' + target).empty();
+
+                var option = document.createElement("option");
+                option.value = "";
+                option.text = "--Select--";
+                floor.appendChild(option);
+
+                for (var i = 0; i < data.rooms.length; i++) {
+                    var option = document.createElement("option");
+                    option.value = data.rooms[i];
+                    option.text = data.rooms[i];
+                    floor.appendChild(option);
+                }
+                if (data.floor != '')
+                    $("#roomselect").show();
+            },
+            error: function (data) {
+                console.log("ajax error");
+            }
+        });
+    }
+
+</script>
+
+{% endblock %}
