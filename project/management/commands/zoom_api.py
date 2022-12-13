@@ -15,7 +15,7 @@ class Command(BaseCommand):
         parser.add_argument('--uniqname')  # Run for one user
         parser.add_argument('--start')     # Run all users starting with this one
         parser.add_argument('--file')      # Run for everyone in a file
-        parser.add_argument('--cut_date')      # Run for everyone in a file
+        parser.add_argument('--cut_date')  # Run for everyone in a file
         parser.add_argument('--report')    # Report of all active zoom phones
 
     def handle(self, *args, **options):
@@ -44,7 +44,7 @@ class Command(BaseCommand):
             else:
                 cut_date = options['cut_date']
 
-            for user in SelectionV.objects.filter(uniqname__isnull=False,cut_date=cut_date).order_by('uniqname'):
+            for user in SelectionV.objects.filter(uniqname__isnull=False,cut_date=cut_date).order_by('zoom_login', 'uniqname'):
                 self.process_user(user.uniqname)
         elif options['start']:
             for user in SubscriberCharges.objects.filter(current_uniqname__isnull=False,current_uniqname__gt=options['start']).order_by('current_uniqname'):
