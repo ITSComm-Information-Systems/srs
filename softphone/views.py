@@ -7,8 +7,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.forms import formset_factory
 
-from project.integrations import MCommunity
-import datetime, re
+import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
 from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV
@@ -71,7 +70,7 @@ class LocationChange(LoginRequiredMixin, View):
 
         LocationFormSet = formset_factory(LocationForm, extra=0)
         phone_list = SelectionV.objects.filter(updated_by=username, new_building_code__isnull=True
-                , processing_status='Selected', cut_date=next_cut_date()).order_by('location_correct')
+                ,migrate='YES_SET', processing_status='Selected', cut_date=next_cut_date()).order_by('location_correct')
         formset = LocationFormSet(initial=phone_list)
 
         return render(request, 'softphone/location_change.html',

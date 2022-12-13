@@ -13,6 +13,7 @@ class Command(BaseCommand):
     bcc = 'itscomm.information.systems.shared.account@umich.edu'
 
     def add_arguments(self, parser):
+        parser.add_argument('--userlist')  
         parser.add_argument('--file')  
         parser.add_argument('--email')  
         parser.add_argument('--audit')  
@@ -34,7 +35,9 @@ class Command(BaseCommand):
         user_query = SelectionV.objects.filter(cut_date=cut_date).values_list('uniqname', flat=True)
         user_list = []
 
-        if options['file']:
+        if options['userlist']:
+            user_list = options['userlist'].splitlines()
+        elif options['file']:
             filename = options['file']
             with open(f'{filename}', encoding='mac_roman') as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)

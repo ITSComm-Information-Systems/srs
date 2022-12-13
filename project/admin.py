@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import Test, Choice, ChoiceTag, Email
 from django.urls import path
 from django.http import HttpResponseRedirect
+from django.template.response import TemplateResponse
 from django.core.mail import send_mail
 from django.core.management import call_command
 
@@ -14,6 +15,7 @@ class EmailAdmin(admin.ModelAdmin):
 
         download_url = [
             path('<int:object_id>/send_email/', self.send_email),
+            path('<int:object_id>/send_to_list/', self.send_to_list),
         ]
         return download_url + urls
 
@@ -30,6 +32,22 @@ class EmailAdmin(admin.ModelAdmin):
         call_command('softphone_email', email=email.code, audit=1)
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    def send_to_list(self, request, object_id):
+        email = Email.objects.get(id=object_id)
+
+        if request.method == 'POST':
+            recipients = request.POST.get('recipents')
+            call_command('softphone_email', email=email.code, userlist=recipients)
+
+        return TemplateResponse(
+            request,
+            'admin/project/email/send_to_list.html',
+            {
+            'email': email,
+            'opts': self.opts
+            }
+        )
 
 
 class TestAdmin(admin.ModelAdmin):
