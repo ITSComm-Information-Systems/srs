@@ -116,10 +116,10 @@ class DesktopRequest(models.Model):
     NETWORK_CHOICES = (('N', 'New'),('E', 'Existing'))
     BASE_IMAGE_CHOICES = (('N', 'New'),('E', 'Existing'))
     INITIAL_IMAGE_CHOICES = (('B', 'Base'),('S', 'MiDesktop Standard Image'))
-    OS_CHOICES = (('W10','Windows 10'))
+    OS_CHOICES = (('W10','Windows 10'),('',''))
 
     user = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
-    mcom_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
+    # mcom_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
     shortcode = models.CharField(max_length=6)
     customer = models.CharField(max_length=1, choices=CUSTOMER_CHOICES)
     network = models.CharField(max_length=1, choices=NETWORK_CHOICES)
@@ -131,4 +131,4 @@ class DesktopRequest(models.Model):
     ram = models.PositiveSmallIntegerField()
     disk_space = models.PositiveSmallIntegerField()
     gpu = models.BooleanField()
-    pool_display_name = shortcode = models.CharField(max_length=60)
+    pool_display_name = models.CharField(max_length=60)
