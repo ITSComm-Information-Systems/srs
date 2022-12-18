@@ -132,3 +132,49 @@ class DesktopRequest(models.Model):
     disk_space = models.PositiveSmallIntegerField()
     gpu = models.BooleanField()
     pool_display_name = models.CharField(max_length=60)
+
+
+from django.db import models
+
+class Pool(models.Model):
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
+    display_name = models.CharField(max_length=100)
+    base_image = models.CharField(
+        max_length=10,
+        choices=[("New", "New"), ("Existing", "Existing")],
+    )
+    initial_image = models.CharField(
+        max_length=20,
+        choices=[("Blank", "Blank"), ("MiDesktop Standard Image", "MiDesktop Standard Image")],
+    )
+    network = models.CharField(
+        max_length=10,
+        choices=[("New", "New"), ("Existing", "Existing")],
+    )
+    size = models.IntegerField()
+    min_num_desktops = models.IntegerField()
+    num_powered_desktops = models.IntegerField()
+    active_directory_container_OU = models.CharField(max_length=100)
+    authorized_AD_groups = models.CharField(max_length=100)
+    details = models.TextField()
+    sle_accepted = models.BooleanField()
+    
+    def __str__(self):
+        return self
+
+
+class Desktop(models.Model):
+    pool_name = models.ForeignKey(Pool, on_delete=models.CASCADE)
+    os = models.CharField(max_length=50)
+    cpu = models.IntegerField()
+    ram = models.IntegerField()
+    disk_space = models.IntegerField()
+    gpu = models.BooleanField()
+    auto_logout = models.CharField(
+        max_length=11,
+        choices=[("Never", "Never"), ("Immediately", "Immediately")],
+    )
+    auth_method = models.CharField(
+        max_length=10,
+        choices=[("Non-2FA", "Non-2FA"), ("2FA Public", "2FA Public"), ("2FA Local", "2FA Local")],
+    )
