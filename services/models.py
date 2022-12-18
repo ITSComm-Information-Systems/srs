@@ -133,9 +133,6 @@ class DesktopRequest(models.Model):
     gpu = models.BooleanField()
     pool_display_name = models.CharField(max_length=60)
 
-
-from django.db import models
-
 class Pool(models.Model):
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     display_name = models.CharField(max_length=100)
