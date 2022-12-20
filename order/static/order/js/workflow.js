@@ -408,6 +408,8 @@ $(document).ready(function() {
 
     if(type == "Oracle" && size < 50){
       $('#id_size').val(50)
+    }else if(type != "Orace" && size != 30){
+      $('#id_size').val(30)
     }
   });
 
