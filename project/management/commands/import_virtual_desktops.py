@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
+from services.models import VirtualDesktop
 import json
-
-from myapp.models import VirtualDesktop
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -24,7 +23,7 @@ class Command(BaseCommand):
                 individual_cost=item['individual_cost'],
                 num_computers=item['num_computers'],
                 total_cost=item['total_cost'],
-                group=item['group']
+                admin_group=item['group']
             )
             computer.save()
 

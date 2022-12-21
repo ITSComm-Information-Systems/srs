@@ -2,6 +2,9 @@ from django.contrib import admin
 from services.views import Azure
 from .models import *
 
+class VirtualDesktopAdmin(admin.ModelAdmin):
+    model = VirtualDesktop
+    list_display = ('pool_name','shortcode','admin_group')
 
 class CloudAdmin(admin.ModelAdmin):
     list_display = ('account_id','owner','billing_contact','shortcode','created_date')
@@ -31,4 +34,4 @@ class GCPInline(admin.TabularInline):
 class GCPAccountAdmin(CloudAdmin):
     inlines = [GCPInline]
     
-
+admin.site.register(VirtualDesktop,VirtualDesktopAdmin)

@@ -123,7 +123,7 @@ class VirtualDesktop(models.Model):
     admin_group = models.CharField(max_length=100)
         
     def __str__(self):
-        return self
+        return self.pool_name
 
 
 # class DesktopRequest(models.Model):
