@@ -112,7 +112,7 @@ class Service():
 
 class VirtualComputer(models.Model):
     shortcode = models.CharField(max_length=6)
-    pool = models.CharField(max_length=100)
+    pool_name = models.CharField(max_length=100)
     gpu = models.BooleanField()
     memory = models.CharField(max_length=4)
     cpu = models.CharField(max_length=4)
