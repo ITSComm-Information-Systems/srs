@@ -15,7 +15,6 @@ class Command(BaseCommand):
 
         for item in data:
             computer = VirtualDesktop(
-                id=item['id'],
                 shortcode=item['shortcode'],
                 pool_name=item['pool_name'],
                 gpu=item['gpu'],
