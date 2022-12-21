@@ -110,7 +110,7 @@ class Service():
     azure = Azure
     gcpaccount = GCPAccount
 
-class VirtualComputer(models.Model):
+class VirtualDesktop(models.Model):
     shortcode = models.CharField(max_length=6)
     pool_name = models.CharField(max_length=100)
     gpu = models.BooleanField()
