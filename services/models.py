@@ -110,68 +110,84 @@ class Service():
     azure = Azure
     gcpaccount = GCPAccount
 
-
-class DesktopRequest(models.Model):
-    CUSTOMER_CHOICES = (('N', 'New'),('E', 'Existing'))
-    NETWORK_CHOICES = (('N', 'New'),('E', 'Existing'))
-    BASE_IMAGE_CHOICES = (('N', 'New'),('E', 'Existing'))
-    INITIAL_IMAGE_CHOICES = (('B', 'Base'),('S', 'MiDesktop Standard Image'))
-    OS_CHOICES = (('W10','Windows 10'),('',''))
-
-    user = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
-    # mcom_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
-    shortcode = models.CharField(max_length=6)
-    customer = models.CharField(max_length=1, choices=CUSTOMER_CHOICES)
-    network = models.CharField(max_length=1, choices=NETWORK_CHOICES)
-    base_image = models.CharField(max_length=1, choices=BASE_IMAGE_CHOICES)
-    initial_image = models.CharField(max_length=1, choices=INITIAL_IMAGE_CHOICES)
-    os = models.CharField(max_length=3, choices=OS_CHOICES)
-
-    cpu = models.PositiveSmallIntegerField()
-    ram = models.PositiveSmallIntegerField()
-    disk_space = models.PositiveSmallIntegerField()
+class Computer(models.Model):
+    id = models.CharField(max_length=100)
+    shortcode = models.CharField(max_length=100)
+    pool = models.CharField(max_length=100)
     gpu = models.BooleanField()
-    pool_display_name = models.CharField(max_length=60)
-
-class Pool(models.Model):
-    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
-    display_name = models.CharField(max_length=100)
-    base_image = models.CharField(
-        max_length=10,
-        choices=[("New", "New"), ("Existing", "Existing")],
-    )
-    initial_image = models.CharField(
-        max_length=20,
-        choices=[("Blank", "Blank"), ("MiDesktop Standard Image", "MiDesktop Standard Image")],
-    )
-    network = models.CharField(
-        max_length=10,
-        choices=[("New", "New"), ("Existing", "Existing")],
-    )
-    size = models.IntegerField()
-    min_num_desktops = models.IntegerField()
-    num_powered_desktops = models.IntegerField()
-    active_directory_container_OU = models.CharField(max_length=100)
-    authorized_AD_groups = models.CharField(max_length=100)
-    details = models.TextField()
-    sle_accepted = models.BooleanField()
-    
+    memory = models.CharField(max_length=100)
+    cpu = models.CharField(max_length=100)
+    storage = models.CharField(max_length=100)
+    individual_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    num_computers = models.CharField(max_length=100)
+    total_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    group = models.CharField(max_length=100)
+        
     def __str__(self):
         return self
 
 
-class Desktop(models.Model):
-    pool_name = models.ForeignKey(Pool, on_delete=models.CASCADE)
-    os = models.CharField(max_length=50)
-    cpu = models.IntegerField()
-    ram = models.IntegerField()
-    disk_space = models.IntegerField()
-    gpu = models.BooleanField()
-    auto_logout = models.CharField(
-        max_length=11,
-        choices=[("Never", "Never"), ("Immediately", "Immediately")],
-    )
-    auth_method = models.CharField(
-        max_length=10,
-        choices=[("Non-2FA", "Non-2FA"), ("2FA Public", "2FA Public"), ("2FA Local", "2FA Local")],
-    )
+# class DesktopRequest(models.Model):
+#     CUSTOMER_CHOICES = (('N', 'New'),('E', 'Existing'))
+#     NETWORK_CHOICES = (('N', 'New'),('E', 'Existing'))
+#     BASE_IMAGE_CHOICES = (('N', 'New'),('E', 'Existing'))
+#     INITIAL_IMAGE_CHOICES = (('B', 'Base'),('S', 'MiDesktop Standard Image'))
+#     OS_CHOICES = (('W10','Windows 10'),('',''))
+
+#     user = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
+#     # mcom_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
+#     shortcode = models.CharField(max_length=6)
+#     customer = models.CharField(max_length=1, choices=CUSTOMER_CHOICES)
+#     network = models.CharField(max_length=1, choices=NETWORK_CHOICES)
+#     base_image = models.CharField(max_length=1, choices=BASE_IMAGE_CHOICES)
+#     initial_image = models.CharField(max_length=1, choices=INITIAL_IMAGE_CHOICES)
+#     os = models.CharField(max_length=3, choices=OS_CHOICES)
+
+#     cpu = models.PositiveSmallIntegerField()
+#     ram = models.PositiveSmallIntegerField()
+#     disk_space = models.PositiveSmallIntegerField()
+#     gpu = models.BooleanField()
+#     pool_display_name = models.CharField(max_length=60)
+
+# class Pool(models.Model):
+#     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
+#     display_name = models.CharField(max_length=100)
+#     base_image = models.CharField(
+#         max_length=10,
+#         choices=[("New", "New"), ("Existing", "Existing")],
+#     )
+#     initial_image = models.CharField(
+#         max_length=20,
+#         choices=[("Blank", "Blank"), ("MiDesktop Standard Image", "MiDesktop Standard Image")],
+#     )
+#     network = models.CharField(
+#         max_length=10,
+#         choices=[("New", "New"), ("Existing", "Existing")],
+#     )
+#     size = models.IntegerField()
+#     min_num_desktops = models.IntegerField()
+#     num_powered_desktops = models.IntegerField()
+#     active_directory_container_OU = models.CharField(max_length=100)
+#     authorized_AD_groups = models.CharField(max_length=100)
+#     details = models.TextField()
+#     sle_accepted = models.BooleanField()
+    
+#     def __str__(self):
+#         return self
+
+
+# class Desktop(models.Model):
+#     pool_name = models.ForeignKey(Pool, on_delete=models.CASCADE)
+#     os = models.CharField(max_length=50)
+#     cpu = models.IntegerField()
+#     ram = models.IntegerField()
+#     disk_space = models.IntegerField()
+#     gpu = models.BooleanField()
+#     auto_logout = models.CharField(
+#         max_length=11,
+#         choices=[("Never", "Never"), ("Immediately", "Immediately")],
+#     )
+#     auth_method = models.CharField(
+#         max_length=10,
+#         choices=[("Non-2FA", "Non-2FA"), ("2FA Public", "2FA Public"), ("2FA Local", "2FA Local")],
+#     )
