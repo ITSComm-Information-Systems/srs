@@ -110,7 +110,7 @@ class Service():
     azure = Azure
     gcpaccount = GCPAccount
 
-class Computer(models.Model):
+class VirtualComputer(models.Model):
     id = models.CharField(max_length=100)
     shortcode = models.CharField(max_length=100)
     pool = models.CharField(max_length=100)
