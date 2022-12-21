@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 import json
 
-from myapp.models import VirtualComputer
+from myapp.models import VirtualDesktop
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -14,10 +14,10 @@ class Command(BaseCommand):
             data = json.load(f)
 
         for item in data:
-            computer = VirtualComputer(
+            computer = VirtualDesktop(
                 id=item['id'],
                 shortcode=item['shortcode'],
-                pool=item['pool'],
+                pool_name=item['pool_name'],
                 gpu=item['gpu'],
                 memory=item['memory'],
                 cpu=item['cpu'],
