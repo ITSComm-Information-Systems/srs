@@ -3,16 +3,23 @@ from services.models import VirtualDesktop
 import json
 
 class Command(BaseCommand):
+    # Add command-line arguments for the command
     def add_arguments(self, parser):
+        # Add an argument for the path to the JSON file
         parser.add_argument('json_file', type=str, help='Path to JSON file')
 
+    # Handle the command
     def handle(self, *args, **kwargs):
+        # Get the path to the JSON file from the command-line arguments
         json_file = kwargs['json_file']
 
+        # Open the JSON file and load the data
         with open(json_file, 'r') as f:
             data = json.load(f)
 
+        # Iterate over the items in the data
         for item in data:
+            # Create a VirtualDesktop instance with the item data
             computer = VirtualDesktop(
                 shortcode=item['shortcode'],
                 pool_name=item['pool_name'],
@@ -25,5 +32,5 @@ class Command(BaseCommand):
                 total_cost=item['total_cost'],
                 admin_group=item['group']
             )
+            # Save the instance to the database
             computer.save()
-
