@@ -126,37 +126,20 @@ class VirtualDesktop(models.Model):
         return self.pool_name
 
 class VirtualDesktop(models.Model):
-    # A character field with a max length of 6 characters,representing a short code for the virtual desktop
-    shortcode = models.CharField(max_length=6)
+    # The VirtualDesktop model represents a virtual desktop and has fields for various details about the virtual desktop,
+    # such as its shortcode, pool name, GPU availability, memory, CPU, storage, individual cost, number of computers,
+    # total cost, and admin group. The __str__ method is used to define the string representation of an instance of the model.
 
-    # A character field with a max length of 100 characters,representing the name of the pool for this virtual desktop
+    shortcode = models.CharField(max_length=6)
     pool_name = models.CharField(max_length=100)
-    
-    # A boolean field representing whether the virtual desktop has a GPU
     gpu = models.BooleanField()
-    
-    # A character field with a max length of 4 characters, representing the amount of memory in the virtual desktop
     memory = models.CharField(max_length=4)
-    
-    # A character field with a max length of 4 characters, representing the number of CPUs in the virtual desktop
     cpu = models.CharField(max_length=4)
-    
-    # A character field with a max length of 8 characters,representing the amount of storage in the virtual desktop
     storage = models.CharField(max_length=8)
-    
-    # A decimal field with a max of 10 digits and 2 decimal places, representing the individual cost of the virtual desktop
     individual_cost = models.DecimalField(max_digits=10, decimal_places=2)
-    
-    # A character field with a max length of 100 characters, representing the number of computers in the virtual desktop pool
     num_computers = models.CharField(max_length=100)
-    
-    # A decimal field with a max of 10 digits and 2 decimal places, representing the total cost of the virtual desktop pool
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
-    
-    # A character field with a max length of 100 characters,representing the name of the admin group for the virtual desktop
     admin_group = models.CharField(max_length=100)
-    
-    # Defines the string representation of an instance of the model
     def __str__(self):
         # Returns the pool name for the instance
         return self.pool_name
