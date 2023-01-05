@@ -118,7 +118,7 @@ class BaseImage(models.Model):
     cpu = models.CharField(max_length=4)
     storage = models.CharField(max_length=8)
 
-    def str(self):
+    def __str__(self):
         return self.image_name
 
 class VirtualPool(models.Model):
@@ -128,18 +128,10 @@ class VirtualPool(models.Model):
     num_computers = models.CharField(max_length=100)
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
     admin_group = models.CharField(max_length=100)
-    base_image = models.ManyToManyField(BaseImage, through='VirtualPoolBaseImage')
+    base_image = models.ManyToManyField(BaseImage)
 
-    def str(self):
+    def __str__(self):
         return self.pool_name
-
-class VirtualPoolBaseImage(models.Model):
-    virtual_pool = models.ForeignKey(VirtualPool, on_delete=models.CASCADE)
-    base_image = models.ForeignKey(BaseImage, on_delete=models.CASCADE)
-
-    def str(self):
-        return f'Virtual Pool: {self.virtual_pool}, Base Image: {self.base_image}'
-
 
 # class VirtualDesktop(models.Model):
 #     # The VirtualDesktop model represents a virtual desktop and has fields for various details about the virtual desktop,
