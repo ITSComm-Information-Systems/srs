@@ -110,36 +110,52 @@ class Service():
     azure = Azure
     gcpaccount = GCPAccount
 
-class VirtualDesktop(models.Model):
-    shortcode = models.CharField(max_length=6)
-    pool_name = models.CharField(max_length=100)
+
+class BaseImage(models.Model):
+    image_name = models.CharField(max_length=100)
     gpu = models.BooleanField()
     memory = models.CharField(max_length=4)
     cpu = models.CharField(max_length=4)
     storage = models.CharField(max_length=8)
-    individual_cost = models.DecimalField(max_digits=10, decimal_places=2)
-    num_computers = models.CharField(max_length=100)
-    total_cost = models.DecimalField(max_digits=10, decimal_places=2)
-    admin_group = models.CharField(max_length=100)
-        
-    def __str__(self):
-        return self.pool_name
 
-class VirtualDesktop(models.Model):
-    # The VirtualDesktop model represents a virtual desktop and has fields for various details about the virtual desktop,
-    # such as its shortcode, pool name, GPU availability, memory, CPU, storage, individual cost, number of computers,
-    # total cost, and admin group. The __str__ method is used to define the string representation of an instance of the model.
+    def str(self):
+        return self.image_name
 
+class VirtualPool(models.Model):
     shortcode = models.CharField(max_length=6)
     pool_name = models.CharField(max_length=100)
-    gpu = models.BooleanField()
-    memory = models.CharField(max_length=4)
-    cpu = models.CharField(max_length=4)
-    storage = models.CharField(max_length=8)
     individual_cost = models.DecimalField(max_digits=10, decimal_places=2)
     num_computers = models.CharField(max_length=100)
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
     admin_group = models.CharField(max_length=100)
-    def __str__(self):
-        # Returns the pool name for the instance
+    base_image = models.ManyToManyField(BaseImage, through='VirtualPoolBaseImage')
+
+    def str(self):
         return self.pool_name
+
+class VirtualPoolBaseImage(models.Model):
+    virtual_pool = models.ForeignKey(VirtualPool, on_delete=models.CASCADE)
+    base_image = models.ForeignKey(BaseImage, on_delete=models.CASCADE)
+
+    def str(self):
+        return f'Virtual Pool: {self.virtual_pool}, Base Image: {self.base_image}'
+
+
+# class VirtualDesktop(models.Model):
+#     # The VirtualDesktop model represents a virtual desktop and has fields for various details about the virtual desktop,
+#     # such as its shortcode, pool name, GPU availability, memory, CPU, storage, individual cost, number of computers,
+#     # total cost, and admin group. The __str__ method is used to define the string representation of an instance of the model.
+
+#     shortcode = models.CharField(max_length=6)
+#     pool_name = models.CharField(max_length=100)
+#     gpu = models.BooleanField()
+#     memory = models.CharField(max_length=4)
+#     cpu = models.CharField(max_length=4)
+#     storage = models.CharField(max_length=8)
+#     individual_cost = models.DecimalField(max_digits=10, decimal_places=2)
+#     num_computers = models.CharField(max_length=100)
+#     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
+#     admin_group = models.CharField(max_length=100)
+#     def __str__(self):
+#         # Returns the pool name for the instance
+#         return self.pool_name
