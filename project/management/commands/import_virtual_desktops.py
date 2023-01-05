@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from services.models import VirtualDesktop
+from services.models import VirtualPool
 import json
 
 class Command(BaseCommand):
@@ -19,14 +19,10 @@ class Command(BaseCommand):
 
         # Iterate over the items in the data
         for item in data:
-            # Create a VirtualDesktop instance with the item data
-            computer = VirtualDesktop(
+            # Create a VirtualPool instance with the item data
+            computer = VirtualPool(
                 shortcode=item['shortcode'],
                 pool_name=item['pool_name'],
-                gpu=item['gpu'],
-                memory=item['memory'],
-                cpu=item['cpu'],
-                storage=item['storage'],
                 individual_cost=item['individual_cost'],
                 num_computers=item['num_computers'],
                 total_cost=item['total_cost'],
