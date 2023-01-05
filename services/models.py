@@ -112,7 +112,7 @@ class Service():
 
 
 class BaseImage(models.Model):
-    image_name = models.CharField(max_length=100)
+    image_name = models.CharField(max_length=100, unique=True)
     gpu = models.BooleanField()
     memory = models.CharField(max_length=4)
     cpu = models.CharField(max_length=4)
@@ -123,7 +123,7 @@ class BaseImage(models.Model):
 
 class VirtualPool(models.Model):
     shortcode = models.CharField(max_length=6)
-    pool_name = models.CharField(max_length=100)
+    pool_name = models.CharField(max_length=100, unique=True)
     individual_cost = models.DecimalField(max_digits=10, decimal_places=2)
     num_computers = models.CharField(max_length=100)
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
