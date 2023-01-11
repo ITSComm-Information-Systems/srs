@@ -6,6 +6,7 @@ urlpatterns = [
     path('pause/<str:uniqname>', views.PauseUser.as_view(), name='pause_user'),
     path('pause', views.PauseUser.as_view(), name='pause_user'),
     path('location', views.LocationChange.as_view(), name='location'),
+    path('dept/', views.department_selection, name='department_selection'),
     path('dept/<int:dept_id>/', views.StepSubscribers.as_view(), name='subscribers'),
     path('dept/<int:dept_id>/', views.StepSubscribers.as_view(), name='subscribers'),
     path('dept/<int:dept_id>/details/', views.StepDetails.as_view(), name='details'),

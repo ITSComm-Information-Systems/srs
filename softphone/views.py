@@ -28,13 +28,19 @@ def get_help(request):
 
 @login_required
 def landing_page(request):
+    return render(request, 'softphone/home.html',
+                        {'title': 'Telephone Audit'})
+
+@login_required
+def department_selection(request):
     user_dept_list = list(AuthUserDeptV.objects.filter(user_id=request.user.id,codename='can_report').values_list('dept', flat=True))
     dept_list = DeptV.objects.filter(dept_id__in=user_dept_list)
 
-    return render(request, 'softphone/home.html',
+    return render(request, 'softphone/departments.html',
                         {'title': 'Telephone Audit',
                         'notices': 	Page.objects.get(permalink='/SFSideBar')
                         ,'dept_list': dept_list})
+
 
 def get_department_list(dept_id, user):
     user_dept_list = list(AuthUserDeptV.objects.filter(user_id=user.id,codename='can_report').values_list('dept', flat=True))
