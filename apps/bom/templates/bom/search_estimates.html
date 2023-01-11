@@ -38,8 +38,8 @@
                 <td>{{ record.project_manager }}</td>
                 <td>{{ record.assigned_engineer }}</td>
                 <td>{{ record.assigned_netops }}</td>
-                <td>{{ record.estimated_start_date|date:"c" }}</td>
-                <td>{{ record.due_date|date:"c" }}</td>
+                <td>{{ record.estimated_start_date|date:"Y-m-d" }}</td>
+                <td>{{ record.due_date|date:"Y-m-d" }}</td>
             </tr>
             {% endfor %}
         </tbody>
