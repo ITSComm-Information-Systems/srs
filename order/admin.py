@@ -243,7 +243,7 @@ class ServerAdmin(ServiceInstanceAdmin):
     list_select_related = ['owner','os']
     inlines = [ServerDiskInline,]
 
-    readonly_fields = ('legacy_data','created_date')
+    readonly_fields = ('legacy_data','created_date','total_cost','total_disk_size')
 
     fieldsets = (
         (None, {
@@ -263,6 +263,9 @@ class ServerAdmin(ServiceInstanceAdmin):
         ('Legacy Data', {
             'classes': ('collapse',),
             'fields': ('legacy_data',),
+        }),
+        (None, {
+            'fields': (('total_disk_size','total_cost'),),
         }),
     )
 
