@@ -6,8 +6,8 @@
 <h1>{{ title }}</h1>
 
 <ul>
-    <li>Refer to this <a href="https://documentation.its.umich.edu/node/3514">guide </a> for more information regarding pausing transitions for your Unit</li>
-    <li>Read more about the <a href="https://record.umich.edu/articles/new-zoom-phone-service-to-offer-greater-flexibility-mobility/">Telephone Service Upgrade Project</a></li>
+    <li>Refer to this <a href="https://documentation.its.umich.edu/node/3514" target="_blank">guide </a> for more information regarding pausing transitions for your Unit</li>
+    <li>Read more about the <a href="https://record.umich.edu/articles/new-zoom-phone-service-to-offer-greater-flexibility-mobility/" target="_blank">Telephone Service Upgrade Project</a></li>
 </ul>
 
 <div class="container">
@@ -28,6 +28,11 @@
                 {{ form.initial.service_number }}<br>
                 Uniqname: {{ form.initial.subscriber_uniqname }}{{ form.initial.uniqname }}<br>
                 {{ form.initial.subscriber_first_name }} {{ form.initial.subscriber_last_name }}<br>
+                {% if form.initial.migrate == 'YES_SET' %}
+                Softphone and Deskset<br>
+                {% else %}
+                Softphone Only<br>
+                {% endif %}
                 {{ form.initial.dept_id }} &nbsp; {{ form.initial.dept_name }}
             </div>
 

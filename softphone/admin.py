@@ -113,6 +113,7 @@ class SelectionAdmin(admin.ModelAdmin):
     ordering = ['-update_date']
     search_fields = ['service_number','uniqname','updated_by','building_code']
     list_filter = [ProcessingStatusListFilter,'migrate',CutDateListFilter, DuoListFilter,ZoomListFilter]
+    date_hierarchy = 'cut_date'
     form = SelectionForm
     actions = ['update_selections','download_csv']
 
