@@ -29,7 +29,9 @@ def get_help(request):
 @login_required
 def landing_page(request):
     return render(request, 'softphone/home.html',
-                        {'title': 'Telephone Audit'})
+                        {'title': 'Telephone Audit',
+                         'notices': 	Page.objects.get(permalink='/SFSideBar')
+                        })
 
 @login_required
 def department_selection(request):
