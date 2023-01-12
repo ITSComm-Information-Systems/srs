@@ -215,3 +215,23 @@ class GcpaccountChangeForm(CloudForm):
     class Meta:
         model = GCPAccount
         fields = ['owner','shortcode']
+
+
+class ContainerNewForm(CloudForm):
+    title = 'Order New Container'
+    custom = ['sensitive_data_yn']
+    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data']
+
+    contact_phone = forms.CharField()
+
+    dummyfield = Uniqname(help_text='Please enter a valid uniqname.')
+    billing_contact = Uniqname(help_text='Please enter a valid uniqname.')
+    security_contact = Uniqname(help_text='Please enter a valid uniqname.')
+
+    fields = ['x','y','z']
+    admin_group = forms.ChoiceField(help_text='MCommunity Admin Group')
+
+    class Meta:
+        model = GCPAccount
+        exclude = ['owner','shortcode']
+

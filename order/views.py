@@ -742,6 +742,8 @@ class Services(UserPassesTestMixin, View):
                                    {'label': 'View/Change Microsoft Azure', 'target': '/services/azure'},
                                    {'label': 'Order AWS', 'target': '/services/aws/add/'},
                                    {'label': 'View/Change AWS', 'target': '/services/aws/'} ]
+            elif service.name == 'container':
+                service.actions = [{'label': 'Request container', 'target': '/services/container/add/'}]
             else:
                 service.actions = action_list.filter(service=service)
                 for action in service.actions:
