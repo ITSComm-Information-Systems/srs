@@ -459,6 +459,8 @@ $(document).ready(function() {
 
   }
 
+
+  
   $(document).on("change", "#id_midatatype" , function() {
     if ($('#id_midatatype option:selected').text()=="MSSQL") { // MSSQL
       $("#div_midatasql").show();
