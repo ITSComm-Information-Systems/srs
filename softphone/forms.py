@@ -97,6 +97,7 @@ class SelectionForm(forms.ModelForm):
         if not obj.uniqname and self.initial['user']:
             obj.uniqname = self.initial['user']
 
+        obj.uniqname = obj.uniqname.lower()
         obj.update_date = datetime.datetime.now()
         obj.updated_by = username
         obj.save()
