@@ -1,65 +1,81 @@
 {% extends 'softphone/base_softphone.html' %}
 {% block styles %}
 <style>
+    .card {
+        position: relative;
+        background-color: lightgray;
+    }
 
-.card {
-  position: relative;
-  background-color: lightgray;
-}
+    .card:hover {
+        position: relative;
+        background-color: gray;
+    }
 
-.card:hover {
-  position: relative;
-  background-color: gray;
-}
-
-.card a::before {
-  content: "";
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-}
-
-
+    .card a::before {
+        content: "";
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        left: 0px;
+    }
 </style>
 {% endblock styles %}
 
 {% block content %}
 
 {% load humanize %}
+
 <br>
-<div class="row col-lg-8">
-    <div class="item col-md-4" style="width:30%;">
-        <div class="card">
-            <div class="card-body">
-                <p class="card-title"> <b style="font-size:large">Selections</b></p>
-                <p class="card-text">Make selections for future softphone migrations.</p>
-                <a href="/softphone/dept/" class="before:absolute before:inset-0"></a>
+
+
+<div class="row">
+    <div class="col-8">
+        <p>Welcome to the Telephone Upgrade Project Transition Tools page. The apps below enable Telephone Upgrade Unit
+            Ambassadors and SRS submitters to enter and update information needed to transition phone numbers to Zoom
+            Phone.</p>
+        <div class="card-group">
+
+            <div class="col-md-4 align-top" style="width:30%;">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title"> <b style="font-size:large">TURF</b></p>
+                        <p class="card-text">Submit telephone numbers to transition to Zoom Phone.</p>
+                        <a href="/softphone/dept/" class="before:absolute before:inset-0"></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" style="width:30%;">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title"> <b style="font-size:large">Pause</b></p>
+                        <p class="card-text">Temporarily pause softphones selected to transition to Zoom Phone.</p>
+                        <a href="/softphone/pause/ua" class="before:absolute before:inset-0"></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" style="width:30%;">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title"><b style="font-size:large">Location Verification</b></p>
+                        <p class="card-text">Verify location for telephone numbers scheduled to receive a deskset.</p>
+                        <a href="/softphone/location" class="before:absolute before:inset-0"></a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4" style="width:30%;">
-        <div class="card">
-            <div class="card-body">
-                <p class="card-title"> <b style="font-size:large">Pause</b></p>
-                <p class="card-text">Temporarily pause softphones moving this week.</p>
-                <a href="/softphone/pause/ua" class="before:absolute before:inset-0"></a>
-            </div>
-        </div>
+    <div class="col-4">
+        {% autoescape off %}
+        {{ notices.bodytext }}
+        {% endautoescape %}
+
     </div>
 
-    <div class="col-md-4" style="width:30%;">
-        <div class="card">
-            <div class="card-body">
-                <p class="card-title"><b style="font-size:large">Location</b></p>
-                <p class="card-text">Validate location for softphones moving this week.</p>
-                <a href="/softphone/location" class="before:absolute before:inset-0"></a>
-            </div>
-        </div>
-    </div>
+
 </div>
-
 
 {% endblock %}
