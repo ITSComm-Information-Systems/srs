@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from softphone.models import Zoom, SelectionV, SubscriberCharges, next_cut_date
+from softphone.models import Zoom, Selection, SelectionV, SubscriberCharges, next_cut_date
 import os, requests
 
 import datetime, csv
@@ -46,6 +46,12 @@ class Command(BaseCommand):
 
             for user in SelectionV.objects.filter(uniqname__isnull=False,cut_date=cut_date).order_by('zoom_login', 'uniqname'):
                 self.process_user(user.uniqname)
+                if user.uniqname != user.uniqname.lower():
+                    print('uniqname not all lowercase', user.uniqname)
+                    sel = Selection.objects.get(subscriber=user.subscriber)
+                    sel.uniqname = sel.uniqname.lower()
+                    sel.save()
+
         elif options['start']:
             for user in SubscriberCharges.objects.filter(current_uniqname__isnull=False,current_uniqname__gt=options['start']).order_by('current_uniqname'):
                 self.process_user(user.current_uniqname)        
