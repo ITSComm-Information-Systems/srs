@@ -103,7 +103,7 @@ class ShortCodesAPI(UmAPI):
     PREFIX = 'bf'
 
     def __init__(self):
-        self._get_token(self.SCOPE, self.PREFIX)
+        self._get_token(self.SCOPE)
 
     def get_shortcode(self, shortcode):        
         url = f'{self.BASE_URL}/um/bf/ShortCodes/ShortCodes/{shortcode}'
