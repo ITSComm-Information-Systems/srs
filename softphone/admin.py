@@ -115,6 +115,7 @@ class SelectionAdmin(admin.ModelAdmin):
     list_filter = [ProcessingStatusListFilter,'migrate',CutDateListFilter, DuoListFilter,ZoomListFilter]
     date_hierarchy = 'cut_date'
     form = SelectionForm
+    date_hierarchy = 'cut_date'
     actions = ['update_selections','download_csv']
 
     def get_urls(self):
