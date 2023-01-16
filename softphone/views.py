@@ -7,18 +7,14 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.forms import formset_factory
 
-from project.integrations import MCommunity
-import datetime, re
+import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment, UmOscNameChangeV
-
 from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
 from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date
-from .forms import SelectionForm, OptOutForm, ChangeUserForm
 from .forms import SelectionForm, OptOutForm, LocationForm
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -32,13 +28,21 @@ def get_help(request):
 
 @login_required
 def landing_page(request):
+    return render(request, 'softphone/home.html',
+                        {'title': 'Telephone Audit',
+                         'notices': 	Page.objects.get(permalink='/SFSideBar')
+                        })
+
+@login_required
+def department_selection(request):
     user_dept_list = list(AuthUserDeptV.objects.filter(user_id=request.user.id,codename='can_report').values_list('dept', flat=True))
     dept_list = DeptV.objects.filter(dept_id__in=user_dept_list)
 
-    return render(request, 'softphone/home.html',
+    return render(request, 'softphone/departments.html',
                         {'title': 'Telephone Audit',
                         'notices': 	Page.objects.get(permalink='/SFSideBar')
                         ,'dept_list': dept_list})
+
 
 def get_department_list(dept_id, user):
     user_dept_list = list(AuthUserDeptV.objects.filter(user_id=user.id,codename='can_report').values_list('dept', flat=True))
@@ -141,7 +145,6 @@ class LocationChange(LoginRequiredMixin, View):
                 form.save()
 
         return HttpResponseRedirect('/softphone/location')
-
 
 
 class PauseUser(LoginRequiredMixin, View):
