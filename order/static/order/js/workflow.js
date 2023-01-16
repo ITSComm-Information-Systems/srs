@@ -396,7 +396,6 @@ $(document).ready(function() {
         linktype = type
       }
       link = "location.href='67?type=" + linktype + "&size=" + size +"';"; 
-      
       $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
     }
