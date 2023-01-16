@@ -30,7 +30,7 @@ def get_help(request):
 def landing_page(request):
     return render(request, 'softphone/home.html',
                         {'title': 'Telephone Audit',
-                         'notices': 	Page.objects.get(permalink='/SFSideBar')
+                         'notices': 	Page.objects.get(permalink='/SFHomeSB')
                         })
 
 @login_required
