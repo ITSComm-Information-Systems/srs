@@ -30,7 +30,8 @@ def get_help(request):
 def landing_page(request):
     return render(request, 'softphone/home.html',
                         {'title': 'Telephone Audit',
-                         'notices': 	Page.objects.get(permalink='/SFSideBar')
+                         'notices': 	Page.objects.get(permalink='/SFHomeSB'),
+                         'help': 	Page.objects.get(permalink='/SFHomeHp')
                         })
 
 @login_required
@@ -63,6 +64,54 @@ def get_department_list(dept_id, user):
 
     return dept_list
 
+
+class ChangeUser(LoginRequiredMixin, View):
+    title = 'Change User - Softphone'
+
+    def get(self, request):
+        print(self.request.GET)
+        f = ChangeUserForm()    
+
+        return render(request, 'softphone/change_user.html',
+                      {'title': self.title,
+                       'form': f
+                       #'formset': formset, 
+                       #'phone_list': phone_list
+                       })
+
+    def post(self, request):
+        if self.request.POST.get('request_action'):
+            return HttpResponseRedirect('/requestsent') 
+        
+        f = ChangeUserForm(self.request.POST)    
+        
+        subscriber_id = self.request.POST.get('subscriber')
+        search = self.request.POST.get('search')
+        uniqname = self.request.POST.get('uniqname')
+
+        num_search = re.sub(r'[^0-9]', '', search)
+        if len(num_search)==10:
+            address = UmOscNameChangeV.objects.filter(service_number=num_search)
+        else:
+            address = UmOscNameChangeV.objects.filter(uniqname=search)
+
+        if uniqname:
+            mc = MCommunity().get_user(uniqname)
+            if mc:
+                new_user = f"{mc['givenName']} {mc['umichDisplaySn']}"
+            else:
+                f.add_error('uniqname', 'Uniqname not found.') 
+                new_user = 'Not Found'
+        else:
+            new_user = ''
+
+        return render(request, 'softphone/change_user.html',
+                      {'title': self.title,
+                       'form': f,
+                       'address': address,
+                       'uniqname': uniqname,
+                       'new_user': new_user
+                       })
 
 class LocationChange(LoginRequiredMixin, View):
     title = 'Location Verification App - Deskset'

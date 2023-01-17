@@ -108,6 +108,11 @@ class OptOutForm(forms.Form):
     comment = forms.CharField(required=False)
 
 
+class ChangeUserForm(forms.Form):
+    subscriber = forms.CharField(widget=forms.HiddenInput())
+    search = forms.CharField(required=False)
+    uniqname = forms.CharField(required=False)
+
 class LocationForm(forms.Form):
     subscriber = forms.CharField(widget=forms.HiddenInput())
     update = forms.BooleanField()

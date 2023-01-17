@@ -1,5 +1,8 @@
 <span id="server_rates" data-ram_rate="{{ tab.form.ram_rate }}" data-disk_replicated="{{ tab.form.disk_replicated }}"
     data-disk_no_replication="{{ tab.form.disk_no_replication }}" data-disk_backup="{{ tab.form.disk_backup }}"></span>
+{% if tab.form.instance.name %}
+<div><strong>Server Name: </strong>{{tab.form.instance.name}}</div><br/>
+{% endif %}
 
 {% for field in tab.form %}
 
