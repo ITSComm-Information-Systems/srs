@@ -2,10 +2,10 @@ from django.core.management.base import BaseCommand
 from django.core.mail import EmailMultiAlternatives
 from project.models import Email
 from django.db import connections
-from softphone.models import SelectionV, next_cut_date
+from softphone.models import SelectionV, next_cut_date, CutDate
 from django.conf import settings
 from django.template import Template, Context
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 import csv, io
 
 class Command(BaseCommand):
@@ -23,8 +23,9 @@ class Command(BaseCommand):
         cut_date = next_cut_date()
         
         if cut_date - date.today() > timedelta(days=7):
-            print('No cut date next week.  Exiting program.')
-            return
+            if email.code != 'DESKSET':
+                print('No cut date next week.  Exiting program.')
+                return
 
         week_of = cut_date - timedelta(days = 3)
 
@@ -49,6 +50,12 @@ class Command(BaseCommand):
             user_list = user_query
         elif email.code == 'UA_WEEKLY':
             user_list = self.get_ua_list(cut_date)
+        elif email.code == 'THURSDAY_VERIFY':
+            user_list = self.get_ua_list(cut_date, filter=" and migrate='YES_SET' ")
+        elif email.code == 'DESKSET':
+            cut_date = CutDate.objects.get(cut_date=datetime.today()).cut_date
+            if cut_date:
+                user_list = SelectionV.objects.filter(cut_date=cut_date, migrate='YES_SET').values_list('uniqname', flat=True)
 
         if options['audit']:
             print('AUDIT ONLY****')
@@ -99,13 +106,13 @@ class Command(BaseCommand):
         msg.attach('distribution_list.csv', csvfile.getvalue(), 'text/csv')
         msg.send()
 
-    def get_ua_list(self, cut_date):
+    def get_ua_list(self, cut_date, filter=''):
         # For the next cut date, get a list of:
         # - Everyone that submitted an update
         # - Ambassadors for the department groups of the users
         # This is the same population that has access to the pause page.
 
-        sql = 'select updated_by from um_softphone_selection_v where cut_date = %s ' \
+        sql = 'select updated_by from um_softphone_selection_v where cut_date = %s ' + filter + \
         'union ' \
         'select distinct amb.uniqname ' \
         'from um_softphone_selection_v sel, ' \
@@ -113,7 +120,7 @@ class Command(BaseCommand):
         'srs_ambassador amb ' \
         "where sel.cut_date = %s " \
         'and sel.dept_id = dept.deptid ' \
-        'and dept.dept_grp = amb.dept_grp '
+        'and dept.dept_grp = amb.dept_grp ' + filter
 
         user_list = []
 
