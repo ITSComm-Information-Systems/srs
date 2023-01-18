@@ -1,6 +1,20 @@
 <!doctype html>
 <html lang="en">
 
+<style>
+	#aux-nav {
+		background-color: {{ background_color }}
+	}
+
+	@media (min-width:992px) {
+		.nav-bar-links {
+			width: 100%;
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+</style>
+
 <head>
 	{% load static %}
 	<link rel="shortcut icon" href="/static/favicon.ico" />
@@ -100,6 +114,36 @@
 				</div>
 			</div>
 		</nav>
+		{% block mainnav %}
+        <nav class="navbar navbar-expand-lg" id="main-nav" aria-label="Main Site Navigation">
+            <div class="container">
+                <div class="collapse navbar-collapse navbars" aria-labelledby="main-nav" role="navigation">
+                    <ul class="navbar-nav nav-fill nav-bar-links">
+                        <li class="nav-item dropdown">
+                            <b>
+                                <a href="/softphone/" class="nav-link"><i class="fas fa-home"></i> Home </a>
+                            </b>
+                        </li>
+						<li class="nav-item dropdown">
+                            <b>
+                                <a href="/softphone/dept/" class="nav-link"><i class="fas fa-database"></i> TURF </a>
+                            </b>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <b>
+                                <a href="/softphone/pause/ua" class="nav-link"><i class="fas fa-pause-circle"></i> Pause</a>
+                            </b>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <b>
+                                <a href="/softphone/location" class="nav-link"><i class="fas fa-location-arrow"></i> Location Verification</a>
+                            </b>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        {% endblock mainnav %}
 	</header>
 	{% endblock header %}
 	{% block body %}{% endblock body %}
