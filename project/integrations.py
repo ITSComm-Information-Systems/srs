@@ -75,26 +75,23 @@ class MCommunity:
 
 
 class UmAPI:
-    CLIENT_ID = settings.UM_API['CLIENT_ID']
     AUTH_TOKEN = settings.UM_API['AUTH_TOKEN']
     BASE_URL = settings.UM_API['BASE_URL']
 
-    def _get_token(self, scope, prefix):
-
+    def _get_token(self, scope):
+        
         headers = { 
             'Authorization': f'Basic {self.AUTH_TOKEN}',
             'accept': 'application/json'
             }
 
-        url = f'{self.BASE_URL}/um/{prefix}/oauth2/token?grant_type=client_credentials&scope={scope}'
+        url = f'{self.BASE_URL}/um/oauth2/token?grant_type=client_credentials&scope={scope}'
         response = requests.post(url, headers=headers)
         response_token = json.loads(response.text)
         access_token = response_token.get('access_token')
 
         self.headers = {
-            'X-IBM-Client-Id': self.CLIENT_ID,
             'Authorization': 'Bearer ' + access_token,
-            #'Content-Type': 'application/json',
             'Accept': 'application/json' 
         }
 
@@ -106,7 +103,7 @@ class ShortCodesAPI(UmAPI):
     PREFIX = 'bf'
 
     def __init__(self):
-        self._get_token(self.SCOPE, self.PREFIX)
+        self._get_token(self.SCOPE)
 
     def get_shortcode(self, shortcode):        
         url = f'{self.BASE_URL}/um/bf/ShortCodes/ShortCodes/{shortcode}'
