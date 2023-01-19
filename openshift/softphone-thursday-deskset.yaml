@@ -1,0 +1,24 @@
+# Send every Thursday at 10 AM
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: softphone-thursday-deskset
+spec:
+  schedule: '0 8 * * 4'
+  ConcurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            parent: dailycron
+        spec:
+          containers:
+            -
+              name: batch
+              image: 'docker-registry.default.svc:5000/srs/production'
+              envFrom:
+              - configMapRef:
+                  name: production
+              command: ["python3",  "manage.py", "softphone_email", "--email", "DESKSET"]
+          restartPolicy: Never
