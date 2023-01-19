@@ -2,7 +2,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: softphone-thursday
+  name: softphone-thursday-verify
 spec:
   schedule: '30 10 * * 4'
   ConcurrencyPolicy: Forbid
