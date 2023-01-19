@@ -2,7 +2,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: softphone-thursday
+  name: softphone-thursday-deskset
 spec:
   schedule: '0 8 * * 4'
   ConcurrencyPolicy: Forbid
