@@ -217,21 +217,44 @@ class GcpaccountChangeForm(CloudForm):
         fields = ['owner','shortcode']
 
 
+container_size_choices = (
+('SMALL', 'SMALL, 1GB ($0.02/hr)'),
+('MEDIUM', 'Upgrade to MEDIUM, 4GB ($0.04/hr)'),
+('LARGE', 'Upgrade to LARGE, 4GB+ ($0.08/hr)'))
+
+database_addon_choices = (
+    ('NONE', 'No Database'),
+    ('SHARED', 'Shared Database'),
+    ('DEDICATED', 'Dedicated Database')
+)
+
+database_type_choices = (
+    ('MARIADB', 'MariaDB'),
+    ('POSTGRES', 'PostGres'),
+)
+
+
 class ContainerNewForm(CloudForm):
-    title = 'Order New Container'
-    custom = ['sensitive_data_yn']
+    title = 'Request a Container Service Project'
+    custom = ['database_type']
     skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data']
 
-    contact_phone = forms.CharField()
+    admin_group = forms.ChoiceField(label='Contact Group', help_text='The MCommunity group is used to identify a point of contact should the primary point of contact for this account change. Must be public and contain at least 2 members. The MCommunity group will not be used to define or maintain access to your project. Please omit @umich.edu from your group name in this field.')
+    project_name = forms.CharField(help_text='The project name is a unique identifier used for billing purposes and to generate your unpublished URL (project-name.webplatformsunpublished.umich.edu). Must be lowercase, contain no special characters, and contain no spaces. Hyphens are permitted.')
+    short_project_description = forms.CharField(help_text='Used to describe any charges associated with this project on billing invoices.')
+    size = forms.ChoiceField(choices=container_size_choices)
+    database = forms.ChoiceField(choices=database_addon_choices)
+    database_type = forms.ChoiceField(choices=database_type_choices, widget=forms.RadioSelect())
+    admins = forms.CharField(widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should be "Admins" for this project.  Enter one uniqname per line.')
+    editors = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "Edit" access to this project.  Enter one uniqname per line.')
+    viewers = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "View" access to this project.  Enter one uniqname per line.')
+    acknowledge_sle = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
+    acknowledge_srd = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
 
-    dummyfield = Uniqname(help_text='Please enter a valid uniqname.')
-    billing_contact = Uniqname(help_text='Please enter a valid uniqname.')
-    security_contact = Uniqname(help_text='Please enter a valid uniqname.')
+    shortcode = forms.CharField(validators=[validate_shortcode])
 
-    fields = ['x','y','z']
-    admin_group = forms.ChoiceField(help_text='MCommunity Admin Group')
+
 
     class Meta:
         model = GCPAccount
-        exclude = ['owner','shortcode']
-
+        fields = ['shortcode']

@@ -103,9 +103,12 @@ class Azure(Cloud):
         verbose_name = 'Azure Subscription'
         
 
+class Container(Cloud):
+    pass
 
 class Service():
     aws = AWS
     gcp = GCP
     azure = Azure
     gcpaccount = GCPAccount
+    container = Container
