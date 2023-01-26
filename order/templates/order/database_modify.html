@@ -52,11 +52,9 @@
                         <td>
                             {{ volume.shortcode }}
                         </td>
-                        <td>
 
-                        </td>
                         <td class="action">
-
+                            <td class="action"><a href="/orders/wf/71?server={{ volume.id }}" onclick="modifyVolume(0, {{ volume.id }})">Edit</a><a href="/orders/server/{{ volume.id }}/delete/" class="delete">Delete</a></td>
                         </td>
                     </tr>
                 {% endfor %}

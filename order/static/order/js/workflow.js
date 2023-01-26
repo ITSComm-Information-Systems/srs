@@ -76,9 +76,6 @@ var update_total_cost = function() {
   $("#total_cost_field").val(total_cost.toFixed(2));
 }
 
-
-
-
 $(document).ready(function() {
 
   $('#productType_1').attr('disabled', true);
@@ -164,6 +161,17 @@ $(document).ready(function() {
 
   if (modifyPages.includes(wfid)) {
     $('#nextBtn').hide();
+  }
+
+  parms = new URLSearchParams(window.location.search);
+  server_id = parms.get('server');
+
+  if (server_id) {  // Special Server Modify
+    currTab = 'volumeSelection';
+    currStep = 4
+    $('#instance_id').val(server_id);
+    sendTabData();
+    $('[data-tab="volumeSelection"]').hide();
   }
 
   $('#pills-tab li:first-child a').tab('show'); // Select first tab
@@ -374,18 +382,42 @@ $(document).ready(function() {
 
     $("#id_midatatype").trigger("change");
     server = $('#id_size').data('server');
+    
 
     if (server) {
       $('#id_size').data('server', '');
       type = $('#id_midatatype option:selected').text();
       size=$('#id_size').val();
       size = Math.trunc(size)
-      if (type=='Oracle' && size < 30) {
-        size = 30;
+      if (type == 'Microsoft SQL Server'){
+        linktype = "MSSQL"
       }
-      link = "location.href='67?type=" + type + "&size=" + size +"';"; 
+      else{
+        linktype = type
+      }
+      link = "location.href='67?type=" + linktype + "&size=" + size +"';"; 
       $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
+    }
+  });
+
+  $(document).on("change", "#id_midatatype" , function() {
+    type = $('#id_midatatype option:selected').text();
+    size=$('#id_size').val();
+
+    if(type == "Oracle" && size < 50){
+      $('#id_size').val(50)
+    }else if(type != "Orace" && size != 30){
+      $('#id_size').val(30)
+    }
+  });
+
+  $(document).on("change", "#id_size" , function() {
+    type = $('#id_midatatype option:selected').text();
+    size=$('#id_size').val();
+
+    if(type == "Oracle" && size < 50){
+      $('#id_size').val(50)
     }
   });
 
@@ -427,6 +459,8 @@ $(document).ready(function() {
 
   }
 
+
+  
   $(document).on("change", "#id_midatatype" , function() {
     if ($('#id_midatatype option:selected').text()=="MSSQL") { // MSSQL
       $("#div_midatasql").show();

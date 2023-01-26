@@ -10,12 +10,7 @@ from project.pinnmodels import UmMpathDwCurrDepartment
 # um_softphone_all_v - All eligible records with null in selection fields
 
 def next_cut_date():    # return next Thursday's date.
-    today = datetime.today()
-    days = (3 - today.weekday() + 7) % 7  # Days until Thursday
-    if days == 0:  # Today is thursday
-        days = 7
-
-    return today + timedelta(days=days)
+    return CutDate.objects.filter(cut_date__gt=datetime.today()).first().cut_date
 
 
 class Category(models.Model):
@@ -164,6 +159,15 @@ class SelectionAbstract(models.Model):
     ncos = models.CharField(max_length=10, blank=True)                        #VARCHAR2(10 CHAR) 
     linecss = models.CharField(max_length=50, blank=True)                     #VARCHAR2(50 CHAR) 
     admin_notes = models.TextField(blank=True)
+    box_number = models.IntegerField(blank=True)   #BOX_NUMBER                     NUMBER(7)           
+    phoneset_manufacturer = models.CharField(max_length=100, blank=True) # PHONESET_MANUFACTURER          VARCHAR2(100 CHAR)  
+    phoneset_model = models.CharField(max_length=100, blank=True)        # PHONESET_MODEL                 VARCHAR2(100 CHAR)  
+    mac_address = models.CharField(max_length=100, blank=True)           # MAC_ADDRESS                    VARCHAR2(100 CHAR)  
+    new_building = models.CharField(max_length=25, blank=True)          # NEW_BUILDING                   VARCHAR2(25 CHAR)   
+    new_building_code = models.CharField(max_length=10, blank=True)     # NEW_BUILDING_CODE              VARCHAR2(10 CHAR)   
+    new_floor = models.CharField(max_length=18, blank=True)             # NEW_FLOOR                      VARCHAR2(18 CHAR)   
+    new_room = models.CharField(max_length=18, blank=True)              # NEW_ROOM                       VARCHAR2(18 CHAR)  
+
 
     objects = SelectionManager()
 
@@ -184,7 +188,6 @@ class Selection(SelectionAbstract):
         if pause_date == 'Never':
             pause_date = '2030-01-01'
 
-        self.processing_status = 'On Hold'
         self.cut_date = pause_date  
         self.review_date = datetime.today()
         self.reviewed_by = current_user.username
@@ -259,6 +262,14 @@ class SubscriberCharges(SelectionAbstract):
     ncos = None
     linecss = None
     admin_notes = None
+    box_number = None
+    phoneset_manufacturer = None
+    phoneset_model = None
+    mac_address = None
+    new_building = None
+    new_building_code = None
+    new_floor = None
+    new_room = None
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_v'
@@ -275,6 +286,13 @@ class DeptV(models.Model):
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_dept_v'
         managed = False
+
+
+class CutDate(models.Model):
+    cut_date = models.DateField(primary_key=True)
+
+    def __str__(self):
+        return self.cut_date
 
 
 class Ambassador(models.Model):

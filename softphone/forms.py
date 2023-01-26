@@ -97,6 +97,7 @@ class SelectionForm(forms.ModelForm):
         if not obj.uniqname and self.initial['user']:
             obj.uniqname = self.initial['user']
 
+        obj.uniqname = obj.uniqname.lower()
         obj.update_date = datetime.datetime.now()
         obj.updated_by = username
         obj.save()
@@ -105,3 +106,20 @@ class OptOutForm(forms.Form):
     subscriber = forms.CharField(widget=forms.HiddenInput())
     pause_until = forms.CharField(required=False)
     comment = forms.CharField(required=False)
+
+class LocationForm(forms.Form):
+    subscriber = forms.CharField(widget=forms.HiddenInput())
+    update = forms.BooleanField()
+    building_code = forms.CharField()
+    building_name = forms.CharField()
+    floor = forms.CharField()
+    room = forms.CharField()
+
+    def save(self):
+        selection = Selection.objects.get(subscriber=self.cleaned_data.get('subscriber'))
+        selection.new_building_code = self.cleaned_data.get('building_code')
+        selection.new_building = self.cleaned_data.get('building_name')
+        selection.new_floor = self.cleaned_data.get('floor')
+        selection.new_room = self.cleaned_data.get('room')
+        selection.location_correct = 0
+        selection.save()

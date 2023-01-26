@@ -584,7 +584,8 @@ class Workflow(UserPassesTestMixin, View):
                     f.template = 'order/base_form.html'  # use base 4/16/2021
                     tab.form = f
 
-
+                if tab.name == 'ChangeSFUser':
+                    js.append('change_user')
                 if tab.name == 'PhoneLocation':
                     js.append('phone_location')
                 elif tab.name == 'LocationNew':
