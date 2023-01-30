@@ -1,0 +1,134 @@
+{% extends 'softphone/base_softphone.html' %}
+
+{% block styles %}
+<style>
+    .card {
+        position: relative;
+        margin-bottom: 20px;
+        margin-right: 20px;
+        max-width: 200px;
+        background-color: aliceblue;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% load humanize %}
+
+<h1>{{ title }}</h1>
+
+<ul>
+    <li>Use this form to request a deskset for an <i>existing</i> softphone.</li>
+    <li>Read more about the <a href="https://record.umich.edu/articles/new-zoom-phone-service-to-offer-greater-flexibility-mobility/" target="_blank">Telephone Service Upgrade Project</a></li>
+</ul>
+
+<div class="container">
+
+    <select type='select' name="dept_parm" id="deptf" size="1" class="form-control text-field-short col-4">
+        {% if dept_list.access_error %}
+        <option selected> {{ dept_list.access_error }} </option>
+        {% endif %}
+
+        {% for dept in dept_list %}
+        <option {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.dept_id }} - {{ dept.dept_name }}</option>
+        {% endfor %}
+    </select>
+
+    <h5 style="color: blue">Select Phone(s):</h5>
+
+
+        <strong class="">Search:</strong>
+            <div class="col-4">
+
+            <select id="id_phone_search" class="form-control col-4" placeholder="Search for Number">
+                <option></option>
+                {% for line in full_list %}
+                <option href="/" value="{{ forloop.counter }}">{{ line.service_number }} - {{ line.uniqname }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+
+<form method="post">
+    {% csrf_token %}
+    <div class="col-4" >
+
+        <div style="display: none;" id="div_verify_location">
+            <p id="address_text" class="col-4" style="white-space: pre;">
+                David Jamison
+                Arbor Lakes 2
+                3214
+            </p>        
+
+            <select class="form-control" id="id_location_correct" name="location_correct" aria-label="Location Correct">
+                <option selected>Is this Location Correct?</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            </select>
+        </div>
+
+        <div style="display: none;" id="div_new_location">
+            <h5>Enter New Location</h5>
+            <input class="form-control">Building</input>
+            <input class="form-control">Floor</input>        
+            <input class="form-control">Room</input>
+            <input class="form-control">Jack</input>
+        </div>
+
+
+
+    </div>
+
+    <div id="footered" class="container-fluid fixed-bottom border border-top-primary" style="background-color: #E2E4E4">
+
+        <div class="container mt-1 mb-1">
+            <button type="submit" class="btn" style="background-color: #0068A8; color:white">Submit Order</button>&nbsp;<span></span>
+        </div>
+
+    </div>
+</form>
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}
+
+
+{% block js %}
+
+<script>
+
+
+    $(document).ready(function () {
+
+        $.fn.select2.defaults.set("theme", "bootstrap4");
+        $('#id_phone_search').select2({
+            placeholder: "Search",
+            display: "inline",
+        });
+
+        $('#id_phone_search').on('change', function () {
+            if (this.value != 'No') {
+                $('#div_verify_location').show();
+            } else {
+                $('#div_verify_location').hide();
+            }
+        });    
+
+        $('#id_location_correct').on('change', function () {
+            if (this.value == 'No') {
+                $('#div_new_location').show();
+            } else {
+                $('#div_new_location').hide();
+            }
+        });    
+
+
+    });
+</script>
+
+
+{% endblock %}
