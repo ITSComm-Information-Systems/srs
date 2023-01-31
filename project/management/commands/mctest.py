@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from order.models import Item
-from project.integrations import MCommunity, ShortCodesAPI
+from project.integrations import MCommunity, ShortCodesAPI, Openshift
 
 
 class Command(BaseCommand):
@@ -11,6 +11,7 @@ class Command(BaseCommand):
         parser.add_argument('--shortcode')
         parser.add_argument('--username')
         parser.add_argument('--item')
+        parser.add_argument('--osproject')
 
     def handle(self, *args, **options):
 
@@ -45,3 +46,11 @@ class Command(BaseCommand):
             print('id', id)
             item = Item.objects.get(id=id)
             #item.route()
+
+        if options['osproject']:
+            name = options['osproject']
+
+            os = Openshift()
+            os.get_project(name)
+
+

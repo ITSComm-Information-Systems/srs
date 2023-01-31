@@ -112,6 +112,25 @@ class ShortCodesAPI(UmAPI):
         url = f'{self.BASE_URL}/um/bf/ShortCodes/ShortCodes/{shortcode}'
         return requests.get(url, headers=self.headers)
 
+class Openshift():
+
+    BASE_URL = settings.OPENSHIFT['BASE_URL']
+    USER = settings.OPENSHIFT['USER']
+    TOKEN = settings.OPENSHIFT['TOKEN']
+    PROJECT_URL = BASE_URL + '/apis/project.openshift.io/v1/projects'
+
+    def get_project(self, name):
+        headers = {'Authorization': f'Bearer {self.TOKEN}'}        
+        #r = requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
+        r = requests.get(f'{self.PROJECT_URL}/', headers=headers)
+        print(r.status_code, r.text)        
+
+    def create_project(self, name):
+        payload = {"metadata":{"name": name}}
+        headers = {'Authorization': f'Bearer {self.TOKEN}'}        
+        r = requests.post(f'{self.PROJECT_URL}', headers=headers, json=payload)
+        print(r.status_code, r.text)      
+
 
 class TDx():
     BASE_URL = settings.TDX['URL']
