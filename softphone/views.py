@@ -10,7 +10,7 @@ from django.forms import formset_factory
 import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV
+from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV, UmOscAvailableLocsV
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
@@ -213,7 +213,7 @@ class Deskset(LoginRequiredMixin, View):
                 ,'subscriber_first_name','subscriber_last_name','dept_id','migrate']
 
     def get(self, request, dept_id):
-
+        building_list = UmOscAvailableLocsV.objects.values_list('building_id', 'building_name', 'campus_desc').distinct()
         phone_list = SelectionV.objects.filter(dept_id=dept_id, migrate='YES')
         dept_list = get_department_list(dept_id, request.user)
         if dept_id == 0:
@@ -223,6 +223,7 @@ class Deskset(LoginRequiredMixin, View):
         return render(request, 'softphone/deskset.html',
                       {'title': self.title,
                        'full_list': phone_list,
+                       'building_list': list(building_list),
                        'dept_list': dept_list})
 
     def post(self, request, dept_id):
