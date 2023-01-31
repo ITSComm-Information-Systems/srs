@@ -108,6 +108,14 @@
             }
         });
 
+        $("#id_course_yn").change(function () {
+            if (this.value == "Yes") {
+                $("#div_course_info").show();
+            } else {
+                $("#div_course_info").hide();
+            }
+        });
+
         $('#id_migrate_existing').trigger('change')
         $('#id_sensitive_data_yn').trigger('change')
         $('#id_gcp_existing').trigger('change')
