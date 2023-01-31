@@ -1,0 +1,323 @@
+{% extends 'softphone/base_softphone.html' %}
+
+{% block styles %}
+<style>
+    .card {
+        position: relative;
+        margin-bottom: 20px;
+        margin-right: 20px;
+        max-width: 200px;
+        background-color: aliceblue;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% load humanize %}
+
+<h1>{{ title }}</h1>
+
+<ul>
+    <li>Use this form to request a deskset for an <i>existing</i> softphone.</li>
+    <li>Read more about the <a
+            href="https://record.umich.edu/articles/new-zoom-phone-service-to-offer-greater-flexibility-mobility/"
+            target="_blank">Telephone Service Upgrade Project</a></li>
+</ul>
+
+<div class="container">
+
+    <select type='select' name="dept_parm" id="deptf" size="1" class="form-control text-field-short col-4">
+        {% if dept_list.zero %}
+        <option selected>No Authorized Departments</option>
+        {% endif %}
+
+        {% for dept in dept_list %}
+        <option {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.dept_id }} - {{ dept.dept_name }}</option>
+        {% endfor %}
+    </select>
+
+    <h5 style="color: blue">Select Phone(s):</h5>
+
+
+    <form method="post">
+        {% csrf_token %}
+
+
+        <strong class="">Search:</strong>
+        <div class="col-4">
+    
+            <select id="id_phone_search" name="subscriber" class="form-control col-4" placeholder="Search for Number">
+                <option></option>
+                {% for line in full_list %}
+                <option href="/" data-location="{{ line.building }} <br> Floor:{{ line.floor }} <br> Room:{{ line.room }}"
+                    value="{{ line.subscriber }}">{{ line.service_number }} - {{ line.subscriber_first_name }} {{ line.subscriber_last_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <div class="col-">
+
+            <div style="display: none;" id="div_verify_location">
+                <p id="address_text" class="col-4" style="white-space: pre;"></p>
+
+                <select class="form-control col-4" id="id_location_correct" name="location_correct"
+                    aria-label="Location Correct">
+                    <option selected>Is this Location Correct?</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
+
+
+
+            <div style="display: none;" id="div_new_location">
+
+                <h6>Search for New Location by Building Name or ID</h6>
+                <div class='input-group col-md-6'>
+                  <input class='form-control' id="buildingSearch" type="text" placeholder="Search...">
+                </div>
+                
+                <table id="buildingTable" class="table table-hover mt-2 col-md-6">
+                  <thead>
+                    <tr>
+                      <th>Building ID</th>
+                      <th>Building Name</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for building in building_list %}
+                      <tr id="{{ building.0 }}">
+                        <td>{{ building.0 }}</td>
+                        <td name="buildingName">{{ building.1 }}</td>
+                        <td id="buildingCampus" hidden>{{ building.2 }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                
+                <div class='col-md-6 mt-4' id='buildingFields'>
+                  <input id='campus' id='campus' hidden>
+                  <input id='phone-num' name='phone-num' hidden>
+                
+                  <div class="form-group">
+                      <label for="buildingID">Building Code</label>
+                      <input class='form-control' type='text' value='test' readonly name='buildingID' id='buildingID'>
+                  </div>
+                  <div class="form-group">
+                    <label for="buildingFloor">Building Name</label>
+                    <input class='form-control' type='text' value='test' readonly name='buildingName' id='buildingName'>
+                  </div>
+                
+                  <div class="form-group">
+                    <label for="buildingFloor">Building Floor</label>
+                    <input class='form-control' type='text' placeholder='Enter a floor...' name='buildingFloor' id='buildingFloor'>
+                  </div>
+                
+                  <div id='roomselect' class="form-group">
+                    <label for="buildingRoom">Select a Building Room</label>
+                    <select type="GET" name="buildingRoom" id="buildingRoom" class="form-control">
+                      <option value="%">--Select--</option>
+                    </select>
+                  </div>
+                
+                  <div id='jackselect' class="form-group">
+                    <label for="buildingJack">Select a Jack</label>
+                    <select type="GET" name="buildingJack" id="buildingJack" class="form-control">
+                      <option value="%">--Select--</option>
+                    </select> 
+                  </div>
+                </div>
+                
+                <p class='mt-3 prv-msgs' id='new_error'></p>
+
+
+
+
+
+            </div>
+
+
+
+        </div>
+
+        <div id="footered" class="container-fluid fixed-bottom border border-top-primary"
+            style="background-color: #E2E4E4">
+
+            <div class="container mt-1 mb-1">
+                <button type="submit" class="btn" style="background-color: #0068A8; color:white">Submit
+                    Order</button>&nbsp;<span></span>
+            </div>
+
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}
+
+
+{% block js %}
+
+<script>
+
+
+    $(document).ready(function () {
+
+        $.fn.select2.defaults.set("theme", "bootstrap4");
+        $('#id_phone_search').select2({
+            placeholder: "Search",
+            display: "inline",
+        });
+
+        $('#id_phone_search').on('change', function () {
+            if (this.value != 'No') {
+                x = $(this).find(':selected').data('location');
+
+                $('#div_verify_location').show();
+                console.log(x);
+                $('#address_text').html(x);
+            } else {
+                $('#div_verify_location').hide();
+            }
+        });
+
+        $('#id_location_correct').on('change', function () {
+            if (this.value == 'No') {
+                $('#div_new_location').show();
+            } else {
+                $('#div_new_location').hide();
+            }
+        });
+
+        $("#deptf").change(function () {
+            console.log(this.value, 'log');
+            window.location.href = "/softphone/deskset/" + this.value + "/";
+        });
+
+        
+
+
+
+    $('input[type=text][name=buildingFloor]').on("keyup", function () {
+        var code = $('#buildingID').val();
+        var floor = $(this).val();
+        $("#roomselect").hide();
+        $("#jackselect").hide();
+        $('#buildingRoom').val('');
+        $('#buildingJack').val('');
+        $.ajax({
+          type: "GET",
+          url: "/tools/voip/floor/",
+          data:{
+            "buildingID": code,
+            "buildingFloor": floor,
+          },
+          dataType:'json',
+          success: function(data) {
+            
+            $('#buildingFloor').val(floor);
+            $('#buildingRoom').empty();
+            var option = document.createElement("option");
+            option.value = "%";
+            option.text = "--Select--";
+            document.getElementById('buildingRoom').appendChild(option);
+
+            for (var i =0; i < data.rooms.length; i++) {
+              var option = document.createElement("option");
+              option.value = data.rooms[i];
+              option.text = data.rooms[i];
+              document.getElementById('buildingRoom').appendChild(option);
+            }
+            if (data.floor != '')
+              $("#roomselect").show();
+            console.log(typeof data);
+          },
+          error: function(data) {
+            //should do some error handling here
+          }
+        });
+    });
+
+    $('#buildingRoom').change(function () {
+        var code = $('#buildingID').val();
+        var floor = $("#buildingFloor").val();
+        var room = $(this).val();
+        $('#buildingJack').val('');
+        $.ajax({
+          type: "GET",
+          url: "/tools/voip/room/",
+          data:{
+            "buildingID": code,
+            "buildingFloor": floor,
+            "buildingRoom": room,
+          },
+          dataType:'json',
+          success: function(data) {
+            // document.getElementById('n5').innerHTML = "Room: " + data.room;
+
+            $('#buildingRoom').val(room);
+            $('#buildingJack').empty();
+            var option = document.createElement("option");
+            option.value = "%";
+            option.text = "--Select--";
+            document.getElementById('buildingJack').appendChild(option);
+
+            for (var i =0; i < data.jacks.length; i++) {
+              var option = document.createElement("option");
+              option.value = data.jacks[i];
+              option.text = data.jacks[i];
+              document.getElementById('buildingJack').appendChild(option);
+            }
+            console.log(typeof data);
+            $("#jackselect").show();
+          },
+          error: function(data) {
+            console.log('error');
+          }
+        });
+    });
+
+
+    $("#buildingFields").hide();
+  $("#buildingTable").hide();
+
+  $("#buildingSearch").on("keyup", function() {
+      $("#buildingTable").show();
+      var value = $(this).val().toLowerCase();
+      $("#buildingTable tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
+  
+    $('#buildingTable tr').click(function() {
+      var building = $(this).find("td").eq(1).html();   
+      var buildingCode = $(this).find("td").eq(0).html(); 
+      var buildingCampus = $(this).find('td').eq(2).html();  
+
+      //$('#new_loc_table').removeAttr('hidden');
+      $('#buildingID').val(buildingCode);
+      $('#buildingName').val(building);
+      $('#campus').val(buildingCampus);
+      $('#buildingSearch').val('');
+      
+      $("#buildingTable").hide();
+      $('#buildingFields').show();
+      $("#roomselect").hide();
+      $("#jackselect").hide();
+      $('#buildingFloor').val('');
+      $('#buildingRoom').val('');
+      $('#buildingJack').val('');
+    });
+
+
+
+    });
+</script>
+
+{% endblock %}
+
+
