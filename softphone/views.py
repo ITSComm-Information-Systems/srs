@@ -215,13 +215,17 @@ class Deskset(LoginRequiredMixin, View):
     def get(self, request, dept_id):
 
         phone_list = SelectionV.objects.filter(dept_id=dept_id, migrate='YES')
+        dept_list = get_department_list(dept_id, request.user)
+        if dept_id == 0:
+            print('set list zero')
+            dept_list.zero = 'True'
 
         return render(request, 'softphone/deskset.html',
                       {'title': self.title,
                        'full_list': phone_list,
-                       'dept_list': get_department_list('2', request.user)})
+                       'dept_list': dept_list})
 
-    def post(self, request, uniqname):
+    def post(self, request, dept_id):
         OptOutFormSet = formset_factory(OptOutForm, extra=0)
         formset = OptOutFormSet(request.POST)
 
@@ -235,7 +239,7 @@ class Deskset(LoginRequiredMixin, View):
                 comment = form.cleaned_data.get('comment')
                 rec.pause(request.user, pause_date, comment)
 
-        return HttpResponseRedirect(f'/softphone/pause/{uniqname}')
+        return HttpResponseRedirect(f'/softphone/')
 
 
 class StepSubscribers(LoginRequiredMixin, View):

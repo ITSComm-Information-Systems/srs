@@ -26,12 +26,12 @@
 <div class="container">
 
     <select type='select' name="dept_parm" id="deptf" size="1" class="form-control text-field-short col-4">
-        {% if dept_list.access_error %}
-        <option selected> {{ dept_list.access_error }} </option>
+        {% if dept_list.zero %}
+        <option selected>Select Department</option>
         {% endif %}
 
         {% for dept in dept_list %}
-        <option {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.dept_id }} - {{ dept.dept_name }}</option>
+        <option href="/softphone/deskset/481091/" {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.dept_id }} - {{ dept.dept_name }}</option>
         {% endfor %}
     </select>
 
@@ -44,7 +44,7 @@
             <select id="id_phone_search" class="form-control col-4" placeholder="Search for Number">
                 <option></option>
                 {% for line in full_list %}
-                <option href="/" value="{{ forloop.counter }}">{{ line.service_number }} - {{ line.uniqname }}</option>
+                <option href="/" data-location="{{ line.building }} <br> Floor:{{ line.floor }} <br> Room:{{ line.room }}" value="{{ line.subscriber }}">{{ line.service_number }} - {{ line.uniqname }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -56,11 +56,7 @@
     <div class="col-4" >
 
         <div style="display: none;" id="div_verify_location">
-            <p id="address_text" class="col-4" style="white-space: pre;">
-                David Jamison
-                Arbor Lakes 2
-                3214
-            </p>        
+            <p id="address_text" class="col-4" style="white-space: pre;"></p>        
 
             <select class="form-control" id="id_location_correct" name="location_correct" aria-label="Location Correct">
                 <option selected>Is this Location Correct?</option>
@@ -112,7 +108,11 @@
 
         $('#id_phone_search').on('change', function () {
             if (this.value != 'No') {
+                x = $(this).find(':selected').data('location');
+                
                 $('#div_verify_location').show();
+                console.log(x);
+                $('#address_text').html(x);
             } else {
                 $('#div_verify_location').hide();
             }
@@ -126,6 +126,10 @@
             }
         });    
 
+        $("#deptf").change(function () {
+            console.log(this.value,'log');
+            window.location.href = "/softphone/deskset/" + this.value + "/";
+        });
 
     });
 </script>
