@@ -29,7 +29,7 @@
 
     <select type='select' name="dept_parm" id="deptf" size="1" class="form-control text-field-short col-4">
         {% if dept_list.zero %}
-        <option selected>Select Department</option>
+        <option selected>No Authorized Departments</option>
         {% endif %}
 
         {% for dept in dept_list %}
@@ -40,22 +40,23 @@
     <h5 style="color: blue">Select Phone(s):</h5>
 
 
-    <strong class="">Search:</strong>
-    <div class="col-4">
-
-        <select id="id_phone_search" class="form-control col-4" placeholder="Search for Number">
-            <option></option>
-            {% for line in full_list %}
-            <option href="/" data-location="{{ line.building }} <br> Floor:{{ line.floor }} <br> Room:{{ line.room }}"
-                value="{{ line.subscriber }}">{{ line.service_number }} - {{ line.uniqname }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-
-
     <form method="post">
         {% csrf_token %}
+
+
+        <strong class="">Search:</strong>
+        <div class="col-4">
+    
+            <select id="id_phone_search" name="subscriber" class="form-control col-4" placeholder="Search for Number">
+                <option></option>
+                {% for line in full_list %}
+                <option href="/" data-location="{{ line.building }} <br> Floor:{{ line.floor }} <br> Room:{{ line.room }}"
+                    value="{{ line.subscriber }}">{{ line.service_number }} - {{ line.subscriber_first_name }} {{ line.subscriber_last_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
         <div class="col-">
 
             <div style="display: none;" id="div_verify_location">

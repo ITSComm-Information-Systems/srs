@@ -3,6 +3,7 @@ from django.db import models, connections
 from django.conf import settings
 from django.db.models.fields import IntegerField
 from project.pinnmodels import UmMpathDwCurrDepartment
+import threading
 
 # Selection = um_softphone_selection - Main table with user selections and processing data.
 # SelectionV = um_softphone_selection_v - Selects off above table, does not have CANCEL records but has extra fields from subscriber
@@ -167,7 +168,7 @@ class SelectionAbstract(models.Model):
     new_building_code = models.CharField(max_length=10, blank=True)     # NEW_BUILDING_CODE              VARCHAR2(10 CHAR)   
     new_floor = models.CharField(max_length=18, blank=True)             # NEW_FLOOR                      VARCHAR2(18 CHAR)   
     new_room = models.CharField(max_length=18, blank=True)              # NEW_ROOM                       VARCHAR2(18 CHAR)  
-
+    new_jack = models.CharField(max_length=30, blank=True)
 
     objects = SelectionManager()
 
@@ -211,6 +212,39 @@ class Selection(SelectionAbstract):
             print(cursor.rowcount, 'update subscriber_id')
         except:
             print('error updating subscriber_api_v')
+
+
+    def submit_order(self, user, dept_id):
+        from order.models import Order, Item
+        order = Order() #order.models.Order()  # Create new order and tie items to it.
+        order.order_reference = 'TBD'
+        order.created_by = user
+        order.chartcom_id = 11318  #firstitem.chartcom
+        order.service_id = 2 # Phone Settings & Features
+        order.save()
+
+        item = Item()
+        item.description = 'Order Deskset for Softphone'
+        item.order = order
+        item.chartcom_id = 11318
+        item.data = {   'action_id': '12', # Change a Phone Set
+                        "subscriber_id": self.subscriber,
+                        "currentBuildingName":  self.building,
+                        "currentBuildingFloor": self.floor,
+                        "currentBuildingRoom":  self.room,
+                        "currentBuildingJack":  self.jack,
+                        "service_number": self.service_number,
+                        "location_id": self.location_id,
+                        "newBuildingCode": self.new_building_code,
+                        "newBuildingName": self.new_building,
+                        "newBuildingFloor": self.new_floor,
+                        "newBuildingRoom": self.new_room,
+                        "reviewSummary": [1,2,3]}
+        item.created_by = user
+        item.save()
+
+        thread = threading.Thread(target=order.create_preorder)
+        thread.start()
 
 
 class SelectionV(SelectionAbstract):
