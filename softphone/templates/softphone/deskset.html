@@ -37,10 +37,8 @@
         {% endfor %}
     </select>
 
-    <h5 style="color: blue">Select Phone(s):</h5>
-
-
-    <form method="post">
+    <form id="div_form" method="post">
+        <h5 style="color: blue">Select Phone(s):</h5>
         {% csrf_token %}
 
 
@@ -174,8 +172,10 @@
         });
 
         $('#id_phone_search').on('change', function () {
+            $("#id_location_correct").val($("#id_location_correct option:first").val());
+            $('#div_new_location').hide();
             if (this.value != 'No') {
-                x = $(this).find(':selected').data('location');
+              x = $(this).find(':selected').data('location');
 
                 $('#div_verify_location').show();
                 console.log(x);
@@ -194,7 +194,7 @@
         });
 
         $("#deptf").change(function () {
-            console.log(this.value, 'log');
+            $('#div_form').hide();
             window.location.href = "/softphone/deskset/" + this.value + "/";
         });
 
