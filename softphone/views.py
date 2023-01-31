@@ -254,6 +254,42 @@ class PauseUser(LoginRequiredMixin, View):
         return HttpResponseRedirect(f'/softphone/pause/{uniqname}')
 
 
+
+class Deskset(LoginRequiredMixin, View):
+    title = 'Request Deskset'
+    field_list = ['subscriber','service_number','subscriber_uniqname' \
+                ,'subscriber_first_name','subscriber_last_name','dept_id','migrate']
+
+    def get(self, request, dept_id):
+
+        phone_list = SelectionV.objects.filter(dept_id=dept_id, migrate='YES')
+        dept_list = get_department_list(dept_id, request.user)
+        if dept_id == 0:
+            print('set list zero')
+            dept_list.zero = 'True'
+
+        return render(request, 'softphone/deskset.html',
+                      {'title': self.title,
+                       'full_list': phone_list,
+                       'dept_list': dept_list})
+
+    def post(self, request, dept_id):
+        OptOutFormSet = formset_factory(OptOutForm, extra=0)
+        formset = OptOutFormSet(request.POST)
+
+        formset.is_valid()
+        for form in formset:
+            pause_date = form.cleaned_data.get('pause_until', 'None')
+
+            if pause_date != 'None':
+                subscriber = form.cleaned_data.get('subscriber')
+                rec = Selection.objects.get(subscriber=subscriber)
+                comment = form.cleaned_data.get('comment')
+                rec.pause(request.user, pause_date, comment)
+
+        return HttpResponseRedirect(f'/softphone/')
+
+
 class StepSubscribers(LoginRequiredMixin, View):
 
     def post(self, request, dept_id):
