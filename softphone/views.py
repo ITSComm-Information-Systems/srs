@@ -261,12 +261,16 @@ class Deskset(LoginRequiredMixin, View):
                 ,'subscriber_first_name','subscriber_last_name','dept_id','migrate']
 
     def get(self, request, dept_id):
-        building_list = UmOscAvailableLocsV.objects.values_list('building_id', 'building_name', 'campus_desc').distinct()
-        phone_list = SelectionV.objects.filter(dept_id=dept_id, migrate='YES')
         dept_list = get_department_list(dept_id, request.user)
         if dept_id == 0:
-            print('set list zero')
-            dept_list.zero = 'True'
+            if len(dept_list) == 0:
+                dept_list.zero = 'True'
+            else:
+                dept_list[0].selected = 'selected'
+                dept_id = dept_list[0].dept_id
+
+        building_list = UmOscAvailableLocsV.objects.values_list('building_id', 'building_name', 'campus_desc').distinct()
+        phone_list = SelectionV.objects.filter(dept_id=dept_id, migrate='YES', processing_status="Completed")
 
         return render(request, 'softphone/deskset.html',
                       {'title': self.title,
@@ -275,20 +279,23 @@ class Deskset(LoginRequiredMixin, View):
                        'dept_list': dept_list})
 
     def post(self, request, dept_id):
-        OptOutFormSet = formset_factory(OptOutForm, extra=0)
-        formset = OptOutFormSet(request.POST)
+        print(request.POST)
+        if self.request.POST.get('location_correct') == 'No':
+            subscriber = self.request.POST.get('subscriber')
+            selection = Selection.objects.get(subscriber=subscriber)
+            selection.migrate = 'YES_SET'
+            selection.processing_status = 'Selected'
+            selection.cut_date = next_cut_date()
+            selection.new_building = self.request.POST.get('buildingName')
+            selection.new_building_code = self.request.POST.get('buildingID')
+            selection.new_floor = self.request.POST.get('buildingFloor')
+            selection.new_room = self.request.POST.get('buildingRoom')
+            selection.new_jack = self.request.POST.get('buildingJack')
+            selection.save()
+            print('update location for', selection.uniqname)
+            selection.submit_order(request.user, dept_id)
 
-        formset.is_valid()
-        for form in formset:
-            pause_date = form.cleaned_data.get('pause_until', 'None')
-
-            if pause_date != 'None':
-                subscriber = form.cleaned_data.get('subscriber')
-                rec = Selection.objects.get(subscriber=subscriber)
-                comment = form.cleaned_data.get('comment')
-                rec.pause(request.user, pause_date, comment)
-
-        return HttpResponseRedirect(f'/softphone/')
+            return render(request, 'softphone/deskset_confirmation.html')
 
 
 class StepSubscribers(LoginRequiredMixin, View):
