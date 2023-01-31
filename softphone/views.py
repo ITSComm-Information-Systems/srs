@@ -231,23 +231,29 @@ class Deskset(LoginRequiredMixin, View):
                        'dept_list': dept_list})
 
     def post(self, request, dept_id):
-        print(request.POST)
+        subscriber = self.request.POST.get('subscriber')
+        selection = Selection.objects.get(subscriber=subscriber)
+        selection.migrate = 'YES_SET'
+        selection.processing_status = 'Selected'
+        selection.cut_date = next_cut_date()
         if self.request.POST.get('location_correct') == 'No':
-            subscriber = self.request.POST.get('subscriber')
-            selection = Selection.objects.get(subscriber=subscriber)
-            selection.migrate = 'YES_SET'
-            selection.processing_status = 'Selected'
-            selection.cut_date = next_cut_date()
             selection.new_building = self.request.POST.get('buildingName')
             selection.new_building_code = self.request.POST.get('buildingID')
             selection.new_floor = self.request.POST.get('buildingFloor')
             selection.new_room = self.request.POST.get('buildingRoom')
             selection.new_jack = self.request.POST.get('buildingJack')
-            selection.save()
-            print('update location for', selection.uniqname)
-            selection.submit_order(request.user, dept_id)
+        else:
+            selection.new_building = selection.building
+            selection.new_building_code = selection.building_code
+            selection.new_floor = selection.floor
+            selection.new_room = selection.room
+            selection.new_jack = selection.jack
 
-            return render(request, 'softphone/deskset_confirmation.html')
+        selection.save()
+        print('update location for', selection.uniqname)
+        selection.submit_order(request.user, dept_id)
+
+        return render(request, 'softphone/deskset_confirmation.html')
 
 
 class StepSubscribers(LoginRequiredMixin, View):
