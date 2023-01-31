@@ -7,12 +7,14 @@
 	}
 
 	@media (min-width:992px) {
-		.nav-bar-links {
+		.nav-bar-links-sf {
 			width: 100%;
 			display: grid;
-			grid-template-columns: repeat(3, 1fr);
+			grid-template-columns: 20pt 20% 20% 20% 20%;
 		}
 	}
+}
+
 </style>
 
 <head>
@@ -115,10 +117,10 @@
 			</div>
 		</nav>
 		{% block mainnav %}
-        <nav class="navbar navbar-expand-lg" id="main-nav" aria-label="Main Site Navigation">
+        <nav class="navbar navbar-expand-sm" id="main-nav" aria-label="Main Site Navigation">
             <div class="container">
-                <div class="collapse navbar-collapse navbars" aria-labelledby="main-nav" role="navigation">
-                    <ul class="navbar-nav nav-fill nav-bar-links">
+                <div class="navbar-collapse" aria-labelledby="main-nav" role="navigation">
+                    <ul class="navbar-nav nav-bar-links-sf">
                         <li class="nav-item dropdown">
                             <b>
                                 <a href="/softphone/" class="nav-link"><i class="fas fa-home"></i> Home </a>
@@ -136,7 +138,12 @@
                         </li>
                         <li class="nav-item dropdown">
                             <b>
-                                <a href="/softphone/location" class="nav-link"><i class="fas fa-location-arrow"></i> Location Verification</a>
+                                <a href="/softphone/location" class="nav-link"><i class="fas fa-location-arrow"></i> Location</a>
+                            </b>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <b>
+                                <a href="/softphone/deskset/0/" class="nav-link"><i class="fas fa-phone"></i> Deskset</a>
                             </b>
                         </li>
                     </ul>
