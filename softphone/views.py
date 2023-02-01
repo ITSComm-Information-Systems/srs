@@ -208,7 +208,7 @@ class PauseUser(LoginRequiredMixin, View):
 
 
 class Deskset(LoginRequiredMixin, View):
-    title = 'Request Deskset'
+    title = 'Add Deskset'
     field_list = ['subscriber','service_number','subscriber_uniqname' \
                 ,'subscriber_first_name','subscriber_last_name','dept_id','migrate']
 
