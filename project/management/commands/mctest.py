@@ -54,3 +54,22 @@ class Command(BaseCommand):
             os.get_project(name)
 
 
+            name = options['osproject']
+            # '/apis/project.openshift.io/v1/projects'
+            os = Openshift()
+            #os.get_project(name)
+            import requests
+
+            url = f'{os.BASE_URL}/apis/user.openshift.io/v1/identities/umich-openid:djamison'
+
+            url = f'{os.BASE_URL}/apis/user.openshift.io/v1/useridentitymappings/umich-openid:djamison'
+            print(url)
+
+            
+    
+            headers = {'Authorization': f'Bearer {os.TOKEN}'}        
+            #r = requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
+            r = requests.get(url, headers=headers)
+            print(r.status_code, r.text)  
+
+
