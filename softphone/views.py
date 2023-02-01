@@ -283,7 +283,8 @@ class Deskset(LoginRequiredMixin, View):
         selection = Selection.objects.get(subscriber=subscriber)
         selection.migrate = 'YES_SET'
         selection.processing_status = 'Selected'
-        selection.cut_date = next_cut_date()
+        selection.cut_date = next_cut_date() + datetime.timedelta(days=7)
+
         if self.request.POST.get('location_correct') == 'No':
             selection.new_building = self.request.POST.get('buildingName')
             selection.new_building_code = self.request.POST.get('buildingID')
@@ -298,8 +299,6 @@ class Deskset(LoginRequiredMixin, View):
             selection.new_jack = selection.jack
 
         selection.save()
-        print('update location for', selection.uniqname)
-        selection.submit_order(request.user, dept_id)
 
         return render(request, 'softphone/deskset_confirmation.html')
 

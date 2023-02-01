@@ -141,7 +141,7 @@
 
     <br>
     <div class="container mt-1 mb-1">
-      <button id="id_submit_button" type="submit" class="btn" style="background-color: #0068A8; color:white">Submit
+      <button disabled id="id_submit_button" type="submit" class="btn" style="background-color: #0068A8; color:white">Submit
         Order</button>&nbsp;<span></span>
     </div>
 
@@ -165,25 +165,26 @@
 
     $('#id_phone_search').on('change', function () {
       $("#id_location_correct").val($("#id_location_correct option:first").val());
+      document.getElementById('id_submit_button').disabled = true;
       $('#div_new_location').hide();
-      if (this.value != 'No') {
-        x = $(this).find(':selected').data('location');
 
-        $('#div_verify_location').show();
+      x = $(this).find(':selected').data('location');
 
-        $('#address_text').html(x);
-        document.getElementById('id_submit_button').scrollIntoView();
-      } else {
-        $('#div_verify_location').hide();
-      }
+      $('#div_verify_location').show();
+
+      $('#address_text').html(x);
+      document.getElementById('id_submit_button').scrollIntoView();
+
     });
 
     $('#id_location_correct').on('change', function () {
       if (this.value == 'No') {
         $('#div_new_location').show();
-        document.getElementById('buildingID').scrollIntoView();
+        document.getElementById('id_submit_button').scrollIntoView();
+        document.getElementById('id_submit_button').disabled = true;
       } else {
         $('#div_new_location').hide();
+        document.getElementById('id_submit_button').disabled = false;
       }
     });
 
@@ -228,6 +229,8 @@
           }
           if (data.floor != '')
             $("#roomselect").show();
+            document.getElementById('id_submit_button').scrollIntoView();
+
           console.log(typeof data);
         },
         error: function (data) {
@@ -305,6 +308,7 @@
       $('#buildingFloor').val('');
       $('#buildingRoom').val('');
       $('#buildingJack').val('');
+      document.getElementById('id_submit_button').disabled = false;
     });
 
 
