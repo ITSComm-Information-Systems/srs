@@ -77,8 +77,19 @@ class LocationChange(LoginRequiredMixin, View):
             username = self.request.user.username
 
         LocationFormSet = formset_factory(LocationForm, extra=0)
-        phone_list = SelectionV.objects.filter(updated_by=username, new_building_code__isnull=True
+        phone_list_up = SelectionV.objects.filter(updated_by=username, new_building_code__isnull=True
                 ,migrate='YES_SET', processing_status='Selected', cut_date=next_cut_date()).order_by('location_correct')
+
+        dept_group_list = list(Ambassador.objects.filter(uniqname=username).values_list('dept_grp', flat=True))
+
+        if len(dept_group_list) > 0:
+            dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp__in=dept_group_list).values_list('deptid', flat=True)
+            phone_list_ua = SelectionV.objects.filter(dept_id__in=dept_list, new_building_code__isnull=True
+                    ,migrate='YES_SET', processing_status='Selected', cut_date=next_cut_date()).order_by('location_correct')
+            phone_list = (phone_list_ua | phone_list_up).distinct()
+        else:
+            phone_list = phone_list_up
+
         formset = LocationFormSet(initial=phone_list)
 
         return render(request, 'softphone/location_change.html',
