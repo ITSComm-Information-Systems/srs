@@ -25,6 +25,7 @@
 
         {% endfor %}
 
+        {% if form.acknowledge_sle %}
         <div class="form-check">
             {{ form.acknowledge_sle}}
             <label class="form-check-label" for="id_acknowledge_sle">I have read and awknowledge the 
@@ -33,7 +34,9 @@
                 </a>
             </label>
         </div>
+        {% endif %}
 
+        {% if form.acknowledge_srd %}
         <div class="form-check">
             {{ form.acknowledge_srd}}
             <label class="form-check-label" for="id_acknowledge_srd">I have read and awknowledge the 
@@ -42,7 +45,7 @@
                 </a>
             </label>
         </div>
-
+        {% endif %}
 
         <hr>
 
