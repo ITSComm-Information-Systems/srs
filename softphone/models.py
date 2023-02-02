@@ -179,7 +179,7 @@ class SelectionAbstract(models.Model):
         return self.uniqname
 
 class Selection(SelectionAbstract):
-    pass
+    pass    
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection'
@@ -255,6 +255,7 @@ class SelectionV(SelectionAbstract):
     subscriber_uniqname = models.CharField(max_length=20)
     subscriber_first_name = models.CharField(max_length=50)    
     subscriber_last_name = models.CharField(max_length=50)
+    new_jack = None
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection_v'
@@ -304,6 +305,7 @@ class SubscriberCharges(SelectionAbstract):
     new_building_code = None
     new_floor = None
     new_room = None
+    new_jack = None
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_v'
