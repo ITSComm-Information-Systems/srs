@@ -18,6 +18,7 @@ urlpatterns = [
 
     path('oidc/', include('mozilla_django_oidc.urls')),
     path('orders/', include('order.urls')),
+    path('services/', include('services.urls')),
     path('pages/', include('pages.urls')),
     path('auth/', include('oscauth.urls')),
     path('apps/', include('apps.urls')),

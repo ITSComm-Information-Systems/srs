@@ -356,7 +356,7 @@ class Submit(PermissionRequiredMixin, View):
 @csrf_exempt
 def send_email(request):   #Pinnacle will route non prod emails to a test address
     if request.method == "POST":
-        subject = request.POST['emailSubject'] + ' question from: ' + request.user.username
+        subject = request.POST.get(['emailSubject']) + ' question from: ' + request.user.username
         body = request.POST['emailBody'] 
         address = (request.POST.get('emailAddress', 'ITCOM.csr@umich.edu'))
         print(request.POST)
@@ -736,7 +736,20 @@ class Services(UserPassesTestMixin, View):
             selected_service = request.session.get('backupStorage','miBackup')
 
         for service in service_list:
-            service.actions = action_list.filter(service=service)
+            if service.name == 'cloud':
+                service.actions = [{'label': 'Order Google Cloud Platform', 'target': '/services/gcp/add/'},
+                                   {'label': 'View/Change GCP Project', 'target': '/services/gcp'},
+                                   {'label': 'Order Microsoft Azure', 'target': '/services/azure/add/'},
+                                   {'label': 'View/Change Microsoft Azure', 'target': '/services/azure'},
+                                   {'label': 'Order AWS', 'target': '/services/aws/add/'},
+                                   {'label': 'View/Change AWS', 'target': '/services/aws/'} ]
+            elif service.name == 'container':
+                service.actions = [{'label': 'Request container', 'target': '/services/container/add/'}]
+            else:
+                service.actions = action_list.filter(service=service)
+                for action in service.actions:
+                    action.target = f'/orders/wf/{action.id}'
+
             if service.name == selected_service:
                 service.active = 'active show'
 
