@@ -9,8 +9,12 @@
   </li>
   <li>
     <a href="/admin/project/email/{{ object_id }}/send_email" class="viewlink">
+    <a href="/admin/project/email/{{ object_id }}/send_test" class="viewlink">
      TEST (send to {{ user }})
     </a>
+    <a href="/admin/project/email/{{ object_id }}/send_to_user" class="viewlink">
+      Send ad hoc.
+     </a>
   </li>
   {{ block.super }}
 {% endblock %}
