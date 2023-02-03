@@ -19,7 +19,7 @@
 <h1>{{ title }}</h1>
 
 <ul>
-  <li>Request a project-funded deskset for a number that has already transitioned to softphone only.</li>
+  <li>Request a project-funded deskset for a number that has <b>already transitioned to softphone only</b>.</li>
   <li>Click HERE for detailed instructions.</li>
 </ul>
 
@@ -59,9 +59,10 @@
         <b>Previous location of phone:</b>
         <p id="address_text" class="col-4" style="white-space: pre;"></p>
         <br>
+        <label for="id_location_correct">VERIFY LOCATION FOR DESKSET DELIVERY</label>
         <select class="form-control col-4" id="id_location_correct" name="location_correct"
           aria-label="Location Correct">
-          <option selected>Validate Location for Physical Set.</option>
+          <option selected>Select</option>
           <option value="Yes">Correct</option>
           <option value="No">Incorrect</option>
         </select>
