@@ -166,6 +166,7 @@ class EstimateView(models.Model):
     due_date = models.DateTimeField(null=True, blank=True)
     estimated_start_date = models.DateTimeField(null=True, blank=True)
     actual_fulfilled_date = models.DateTimeField(null=True, blank=True)
+    estimated_completion_date = models.DateTimeField(null=True, blank=True)
 
     class Meta: 
         db_table = 'um_bom_estimate_search_v'
