@@ -732,10 +732,7 @@ class ServerDisk(models.Model):
     def save(self, *args, **kwargs):
 
         if self.controller == None or self.device == None:
-            try:
-                self.set_scsi_id()
-            except:
-                print('error with scsi')
+            self.set_scsi_id()
 
         super().save(*args, **kwargs)  # Call the "real" save() method.
 
