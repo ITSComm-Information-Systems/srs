@@ -706,6 +706,12 @@ class Server(models.Model):
     def get_checkboxes(self):
         return [] 
 
+    def save(self, *args, **kwargs):
+
+        self.shortcode = self.shortcode.strip()
+
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+
 
 class ServerDisk(models.Model):
     CONTROLLER_LIST = [(0,0),(1,1),(2,2),(3,3),]
