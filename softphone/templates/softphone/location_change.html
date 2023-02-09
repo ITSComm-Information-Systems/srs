@@ -59,7 +59,14 @@
                 </div>
                 <div id="div_{{ form.prefix }}-room" class="form-group" style="display: none;">
                     <label for="id_{{ form.prefix }}-room">Room</label>
-                    <select class="form-control" name="{{ form.prefix }}-room" id="id_{{ form.prefix }}-room">
+                    <select class="form-control change-room" name="{{ form.prefix }}-room" id="id_{{ form.prefix }}-room">
+                        <option></option>
+                    </select>
+                </div>
+
+                <div id="div_{{ form.prefix }}-jack" class="form-group" style="display: none;">
+                    <label for="id_{{ form.prefix }}-jack">Jack</label>
+                    <select class="form-control" name="{{ form.prefix }}-jack" id="id_{{ form.prefix }}-jack">
                         <option></option>
                     </select>
                 </div>
@@ -152,6 +159,26 @@
                 update_room_list('id_' + prefix + '-room');
             });
         });
+
+
+        document.querySelectorAll('.change-room').forEach(widget => {
+            widget.addEventListener('change', function handleChange(event) {
+                prefix = getFormPrefix(this.id)
+                target = '#' + $(this).attr('id').replace("room", "jack")
+                target_div = target.replace("id_", "div_");
+
+                if (this.value) {
+                    $(target_div).show();
+                    $(target).attr("required", true);
+                } else {
+                    $(target_div).hide();
+                    $(target).removeAttr("required");
+                }
+                update_jack_list('id_' + prefix + '-jack');
+            });
+        });
+
+
     });
 
     function getFormPrefix(str) {
@@ -205,6 +232,46 @@
                 }
                 if (data.floor != '')
                     $("#roomselect").show();
+            },
+            error: function (data) {
+                console.log("ajax error");
+            }
+        });
+    }
+
+    function update_jack_list(target) {
+        code = $('#' + target.replace("jack", "building_code")).val();
+        floor = $('#' + target.replace("jack", "floor")).val();
+        room = $('#' + target.replace("jack", "room")).val();
+
+        $.ajax({
+            type: "GET",
+            url: "/tools/voip/room/",
+            data: {
+                "buildingID": code,
+                "buildingFloor": floor,
+                "buildingRoom": room,
+            },
+            dataType: 'json',
+            success: function (data) {
+
+                //$('#buildingFloor').val(floor);
+                floor = document.getElementById(target)
+                $('#' + target).empty();
+
+                var option = document.createElement("option");
+                option.value = "";
+                option.text = "--Select--";
+                floor.appendChild(option);
+
+                for (var i = 0; i < data.jacks.length; i++) {
+                    var option = document.createElement("option");
+                    option.value = data.jacks[i];
+                    option.text = data.jacks[i];
+                    floor.appendChild(option);
+                }
+                if (data.floor != '')
+                    $("#jackselect").show();
             },
             error: function (data) {
                 console.log("ajax error");
