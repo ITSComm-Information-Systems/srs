@@ -674,7 +674,10 @@ class Server(models.Model):
 
     @property
     def ram_cost(self):
-        return self.ram * self.ram_rate
+        if self.ram:
+            return self.ram * self.ram_rate
+        else:
+            return 0
 
     @property
     def backup_cost(self):
