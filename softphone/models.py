@@ -24,6 +24,7 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = "Categories"
         #db_table = 'um_softphone_category'
+        ordering = ['sequence']
         db_table = 'PINN_CUSTOM\".\"um_softphone_category'
         managed = False
 
