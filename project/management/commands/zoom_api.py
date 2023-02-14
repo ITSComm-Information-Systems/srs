@@ -83,7 +83,10 @@ class Command(BaseCommand):
             if data.get('zoom'):
                 for key, value in data['zoom'].items():
                     if key in ('created_at','last_login_time'):
-                        value = datetime.datetime.strptime(value, "%m-%d-%Y %H:%M:%S %p %Z").date()
+                        try:
+                            value = datetime.datetime.strptime(value, "%m-%d-%Y %H:%M:%S %p %Z").date()
+                        except:
+                            print('login date null for user account', uniqname)
 
                     setattr(z, key, value)
             else:

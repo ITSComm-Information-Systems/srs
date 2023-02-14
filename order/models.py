@@ -674,7 +674,10 @@ class Server(models.Model):
 
     @property
     def ram_cost(self):
-        return self.ram * self.ram_rate
+        if self.ram:
+            return self.ram * self.ram_rate
+        else:
+            return 0
 
     @property
     def backup_cost(self):
@@ -705,6 +708,12 @@ class Server(models.Model):
 
     def get_checkboxes(self):
         return [] 
+
+    def save(self, *args, **kwargs):
+
+        self.shortcode = self.shortcode.strip()
+
+        super().save(*args, **kwargs)  # Call the "real" save() method.
 
 
 class ServerDisk(models.Model):
