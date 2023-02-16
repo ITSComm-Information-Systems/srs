@@ -168,7 +168,7 @@ class SelectionAbstract(models.Model):
     new_building_code = models.CharField(max_length=10, blank=True)     # NEW_BUILDING_CODE              VARCHAR2(10 CHAR)   
     new_floor = models.CharField(max_length=18, blank=True)             # NEW_FLOOR                      VARCHAR2(18 CHAR)   
     new_room = models.CharField(max_length=18, blank=True)              # NEW_ROOM                       VARCHAR2(18 CHAR)  
-
+    new_jack = models.CharField(max_length=18, blank=True)            
 
     objects = SelectionManager()
 
@@ -271,6 +271,7 @@ class SubscriberCharges(SelectionAbstract):
     new_building_code = None
     new_floor = None
     new_room = None
+    new_jack = None
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_v'
