@@ -169,7 +169,8 @@ class SelectionAbstract(models.Model):
     new_building_code = models.CharField(max_length=10, blank=True)     # NEW_BUILDING_CODE              VARCHAR2(10 CHAR)   
     new_floor = models.CharField(max_length=18, blank=True)             # NEW_FLOOR                      VARCHAR2(18 CHAR)   
     new_room = models.CharField(max_length=18, blank=True)              # NEW_ROOM                       VARCHAR2(18 CHAR)  
-    new_jack = models.CharField(max_length=30, blank=True)
+    new_jack = models.CharField(max_length=30, blank=True)            
+
 
     objects = SelectionManager()
 

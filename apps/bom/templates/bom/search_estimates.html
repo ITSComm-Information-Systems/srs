@@ -24,7 +24,7 @@
                 <th>Engineer</th>
                 <th>Netops</th>
                 <th>Start Date</th>
-                <th>Actual Fulfilled Date</th>
+                <th>Estimated Fulfilled Date</th>
             </tr>
         </thead>
         <tbody id="workOrderTableBody">
@@ -39,7 +39,7 @@
                 <td>{{ record.assigned_engineer }}</td>
                 <td>{{ record.assigned_netops }}</td>
                 <td>{{ record.estimated_start_date|date:"Y-m-d" }}</td>
-                <td>{{ record.actual_fulfilled_date|date:"Y-m-d" }}</td>
+                <td>{{ record.estimated_completion_date|date:"Y-m-d" }}</td>
             </tr>
             {% endfor %}
         </tbody>
