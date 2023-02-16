@@ -119,6 +119,7 @@ class LocationForm(forms.Form):
     building_name = forms.CharField()
     floor = forms.CharField()
     room = forms.CharField()
+    jack = forms.CharField()
 
     def save(self):
         selection = Selection.objects.get(subscriber=self.cleaned_data.get('subscriber'))
@@ -126,5 +127,6 @@ class LocationForm(forms.Form):
         selection.new_building = self.cleaned_data.get('building_name')
         selection.new_floor = self.cleaned_data.get('floor')
         selection.new_room = self.cleaned_data.get('room')
+        selection.new_jack = self.cleaned_data.get('jack')
         selection.location_correct = 0
         selection.save()

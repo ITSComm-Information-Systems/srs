@@ -171,6 +171,7 @@ class SelectionAbstract(models.Model):
     new_room = models.CharField(max_length=18, blank=True)              # NEW_ROOM                       VARCHAR2(18 CHAR)  
     new_jack = models.CharField(max_length=30, blank=True)
 
+
     objects = SelectionManager()
 
     class Meta:
