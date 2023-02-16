@@ -22,7 +22,7 @@
                     {% endif %}
 
                     {% for dept in dept_list %}
-                    <option {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.dept_id }} - {{ dept.dept_name }} ({{ dept.remaining }} remaining)</option>
+                    <option {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.dept_id }} - {{ dept.dept_name }}</option>
                     {% endfor %}
                 </select>
             </div>
