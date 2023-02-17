@@ -10,6 +10,7 @@ from django.contrib import messages
 from project.utils import download_csv_from_queryset
 from datetime import date
 
+# Add comment to test github
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
