@@ -301,7 +301,8 @@
 
         $(".upgrade_to_softphone").change(function () {
             if (this.dataset.location == "") {
-                return;
+                // return;
+                console.log('location not found');
             }
 
             source = $(this).attr('id').replace("div_", "");    
