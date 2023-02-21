@@ -21,3 +21,5 @@ Environment setting are in the [production config map](https://containers.it.umi
 This is built from the master branch.  Rebuilds are manual.
 
 Admins can access an openshift "cheat sheet" [here](https://docs.google.com/document/d/1FrGvyXhpybbMKpLENfLhjxzAmKt60gbj2Tz9A6PlUjk/edit).
+
+Lorem
