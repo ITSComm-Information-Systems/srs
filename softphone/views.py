@@ -10,7 +10,7 @@ from django.forms import formset_factory
 import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV
+from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV, UmOscAvailableLocsV
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
@@ -63,6 +63,54 @@ def get_department_list(dept_id, user):
 
     return dept_list
 
+
+class ChangeUser(LoginRequiredMixin, View):
+    title = 'Change User - Softphone'
+
+    def get(self, request):
+        print(self.request.GET)
+        f = ChangeUserForm()    
+
+        return render(request, 'softphone/change_user.html',
+                      {'title': self.title,
+                       'form': f
+                       #'formset': formset, 
+                       #'phone_list': phone_list
+                       })
+
+    def post(self, request):
+        if self.request.POST.get('request_action'):
+            return HttpResponseRedirect('/requestsent') 
+        
+        f = ChangeUserForm(self.request.POST)    
+        
+        subscriber_id = self.request.POST.get('subscriber')
+        search = self.request.POST.get('search')
+        uniqname = self.request.POST.get('uniqname')
+
+        num_search = re.sub(r'[^0-9]', '', search)
+        if len(num_search)==10:
+            address = UmOscNameChangeV.objects.filter(service_number=num_search)
+        else:
+            address = UmOscNameChangeV.objects.filter(uniqname=search)
+
+        if uniqname:
+            mc = MCommunity().get_user(uniqname)
+            if mc:
+                new_user = f"{mc['givenName']} {mc['umichDisplaySn']}"
+            else:
+                f.add_error('uniqname', 'Uniqname not found.') 
+                new_user = 'Not Found'
+        else:
+            new_user = ''
+
+        return render(request, 'softphone/change_user.html',
+                      {'title': self.title,
+                       'form': f,
+                       'address': address,
+                       'uniqname': uniqname,
+                       'new_user': new_user
+                       })
 
 class LocationChange(LoginRequiredMixin, View):
     title = 'Location Verification App - Deskset'
@@ -215,6 +263,55 @@ class PauseUser(LoginRequiredMixin, View):
                 rec.pause(request.user, pause_date, comment)
 
         return HttpResponseRedirect(f'/softphone/pause/{uniqname}')
+
+
+
+class Deskset(LoginRequiredMixin, View):
+    title = 'Add Deskset'
+    field_list = ['subscriber','service_number','subscriber_uniqname' \
+                ,'subscriber_first_name','subscriber_last_name','dept_id','migrate']
+
+    def get(self, request, dept_id):
+        dept_list = get_department_list(dept_id, request.user)
+        if dept_id == 0:
+            if len(dept_list) == 0:
+                dept_list.zero = 'True'
+            else:
+                dept_list[0].selected = 'selected'
+                dept_id = dept_list[0].dept_id
+
+        building_list = UmOscAvailableLocsV.objects.values_list('building_id', 'building_name', 'campus_desc').distinct()
+        phone_list = SelectionV.objects.filter(dept_id=dept_id, migrate='YES', processing_status="Completed")
+
+        return render(request, 'softphone/deskset.html',
+                      {'title': self.title,
+                       'full_list': phone_list,
+                       'building_list': list(building_list),
+                       'dept_list': dept_list})
+
+    def post(self, request, dept_id):
+        subscriber = self.request.POST.get('subscriber')
+        selection = Selection.objects.get(subscriber=subscriber)
+        selection.migrate = 'YES_SET'
+        selection.processing_status = 'Selected'
+        selection.cut_date = next_cut_date() + datetime.timedelta(days=7)
+
+        if self.request.POST.get('location_correct') == 'No':
+            selection.new_building = self.request.POST.get('buildingName')
+            selection.new_building_code = self.request.POST.get('buildingID')
+            selection.new_floor = self.request.POST.get('buildingFloor')
+            selection.new_room = self.request.POST.get('buildingRoom')
+            selection.new_jack = self.request.POST.get('buildingJack')
+        else:
+            selection.new_building = selection.building
+            selection.new_building_code = selection.building_code
+            selection.new_floor = selection.floor
+            selection.new_room = selection.room
+            selection.new_jack = selection.jack
+
+        selection.save()
+
+        return render(request, 'softphone/deskset_confirmation.html')
 
 
 class StepSubscribers(LoginRequiredMixin, View):

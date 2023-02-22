@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+<div class='col-6'>
+
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+
+            <div class="form-group">
+                <label for="exampleInputEmail1"><strong>{{ field.label }}</strong></label>
+                <small id="emailHelp" class="form-text text-muted">{{ field.help_text }}</small>
+                {{ field }}
+                
+                {% for error in field.errors %}
+                <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
+                        aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
+                {% endfor %}
+            </div>
+
+        {% endfor %}
+
+        <br>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="charter">
+            <label class="form-check-label" for="charter">I have read and awknowledge the 
+                <a target="_blank" href="https://docs.google.com/document/d/1m401diwNcS70iFEWd861XW7dtKcoAOZfTupgFDs8cEI/edit?usp=sharing">
+                    Service Charter
+                </a>
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="respdoc">
+            <label class="form-check-label" for="respdoc">I have read and awknowledge the 
+                <a target="_blank" href="https://docs.google.com/spreadsheets/d/1UwNYBqUPeMABrYb6OeEdlzY6hZn5mNrT_mW9B_2yV2U/edit#gid=1259966563">
+                    Shared Responsibility Document
+                </a>
+            </label>
+        </div>
+
+
+        <hr>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+</div>
+
+{% endblock %}

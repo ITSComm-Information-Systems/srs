@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'order',
     #'pages',
+    'services',
     'reports',
     'tools',
     'softphone',
@@ -135,6 +136,12 @@ UM_API = {
     'CLIENT_SECRET': os.getenv('UM_API_CLIENT_SECRET'),
     'AUTH_TOKEN': os.getenv('UM_API_AUTH_TOKEN'),
     'BASE_URL': os.getenv('UM_API_URL'),
+}
+
+OPENSHIFT = {
+    'BASE_URL': os.getenv('OPENSHIFT_BASE_URL'),
+    'USER': os.getenv('OPENSHIFT_USER'),
+    'TOKEN': os.getenv('OPENSHIFT_TOKEN'),
 }
 
 ROOT_URLCONF = 'project.urls'

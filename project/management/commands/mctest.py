@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from order.models import Item
-from project.integrations import MCommunity, ShortCodesAPI
+from project.integrations import MCommunity, ShortCodesAPI, Openshift
 
 
 class Command(BaseCommand):
@@ -11,6 +11,7 @@ class Command(BaseCommand):
         parser.add_argument('--shortcode')
         parser.add_argument('--username')
         parser.add_argument('--item')
+        parser.add_argument('--osproject')
 
     def handle(self, *args, **options):
 
@@ -45,3 +46,46 @@ class Command(BaseCommand):
             print('id', id)
             item = Item.objects.get(id=id)
             #item.route()
+
+        if options['osproject']:
+            name = options['osproject']
+
+            DJ = 'umich-openid:djamison'
+            name = options['osproject']
+            # '/apis/project.openshift.io/v1/projects'
+            os = Openshift()
+            
+            projname = 'srsformtesst'
+            uniqname = 'djamison'
+            role = 'admin'
+
+            body = {
+                #'kind': 'namespace',
+                #'apiVersion': f'authorization.openshift.io/{settings.DEFAULT_OPENSHIFT_API_VERSION}',
+                'metadata': {'namespace': projname, 'generateName': role},
+                'subjects': [{'kind': 'User', 'name': uniqname}],
+                'roleRef': {'name': role, "kind": "ClusterRole"}
+                , 'userNames': [uniqname]
+            }
+
+        
+            os.post_url(f'/apis/rbac.authorization.k8s.io/v1/namespaces/{projname}/rolebindings', body)  # Roles for project?
+            #os.get_url('/apis/rbac.authorization.k8s.io/v1/namespaces/srsformtesst/rolebindings/' )  # Roles for project?
+            return
+
+            os.get_project(name)
+            import requests
+
+            url = f'{os.BASE_URL}/apis/user.openshift.io/v1/identities/umich-openid:djamison'
+
+            url = f'{os.BASE_URL}/apis/user.openshift.io/v1/useridentitymappings/umich-openid:djamison'
+            print(url)
+
+            
+    
+            headers = {'Authorization': f'Bearer {os.TOKEN}'}        
+            #r = requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
+            r = requests.get(url, headers=headers)
+            print(r.status_code, r.text)  
+
+
