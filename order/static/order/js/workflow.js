@@ -385,9 +385,9 @@ $(document).ready(function() {
     
 
     if (server) {
+      $(document).on("change","#id_size", function() {size=$('#id_size').val();})
       $('#id_size').data('server', '');
       type = $('#id_midatatype option:selected').text();
-      size=$('#id_size').val();
       size = Math.trunc(size)
       if (type == 'Microsoft SQL Server'){
         linktype = "MSSQL"
@@ -407,7 +407,7 @@ $(document).ready(function() {
 
     if(type == "Oracle" && size < 50){
       $('#id_size').val(50)
-    }else if(type != "Orace" && size != 30){
+    }else if(type != "Oracle" && size != 30){
       $('#id_size').val(30)
     }
   });
