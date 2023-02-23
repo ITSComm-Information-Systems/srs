@@ -648,8 +648,8 @@ class Cart(PermissionRequiredMixin, View):
 
         status = ['Ready to Order','Saved for Later']
         item_list = Item.objects.filter(deptid=deptid).exclude(order_id__gt=0).order_by('chartcom','-create_date')
-        chartcoms = item_list.distinct().values('chartcom','chartcom_id','chartcom__name') #, 'chartcom_id')
-        saved = item_list.distinct().values('chartcom','chartcom_id','chartcom__name') #, 'chartcom_id')
+        chartcoms = item_list.distinct().values('chartcom','chartcom_id','chartcom__name').order_by('chartcom') #, 'chartcom_id')
+        saved = item_list.distinct().values('chartcom','chartcom_id','chartcom__name').order_by('chartcom') #, 'chartcom_id')
 
         #item_list = Item.objects.filter(deptid=deptid,order__isnull=True).order_by('chartcom','-create_date')
 
