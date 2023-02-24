@@ -4,7 +4,7 @@ kind: CronJob
 metadata:
   name: softphone-tuesday
 spec:
-  schedule: '0 10 * * 2'
+  schedule: '5 10 * * 2'
   ConcurrencyPolicy: Forbid
   jobTemplate:
     spec:

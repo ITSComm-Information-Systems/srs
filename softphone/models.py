@@ -327,3 +327,11 @@ class Zoom(models.Model):
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_zoom'
         managed = False
+
+
+class ZoomToken(models.Model):
+    token = models.TextField(primary_key=True)
+
+    class Meta:
+        db_table = 'PINN_CUSTOM\".\"um_zoom_token'
+        managed = False

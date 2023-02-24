@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.core.management import call_command
 from django.core.mail import EmailMultiAlternatives
 from project.models import Email
 from django.db import connections
@@ -44,6 +45,7 @@ class Command(BaseCommand):
         elif email.code == 'MON_PAUSE_NOVERIFY':
             user_list = self.get_ua_list(cut_date, filter=" and migrate='YES_SET' and location_correct = 0 and new_building is null ")
         elif email.code in ['TUE_NO_LOGIN','WED_NO_LOGIN']:
+            call_command('zoom_api', cut_date='next')  # Check for no logins
             user_list = user_query.values_list('uniqname','updated_by').filter(zoom_login='N')
         elif email.code == 'USER_MIGRATE':
             user_list = user_query
