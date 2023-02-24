@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+<table class="table table-hover table-striped table-sm">
+    <tr>
+        <th>Account</th>
+        <th>Owner</th>
+        <th>Shortcode</th>
+        <th>Created</th>
+        <th></th>
+    </tr>
+
+
+    <tr>
+        <td>{{ instance.account_id }}</td>  
+        <td>{{ instance.owner }}</td>  
+        <td>{{ instance.shortcode }}</td>   
+        <td>{{ instance.created_date }}</td>
+    </tr>
+
+
+
+</table>
+{% endblock %}
