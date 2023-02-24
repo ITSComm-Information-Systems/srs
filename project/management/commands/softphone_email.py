@@ -41,6 +41,8 @@ class Command(BaseCommand):
                 csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
                 for row in csv_reader:
                     user_list.append(row[0])
+        elif email.code == 'MON_PAUSE_NOVERIFY':
+            user_list = self.get_ua_list(cut_date, filter=" and migrate='YES_SET' and location_correct = 0 and new_building is null ")
         elif email.code in ['TUE_NO_LOGIN','WED_NO_LOGIN']:
             user_list = user_query.values_list('uniqname','updated_by').filter(zoom_login='N')
         elif email.code == 'USER_MIGRATE':
