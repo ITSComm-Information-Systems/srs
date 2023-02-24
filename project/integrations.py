@@ -406,8 +406,12 @@ class Payload():
             #self.add_attribute(self.delete_vpn.id, instance.vpn)
 
         #self.payload = self.BASE | self.payload
+<<<<<<< HEAD
         if hasattr(self, 'request_type'):
             self.add_attribute(self.request_type.id, getattr(self.request_type, action))
+=======
+        self.add_attribute(self.request_type.id, getattr(self.request_type, action))
+>>>>>>> 9fa05919 (reapply integrations)
 
 
 class ChoiceAttribute():
@@ -541,6 +545,7 @@ class AzurePayload(Payload):
     delete_owner = TextAttribute(4690)
     delete_acknowledgement = ChoiceAttribute(4691, Yes=5464)
 
+<<<<<<< HEAD
 
 class ContainerPayload(Payload):
     DBA_TEAM = 17
@@ -594,17 +599,26 @@ class ContainerPayload(Payload):
             self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.CONTAINER_TEAM} )
 
 
+=======
+>>>>>>> 9fa05919 (reapply integrations)
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
     service = service.upper()
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
+<<<<<<< HEAD
+=======
+    #print(payload.data)
+>>>>>>> 9fa05919 (reapply integrations)
 
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
         print('TDx response', resp.status_code, resp.text)
+<<<<<<< HEAD
     
     return json.loads(resp.text)
+=======
+>>>>>>> 9fa05919 (reapply integrations)
 
 def create_ticket_database_modify(instance, user, description):
 
