@@ -36,13 +36,14 @@ class ServiceRequestView(UserPassesTestMixin, View):
             if model == Container:   
                 name = form.cleaned_data.get('project_name')             
                 os = Openshift()
-                os.create_project( form.cleaned_data.get('project_name') )
-
+                #os.create_project( form.cleaned_data.get('project_name') )
+                instance = form.instance
                 print('model', 'create container')
             else:
                 form.save()
                 instance = model.objects.get(id=form.instance.id)
-                create_ticket('New', instance, request, title=title)
+            
+            create_ticket('New', instance, request, title=title)
 
             return HttpResponseRedirect('/requestsent')
         else:

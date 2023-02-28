@@ -249,22 +249,19 @@ class ContainerNewForm(CloudForm):
         label='Are you requesting this service for a course project?',
         help_text = "This service is available at no cost for faculty, staff, or students provided it's being used for a project or activity associated with a current U-M course. Faculty may request multiple application instances at one time (e.g., one per student). A valid course code is required.")
     course_info = forms.CharField(required=False)
+    shortcode = forms.CharField(validators=[validate_shortcode])
     admin_group = forms.ChoiceField(label='Contact Group', help_text='The MCommunity group is used to identify a point of contact should the primary point of contact for this account change. Must be public and contain at least 2 members. The MCommunity group will not be used to define or maintain access to your project. Please omit @umich.edu from your group name in this field.')
     project_name = forms.CharField(help_text='The project name is a unique identifier used for billing purposes and to generate your unpublished URL (project-name.webplatformsunpublished.umich.edu). Must be lowercase, contain no special characters, and contain no spaces. Hyphens are permitted.')
     short_project_description = forms.CharField(help_text='Used to describe any charges associated with this project on billing invoices.')
-    size = forms.ChoiceField(choices=container_size_choices)
+    #size = forms.ChoiceField(choices=container_size_choices)
     database = forms.ChoiceField(choices=database_addon_choices)
-    database_type = forms.ChoiceField(required=False, choices=database_type_choices, widget=forms.RadioSelect())
+    #database_type = forms.ChoiceField(required=False, choices=database_type_choices, widget=forms.RadioSelect())
+    backup = forms.BooleanField()
     admins = forms.CharField(widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should be "Admins" for this project.  Enter one uniqname per line.')
     editors = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "Edit" access to this project.  Enter one uniqname per line.')
     viewers = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "View" access to this project.  Enter one uniqname per line.')
-    #acknowledge_sle = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
-
-
-    #shortcode = forms.CharField(validators=[validate_shortcode])
-
-
 
     class Meta:
         model = Container
-        fields = ['container_sensitive']
+        fields = ['container_sensitive','admin_group','course_yn','course_info','shortcode',
+                  'project_name', 'short_project_description', 'size','database','database_type'] # Remaining follow form order

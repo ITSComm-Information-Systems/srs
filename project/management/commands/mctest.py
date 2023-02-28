@@ -1,8 +1,9 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from order.models import Item
-from project.integrations import MCommunity, ShortCodesAPI
-
+from project.integrations import MCommunity, ShortCodesAPI, Openshift
+import yaml
+from django.conf import settings
 
 class Command(BaseCommand):
     help = 'Add Backup Domain'
@@ -11,8 +12,28 @@ class Command(BaseCommand):
         parser.add_argument('--shortcode')
         parser.add_argument('--username')
         parser.add_argument('--item')
+        parser.add_argument('--os')
+
 
     def handle(self, *args, **options):
+
+        if options['os']:
+
+
+            os = Openshift()
+            body = os.get_yaml('backup')
+            print(body)
+            return
+
+            #with open(f'/Users/djamison/Downloads/{filename}', encoding='mac_roman') as csv_file:
+            #    print('x')
+            print(settings.BASE_DIR)
+            size_yaml = settings.BASE_DIR + '/project/backup.yaml'
+            #size_yaml = '/Users/djamison/Downloads/backup.yaml'
+            with open(size_yaml, 'r') as f:
+                body = yaml.safe_load(f)
+            print(body)
+            return
 
         if options['shortcode']:
             sc = ShortCodesAPI()

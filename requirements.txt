@@ -2,9 +2,7 @@ Django~=4.1.0
 whitenoise
 gunicorn
 mozilla-django-oidc
-#dj-database-url~=0.5.0
-psycopg2
-#python-decouple~=3.3
+pyyaml
 cx_Oracle
 django-debug-toolbar
 ldap3
