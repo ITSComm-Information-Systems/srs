@@ -1,16 +1,20 @@
 {% extends 'bom/base.html' %}
 {% block content %}
 {% load humanize %}
-<h2>{{ title }}</h2>
+<h2>{{ item.code }}({{item.name}})</h2>
 
+<p><strong>Material Count:</strong> {{material_count}}</p>
+<p><strong>Estimate Count:</strong> {{estimate_count}}</p>
 
-<div class="form-group col-md-3">
-    <label for="formGroupExampleInput">Filter</label>
-    <input type="text" class="form-control" id="item_code" name="item_code">
-</div>
+<ul>
+{% for estimate in estimates %}
+    <li>{{estimate.woid}} - {{estimate.label}}</li>
+{% empty %}
+    <li>No estimates found.</li>
+{% endfor %}
+</ul>
 
-
-<table id="item_table" class="table table-hover table-striped" aria-live=”polite”>
+<!-- <table id="item_table" class="table table-hover table-striped" aria-live=”polite”>
     <thead>
         <tr>
             <th>Code</th>
@@ -25,7 +29,7 @@
     <tbody id="itemTableBody">
         {% for item in item_list %}
         <tr data-item_id="{{ item.id }}" data-item_code="{{ item.code }}">
-            <td><a href="{% url 'item_details' item_pk=item.id %}">{{ item.code }}</a></td>
+            <td>{{ item.code }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.class_code }}</td>
             <td>{{ item.subclass_name }}</td>
@@ -35,7 +39,7 @@
         </tr>
         {% endfor %}
     </tbody>
-</table>
+</table> -->
 
 {% endblock %}
 
