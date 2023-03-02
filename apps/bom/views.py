@@ -283,7 +283,7 @@ def upload_csv(request):
 
 class Estimates(PermissionRequiredMixin, View):
     permission_required = 'bom.can_access_bom'
-    MaterialFormSet = modelformset_factory(Material,  fields=('quantity','staged','estimated_receive_date') #,'vendor','release_number','staged','estimated_receive_date','order_date')
+    MaterialFormSet = modelformset_factory(Material,  fields=('quantity',) #,'vendor','release_number','staged','estimated_receive_date','order_date')
         , can_delete=True)
     LaborFormSet = inlineformset_factory(Estimate, Labor,  fields=(
         'group', 'description', 'hours', 'rate_type'), can_delete=True)
