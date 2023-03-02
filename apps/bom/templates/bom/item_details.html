@@ -3,43 +3,8 @@
 {% load humanize %}
 <h2>{{ item.code }}({{item.name}})</h2>
 
-<p><strong>Material Count:</strong> {{material_count}}</p>
-<p><strong>Estimate Count:</strong> {{estimate_count}}</p>
 
-<ul>
-{% for estimate in estimates %}
-    <li>{{estimate.woid}} - {{estimate.label}}</li>
-{% empty %}
-    <li>No estimates found.</li>
-{% endfor %}
-</ul>
-
-<!-- <table id="item_table" class="table table-hover table-striped" aria-live=”polite”>
-    <thead>
-        <tr>
-            <th>Code</th>
-            <th>Description</th>
-            <th>Type</th>
-            <th>Subclass</th>
-            <th>Manufacturer</th>
-            <th>Manufacturer#</th>
-            <th class="text-right">Price</th>
-        </tr>
-    </thead>
-    <tbody id="itemTableBody">
-        {% for item in item_list %}
-        <tr data-item_id="{{ item.id }}" data-item_code="{{ item.code }}">
-            <td>{{ item.code }}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.class_code }}</td>
-            <td>{{ item.subclass_name }}</td>
-            <td>{{ item.manufacturer }}</td>
-            <td>{{ item.manufacturer_part_number }}</td>
-            <td class="text-right">{{ item.price|intcomma }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table> -->
+<p>Total Quantity used in Warehouse/Ordered estimates: {{total_quantity}}</p>
 
 {% endblock %}
 

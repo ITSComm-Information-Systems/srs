@@ -8,7 +8,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.forms import modelform_factory, modelformset_factory, inlineformset_factory
 from project.pinnmodels import UmOscPreorderApiV
-from django.db.models import Q, Subquery
+from django.db.models import Q, Sum
 from datetime import datetime
 
 
@@ -168,18 +168,10 @@ def item_lookup(request):
 
 @permission_required('bom.can_access_bom')
 def item_details(request, item_pk):
+    # Get the item object for the given pk
     item = get_object_or_404(Item, pk=item_pk)
-    material_locations = Material.objects.filter(item_code=item.code).select_related('material_location__estimate')
-    estimates = Estimate.objects.filter(pk__in=Subquery(material_locations.values('material_location__estimate__pk'))).distinct()
-    #estimates = Estimate.objects.filter(material__item_code=item.code).distinct()
-   #estimate_count = materials.values('material_location__estimate').distinct().count()
-
-    return render(request, 'bom/item_details.html',{
-                    'item': item,
-                    'estimate_count': 0,
-                    'estimates': estimates,
-                    'material_count': 0
-    })
+    total_quantity = Material.objects.filter(item=item, material_location__estimate__status__in=[Estimate.WAREHOUSE, Estimate.ORDERED]).aggregate(Sum('quantity'))['quantity__sum']
+    return render(request, 'bom/item_details.html',{'total_quantity': total_quantity,'item': item,})
 
 @permission_required('bom.can_access_bom')
 def edit_material_location(request):
