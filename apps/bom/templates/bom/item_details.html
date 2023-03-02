@@ -7,18 +7,3 @@
 <p>Total Quantity used in Warehouse/Ordered estimates: {{total_quantity}}</p>
 
 {% endblock %}
-
-
-{% block js %}
-<script>
-
-    $("#item_code").on("keyup", function () {
-        $("#item_table").show();
-        var value = $(this).val().toLowerCase();
-        $("#itemTableBody tr").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
-
-</script>
-{% endblock js %}
