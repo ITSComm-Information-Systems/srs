@@ -655,3 +655,26 @@ def create_ticket_database_modify(instance, user, description):
     }
 
     TDx().create_ticket(payload)
+
+
+class Slack:
+    AUTH_TOKEN = settings.SLACK_AUTH_TOKEN
+    BASE_URL = 'https://slack.com/api/chat.postMessage'
+
+    def send_message(self, message, channel):
+        
+        headers = { 
+            'Authorization': f'Bearer {self.AUTH_TOKEN}',
+            'accept': 'application/json'
+            }
+        
+        body =  {
+            "channel": channel,
+            "text": message,
+        }
+
+        url = self.BASE_URL
+        response = requests.post(url, headers=headers, json=body)
+
+
+
