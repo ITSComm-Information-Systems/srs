@@ -114,8 +114,15 @@
         $("#id_course_yn").change(function () {
             if (this.value == "Yes") {
                 $("#div_course_info").show();
+                $("#div_shortcode").hide()
+                $('#id_shortcode').prop('required',false);
+
+                
+
             } else {
                 $("#div_course_info").hide();
+                $("#div_shortcode").show();
+                $('#id_shortcode').prop('required',true);
             }
         });
 

@@ -1,4 +1,4 @@
-import json, requests
+import json, yaml, requests
 from django.conf import settings
 from ldap3 import Server, Connection, ALL, MODIFY_ADD
 
@@ -128,6 +128,14 @@ class Openshift():
         headers = {'Authorization': f'Bearer {self.TOKEN}'}        
         r = requests.post(f'{self.PROJECT_URL}', headers=headers, json=payload)
         print(r.status_code, r.text)      
+
+    def get_yaml(self, file):
+        file = f'{settings.BASE_DIR}/project/rosa/{file}.yaml'
+
+        with open(file, 'r') as f:
+            body = yaml.safe_load(f)
+        
+        return(body)
 
 
 class TDx():
@@ -298,7 +306,8 @@ class Payload():
             #self.add_attribute(self.delete_vpn.id, instance.vpn)
 
         #self.payload = self.BASE | self.payload
-        self.add_attribute(self.request_type.id, getattr(self.request_type, action))
+        if hasattr(self, 'request_type'):
+            self.add_attribute(self.request_type.id, getattr(self.request_type, action))
 
 
 class ChoiceAttribute():
@@ -432,12 +441,46 @@ class AzurePayload(Payload):
     delete_owner = TextAttribute(4690)
     delete_acknowledgement = ChoiceAttribute(4691, Yes=5464)
 
+
+class ContainerPayload(Payload):
+    form_id = 20
+    type_id = 25
+    service_id = 13
+    responsible_group_id = 7
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.description = (f'Submitted by user: {request.user.username} \n\n' 
+            f'Submission_date: {instance.created_date}\n' 
+            f'Uniqname: {request.user.username}\n' 
+            f'Are you requesting this service for a course project? {request.POST.get("course_yn")}\n' 
+            '\n\n--BUILD--\n' 
+            'Application environment: NA\n' 
+            'Does your application need a domain (or public endpoint)?\n' 
+            f'Project or Application Name: {request.POST.get("project_name")}\n' 
+            f'Project Description/Purpose:\n{request.POST.get("short_project_description")}\n'
+            '\n--CUSTOMIZE--\n' 
+            f'Select a container size: {instance.size}\n' 
+            '--Add-ons--\n' 
+            f'{instance.get_database_type_display()}\n'
+            '\n--ADMINS--\n'
+            f'MCommunity Group: {request.POST.get("admin_group")}\n' 
+            'Project Admins:\n' 
+            f'{request.POST.get("admins")}\n'
+            'Project Editors:\n' 
+            'Project Viewers:\n' 
+            f'\nShortcode: {request.POST.get("shortcode")}\n' 
+            'The results of this submission may be viewed at:\n')
+            #https://its.umich.edu/computing/virtualization-cloud/container-service/node/10/submission/594
+            
+
+        super().__init__(action, instance, request, **kwargs)
+
+
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
     service = service.upper()
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
-    #print(payload.data)
 
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
