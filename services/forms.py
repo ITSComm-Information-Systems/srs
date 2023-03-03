@@ -1,7 +1,7 @@
 from django import forms
 from project.forms.fields import *
 from .models import AWS, Azure, GCP, GCPAccount, Container
-from project.integrations import MCommunity
+from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
 
 # Defaults
@@ -216,55 +216,31 @@ class GcpaccountChangeForm(CloudForm):
         model = GCPAccount
         fields = ['owner','shortcode']
 
-
-container_size_choices = (
-('SMALL', 'SMALL, 1GB ($0.02/hr)'),
-('MEDIUM', 'Upgrade to MEDIUM, 4GB ($0.04/hr)'),
-('LARGE', 'Upgrade to LARGE, 4GB+ ($0.08/hr)'))
-
-database_addon_choices = (
-    ('NONE', 'No Database'),
-    ('SHARED', 'Shared Database'),
-    ('DEDICATED', 'Dedicated Database')
-)
-
-database_type_choices = (
-    ('MARIADB', 'MariaDB'),
-    ('POSTGRES', 'PostGres'),
-)
-
-course_choices = (
-    ('No', 'No'),
-    ('Yes', 'Yes')
-)
-
 class ContainerNewForm(CloudForm):
     title = 'Request a Container Service Project'
     custom = ['database_type', 'course_info','container_sensitive']
     skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data']
-
     container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
-
-    course_yn = forms.ChoiceField(choices=course_choices, 
+    course_yn = forms.BooleanField(widget=NoYes,
         label='Are you requesting this service for a course project?',
         help_text = "This service is available at no cost for faculty, staff, or students provided it's being used for a project or activity associated with a current U-M course. Faculty may request multiple application instances at one time (e.g., one per student). A valid course code is required.")
     course_info = forms.CharField(required=False)
+    shortcode = forms.CharField(validators=[validate_shortcode], required=False)
     admin_group = forms.ChoiceField(label='Contact Group', help_text='The MCommunity group is used to identify a point of contact should the primary point of contact for this account change. Must be public and contain at least 2 members. The MCommunity group will not be used to define or maintain access to your project. Please omit @umich.edu from your group name in this field.')
     project_name = forms.CharField(help_text='The project name is a unique identifier used for billing purposes and to generate your unpublished URL (project-name.webplatformsunpublished.umich.edu). Must be lowercase, contain no special characters, and contain no spaces. Hyphens are permitted.')
     short_project_description = forms.CharField(help_text='Used to describe any charges associated with this project on billing invoices.')
-    size = forms.ChoiceField(choices=container_size_choices)
-    database = forms.ChoiceField(choices=database_addon_choices)
-    database_type = forms.ChoiceField(required=False, choices=database_type_choices, widget=forms.RadioSelect())
+    backup = forms.BooleanField(widget=NoYes)
     admins = forms.CharField(widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should be "Admins" for this project.  Enter one uniqname per line.')
     editors = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "Edit" access to this project.  Enter one uniqname per line.')
     viewers = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "View" access to this project.  Enter one uniqname per line.')
-    #acknowledge_sle = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
-
-
-    #shortcode = forms.CharField(validators=[validate_shortcode])
-
-
 
     class Meta:
         model = Container
-        fields = ['container_sensitive']
+        fields = ['container_sensitive','admin_group','course_yn','course_info','shortcode',
+                  'project_name', 'short_project_description', 'size','database','database_type'] # Remaining follow form order
+
+    def save(self):
+        # Create project in openshift, don't save to SRS.
+        os = Openshift()
+        os.create_project( self.cleaned_data.get('project_name') )
+
