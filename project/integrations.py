@@ -119,13 +119,25 @@ class Openshift():
 
     def get_project(self, name):
         headers = {'Authorization': f'Bearer {self.TOKEN}'}        
-        #r = requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
-        r = requests.get(f'{self.PROJECT_URL}/', headers=headers)
-        print(r.status_code, r.text)        
+        r = requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
+        print(r.status_code, r.text)        # 404 if project doesn't exist
 
-    def create_project(self, name):
-        payload = {"metadata":{"name": name}}
-        headers = {'Authorization': f'Bearer {self.TOKEN}'}        
+    def create_project(self, instance):
+        headers = {'Authorization': f'Bearer {self.TOKEN}'}
+
+        payload = {"metadata": {
+                "name": instance.project_name,
+                "labels": {
+                    "shortcode": instance.shortcode,
+                    "course": instance.course_info,
+                    'size': instance.size,
+                },
+                "annotations": {
+                    "openshift.io/description": instance.project_description,
+                    "openshift.io/display-name": instance.project_name,
+                },
+        }}
+
         r = requests.post(f'{self.PROJECT_URL}', headers=headers, json=payload)
         print(r.status_code, r.text)      
 
