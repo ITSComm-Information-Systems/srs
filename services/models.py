@@ -105,9 +105,9 @@ class Azure(Cloud):
 
 class Container(Cloud):
     SIZE_CHOICES = (
-        ('SMALL', 'SMALL, 1GB ($0.02/hr)'),
-        ('MEDIUM', 'Upgrade to MEDIUM, 4GB ($0.04/hr)'),
-        ('LARGE', 'Upgrade to LARGE, 4GB+ ($0.08/hr)'))
+        ('sm_container', 'SMALL, 1GB ($0.02/hr)'),
+        ('med_container', 'Upgrade to MEDIUM, 4GB ($0.04/hr)'),
+        ('lg_container', 'Upgrade to LARGE, 4GB+ ($0.08/hr)'))
 
     DATABASE_TYPE_CHOICES = (
         ('MARIADB', 'MariaDB'),
@@ -123,9 +123,10 @@ class Container(Cloud):
     instance_label = 'Project'
     project_name = models.CharField(max_length=40)
     project_description = models.CharField(max_length=40)
-    size = models.CharField(max_length=10, choices=SIZE_CHOICES)
+    size = models.CharField(max_length=20, choices=SIZE_CHOICES)
     database_type = models.CharField(max_length=10, choices=DATABASE_TYPE_CHOICES, null=True)
     database = models.CharField(max_length=10, choices=DATABASE_ADDON_CHOICES)
+    course_info = models.CharField(max_length=20)
 
     class Meta:
         verbose_name = 'Project'
