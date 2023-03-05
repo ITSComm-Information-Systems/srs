@@ -32,12 +32,12 @@
         <div id="edit-submitted-sensitive-data" class="form-checkboxes">
             <div
                 class="form-item form-item-submitted-sensitive-data-confirm-sensitive-data form-type-checkbox checkbox">
-                <label class="control-label" for="id_container_sensitive"><input type="checkbox"
-                        id="id_container_sensitive" name="container_sensitive"
-                        value="confirm-sensitive-data" required class="form-checkbox">&nbsp; I have read the above
+                {{ form.container_sensitive }}
+                <label class="control-label" for="id_container_sensitive">&nbsp; I have read the above
                     information. My site/app does not use any sensitive data classified as <a
                         href="https://www.safecomputing.umich.edu/protect-the-u/safely-use-sensitive-data/classification-levels"><strong>Restricted</strong>
                         or <strong>High</strong></a></label>
             </div>
+            
         </div>
     </div>
