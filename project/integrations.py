@@ -119,8 +119,7 @@ class Openshift():
 
     def get_project(self, name):
         headers = {'Authorization': f'Bearer {self.TOKEN}'}        
-        r = requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
-        print(r.status_code, r.text)        # 404 if project doesn't exist
+        return requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
 
     def create_project(self, instance):
         headers = {'Authorization': f'Bearer {self.TOKEN}'}
@@ -128,8 +127,6 @@ class Openshift():
         payload = {"metadata": {
                 "name": instance.project_name,
                 "labels": {
-                    "shortcode": instance.shortcode,
-                    "course": instance.course_info,
                     'size': instance.size,
                 },
                 "annotations": {
@@ -137,6 +134,11 @@ class Openshift():
                     "openshift.io/display-name": instance.project_name,
                 },
         }}
+
+        if instance.course_info:
+            payload['metadata']['labels']['course'] = instance.course_info
+        else:
+            payload['metadata']['labels']['shortcode'] = instance.shortcode
 
         r = requests.post(f'{self.PROJECT_URL}', headers=headers, json=payload)
         print(r.status_code, r.text)      
@@ -462,14 +464,14 @@ class ContainerPayload(Payload):
 
     def __init__(self, action, instance, request, **kwargs):
         self.description = (f'Submitted by user: {request.user.username} \n\n' 
-            f'Submission_date: {instance.created_date}\n' 
+            #f'Submission_date: {instance.created_date}\n' 
             f'Uniqname: {request.user.username}\n' 
             f'Are you requesting this service for a course project? {request.POST.get("course_yn")}\n' 
             '\n\n--BUILD--\n' 
             'Application environment: NA\n' 
             'Does your application need a domain (or public endpoint)?\n' 
-            f'Project or Application Name: {request.POST.get("project_name")}\n' 
-            f'Project Description/Purpose:\n{request.POST.get("short_project_description")}\n'
+            f'Project or Application Name: {instance.project_name}\n' 
+            f'Project Description/Purpose:\n{instance.project_description}\n'
             '\n--CUSTOMIZE--\n' 
             f'Select a container size: {instance.size}\n' 
             '--Add-ons--\n' 
@@ -480,7 +482,7 @@ class ContainerPayload(Payload):
             f'{request.POST.get("admins")}\n'
             'Project Editors:\n' 
             'Project Viewers:\n' 
-            f'\nShortcode: {request.POST.get("shortcode")}\n' 
+            f'\nShortcode: {instance.shortcode}\n' 
             'The results of this submission may be viewed at:\n')
             #https://its.umich.edu/computing/virtualization-cloud/container-service/node/10/submission/594
             
