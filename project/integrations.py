@@ -74,6 +74,20 @@ class MCommunity:
         else:
             return None
 
+    def check_user_list(self, uniqnames):  # Take a list of uniqnames and return a list of the ones found in MCommunity
+        filter = ''
+        for uniqname in uniqnames:
+            filter = filter + f'(uid={uniqname})'
+
+        filter = f'(|{filter})'
+        self.conn.search('ou=People,dc=umich,dc=edu', filter, attributes=["uid","mail","user"])
+
+        valid = []
+        for entry in self.conn.entries:
+            valid.append(str(entry.uid))
+
+        return valid
+
 
 class UmAPI:
     AUTH_TOKEN = settings.UM_API['AUTH_TOKEN']

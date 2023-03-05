@@ -45,10 +45,12 @@ class CloudForm(forms.ModelForm):
         super().save()
 
     def clean(self):
-        super().clean()
+        cleaned_data = super().clean()
         
         for err_field in self.errors:
             self.fields[err_field].widget.attrs['class'] += ' is-invalid'
+
+        return cleaned_data
 
 class CloudNewForm(CloudForm):
     custom = ['sensitive_data_yn']
@@ -251,6 +253,32 @@ class ContainerNewForm(CloudForm):
         model = Container
         fields = ['container_sensitive','admin_group','course_yn','course_info','shortcode',
                   'project_name', 'project_description', 'size','database','database_type'] # Remaining follow form order
+
+    def clean(self):
+        # Check all uniqnames in a single call for efficiency porpoises
+        uniqnames = []
+        cleaned_names = {}
+        for users in ['admins', 'editors', 'viewers']:
+            cleaned_names[users] = []
+            for user in self.cleaned_data.get(users).split('\n'):
+                user = user.strip('\r, ')
+                uniqnames.append(user)
+                cleaned_names[users].append(user)
+
+        valid_uniqnames = MCommunity().check_user_list(uniqnames)
+
+        for users in ['admins', 'editors', 'viewers']:
+            error = ''
+            for user in cleaned_names[users]:
+                if user not in valid_uniqnames:
+                    error = error + user + ' '
+            
+            if error:
+                self.add_error(users, error + 'not found.')        
+
+        self.instance.cleaned_names = cleaned_names  # Hang on to this for later.
+
+        return super().clean()
 
     def save(self):
         # Create project in openshift, don't save to SRS.
