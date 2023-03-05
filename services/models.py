@@ -101,7 +101,7 @@ class Azure(Cloud):
 
     class Meta:
         verbose_name = 'Azure Subscription'
-        
+
 
 class Container(Cloud):
     SIZE_CHOICES = (
@@ -129,7 +129,6 @@ class Container(Cloud):
     course_info = models.CharField(max_length=20)
 
     class Meta:
-        verbose_name = 'Project'
         managed = False   # We don't want a real table in Oracle but abstract models can't be instantiated.
 
 

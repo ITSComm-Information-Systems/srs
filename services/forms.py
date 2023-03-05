@@ -218,6 +218,11 @@ class GcpaccountChangeForm(CloudForm):
         fields = ['owner','shortcode']
 
 
+def validate_project_name(value):
+    if Openshift().get_project(value).ok:
+        raise ValidationError(f'A project with this name already exists.  Please select a different name.')
+    
+
 class ContainerNewForm(CloudForm):
     title = 'Request a Container Service Project'
     custom = ['database_type', 'course_info','container_sensitive']
@@ -233,7 +238,7 @@ class ContainerNewForm(CloudForm):
                                    validators=[validators.RegexValidator(
                                         regex='^[a-z][a-z\-]*[a-z]$',  # lowercase and hypens, also start and end with a lowercase letter
                                         message='Name can only contain lowercase letters and hypens.',
-                                        code='invalid_name')]
+                                        code='invalid_name'), validate_project_name]
                                    )
 
     project_description = forms.CharField(help_text='Used to describe any charges associated with this project on billing invoices.')
