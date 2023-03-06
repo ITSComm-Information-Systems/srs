@@ -74,6 +74,20 @@ class MCommunity:
         else:
             return None
 
+    def check_user_list(self, uniqnames):  # Take a list of uniqnames and return a list of the ones found in MCommunity
+        filter = ''
+        for uniqname in uniqnames:
+            filter = filter + f'(uid={uniqname})'
+
+        filter = f'(|{filter})'
+        self.conn.search('ou=People,dc=umich,dc=edu', filter, attributes=["uid","mail","user"])
+
+        valid = []
+        for entry in self.conn.entries:
+            valid.append(str(entry.uid))
+
+        return valid
+
 
 class UmAPI:
     AUTH_TOKEN = settings.UM_API['AUTH_TOKEN']
@@ -140,8 +154,25 @@ class Openshift():
         else:
             payload['metadata']['labels']['shortcode'] = instance.shortcode
 
-        r = requests.post(f'{self.PROJECT_URL}', headers=headers, json=payload)
-        print(r.status_code, r.text)      
+        r = requests.post(f'{self.PROJECT_URL}', headers=headers, json=payload)     
+        self.create_role_bindings(instance)
+
+    def create_role_bindings(self, instance):
+        headers = {'Authorization': f'Bearer {self.TOKEN}'}
+        url = self.BASE_URL + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
+
+        for users in instance.cleaned_names:
+            role = users[:-1]
+            uniqnames = instance.cleaned_names[users]
+            if len(uniqnames) > 0:
+
+                body = {
+                    'kind': 'RoleBinding',
+                    'metadata': {'namespace': instance.project_name, 'generateName': role},
+                    'roleRef': {'name': role}, 'userNames': uniqnames
+                }
+                
+                r = requests.post(url, headers=headers, json=body)
 
     def get_yaml(self, file):
         file = f'{settings.BASE_DIR}/project/rosa/{file}.yaml'
