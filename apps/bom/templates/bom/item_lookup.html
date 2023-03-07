@@ -25,7 +25,7 @@
     <tbody id="itemTableBody">
         {% for item in item_list %}
         <tr data-item_id="{{ item.id }}" data-item_code="{{ item.code }}">
-            <td><a href="{% url 'item_details' item_pk=item.id %}">{{ item.code }}</a></td>
+            <td>{{ item.code }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.class_code }}</td>
             <td>{{ item.subclass_name }}</td>
