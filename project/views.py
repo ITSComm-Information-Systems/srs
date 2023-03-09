@@ -53,14 +53,8 @@ def homepage(request):
 	}
 	return HttpResponse(template.render(context, request))
 
-def raise404(request):
-	raise Http404("Page not found")
-
-def handler404(request, exception):
-    return render(request, '404.html', status=404)
-
-def handler500(request):
-    return render(request, '404.html', status=500)
+def handle_custom_404(request, exception):
+	return render(request, '404.html', status=404)
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def chartchangeoptions(request):
