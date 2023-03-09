@@ -10,7 +10,7 @@ admin.AdminSite.site_header = 'SRS Administration'
 admin.AdminSite.site_title = 'SRS Site Admin'
 
 handler404 = views.handle_custom_404
-handler500 = views.handle_custom_404
+handler500 = views.handle_custom_500
 
 urlpatterns = [
 

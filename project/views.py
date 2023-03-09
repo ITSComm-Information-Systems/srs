@@ -56,6 +56,9 @@ def homepage(request):
 def handle_custom_404(request, exception):
 	return render(request, '404.html', status=404)
 
+def handle_custom_500(request):
+	return render(request, '404.html', status=500)
+
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def chartchangeoptions(request):
 	template = loader.get_template('chartchangeoptions.html')
