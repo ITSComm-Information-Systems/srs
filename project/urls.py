@@ -42,8 +42,14 @@ urlpatterns = [
     #path('namechange/', views.NameChange.as_view()),
     path('', views.homepage),
     path('', include('pages.urls')),
-    path('tools/',include('tools.urls'))
+    path('tools/',include('tools.urls')),
+    path('testtest/',views.raise404)
+
 ]
+
+
+handler404 = views.handler404,
+handler500 = views.handler404
 
 if settings.DEBUG:
     import debug_toolbar
