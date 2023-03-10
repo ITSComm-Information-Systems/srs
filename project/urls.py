@@ -9,6 +9,8 @@ from . import api
 admin.AdminSite.site_header = 'SRS Administration'
 admin.AdminSite.site_title = 'SRS Site Admin'
 
+handler404 = views.handle_custom_404
+handler500 = views.handle_custom_500
 
 urlpatterns = [
 
@@ -43,8 +45,10 @@ urlpatterns = [
     #path('namechange/', views.NameChange.as_view()),
     path('', views.homepage),
     path('', include('pages.urls')),
-    path('tools/',include('tools.urls'))
-]
+    path('tools/',include('tools.urls')),
+    #path('testtest/',views.raise404)
+
+] 
 
 if settings.DEBUG:
     import debug_toolbar

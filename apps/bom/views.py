@@ -8,7 +8,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.forms import modelform_factory, modelformset_factory, inlineformset_factory
 from project.pinnmodels import UmOscPreorderApiV
-from django.db.models import Q
+from django.db.models import Q, Sum
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
@@ -164,6 +164,12 @@ def item_lookup(request):
                     {'title': 'Item Lookup',
                     'item_list': item_list})
 
+@permission_required('bom.can_access_bom')
+def item_details(request, item_pk):
+    # Get the item object for the given pk
+    item = get_object_or_404(Item, pk=item_pk)
+    total_quantity = Material.objects.filter(item=item, material_location__estimate__status__in=[Estimate.WAREHOUSE, Estimate.ORDERED]).aggregate(Sum('quantity'))['quantity__sum']
+    return render(request, 'bom/item_details.html',{'total_quantity': total_quantity,'item': item,})
 
 @permission_required('bom.can_access_bom')
 def edit_material_location(request):
