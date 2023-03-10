@@ -1430,7 +1430,11 @@ class Item(models.Model):
                     new_node[0].time = time
                     new_node[0].save()
 
-        ex = BackupNode.objects.filter(backup_domain=rec).exclude(name__in=self.data['nodeNames']).delete()
+        node_list = self.data['nodeNames']   # remove blanks workaround https://code.djangoproject.com/ticket/20024
+        while("" in node_list):
+            node_list.remove("")
+
+        ex = BackupNode.objects.filter(backup_domain=rec).exclude(name__in=node_list).delete()
 
     def update_arcts(self, rec):
 
