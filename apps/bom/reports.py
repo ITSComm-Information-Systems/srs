@@ -196,27 +196,16 @@ class PdfCreator:
 
 		data = [[Paragraph('<b>Item Code</b>', normal), Paragraph('<b>Item Description</b>', normal),
 				Paragraph('<b>Manufacturer Part Number</b>', normal), Paragraph('<b>Quantity</b>', normal),
-				Paragraph('<b>Unit Cost</b>', normal), Paragraph('<b>Extension Cost</b>', normal)]]
+				Paragraph('<b>Unit Price</b>', normal), Paragraph('<b>Extension Price</b>', normal)]]
 
-	# for record in self.estimate.part_list:
-	# 		data.append([Paragraph(str(record['item__code']), normal),
-	# 					Paragraph(str(record['quantity__sum']), CENTER),
-	# 					Paragraph('', normal),
-	# 					Paragraph(str(record['item__name']), normal),
-	# 					Paragraph(str(record['item__manufacturer_part_number']), normal),
-	# 					Paragraph(str(record['release_number']), normal),
-	# 					Paragraph(str(record['reel_number']), normal),
-	# 					Paragraph(options[str(record['staged'])], normal),
-	# 					Paragraph(str(options[record['status']]), normal),
-	# 					])
 
 		for record in self.estimate.part_list:
 			data.append([Paragraph(str(record['item__code']), normal),
 						Paragraph(str(record['item__name']), normal),
 						Paragraph(str(record['item__manufacturer_part_number']), normal),
 						Paragraph(str(record['quantity__sum']), CENTER),
-						Paragraph(str(record['item__price']), normal),
-						# Paragraph(f'{record.extended_price:,}', RIGHT)
+						Paragraph(str(record['price']), normal),
+						Paragraph(str(record['quantity__sum'] * record['price']), RIGHT)
 						])
 
 		col_widths = [1 * inch, 2 * inch, 2 * inch, 0.8 * inch, 0.7 * inch, 1 * inch]
@@ -277,8 +266,8 @@ class PdfCreator:
 		prev_loc = self.estimate.material_list[0].material_location
 		table_heading = [Paragraph('<b>Item Code</b>', normal), Paragraph('<b>Material Detail</b>', normal),
 						Paragraph('<b>Manufacturer Part Number</b>', normal), Paragraph('<b>Mfg</b>', normal),
-						Paragraph('<b>Est # of Units</b>', normal), Paragraph('<b>Unit Price</b>', normal),
-						Paragraph('<b>Price Extension</b>', normal)]
+						Paragraph('<b>Est # of Units</b>', normal), Paragraph('<b>Unit Cost</b>', normal),
+						Paragraph('<b>Cost Extension</b>', normal)]
 		data = [table_heading]
 		flowables.append(Paragraph(str(self.estimate.material_list[0].material_location), self.subheader))
 		flowables.append(Paragraph('Total for Location: $' + "{:,}".format(self.location_totals[prev_loc]), self.location_total_style))

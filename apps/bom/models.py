@@ -283,7 +283,7 @@ class Estimate(BOM):
         for item in self.material_list:
             self.material_total = self.material_total + item.extended_price
 
-        self.part_list = Material.objects.filter(material_location__estimate=self).order_by('item').values('item','item__code','item__name','item__manufacturer_part_number','item__price','release_number','reel_number','staged','status').annotate(Sum('quantity'))
+        self.part_list = Material.objects.filter(material_location__estimate=self).order_by('item').values('item','item__code','item__name','item__manufacturer_part_number','item__price','release_number','reel_number','staged','status','price').annotate(Sum('quantity'))
 
         self.location_list = MaterialLocation.objects.filter(estimate_id=self.id).order_by('name')
 
