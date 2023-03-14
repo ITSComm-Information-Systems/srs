@@ -129,3 +129,17 @@
 </div>
 <input type="hidden" name="total_cost" id="total_cost_field">
 
+{% block js %}
+<script>
+const regulatedRadioButtonYes = document.getElementById("misevregu_0");
+const unregulatedRadioButtonYes = document.getElementById("misevnonregu_0");
+const backupRadioButtonYes = document.getElementById("backup_0")
+const backupRadioButtonNo = document.getElementById("backup_1")
+
+if (regulatedRadioButtonYes.checked || unregulatedRadioButtonYes.checked){
+                backupRadioButtonYes.checked = true;
+                backupRadioButtonNo.disabled = true;
+    }
+</script>
+
+{% endblock %}
