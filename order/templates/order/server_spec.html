@@ -137,13 +137,17 @@ const backupRadioButtonYes = document.getElementById("backup_0")
 const backupRadioButtonNo = document.getElementById("backup_1")
 const backupFieldset = document.getElementById("div_backup");
 
-if (regulatedRadioButtonYes.checked || unregulatedRadioButtonYes.checked){
+if(regulatedRadioButtonYes && unregulatedRadioButtonYes && backupRadioButtonYes && backupRadioButtonNo && backupFieldset){
+    if (regulatedRadioButtonYes.checked || unregulatedRadioButtonYes.checked){
                 backupRadioButtonYes.checked = true;
                 backupRadioButtonNo.disabled = true;
                 let span = document.createElement("span");
 
                 backupFieldset.after(span, "Backup service is required for all servers containing sensitive data.");
     }
+}
+
+
 </script>
 
 {% endblock %}
