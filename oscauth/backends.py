@@ -66,4 +66,7 @@ class UMAuthenticationBackend(OIDCAuthenticationBackend):
     def update_user(self, user, claims):
         add_custom_permissions(user.id)
         user = upsert_user(user.username)  # Create or Update User
+        if not user.is_active == True:
+            user.is_active = True    #  If user has been deactived and logs back in reactivate the account.
+            user.save()
         return user
