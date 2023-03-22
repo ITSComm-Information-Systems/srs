@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.core.management import call_command
 from django.template.response import TemplateResponse
 from django.core.mail import EmailMultiAlternatives
+from reports.toll.models import DownloadLog
 
 @admin.register(Email)
 class EmailAdmin(admin.ModelAdmin):
@@ -84,4 +85,5 @@ class ChoiceAdmin(admin.ModelAdmin):
     ]
 
 admin.site.register(Choice, ChoiceAdmin)
+admin.site.register(DownloadLog)
 
