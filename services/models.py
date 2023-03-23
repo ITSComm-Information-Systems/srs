@@ -123,7 +123,9 @@ class Container(Cloud):
     instance_label = 'Project'
     project_name = models.CharField(max_length=40)
     project_description = models.CharField(max_length=40)
-    size = models.CharField(verbose_name='Container Size', max_length=20, choices=SIZE_CHOICES)
+    size = models.CharField(max_length=20, choices=SIZE_CHOICES,
+                            verbose_name='Container Size',
+                            help_text="This sets the upper limit of CPU and RAM available for your containerized applications. This can be changed later via request to Container Service staff. More information about container sizes and rates can be found here: <a href='https://its.umich.edu/computing/virtualization-cloud/container-service/pricing' target='_blank'>https://its.umich.edu/computing/virtualization-cloud/container-service/pricing</a>")
     database_type = models.CharField(max_length=10, choices=DATABASE_TYPE_CHOICES, null=True)
     database = models.CharField(max_length=10, choices=DATABASE_ADDON_CHOICES)
     course_info = models.CharField(max_length=20)

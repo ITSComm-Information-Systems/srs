@@ -13,7 +13,7 @@
             {% else %}
                 <div class="form-group {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
                     <label for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
-                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                    <small class="form-text text-muted">{% autoescape off %}{{ field.help_text }}{% endautoescape %}</small>
                     {{ field }}
                     
                     {% for error in field.errors %}
