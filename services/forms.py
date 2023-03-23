@@ -238,12 +238,12 @@ class ContainerNewForm(CloudForm):
     admin_group = forms.ChoiceField(label='Contact Group', help_text='The MCommunity group is used to identify a point of contact should the primary point of contact for this account change. Must be public and contain at least 2 members. The MCommunity group will not be used to define or maintain access to your project. Please omit @umich.edu from your group name in this field.')
     project_name = forms.CharField(help_text='The project name is a unique identifier used for billing purposes and to generate your unpublished URL (project-name.webplatformsunpublished.umich.edu). Must be lowercase, contain no special characters, and contain no spaces. Hyphens are permitted.',
                                    validators=[validators.RegexValidator(
-                                        regex='^[a-z][a-z\-]*[a-z]$',  # lowercase and hypens, also start and end with a lowercase letter
-                                        message='Name can only contain lowercase letters and hypens.',
+                                        regex='^[a-z0-9][0-9a-z\-]*[a-z0-9]$',  # lowercase and hypens, also start and end with a lowercase letter
+                                        message="Label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character.",
                                         code='invalid_name'), validate_project_name]
                                    )
 
-    project_description = forms.CharField(help_text='Used to describe any charges associated with this project on billing invoices.')
+    project_description = forms.CharField(required=False, help_text='Used to describe any charges associated with this project on billing invoices.')
     backup = forms.BooleanField(widget=NoYes)
     admins = forms.CharField(widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should be "Admins" for this project.  Enter one uniqname per line.')
     editors = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "Edit" access to this project.  Enter one uniqname per line.')
@@ -270,7 +270,7 @@ class ContainerNewForm(CloudForm):
         for users in ['admins', 'editors', 'viewers']:
             error = ''
             for user in cleaned_names[users]:
-                if user not in valid_uniqnames:
+                if user and user not in valid_uniqnames:
                     error = error + user + ' '
             
             if error:
