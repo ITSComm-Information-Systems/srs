@@ -1,8 +1,6 @@
-import json, requests
-from ssl import ALERT_DESCRIPTION_UNKNOWN_PSK_IDENTITY
+import json, yaml, requests
 from django.conf import settings
 from ldap3 import Server, Connection, ALL, MODIFY_ADD
-
 
 class MCommunity:
 
@@ -76,6 +74,20 @@ class MCommunity:
         else:
             return None
 
+    def check_user_list(self, uniqnames):  # Take a list of uniqnames and return a list of the ones found in MCommunity
+        filter = ''
+        for uniqname in uniqnames:
+            filter = filter + f'(uid={uniqname})'
+
+        filter = f'(|{filter})'
+        self.conn.search('ou=People,dc=umich,dc=edu', filter, attributes=["uid","mail","user"])
+
+        valid = []
+        for entry in self.conn.entries:
+            valid.append(str(entry.uid))
+
+        return valid
+
 
 class UmAPI:
     AUTH_TOKEN = settings.UM_API['AUTH_TOKEN']
@@ -121,15 +133,54 @@ class Openshift():
 
     def get_project(self, name):
         headers = {'Authorization': f'Bearer {self.TOKEN}'}        
-        #r = requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
-        r = requests.get(f'{self.PROJECT_URL}/', headers=headers)
-        print(r.status_code, r.text)        
+        return requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
 
-    def create_project(self, name):
-        payload = {"metadata":{"name": name}}
-        headers = {'Authorization': f'Bearer {self.TOKEN}'}        
-        r = requests.post(f'{self.PROJECT_URL}', headers=headers, json=payload)
-        print(r.status_code, r.text)      
+    def create_project(self, instance):
+        headers = {'Authorization': f'Bearer {self.TOKEN}'}
+
+        payload = {"metadata": {
+                "name": instance.project_name,
+                "labels": {
+                    'size': instance.size,
+                },
+                "annotations": {
+                    "openshift.io/description": instance.project_description,
+                    "openshift.io/display-name": instance.project_name,
+                },
+        }}
+
+        if instance.course_info:
+            payload['metadata']['labels']['course'] = instance.course_info
+        else:
+            payload['metadata']['labels']['shortcode'] = instance.shortcode
+
+        r = requests.post(f'{self.PROJECT_URL}', headers=headers, json=payload)     
+        self.create_role_bindings(instance)
+
+    def create_role_bindings(self, instance):
+        headers = {'Authorization': f'Bearer {self.TOKEN}'}
+        url = self.BASE_URL + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
+
+        for users in instance.cleaned_names:
+            role = users[:-1]
+            uniqnames = instance.cleaned_names[users]
+            if len(uniqnames) > 0:
+
+                body = {
+                    'kind': 'RoleBinding',
+                    'metadata': {'namespace': instance.project_name, 'generateName': role},
+                    'roleRef': {'name': role}, 'userNames': uniqnames
+                }
+                
+                r = requests.post(url, headers=headers, json=body)
+
+    def get_yaml(self, file):
+        file = f'{settings.BASE_DIR}/project/rosa/{file}.yaml'
+
+        with open(file, 'r') as f:
+            body = yaml.safe_load(f)
+        
+        return(body)
 
 
 class TDx():
@@ -300,7 +351,8 @@ class Payload():
             #self.add_attribute(self.delete_vpn.id, instance.vpn)
 
         #self.payload = self.BASE | self.payload
-        self.add_attribute(self.request_type.id, getattr(self.request_type, action))
+        if hasattr(self, 'request_type'):
+            self.add_attribute(self.request_type.id, getattr(self.request_type, action))
 
 
 class ChoiceAttribute():
@@ -434,12 +486,46 @@ class AzurePayload(Payload):
     delete_owner = TextAttribute(4690)
     delete_acknowledgement = ChoiceAttribute(4691, Yes=5464)
 
+
+class ContainerPayload(Payload):
+    form_id = 20
+    type_id = 25
+    service_id = 13
+    responsible_group_id = 7
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.description = (f'Submitted by user: {request.user.username} \n\n' 
+            #f'Submission_date: {instance.created_date}\n' 
+            f'Uniqname: {request.user.username}\n' 
+            f'Are you requesting this service for a course project? {request.POST.get("course_yn")}\n' 
+            '\n\n--BUILD--\n' 
+            'Application environment: NA\n' 
+            'Does your application need a domain (or public endpoint)?\n' 
+            f'Project or Application Name: {instance.project_name}\n' 
+            f'Project Description/Purpose:\n{instance.project_description}\n'
+            '\n--CUSTOMIZE--\n' 
+            f'Select a container size: {instance.size}\n' 
+            '--Add-ons--\n' 
+            f'{instance.get_database_type_display()}\n'
+            '\n--ADMINS--\n'
+            f'MCommunity Group: {request.POST.get("admin_group")}\n' 
+            'Project Admins:\n' 
+            f'{request.POST.get("admins")}\n'
+            'Project Editors:\n' 
+            'Project Viewers:\n' 
+            f'\nShortcode: {instance.shortcode}\n' 
+            'The results of this submission may be viewed at:\n')
+            #https://its.umich.edu/computing/virtualization-cloud/container-service/node/10/submission/594
+            
+
+        super().__init__(action, instance, request, **kwargs)
+
+
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
     service = service.upper()
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
-    #print(payload.data)
 
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:

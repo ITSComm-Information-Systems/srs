@@ -101,7 +101,35 @@ class Azure(Cloud):
 
     class Meta:
         verbose_name = 'Azure Subscription'
-        
+
+
+class Container(Cloud):
+    SIZE_CHOICES = (
+        ('sm_container', 'SMALL, 1GB ($0.02/hr)'),
+        ('med_container', 'Upgrade to MEDIUM, 4GB ($0.04/hr)'),
+        ('lg_container', 'Upgrade to LARGE, 4GB+ ($0.08/hr)'))
+
+    DATABASE_TYPE_CHOICES = (
+        ('MARIADB', 'MariaDB'),
+        ('POSTGRES', 'PostGres'),
+    )
+
+    DATABASE_ADDON_CHOICES = (
+        ('NONE', 'No Database'),
+        ('SHARED', 'Shared Database'),
+        ('DEDICATED', 'Dedicated Database')
+    )
+
+    instance_label = 'Project'
+    project_name = models.CharField(max_length=40)
+    project_description = models.CharField(max_length=40)
+    size = models.CharField(max_length=20, choices=SIZE_CHOICES)
+    database_type = models.CharField(max_length=10, choices=DATABASE_TYPE_CHOICES, null=True)
+    database = models.CharField(max_length=10, choices=DATABASE_ADDON_CHOICES)
+    course_info = models.CharField(max_length=20)
+
+    class Meta:
+        managed = False   # We don't want a real table in Oracle but abstract models can't be instantiated.
 
 
 class Service():

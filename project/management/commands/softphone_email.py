@@ -12,6 +12,7 @@ import csv, io
 class Command(BaseCommand):
     help = 'Send Email to Softphone Users'
     bcc = 'itscomm.information.systems.shared.account@umich.edu'
+    reply_to = 'itscomm.information.systems@umich.edu'
 
     def add_arguments(self, parser):
         parser.add_argument('--file')  
@@ -95,7 +96,7 @@ class Command(BaseCommand):
                 if cc:
                     cc = cc + '@umich.edu'
 
-                msg = EmailMultiAlternatives(email.subject, text_message, email.sender, [to], bcc=[self.bcc], cc=[cc])
+                msg = EmailMultiAlternatives(email.subject, text_message, email.sender, [to], bcc=[self.bcc], cc=[cc], reply_to=[self.reply_to])
                 msg.attach_alternative(email.body, "text/html")
                 msg.send()
 
