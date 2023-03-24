@@ -4,6 +4,16 @@
     #aux-nav {
         background-color: {{background_color}}
     }
+    .notice{
+        width: 105%;
+    }
+
+    .important-message {
+        margin-bottom: 20px;
+        margin-top: 20px;
+        margin-left: 50px;
+        padding-right: 150px;
+    }
 
     .option {
         cursor: pointer;
@@ -40,7 +50,7 @@
     <div class="col">
         <div tabindex="0" role="button" id='original' class="option" onclick="window.location.href='/chartchange/'">
             <div id="text1" class="text-center">
-                Click here to make changes for departments you are authorized for.
+                Make changes for departments you are authorized for.<br/><span style="font-size:50px;">&#9654;</span>
             </div>
             <div id="loading1" style="display: none;" class="spinner-border text-light" role="status">
                 <!-- <span class="visually-hidden">Loading...</span> -->
@@ -51,7 +61,7 @@
     <div class="col">
         <div tabindex="0" role="button" id='new' class="option" onclick="window.location.href='/chartchangedept/'">
             <div id="text2" class="text-center">
-                Click here to request changes for departments you are NOT authorized for.
+                Request changes for departments you are <span style="font-weight:bold">NOT</span> authorized for.<br/><span style="font-size:50px;">&#9654;</span>
             </div>
             <div id="loading2" style="display: none;" class="spinner-border text-light" role="status">
                 <!-- <span class="visually-hidden">Loading...</span> -->
@@ -59,12 +69,20 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-7">
+    </div>
+    <div class="col important-message">
+      <span style="font-weight:bold">Important: </span>you must be authorized for the existing department in the SRS to make this request.
+    </div>
+  </div>
 {% if notice.bodytext != "none"%}
 <div class="container">
     <div class="row justify-content-md-center">
         <div class='col-6 mt-3'>
             {% autoescape off %}
-            {{notice.bodytext}}
+            <div class="notice">{{notice.bodytext}}</div>
+            
             {% endautoescape %}
         </div>
     </div>

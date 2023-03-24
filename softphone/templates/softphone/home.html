@@ -1,34 +1,79 @@
 {% extends 'softphone/base_softphone.html' %}
+{% block styles %}
+<style>
+    .card {
+        position: relative;
+        background-color: lightgray;
+    }
+
+    .card:hover {
+        position: relative;
+        background-color: gray;
+    }
+
+    .card a::before {
+        content: "";
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        left: 0px;
+    }
+</style>
+{% endblock styles %}
+
 {% block content %}
 
 {% load humanize %}
 
-<h1>Telephone Upgrade Request Form</h1>
+<h1>Telephone Upgrade Project Transition Tools</h1>
+
 <div class="row">
+    <div class="col-8">
+        <p>Welcome to the Telephone Upgrade Project Transition Tools page. The apps below enable Telephone Upgrade Unit
+            Ambassadors and SRS submitters to enter and update information needed to transition phone numbers to Zoom
+            Phone.</p>
+        <div class="card-group">
 
-    <div class="col-6">
-        {% if dept_list %}
-        <p>
-            You have access to these departments:
-        </p>
-        <ul>
-            {% for dept in dept_list %}
-            <li><a href="/softphone/dept/{{ dept.dept_id }}/">{{ dept.dept_id }}</a> - {{ dept.dept_name }} ({{ dept.remaining}} remaining)</li>
-            {% endfor %}
+            <div class="col-md-4 align-top" style="width:30%;">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title"> <b style="font-size:large">Telephone Upgrade Request Form (TURF)</b></p>
+                        <p class="card-text">Submit telephone numbers to transition to Zoom Phone.</p>
+                        <a href="/softphone/dept/" class="before:absolute before:inset-0"></a>
+                    </div>
+                </div>
+            </div>
 
-        </ul>
-        {% else %}
-        <p>
-            No departments found for current user
-        </p>
-        {% endif %}
+            <div class="col-md-4" style="width:30%;">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title"> <b style="font-size:large">Pause Zoom Phone Transition</b></p>
+                        <p class="card-text">Temporarily pause softphones selected to transition to Zoom Phone.</p>
+                        <a href="/softphone/pause/ua" class="before:absolute before:inset-0"></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" style="width:30%;">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title"><b style="font-size:large">Location Verification-Deskset</b></p>
+                        <p class="card-text">Verify location for telephone numbers scheduled to receive a deskset.</p>
+                        <a href="/softphone/location" class="before:absolute before:inset-0"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="col-6">
+    <div class="col-4">
         {% autoescape off %}
         {{ notices.bodytext }}
         {% endautoescape %}
     </div>
+
+
 </div>
 
 {% endblock %}

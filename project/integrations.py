@@ -78,26 +78,23 @@ class MCommunity:
 
 
 class UmAPI:
-    CLIENT_ID = settings.UM_API['CLIENT_ID']
     AUTH_TOKEN = settings.UM_API['AUTH_TOKEN']
     BASE_URL = settings.UM_API['BASE_URL']
 
-    def _get_token(self, scope, prefix):
-
+    def _get_token(self, scope):
+        
         headers = { 
             'Authorization': f'Basic {self.AUTH_TOKEN}',
             'accept': 'application/json'
             }
 
-        url = f'{self.BASE_URL}/um/{prefix}/oauth2/token?grant_type=client_credentials&scope={scope}'
+        url = f'{self.BASE_URL}/um/oauth2/token?grant_type=client_credentials&scope={scope}'
         response = requests.post(url, headers=headers)
         response_token = json.loads(response.text)
         access_token = response_token.get('access_token')
 
         self.headers = {
-            'X-IBM-Client-Id': self.CLIENT_ID,
             'Authorization': 'Bearer ' + access_token,
-            #'Content-Type': 'application/json',
             'Accept': 'application/json' 
         }
 
@@ -109,11 +106,30 @@ class ShortCodesAPI(UmAPI):
     PREFIX = 'bf'
 
     def __init__(self):
-        self._get_token(self.SCOPE, self.PREFIX)
+        self._get_token(self.SCOPE)
 
     def get_shortcode(self, shortcode):        
         url = f'{self.BASE_URL}/um/bf/ShortCodes/ShortCodes/{shortcode}'
         return requests.get(url, headers=self.headers)
+
+class Openshift():
+
+    BASE_URL = settings.OPENSHIFT['BASE_URL']
+    USER = settings.OPENSHIFT['USER']
+    TOKEN = settings.OPENSHIFT['TOKEN']
+    PROJECT_URL = BASE_URL + '/apis/project.openshift.io/v1/projects'
+
+    def get_project(self, name):
+        headers = {'Authorization': f'Bearer {self.TOKEN}'}        
+        #r = requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
+        r = requests.get(f'{self.PROJECT_URL}/', headers=headers)
+        print(r.status_code, r.text)        
+
+    def create_project(self, name):
+        payload = {"metadata":{"name": name}}
+        headers = {'Authorization': f'Bearer {self.TOKEN}'}        
+        r = requests.post(f'{self.PROJECT_URL}', headers=headers, json=payload)
+        print(r.status_code, r.text)      
 
 
 class TDx():
@@ -478,4 +494,3 @@ def create_ticket_database_modify(instance, user, description):
     }
 
     TDx().create_ticket(payload)
-

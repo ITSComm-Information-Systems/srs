@@ -1,10 +1,10 @@
-# Send every Tuesday at 10 AM
+# Run on the 15th of every month at 5 AM
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: softphone-tuesday
+  name: billing-github
 spec:
-  schedule: '5 10 * * 2'
+  schedule: '35 6 15 * *'
   ConcurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -20,5 +20,8 @@ spec:
               envFrom:
               - configMapRef:
                   name: production
-              command: ["python3",  "manage.py", "softphone_email", "--email", "TUE_NO_LOGIN"]
-          restartPolicy: Never
+              command:
+                - python3
+                - manage.py
+                - upload_github_billing
+          restartPolicy: OnFailure

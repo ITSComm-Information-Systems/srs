@@ -58,7 +58,7 @@ class ProcessingStatusListFilter(admin.SimpleListFilter):
     parameter_name = 'processing_status'
 
     def lookups(self, request, model_admin):
-        return (('Selected', 'Selected'), ('Completed', 'Completed'),  ('On Hold', 'On Hold'),  ('None', 'None'), )
+        return (('Selected', 'Selected'), ('Completed', 'Completed'),  ('On Hold', 'On Hold'),('Disconnected', 'Disconnected'), ('None', 'None'), )
 
     def queryset(self, request, queryset):
         if self.value() == None:
@@ -113,6 +113,7 @@ class SelectionAdmin(admin.ModelAdmin):
     ordering = ['-update_date']
     search_fields = ['service_number','uniqname','updated_by','building_code']
     list_filter = [ProcessingStatusListFilter,'migrate',CutDateListFilter, DuoListFilter,ZoomListFilter]
+    date_hierarchy = 'cut_date'
     form = SelectionForm
     actions = ['update_selections','download_csv']
 

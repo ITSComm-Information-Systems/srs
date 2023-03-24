@@ -1,10 +1,10 @@
-# Send every Tuesday at 10 AM
+# Send every Thursday at 10 AM
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: softphone-tuesday
+  name: softphone-thursday-verify
 spec:
-  schedule: '5 10 * * 2'
+  schedule: '30 10 * * 4'
   ConcurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -20,5 +20,5 @@ spec:
               envFrom:
               - configMapRef:
                   name: production
-              command: ["python3",  "manage.py", "softphone_email", "--email", "TUE_NO_LOGIN"]
+              command: ["python3",  "manage.py", "softphone_email", "--email", "THURSDAY_VERIFY"]
           restartPolicy: Never

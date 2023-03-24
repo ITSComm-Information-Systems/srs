@@ -10,12 +10,12 @@ from django.forms import formset_factory
 import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmOscDeptProfileV, UmMpathDwCurrDepartment
+from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
-from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, next_cut_date
-from .forms import SelectionForm, OptOutForm
+from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date
+from .forms import SelectionForm, OptOutForm, LocationForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 
@@ -28,13 +28,21 @@ def get_help(request):
 
 @login_required
 def landing_page(request):
+    return render(request, 'softphone/home.html',
+                        {'title': 'Telephone Audit',
+                         'notices': 	Page.objects.get(permalink='/SFHomeSB')
+                        })
+
+@login_required
+def department_selection(request):
     user_dept_list = list(AuthUserDeptV.objects.filter(user_id=request.user.id,codename='can_report').values_list('dept', flat=True))
     dept_list = DeptV.objects.filter(dept_id__in=user_dept_list)
 
-    return render(request, 'softphone/home.html',
+    return render(request, 'softphone/departments.html',
                         {'title': 'Telephone Audit',
                         'notices': 	Page.objects.get(permalink='/SFSideBar')
                         ,'dept_list': dept_list})
+
 
 def get_department_list(dept_id, user):
     user_dept_list = list(AuthUserDeptV.objects.filter(user_id=user.id,codename='can_report').values_list('dept', flat=True))
@@ -56,20 +64,69 @@ def get_department_list(dept_id, user):
     return dept_list
 
 
+class LocationChange(LoginRequiredMixin, View):
+    title = 'Location Verification App - Deskset'
+
+    def get(self, request):
+        building_list = UmOSCBuildingV.objects.all()
+
+        if self.request.user.is_superuser and request.GET.get('user'):
+            print('impersonate', self.request.GET.get('user'))
+            username = self.request.GET.get('user')
+        else:
+            username = self.request.user.username
+
+        LocationFormSet = formset_factory(LocationForm, extra=0)
+        phone_list_up = SelectionV.objects.filter(updated_by=username, new_building_code__isnull=True
+                ,migrate='YES_SET', processing_status='Selected', cut_date=next_cut_date()).order_by('location_correct')
+
+        dept_group_list = list(Ambassador.objects.filter(uniqname=username).values_list('dept_grp', flat=True))
+
+        if len(dept_group_list) > 0:
+            dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp__in=dept_group_list).values_list('deptid', flat=True)
+            phone_list_ua = SelectionV.objects.filter(dept_id__in=dept_list, new_building_code__isnull=True
+                    ,migrate='YES_SET', processing_status='Selected', cut_date=next_cut_date()).order_by('location_correct')
+            phone_list = (phone_list_ua | phone_list_up).distinct()
+        else:
+            phone_list = phone_list_up
+
+        formset = LocationFormSet(initial=phone_list)
+
+        return render(request, 'softphone/location_change.html',
+                      {'title': self.title,
+                       'building_list': building_list,
+                       'formset': formset, 
+                       'phone_list': []})
+
+    def post(self, request):
+        LocationFormSet = formset_factory(LocationForm, extra=0)
+        formset = LocationFormSet(request.POST)
+
+        formset.is_valid()
+        for form in formset:
+            if form.cleaned_data.get('building_code'):
+                form.save()
+
+        return HttpResponseRedirect('/softphone/location')
+
+
 class PauseUser(LoginRequiredMixin, View):
     title = 'Pause U-M Zoom Phone'
+    field_list = ['subscriber','service_number','subscriber_uniqname' \
+                ,'subscriber_first_name','subscriber_last_name','dept_id','migrate']
 
     def get(self, request, uniqname):
+        cut_date = next_cut_date()
+        print('selected cut date', cut_date)
+
         now = datetime.datetime.now() 
-        if now.weekday() == 2 and int(now.strftime('%H')) > 11:
-            return render(request, 'softphone/pause_message.html',  # Lockout wednesday at noon.
+        today = datetime.date.today()
+
+        # If tomorrow is the cut date, cut off at noon today.
+        if cut_date == today+datetime.timedelta(1) and int(now.strftime('%H')) > 11:
+            return render(request, 'softphone/pause_message.html',  
                 {'title': self.title,
                 'message': 'No selections are available to pause.'})
-
-        #cut_date = datetime.datetime(2022, 9, 8)
-        cut_date = next_cut_date()
-
-        print('calculated cut date', cut_date)
 
         if uniqname == 'ua':
             if self.request.user.is_superuser and request.GET.get('user'):
@@ -78,16 +135,14 @@ class PauseUser(LoginRequiredMixin, View):
             else:
                 username = self.request.user.username
 
-            phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=cut_date).values('subscriber'
-                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
+            phone_list = SelectionV.objects.filter(updated_by=username, processing_status='Selected', cut_date=cut_date).values(*self.field_list)
 
             dept_group_list = list(Ambassador.objects.filter(uniqname=username).values_list('dept_grp', flat=True))
 
             message = 'There are no users in your unit scheduled to transition'             
             if len(dept_group_list) != 0:  # Get submissions by user
                 dept_list = UmMpathDwCurrDepartment.objects.filter(dept_grp__in=dept_group_list).values_list('deptid', flat=True)
-                amb_phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values('subscriber'
-                    ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name','dept_id')
+                amb_phone_list = SelectionV.objects.filter(dept_id__in=dept_list, processing_status='Selected', cut_date=cut_date).values(*self.field_list)
 
                 phone_list = phone_list.union(amb_phone_list)
 
@@ -103,8 +158,7 @@ class PauseUser(LoginRequiredMixin, View):
                 if not self.request.user.is_superuser:
                     return HttpResponseRedirect(f'/softphone/pause/{self.request.user.username}')
 
-            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='Selected', cut_date=cut_date) | Q(uniqname=uniqname, processing_status='Selected', cut_date=cut_date)).values('subscriber'
-                ,'service_number','subscriber_uniqname','subscriber_first_name','subscriber_last_name')
+            phone_list = SelectionV.objects.filter(Q(subscriber_uniqname=uniqname, processing_status='Selected', cut_date=cut_date) | Q(uniqname=uniqname, processing_status='Selected', cut_date=cut_date)).values(*self.field_list)
 
             if len(phone_list) == 0:
                 message =  'User not scheduled for migration.'
@@ -123,9 +177,9 @@ class PauseUser(LoginRequiredMixin, View):
         formset = OptOutFormSet(initial=phone_list)
 
         date_list = [(None,'---')]
-        for i in range(1, 4):
-            cut_date = cut_date + datetime.timedelta(7)
-            date_list.append((cut_date.strftime("%Y-%m-%d"), f'Until {cut_date.strftime("%B %d, %Y")}'))
+
+        for rec in CutDate.objects.filter(cut_date__gt=cut_date).order_by('cut_date')[:3]:
+            date_list.append((rec.cut_date.strftime("%Y-%m-%d"), f'Until {rec.cut_date.strftime("%B %d, %Y")}'))
 
         date_list.append(('Never', 'Do not implement softphone'))
 

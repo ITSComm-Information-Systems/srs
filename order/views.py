@@ -356,7 +356,7 @@ class Submit(PermissionRequiredMixin, View):
 @csrf_exempt
 def send_email(request):   #Pinnacle will route non prod emails to a test address
     if request.method == "POST":
-        subject = request.POST.get(['emailSubject']) + ' question from: ' + request.user.username
+        subject = request.POST.get('emailSubject') + ' question from: ' + request.user.username
         body = request.POST['emailBody'] 
         address = (request.POST.get('emailAddress', 'ITCOM.csr@umich.edu'))
         print(request.POST)
@@ -584,7 +584,8 @@ class Workflow(UserPassesTestMixin, View):
                     f.template = 'order/base_form.html'  # use base 4/16/2021
                     tab.form = f
 
-
+                if tab.name == 'ChangeSFUser':
+                    js.append('change_user')
                 if tab.name == 'PhoneLocation':
                     js.append('phone_location')
                 elif tab.name == 'LocationNew':
@@ -647,8 +648,8 @@ class Cart(PermissionRequiredMixin, View):
 
         status = ['Ready to Order','Saved for Later']
         item_list = Item.objects.filter(deptid=deptid).exclude(order_id__gt=0).order_by('chartcom','-create_date')
-        chartcoms = item_list.distinct().values('chartcom','chartcom_id','chartcom__name') #, 'chartcom_id')
-        saved = item_list.distinct().values('chartcom','chartcom_id','chartcom__name') #, 'chartcom_id')
+        chartcoms = item_list.distinct().values('chartcom','chartcom_id','chartcom__name').order_by('chartcom') #, 'chartcom_id')
+        saved = item_list.distinct().values('chartcom','chartcom_id','chartcom__name').order_by('chartcom') #, 'chartcom_id')
 
         #item_list = Item.objects.filter(deptid=deptid,order__isnull=True).order_by('chartcom','-create_date')
 
@@ -742,6 +743,8 @@ class Services(UserPassesTestMixin, View):
                                    {'label': 'View/Change Microsoft Azure', 'target': '/services/azure'},
                                    {'label': 'Order AWS', 'target': '/services/aws/add/'},
                                    {'label': 'View/Change AWS', 'target': '/services/aws/'} ]
+            elif service.name == 'container':
+                service.actions = [{'label': 'Request Container Project', 'target': '/services/container/add/'}]
             else:
                 service.actions = action_list.filter(service=service)
                 for action in service.actions:

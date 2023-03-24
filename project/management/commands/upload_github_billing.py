@@ -79,7 +79,7 @@ class Command(BaseCommand):
 
         if settings.ENVIRONMENT == 'Production':
             subject = f'GitHub Billing Records Uploaded'
-            to = [self.owner_email, 'ITComBill@umich.edu', 'itscomm.information.systems@umich.edu']
+            to = ['ITComBill@umich.edu', 'itscomm.information.systems@umich.edu']
         else:
             subject = f'GitHub Billing Records Uploaded - {settings.ENVIRONMENT}'
             to = ['itscomm.information.systems@umich.edu', 'djamison@umich.edu']

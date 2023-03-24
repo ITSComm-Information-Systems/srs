@@ -138,6 +138,12 @@ UM_API = {
     'BASE_URL': os.getenv('UM_API_URL'),
 }
 
+OPENSHIFT = {
+    'BASE_URL': os.getenv('OPENSHIFT_BASE_URL'),
+    'USER': os.getenv('OPENSHIFT_USER'),
+    'TOKEN': os.getenv('OPENSHIFT_TOKEN'),
+}
+
 ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = {

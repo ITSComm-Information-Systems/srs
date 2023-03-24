@@ -9,6 +9,7 @@ from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
 from project.integrations import MCommunity, TDx
 from project.models import ShortCodeField, Choice
+from softphone.models import Selection
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from django.utils import timezone
@@ -74,7 +75,8 @@ class Step(Configuration):
         ('ServerSupportForm', 'Server Support'),
         ('ServerSpecForm', 'Server Specification'),
         ('ServerDataForm', 'Server Data Sensitivity'),
-        ('DataDenForm', 'Data Den Form')
+        ('DataDenForm', 'Data Den Form'),
+        ('ChangeSFUserForm', 'Change Softphone User')
     )
 
     custom_form = models.CharField(blank=True, max_length=20, choices=FORM_CHOICES)
@@ -672,7 +674,10 @@ class Server(models.Model):
 
     @property
     def ram_cost(self):
-        return self.ram * self.ram_rate
+        if self.ram:
+            return self.ram * self.ram_rate
+        else:
+            return 0
 
     @property
     def backup_cost(self):
@@ -703,6 +708,12 @@ class Server(models.Model):
 
     def get_checkboxes(self):
         return [] 
+
+    def save(self, *args, **kwargs):
+
+        self.shortcode = self.shortcode.strip()
+
+        super().save(*args, **kwargs)  # Call the "real" save() method.
 
 
 class ServerDisk(models.Model):
@@ -952,6 +963,9 @@ class Order(models.Model):
             if action_id != '41':
                 wiring_only = False
 
+            if action_id == '74' and item.data.get('verify_location') == '0':
+                item.update_softphone()
+
             if issue['wo_type_category_id'] == '0':
                 if action_id != '37' and action_id != '41':
                     create_bill_only = True
@@ -1133,6 +1147,14 @@ class Item(models.Model):
     def submit_incident(self, route, action):
 
         text = self.data['reviewSummary']
+        if self.description == 'MiServer' or self.description == 'Modify MiServer':
+            for entry in text:
+                for field in entry['fields']:
+                    if field['label'] == 'MCommunity Admin Group':
+                        field['label'] = 'MCommunity Owner Group'
+                    if field['label'] == '*MCommunity Admin Group':
+                        field['label'] = '*MCommunity Owner Group'
+            
         note = render_to_string('order/pinnacle_note.html', {'text': text, 'description': self.description})
  
         payload = route['constants']
@@ -1353,7 +1375,7 @@ class Item(models.Model):
 
         db_type = self.data.get('database')
         if db_type:
-            rec.database_type = Choice.objects.get(parent__code='DATABASE_TYPE', label=db_type)
+            rec.database_type = Choice.objects.get(parent__code='DATABASE_TYPE', code=db_type.upper())
         
         rec.save()
 
@@ -1408,7 +1430,11 @@ class Item(models.Model):
                     new_node[0].time = time
                     new_node[0].save()
 
-        ex = BackupNode.objects.filter(backup_domain=rec).exclude(name__in=self.data['nodeNames']).delete()
+        node_list = self.data['nodeNames']   # remove blanks workaround https://code.djangoproject.com/ticket/20024
+        while("" in node_list):
+            node_list.remove("")
+
+        ex = BackupNode.objects.filter(backup_domain=rec).exclude(name__in=node_list).delete()
 
     def update_arcts(self, rec):
 
@@ -1475,6 +1501,17 @@ class Item(models.Model):
 
         if self.data.get('flux') == 'yes':
             rec.flux = True
+
+    def update_softphone(self):
+        try:
+            selection = Selection.objects.get(service_number=self.data.get('phone'))
+            selection.new_building = self.data.get('newBuildingName')
+            selection.new_building_code = self.data.get('newBuildingCode')
+            selection.new_floor = self.data.get('newBuildingFloor')
+            selection.new_room = self.data.get('newBuildingRoom')
+            selection.save()
+        except:
+            print('softphone not found')
 
     def leppard(self):
         pour=['me']

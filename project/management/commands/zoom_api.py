@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from softphone.models import Zoom, SelectionV, SubscriberCharges, next_cut_date
+from softphone.models import Zoom, Selection, SelectionV, SubscriberCharges, next_cut_date, ZoomToken
 import os, requests
 
 import datetime, csv
@@ -15,11 +15,14 @@ class Command(BaseCommand):
         parser.add_argument('--uniqname')  # Run for one user
         parser.add_argument('--start')     # Run all users starting with this one
         parser.add_argument('--file')      # Run for everyone in a file
-        parser.add_argument('--cut_date')      # Run for everyone in a file
+        parser.add_argument('--cut_date')  # Run for everyone in a file
         parser.add_argument('--report')    # Report of all active zoom phones
 
     def handle(self, *args, **options):
         self.zoom_token = os.getenv('ZOOM_TOKEN')
+
+        if not self.zoom_token:
+            self.zoom_token = ZoomToken.objects.all()[0].token
 
         if options['report']:
             self.get_zoom_report()
@@ -44,8 +47,14 @@ class Command(BaseCommand):
             else:
                 cut_date = options['cut_date']
 
-            for user in SelectionV.objects.filter(uniqname__isnull=False,cut_date=cut_date).order_by('uniqname'):
+            for user in SelectionV.objects.filter(uniqname__isnull=False,cut_date=cut_date,zoom_login='N').order_by('uniqname'):
                 self.process_user(user.uniqname)
+                if user.uniqname != user.uniqname.lower():
+                    print('uniqname not all lowercase', user.uniqname)
+                    sel = Selection.objects.get(subscriber=user.subscriber)
+                    sel.uniqname = sel.uniqname.lower()
+                    sel.save()
+
         elif options['start']:
             for user in SubscriberCharges.objects.filter(current_uniqname__isnull=False,current_uniqname__gt=options['start']).order_by('current_uniqname'):
                 self.process_user(user.current_uniqname)        
@@ -77,7 +86,10 @@ class Command(BaseCommand):
             if data.get('zoom'):
                 for key, value in data['zoom'].items():
                     if key in ('created_at','last_login_time'):
-                        value = datetime.datetime.strptime(value, "%m-%d-%Y %H:%M:%S %p %Z").date()
+                        try:
+                            value = datetime.datetime.strptime(value, "%m-%d-%Y %H:%M:%S %p %Z").date()
+                        except:
+                            print('login date null for user account', uniqname)
 
                     setattr(z, key, value)
             else:
