@@ -138,3 +138,25 @@ class Service():
     azure = Azure
     gcpaccount = GCPAccount
     container = Container
+
+class BaseImage(models.Model):
+    image_name = models.CharField(max_length=100, unique=True)
+    gpu = models.BooleanField()
+    memory = models.CharField(max_length=4)
+    cpu = models.CharField(max_length=4)
+    storage = models.CharField(max_length=8)
+
+    def __str__(self):
+        return self.image_name
+
+class VirtualPool(models.Model):
+    shortcode = models.CharField(max_length=6)
+    pool_name = models.CharField(max_length=100, unique=True)
+    individual_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    num_computers = models.CharField(max_length=100)
+    total_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    admin_group = models.CharField(max_length=100)
+    base_image = models.ManyToManyField(BaseImage)
+
+    def __str__(self):
+        return self.pool_name

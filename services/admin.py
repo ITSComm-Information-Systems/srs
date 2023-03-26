@@ -30,5 +30,7 @@ class GCPInline(admin.TabularInline):
 @admin.register(GCPAccount)
 class GCPAccountAdmin(CloudAdmin):
     inlines = [GCPInline]
-    
+
+admin.site.register(VirtualPool)
+admin.site.register(BaseImage)
 
