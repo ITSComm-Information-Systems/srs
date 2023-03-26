@@ -5,7 +5,7 @@ from oscauth.models import AuthUserDept
 import csv, io, datetime
 
 class Command(BaseCommand):
-    help = 'Deactivate Users'
+    help = 'Deactivate Users - called from dailyjob.py'
 
     def add_arguments(self, parser):
         parser.add_argument('--update')
@@ -65,7 +65,7 @@ class Command(BaseCommand):
 
                 print(' ')
 
-            u+=1
+                u+=1
 
             #if u % 10 == 0:
             #    print(datetime.datetime.now(), str(u),'records read')
