@@ -133,10 +133,7 @@ class Openshift():
     CONSOLE_URL = settings.OPENSHIFT['CONSOLE_URL']
 
     def get_project(self, name):
-        headers = {'Authorization': f'Bearer {self.TOKEN}'}        
-        url = self.BASE_URL + '/api/v1/limitranges'
-        return requests.get(f'{url}/{name}', headers=headers)        
-        
+        headers = {'Authorization': f'Bearer {self.TOKEN}'}                
         return requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
 
     def create_project(self, instance, requester):
