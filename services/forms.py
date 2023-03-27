@@ -283,4 +283,4 @@ class ContainerNewForm(CloudForm):
     def save(self):
         # Create project in openshift, don't save to SRS.
         os = Openshift()
-        os.create_project(self.instance)
+        os.create_project(self.instance, self.user.username)

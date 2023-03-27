@@ -140,6 +140,7 @@ UM_API = {
 
 OPENSHIFT = {
     'BASE_URL': os.getenv('OPENSHIFT_BASE_URL'),
+    'CONSOLE_URL': os.getenv('OPENSHIFT_CONSOLE_URL'),
     'USER': os.getenv('OPENSHIFT_USER'),
     'TOKEN': os.getenv('OPENSHIFT_TOKEN'),
 }

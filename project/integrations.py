@@ -130,12 +130,16 @@ class Openshift():
     USER = settings.OPENSHIFT['USER']
     TOKEN = settings.OPENSHIFT['TOKEN']
     PROJECT_URL = BASE_URL + '/apis/project.openshift.io/v1/projects'
+    CONSOLE_URL = settings.OPENSHIFT['CONSOLE_URL']
 
     def get_project(self, name):
         headers = {'Authorization': f'Bearer {self.TOKEN}'}        
+        url = self.BASE_URL + '/api/v1/limitranges'
+        return requests.get(f'{url}/{name}', headers=headers)        
+        
         return requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
 
-    def create_project(self, instance):
+    def create_project(self, instance, requester):
         headers = {'Authorization': f'Bearer {self.TOKEN}'}
 
         payload = {"metadata": {
@@ -146,6 +150,7 @@ class Openshift():
                 "annotations": {
                     "openshift.io/description": instance.project_description,
                     "openshift.io/display-name": instance.project_name,
+                    "openshift.io/requester": requester
                 },
         }}
 
@@ -153,6 +158,9 @@ class Openshift():
             payload['metadata']['labels']['course'] = instance.course_info
         else:
             payload['metadata']['labels']['shortcode'] = instance.shortcode
+
+        spec = self.get_yaml('med-limits')
+        payload['spec'] = spec['spec']
 
         r = requests.post(f'{self.PROJECT_URL}', headers=headers, json=payload)     
         self.create_role_bindings(instance)
