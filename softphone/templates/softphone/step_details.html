@@ -316,7 +316,7 @@
                 $("#div_" + form + "location_correct").hide();
             }
 
-            if (sel=='YES') {
+            if (sel=='YES' || 'YES_SET') {
                 $("#" + form + "uniqname_correct option[value='NA']").attr('disabled','disabled').removeAttr("selected");
                 $("#" + form + "category option:gt(2)").attr('disabled','disabled').removeAttr("selected");
                 $("#" + form + "other_category").val("");
