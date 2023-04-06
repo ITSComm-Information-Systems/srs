@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from order.models import Item
-from project.integrations import MCommunity, ShortCodesAPI
+from project.integrations import MCommunity, ShortCodesAPI, Openshift
 
 
 class Command(BaseCommand):
@@ -11,8 +11,14 @@ class Command(BaseCommand):
         parser.add_argument('--shortcode')
         parser.add_argument('--username')
         parser.add_argument('--item')
+        parser.add_argument('--openshift')
 
     def handle(self, *args, **options):
+        if options['openshift']:
+            os = Openshift()
+            resp = os.get_project('srs-integration-testing')
+            print(resp.status_code, resp.text)
+            print(resp.url)
 
         if options['shortcode']:
             sc = ShortCodesAPI()

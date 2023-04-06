@@ -36,7 +36,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
             create_ticket('New', form.instance, request, title=title)
 
             if model == Container:
-                project_url = f'{Openshift.CONSOLE_URL}/{form.instance.project_name}'
+                project_url = f'{Openshift.PROJECT_URL}/{form.instance.project_name}'
                 return render(request, 'services/new_container.html', {'link': project_url})
             else:
                 return HttpResponseRedirect('/requestsent')
