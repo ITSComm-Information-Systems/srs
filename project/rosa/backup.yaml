@@ -1,15 +1,15 @@
 apiVersion: velero.io/v1
 kind: Schedule
 metadata:
-  name: backup-schedule-{namespace}
+  name: backup-schedule-cs-sandbox
   namespace: openshift-adp
 spec:
-  schedule: 0 1 * * *
+  schedule: 0 5 * * *
   template:
     excludedResources:
     - events.events.k8s.io
     - events
     includedNamespaces:
-    - { namespace being created }
+    - cs-sandbox
     defaultVolumesToRestic: true
     ttl: 168h0m0s

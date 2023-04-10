@@ -128,6 +128,7 @@ class Container(Cloud):
                             help_text="This sets the upper limit of CPU and RAM available for your containerized applications. This can be changed later via request to Container Service staff. More information about container sizes and rates can be found here: <a href='https://its.umich.edu/computing/virtualization-cloud/container-service/pricing' target='_blank'>https://its.umich.edu/computing/virtualization-cloud/container-service/pricing</a>")
     database_type = models.CharField(max_length=10, choices=DATABASE_TYPE_CHOICES, null=True)
     database = models.CharField(max_length=10, choices=DATABASE_ADDON_CHOICES)
+    backup = models.BooleanField()
     course_info = models.CharField(max_length=20)
 
     class Meta:

@@ -125,20 +125,16 @@ class ShortCodesAPI(UmAPI):
         return requests.get(url, headers=self.headers)
 
 class Openshift():
-
-    BASE_URL = settings.OPENSHIFT['BASE_URL']
+    SERVER = settings.OPENSHIFT['SERVER']    
     USER = settings.OPENSHIFT['USER']
-    TOKEN = settings.OPENSHIFT['TOKEN']
-    PROJECT_URL = BASE_URL + '/apis/project.openshift.io/v1/projects'
-    CONSOLE_URL = settings.OPENSHIFT['CONSOLE_URL']
+    HEADERS = {'Authorization': 'Bearer ' + settings.OPENSHIFT['TOKEN']}
+    API_ENDPOINT = f'https://api.{SERVER}:6443'
+    PROJECT_URL = f'https://console-openshift-console.apps.{SERVER}/k8s/cluster/projects'
 
     def get_project(self, name):
-        headers = {'Authorization': f'Bearer {self.TOKEN}'}                
-        return requests.get(f'{self.PROJECT_URL}/{name}', headers=headers)
+        return requests.get(f'{self.API_ENDPOINT}/apis/project.openshift.io/v1/projects/{name}', headers=self.HEADERS)
 
     def create_project(self, instance, requester):
-        headers = {'Authorization': f'Bearer {self.TOKEN}'}
-
         payload = {"metadata": {
                 "name": instance.project_name,
                 "labels": {
@@ -156,15 +152,14 @@ class Openshift():
         else:
             payload['metadata']['labels']['shortcode'] = instance.shortcode
 
-        spec = self.get_yaml('med-limits')
-        payload['spec'] = spec['spec']
-
-        r = requests.post(f'{self.PROJECT_URL}', headers=headers, json=payload)     
+        r = requests.post(f'{self.API_ENDPOINT}/apis/project.openshift.io/v1/projects', headers=self.HEADERS, json=payload)     
         self.create_role_bindings(instance)
+        self.add_limits(instance)
+        if instance.backup:
+            self.add_backup(instance)
 
     def create_role_bindings(self, instance):
-        headers = {'Authorization': f'Bearer {self.TOKEN}'}
-        url = self.BASE_URL + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
+        url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
 
         for users in instance.cleaned_names:
             role = users[:-1]
@@ -177,7 +172,20 @@ class Openshift():
                     'roleRef': {'name': role}, 'userNames': uniqnames
                 }
                 
-                r = requests.post(url, headers=headers, json=body)
+                r = requests.post(url, headers=self.HEADERS, json=body)
+
+    def add_limits(self, instance):
+        limits = self.get_yaml(instance.size)
+        return requests.post(f'{self.API_ENDPOINT}/api/v1/namespaces/{instance.project_name}/limitranges'
+                             , headers=self.HEADERS, json=limits)
+
+    def add_backup(self, instance):
+        payload = self.get_yaml('backup')
+        payload['metadata']['name'] = f'backup-schedule-{instance.project_name}'
+        payload['spec']['template']['includedNamespaces'][0] = instance.project_name
+
+        return requests.post(f'{self.API_ENDPOINT}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
+                             , headers=self.HEADERS)
 
     def get_yaml(self, file):
         file = f'{settings.BASE_DIR}/project/rosa/{file}.yaml'
