@@ -155,6 +155,8 @@ class Openshift():
         r = requests.post(f'{self.API_ENDPOINT}/apis/project.openshift.io/v1/projects', headers=self.HEADERS, json=payload)     
         self.create_role_bindings(instance)
         self.add_limits(instance)
+        if instance.backup:
+            self.add_backup(instance)
 
     def create_role_bindings(self, instance):
         url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
@@ -173,20 +175,17 @@ class Openshift():
                 r = requests.post(url, headers=self.HEADERS, json=body)
 
     def add_limits(self, instance):
-        limits = self.get_yaml('med-limits')
+        limits = self.get_yaml(instance.size)
         return requests.post(f'{self.API_ENDPOINT}/api/v1/namespaces/{instance.project_name}/limitranges'
                              , headers=self.HEADERS, json=limits)
 
-    def add_backup(self):
-        name = 'srs-integration-testing'
-
+    def add_backup(self, instance):
         payload = self.get_yaml('backup')
-        payload['metadata']['name'] = f'backup-schedule-{name}'
-        payload['spec']['template']['includedNamespaces'][0] = name
+        payload['metadata']['name'] = f'backup-schedule-{instance.project_name}'
+        payload['spec']['template']['includedNamespaces'][0] = instance.project_name
 
         return requests.post(f'{self.API_ENDPOINT}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
                              , headers=self.HEADERS)
-
 
     def get_yaml(self, file):
         file = f'{settings.BASE_DIR}/project/rosa/{file}.yaml'

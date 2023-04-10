@@ -15,8 +15,18 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['openshift']:
+
+
+
+
+            
             os = Openshift()
-            resp = os.get_project('srs-integration-testing')
+            #resp = os.get_project('srs-integration-testing')
+
+            body =  {"kind":"LimitRangeList","apiVersion":"v1","metadata":{"resourceVersion":"520238789"},"items":[]}
+
+            resp = os.add_backup()
+
             print(resp.status_code, resp.text)
             print(resp.url)
 
