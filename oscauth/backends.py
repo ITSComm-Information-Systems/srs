@@ -30,6 +30,9 @@ class SuBackend(object):
             return None
 
     def has_perm(self, user_obj, perm, obj=None):
+        if not user_obj.username:
+            return None
+
         if perm == 'bom.can_access_bom':
             return UmRteTechnicianV.objects.filter(uniqname=user_obj.username).exists()
         elif perm == 'bom.can_update_bom_ordered':
