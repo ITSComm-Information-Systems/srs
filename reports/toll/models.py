@@ -36,12 +36,11 @@ class UmTollCallDetail(models.Model):
         db_table = 'PINN_CUSTOM\".\"um_toll_call_detail_v'
 
 class DownloadLog(models.Model):
-    department_id = models.IntegerField()
-    report_year = models.IntegerField()
-    report_month = models.CharField(max_length=10)
+    dept_id = models.IntegerField()
+    bill_year = models.IntegerField()
+    bill_month = models.CharField(max_length=10)
     report_type = models.CharField(max_length=10)
     clicked_at = models.DateTimeField(auto_now_add=True)
-    clicked_by = models.CharField(max_length=20)
 
     def __str__(self):
-        return f'{self.report_month} {self.report_year} - {self.department_id} {self.report_type}'
+        return f'{self.bill_month} {self.bill_year} - {self.dept_id} {self.report_type}'

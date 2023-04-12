@@ -82,8 +82,11 @@
 
 {% block js %}
 <script>
-    function trackLinkClick(month,year,dept_id,report_type){
-        console.log(month,year,dept_id,report_type)
+    function trackLinkClick(bill_month,bill_year,dept_id,report_type){
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'download/log/', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({ bill_month: bill_month,bill_year:bill_year,dept_id:dept_id,report_type:report_type }));
     }
 </script>
 {% endblock %}

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import DownloadLog
+from .models import Log
 
-admin.site.register(DownloadLog)
+admin.site.register(Log)
 
 # Register your models here.
