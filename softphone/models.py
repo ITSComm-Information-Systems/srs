@@ -131,7 +131,7 @@ class SelectionAbstract(models.Model):
 
     subscriber = models.IntegerField(primary_key=True)
     uniqname_correct = models.CharField(max_length=12, choices=UNIQNAME_CHOICES)
-    uniqname = models.CharField(max_length=8)
+    uniqname = models.CharField(max_length=8, blank=True)
     migrate = models.CharField(max_length=12) #, choices=MIGRATE_CHOICES)
     location_correct = models.BooleanField(null=True)
     notes = models.TextField(max_length=200, blank=True, null=True)

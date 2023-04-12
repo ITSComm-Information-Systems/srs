@@ -2,10 +2,10 @@ from project.integrations import MCommunity
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from oscauth.models import AuthUserDept
-import csv, io, datetime
+import datetime
 
 class Command(BaseCommand):
-    help = 'Deactivate Users'
+    help = 'Deactivate Users - called from dailyjob.py'
 
     def add_arguments(self, parser):
         parser.add_argument('--update')
@@ -19,10 +19,6 @@ class Command(BaseCommand):
 
         mc = MCommunity()
         u = 0
-
-        csvfile =  open(f'/Users/djamison/Downloads/user_access.csv','w', encoding='mac_roman')
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(['uniqname', 'afil', 'last login','srs groups', 'srs permissions','dept permissions'])
 
         for user in User.objects.filter(password='',is_active=True).order_by('username'):   # Don't select system accounts.
             mc_user = mc.get_user(user.username)
@@ -57,15 +53,13 @@ class Command(BaseCommand):
                 for perm in department_perms:
                     print('   ', perm.dept, perm.group)
 
-                csvwriter.writerow([user.username, afil, user.last_login, user.groups.count(), user.user_permissions.count(), len(department_perms)])
-
                 if update == True:
                     department_perms.delete()
                     self.remove_security(user)
 
                 print(' ')
 
-            u+=1
+                u+=1
 
             #if u % 10 == 0:
             #    print(datetime.datetime.now(), str(u),'records read')

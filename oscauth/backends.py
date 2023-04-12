@@ -5,7 +5,7 @@ from project.pinnmodels import UmRteTechnicianV, UmBomProcurementUsersV, UmEcomm
 
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 from oscauth.utils import upsert_user
-
+from oscauth.views import add_custom_permissions
 
 class SuBackend(object):
     supports_inactive_user = False
@@ -64,5 +64,9 @@ class UMAuthenticationBackend(OIDCAuthenticationBackend):
         return user
 
     def update_user(self, user, claims):
+        add_custom_permissions(user.id)
         user = upsert_user(user.username)  # Create or Update User
+        if not user.is_active == True:
+            user.is_active = True    #  If user has been deactived and logs back in reactivate the account.
+            user.save()
         return user
