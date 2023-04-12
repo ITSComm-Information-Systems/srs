@@ -318,7 +318,32 @@
                 <input type="hidden" name="estimate_id" value="{{ estimate.id }}">
                 <div class="modal-body">
 
-                    <label for="id_file">Attach a CSV (The CSV file must include three columns: location, z-code, and quantity. There should be a new row for each location, Z-code, quantity.):</label><br>
+                    <label for="id_file">Attach a CSV <br/><span style="font-size: 10px;">(The CSV file must include three columns: location, z-code, and quantity. There should be a new row for each location, Z-code, quantity.)</span></label><br>
+                    <input type="file" name="file" multiple id="id_file">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function countChar(val) {
+        var len = val.value.length;
+        if (len >= 100) {
+          val.value = val.value.substring(0, 100);
+          document.querySelector("#charNum").textContent = "Character limit reached";
+        } else {
+            message = String(100 - len)+' characters left'
+            document.querySelector("#charNum").textContent = message;
+        }
+      };
+</script>
+
                     <input type="file" name="file" multiple id="id_file">
 
                 </div>
