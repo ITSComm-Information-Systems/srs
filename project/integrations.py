@@ -520,6 +520,7 @@ class ContainerPayload(Payload):
             f'Select a container size: {instance.size}\n' 
             '--Add-ons--\n' 
             f'{instance.get_database_type_display()}\n'
+            f'Backup: {instance.backup}\n'
             '\n--ADMINS--\n'
             f'MCommunity Group: {request.POST.get("admin_group")}\n' 
             'Project Admins:\n' 
