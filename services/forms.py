@@ -244,7 +244,7 @@ class ContainerNewForm(CloudForm):
                                    )
 
     project_description = forms.CharField(required=False, help_text='Used to describe any charges associated with this project on billing invoices.')
-    backup = forms.BooleanField(widget=NoYes, help_text='Selecting "Yes" here will automatically create a backup of the artifacts and persistent volumes associated with your application.')
+    backup = forms.CharField(widget=NoYes, help_text='Selecting "Yes" here will automatically create a backup of the artifacts and persistent volumes associated with your application.')
     admins = forms.CharField(widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should be "Admins" for this project.  Enter one uniqname per line.')
     editors = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "Edit" access to this project.  Enter one uniqname per line.')
     viewers = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "View" access to this project.  Enter one uniqname per line.')

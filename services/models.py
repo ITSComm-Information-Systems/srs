@@ -129,7 +129,7 @@ class Container(Cloud):
     database_type = models.CharField(max_length=10, choices=DATABASE_TYPE_CHOICES, null=True)
     database = models.CharField(max_length=10, choices=DATABASE_ADDON_CHOICES,
                             help_text='The MiDatabase team manages Amazon RDS databases for Container Service customers. Databases in shared instances are available at no cost. The cost of dedicated RDS instances are passed through to the shortcode provided.')
-    backup = models.BooleanField()
+    backup = models.CharField(max_length=6)
     course_info = models.CharField(max_length=20)
 
     class Meta:
