@@ -155,7 +155,7 @@ class Openshift():
         r = requests.post(f'{self.API_ENDPOINT}/apis/project.openshift.io/v1/projects', headers=self.HEADERS, json=payload)     
         self.create_role_bindings(instance)
         self.add_limits(instance)
-        if instance.backup:
+        if instance.backup == True:
             self.add_backup(instance)
 
     def create_role_bindings(self, instance):
