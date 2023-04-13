@@ -47,6 +47,8 @@ class Command(BaseCommand):
         elif email.code in ['TUE_NO_LOGIN','WED_NO_LOGIN']:
             call_command('zoom_api', cut_date='next')  # Check for no logins
             user_list = user_query.values_list('uniqname','updated_by').filter(zoom_login='N')
+            if email.code == 'WED_NO_LOGIN':
+                self.pause_users(cut_date)
         elif email.code == 'USER_MIGRATE':
             user_list = user_query
         elif email.code == 'UA_WEEKLY':
@@ -131,3 +133,32 @@ class Command(BaseCommand):
                 user_list.append(user[0])
 
         return user_list
+
+    def pause_users(self, cut_date):
+        print('pause')
+
+        with connections['default'].cursor() as cursor:
+            print('cut date', cut_date)
+            sql = 'update um_softphone_selection '   \
+            'set cut_date = (select min(cut_date) ' \
+            '                from SRS_SOFTPHONE_CUTDATE ' \
+            '                where cut_date > %s) ' \
+            ", admin_notes = admin_notes || chr(10) || to_char(sysdate, 'MM/DD/YY') || ' SRS pause - user not logged in.' " \
+            'where cut_date = %s ' \
+            'and uniqname not in (select id from um_softphone_zoom ' \
+            '                       where last_login_time is not null) '   # List of all logged in users 
+
+            cursor.execute(sql, (cut_date, cut_date))
+ 
+
+            sql = 'update um_softphone_selection ' \
+            'set cut_date = (select min(cut_date) ' \
+            '        from SRS_SOFTPHONE_CUTDATE ' \
+            '        where cut_date > %s) '  \
+            ", admin_notes = admin_notes || chr(10) || to_char(sysdate, 'MM/DD/YY') || ' SRS pause - no address verification.' " \
+            ' where cut_date = %s ' \
+            "  and migrate = 'YES_SET' " \
+            '  and (location_correct = 0 or location_correct is null) ' \
+            '  and new_building is null '
+
+            cursor.execute(sql, (cut_date, cut_date))
