@@ -1,5 +1,6 @@
 import warnings
 from datetime import datetime
+import json
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.template import loader
@@ -17,11 +18,13 @@ from django import forms
 
 from ldap3 import Server, Connection, ALL
 
-from .models import UmTollCallDetail
+from .models import UmTollCallDetail, DownloadLog
 from oscauth.models import AuthUserDept, Grantor, Role, AuthUserDeptV
 
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from django.contrib.auth.decorators import login_required, permission_required
+from django.views.decorators.csrf import csrf_exempt
+
 
 from datetime import datetime
 from django.utils.dateparse import parse_date
@@ -210,3 +213,31 @@ def download_CSV(request, bill_date, deptid):
 		raise Http404
 	else:
 		return HttpResponse(file_path)
+	
+@permission_required('oscauth.can_report', raise_exception=True)
+@csrf_exempt
+def log_report_download(request):
+	if request.method != 'POST':
+		return HttpResponseBadRequest('Invalid request method')
+	request_body = request.body.decode('utf-8')
+	try:
+		data = json.loads(request_body)
+	except json.JSONDecodeError:
+		return HttpResponseBadRequest('Invalid JSON in request body')
+	
+	report_type = data.get('report_type')
+	bill_month = data.get('bill_month')
+	bill_year = data.get('bill_year')
+	dept_id = data.get('dept_id')
+	print(report_type,bill_month,bill_year,dept_id)
+
+	log_event = DownloadLog(
+		report_type = report_type,
+		bill_year = bill_year,
+		bill_month = bill_month,
+		dept_id = dept_id
+	)
+
+	log_event.save()
+	
+	return HttpResponse("logged", status=200)
