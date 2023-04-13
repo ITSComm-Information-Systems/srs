@@ -105,9 +105,9 @@ class Azure(Cloud):
 
 class Container(Cloud):
     SIZE_CHOICES = (
-        ('sm_container', 'SMALL, 1GB ($0.02/hr)'),
-        ('med_container', 'Upgrade to MEDIUM, 4GB ($0.04/hr)'),
-        ('lg_container', 'Upgrade to LARGE, 4GB+ ($0.08/hr)'))
+        ('sm_container', 'SMALL, up to 1GB RAM ($0.02/hr)'),
+        ('med_container', 'Upgrade to MEDIUM, 1-4GB RAM ($0.04/hr)'),
+        ('lg_container', 'Upgrade to LARGE, 4-8GB RAM ($0.08/hr)'))
 
     DATABASE_TYPE_CHOICES = (
         ('MARIADB', 'MariaDB'),
@@ -127,7 +127,8 @@ class Container(Cloud):
                             verbose_name='Container Size',
                             help_text="This sets the upper limit of CPU and RAM available for your containerized applications. This can be changed later via request to Container Service staff. More information about container sizes and rates can be found here: <a href='https://its.umich.edu/computing/virtualization-cloud/container-service/pricing' target='_blank'>https://its.umich.edu/computing/virtualization-cloud/container-service/pricing</a>")
     database_type = models.CharField(max_length=10, choices=DATABASE_TYPE_CHOICES, null=True)
-    database = models.CharField(max_length=10, choices=DATABASE_ADDON_CHOICES)
+    database = models.CharField(max_length=10, choices=DATABASE_ADDON_CHOICES,
+                            help_text='The MiDatabase team manages Amazon RDS databases for Container Service customers. Databases in shared instances are available at no cost. The cost of dedicated RDS instances are passed through to the shortcode provided.')
     backup = models.BooleanField()
     course_info = models.CharField(max_length=20)
 
