@@ -34,3 +34,13 @@ class UmTollCallDetail(models.Model):
         managed = False
         unique_together = (('billing_date', 'deptid'))
         db_table = 'PINN_CUSTOM\".\"um_toll_call_detail_v'
+
+class DownloadLog(models.Model):
+    dept_id = models.IntegerField()
+    bill_year = models.IntegerField()
+    bill_month = models.CharField(max_length=10)
+    report_type = models.CharField(max_length=10)
+    clicked_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.bill_month} {self.bill_year} - {self.dept_id} {self.report_type}'

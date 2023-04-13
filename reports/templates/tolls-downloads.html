@@ -61,14 +61,14 @@
 <div class="col mb-4">
     <i class="fas fa-file-csv" style="color:#28a745"></i><a
         href='download/csv/{{bill_month}}_{{bill_year}}/{{dept_id}}/'
-        download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv">&nbsp;&nbsp;CSV Download</a>
+        download="{{bill_month}}{{bill_year}}-{{dept_id}}.csv" onclick="trackLinkClick('{{bill_month}}','{{bill_year}}','{{dept_id}}','csv')">&nbsp;&nbsp;CSV Download</a>
 </div>
 <div class="col mb-4">
-    <i class="fas fa-file-pdf prv-msgs"></i><a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'>&nbsp;&nbsp;PDF
+    <i class="fas fa-file-pdf prv-msgs"></i><a href='download/pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/' onclick="trackLinkClick('{{bill_month}}','{{bill_year}}','{{dept_id}}','pdf')">&nbsp;&nbsp;PDF
         Download</a>
 </div>
 <div class="col mb-4">
-    <i class="fas fa-file-pdf prv-msgs"></i><a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/'>
+    <i class="fas fa-file-pdf prv-msgs"></i><a href='download/cond-pdf/{{bill_month}}_{{bill_year}}/{{dept_id}}/' onclick="trackLinkClick('{{bill_month}}','{{bill_year}}','{{dept_id}}','condensed')">
         &nbsp;&nbsp;Condensed PDF Download</a>
 </div>
 
@@ -78,4 +78,15 @@
 <i class="fas fa-exclamation-triangle prv-msgs"></i><span class="prv-msgs">Department is inactive.</span>
 {% endif %}
 
+{% endblock %}
+
+{% block js %}
+<script>
+    function trackLinkClick(bill_month,bill_year,dept_id,report_type){
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'download/log/', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({ bill_month: bill_month,bill_year:bill_year,dept_id:dept_id,report_type:report_type }));
+    }
+</script>
 {% endblock %}
