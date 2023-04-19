@@ -227,8 +227,8 @@ def validate_project_name(value):
 
 class ContainerNewForm(CloudForm):
     title = 'Request a Container Service Project'
-    custom = ['database_type', 'course_info','container_sensitive']
-    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data']
+    custom = ['database_type', 'course_info']
+    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','container_sensitive']
     container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
     course_yn = forms.BooleanField(widget=NoYes,
         label='Are you requesting this service for a course project?',

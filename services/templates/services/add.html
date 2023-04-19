@@ -6,6 +6,12 @@
 
     <form method="POST">
         {% csrf_token %}
+
+        {% if 'container_sensitive' in form.fields %}
+        {% include 'services/container_sensitive.html' %}
+        {% endif %}
+
+        <div id="div_formbody">
         {% for field in form %}
             {% if field.name in form.skip %}
             {% elif field.name in form.custom %}
@@ -46,10 +52,10 @@
             </label>
         </div>
         {% endif %}
-
+        </div>
         <hr>
 
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
     </form>
 
 </div>
@@ -103,6 +109,18 @@
             }
         });
 
+        $("#id_container_sensitive").change(function () {
+            if (this.checked) {
+                $("#div_formbody").show();
+                $("#submit_btn").show();
+            } else {
+                $("#div_formbody").hide();
+                $("#submit_btn").hide();
+            }
+        });
+
+        
+
         $("#id_nih_yn").change(function () {
             if (this.value == "Yes") {
                 $("#div_nih_info").show();
@@ -126,6 +144,7 @@
             }
         });
 
+        $('#id_container_sensitive').trigger('change')
         $('#id_migrate_existing').trigger('change')
         $('#id_sensitive_data_yn').trigger('change')
         $('#id_gcp_existing').trigger('change')
