@@ -32,19 +32,14 @@ class ServiceRequestView(UserPassesTestMixin, View):
         title = f'Request {model._meta.verbose_name.title()} {model.instance_label}'
 
         if form.is_valid():
+            form.save()
+            create_ticket('New', form.instance, request, title=title)
 
-            if model == Container:   
-                name = form.cleaned_data.get('project_name')             
-                os = Openshift()
-                os.create_project( form.cleaned_data.get('project_name') )
-
-                print('model', 'create container')
+            if model == Container:
+                project_url = f'{Openshift.PROJECT_URL}/{form.instance.project_name}'
+                return render(request, 'services/new_container.html', {'link': project_url, 'title': 'New Container Service Project'})
             else:
-                form.save()
-                instance = model.objects.get(id=form.instance.id)
-                create_ticket('New', instance, request, title=title)
-
-            return HttpResponseRedirect('/requestsent')
+                return HttpResponseRedirect('/requestsent')
         else:
             print(form.errors)
 
