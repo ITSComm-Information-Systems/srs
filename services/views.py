@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import UserPassesTestMixin
 from .forms import *
 from .models import *
-from project.integrations import create_ticket, Openshift
+from project.integrations import create_ticket, Openshift, TDx
 from oscauth.models import LDAPGroupMember
 
 
@@ -33,7 +33,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
         if form.is_valid():
             form.save()
-            create_ticket('New', form.instance, request, title=title)
+            r = create_ticket('New', form.instance, request, title=title)
 
             if model == Container:
                 project_url = f'{Openshift.PROJECT_URL}/{form.instance.project_name}'

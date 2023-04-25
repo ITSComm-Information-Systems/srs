@@ -215,6 +215,27 @@ class TDx():
         if not resp.ok:
             print(resp.status_code, resp.text)
 
+        if 'Tasks' in payload:
+            task_id = 0
+            ticket = json.loads(resp.text).get('ID')
+
+            for task in payload.get('Tasks'):
+                task['PredecessorID'] = task_id
+                task_response = self.create_task(task, ticket)
+                task_id = json.loads(task_response.text).get('ID')
+
+        return resp
+
+    def create_task(self, payload, ticket):
+        payload['SourceID'] = 8         # System
+
+        resp = requests.post( f'{self.BASE_URL}/31/tickets/{ticket}/tasks'
+                            , headers=self.headers
+                            , json=payload )
+
+        if not resp.ok:
+            print(resp.status_code, resp.text)
+
         return resp
 
     def __init__(self):
@@ -501,10 +522,13 @@ class AzurePayload(Payload):
 
 
 class ContainerPayload(Payload):
+    DBA_TEAM = 7
+    CONTAINER_TEAM = 17
+
     form_id = 20
     type_id = 25
     service_id = 13
-    responsible_group_id = 7
+    responsible_group_id = CONTAINER_TEAM
 
     def __init__(self, action, instance, request, **kwargs):
         self.description = (f'Submitted by user: {request.user.username} \n\n' 
@@ -519,7 +543,7 @@ class ContainerPayload(Payload):
             '\n--CUSTOMIZE--\n' 
             f'Select a container size: {instance.size}\n' 
             '--Add-ons--\n' 
-            f'{instance.get_database_type_display()}\n'
+            f'{instance.get_database_display()}\n'
             f'Backup: {instance.backup}\n'
             '\n--ADMINS--\n'
             f'MCommunity Group: {request.POST.get("admin_group")}\n' 
@@ -534,6 +558,15 @@ class ContainerPayload(Payload):
 
         super().__init__(action, instance, request, **kwargs)
 
+        self.data["Tasks"] = [{'Title': 'Validate customer request', "Order": 1, "ResponsibleGroupID": self.CONTAINER_TEAM}]
+
+        if instance.database in ['SHARED', 'DEDICATED']:
+            title = f'Create { instance.db_type } { instance.database }  for project: { instance.name }'
+            self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.DBA_TEAM} )
+
+            title = 'Add contact group to notification group'
+            self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.DBA_TEAM} )
+
 
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
@@ -544,6 +577,8 @@ def create_ticket(action, instance, request, **kwargs):
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
         print('TDx response', resp.status_code, resp.text)
+    
+    return json.loads(resp.text)
 
 def create_ticket_database_modify(instance, user, description):
 
