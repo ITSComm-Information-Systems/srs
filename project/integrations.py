@@ -217,6 +217,18 @@ class TDx():
 
         return resp
 
+    def create_task(self, payload, ticket):
+        payload['SourceID'] = 8         # System
+
+        resp = requests.post( f'{self.BASE_URL}/31/tickets/{ticket}/tasks'
+                            , headers=self.headers
+                            , json=payload )
+
+        if not resp.ok:
+            print(resp.status_code, resp.text)
+
+        return resp
+
     def __init__(self):
         self._get_token()
 
@@ -544,6 +556,8 @@ def create_ticket(action, instance, request, **kwargs):
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
         print('TDx response', resp.status_code, resp.text)
+    
+    return json.loads(resp.text)
 
 def create_ticket_database_modify(instance, user, description):
 
