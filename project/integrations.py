@@ -522,8 +522,8 @@ class AzurePayload(Payload):
 
 
 class ContainerPayload(Payload):
-    DBA_TEAM = 7
-    CONTAINER_TEAM = 17
+    DBA_TEAM = 17
+    CONTAINER_TEAM = 7
 
     form_id = 20
     type_id = 25
