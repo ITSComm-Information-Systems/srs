@@ -561,7 +561,7 @@ class ContainerPayload(Payload):
         self.data["Tasks"] = [{'Title': 'Validate customer request', "Order": 1, "ResponsibleGroupID": self.CONTAINER_TEAM}]
 
         if instance.database in ['SHARED', 'DEDICATED']:
-            title = f'Create { instance.db_type } { instance.database }  for project: { instance.name }'
+            title = f'Create { instance.get_database_type_display() } { instance.get_database_display() }  for project: { instance.project_name }'
             self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.DBA_TEAM} )
 
             title = 'Add contact group to notification group'
