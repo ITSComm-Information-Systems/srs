@@ -522,8 +522,8 @@ class AzurePayload(Payload):
 
 
 class ContainerPayload(Payload):
-    DBA_TEAM = 7
-    CONTAINER_TEAM = 17
+    DBA_TEAM = 17
+    CONTAINER_TEAM = 7
 
     form_id = 20
     type_id = 25
@@ -531,6 +531,11 @@ class ContainerPayload(Payload):
     responsible_group_id = CONTAINER_TEAM
 
     def __init__(self, action, instance, request, **kwargs):
+        if instance.database in ['SHARED', 'DEDICATED']:
+            db = ' - ' + instance.get_database_type_display()
+        else:
+            db = ''
+
         self.description = (f'Submitted by user: {request.user.username} \n\n' 
             #f'Submission_date: {instance.created_date}\n' 
             f'Uniqname: {request.user.username}\n' 
@@ -543,7 +548,7 @@ class ContainerPayload(Payload):
             '\n--CUSTOMIZE--\n' 
             f'Select a container size: {instance.size}\n' 
             '--Add-ons--\n' 
-            f'{instance.get_database_display()}\n'
+            f'{instance.get_database_display()} {db}\n'
             f'Backup: {instance.backup}\n'
             '\n--ADMINS--\n'
             f'MCommunity Group: {request.POST.get("admin_group")}\n' 
@@ -561,11 +566,11 @@ class ContainerPayload(Payload):
         self.data["Tasks"] = [{'Title': 'Validate customer request', "Order": 1, "ResponsibleGroupID": self.CONTAINER_TEAM}]
 
         if instance.database in ['SHARED', 'DEDICATED']:
-            title = f'Create { instance.db_type } { instance.database }  for project: { instance.name }'
+            title = f'Create { instance.get_database_type_display() } { instance.get_database_display() }  for project: { instance.project_name }'
             self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.DBA_TEAM} )
 
             title = 'Add contact group to notification group'
-            self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.DBA_TEAM} )
+            self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.CONTAINER_TEAM} )
 
 
 def create_ticket(action, instance, request, **kwargs):
