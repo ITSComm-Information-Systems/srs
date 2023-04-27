@@ -139,9 +139,9 @@ UM_API = {
 }
 
 OPENSHIFT = {
-    'BASE_URL': os.getenv('OPENSHIFT_BASE_URL'),
-    'USER': os.getenv('OPENSHIFT_USER'),
-    'TOKEN': os.getenv('OPENSHIFT_TOKEN'),
+    'SERVER': os.getenv('OPENSHIFT_SERVER', 'containersdev.03r5.p1.openshiftapps.com'),
+    'USER': os.getenv('OPENSHIFT_USER', 'srs-serviceaccount'),
+    'TOKEN': os.getenv('OPENSHIFT_TOKEN', 'notfound'),
 }
 
 ROOT_URLCONF = 'project.urls'
