@@ -152,8 +152,13 @@ class Openshift():
             payload['metadata']['labels']['course'] = instance.course_info
         else:
             payload['metadata']['labels']['shortcode'] = instance.shortcode
-            
-            payload['metadata']['labels']['billing-dept-name'] = instance.dept
+
+            try:
+                sc = ShortCodesAPI().get_shortcode(instance.shortcode).json()
+                dept_name =  sc['ShortCodes']['ShortCode']['deptDescription']
+                payload['metadata']['labels']['billing-dept-name'] = dept_name
+            except:
+                print('error getting shortcode')
 
         r = requests.post(f'{self.API_ENDPOINT}/apis/project.openshift.io/v1/projects', headers=self.HEADERS, json=payload)     
         self.create_role_bindings(instance)
