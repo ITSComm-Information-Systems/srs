@@ -131,6 +131,7 @@ class Container(Cloud):
                             help_text='The MiDatabase team manages Amazon RDS databases for Container Service customers. Databases in shared instances are available at no cost. The cost of dedicated RDS instances are passed through to the shortcode provided.')
     backup = models.CharField(max_length=6)
     course_info = models.CharField(max_length=20)
+    admin_group = models.CharField(max_length=80)
 
     class Meta:
         managed = False   # We don't want a real table in Oracle but abstract models can't be instantiated.
