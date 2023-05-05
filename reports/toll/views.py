@@ -18,7 +18,7 @@ from django import forms
 
 from ldap3 import Server, Connection, ALL
 
-from .models import UmTollCallDetail,DownloadLog
+from .models import UmTollCallDetail, DownloadLog
 from oscauth.models import AuthUserDept, Grantor, Role, AuthUserDeptV
 
 from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
