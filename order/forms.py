@@ -441,9 +441,13 @@ class RestrictionsForm(TabForm):
     template = 'order/restrictions.html'
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True  # Django 4.1.9 workaround
+
+
 class AddlInfoForm(TabForm):
 
-    file = forms.FileField(label="Please attach any drawings, spreadsheets or floor plans with jack locations as needed", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    file = forms.FileField(label="Please attach any drawings, spreadsheets or floor plans with jack locations as needed", required=False, widget=MultipleFileInput(attrs={'multiple': True}))
     file.type = 'file'
     template = 'order/addl_info.html'
 
