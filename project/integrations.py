@@ -139,7 +139,7 @@ class Openshift():
                 "name": instance.project_name,
                 "labels": {
                     'size': instance.size,
-                    'contact-mcomm-group': instance.admin_group,
+                    'contact-mcomm-group': instance.admin_group.replace(' ', '-'),
                 },
                 "annotations": {
                     "openshift.io/description": instance.project_description,
