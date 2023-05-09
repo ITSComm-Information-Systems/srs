@@ -1,3 +1,9 @@
+{% with server=tab.form.instance %}
+{% if server.non_regulated_data.all or server.regulated_data.all %}
+    <div id="sensitive_data_present" hidden></div>
+{% endif %}
+{% endwith %}
+
 <span id="server_rates" data-ram_rate="{{ tab.form.ram_rate }}" data-disk_replicated="{{ tab.form.disk_replicated }}"
     data-disk_no_replication="{{ tab.form.disk_no_replication }}" data-disk_backup="{{ tab.form.disk_backup }}"></span>
 
@@ -129,3 +135,29 @@
 </div>
 <input type="hidden" name="total_cost" id="total_cost_field">
 
+{% block js %}
+<script>
+const regulatedRadioButtonYes = document.getElementById("misevregu_0");
+const unregulatedRadioButtonYes = document.getElementById("misevnonregu_0");
+const backupRadioButtonYes = document.getElementById("backup_0")
+const backupRadioButtonNo = document.getElementById("backup_1")
+const productionRadioButton = document.getElementById("production_0")
+const backupFieldset = document.getElementById("div_backup");
+const sensitiveDataPresent = document.getElementById("sensitive_data_present")
+
+
+if(sensitiveDataPresent) handleSensitiveDataFormOptions()
+
+if(regulatedRadioButtonYes && unregulatedRadioButtonYes && backupRadioButtonYes && backupRadioButtonNo && backupFieldset){
+    if (productionRadioButton.checked && (regulatedRadioButtonYes.checked || unregulatedRadioButtonYes.checked)) handleSensitiveDataFormOptions()
+}
+
+function handleSensitiveDataFormOptions() {
+    backupRadioButtonYes.checked = true;
+    backupRadioButtonNo.disabled = true;
+    let span = document.createElement("span");
+
+    backupFieldset.after(span, "Backup service is required for all production servers containing sensitive data.");
+}
+</script>
+{% endblock %}
