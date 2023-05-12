@@ -113,8 +113,6 @@
             <strong>Due Date:</strong>{{ estimate.project.due_date|date:"SHORT_DATE_FORMAT" }}<br>
             <strong>Completed Date:</strong>{{ estimate.project.completed_date|date:"SHORT_DATE_FORMAT" }}<br>
             <strong>Project Status:</strong>{{ estimate.project.get_status_display }}<br>
-            <strong>% Completed:</strong>{{ estimate.project.percent_completed }}<br>
-            <strong>Project Health:</strong>{{ estimate.project.get_health_display }}<br>
           </div>
         </div>
 

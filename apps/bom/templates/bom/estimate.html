@@ -81,6 +81,13 @@
           {{ form.assigned_engineer }}
         </div>
 
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="estimate-label">Engineer Work</span>
+          </div>
+          {{ form.engineer_status }}
+        </div>
+
         <a href="{{ estimate.folder }}" target="_blank"><i class="fas fa-link"></i>&nbsp; Drive Folder</a>
         {{ form.folder }}
 
