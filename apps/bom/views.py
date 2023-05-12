@@ -529,7 +529,7 @@ class NetOpsSearch(PermissionRequiredMixin, View):
     def get(self, request):
         template = 'bom/netops.html'
 
-        search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3) | Q(percent_completed__lt=100)).order_by('-woid')
+        search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3)).order_by('-woid')
         return render(request, template,
                       {'title': 'Netops Projects',
                        'search_list': search_list})

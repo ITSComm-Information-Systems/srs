@@ -399,8 +399,6 @@ class ProjectView(BOM):
     updated_by = models.CharField(null=True, max_length=32)
     woid = models.IntegerField()
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, null=True)
-    percent_completed = models.PositiveSmallIntegerField(blank=True, null=True)
-    health = models.PositiveSmallIntegerField(choices=PROJECT_HEALTH_CHOICES, null=True)
     assigned_date = models.DateTimeField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     completed_date = models.DateTimeField(null=True, blank=True)
