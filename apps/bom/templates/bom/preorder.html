@@ -33,8 +33,13 @@
             <p class="font-weight-normal">{{ workorder.due_date|date:"SHORT_DATE_FORMAT" }}</p>
           </div>
           <div class="col-sm">
-            <p class="h4" id="tabTitle">Assigned To</p>
-            <p class="font-weight-normal">{{ workorder.assigned_labor_name_display }}</p>
+            {% if eng_view %}
+              <p class="h4" id="tabTitle">Pinnacle Assigned</p>
+              <p class="font-weight-normal">{{ workorder.assigned_labor_name_display }}</p>
+            {% else %}
+              <p class="h4" id="tabTitle">Assigned To</p>
+              <p class="font-weight-normal">{{ workorder.assigned_labor_name_display }}</p>
+            {% endif %}
             <strong>Engineering Due Date</strong>
             <p class="font-weight-normal">{{ workorder.estimated_completion_date|date:"SHORT_DATE_FORMAT" }}</p>
             <strong>Estimated Receive Date</strong>
@@ -113,8 +118,6 @@
             <strong>Due Date:</strong>{{ estimate.project.due_date|date:"SHORT_DATE_FORMAT" }}<br>
             <strong>Completed Date:</strong>{{ estimate.project.completed_date|date:"SHORT_DATE_FORMAT" }}<br>
             <strong>Project Status:</strong>{{ estimate.project.get_status_display }}<br>
-            <strong>% Completed:</strong>{{ estimate.project.percent_completed }}<br>
-            <strong>Project Health:</strong>{{ estimate.project.get_health_display }}<br>
           </div>
         </div>
 

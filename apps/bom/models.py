@@ -345,20 +345,9 @@ class Project(BOM):
         (REWORK, 'Rework'),
     ]
 
-    RED = 1
-    YELLOW = 2
-    GREEN = 3
-    PROJECT_HEALTH_CHOICES = [
-        (RED, 'Red'),
-        (YELLOW, 'Yellow'),
-        (GREEN, 'Green'),
-    ]
-
     woid = models.IntegerField()
     netops_engineer = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True, verbose_name='NetOps')
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, null=True)
-    percent_completed = models.PositiveSmallIntegerField(blank=True, null=True)
-    health = models.PositiveSmallIntegerField(choices=PROJECT_HEALTH_CHOICES, null=True)
     assigned_date = models.DateTimeField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     completed_date = models.DateTimeField(null=True, blank=True)
@@ -387,15 +376,6 @@ class ProjectView(BOM):
         (REWORK, 'Rework'),
     ]
 
-    RED = 1
-    YELLOW = 2
-    GREEN = 3
-    PROJECT_HEALTH_CHOICES = [
-        (RED, 'Red'),
-        (YELLOW, 'Yellow'),
-        (GREEN, 'Green'),
-    ]
-
     wo_number_display = models.CharField(max_length=14)
     pre_order_number = models.IntegerField()
     id = models.IntegerField(primary_key=True)
@@ -405,8 +385,6 @@ class ProjectView(BOM):
     updated_by = models.CharField(null=True, max_length=32)
     woid = models.IntegerField()
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, null=True)
-    percent_completed = models.PositiveSmallIntegerField(blank=True, null=True)
-    health = models.PositiveSmallIntegerField(choices=PROJECT_HEALTH_CHOICES, null=True)
     assigned_date = models.DateTimeField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     completed_date = models.DateTimeField(null=True, blank=True)

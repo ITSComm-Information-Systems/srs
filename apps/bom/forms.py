@@ -75,7 +75,7 @@ class ProjectForm(ModelForm):
     
     class Meta:
         model = Project
-        fields = ['netops_engineer','assigned_date','due_date','completed_date','status','percent_completed','health']
+        fields = ['netops_engineer','assigned_date','due_date','completed_date','status']
         widgets = {
             'assigned_date': forms.DateInput(attrs={'type': 'date'}),
             'due_date': forms.DateInput(attrs={'type': 'date'}),

@@ -266,6 +266,10 @@
   </div>
 </div>
 
+{% if eng_view %}
+<div id="eng_view" hidden></div>
+{% endif %}
+
 
 {% endblock %}
 
@@ -413,6 +417,10 @@
     }
 
   })
+
+
+  const eng_view = document.getElementById("eng_view");
+  if (eng_view){console.log('engineer view')}
 
 </script>
 {% endblock js %}

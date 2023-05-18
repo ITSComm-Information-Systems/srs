@@ -38,13 +38,23 @@
     <body>
         <h3>What do you want to do?</h3>
         <div class="row">
-            <button class="column" onclick="window.location.href='search/';">
+            <!-- <button id="find_order" class="column" onclick="window.location.href='search/';">
                 <h2>Find a Preorder or Workorder</h2>
             </button>
-            <button class="column" onclick="window.location.href='search?filter=assigned_to_me';">
+            <button id="show_assignments" class="column" onclick="window.location.href='search?filter=assigned_to_me';">
+                <h2>Show my Assignments</h2>
+            </button> -->
+
+            <button id="find_order" class="column" onclick="handleWorkorderClick()">
+                <h2>Find a Preorder or Workorder</h2>
+            </button>
+            <button id="show_assignments" class="column" onclick="handleAssignmentsClick()">
                 <h2>Show my Assignments</h2>
             </button>
         </div>
+        <input type="checkbox" id="eng_view" name="eng_view" value="eng_view">
+        <label for="eng_view">Engineer View</label><br>
+        
     </body>
 </html>
 
@@ -55,6 +65,27 @@
 
 {% block js %}
     <script>
+        const eng_view = document.getElementById("eng_view");
+        const find_order_button = document.getElementById("find_order");
+        const show_assignments_button = document.getElementById("show_assignments");
+        const default_find_order_url = "search/";
+        const default_show_assignments_url = "search?filter=assigned_to_me";
+        const engineer_find_order_url = "search?eng_view=true"
+        const engineer_show_assignments_url = ""
+
+        handleWorkorderClick = () => {
+            if (eng_view.checked){
+                location.href = engineer_find_order_url
+            }else{
+                location.href = default_find_order_url
+            }
+            
+        }
+
+        handleAssignmentsClick = () => {
+            location.href = default_show_assignments_url
+        }
+
         $('.collapse').collapse();
     </script>
 {% endblock js %}
