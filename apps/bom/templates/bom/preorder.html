@@ -161,3 +161,26 @@
     </div>
   </div>
 </div>
+
+
+{% block js %}
+  <script>
+    const status = document.getElementById("id_project-status");
+    const completed_date_field = document.getElementById("id_project-completed_date");
+    const completed_date_field_initial_value = completed_date_field.value
+
+    
+    status.onchange = function(){
+      if (status.value == '1'){
+        handleComplete()
+      } else {
+        completed_date_field.value = completed_date_field_initial_value
+      }
+    }
+
+    const handleComplete = () =>{
+      completed_date_field.valueAsDate = new Date();
+    }
+
+  </script>
+{% endblock js %}

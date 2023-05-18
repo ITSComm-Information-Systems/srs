@@ -338,11 +338,11 @@ class Estimate(BOM):
 class Project(BOM):
     COMPLETE = 1
     OPEN = 2
-    REWORK = 3
+    IN_PROGRESS = 4
     STATUS_CHOICES = [
         (COMPLETE, 'Complete'),
         (OPEN, 'Open'),
-        (REWORK, 'Rework'),
+        (IN_PROGRESS, 'In Progress'),
     ]
 
     woid = models.IntegerField()
