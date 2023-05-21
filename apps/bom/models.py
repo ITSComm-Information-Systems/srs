@@ -344,10 +344,11 @@ class Estimate(BOM):
 class Project(BOM):
     COMPLETE = 1
     OPEN = 2
-    REWORK = 3  # Deprecated
+    IN_PROGRESS = 4
     STATUS_CHOICES = [
         (COMPLETE, 'Complete'),
         (OPEN, 'Open'),
+        (IN_PROGRESS, 'In Progress'),
     ]
 
     woid = models.IntegerField()
@@ -379,15 +380,6 @@ class ProjectView(BOM):
         (COMPLETE, 'Complete'),
         (OPEN, 'Open'),
         (REWORK, 'Rework'),
-    ]
-
-    RED = 1
-    YELLOW = 2
-    GREEN = 3
-    PROJECT_HEALTH_CHOICES = [
-        (RED, 'Red'),
-        (YELLOW, 'Yellow'),
-        (GREEN, 'Green'),
     ]
 
     wo_number_display = models.CharField(max_length=14)

@@ -33,8 +33,13 @@
             <p class="font-weight-normal">{{ workorder.due_date|date:"SHORT_DATE_FORMAT" }}</p>
           </div>
           <div class="col-sm">
-            <p class="h4" id="tabTitle">Assigned To</p>
-            <p class="font-weight-normal">{{ workorder.assigned_labor_name_display }}</p>
+            {% if eng_view %}
+              <p class="h4" id="tabTitle">Pinnacle Assigned</p>
+              <p class="font-weight-normal">{{ workorder.assigned_labor_name_display }}</p>
+            {% else %}
+              <p class="h4" id="tabTitle">Assigned To</p>
+              <p class="font-weight-normal">{{ workorder.assigned_labor_name_display }}</p>
+            {% endif %}
             <strong>Engineering Due Date</strong>
             <p class="font-weight-normal">{{ workorder.estimated_completion_date|date:"SHORT_DATE_FORMAT" }}</p>
             <strong>Estimated Receive Date</strong>
@@ -156,3 +161,26 @@
     </div>
   </div>
 </div>
+
+
+{% block js %}
+  <script>
+    const status = document.getElementById("id_project-status");
+    const completed_date_field = document.getElementById("id_project-completed_date");
+    const completed_date_field_initial_value = completed_date_field.value
+
+    
+    status.onchange = function(){
+      if (status.value == '1'){
+        handleComplete()
+      } else {
+        completed_date_field.value = completed_date_field_initial_value
+      }
+    }
+
+    const handleComplete = () =>{
+      completed_date_field.valueAsDate = new Date();
+    }
+
+  </script>
+{% endblock js %}
