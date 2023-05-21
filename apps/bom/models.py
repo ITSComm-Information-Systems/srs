@@ -193,10 +193,16 @@ class Estimate(BOM):
         (CANCELLED, 'Cancelled'),
     ]
 
+    ENGINEER_STATUS = [
+        ('COMPLETE', 'Complete'),
+        ('NOT_COMPLETE', 'Not Complete'),
+    ]
+
     woid = models.IntegerField()
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=ESTIMATE)
     label = models.CharField(max_length=20)
     assigned_engineer = models.ForeignKey(Technician, on_delete=models.CASCADE, blank=True,null=True)
+    engineer_status = models.CharField(max_length=20, choices=ENGINEER_STATUS, default='NOT_COMPLETE')
     contingency_amount = models.DecimalField(null=True, max_digits=8, decimal_places=2, default=0)
     contingency_percentage = models.IntegerField(null=True, default=0)
     folder = models.URLField(null=True, blank=True)

@@ -18,7 +18,7 @@ class EstimateForm(ModelForm):
 
     class Meta:
         model = Estimate
-        fields = ['label', 'status', 'folder', 'contingency_amount','contingency_percentage','assigned_engineer']
+        fields = ['label', 'status', 'folder', 'contingency_amount','contingency_percentage','assigned_engineer','engineer_status']
 
     def __init__(self, *args, **kwargs):
         super(EstimateForm, self).__init__(*args, **kwargs)
