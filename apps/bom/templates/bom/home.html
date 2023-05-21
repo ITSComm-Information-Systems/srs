@@ -71,7 +71,7 @@
         const default_find_order_url = "search/";
         const default_show_assignments_url = "search?filter=assigned_to_me";
         const engineer_find_order_url = "search?eng_view=true"
-        const engineer_show_assignments_url = ""
+        const engineer_show_assignments_url = "search?filter=assigned_to_me&eng_view=true"
 
         handleWorkorderClick = () => {
             if (eng_view.checked){
@@ -83,7 +83,12 @@
         }
 
         handleAssignmentsClick = () => {
-            location.href = default_show_assignments_url
+            if (eng_view.checked){
+                location.href = engineer_show_assignments_url
+            }else{
+                location.href = default_show_assignments_url
+            }
+            
         }
 
         $('.collapse').collapse();

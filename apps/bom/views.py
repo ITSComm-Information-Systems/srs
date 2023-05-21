@@ -68,7 +68,6 @@ class Search(PermissionRequiredMixin, View):
 
         filter = request.GET.get('filter', all)
         eng_view = request.GET.get('eng_view', all)
-        print(eng_view)
 
         if filter == 'open_estimates':
             title = 'Open Estimates'
@@ -90,7 +89,18 @@ class Search(PermissionRequiredMixin, View):
             title = 'Assigned to Me'
             username = request.user.username
             open = ['Estimate']
-            search_list = EstimateView.objects.filter(project_manager=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_engineer=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_netops=username, status__in=EstimateView.OPEN)
+            if eng_view == 'true':
+                search_list = []
+                estimate_list = EstimateView.objects.filter(project_manager=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_engineer=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_netops=username, status__in=EstimateView.OPEN)
+                for estimate in estimate_list:
+                    project = ProjectView.objects.filter(pre_order_number=estimate.pre_order_number)
+                    for pro in project:
+                        if pro.status != 1:
+                            search_list.append(estimate)
+                    if not project:
+                        search_list.append(estimate)
+            else:
+                search_list = EstimateView.objects.filter(project_manager=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_engineer=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_netops=username, status__in=EstimateView.OPEN)
             template = 'bom/search_estimates.html'
         else:  # open_workorder
             title = 'Search Open Preorders/Workorders'
