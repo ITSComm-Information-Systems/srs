@@ -429,5 +429,12 @@
   const eng_view = document.getElementById("eng_view");
   if (eng_view){console.log('engineer view')}
 
+  document.addEventListener("DOMContentLoaded", function() {
+    var selectElement = document.getElementById("id_status");
+    var statusValue = selectElement.value;
+    var selectDisabled = statusValue === "0"; // Disable if "Rejected" option is selected (value is "0")
+    selectElement.disabled = selectDisabled;
+  });
+
 </script>
 {% endblock js %}
