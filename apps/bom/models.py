@@ -183,14 +183,16 @@ class Estimate(BOM):
     ORDERED = 3
     COMPLETED = 4
     CANCELLED = 5
+    APPROVED = 6
 
     STATUS_CHOICES = [
         (REJECTED, 'Rejected'),
         (ESTIMATE, 'Estimate'),
+        (APPROVED, 'Approved'),
         (WAREHOUSE, 'Warehouse'),
         (ORDERED, 'Ordered'),
         (COMPLETED, 'Completed'),
-        (CANCELLED, 'Cancelled'),
+        (CANCELLED, 'Cancelled')
     ]
 
     ENGINEER_STATUS = [
@@ -241,8 +243,10 @@ class Estimate(BOM):
 
         if self.status != self.initial_status:
             Notification.objects.notify(self)
-            if self.initial_status == self.ESTIMATE and self.status != self.REJECTED:
-                Estimate.objects.filter(woid=self.woid,status=self.ESTIMATE,legacy_id='0').update(status=self.REJECTED)
+            # if self.initial_status == self.ESTIMATE and self.status != self.REJECTED:
+            #     Estimate.objects.filter(woid=self.woid,status=self.ESTIMATE,legacy_id='0').update(status=self.REJECTED)
+            if self.initial_status != self.APPROVED and self.status == self.APPROVED:
+                Estimate.objects.filter(woid=self.woid,status=self.ESTIMATE).update(status=self.REJECTED)
 
     def import_material_from_csv(self, file, user):
 
