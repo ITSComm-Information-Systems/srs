@@ -56,9 +56,8 @@ class Command(BaseCommand):
         elif email.code == 'THURSDAY_VERIFY':
             user_list = self.get_ua_list(cut_date, filter=" and migrate='YES_SET' ")
         elif email.code == 'DESKSET':
-            cut_date = CutDate.objects.get(cut_date=datetime.today()).cut_date
-            if cut_date:
-                user_list = SelectionV.objects.filter(cut_date=cut_date, migrate='YES_SET').values_list('uniqname', flat=True)
+            DesksetEmail().send_deskset_emails()
+            return
 
         if options['audit']:
             print('AUDIT ONLY****')
@@ -162,3 +161,64 @@ class Command(BaseCommand):
             '  and new_building is null '
 
             cursor.execute(sql, (cut_date, cut_date))
+
+
+class DesksetEmail():
+
+    email_schedule = []
+
+    # Users who haven’t logged in; cc Submitters, tasoftphone@umich.edu
+    # 1 week before transition START Day
+    email_schedule.append(('DS_PRE_TRANSITION', 'building_transition_start_date', 5, True))
+
+    # To Users; cc Submitters
+    # 2-3 days before transition START Day
+    email_schedule.append(('DS_LOG_IN', 'building_transition_start_date', 3, False))
+
+    # Users who haven’t logged in; cc Submitters, tasoftphone@umich.edu
+    # 2-3 days before transition START Day
+    email_schedule.append(('DS_LOG_IN_FINAL', 'building_transition_start_date', 2, True))
+
+    # To Users; cc Submitters
+    # On Transition Building END Day
+    email_schedule.append(('DS_POST_TRANSITION', 'building_transition_end_date', 0, False))
+
+
+    def send_deskset_emails(self):
+
+        for comm in self.email_schedule:
+            user_list = self.get_user_list(comm[1], comm[2], comm[3])
+
+            if len(user_list) > 0:
+                print('get email to send')
+                email = Email.objects.get(code=comm[0])
+                print(comm, email)
+
+                #context = {'cut_date': cut_date, 'week_of': week_of}
+                #email.body = Template(email.body).render(Context(context))
+                #email.subject = Template(email.subject).render(Context(context))
+
+    
+    def get_user_list(self, date_field, t_minus_date, login):
+
+        call_command('zoom_api', cut_date='next')
+
+        sql = 'select bldg.uniqname, sel.updated_by ' \
+              'from ps_rating.UM_SOFTPHONE_BLDG_API_V bldg ' \
+              'left join um_softphone_selection sel ' \
+              'on bldg.uniqname = sel.uniqname ' \
+              'left join um_softphone_zoom zm ' \
+              'on bldg.uniqname = zm.id ' \
+              f'where UM_COUNT_WEEKDAYS_F(sysdate, {date_field}) = {t_minus_date} ' 
+              
+        if login:
+            sql = sql + 'and zm.last_login_time is not null '
+
+        user_list = []
+
+        with connections['pinnacle'].cursor() as cursor:
+            cursor.execute(sql)
+            for user in cursor.fetchall():
+                user_list.append((user[0], user[1]))
+
+        return user_list
