@@ -25,7 +25,6 @@ from project.pinnmodels import UmOscDeptProfileV, UmCurrentDeptManagersV
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.csrf import csrf_exempt
 
-
 from datetime import datetime
 from django.utils.dateparse import parse_date
 from time import strptime

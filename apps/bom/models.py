@@ -193,10 +193,16 @@ class Estimate(BOM):
         (CANCELLED, 'Cancelled'),
     ]
 
+    ENGINEER_STATUS = [
+        ('COMPLETE', 'Complete'),
+        ('NOT_COMPLETE', 'Not Complete'),
+    ]
+
     woid = models.IntegerField()
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=ESTIMATE)
     label = models.CharField(max_length=20)
     assigned_engineer = models.ForeignKey(Technician, on_delete=models.CASCADE, blank=True,null=True)
+    engineer_status = models.CharField(max_length=20, choices=ENGINEER_STATUS, default='NOT_COMPLETE')
     contingency_amount = models.DecimalField(null=True, max_digits=8, decimal_places=2, default=0)
     contingency_percentage = models.IntegerField(null=True, default=0)
     folder = models.URLField(null=True, blank=True)
@@ -338,27 +344,15 @@ class Estimate(BOM):
 class Project(BOM):
     COMPLETE = 1
     OPEN = 2
-    REWORK = 3
+    REWORK = 3  # Deprecated
     STATUS_CHOICES = [
         (COMPLETE, 'Complete'),
         (OPEN, 'Open'),
-        (REWORK, 'Rework'),
-    ]
-
-    RED = 1
-    YELLOW = 2
-    GREEN = 3
-    PROJECT_HEALTH_CHOICES = [
-        (RED, 'Red'),
-        (YELLOW, 'Yellow'),
-        (GREEN, 'Green'),
     ]
 
     woid = models.IntegerField()
     netops_engineer = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True, verbose_name='NetOps')
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, null=True)
-    percent_completed = models.PositiveSmallIntegerField(blank=True, null=True)
-    health = models.PositiveSmallIntegerField(choices=PROJECT_HEALTH_CHOICES, null=True)
     assigned_date = models.DateTimeField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     completed_date = models.DateTimeField(null=True, blank=True)
@@ -405,8 +399,6 @@ class ProjectView(BOM):
     updated_by = models.CharField(null=True, max_length=32)
     woid = models.IntegerField()
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, null=True)
-    percent_completed = models.PositiveSmallIntegerField(blank=True, null=True)
-    health = models.PositiveSmallIntegerField(choices=PROJECT_HEALTH_CHOICES, null=True)
     assigned_date = models.DateTimeField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     completed_date = models.DateTimeField(null=True, blank=True)
