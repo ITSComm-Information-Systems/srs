@@ -157,7 +157,19 @@ function handleSensitiveDataFormOptions() {
     backupRadioButtonNo.disabled = true;
     let span = document.createElement("span");
 
-    backupFieldset.after(span, "Backup service is required for all production servers containing sensitive data.");
+    var link = document.createElement("a");
+    var text = document.createTextNode("Per IA requirements, Backup Service is required for all production servers containing sensitive data.");
+
+    // Set the link properties
+    link.href = "https://safecomputing.umich.edu/protect-the-u/protect-your-unit/backup-um-data";
+    link.textContent = " Safe Computing Backup Requirements";
+
+    // Append the text and link to the span
+    span.appendChild(text);
+    span.appendChild(link);
+
+    // Add the span element after the backupFieldset
+    backupFieldset.after(span);
 }
 </script>
 {% endblock %}
