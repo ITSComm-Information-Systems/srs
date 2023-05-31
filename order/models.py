@@ -630,6 +630,7 @@ class Server(models.Model):
 
     cpu = models.IntegerField('CPU')   #  <cpu>4</cpu>
     ram = models.IntegerField('RAM')    #  <ram>8</ram>
+    production = models.CharField(max_length=10,default=None)
     regulated_data = models.ManyToManyField(Choice, blank=True, limit_choices_to={"parent__code": "REGULATED_SENSITIVE_DATA"}, related_name='regulated')
     non_regulated_data = models.ManyToManyField(Choice, blank=True, limit_choices_to={"parent__code": "NON_REGULATED_SENSITIVE_DATA"})
     replicated = models.BooleanField(default=True)
