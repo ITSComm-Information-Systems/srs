@@ -34,3 +34,21 @@
 </div>
 {% endif %}
 {% endfor %}
+
+
+{% block js %}
+<script>
+    const production = document.getElementById("production_0");
+    const nonProduction = document.getElementById("production_1");
+    const onCallFieldSet = document.getElementById("div_on_call")
+
+    if(nonProduction.checked){
+        onCallFieldSet.style.display = 'none';
+    }
+
+    if(production.checked)
+    {
+        onCallFieldSet.style.display = '';
+    }
+</script>
+{% endblock %}
