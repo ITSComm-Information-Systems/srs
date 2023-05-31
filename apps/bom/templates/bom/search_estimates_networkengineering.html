@@ -1,6 +1,7 @@
 {% extends 'bom/base.html' %}
 {% block content %}
 <h2>{{ title }}</h2>
+<h3>NET ENG</h3>
 
 
 <div class="form-inline">
@@ -22,7 +23,6 @@
                 <th>Estimate Status</th>
                 <th>PM</th>
                 <th>Engineer</th>
-                <th>UMNet</th>
                 <th>Start Date</th>
                 <th>Engineering Due Date</th>
             </tr>
@@ -37,7 +37,6 @@
                 <td>{{ record.status }}</td>
                 <td>{{ record.project_manager }}</td>
                 <td>{{ record.assigned_engineer }}</td>
-                <td>{{ record.assigned_netops }}</td>
                 <td>{{ record.estimated_start_date|date:"Y-m-d" }}</td>
                 <td>{{ record.estimated_completion_date|date:"Y-m-d" }}</td>
             </tr>

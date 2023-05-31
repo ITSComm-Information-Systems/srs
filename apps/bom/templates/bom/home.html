@@ -38,13 +38,21 @@
     <body>
         <h3>What do you want to do?</h3>
         <div class="row">
-            <button class="column" onclick="window.location.href='search/';">
+            <!-- <button id="find_order" class="column" onclick="window.location.href='search/';">
                 <h2>Find a Preorder or Workorder</h2>
             </button>
-            <button class="column" onclick="window.location.href='search?filter=assigned_to_me';">
+            <button id="show_assignments" class="column" onclick="window.location.href='search?filter=assigned_to_me';">
+                <h2>Show my Assignments</h2>
+            </button> -->
+
+            <button id="find_order" class="column" onclick="handleWorkorderClick()">
+                <h2>Find a Preorder or Workorder</h2>
+            </button>
+            <button id="show_assignments" class="column" onclick="handleAssignmentsClick()">
                 <h2>Show my Assignments</h2>
             </button>
         </div>
+        
     </body>
 </html>
 
@@ -55,6 +63,19 @@
 
 {% block js %}
     <script>
+        const find_order_button = document.getElementById("find_order");
+        const show_assignments_button = document.getElementById("show_assignments");
+        const default_find_order_url = "search/";
+        const default_show_assignments_url = "search?filter=assigned_to_me";
+
+        handleWorkorderClick = () => {
+                location.href = default_find_order_url
+            }
+
+        handleAssignmentsClick = () => {
+            location.href = default_show_assignments_url
+        }
+
         $('.collapse').collapse();
     </script>
 {% endblock js %}
