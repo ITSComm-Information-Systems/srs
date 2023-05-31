@@ -42,13 +42,17 @@
     const nonProduction = document.getElementById("production_1");
     const onCallFieldSet = document.getElementById("div_on_call")
 
-    if(nonProduction.checked){
+    if(production && nonProduction){
+        if(nonProduction.checked){
         onCallFieldSet.style.display = 'none';
+        }
+
+        if(production.checked)
+        {
+            onCallFieldSet.style.display = '';
+        }
     }
 
-    if(production.checked)
-    {
-        onCallFieldSet.style.display = '';
-    }
+    
 </script>
 {% endblock %}
