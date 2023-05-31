@@ -105,28 +105,31 @@ class Search(PermissionRequiredMixin, View):
                 estimate_list = EstimateView.objects.filter(assigned_engineer=username)
                 for estimate in estimate_list:
                     if estimate.status != 'Completed' and estimate.status != 'Cancelled' and estimate.status != 'Rejected' and estimate.status != 'Ordered':
-                        search_list.append(estimate)
+                        projects = ProjectView.objects.filter(pre_order_number=estimate.pre_order_number)
+                        for project in projects:
+                            if project.status != 'Complete':
+                                search_list.append(estimate)
+                        
                 # for estimate_view in estimate_list:
                 #     engineer_status = estimate_view.estimate.engineer_status
                 #     print(engineer_status)
             elif group == 'Network Operations':
                 search_list = []
+                project_list=[]
+                
                 template = 'bom/search_estimates_networkoperations.html'
                 search_list = EstimateView.objects.filter(assigned_netops=username)
+
+                
                 # for estimate in estimate_list:
-                #     project = ProjectView.objects.filter(pre_order_number=estimate.pre_order_number)
-                #     for pro in project:
-                #         if pro.status != 1:
-                #             search_list.append(estimate)
-                #     if not project:
-                #         search_list.append(estimate)
+                #     search_list.append(estimate)
+                #     print('bingbong')
+                #     project = ProjectView.objects.filter(estimate_id=estimate.id)
+                #     project_list.append(project)
             elif group == 'Project Managers':
                 search_list = []
                 template = 'bom/search_estimates_projectmanagers.html'
-                estimate_list = EstimateView.objects.filter(project_manager=username)
-                for estimate in estimate_list:
-                    if estimate.status != 'Completed' and estimate.status != 'Rejected' and estimate.status != 'Cancelled':
-                        search_list.append(estimate)
+                search_list = EstimateView.objects.filter(project_manager=username)
 
             else:
                 search_list = EstimateView.objects.filter(project_manager=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_engineer=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_netops=username, status__in=EstimateView.OPEN)

@@ -152,6 +152,10 @@ class PreOrder(models.Model):
 
 class EstimateView(models.Model):
     OPEN = ['Estimate', 'Warehouse', 'Ordered']
+    ENGINEER_STATUS = [
+        ('COMPLETE', 'Complete'),
+        ('NOT_COMPLETE', 'Not Complete'),
+    ]
     id = models.IntegerField(primary_key=True)
     label = models.IntegerField()
     status = models.CharField(max_length=20)
@@ -167,6 +171,7 @@ class EstimateView(models.Model):
     estimated_start_date = models.DateTimeField(null=True, blank=True)
     actual_fulfilled_date = models.DateTimeField(null=True, blank=True)
     estimated_completion_date = models.DateTimeField(null=True, blank=True)
+    engineer_status = models.CharField(max_length=20, choices=ENGINEER_STATUS, default='NOT_COMPLETE')
 
     class Meta: 
         db_table = 'um_bom_estimate_search_v'
@@ -214,7 +219,7 @@ class Estimate(BOM):
     @property
     def read_only(self):
         if self.status:
-            if int(self.status) in [self.ESTIMATE, self.WAREHOUSE, self.ORDERED]:
+            if int(self.status) in [self.ESTIMATE, self.WAREHOUSE, self.ORDERED, self.APPROVED]:
                 return False
             else:
                 return True
@@ -239,6 +244,7 @@ class Estimate(BOM):
         self.initial_status = self.status
 
     def save(self, *args, **kwargs):
+        print(self.status, self.initial_status)
         super().save(*args, **kwargs)  # Call the "real" save() method.
 
         if self.status != self.initial_status:
@@ -248,7 +254,7 @@ class Estimate(BOM):
 
             if self.initial_status != self.APPROVED and self.status == self.APPROVED:
                 Estimate.objects.filter(woid=self.woid,status=self.ESTIMATE).update(status=self.REJECTED)
-                Estimate.objects.filter(id=self.id).update(engineer_status=self.ENGINEER_STATUS[1][0])
+                Estimate.objects.filter(id=self.id).update(engineer_status='NOT_COMPLETE')
 
     def import_material_from_csv(self, file, user):
 

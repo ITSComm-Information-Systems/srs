@@ -23,6 +23,7 @@
                 <th>Estimate Status</th>
                 <th>PM</th>
                 <th>Engineer</th>
+                <th>Engineer Status</th>
                 <th>Start Date</th>
                 <th>Engineering Due Date</th>
             </tr>
@@ -37,6 +38,12 @@
                 <td>{{ record.status }}</td>
                 <td>{{ record.project_manager }}</td>
                 <td>{{ record.assigned_engineer }}</td>
+                {% if record.engineer_status == 'COMPLETE' %}
+                    <td>Complete</td>
+                {% else %}
+                    <td>Not Complete</td>
+                {% endif %}
+                
                 <td>{{ record.estimated_start_date|date:"Y-m-d" }}</td>
                 <td>{{ record.estimated_completion_date|date:"Y-m-d" }}</td>
             </tr>

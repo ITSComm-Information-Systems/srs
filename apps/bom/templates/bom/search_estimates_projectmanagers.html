@@ -26,6 +26,7 @@
                 <th>UMNet</th>
                 <th>Start Date</th>
                 <th>Engineering Due Date</th>
+                <th>Engineer Status</th>
             </tr>
         </thead>
         <tbody id="workOrderTableBody">
@@ -41,6 +42,11 @@
                 <td>{{ record.assigned_netops }}</td>
                 <td>{{ record.estimated_start_date|date:"Y-m-d" }}</td>
                 <td>{{ record.estimated_completion_date|date:"Y-m-d" }}</td>
+                {% if record.engineer_status == 'COMPLETE' %}
+                    <td>Complete</td>
+                {% else %}
+                    <td>Not Complete</td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>
