@@ -101,18 +101,28 @@ class Search(PermissionRequiredMixin, View):
             open = ['Estimate']
             if group == 'Network Engineering':
                 search_list = []
+                raw_list=[]
                 template = 'bom/search_estimates_networkengineering.html'
                 estimate_list = EstimateView.objects.filter(assigned_engineer=username)
+                filter_list = []
                 for estimate in estimate_list:
                     if estimate.status != 'Completed' and estimate.status != 'Cancelled' and estimate.status != 'Rejected' and estimate.status != 'Ordered':
-                        projects = ProjectView.objects.filter(pre_order_number=estimate.pre_order_number)
-                        for project in projects:
-                            if project.status != 'Complete':
-                                search_list.append(estimate)
-                        
-                # for estimate_view in estimate_list:
-                #     engineer_status = estimate_view.estimate.engineer_status
-                #     print(engineer_status)
+                        if estimate.engineer_status == 'COMPLETE':
+                            filter_list.append(estimate.pre_order_number)
+
+                        if estimate.engineer_status != 'COMPLETE':
+                            projects = ProjectView.objects.filter(pre_order_number=estimate.pre_order_number)
+                            for project in projects:
+                                if project.status != 'Complete':
+                                    raw_list.append(estimate)
+                if len(filter_list) < 1:
+                    search_list = raw_list
+                else:
+                    for pre_order in filter_list:
+                        for raw_estimate in raw_list:
+                            if (raw_estimate.pre_order_number != pre_order):
+                                search_list.append(raw_estimate)
+                
             elif group == 'Network Operations':
                 search_list = []
                 project_list=[]

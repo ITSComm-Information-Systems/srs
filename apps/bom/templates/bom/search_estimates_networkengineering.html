@@ -21,7 +21,7 @@
                 <th>Estimate Label</th>
                 <th>Estimate Status</th>
                 <th>PM</th>
-                <th>Engineer</th>
+                <th>UMNet</th>
                 <th>Engineer Status</th>
                 <th>Start Date</th>
                 <th>Engineering Due Date</th>
@@ -36,7 +36,7 @@
                 <td>{{ record.label }}</td>
                 <td>{{ record.status }}</td>
                 <td>{{ record.project_manager }}</td>
-                <td>{{ record.assigned_engineer }}</td>
+                <td>{{ record.assigned_netops }}</td>
                 {% if record.engineer_status == 'COMPLETE' %}
                     <td>Complete</td>
                 {% else %}
