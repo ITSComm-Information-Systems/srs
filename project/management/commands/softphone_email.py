@@ -192,6 +192,8 @@ class DesksetEmail():
             if len(user_list) > 0:
                 print('get email to send')
                 email = Email.objects.get(code=comm[0])
+
+                Command.send_email(user_list, email)
                 print(comm, email)
 
                 #context = {'cut_date': cut_date, 'week_of': week_of}
