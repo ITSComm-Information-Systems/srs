@@ -149,8 +149,6 @@ const sensitiveDataPresent = document.getElementById("sensitive_data_present")
 if(sensitiveDataPresent) handleSensitiveDataFormOptions()
 
 if(regulatedRadioButtonYes && unregulatedRadioButtonYes && backupRadioButtonYes && backupRadioButtonNo && backupFieldset){
-    if (regulatedRadioButtonYes.checked || unregulatedRadioButtonYes.checked) handleSensitiveDataFormOptions()
-} else if (productionRadioButton && regulatedRadioButtonYes && unregulatedRadioButtonYes && backupRadioButtonYes && backupRadioButtonNo && backupFieldset){
     if (productionRadioButton.checked && (regulatedRadioButtonYes.checked || unregulatedRadioButtonYes.checked)) handleSensitiveDataFormOptions()
 }
 
