@@ -211,7 +211,7 @@ class DesksetEmail():
               'on bldg.uniqname = sel.uniqname ' \
               'left join um_softphone_zoom zm ' \
               'on bldg.uniqname = zm.id ' \
-              f'where UM_COUNT_WEEKDAYS_F(sysdate, {date_field}) = {t_minus_date} ' 
+              f'where ceil(um_date_util_k.um_count_business_days_f(sysdate, {date_field})) = {t_minus_date} ' 
               
         if login:
             sql = sql + 'and zm.last_login_time is not null '
