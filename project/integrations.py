@@ -169,7 +169,7 @@ class Openshift():
                 self.add_backup(instance)
         else:
             print('error', r.status_code, r.text)
-            raise BaseException(r.text)
+            raise RuntimeError(r.status_code, r.text)
 
     def create_role_bindings(self, instance):
         url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
