@@ -139,12 +139,12 @@ class Openshift():
                 "name": instance.project_name,
                 "labels": {
                     'size': instance.size,
-                    'contact-mcomm-group': instance.admin_group.replace(' ', '-'),
                 },
                 "annotations": {
                     "openshift.io/description": instance.project_description,
                     "openshift.io/display-name": instance.project_name,
-                    "openshift.io/requester": requester
+                    "openshift.io/requester": requester,
+                    "contact-mcomm-group": instance.admin_group
                 },
         }}
 
@@ -156,8 +156,7 @@ class Openshift():
             try:
                 sc = ShortCodesAPI().get_shortcode(instance.shortcode).json()
                 dept_name =  sc['ShortCodes']['ShortCode']['deptDescription']
-                dept_name = dept_name.replace(' ', '-')
-                payload['metadata']['labels']['billing-dept-name'] = dept_name
+                payload['metadata']['annotations']['billing-dept-name'] = dept_name
             except:
                 print('error getting shortcode')
 
@@ -169,6 +168,7 @@ class Openshift():
                 self.add_backup(instance)
         else:
             print('error', r.status_code, r.text)
+            raise RuntimeError(r.status_code, r.text)
 
     def create_role_bindings(self, instance):
         url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
