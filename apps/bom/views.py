@@ -125,7 +125,6 @@ class Search(PermissionRequiredMixin, View):
                 
             elif group == 'Network Operations':
                 search_list = []
-                project_list=[]
                 
                 template = 'bom/search_estimates_networkoperations.html'
                 search_list = EstimateView.objects.filter(assigned_netops=username)
@@ -139,7 +138,8 @@ class Search(PermissionRequiredMixin, View):
             elif group == 'Project Managers':
                 search_list = []
                 template = 'bom/search_estimates_projectmanagers.html'
-                search_list = EstimateView.objects.filter(project_manager=username)
+                search_list = EstimateView.objects.filter(project_manager=username,status__in=EstimateView.OPEN)
+                #search_list = raw_estimates.filter(status='Estimate') | raw_estimates.filter(status='Warehouse') | raw_estimates.filter(status='Ordered') | raw_estimates.filter(status='Approved')
 
             else:
                 search_list = EstimateView.objects.filter(project_manager=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_engineer=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_netops=username, status__in=EstimateView.OPEN)

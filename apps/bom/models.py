@@ -151,7 +151,7 @@ class PreOrder(models.Model):
 
 
 class EstimateView(models.Model):
-    OPEN = ['Estimate', 'Warehouse', 'Ordered']
+    OPEN = ['Estimate', 'Warehouse', 'Ordered', 'Approved']
     ENGINEER_STATUS = [
         ('COMPLETE', 'Complete'),
         ('NOT_COMPLETE', 'Not Complete'),
