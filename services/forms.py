@@ -307,7 +307,8 @@ class ClouddesktopNewForm(CloudForm):
 
     def save(self):
         # Save the form data to create a new pool instance
-        account_id=self.cleaned_data['base_image_name'],
+        image_name=self.cleaned_data['base_image_name']
+        owner = LDAPGroup().lookup( self.cleaned_data.get('admin_group') )
         cpu=self.cleaned_data['cpu']
         gpu=self.cleaned_data['gpu']
         storage=self.cleaned_data['storage']
@@ -320,9 +321,26 @@ class ClouddesktopNewForm(CloudForm):
             gpu_cost = 6.07
         total = 31.31 + cpu_cost + storage_cost + gpu_cost
 
+        pool_name = self.cleaned_data['pool_name']
+        pool_maximum = self.cleaned_data['pool_maximum']
+        pool_cost = int(pool_maximum) * total
+        ad_access_groups = self.cleaned_data['ad_groups']
+        sla = self.cleaned_data['sla']
+        shortcode = self.cleaned_data['shortcode']
+
+
+
+        if pool_maximum == '1':
+            persistent_vm = True
+        else:
+            persistent_vm = False
+
+
 
         image = CloudImage(
-            account_id=account_id,
+            owner=owner,
+            account_id=image_name,
+            shortcode = shortcode,
             cpu=cpu,
             cpu_cost=cpu_cost,
             memory=memory,
@@ -333,10 +351,24 @@ class ClouddesktopNewForm(CloudForm):
             gpu_cost=gpu_cost,
             total = total
         )
+
         image.save()
 
-        self.account_id=account_id
-        self.pool_maximum = self.cleaned_data['pool_maximum']
+        pool = CloudDesktop(
+            owner=owner,
+            account_id = pool_name,
+            shortcode = shortcode,
+            pool_maximum = pool_maximum,
+            pool_cost = pool_cost,
+            ad_access_groups = ad_access_groups,
+            sla=sla,
+            persistent_vm = persistent_vm
+        )
+        
+        pool.save()
+
+
+        
     
 
 
@@ -346,3 +378,10 @@ class ClouddesktopNewForm(CloudForm):
         fields=['admin_group','shortcode','shared_network','base_image_name','initial_image','operating_system',
                 'cpu','memory','storage','gpu','pool_name','auto_logout','pool_maximum',
                 'powered_on_desktops','min_desktops','ad_container','ad_groups','additional_details','sla']
+        
+class ClouddesktopChangeForm(CloudForm):
+    title = 'Modify MiDesktop'
+
+    class Meta:
+        model = CloudDesktop
+        fields = ['admin_group','shortcode','account_id','pool_maximum','ad_access_groups','sla']
