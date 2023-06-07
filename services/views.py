@@ -31,6 +31,10 @@ class ServiceRequestView(UserPassesTestMixin, View):
         form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)
         title = f'Request {model._meta.verbose_name.title()} {model.instance_label}'
 
+        if service == "clouddesktop":
+            for field in form:
+                print(field)
+
         if form.is_valid():
             form.save()
             r = create_ticket('New', form.instance, request, title=title)
@@ -50,7 +54,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
     def get(self, request, service):
         request.session['backupStorage'] = 'cloud'
         if service == "clouddesktop":
-            self.template = 'services/add_cloud_destop.html'
+            self.template = 'services/add_cloud_desktop.html'
 
         try:
             form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)

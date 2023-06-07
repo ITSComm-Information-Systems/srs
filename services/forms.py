@@ -4,6 +4,7 @@ from project.forms.fields import *
 from .models import AWS, Azure, GCP, GCPAccount, Container, CloudDesktop
 from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
+from .clouddesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
 
 # Defaults
 CharField = forms.CharField( widget=forms.TextInput(attrs={'class': 'form-control'}) )
@@ -287,7 +288,28 @@ class ContainerNewForm(CloudForm):
 
 class ClouddesktopNewForm(CloudForm):
     title = 'MiDesktop New Order Form'
+    shared_network = forms.ChoiceField(choices=((True, 'Shared Network'), (False, 'New Dedicated Network')))
+    initial_image = forms.ChoiceField(choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
+    operating_system = forms.ChoiceField(choices=(('Windows10 64bit','Windows10 64bit'),))
+    base_image_name = forms.CharField()
+    cpu = forms.ChoiceField(choices=CPU_CHOICES)
+    memory = forms.ChoiceField(choices=RAM_CHOICES)
+    storage = forms.ChoiceField(choices=STORAGE_CHOICES)
+    gpu = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
+    pool_name = forms.CharField()
+    auto_logout = forms.ChoiceField(choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
+    pool_maximum = forms.IntegerField()
+    powered_on_desktops = forms.IntegerField() 
+    min_desktops = forms.IntegerField()
+    ad_container = forms.CharField()
+    ad_groups = forms.CharField()
+    additional_details = forms.CharField()
+    
+
+
 
     class Meta:
         model = CloudDesktop
-        fields=['admin_group']
+        fields=['admin_group','shortcode','shared_network','base_image_name','initial_image','operating_system',
+                'cpu','memory','storage','gpu','pool_name','auto_logout','pool_maximum',
+                'powered_on_desktops','min_desktops','ad_container','ad_groups','additional_details']

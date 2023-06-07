@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="container">
+
+    <form method="POST">
+        {% csrf_token %}
+        <div id="div_formbody">
+            <div class="form-group {{ field.field.div_class }}" id="div_{{ field.name }}">
+                <div class="form-group">
+                    <label for="{{ form.admin_group.id_for_label }}"><h6><span style="color:red; font-size:12px;">* </span>MCommunity Group</h6></label>
+                    {{ form.admin_group }}
+                    <label for="{{ form.shortcode.id_for_label }}"><h6><span style="color:red; font-size:12px;">* </span>Shortcode</h6></label>
+                    {{ form.shortcode }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.shared_network.id_for_label }}"><h6>Will you be using a shared network or do you need a new dedicated network?</h6></label>
+                    {{ form.shared_network }}
+                    <label for="{{ form.base_image_name.id_for_label }}"><h6>Base Image Name</h6></label>
+                    {{ form.base_image_name }}
+                    <label for="{{ form.initial_image.id_for_label }}"><h6>Initial Image</h6></label>
+                    {{ form.initial_image }}
+                    <label for="{{ form.operating_system.id_for_label }}"><h6>Operating System</h6></label>
+                    {{ form.operating_system }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.cpu.id_for_label }}"><h6>CPU</h6></label>
+                    {{ form.cpu }}
+                    <label for="{{ form.memory.id_for_label }}"><h6>Memory</h6></label>
+                    {{ form.memory }}
+                    <label for="{{ form.storage.id_for_label }}"><h6>Disk Space</h6></label>
+                    {{ form.storage }}
+                    <label for="{{ form.gpu.id_for_label }}"><h6>GPU (optional)</h6></label>
+                    {{ form.gpu }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.pool_name.id_for_label }}"><h6><span style="color:red; font-size:12px;">* </span>Pool Display Name</h6></label>
+                    {{ form.pool_name }}
+                    <label for="{{ form.auto_logout.id_for_label }}"><h6>Time Delay Until Auto Logout</h6></label>
+                    {{ form.auto_logout }}
+                    <label for="{{ form.pool_maximum.id_for_label }}"><h6><span style="color:red; font-size:12px;">* </span>Pool Size (Max Number of Desktops)</h6></label>
+                    {{ form.pool_maximum }}
+                    <label for="{{ form.powered_on_desktops.id_for_label }}"><h6>Number of Powered on Desktops (Optional)</h6></label>
+                    {{ form.powered_on_desktops }}
+                    <label for="{{ form.min_desktops.id_for_label }}"><h6>Minimum Number of Desktops (Optional)</h6></label>
+                    {{ form.min_desktops }}
+                    <label for="{{ form.ad_container.id_for_label }}"><h6><span style="color:red; font-size:12px;">* </span>Active Directory Container OU Path For Pool Desktops</h6></label>
+                    {{ form.ad_container }}
+                    <label for="{{ form.ad_groups.id_for_label }}"><h6><span style="color:red; font-size:12px;">* </span>AD Group(s) Allowed To Access Pool</h6></label>
+                    {{ form.ad_groups }}
+                    <label for="{{ form.ad_groups.id_for_label }}"><h6>Additional Details</h6></label>
+                    {{ form.additional_details }}
+
+                </div>
+            </div>
+        <hr/>
+
+        <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+</div>
+
+{% endblock %}

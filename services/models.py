@@ -145,7 +145,7 @@ class CloudImage(Cloud):
     memory_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     storage= models.CharField(max_length=8)
     storage_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    gpu = models.BooleanField()
+    gpu = models.BooleanField(blank=True, null=True)
     gpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     account_id = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
