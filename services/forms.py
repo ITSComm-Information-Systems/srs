@@ -1,7 +1,7 @@
 from django import forms
 from django.core import validators
 from project.forms.fields import *
-from .models import AWS, Azure, GCP, GCPAccount, Container
+from .models import AWS, Azure, GCP, GCPAccount, Container, CloudDesktop
 from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
 
@@ -284,3 +284,10 @@ class ContainerNewForm(CloudForm):
         # Create project in openshift, don't save to SRS.
         os = Openshift()
         os.create_project(self.instance, self.user.username)
+
+class ClouddesktopNewForm(CloudForm):
+    title = 'MiDesktop New Order Form'
+
+    class Meta:
+        model = CloudDesktop
+        fields=['admin_group']

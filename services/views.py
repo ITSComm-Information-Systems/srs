@@ -49,6 +49,8 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
     def get(self, request, service):
         request.session['backupStorage'] = 'cloud'
+        if service == "clouddesktop":
+            self.template = 'services/add_cloud_destop.html'
 
         try:
             form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)

@@ -136,10 +136,43 @@ class Container(Cloud):
     class Meta:
         managed = False   # We don't want a real table in Oracle but abstract models can't be instantiated.
 
+class CloudImage(Cloud):
+    instance_label = 'Image Name'
+    name = models.CharField(max_length=40)
+    cpu = models.CharField(max_length=4)
+    cpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    memory = models.CharField(max_length=4)
+    memory_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    storage= models.CharField(max_length=8)
+    storage_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    gpu = models.BooleanField()
+    gpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    account_id = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
+
+    class Meta:
+        verbose_name = 'MiServer Cloud Desktop Image'
+        db_table = "srs_services_clouddimagetest"
+
+
+
+class CloudDesktop(Cloud):
+    instance_label = 'Pool Name'
+    account_id = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
+    pool_maximum = models.IntegerField()
+    pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    ad_access_groups = models.CharField(max_length=100)
+    sla = models.BooleanField()
+    persistent_vm = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'MiServer Cloud Desktop Pool'
+        db_table = "srs_services_clouddesktoptest"
 
 class Service():
     aws = AWS
     gcp = GCP
     azure = Azure
     gcpaccount = GCPAccount
+    clouddesktop = CloudDesktop
     container = Container
