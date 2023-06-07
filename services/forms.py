@@ -1,7 +1,7 @@
 from django import forms
 from django.core import validators
 from project.forms.fields import *
-from .models import AWS, Azure, GCP, GCPAccount, Container, CloudDesktop
+from .models import AWS, Azure, GCP, GCPAccount, Container, CloudDesktop, CloudImage
 from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from .clouddesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
@@ -304,6 +304,39 @@ class ClouddesktopNewForm(CloudForm):
     ad_container = forms.CharField()
     ad_groups = forms.CharField()
     additional_details = forms.CharField()
+
+    def save(self):
+        # Save the form data to create a new pool instance
+        account_id=self.cleaned_data['base_image_name'],
+        cpu=self.cleaned_data['cpu']
+        gpu=self.cleaned_data['gpu']
+        storage=self.cleaned_data['storage']
+        memory=self.cleaned_data['memory']
+        cpu_cost = int(cpu) * 1.15
+        storage_cost = int(storage) * 0.10
+        memory_cost = int(memory) * 0.48
+        gpu_cost = 0
+        if gpu:
+            gpu_cost = 6.07
+        total = 31.31 + cpu_cost + storage_cost + gpu_cost
+
+
+        image = CloudImage(
+            account_id=account_id,
+            cpu=cpu,
+            cpu_cost=cpu_cost,
+            memory=memory,
+            memory_cost=memory_cost,
+            storage=storage,
+            storage_cost = storage_cost,
+            gpu=gpu,
+            gpu_cost=gpu_cost,
+            total = total
+        )
+        image.save()
+
+        self.account_id=account_id
+        self.pool_maximum = self.cleaned_data['pool_maximum']
     
 
 
@@ -312,4 +345,4 @@ class ClouddesktopNewForm(CloudForm):
         model = CloudDesktop
         fields=['admin_group','shortcode','shared_network','base_image_name','initial_image','operating_system',
                 'cpu','memory','storage','gpu','pool_name','auto_logout','pool_maximum',
-                'powered_on_desktops','min_desktops','ad_container','ad_groups','additional_details']
+                'powered_on_desktops','min_desktops','ad_container','ad_groups','additional_details','sla']

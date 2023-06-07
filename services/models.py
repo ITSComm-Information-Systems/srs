@@ -138,7 +138,7 @@ class Container(Cloud):
 
 class CloudImage(Cloud):
     instance_label = 'Image Name'
-    name = models.CharField(max_length=40)
+    account_id = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
     cpu = models.CharField(max_length=4)
     cpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     memory = models.CharField(max_length=4)
@@ -148,7 +148,6 @@ class CloudImage(Cloud):
     gpu = models.BooleanField(blank=True, null=True)
     gpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    account_id = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
 
     class Meta:
         verbose_name = 'MiServer Cloud Desktop Image'
