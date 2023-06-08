@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Modify Image</h1>
+<div class="container">
+    <strong>{{ form.instance.instance_label }}:</strong>&nbsp;{{ form.instance.account_id }}<br/>
+    <hr>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-body">
+            <input type="hidden" name="account_id" value="{{ form.instance.account_id }}"/>
+            <div class="form-group">
+                <label for="{{ form.admin_group.id_for_label }}"><h6>MCommunity Group</h6></label>
+                    {{ form.admin_group }}
+                <label for="{{ form.account_id.id_for_label }}"><h6>Image Name</h6></label>
+                    {{ form.account_id }}
+                <label for="{{ form.cpu.id_for_label }}"><h6>CPU</h6></label>
+                    {{ form.cpu }}
+                <label for="{{ form.cpu_cost.id_for_label }}"><h6>CPU Total</h6></label>
+                    {{ form.cpu_cost }}
+                <label for="{{ form.memory.id_for_label }}"><h6>Memory</h6></label>
+                    {{ form.memory }}
+                <label for="{{ form.memory_cost.id_for_label }}"><h6>Memory Total</h6></label>
+                    {{ form.memory_cost }}
+                <label for="{{ form.storage.id_for_label }}"><h6>Disk Space</h6></label>
+                    {{ form.storage }}
+                <label for="{{ form.storage_cost.id_for_label }}"><h6>Disk Space Total</h6></label>
+                    {{ form.storage_cost }}
+                <label for="{{ form.gpu.id_for_label }}"><h6>GPU (optional)</h6></label>
+                    {{ form.gpu }}
+                <label for="id_total"><h6>Base Image Total</h6></label>
+                <input type="text" name="total" value="40" maxlength="8" class="form-control" required="" id="id_total">
+                <label for="{{ form.additional_details.id_for_label }}"><h6>Comments</h6></label>
+                    {{ form.additional_details }}
+            </div>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+
+
+</script>
+{% endblock %}

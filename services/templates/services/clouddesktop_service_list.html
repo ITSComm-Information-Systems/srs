@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>{{ title }}</h1>
+<h1>MiDesktop</h1>
+<h3>Pools</h3>
 <table class="table table-hover table-striped table-sm">
     <tr>
         <th width="210px">Pool Name</th>
@@ -30,7 +31,7 @@
 
 
 </table>
-
+<h3>Images</h3>
 <table class="table table-hover table-striped table-sm">
     <tr>
         <th width="210px">Image Name</th>
@@ -47,11 +48,11 @@
         <td>{{ rec.shortcode }}</td>   
         <td>{{ rec.created_date }}</td>
         <td>
-            <a href="{{ rec.id }}/change/">
+            <a href="{{ rec.id }}/imagechange/">
                 <i class="fas fa-edit"></i>
             </a>
             &nbsp;
-            <a href="{{ rec.id }}/delete/">
+            <a href="{{ rec.id }}/imagedelete/">
                 <i class="fas fa-trash"></i>
             </a>
         </td>

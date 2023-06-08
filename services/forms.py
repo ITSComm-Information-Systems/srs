@@ -362,7 +362,8 @@ class ClouddesktopNewForm(CloudForm):
             pool_cost = pool_cost,
             ad_access_groups = ad_access_groups,
             sla=sla,
-            persistent_vm = persistent_vm
+            persistent_vm = persistent_vm,
+            image_id = image.id
         )
         
         pool.save()
@@ -381,7 +382,16 @@ class ClouddesktopNewForm(CloudForm):
         
 class ClouddesktopChangeForm(CloudForm):
     title = 'Modify MiDesktop'
+    additional_details = forms.CharField(required=False)
+
 
     class Meta:
         model = CloudDesktop
-        fields = ['admin_group','shortcode','account_id','pool_maximum','ad_access_groups','sla']
+        fields = ['admin_group','shortcode','account_id','pool_maximum','pool_cost','ad_access_groups','additional_details']
+
+class ClouddesktopImageChangeForm(CloudForm):
+    title = 'Modify Image'
+    additional_details = forms.CharField(required=False)
+    class Meta:
+        model = CloudImage
+        fields = ['admin_group','account_id','cpu','memory','storage','gpu','additional_details']

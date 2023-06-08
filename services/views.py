@@ -83,17 +83,17 @@ class ServiceDeleteView(UserPassesTestMixin, View):
         if request.POST.get('instance') != str(id):
             return HttpResponseRedirect(request.path) 
 
-        print(service)
-
         model = getattr(Service, service)
         instance = get_object_or_404(model, pk=id)
 
         if not user_has_access(request.user, instance.owner):
             return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
 
-        create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
         instance.status = Status.ENDED
         instance.save()
+
+        create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
+        
 
         return HttpResponseRedirect('/requestsent')
 
@@ -109,6 +109,82 @@ class ServiceDeleteView(UserPassesTestMixin, View):
         return render(request, self.template,
                       {'title': title,
                        'instance': instance, })
+
+class ImageDeleteView(UserPassesTestMixin, View):
+    template = 'services/image_delete.html'
+
+    def test_func(self):
+        if self.request.user.is_authenticated:
+            return True
+        else:
+            return False
+        
+    def get(self, request, service, id):
+        model = CloudImage.objects.filter(status='A').order_by('account_id')
+        instance = get_object_or_404(model, pk=id)
+        title = f'Delete {instance._meta.verbose_name.title()}'
+
+        if not user_has_access(request.user, instance.owner):
+            return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+
+        return render(request, self.template,
+                      {'title': title,
+                       'instance': instance, })
+    
+    def post(self, request, service, id):
+
+        if request.POST.get('confirm_delete') != 'on':
+            return HttpResponseRedirect(request.path) 
+
+        if request.POST.get('instance') != str(id):
+            return HttpResponseRedirect(request.path) 
+        
+        model = CloudImage.objects.filter(status='A').order_by('account_id')
+        instance = get_object_or_404(model, pk=id)
+
+        if not user_has_access(request.user, instance.owner):
+            return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+        
+        instance.status = Status.ENDED
+        instance.save()
+        
+        create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
+        
+class ImageChangeView(UserPassesTestMixin, View):
+    template = 'services/image_change.html'
+    
+    def test_func(self):
+        if self.request.user.is_authenticated:
+            return True
+        else:
+            return False
+        
+    def post(self, request, service, id):
+        model = CloudImage.objects.filter(status='A').order_by('account_id')
+        instance = get_object_or_404(model, pk=id)      
+        
+        form = ClouddesktopImageChangeForm(request.POST, user=self.request.user, instance=instance)
+
+        if form.is_valid():
+            form.save()
+
+            return HttpResponseRedirect('/requestsent')
+        else:
+            return render(request, self.template,
+                {'form': form, })
+
+        
+        
+    def get(self, request, service, id):
+        model =  CloudImage.objects.filter(status='A').order_by('account_id')
+        instance = get_object_or_404(model, pk=id)
+
+        if not user_has_access(request.user, instance.owner):
+            return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+
+        form = ClouddesktopImageChangeForm(user=self.request.user, instance=instance)
+        return render(request, self.template,
+                      {'form': form, })
 
 
 class ServiceChangeView(UserPassesTestMixin, View):
@@ -151,6 +227,15 @@ class ServiceChangeView(UserPassesTestMixin, View):
             form = globals()[service.capitalize() + 'ChangeForm'](user=self.request.user, instance=instance)
         except KeyError:
             return HttpResponseNotFound('<h1>Page not found</h1>')
+        
+        if service == 'clouddesktop':
+            self.template = 'services/pool_change.html'
+            image = CloudImage.objects.filter(id=instance.image_id).first()
+
+            return render(request, self.template,
+                      {'title': title,
+                       'form': form,
+                       'image': image })
 
         return render(request, self.template,
                       {'title': title,
@@ -193,3 +278,4 @@ def get_service_list(request, service):
              'service_list': service_list,
              'groups': groups,
             })
+

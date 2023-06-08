@@ -163,6 +163,7 @@ class CloudDesktop(Cloud):
     ad_access_groups = models.CharField(max_length=100)
     sla = models.BooleanField()
     persistent_vm = models.BooleanField(default=False)
+    image_id = models.IntegerField()
 
     class Meta:
         verbose_name = 'MiServer Cloud Desktop Pool'

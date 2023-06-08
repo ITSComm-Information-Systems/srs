@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Modify Pool</h1>
+<div class="container">
+    <strong>{{ form.instance.instance_label }}:</strong>&nbsp;{{ form.instance.account_id }}<br/>
+    <strong>Image Name:</strong>&nbsp;<a href="">{{image.account_id}}</a><br/>
+    <hr>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-body">
+            <input type="hidden" name="account_id" value="{{ form.instance.account_id }}"/>
+            <div class="form-group">
+                <label for="{{ form.admin_group.id_for_label }}"><h6>MCommunity Group</h6></label>
+                    {{ form.admin_group }}
+                <label for="{{ form.account_id.id_for_label }}"><h6>Pool Name</h6></label>
+                    {{ form.account_id }}
+                <label for="{{ form.shortcode.id_for_label }}"><h6>Shortcode</h6></label>
+                    {{ form.shortcode }}
+                <label for="{{ form.pool_maximum.id_for_label }}"><h6>Pool Size</h6></label>
+                    {{ form.pool_maximum }}
+                <label for="{{ form.pool_cost.id_for_label }}"><h6>Total Pool Cost</h6></label>
+                    {{ form.pool_cost}}
+                <label for="{{ form.ad_access_groups.id_for_label }}"><h6>Update AD Group(s) Allowed To Access Pool</h6></label>
+                    {{ form.ad_access_groups }}
+                <label for="{{ form.additional_details.id_for_label }}"><h6>Comments</h6></label>
+                    {{ form.additional_details }}
+            </div>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+
+    const pool_size = document.getElementById("{{ form.pool_maximum.id_for_label }}");
+    const pool_cost = document.getElementById("{{ form.pool_cost.id_for_label }}");
+    const image_cost = "{{image.total}}"
+
+    pool_cost.setAttribute('readonly',"readonly")
+
+    pool_size.addEventListener('change', function(){
+        calculatePoolCost()
+    })
+
+    const calculatePoolCost = () =>{
+        new_cost = Math.round((pool_size.value * image_cost) * 100) / 100
+        pool_cost.value = new_cost
+    }
+
+</script>
+{% endblock %}
