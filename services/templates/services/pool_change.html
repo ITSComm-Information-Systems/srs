@@ -3,7 +3,7 @@
 <h1>MiDesktop Modify Pool</h1>
 <div class="container">
     <strong>{{ form.instance.instance_label }}:</strong>&nbsp;{{ form.instance.account_id }}<br/>
-    <strong>Image Name:</strong>&nbsp;<a href="">{{image.account_id}}</a><br/>
+    <strong>Image Name:</strong>&nbsp;<a href="{% url 'image_change' service='clouddesktop' id=image.id %}">{{image.account_id}}</a><br/>
     <hr>
     <form method="POST">
         {% csrf_token %}
@@ -35,8 +35,10 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Submit</button>
+        <div type="text" class="btn btn-secondary" onclick="location.href='/services/clouddesktop/';">Cancel</div>
+        
     </form>
-
+    
 </div>
 {% endblock %}
 
@@ -55,6 +57,10 @@
     admin_group.setAttribute('hidden',true)
 
     pool_size.addEventListener('change', function(){
+        if (pool_size.value < 2){
+            console.log('now')
+            pool_size.value = 1
+        }
         calculatePoolCost()
     })
 
