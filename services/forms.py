@@ -293,9 +293,14 @@ class ClouddesktopNewForm(CloudForm):
     operating_system = forms.ChoiceField(choices=(('Windows10 64bit','Windows10 64bit'),))
     base_image_name = forms.CharField()
     cpu = forms.ChoiceField(choices=CPU_CHOICES)
+    cpu_cost = forms.DecimalField(initial=1.15)
     memory = forms.ChoiceField(choices=RAM_CHOICES)
+    memory_cost = forms.DecimalField(initial=0.48)
     storage = forms.ChoiceField(choices=STORAGE_CHOICES)
+    storage_cost = forms.DecimalField(initial=0.10)
     gpu = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
+    gpu_cost = forms.DecimalField(initial=0.00)
+    total = forms.DecimalField(initial=34.67)
     pool_name = forms.CharField()
     auto_logout = forms.ChoiceField(choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
     pool_maximum = forms.IntegerField()
@@ -313,29 +318,17 @@ class ClouddesktopNewForm(CloudForm):
         gpu=self.cleaned_data['gpu']
         storage=self.cleaned_data['storage']
         memory=self.cleaned_data['memory']
-        cpu_cost = int(cpu) * 1.15
-        storage_cost = int(storage) * 0.10
-        memory_cost = int(memory) * 0.48
-        gpu_cost = 0
-        if gpu:
-            gpu_cost = 6.07
-        total = 31.31 + cpu_cost + storage_cost + gpu_cost
-
+        cpu_cost = self.cleaned_data['cpu_cost']
+        storage_cost = self.cleaned_data['storage_cost']
+        memory_cost = self.cleaned_data['memory_cost']
+        gpu_cost = self.cleaned_data['gpu_cost']
+        total = self.cleaned_data['total']
         pool_name = self.cleaned_data['pool_name']
         pool_maximum = self.cleaned_data['pool_maximum']
         pool_cost = int(pool_maximum) * total
         ad_access_groups = self.cleaned_data['ad_groups']
         sla = self.cleaned_data['sla']
         shortcode = self.cleaned_data['shortcode']
-
-
-
-        if pool_maximum == '1':
-            persistent_vm = True
-        else:
-            persistent_vm = False
-
-
 
         image = CloudImage(
             owner=owner,
@@ -362,7 +355,6 @@ class ClouddesktopNewForm(CloudForm):
             pool_cost = pool_cost,
             ad_access_groups = ad_access_groups,
             sla=sla,
-            persistent_vm = persistent_vm,
             image_id = image.id
         )
         
@@ -377,7 +369,7 @@ class ClouddesktopNewForm(CloudForm):
     class Meta:
         model = CloudDesktop
         fields=['admin_group','shortcode','shared_network','base_image_name','initial_image','operating_system',
-                'cpu','memory','storage','gpu','pool_name','auto_logout','pool_maximum',
+                'cpu','cpu_cost','memory','memory_cost','storage','storage_cost','gpu','gpu_cost','total','pool_name','auto_logout','pool_maximum',
                 'powered_on_desktops','min_desktops','ad_container','ad_groups','additional_details','sla']
         
 class ClouddesktopChangeForm(CloudForm):
@@ -392,6 +384,10 @@ class ClouddesktopChangeForm(CloudForm):
 class ClouddesktopImageChangeForm(CloudForm):
     title = 'Modify Image'
     additional_details = forms.CharField(required=False)
+    cpu = forms.ChoiceField(choices=CPU_CHOICES)
+    memory = forms.ChoiceField(choices=RAM_CHOICES)
+    storage = forms.ChoiceField(choices=STORAGE_CHOICES)
+    gpu = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
     class Meta:
         model = CloudImage
-        fields = ['admin_group','account_id','cpu','memory','storage','gpu','additional_details']
+        fields = ['admin_group','account_id','cpu','cpu_cost','memory','memory_cost','storage','storage_cost','gpu','gpu_cost','total','additional_details']

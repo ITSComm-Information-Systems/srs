@@ -169,6 +169,13 @@ class CloudDesktop(Cloud):
         verbose_name = 'MiServer Cloud Desktop Pool'
         db_table = "srs_services_clouddesktoptest"
 
+    def save(self, *args, **kwargs):
+        if self.pool_maximum == 1:
+            self.persistent_vm = True
+        else:
+            self.persistent_vm = False
+        super().save(*args, **kwargs)
+
 class Service():
     aws = AWS
     gcp = GCP

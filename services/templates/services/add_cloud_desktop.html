@@ -25,18 +25,54 @@
                     {{ form.operating_system }}
                 </div>
                 <div class="form-group">
-                    <label for="{{ form.cpu.id_for_label }}"><h6>CPU</h6></label>
-                    {{ form.cpu }}
-                    <label for="{{ form.memory.id_for_label }}"><h6>Memory</h6></label>
-                    {{ form.memory }}
-                    <label for="{{ form.storage.id_for_label }}"><h6>Disk Space</h6></label>
-                    {{ form.storage }}
-                    <label for="{{ form.gpu.id_for_label }}"><h6>GPU (optional)</h6></label>
-                    {{ form.gpu }}
+                    <div class="row">
+                        <div class="col">
+                            <label for="{{ form.cpu.id_for_label }}"><h6>CPU</h6></label>
+                            {{ form.cpu }}
+                        </div>
+                        <div class="col">
+                            <label for="{{ form.cpu_cost.id_for_label }}"><h6>CPU Total</h6></label>
+                            {{ form.cpu_cost }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="{{ form.memory.id_for_label }}"><h6>Memory</h6></label>
+                            {{ form.memory }}
+                        </div>
+                        <div class="col">
+                            <label for="{{ form.memory_cost.id_for_label }}"><h6>RAM Total</h6></label>
+                            {{ form.memory_cost }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="{{ form.storage.id_for_label }}"><h6>Disk Space</h6></label>
+                            {{ form.storage }}
+                        </div>
+                        <div class="col">
+                            <label for="{{ form.storage_cost.id_for_label }}"><h6>Disk Space Total</h6></label>
+                            {{ form.storage_cost }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="{{ form.gpu.id_for_label }}"><h6>GPU (optional)</h6></label>
+                            {{ form.gpu }}
+                        </div>
+                        <div class="col">
+                            <label for="{{ form.gpu_cost.id_for_label }}"><h6>GPU Total</h6></label>
+                            {{ form.gpu_cost }}
+                        </div>
+                    </div>
+                    <label for="id_total"><h6>Base Image Total</h6></label>
+                    {{ form.total }}
                 </div>
+                <h2>Order New Pool</h2>
                 <div class="form-group">
                     <label for="{{ form.pool_name.id_for_label }}"><h6><span style="color:red; font-size:12px;">* </span>Pool Display Name</h6></label>
                     {{ form.pool_name }}
+                    <h2>Connection Options</h2>
                     <label for="{{ form.auto_logout.id_for_label }}"><h6>Time Delay Until Auto Logout</h6></label>
                     {{ form.auto_logout }}
                     <label for="{{ form.pool_maximum.id_for_label }}"><h6><span style="color:red; font-size:12px;">* </span>Pool Size (Max Number of Desktops)</h6></label>
@@ -51,8 +87,10 @@
                     {{ form.ad_groups }}
                     <label for="{{ form.ad_groups.id_for_label }}"><h6>Additional Details</h6></label>
                     {{ form.additional_details }}
-                    <label for="{{ form.sla.id_for_label }}"><h6>SLA</h6></label>
-                    {{ form.sla }}
+                    <h2>Service Level Expectations</h2>
+                    <hr/>
+                    <a href="https://its.umich.edu/computing/computers-software/midesktop" target="_blank">Click here for Service Level Expectations</a>
+                    <span>{{ form.sla }}I have read and acknowledge the Service Level Expectations</span>
 
                 </div>
             </div>
@@ -63,4 +101,60 @@
 
 </div>
 
+{% endblock %}
+
+{% block js %}
+<script>
+    const cpu_cost = document.getElementById("{{ form.cpu_cost.id_for_label }}");
+    const cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}");
+
+    const memory_cost = document.getElementById("{{ form.memory_cost.id_for_label }}");
+    const memory_choice = document.getElementById("{{ form.memory.id_for_label }}");
+
+    const storage_cost = document.getElementById("{{ form.storage_cost.id_for_label }}");
+    const storage_choice = document.getElementById("{{ form.storage.id_for_label }}");
+
+    const total_cost = document.getElementById("{{ form.total.id_for_label }}");
+
+    const gpu_cost = document.getElementById("{{ form.gpu_cost.id_for_label }}");
+    const gpu_choice = document.getElementById("{{ form.gpu.id_for_label }}");
+
+    cpu_cost.setAttribute('readonly',"readonly")
+    memory_cost.setAttribute('readonly',"readonly")
+    storage_cost.setAttribute('readonly',"readonly")
+    gpu_cost.setAttribute('readonly',"readonly")
+    total_cost.setAttribute('readonly',"readonly")
+
+    window.addEventListener("load", (event) => {
+        calculateBaseImageCost()
+    })
+
+    cpu_choice.addEventListener("change", () => {
+        cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
+        calculateBaseImageCost()
+    })
+
+    memory_choice.addEventListener("change", () => {
+        memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
+        calculateBaseImageCost()
+    })
+
+    storage_choice.addEventListener("change", () => {
+        storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
+        calculateBaseImageCost()
+    })
+
+    gpu_choice.addEventListener("change", () => {
+        gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+        calculateBaseImageCost()
+    })
+
+
+    function calculateBaseImageCost(){
+        base_cost = 31.31
+        cost = base_cost + parseFloat(cpu_cost.value) + parseFloat(memory_cost.value) + parseFloat(storage_cost.value) + parseFloat(gpu_cost.value)
+        total_cost.value = cost.toFixed(2)
+    }
+
+</script>
 {% endblock %}
