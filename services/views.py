@@ -83,6 +83,8 @@ class ServiceDeleteView(UserPassesTestMixin, View):
         if request.POST.get('instance') != str(id):
             return HttpResponseRedirect(request.path) 
 
+        print(service)
+
         model = getattr(Service, service)
         instance = get_object_or_404(model, pk=id)
 
@@ -156,17 +158,31 @@ class ServiceChangeView(UserPassesTestMixin, View):
 
 
 def get_service_list(request, service):
+    groups = list(LDAPGroupMember.objects.filter(username=request.user).values_list('ldap_group_id',flat=True))
     if hasattr(Service, service):
-        model = getattr(Service, service)
-        request.session['backupStorage'] = 'cloud'
+        if service == 'clouddesktop':
+            pools = CloudDesktop.objects.filter(status='A',owner__in=groups).order_by('account_id')
+            images = CloudImage.objects.filter(status='A',owner__in=groups).order_by('account_id')
+        else:
+            model = getattr(Service, service)
+            request.session['backupStorage'] = 'cloud'
     else:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    groups = list(LDAPGroupMember.objects.filter(username=request.user).values_list('ldap_group_id',flat=True))
+    
 
     if service == 'gcp':
         template = 'gcp_service_list.html'
         service_list = GCPAccount.objects.filter(status='A',owner__in=groups).order_by('account_id')
+    elif service == 'clouddesktop':
+        template = 'services/clouddesktop_service_list.html'
+        return render(request, template,{
+                      'title':'Test Title',
+                      'instance_label': 'pools',
+                      'pools': pools,
+                      'images': images,
+                      'groups': groups
+        })
     else:
         template = 'service_list.html'
         service_list = model.objects.filter(status='A',owner__in=groups)

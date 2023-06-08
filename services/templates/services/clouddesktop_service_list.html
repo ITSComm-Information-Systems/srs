@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+<table class="table table-hover table-striped table-sm">
+    <tr>
+        <th width="210px">Pool Name</th>
+        <th>Owner</th>
+        <th>Shortcode</th>
+        <th>Created</th>
+        <th></th>
+    </tr>
+
+    {% for rec in pools %}
+    <tr>
+        <td>{{ rec.account_id }}</td>  
+        <td>{{ rec.owner }}</td>  
+        <td>{{ rec.shortcode }}</td>   
+        <td>{{ rec.created_date }}</td>
+        <td>
+            <a href="{{ rec.id }}/change/">
+                <i class="fas fa-edit"></i>
+            </a>
+            &nbsp;
+            <a href="{{ rec.id }}/delete/">
+                <i class="fas fa-trash"></i>
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+
+
+</table>
+
+<table class="table table-hover table-striped table-sm">
+    <tr>
+        <th width="210px">Image Name</th>
+        <th>Owner</th>
+        <th>Shortcode</th>
+        <th>Created</th>
+        <th></th>
+    </tr>
+
+    {% for rec in images %}
+    <tr>
+        <td>{{ rec.account_id }}</td>  
+        <td>{{ rec.owner }}</td>  
+        <td>{{ rec.shortcode }}</td>   
+        <td>{{ rec.created_date }}</td>
+        <td>
+            <a href="{{ rec.id }}/change/">
+                <i class="fas fa-edit"></i>
+            </a>
+            &nbsp;
+            <a href="{{ rec.id }}/delete/">
+                <i class="fas fa-trash"></i>
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+
+
+</table>
+{% endblock %}
