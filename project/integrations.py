@@ -584,6 +584,37 @@ class ContainerPayload(Payload):
             title = 'Add contact group to notification group'
             self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.CONTAINER_TEAM} )
 
+class ClouddesktopPayload(Payload):
+    form_id = 85
+    type_id = 7                 
+    service_id = 81              
+    responsible_group_id = 86     
+    delete_account = TextAttribute(1796)
+    delete_owner = TextAttribute(4690)
+    delete_acknowledgement = ChoiceAttribute(4691, Yes=5464)
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.description = (f'Submitted by user: {request.user.username} \n\n' )
+            #https://its.umich.edu/computing/virtualization-cloud/container-service/node/10/submission/594
+            
+
+        super().__init__(action, instance, request, **kwargs)
+        
+class CloudimagePayload(Payload):
+    form_id = 85
+    type_id = 7                 
+    service_id = 81              
+    responsible_group_id = 86     
+    delete_account = TextAttribute(1796)
+    delete_owner = TextAttribute(4690)
+    delete_acknowledgement = ChoiceAttribute(4691, Yes=5464)
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.description = (f'Submitted by user: {request.user.username} \n\n' )
+            #https://its.umich.edu/computing/virtualization-cloud/container-service/node/10/submission/594
+            
+
+        super().__init__(action, instance, request, **kwargs)
 
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__

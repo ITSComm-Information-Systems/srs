@@ -149,6 +149,7 @@ class ImageDeleteView(UserPassesTestMixin, View):
         instance.save()
         
         create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
+        return HttpResponseRedirect('/requestsent')
         
 class ImageChangeView(UserPassesTestMixin, View):
     template = 'services/image_change.html'
