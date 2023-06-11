@@ -232,11 +232,16 @@ class ServiceChangeView(UserPassesTestMixin, View):
         if service == 'clouddesktop':
             self.template = 'services/pool_change.html'
             image = CloudImage.objects.filter(id=instance.image_id).first()
+            shared = False
+            if instance.shared_network:
+                shared = True
+
 
             return render(request, self.template,
                       {'title': title,
                        'form': form,
-                       'image': image })
+                       'image': image,
+                       'shared': shared})
 
         return render(request, self.template,
                       {'title': title,

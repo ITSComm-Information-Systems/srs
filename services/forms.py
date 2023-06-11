@@ -286,6 +286,8 @@ class ContainerNewForm(CloudForm):
         os = Openshift()
         os.create_project(self.instance, self.user.username)
 
+
+ACCESS_INTERNET_CHOICES = (('True','Yes, my desktop needs internet access (outside of U of M sites)'),('False','No, my desktop do not need internet access to any network outside of U of M'))
 class ClouddesktopNewForm(CloudForm):
     MASK_CHOICES = [["/28", "/28 (16 addresses)"], ["/27", "/27 (32 addresses)"], ["/26", "/26 (64 addresses)"], 
                     ["/25", "/25 (128 addresses)"], ["/24", "/24 (256 addresses)"]]
@@ -322,7 +324,7 @@ class ClouddesktopNewForm(CloudForm):
     ad_container = forms.CharField()
     ad_groups = forms.CharField()
     additional_details = forms.CharField(required=False)
-    access_internet = forms.ChoiceField(required=False,choices=(('True','Yes, my desktop needs internet access (outside of U of M sites)'),('False','No, my desktop do not need internet access to any network outside of U of M')))
+    access_internet = forms.ChoiceField(required=False,choices=ACCESS_INTERNET_CHOICES)
     mask = forms.ChoiceField(choices=MASK_CHOICES, required=False)
     protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, required=False)
     technical_contact = forms.CharField(required=False)
@@ -350,7 +352,6 @@ class ClouddesktopNewForm(CloudForm):
         sla = self.cleaned_data['sla']
         shortcode = self.cleaned_data['shortcode']
         shared_network = self.cleaned_data['shared_network']
-        print(shared_network)
         if shared_network == 'False':
             access_internet = True
             mask = self.cleaned_data['mask']
@@ -379,7 +380,8 @@ class ClouddesktopNewForm(CloudForm):
             storage_cost = storage_cost,
             gpu=gpu,
             gpu_cost=gpu_cost,
-            total = total
+            total = total,
+            shared_network = shared_network
         )
 
         image.save()
@@ -419,11 +421,14 @@ class ClouddesktopNewForm(CloudForm):
 class ClouddesktopChangeForm(CloudForm):
     title = 'Modify MiDesktop'
     additional_details = forms.CharField(required=False)
+    access_internet = forms.ChoiceField(required=False,choices=ACCESS_INTERNET_CHOICES)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select())  
+
 
 
     class Meta:
         model = CloudDesktop
-        fields = ['admin_group','shortcode','account_id','pool_maximum','pool_cost','ad_access_groups','additional_details']
+        fields = ['admin_group','shortcode','account_id','pool_maximum','pool_cost','ad_access_groups','additional_details','access_internet','billing_contact','security_contact','mask','protection','technical_contact']
 
 class ClouddesktopImageChangeForm(CloudForm):
     title = 'Modify Image'

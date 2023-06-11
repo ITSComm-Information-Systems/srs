@@ -168,6 +168,7 @@ class CloudDesktop(Cloud):
     mask = models.CharField(blank=True, max_length=80)
     protection = models.BooleanField(default=False, blank=True)
     technical_contact = models.CharField(blank=True, max_length=80)
+    shared_network = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = 'MiServer Cloud Desktop Pool'

@@ -3,7 +3,7 @@
 <h1>Midesktop Modify Image</h1>
 <div class="container">
     <strong>{{ form.instance.instance_label }}:</strong>&nbsp;{{ form.instance.account_id }}<br/>
-    <hr>
+    <hr/>
 
     <form method="POST">
         {% csrf_token %}
@@ -59,11 +59,11 @@
                     {{ form.additional_details }}
             </div>
 
-        </div>
 
         <button type="submit" class="btn btn-primary">Submit</button>
         <div type="text" class="btn btn-secondary" onclick="location.href='/services/clouddesktop/';">Cancel</div>
     </form>
+</div>
 
 </div>
 {% endblock %}

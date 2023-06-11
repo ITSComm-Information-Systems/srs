@@ -4,40 +4,58 @@
 <div class="container">
     <strong>{{ form.instance.instance_label }}:</strong>&nbsp;{{ form.instance.account_id }}<br/>
     <strong>Image Name:</strong>&nbsp;<a href="{% url 'image_change' service='clouddesktop' id=image.id %}">{{image.account_id}}</a><br/>
-    <hr>
-    <form method="POST">
-        {% csrf_token %}
-        <div class="form-body">
-            <input type="hidden" name="account_id" value="{{ form.instance.account_id }}"/>
-            <div class="form-group">
-                    {{ form.admin_group }}
-                <label for="{{ form.account_id.id_for_label }}"><h6>Pool Name</h6></label>
-                    {{ form.account_id }}
-                <label for="{{ form.shortcode.id_for_label }}"><h6>Shortcode</h6></label>
-                    {{ form.shortcode }}
-                <div class="row">
-                    <div class="col">
-                        <label for="{{ form.pool_maximum.id_for_label }}"><h6>Pool Size</h6></label>
-                        {{ form.pool_maximum }}
+    <hr/>
+    <div class="container">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-body">
+                <input type="hidden" name="account_id" value="{{ form.instance.account_id }}"/>
+                <div class="form-group">
+                        {{ form.admin_group }}
+                    <label for="{{ form.account_id.id_for_label }}"><h6>Pool Name</h6></label>
+                        {{ form.account_id }}
+                    <label for="{{ form.shortcode.id_for_label }}"><h6>Shortcode</h6></label>
+                        {{ form.shortcode }}
+                    <div class="row">
+                        <div class="col">
+                            <label for="{{ form.pool_maximum.id_for_label }}"><h6>Pool Size</h6></label>
+                            {{ form.pool_maximum }}
+                        </div>
+                        <div class="col">
+                            <label for="{{ form.pool_cost.id_for_label }}"><h6>Total Pool Cost</h6></label>
+                            {{ form.pool_cost}}
+                        </div>
                     </div>
-                    <div class="col">
-                        <label for="{{ form.pool_cost.id_for_label }}"><h6>Total Pool Cost</h6></label>
-                        {{ form.pool_cost}}
+                    <label for="{{ form.ad_access_groups.id_for_label }}"><h6>Update AD Group(s) Allowed To Access Pool</h6></label>
+                        {{ form.ad_access_groups }}
+                    <label for="{{ form.additional_details.id_for_label }}"><h6>Comments</h6></label>
+                        {{ form.additional_details }}
+                    {% if not shared %}
+                    <br/>
+                    <h2>Network</h2>
+                    <div class="container">
+                        <label for="{{ form.access_internet.id_for_label }}"><h6>Do the desktops need to access sites outside of the University of Michigan (on the internet)?</h6></label>
+                        {{ form.access_internet }}
+                        <label for="{{ form.mask.id_for_label }}"><h6>What subnet mask does this pool need?</h6></label>
+                        {{ form.mask }}
+                        <label for="{{ form.protection.id_for_label }}"><h6>Do you need your network protected by the IPS?</h6></label>
+                        {{ form.protection }}
+                        <label for="{{ form.technical_contact.id_for_label }}"><h6>Please enter the email address of the technical contact:</h6></label>
+                        {{ form.technical_contact }}
+                        <label for="{{ form.billing_contact.id_for_label }}"><h6>Please enter the email address of the business contact:</h6></label>
+                        {{ form.billing_contact }}
+                        <label for="{{ form.security_contact.id_for_label }}"><h6>Please enter the email address of the security contact:</h6></label>
+                        {{ form.security_contact }}
                     </div>
+                    {% endif %}
                 </div>
-                
-                <label for="{{ form.ad_access_groups.id_for_label }}"><h6>Update AD Group(s) Allowed To Access Pool</h6></label>
-                    {{ form.ad_access_groups }}
-                <label for="{{ form.additional_details.id_for_label }}"><h6>Comments</h6></label>
-                    {{ form.additional_details }}
+
             </div>
-
-        </div>
-
-        <button type="submit" class="btn btn-primary">Submit</button>
-        <div type="text" class="btn btn-secondary" onclick="location.href='/services/clouddesktop/';">Cancel</div>
-        
-    </form>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <div type="text" class="btn btn-secondary" onclick="location.href='/services/clouddesktop/';">Cancel</div>
+            
+        </form>
+    </div>
     
 </div>
 {% endblock %}
@@ -50,6 +68,7 @@
     const image_cost = "{{image.total}}"
 
     window.addEventListener("load", (event) => {
+        console.log("{{ form.shared_network.value }}")
         calculatePoolCost()
         pool_cost.value=parseFloat(pool_cost.value).toFixed(2)
     })

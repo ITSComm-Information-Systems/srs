@@ -17,21 +17,23 @@
                 <div class="form-group">
                     <label for="{{ form.shared_network.id_for_label }}"><h6>Will you be using a shared network or do you need a new dedicated network?</h6></label>
                     {{ form.shared_network }}
-                    <div id="network_options" style="display:none">
-                        <label for="{{ form.purpose.id_for_label }}"><h6>What is the purpose of the network?</h6></label>
-                        {{ form.purpose }}
-                        <label for="{{ form.access_internet.id_for_label }}"><h6>Do the desktops need to access sites outside of the University of Michigan (on the internet)?</h6></label>
-                        {{ form.access_internet }}
-                        <label for="{{ form.mask.id_for_label }}"><h6>What subnet mask does this pool need?</h6></label>
-                        {{ form.mask }}
-                        <label for="{{ form.protection.id_for_label }}"><h6>Do you need your network protected by the IPS?</h6></label>
-                        {{ form.protection }}
-                        <label for="{{ form.technical_contact.id_for_label }}"><h6>Please enter the email address of the technical contact:</h6></label>
-                        {{ form.technical_contact }}
-                        <label for="{{ form.billing_contact.id_for_label }}"><h6>Please enter the email address of the business contact:</h6></label>
-                        {{ form.billing_contact }}
-                        <label for="{{ form.security_contact.id_for_label }}"><h6>Please enter the email address of the security contact:</h6></label>
-                        {{ form.security_contact }}
+                    <div class="container">
+                        <div id="network_options" style="display:none">
+                            <label for="{{ form.purpose.id_for_label }}"><h6>What is the purpose of the network?</h6></label>
+                            {{ form.purpose }}
+                            <label for="{{ form.access_internet.id_for_label }}"><h6>Do the desktops need to access sites outside of the University of Michigan (on the internet)?</h6></label>
+                            {{ form.access_internet }}
+                            <label for="{{ form.mask.id_for_label }}"><h6>What subnet mask does this pool need?</h6></label>
+                            {{ form.mask }}
+                            <label for="{{ form.protection.id_for_label }}"><h6>Do you need your network protected by the IPS?</h6></label>
+                            {{ form.protection }}
+                            <label for="{{ form.technical_contact.id_for_label }}"><h6>Please enter the email address of the technical contact:</h6></label>
+                            {{ form.technical_contact }}
+                            <label for="{{ form.billing_contact.id_for_label }}"><h6>Please enter the email address of the business contact:</h6></label>
+                            {{ form.billing_contact }}
+                            <label for="{{ form.security_contact.id_for_label }}"><h6>Please enter the email address of the security contact:</h6></label>
+                            {{ form.security_contact }}
+                        </div>
                     </div>
                     
                     <label for="{{ form.base_image_name.id_for_label }}"><h6>Base Image Name</h6></label>
