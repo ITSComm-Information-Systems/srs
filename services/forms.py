@@ -287,20 +287,33 @@ class ContainerNewForm(CloudForm):
         os.create_project(self.instance, self.user.username)
 
 class ClouddesktopNewForm(CloudForm):
+    MASK_CHOICES = [["/28", "/28 (16 addresses)"], ["/27", "/27 (32 addresses)"], ["/26", "/26 (64 addresses)"], 
+                    ["/25", "/25 (128 addresses)"], ["/24", "/24 (256 addresses)"]]
+    
+    CPU_INITIAL = 1.15
+    MEMORY_INITIAL = 0.96
+    STORAGE_INITIAL = 5.00
+    GPU_INITIAL = 0.00
+    BASE_COST = 31.31
+    TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
+
     title = 'MiDesktop New Order Form'
     shared_network = forms.ChoiceField(choices=((True, 'Shared Network'), (False, 'New Dedicated Network')))
     initial_image = forms.ChoiceField(choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
     operating_system = forms.ChoiceField(choices=(('Windows10 64bit','Windows10 64bit'),))
+
+    purpose = forms.CharField(required=False)
+
     base_image_name = forms.CharField()
     cpu = forms.ChoiceField(choices=CPU_CHOICES)
-    cpu_cost = forms.DecimalField(initial=1.15)
+    cpu_cost = forms.DecimalField(initial=CPU_INITIAL)
     memory = forms.ChoiceField(choices=RAM_CHOICES)
-    memory_cost = forms.DecimalField(initial=0.48)
+    memory_cost = forms.DecimalField(initial=MEMORY_INITIAL)
     storage = forms.ChoiceField(choices=STORAGE_CHOICES)
-    storage_cost = forms.DecimalField(initial=0.10)
+    storage_cost = forms.DecimalField(initial=STORAGE_INITIAL)
     gpu = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
-    gpu_cost = forms.DecimalField(initial=0.00)
-    total = forms.DecimalField(initial=34.67)
+    gpu_cost = forms.DecimalField(initial=GPU_INITIAL)
+    total = forms.DecimalField(initial=TOTAL_INITIAL)
     pool_name = forms.CharField()
     auto_logout = forms.ChoiceField(choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
     pool_maximum = forms.IntegerField()
@@ -308,7 +321,14 @@ class ClouddesktopNewForm(CloudForm):
     min_desktops = forms.IntegerField()
     ad_container = forms.CharField()
     ad_groups = forms.CharField()
-    additional_details = forms.CharField()
+    additional_details = forms.CharField(required=False)
+    access_internet = forms.ChoiceField(required=False,choices=(('True','Yes, my desktop needs internet access (outside of U of M sites)'),('False','No, my desktop do not need internet access to any network outside of U of M')))
+    mask = forms.ChoiceField(choices=MASK_CHOICES, required=False)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, required=False)
+    technical_contact = forms.CharField(required=False)
+    billing_contact = forms.CharField(required=False)
+    security_contact = forms.CharField(required=False)
+
 
     def save(self):
         # Save the form data to create a new pool instance
@@ -329,6 +349,23 @@ class ClouddesktopNewForm(CloudForm):
         ad_access_groups = self.cleaned_data['ad_groups']
         sla = self.cleaned_data['sla']
         shortcode = self.cleaned_data['shortcode']
+        shared_network = self.cleaned_data['shared_network']
+        print(shared_network)
+        if shared_network == 'False':
+            access_internet = True
+            mask = self.cleaned_data['mask']
+            protection = self.cleaned_data['protection']
+            technical_contact = self.cleaned_data['technical_contact']
+            billing_contact = self.cleaned_data['billing_contact']
+            security_contact = self.cleaned_data['security_contact']
+        else:
+            access_internet = False
+            mask = ''
+            protection = False
+            technical_contact = ''
+            billing_contact = ''
+            security_contact = ''
+
 
         image = CloudImage(
             owner=owner,
@@ -355,7 +392,13 @@ class ClouddesktopNewForm(CloudForm):
             pool_cost = pool_cost,
             ad_access_groups = ad_access_groups,
             sla=sla,
-            image_id = image.id
+            image_id = image.id,
+            access_internet = access_internet,
+            mask = mask,
+            protection = protection,
+            technical_contact = technical_contact,
+            billing_contact = billing_contact,
+            security_contact = security_contact
         )
         
         pool.save()
@@ -368,7 +411,8 @@ class ClouddesktopNewForm(CloudForm):
 
     class Meta:
         model = CloudDesktop
-        fields=['admin_group','shortcode','shared_network','base_image_name','initial_image','operating_system',
+        fields=['admin_group','shortcode','shared_network','purpose','access_internet','billing_contact','security_contact','mask','protection','technical_contact',
+                'base_image_name','initial_image','operating_system',
                 'cpu','cpu_cost','memory','memory_cost','storage','storage_cost','gpu','gpu_cost','total','pool_name','auto_logout','pool_maximum',
                 'powered_on_desktops','min_desktops','ad_container','ad_groups','additional_details','sla']
         

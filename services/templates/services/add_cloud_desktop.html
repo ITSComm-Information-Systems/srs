@@ -17,6 +17,23 @@
                 <div class="form-group">
                     <label for="{{ form.shared_network.id_for_label }}"><h6>Will you be using a shared network or do you need a new dedicated network?</h6></label>
                     {{ form.shared_network }}
+                    <div id="network_options" style="display:none">
+                        <label for="{{ form.purpose.id_for_label }}"><h6>What is the purpose of the network?</h6></label>
+                        {{ form.purpose }}
+                        <label for="{{ form.access_internet.id_for_label }}"><h6>Do the desktops need to access sites outside of the University of Michigan (on the internet)?</h6></label>
+                        {{ form.access_internet }}
+                        <label for="{{ form.mask.id_for_label }}"><h6>What subnet mask does this pool need?</h6></label>
+                        {{ form.mask }}
+                        <label for="{{ form.protection.id_for_label }}"><h6>Do you need your network protected by the IPS?</h6></label>
+                        {{ form.protection }}
+                        <label for="{{ form.technical_contact.id_for_label }}"><h6>Please enter the email address of the technical contact:</h6></label>
+                        {{ form.technical_contact }}
+                        <label for="{{ form.billing_contact.id_for_label }}"><h6>Please enter the email address of the business contact:</h6></label>
+                        {{ form.billing_contact }}
+                        <label for="{{ form.security_contact.id_for_label }}"><h6>Please enter the email address of the security contact:</h6></label>
+                        {{ form.security_contact }}
+                    </div>
+                    
                     <label for="{{ form.base_image_name.id_for_label }}"><h6>Base Image Name</h6></label>
                     {{ form.base_image_name }}
                     <label for="{{ form.initial_image.id_for_label }}"><h6>Initial Image</h6></label>
@@ -90,7 +107,7 @@
                     <h2>Service Level Expectations</h2>
                     <hr/>
                     <a href="https://its.umich.edu/computing/computers-software/midesktop" target="_blank">Click here for Service Level Expectations</a>
-                    <span>{{ form.sla }}I have read and acknowledge the Service Level Expectations</span>
+                    <br/><span>{{ form.sla }} <span style="color:red; font-size:12px;">*</span>I have read and acknowledge the Service Level Expectations</span>
 
                 </div>
             </div>
@@ -119,6 +136,13 @@
     const gpu_cost = document.getElementById("{{ form.gpu_cost.id_for_label }}");
     const gpu_choice = document.getElementById("{{ form.gpu.id_for_label }}");
 
+    const sla = document.getElementById("{{ form.sla.id_for_label }}");
+
+    const shared_network = document.getElementById("{{ form.shared_network.id_for_label }}");
+    const network_options = document.getElementById("network_options");
+
+    
+
     cpu_cost.setAttribute('readonly',"readonly")
     memory_cost.setAttribute('readonly',"readonly")
     storage_cost.setAttribute('readonly',"readonly")
@@ -127,6 +151,9 @@
 
     window.addEventListener("load", (event) => {
         calculateBaseImageCost()
+        sla.classList.remove("form-control")
+        storage_cost.value=parseFloat(storage_cost.value).toFixed(2)
+        gpu_cost.value=parseFloat(gpu_cost.value).toFixed(2)
     })
 
     cpu_choice.addEventListener("change", () => {
@@ -155,6 +182,14 @@
         cost = base_cost + parseFloat(cpu_cost.value) + parseFloat(memory_cost.value) + parseFloat(storage_cost.value) + parseFloat(gpu_cost.value)
         total_cost.value = cost.toFixed(2)
     }
+
+    shared_network.addEventListener("change", () => {
+        if(shared_network.value == 'False'){
+            network_options.style.display = "block";
+        } else{
+            network_options.style.display = "none";
+        }
+    })
 
 </script>
 {% endblock %}

@@ -51,6 +51,7 @@
 
     window.addEventListener("load", (event) => {
         calculatePoolCost()
+        pool_cost.value=parseFloat(pool_cost.value).toFixed(2)
     })
 
     pool_cost.setAttribute('readonly',"readonly")

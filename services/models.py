@@ -164,10 +164,15 @@ class CloudDesktop(Cloud):
     sla = models.BooleanField()
     persistent_vm = models.BooleanField(default=False)
     image_id = models.IntegerField()
+    access_internet = models.BooleanField(default=False, blank=True)
+    mask = models.CharField(blank=True, max_length=80)
+    protection = models.BooleanField(default=False, blank=True)
+    technical_contact = models.CharField(blank=True, max_length=80)
 
     class Meta:
         verbose_name = 'MiServer Cloud Desktop Pool'
         db_table = "srs_services_clouddesktoptest"
+
 
     def save(self, *args, **kwargs):
         if self.pool_maximum == 1:

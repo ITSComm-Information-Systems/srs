@@ -96,6 +96,11 @@
 
     window.addEventListener("load", (event) => {
         calculateBaseImageCost()
+        memory_cost.value=parseFloat(memory_cost.value).toFixed(2)
+        cpu_cost.value=parseFloat(cpu_cost.value).toFixed(2)
+        storage_cost.value=parseFloat(storage_cost.value).toFixed(2)
+        gpu_cost.value=parseFloat(gpu_cost.value).toFixed(2)
+        total_cost.value=parseFloat(total_cost.value).toFixed(2)
     })
 
     cpu_choice.addEventListener("change", () => {
