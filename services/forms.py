@@ -288,9 +288,11 @@ class ContainerNewForm(CloudForm):
 
 
 ACCESS_INTERNET_CHOICES = (('True','Yes, my desktop needs internet access (outside of U of M sites)'),('False','No, my desktop do not need internet access to any network outside of U of M'))
-class ClouddesktopNewForm(CloudForm):
-    MASK_CHOICES = [["/28", "/28 (16 addresses)"], ["/27", "/27 (32 addresses)"], ["/26", "/26 (64 addresses)"], 
+MASK_CHOICES = [["/28", "/28 (16 addresses)"], ["/27", "/27 (32 addresses)"], ["/26", "/26 (64 addresses)"], 
                     ["/25", "/25 (128 addresses)"], ["/24", "/24 (256 addresses)"]]
+
+class ClouddesktopNewForm(CloudForm):
+    
     
     CPU_INITIAL = 1.15
     MEMORY_INITIAL = 0.96
@@ -330,6 +332,7 @@ class ClouddesktopNewForm(CloudForm):
     technical_contact = forms.CharField(required=False)
     billing_contact = forms.CharField(required=False)
     security_contact = forms.CharField(required=False)
+    shortcode = forms.CharField(validators=[validate_shortcode], required=False)
 
 
     def save(self):
@@ -381,7 +384,6 @@ class ClouddesktopNewForm(CloudForm):
             gpu=gpu,
             gpu_cost=gpu_cost,
             total = total,
-            shared_network = shared_network
         )
 
         image.save()
@@ -400,7 +402,8 @@ class ClouddesktopNewForm(CloudForm):
             protection = protection,
             technical_contact = technical_contact,
             billing_contact = billing_contact,
-            security_contact = security_contact
+            security_contact = security_contact,
+            shared_network = shared_network
         )
         
         pool.save()
@@ -422,7 +425,13 @@ class ClouddesktopChangeForm(CloudForm):
     title = 'Modify MiDesktop'
     additional_details = forms.CharField(required=False)
     access_internet = forms.ChoiceField(required=False,choices=ACCESS_INTERNET_CHOICES)
-    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select())  
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select())
+    access_internet = forms.ChoiceField(required=False,choices=ACCESS_INTERNET_CHOICES)
+    mask = forms.ChoiceField(choices=MASK_CHOICES, required=False)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, required=False)
+    technical_contact = forms.CharField(required=False)
+    billing_contact = forms.CharField(required=False)
+    security_contact = forms.CharField(required=False)  
 
 
 
