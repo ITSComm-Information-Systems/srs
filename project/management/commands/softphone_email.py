@@ -193,7 +193,6 @@ class DesksetEmail():
                 print('get email to send')
                 email = Email.objects.get(code=comm[0])
 
-                Command.send_email(user_list, email)
                 print(comm, email)
 
                 #context = {'cut_date': cut_date, 'week_of': week_of}
@@ -211,7 +210,8 @@ class DesksetEmail():
               'on bldg.uniqname = sel.uniqname ' \
               'left join um_softphone_zoom zm ' \
               'on bldg.uniqname = zm.id ' \
-              f'where ceil(um_date_util_k.um_count_business_days_f(sysdate, {date_field})) = {t_minus_date} ' 
+              f'where UM_COUNT_WEEKDAYS_F(sysdate, {date_field}) = {t_minus_date} ' 
+
               
         if login:
             sql = sql + 'and zm.last_login_time is not null '
