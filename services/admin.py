@@ -30,5 +30,31 @@ class GCPInline(admin.TabularInline):
 @admin.register(GCPAccount)
 class GCPAccountAdmin(CloudAdmin):
     inlines = [GCPInline]
-    
+
+@admin.register(CloudImage)
+class CloudImageAdmin(admin.ModelAdmin):
+    list_display = ('account_id','owner','shortcode','created_date')
+    readonly_fields = ('cpu','cpu_cost','memory','memory_cost','storage','storage_cost','gpu','gpu_cost','total')
+    fieldsets = (
+        (None, {
+            'fields': ('status','owner','shortcode'),
+        }),
+        ('Resource Details', {
+            'fields': ('cpu','cpu_cost','memory','memory_cost','storage','storage_cost','gpu','gpu_cost','total'),
+        }),
+    )
+
+
+@admin.register(CloudDesktop)
+class CloudDesktopAdmin(admin.ModelAdmin):
+    list_display = ('account_id','owner','shortcode','created_date')
+    readonly_fields = ('pool_maximum','pool_cost')
+    fieldsets = (
+        (None, {
+            'fields': ('status','owner'),
+        }),
+        (None, {
+            'fields': ('pool_maximum', 'pool_cost', 'ad_access_groups','sla','persistent_vm'),
+        }),
+    )
 

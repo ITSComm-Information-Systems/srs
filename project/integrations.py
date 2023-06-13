@@ -139,12 +139,12 @@ class Openshift():
                 "name": instance.project_name,
                 "labels": {
                     'size': instance.size,
-                    'contact-mcomm-group': instance.admin_group.replace(' ', '-'),
                 },
                 "annotations": {
                     "openshift.io/description": instance.project_description,
                     "openshift.io/display-name": instance.project_name,
-                    "openshift.io/requester": requester
+                    "openshift.io/requester": requester,
+                    "contact-mcomm-group": instance.admin_group
                 },
         }}
 
@@ -156,8 +156,7 @@ class Openshift():
             try:
                 sc = ShortCodesAPI().get_shortcode(instance.shortcode).json()
                 dept_name =  sc['ShortCodes']['ShortCode']['deptDescription']
-                dept_name = dept_name.replace(' ', '-')
-                payload['metadata']['labels']['billing-dept-name'] = dept_name
+                payload['metadata']['annotations']['billing-dept-name'] = dept_name
             except:
                 print('error getting shortcode')
 
@@ -169,6 +168,7 @@ class Openshift():
                 self.add_backup(instance)
         else:
             print('error', r.status_code, r.text)
+            raise RuntimeError(r.status_code, r.text)
 
     def create_role_bindings(self, instance):
         url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
@@ -584,6 +584,37 @@ class ContainerPayload(Payload):
             title = 'Add contact group to notification group'
             self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.CONTAINER_TEAM} )
 
+class ClouddesktopPayload(Payload):
+    form_id = 85
+    type_id = 7                 
+    service_id = 81              
+    responsible_group_id = 86     
+    delete_account = TextAttribute(1796)
+    delete_owner = TextAttribute(4690)
+    delete_acknowledgement = ChoiceAttribute(4691, Yes=5464)
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.description = (f'Submitted by user: {request.user.username} \n\n' )
+            #https://its.umich.edu/computing/virtualization-cloud/container-service/node/10/submission/594
+            
+
+        super().__init__(action, instance, request, **kwargs)
+        
+class CloudimagePayload(Payload):
+    form_id = 85
+    type_id = 7                 
+    service_id = 81              
+    responsible_group_id = 86     
+    delete_account = TextAttribute(1796)
+    delete_owner = TextAttribute(4690)
+    delete_acknowledgement = ChoiceAttribute(4691, Yes=5464)
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.description = (f'Submitted by user: {request.user.username} \n\n' )
+            #https://its.umich.edu/computing/virtualization-cloud/container-service/node/10/submission/594
+            
+
+        super().__init__(action, instance, request, **kwargs)
 
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__

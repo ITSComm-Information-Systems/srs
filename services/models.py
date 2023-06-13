@@ -136,10 +136,56 @@ class Container(Cloud):
     class Meta:
         managed = False   # We don't want a real table in Oracle but abstract models can't be instantiated.
 
+class CloudImage(Cloud):
+    instance_label = 'Image Name'
+    account_id = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
+    cpu = models.CharField(max_length=4)
+    cpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    memory = models.CharField(max_length=4)
+    memory_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    storage= models.CharField(max_length=8)
+    storage_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    gpu = models.BooleanField(blank=True, null=True)
+    gpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'MiServer Cloud Desktop Image'
+        db_table = "srs_services_clouddimagetest"
+
+
+
+class CloudDesktop(Cloud):
+    instance_label = 'Pool Name'
+    account_id = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
+    pool_maximum = models.IntegerField()
+    pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    ad_access_groups = models.CharField(max_length=100)
+    sla = models.BooleanField()
+    persistent_vm = models.BooleanField(default=False)
+    image_id = models.IntegerField()
+    access_internet = models.BooleanField(default=False, blank=True)
+    mask = models.CharField(blank=True, max_length=80)
+    protection = models.BooleanField(default=False, blank=True)
+    technical_contact = models.CharField(blank=True, max_length=80)
+    shared_network = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = 'MiServer Cloud Desktop Pool'
+        db_table = "srs_services_clouddesktoptest"
+
+
+    def save(self, *args, **kwargs):
+        if self.pool_maximum == 1:
+            self.persistent_vm = True
+        else:
+            self.persistent_vm = False
+        super().save(*args, **kwargs)
 
 class Service():
     aws = AWS
     gcp = GCP
     azure = Azure
     gcpaccount = GCPAccount
+    clouddesktop = CloudDesktop
     container = Container
