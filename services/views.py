@@ -32,8 +32,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
         title = f'Request {model._meta.verbose_name.title()} {model.instance_label}'
 
         if service == "clouddesktop":
-            for field in form:
-                print(field)
+            self.template = 'services/add_cloud_desktop.html'
 
         if form.is_valid():
             form.save()
