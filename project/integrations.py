@@ -587,23 +587,22 @@ class ContainerPayload(Payload):
 class ClouddesktopPayload(Payload):
     form_id = 85
     type_id = 7                 
-    service_id = 81              
+    service_id = 58     #ITS-MiDesktop New Order              
     responsible_group_id = 86     
     delete_account = TextAttribute(1796)
     delete_owner = TextAttribute(4690)
     delete_acknowledgement = ChoiceAttribute(4691, Yes=5464)
 
-    def __init__(self, action, instance, request, **kwargs):
-        self.description = (f'Submitted by user: {request.user.username} \n\n' )
-            #https://its.umich.edu/computing/virtualization-cloud/container-service/node/10/submission/594
-            
+    
 
+    def __init__(self, action, instance, request, form_instance, **kwargs):
+        self.description = f'\nShortcode: {form_instance.cleaned_data["shortcode"]}\n\n'
         super().__init__(action, instance, request, **kwargs)
         
 class CloudimagePayload(Payload):
     form_id = 85
     type_id = 7                 
-    service_id = 81              
+    service_id = 58     #ITS-MiDesktop New Order              
     responsible_group_id = 86     
     delete_account = TextAttribute(1796)
     delete_owner = TextAttribute(4690)
@@ -615,6 +614,87 @@ class CloudimagePayload(Payload):
             
 
         super().__init__(action, instance, request, **kwargs)
+
+def create_midesktop_ticket(action, instance, request, form, **kwargs):
+    payload = {
+        "FormID": 85,              # ITS-MiDatabase Account Requests - Form
+        "TypeID": 7,               # Compute Services
+        "SourceID": 4,             #
+        "StatusID": 77,            # Open
+        "ServiceID": 58,            # ITS-MiDatabase Account Requests
+        "ResponsibleGroupID": 86,  # ITS-MiDatabase
+        "Title": "MiDesktop New Order",
+        "RequestorEmail": request.user.email,
+        "Description": (
+            f'MCommunity Group: {form.cleaned_data["admin_group"]} \n\n'
+            f'Shortcode: {form.cleaned_data["shortcode"]} \n\n'
+            f'Pool Display Name: {form.cleaned_data["pool_name"]} \n\n'
+            f'Base Image Name: {form.cleaned_data["base_image_name"]} \n\n'
+            f'CPU: {form.cleaned_data["cpu"]} \n\n'
+            f'Memory: {form.cleaned_data["memory"]} \n\n'
+            f'Disk Space: {form.cleaned_data["storage"]} \n\n'
+            f'GPU: {form.cleaned_data["gpu"]} \n\n'
+            f'Base Image Total: {form.cleaned_data["total"]} \n\n'
+            f'Auto Logout Users After Session Disconnect: {form.cleaned_data["auto_logout"]} \n\n'
+            f'Pool Size: {form.cleaned_data["pool_maximum"]} \n\n'
+            f'Minimum Number of Desktops: {form.cleaned_data["min_desktops"]} \n\n'
+            f'Additional Powered-on Desktops {form.cleaned_data["powered_on_desktops"]} \n\n'
+            f'Active Directory Container OU Path: {form.cleaned_data["ad_container"]} \n\n'
+            f'Pool entitlements: {form.cleaned_data["ad_groups"]} \n\n'
+            f'Additional Details: {form.cleaned_data["additional_details"]} \n\n'
+                        ),
+        # "Attributes": [
+        #     {
+        #         "ID": "1855", # Name
+        #         "Value": instance.name
+        #     },
+        #     {
+        #         "ID": "1857", # Size
+        #         "Value": str(instance.size)
+        #     },
+        #     {
+        #         "ID": "1858", # Type
+        #         "Value": instance.type.label
+        #     },
+        #     {
+        #         "ID": "1875",  # Shortcode
+        #         "Value": instance.shortcode
+        #     },
+        #     {
+        #         "ID": "1859",  # Owner
+        #         "Value": instance.owner.name
+        #     },
+        #     {
+        #         "ID": "1975",  # Support Email
+        #         "Value": instance.support_email
+        #     },
+        #     {
+        #         "ID": "1974",  # On Call
+        #         "Value": instance.on_call
+        #     },
+        #     {
+        #         "ID": "1842",
+        #         "Value": "88"  # Modify
+        #     }
+        # ]
+    }
+
+
+
+
+    # payload= {
+    #     "FormID": 85,
+    #     "TypeID": 7,
+    #     "SourceID": 4,
+    #     "StatusID": 77,
+    #     "ServiceID": 58,
+    #     "ResponsibleGroupID": 86,
+    #     "Title":"MiDesktop New Order",
+    #     "Description" : f'\nShortcode: {form.cleaned_data["shortcode"]}\n\n'
+    # }
+    print('bingbong')
+    TDx().create_ticket(payload)
+
 
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
