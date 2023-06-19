@@ -30,6 +30,9 @@ class SuBackend(object):
             return None
 
     def has_perm(self, user_obj, perm, obj=None):
+        if not user_obj.username:
+            return
+
         if perm == 'bom.can_access_bom':
             return UmRteTechnicianV.objects.filter(uniqname=user_obj.username).exists()
         elif perm == 'bom.can_update_bom_ordered':
@@ -64,7 +67,7 @@ class UMAuthenticationBackend(OIDCAuthenticationBackend):
         return user
 
     def update_user(self, user, claims):
-        add_custom_permissions(user.id)
+        #add_custom_permissions(user.id)
         user = upsert_user(user.username)  # Create or Update User
         if not user.is_active == True:
             user.is_active = True    #  If user has been deactived and logs back in reactivate the account.
