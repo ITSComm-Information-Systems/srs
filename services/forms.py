@@ -409,10 +409,6 @@ class ClouddesktopNewForm(CloudForm):
         pool.save()
 
 
-        
-    
-
-
 
     class Meta:
         model = CloudDesktop

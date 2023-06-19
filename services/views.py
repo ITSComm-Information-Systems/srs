@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import UserPassesTestMixin
 from .forms import *
 from .models import *
-from project.integrations import create_ticket, Openshift, TDx
+from project.integrations import create_ticket, Openshift, TDx, create_midesktop_ticket
 from oscauth.models import LDAPGroupMember
 
 
@@ -33,10 +33,14 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
         if service == "clouddesktop":
             self.template = 'services/add_cloud_desktop.html'
+            title = 'MiDesktop New Order'
 
         if form.is_valid():
             form.save()
-            r = create_ticket('New', form.instance, request, title=title)
+            if service == "clouddesktop":
+                r = create_midesktop_ticket('New', form.instance, request,form, title=title)
+            else:
+                r = create_ticket('New', form.instance, request, title=title)
 
             if model == Container:
                 project_url = f'{Openshift.PROJECT_URL}/{form.instance.project_name}'
@@ -91,7 +95,10 @@ class ServiceDeleteView(UserPassesTestMixin, View):
         instance.status = Status.ENDED
         instance.save()
 
-        create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
+        if service == 'clouddesktop':
+            create_midesktop_ticket('Delete', instance, request,'', title='None')
+        else:
+            create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
         
 
         return HttpResponseRedirect('/requestsent')
@@ -144,10 +151,12 @@ class ImageDeleteView(UserPassesTestMixin, View):
         if not user_has_access(request.user, instance.owner):
             return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
         
+        create_midesktop_ticket('DeleteImage', instance, request, '', title='None')
+
         instance.status = Status.ENDED
         instance.save()
         
-        create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
+        
         return HttpResponseRedirect('/requestsent')
         
 class ImageChangeView(UserPassesTestMixin, View):
@@ -167,6 +176,7 @@ class ImageChangeView(UserPassesTestMixin, View):
 
         if form.is_valid():
             form.save()
+            create_midesktop_ticket('ModifyImage', instance, request, form, title='None')
 
             return HttpResponseRedirect('/requestsent')
         else:
@@ -205,7 +215,11 @@ class ServiceChangeView(UserPassesTestMixin, View):
         if form.is_valid():
             form.save()
             if not service == 'gcpaccount':
-                create_ticket('Modify', instance, request, title=f'Modify {instance._meta.verbose_name.title()} {model.instance_label}')
+                if service == 'clouddesktop':
+                    print('bingbong')
+                    create_midesktop_ticket('Modify', form.instance, request,form, title='None')
+                else:
+                    create_ticket('Modify', instance, request, title=f'Modify {instance._meta.verbose_name.title()} {model.instance_label}')
 
             return HttpResponseRedirect('/requestsent')
 
