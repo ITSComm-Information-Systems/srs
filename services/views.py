@@ -95,7 +95,10 @@ class ServiceDeleteView(UserPassesTestMixin, View):
         instance.status = Status.ENDED
         instance.save()
 
-        create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
+        if service == 'clouddesktop':
+            create_midesktop_ticket('Delete', instance, request,'', title='None')
+        else:
+            create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
         
 
         return HttpResponseRedirect('/requestsent')
@@ -148,10 +151,12 @@ class ImageDeleteView(UserPassesTestMixin, View):
         if not user_has_access(request.user, instance.owner):
             return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
         
+        create_midesktop_ticket('DeleteImage', instance, request, '', title='None')
+
         instance.status = Status.ENDED
         instance.save()
         
-        create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
+        
         return HttpResponseRedirect('/requestsent')
         
 class ImageChangeView(UserPassesTestMixin, View):
@@ -171,6 +176,7 @@ class ImageChangeView(UserPassesTestMixin, View):
 
         if form.is_valid():
             form.save()
+            create_midesktop_ticket('ModifyImage', instance, request, form, title='None')
 
             return HttpResponseRedirect('/requestsent')
         else:
@@ -209,7 +215,11 @@ class ServiceChangeView(UserPassesTestMixin, View):
         if form.is_valid():
             form.save()
             if not service == 'gcpaccount':
-                create_ticket('Modify', instance, request, title=f'Modify {instance._meta.verbose_name.title()} {model.instance_label}')
+                if service == 'clouddesktop':
+                    print('bingbong')
+                    create_midesktop_ticket('Modify', form.instance, request,form, title='None')
+                else:
+                    create_ticket('Modify', instance, request, title=f'Modify {instance._meta.verbose_name.title()} {model.instance_label}')
 
             return HttpResponseRedirect('/requestsent')
 
