@@ -236,7 +236,7 @@ class ContainerNewForm(CloudForm):
     course_info = forms.CharField(required=False)
     shortcode = forms.CharField(validators=[validate_shortcode], required=False)
     admin_group = forms.ChoiceField(label='Contact Group', help_text='The MCommunity group is used to identify a point of contact should the primary point of contact for this account change. Must be public and contain at least 2 members. The MCommunity group will not be used to define or maintain access to your project. Please omit @umich.edu from your group name in this field.')
-    project_name = forms.CharField(help_text='The project name is a unique identifier used for billing purposes and to generate your unpublished URL (project-name.webplatformsunpublished.umich.edu). Must be lowercase, contain no special characters, and contain no spaces. Hyphens are permitted.',
+    project_name = forms.CharField(help_text='A project is a logical grouping of resources that can be managed together. A project can contain multiple applications, services, and other resources. Projects are used to organize and manage resources in a way that makes sense for your team. The project name must be unique on the hosting cluster. It must be lowercase, contain no special characters, and contain no spaces. Hyphens are permitted.',
                                    validators=[validators.RegexValidator(
                                         regex='^[a-z0-9][0-9a-z\-]*[a-z0-9]$',  # lowercase and hypens, also start and end with a lowercase letter
                                         message="Label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character.",
