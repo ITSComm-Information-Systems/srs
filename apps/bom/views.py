@@ -7,7 +7,7 @@ from django.views.generic import View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.forms import modelform_factory, modelformset_factory, inlineformset_factory
-from project.pinnmodels import UmOscPreorderApiV
+from project.pinnmodels import UmOscPreorderApiV,UmRteTechnicianV, UmRteLaborGroupV
 from django.db.models import Q, Sum
 from datetime import datetime
 
@@ -85,11 +85,65 @@ class Search(PermissionRequiredMixin, View):
             search_list = EstimateView.objects.all()
             template = 'bom/search_estimates.html'
         elif filter == 'assigned_to_me':
+            template = 'bom/search_estimates.html'
             title = 'Assigned to Me'
             username = request.user.username
+
+            all_techs = UmRteTechnicianV.objects.filter(uniqname=username)
+            if all_techs:
+                tech_id = all_techs[0].labor_code
+                assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech_id).values('wo_group_name'))
+                group = assigned_groups[0]["wo_group_name"]
+            else:
+                group = None
+            
+
             open = ['Estimate']
-            search_list = EstimateView.objects.filter(project_manager=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_engineer=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_netops=username, status__in=EstimateView.OPEN)
-            template = 'bom/search_estimates.html'
+            if group == 'Network Engineering':
+                search_list = []
+                raw_list=[]
+                template = 'bom/search_estimates_networkengineering.html'
+                estimate_list = EstimateView.objects.filter(assigned_engineer=username)
+                filter_list = []
+                for estimate in estimate_list:
+                    if estimate.status != 'Completed' and estimate.status != 'Cancelled' and estimate.status != 'Rejected' and estimate.status != 'Ordered':
+                        if estimate.engineer_status == 'COMPLETE':
+                            filter_list.append(estimate.pre_order_number)
+
+                        if estimate.engineer_status != 'COMPLETE':
+                            projects = ProjectView.objects.filter(pre_order_number=estimate.pre_order_number)
+                            for project in projects:
+                                if project.status != 'Complete':
+                                    raw_list.append(estimate)
+                if len(filter_list) < 1:
+                    search_list = raw_list
+                else:
+                    for pre_order in filter_list:
+                        for raw_estimate in raw_list:
+                            if (raw_estimate.pre_order_number != pre_order):
+                                search_list.append(raw_estimate)
+                
+            elif group == 'Network Operations':
+                search_list = []
+                
+                template = 'bom/search_estimates_networkoperations.html'
+                search_list = EstimateView.objects.filter(assigned_netops=username)
+
+                
+                # for estimate in estimate_list:
+                #     search_list.append(estimate)
+                #     print('bingbong')
+                #     project = ProjectView.objects.filter(estimate_id=estimate.id)
+                #     project_list.append(project)
+            elif group == 'Project Managers':
+                search_list = []
+                template = 'bom/search_estimates_projectmanagers.html'
+                search_list = EstimateView.objects.filter(project_manager=username,status__in=EstimateView.OPEN)
+                #search_list = raw_estimates.filter(status='Estimate') | raw_estimates.filter(status='Warehouse') | raw_estimates.filter(status='Ordered') | raw_estimates.filter(status='Approved')
+
+            else:
+                search_list = EstimateView.objects.filter(project_manager=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_engineer=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_netops=username, status__in=EstimateView.OPEN)
+            
         else:  # open_workorder
             title = 'Search Open Preorders/Workorders'
             search_list = Workorder.objects.filter(status_name='Open').defer('status_name')
@@ -107,7 +161,8 @@ class Search(PermissionRequiredMixin, View):
 
         return render(request, template,
                       {'title': title,
-                       'search_list': search_list, })
+                       'search_list': search_list,
+                       })
 
 
 @permission_required('bom.can_access_bom')
@@ -294,6 +349,7 @@ class Estimates(PermissionRequiredMixin, View):
     LaborFormSet = inlineformset_factory(Estimate, Labor,  fields=(
         'group', 'description', 'hours', 'rate_type'), can_delete=True)
 
+
     def post(self, request, estimate_id):
         estimate = Estimate.objects.get(id=estimate_id)
         current_tab = request.POST.get('current_tab', '')
@@ -381,7 +437,7 @@ class Estimates(PermissionRequiredMixin, View):
                        'material_formset': material_formset,
                        'labor_formset': labor_formset,
                        'workorder': estimate.workorder,
-                       'estimate': estimate})
+                       'estimate': estimate,})
 
 
 class AddItem(PermissionRequiredMixin, View):
@@ -529,7 +585,7 @@ class NetOpsSearch(PermissionRequiredMixin, View):
     def get(self, request):
         template = 'bom/netops.html'
 
-        search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3) | Q(percent_completed__lt=100)).order_by('-woid')
+        search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3)).order_by('-woid')
         return render(request, template,
-                      {'title': 'Netops Projects',
+                      {'title': 'UMNet Projects',
                        'search_list': search_list})

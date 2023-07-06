@@ -151,7 +151,11 @@ class PreOrder(models.Model):
 
 
 class EstimateView(models.Model):
-    OPEN = ['Estimate', 'Warehouse', 'Ordered']
+    OPEN = ['Estimate', 'Warehouse', 'Ordered', 'Approved']
+    ENGINEER_STATUS = [
+        ('COMPLETE', 'Complete'),
+        ('NOT_COMPLETE', 'Not Complete'),
+    ]
     id = models.IntegerField(primary_key=True)
     label = models.IntegerField()
     status = models.CharField(max_length=20)
@@ -167,6 +171,7 @@ class EstimateView(models.Model):
     estimated_start_date = models.DateTimeField(null=True, blank=True)
     actual_fulfilled_date = models.DateTimeField(null=True, blank=True)
     estimated_completion_date = models.DateTimeField(null=True, blank=True)
+    engineer_status = models.CharField(max_length=20, choices=ENGINEER_STATUS, default='NOT_COMPLETE')
 
     class Meta: 
         db_table = 'um_bom_estimate_search_v'
@@ -183,20 +188,28 @@ class Estimate(BOM):
     ORDERED = 3
     COMPLETED = 4
     CANCELLED = 5
+    APPROVED = 6
 
     STATUS_CHOICES = [
         (REJECTED, 'Rejected'),
         (ESTIMATE, 'Estimate'),
+        (APPROVED, 'Approved'),
         (WAREHOUSE, 'Warehouse'),
         (ORDERED, 'Ordered'),
         (COMPLETED, 'Completed'),
         (CANCELLED, 'Cancelled'),
     ]
 
+    ENGINEER_STATUS = [
+        ('COMPLETE', 'Complete'),
+        ('NOT_COMPLETE', 'Not Complete'),
+    ]
+
     woid = models.IntegerField()
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=ESTIMATE)
     label = models.CharField(max_length=20)
     assigned_engineer = models.ForeignKey(Technician, on_delete=models.CASCADE, blank=True,null=True)
+    engineer_status = models.CharField(max_length=20, choices=ENGINEER_STATUS, default='NOT_COMPLETE')
     contingency_amount = models.DecimalField(null=True, max_digits=8, decimal_places=2, default=0)
     contingency_percentage = models.IntegerField(null=True, default=0)
     folder = models.URLField(null=True, blank=True)
@@ -206,7 +219,7 @@ class Estimate(BOM):
     @property
     def read_only(self):
         if self.status:
-            if int(self.status) in [self.ESTIMATE, self.WAREHOUSE, self.ORDERED]:
+            if int(self.status) in [self.ESTIMATE, self.WAREHOUSE, self.ORDERED, self.APPROVED]:
                 return False
             else:
                 return True
@@ -231,12 +244,17 @@ class Estimate(BOM):
         self.initial_status = self.status
 
     def save(self, *args, **kwargs):
+        print(self.status, self.initial_status)
         super().save(*args, **kwargs)  # Call the "real" save() method.
 
         if self.status != self.initial_status:
             Notification.objects.notify(self)
-            if self.initial_status == self.ESTIMATE and self.status != self.REJECTED:
-                Estimate.objects.filter(woid=self.woid,status=self.ESTIMATE,legacy_id='0').update(status=self.REJECTED)
+            # if self.initial_status == self.ESTIMATE and self.status != self.REJECTED:
+            #     Estimate.objects.filter(woid=self.woid,status=self.ESTIMATE,legacy_id='0').update(status=self.REJECTED)
+
+            if self.initial_status != self.APPROVED and self.status == self.APPROVED:
+                Estimate.objects.filter(woid=self.woid,status=self.ESTIMATE).update(status=self.REJECTED)
+                Estimate.objects.filter(id=self.id).update(engineer_status='NOT_COMPLETE')
 
     def import_material_from_csv(self, file, user):
 
@@ -338,27 +356,16 @@ class Estimate(BOM):
 class Project(BOM):
     COMPLETE = 1
     OPEN = 2
-    REWORK = 3
+    IN_PROGRESS = 4
     STATUS_CHOICES = [
         (COMPLETE, 'Complete'),
         (OPEN, 'Open'),
-        (REWORK, 'Rework'),
-    ]
-
-    RED = 1
-    YELLOW = 2
-    GREEN = 3
-    PROJECT_HEALTH_CHOICES = [
-        (RED, 'Red'),
-        (YELLOW, 'Yellow'),
-        (GREEN, 'Green'),
+        (IN_PROGRESS, 'In Progress'),
     ]
 
     woid = models.IntegerField()
     netops_engineer = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True, verbose_name='NetOps')
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, null=True)
-    percent_completed = models.PositiveSmallIntegerField(blank=True, null=True)
-    health = models.PositiveSmallIntegerField(choices=PROJECT_HEALTH_CHOICES, null=True)
     assigned_date = models.DateTimeField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     completed_date = models.DateTimeField(null=True, blank=True)
@@ -387,15 +394,6 @@ class ProjectView(BOM):
         (REWORK, 'Rework'),
     ]
 
-    RED = 1
-    YELLOW = 2
-    GREEN = 3
-    PROJECT_HEALTH_CHOICES = [
-        (RED, 'Red'),
-        (YELLOW, 'Yellow'),
-        (GREEN, 'Green'),
-    ]
-
     wo_number_display = models.CharField(max_length=14)
     pre_order_number = models.IntegerField()
     id = models.IntegerField(primary_key=True)
@@ -405,8 +403,6 @@ class ProjectView(BOM):
     updated_by = models.CharField(null=True, max_length=32)
     woid = models.IntegerField()
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, null=True)
-    percent_completed = models.PositiveSmallIntegerField(blank=True, null=True)
-    health = models.PositiveSmallIntegerField(choices=PROJECT_HEALTH_CHOICES, null=True)
     assigned_date = models.DateTimeField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     completed_date = models.DateTimeField(null=True, blank=True)

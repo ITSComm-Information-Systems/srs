@@ -3,6 +3,7 @@
 <h2>{{ title }}</h2>
 
 
+
 <div class="form-inline">
     <input type="search" id="workorder_search" class="form-control form-inline"
     aria-label = "Search through site content" placeholder="filter">
@@ -46,35 +47,30 @@
 {% block js %}
 <script>
 
-
-    //$("#div_workorder_table").hide();
-
-    $("#workorder_search").on("keyup", function () {
-        $("#div_workorder_table").show();
-        var value = $(this).val().toLowerCase();
-        $("#workOrderTableBody tr").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    document.getElementById("workorder_search").addEventListener("keyup", function () {
+        document.getElementById("div_workorder_table").style.display = "block";
+        var value = this.value.toLowerCase();
+        var tableRows = document.querySelectorAll("#workOrderTableBody tr");
+        tableRows.forEach(function (row) {
+            var text = row.textContent.toLowerCase();
+            row.style.display = text.indexOf(value) > -1 ? "table-row" : "none";
         });
     });
 
-    $('#workOrderTableBody tr').click(function () {
-        //var estimate = $(this).dataset.estimate_id
-        var estimate_id = this.getAttribute('data-estimate_id');
-        if (estimate_id != 'None') {
-            window.location.replace("/apps/bom/estimate/" + estimate_id + "/");
-        } else {
-            var pre_order_id = this.getAttribute('data-pre_order_id');
-            //row = $("tr[data-pre_order_id='" + pre_order_id + "']");
-            //$("#workorder").text(row.find("td").eq(0).html());
-            //$("#preorder").text(row.find("td").eq(1).html());
-            //$("#description").html(row.find("td").eq(2).html());
-            console.log(pre_order_id,'pid');
-            $("#pre_order_id").val(pre_order_id);
-            $('#addEstimate').modal('show');
-        }
-
+    var tableRows = document.querySelectorAll("#workOrderTableBody tr");
+    tableRows.forEach(function (row) {
+        row.addEventListener("click", function () {
+            var estimate_id = this.getAttribute('data-estimate_id');
+            if (estimate_id !== 'None') {
+                    window.location.replace("/apps/bom/estimate/" + estimate_id + "/");
+            } else {
+                var pre_order_id = this.getAttribute('data-pre_order_id');
+                console.log(pre_order_id, 'pid');
+                document.getElementById("pre_order_id").value = pre_order_id;
+                document.getElementById("addEstimate").style.display = "block";
+            }
+        });
     });
-
 
 </script>
 

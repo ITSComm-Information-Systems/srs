@@ -19,12 +19,11 @@
                 <th>Preorder</th>
                 <th>Project</th>
                 <th>Estimate Label</th>
-                <th>Estimate Status</th>
                 <th>PM</th>
                 <th>Engineer</th>
-                <th>UMNet</th>
-                <th>Start Date</th>
-                <th>Engineering Due Date</th>
+                <th>UMNet Engineer</th>
+                <th>UMNet Status</th>
+                <th>Due Date</th>
             </tr>
         </thead>
         <tbody id="workOrderTableBody">
@@ -34,12 +33,12 @@
                 <td>{{ record.pre_order_number }}</td>
                 <td>{{ record.project_display }}</td>
                 <td>{{ record.label }}</td>
-                <td>{{ record.status }}</td>
                 <td>{{ record.project_manager }}</td>
                 <td>{{ record.assigned_engineer }}</td>
                 <td>{{ record.assigned_netops }}</td>
-                <td>{{ record.estimated_start_date|date:"Y-m-d" }}</td>
-                <td>{{ record.estimated_completion_date|date:"Y-m-d" }}</td>
+                <td></td>
+                <td>{{ record.due_date }}</td>
+                
             </tr>
             {% endfor %}
         </tbody>

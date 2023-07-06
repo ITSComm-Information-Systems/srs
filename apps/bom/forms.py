@@ -18,7 +18,7 @@ class EstimateForm(ModelForm):
 
     class Meta:
         model = Estimate
-        fields = ['label', 'status', 'folder', 'contingency_amount','contingency_percentage','assigned_engineer']
+        fields = ['label', 'status', 'folder', 'contingency_amount','contingency_percentage','assigned_engineer','engineer_status']
 
     def __init__(self, *args, **kwargs):
         super(EstimateForm, self).__init__(*args, **kwargs)
@@ -75,7 +75,10 @@ class ProjectForm(ModelForm):
     
     class Meta:
         model = Project
-        fields = ['netops_engineer','assigned_date','due_date','completed_date','status','percent_completed','health']
+        fields = ['netops_engineer','assigned_date','due_date','completed_date','status']
+        labels = {
+        "netops_engineer":  "UMNet Engineer",
+        }
         widgets = {
             'assigned_date': forms.DateInput(attrs={'type': 'date'}),
             'due_date': forms.DateInput(attrs={'type': 'date'}),
