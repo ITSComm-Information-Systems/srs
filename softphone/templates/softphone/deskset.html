@@ -70,48 +70,32 @@
 
 
 
-      <div style="display: none;" id="div_new_location">
+      <br>
+      <div style="display: none;" id="div_new_location" class="col-4">
+          <div id="id_building">
 
-        <h6>Search for New Location by Building Name or ID</h6>
-        <div class='input-group col-md-6'>
-          <input class='form-control' id="buildingSearch" type="text" placeholder="Search...">
-        </div>
-
-        <table id="buildingTable" class="table table-hover mt-2 col-md-6">
-          <thead>
-            <tr>
-              <th>Building ID</th>
-              <th>Building Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for building in building_list %}
-            <tr id="{{ building.0 }}">
-              <td>{{ building.0 }}</td>
-              <td name="buildingName">{{ building.1 }}</td>
-              <td id="buildingCampus" hidden>{{ building.2 }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-
-        <div class='col-md-6 mt-4' id='buildingFields'>
-          <input id='campus' id='campus' hidden>
-          <input id='phone-num' name='phone-num' hidden>
-
-          <div class="form-group">
-            <label for="buildingID">Building Code</label>
-            <input class='form-control' type='text' value='test' readonly name='buildingID' id='buildingID'>
+              <label for="browser">Search by building Name or Number:</label>
+              <input class='form-control change-building' list="buildings" name="building_code" id="id_building_code">
+              <input class="form-control-plaintext form-control-sm" readonly tabindex="-1" type="text" 
+                      name="building_name" id="id_building_name">
           </div>
-          <div class="form-group">
-            <label for="buildingFloor">Building Name</label>
-            <input class='form-control' type='text' value='test' readonly name='buildingName' id='buildingName'>
+          <div id="div_floor" class="form-group" style="display: none;">
+              <label for="id_floor">Floor</label>
+              <input type="text" class="form-control change-floor" name="floor" id="id_floor">
+          </div>
+          <div id="div_room" class="form-group" style="display: none;">
+              <label for="id_room">Room</label>
+              <select class="form-control change-room" name="room" id="id_room">
+                  <option></option>
+              </select>
           </div>
 
-
-        <p class='mt-3 prv-msgs' id='new_error'></p>
-
-
+          <div id="div_jack" class="form-group" style="display: none;">
+              <label for="id_jack">Jack</label>
+              <select class="form-control" name="jack" id="id_jack">
+                  <option></option>
+              </select>
+          </div>
 
 
 
@@ -128,6 +112,14 @@
 
   </form>
 </div>
+
+<datalist id="buildings">
+  {% for building in building_list %}
+      <option value="{{ building.building_code }}">{{ building.building_name }}</option>    
+  {% endfor %}
+</datalist>
+
+
 {% endblock content %}
 
 
@@ -178,123 +170,153 @@
 
 
 
-    $('input[type=text][name=buildingFloor]').on("keyup", function () {
-      var code = $('#buildingID').val();
-      var floor = $(this).val();
-      $("#roomselect").hide();
-      $("#jackselect").hide();
-      $('#buildingRoom').val('');
-      $('#buildingJack').val('');
-      $.ajax({
-        type: "GET",
-        url: "/tools/voip/floor/",
-        data: {
-          "buildingID": code,
-          "buildingFloor": floor,
-        },
-        dataType: 'json',
-        success: function (data) {
+    document.querySelectorAll('.change-building').forEach(widget => {
+            widget.addEventListener('change', function handleChange(event) {
+                //prefix = getFormPrefix(this.id)
 
-          $('#buildingFloor').val(floor);
-          $('#buildingRoom').empty();
-          var option = document.createElement("option");
-          option.value = "%";
-          option.text = "--Select--";
-          document.getElementById('buildingRoom').appendChild(option);
+                document.getElementById(`id_building_name`).value = "";
+                document.getElementById(`id_floor`).value = "";
 
-          for (var i = 0; i < data.rooms.length; i++) {
-            var option = document.createElement("option");
-            option.value = data.rooms[i];
-            option.text = data.rooms[i];
-            document.getElementById('buildingRoom').appendChild(option);
-          }
-          if (data.floor != '')
-            $("#roomselect").show();
-            document.getElementById('id_submit_button').scrollIntoView();
+                if (this.value) {
+                    document.getElementById(`div_floor`).style.display = "block";
+                    fld = document.getElementById(`id_floor`).required = true;
 
-          console.log(typeof data);
-        },
-        error: function (data) {
-          //should do some error handling here
-        }
-      });
-    });
+                    var opts = document.getElementById('buildings').childNodes;
+                    for (var i = 0; i < opts.length; i++) {
+                        if (opts[i].value === this.value) {
+                            document.getElementById(`id_building_name`).value = opts[i].text;
+                            break;
+                        }
+                    }
 
-    $('#buildingRoom').change(function () {
-      var code = $('#buildingID').val();
-      var floor = $("#buildingFloor").val();
-      var room = $(this).val();
-      $('#buildingJack').val('');
-      $.ajax({
-        type: "GET",
-        url: "/tools/voip/room/",
-        data: {
-          "buildingID": code,
-          "buildingFloor": floor,
-          "buildingRoom": room,
-        },
-        dataType: 'json',
-        success: function (data) {
-          // document.getElementById('n5').innerHTML = "Room: " + data.room;
+                } else {
+                    hideDivs(prefix, 'floor', 'room');
+                }
+            });
+        });
 
-          $('#buildingRoom').val(room);
-          $('#buildingJack').empty();
-          var option = document.createElement("option");
-          option.value = "%";
-          option.text = "--Select--";
-          document.getElementById('buildingJack').appendChild(option);
-
-          for (var i = 0; i < data.jacks.length; i++) {
-            var option = document.createElement("option");
-            option.value = data.jacks[i];
-            option.text = data.jacks[i];
-            document.getElementById('buildingJack').appendChild(option);
-          }
-          console.log(typeof data);
-          $("#jackselect").show();
-        },
-        error: function (data) {
-          console.log('error');
-        }
-      });
-    });
+        document.querySelectorAll('.change-floor').forEach(widget => {
+            widget.addEventListener('change', function handleChange(event) {
+                target = '#' + $(this).attr('id').replace("floor", "room")
+                target_div = target.replace("id_", "div_");
+                console.log('omg');
+                if (this.value) { 
+                    $(target_div).show();
+                    $(target).attr("required", true);
+                } else {
+                    $(target_div).hide();
+                    $(target).removeAttr("required");
+                }
+                update_room_list('id_room');
+            });
+        });
 
 
-    $("#buildingFields").hide();
-    $("#buildingTable").hide();
+        document.querySelectorAll('.change-room').forEach(widget => {
+            widget.addEventListener('change', function handleChange(event) {
+                target = '#' + $(this).attr('id').replace("room", "jack")
+                target_div = target.replace("id_", "div_");
 
-    $("#buildingSearch").on("keyup", function () {
-      $("#buildingTable").show();
-      var value = $(this).val().toLowerCase();
-      $("#buildingTable tr").filter(function () {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-      });
-    });
-
-    $('#buildingTable tr').click(function () {
-      var building = $(this).find("td").eq(1).html();
-      var buildingCode = $(this).find("td").eq(0).html();
-      var buildingCampus = $(this).find('td').eq(2).html();
-
-      //$('#new_loc_table').removeAttr('hidden');
-      $('#buildingID').val(buildingCode);
-      $('#buildingName').val(building);
-      $('#campus').val(buildingCampus);
-      $('#buildingSearch').val('');
-
-      $("#buildingTable").hide();
-      $('#buildingFields').show();
-      $("#roomselect").hide();
-      $("#jackselect").hide();
-      $('#buildingFloor').val('');
-      $('#buildingRoom').val('');
-      $('#buildingJack').val('');
-      document.getElementById('id_submit_button').disabled = false;
-    });
-
+                if (this.value) {
+                    $(target_div).show();
+                    $(target).attr("required", true);
+                } else {
+                    $(target_div).hide();
+                    $(target).removeAttr("required");
+                }
+                update_jack_list('id_jack');
+            });
+        });
 
 
   });
+
+
+
+
+
+  function update_room_list(target) {
+        code = $('#' + target.replace("room", "building_code")).val();
+        floor = $('#' + target.replace("room", "floor")).val();
+
+        $.ajax({
+            type: "GET",
+            url: "/tools/voip/floor/",
+            data: {
+                "buildingID": code,
+                "buildingFloor": floor,
+            },
+            dataType: 'json',
+            success: function (data) {
+
+                //$('#buildingFloor').val(floor);
+                floor = document.getElementById(target)
+                $('#' + target).empty();
+
+                var option = document.createElement("option");
+                option.value = "";
+                option.text = "--Select--";
+                floor.appendChild(option);
+
+                for (var i = 0; i < data.rooms.length; i++) {
+                    var option = document.createElement("option");
+                    option.value = data.rooms[i];
+                    option.text = data.rooms[i];
+                    floor.appendChild(option);
+                }
+                if (data.floor != '')
+                    $("#roomselect").show();
+            },
+            error: function (data) {
+                console.log("ajax error");
+            }
+        });
+    }
+
+    function update_jack_list(target) {
+        code = $('#' + target.replace("jack", "building_code")).val();
+        floor = $('#' + target.replace("jack", "floor")).val();
+        room = $('#' + target.replace("jack", "room")).val();
+
+        $.ajax({
+            type: "GET",
+            url: "/tools/voip/room/",
+            data: {
+                "buildingID": code,
+                "buildingFloor": floor,
+                "buildingRoom": room,
+            },
+            dataType: 'json',
+            success: function (data) {
+
+                //$('#buildingFloor').val(floor);
+                floor = document.getElementById(target)
+                $('#' + target).empty();
+
+                var option = document.createElement("option");
+                option.value = "";
+                option.text = "--Select--";
+                floor.appendChild(option);
+
+                for (var i = 0; i < data.jacks.length; i++) {
+                    var option = document.createElement("option");
+                    option.value = data.jacks[i];
+                    option.text = data.jacks[i];
+                    floor.appendChild(option);
+                }
+                if (data.floor != '')
+                    $("#jackselect").show();
+            },
+            error: function (data) {
+                console.log("ajax error");
+            }
+        });
+    }
+
+
+
+
+
 </script>
 
 {% endblock %}

@@ -231,13 +231,12 @@ class Deskset(LoginRequiredMixin, View):
                 dept_list[0].selected = 'selected'
                 dept_id = dept_list[0].dept_id
 
-        building_list = UmOscAvailableLocsV.objects.values_list('building_id', 'building_name', 'campus_desc').distinct()
         phone_list = SelectionV.objects.filter(dept_id=dept_id, migrate='YES', processing_status="Completed")
 
         return render(request, 'softphone/deskset.html',
                       {'title': self.title,
                        'full_list': phone_list,
-                       'building_list': list(building_list),
+                       'building_list': UmOSCBuildingV.objects.all(),
                        'dept_list': dept_list})
 
     def post(self, request, dept_id):
