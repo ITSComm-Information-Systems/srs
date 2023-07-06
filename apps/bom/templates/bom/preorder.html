@@ -165,9 +165,9 @@
 
 {% block js %}
   <script>
-    const status = document.getElementById("id_project-status");
-    const completed_date_field = document.getElementById("id_project-completed_date");
-    const completed_date_field_initial_value = completed_date_field.value
+    var status = document.getElementById("id_project-status");
+    var completed_date_field = document.getElementById("id_project-completed_date");
+    var completed_date_field_initial_value = completed_date_field.value
 
     
     status.onchange = function(){
