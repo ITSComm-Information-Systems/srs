@@ -86,11 +86,6 @@ class Technician(models.Model):
         return self.labor_name_display
         
 
-class EstimateManager(models.Manager):
-    def get_totals(self):
-        return 99
-
-
 class Workorder(models.Model):
     pre_order_id = models.IntegerField(primary_key=True)
     wo_number_display = models.CharField(max_length=20)
@@ -150,12 +145,43 @@ class PreOrder(models.Model):
         return self.wo_number_display
 
 
+class EstimateManager(models.Manager):
+    def assigned_to(self, username):
+
+        sql = "select * " \
+        "from um_bom_estimate_search_v est " \
+        "where status_name = 'Open' " \
+        "and status = 'Estimate' " \
+        "and assigned_engineer = %s " \
+        "and engineer_status = 'NOT_COMPLETE' " \
+        "and not exists (select 'x' from um_bom_estimate_search_v " \
+        "                where pre_order_number = est.pre_order_number " \
+        "                and (engineer_status <> 'NOT_COMPLETE' or status <> 'Estimate')) " \
+        "union " \
+        "select *  " \
+        "from um_bom_estimate_search_v " \
+        "where status_name = 'Open' " \
+        "and status in ('Approved' , 'Ordered') " \
+        "and engineer_status = 'NOT_COMPLETE' " \
+        "and assigned_engineer = %s " \
+        "union " \
+        "select *  " \
+        "from um_bom_estimate_search_v " \
+        "where status_name = 'Open' " \
+        "and status_name = 'Ordered'  " \
+        "and project_manager = %s " 
+
+        return self.raw(sql, [username,username,username])
+    
+
 class EstimateView(models.Model):
     OPEN = ['Estimate', 'Warehouse', 'Ordered', 'Approved']
     ENGINEER_STATUS = [
         ('COMPLETE', 'Complete'),
         ('NOT_COMPLETE', 'Not Complete'),
     ]
+    objects = EstimateManager()
+
     id = models.IntegerField(primary_key=True)
     label = models.IntegerField()
     status = models.CharField(max_length=20)
