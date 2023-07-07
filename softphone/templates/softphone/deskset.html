@@ -171,20 +171,32 @@
 
 
     document.querySelectorAll('.change-building').forEach(widget => {
+
+            widget.addEventListener('input', function handleChange(event) {
+                document.getElementById(`div_floor`).style.display = "none";
+                document.getElementById(`div_room`).style.display = "none";
+                document.getElementById(`div_jack`).style.display = "none";
+                //fld = document.getElementById(`id_floor`).required = true;
+            });
+
             widget.addEventListener('change', function handleChange(event) {
                 //prefix = getFormPrefix(this.id)
 
                 document.getElementById(`id_building_name`).value = "";
                 document.getElementById(`id_floor`).value = "";
+                document.getElementById(`id_room`).value = "";
+                document.getElementById(`id_jack`).value = "";
 
                 if (this.value) {
-                    document.getElementById(`div_floor`).style.display = "block";
-                    fld = document.getElementById(`id_floor`).required = true;
 
                     var opts = document.getElementById('buildings').childNodes;
                     for (var i = 0; i < opts.length; i++) {
                         if (opts[i].value === this.value) {
                             document.getElementById(`id_building_name`).value = opts[i].text;
+
+                            document.getElementById(`div_floor`).style.display = "block";
+                            fld = document.getElementById(`id_floor`).required = true;
+
                             break;
                         }
                     }
@@ -196,10 +208,9 @@
         });
 
         document.querySelectorAll('.change-floor').forEach(widget => {
-            widget.addEventListener('change', function handleChange(event) {
+            widget.addEventListener('input', function handleChange(event) {
                 target = '#' + $(this).attr('id').replace("floor", "room")
                 target_div = target.replace("id_", "div_");
-                console.log('omg');
                 if (this.value) { 
                     $(target_div).show();
                     $(target).attr("required", true);
