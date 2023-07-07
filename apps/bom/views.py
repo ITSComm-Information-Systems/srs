@@ -85,65 +85,21 @@ class Search(PermissionRequiredMixin, View):
             search_list = EstimateView.objects.all()
             template = 'bom/search_estimates.html'
         elif filter == 'assigned_to_me':
-            template = 'bom/search_estimates.html'
+            template = 'bom/search_estimates_networkengineering.html'
             title = 'Assigned to Me'
-            username = request.user.username
+            search_list = EstimateView.objects.assigned_to(request.user.username)
 
-            all_techs = UmRteTechnicianV.objects.filter(uniqname=username)
+            all_techs = UmRteTechnicianV.objects.filter(uniqname=request.user.username)
             if all_techs:
                 tech_id = all_techs[0].labor_code
-                assigned_groups = list(UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech_id).values('wo_group_name'))
-                group = assigned_groups[0]["wo_group_name"]
-            else:
-                group = None
-            
+                assigned_groups = UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech_id).values_list('wo_group_name',flat=True)
 
-            open = ['Estimate']
-            if group == 'Network Engineering':
-                search_list = []
-                raw_list=[]
-                template = 'bom/search_estimates_networkengineering.html'
-                estimate_list = EstimateView.objects.filter(assigned_engineer=username)
-                filter_list = []
-                for estimate in estimate_list:
-                    if estimate.status != 'Completed' and estimate.status != 'Cancelled' and estimate.status != 'Rejected' and estimate.status != 'Ordered':
-                        if estimate.engineer_status == 'COMPLETE':
-                            filter_list.append(estimate.pre_order_number)
+                if 'Network Operations' in assigned_groups:
+                    template = 'bom/search_estimates_networkoperations.html'
 
-                        if estimate.engineer_status != 'COMPLETE':
-                            projects = ProjectView.objects.filter(pre_order_number=estimate.pre_order_number)
-                            for project in projects:
-                                if project.status != 'Complete':
-                                    raw_list.append(estimate)
-                if len(filter_list) < 1:
-                    search_list = raw_list
-                else:
-                    for pre_order in filter_list:
-                        for raw_estimate in raw_list:
-                            if (raw_estimate.pre_order_number != pre_order):
-                                search_list.append(raw_estimate)
-                
-            elif group == 'Network Operations':
-                search_list = []
-                
-                template = 'bom/search_estimates_networkoperations.html'
-                search_list = EstimateView.objects.filter(assigned_netops=username)
+                if 'Project Managers' in assigned_groups:
+                    template = 'bom/search_estimates_projectmanagers.html'
 
-                
-                # for estimate in estimate_list:
-                #     search_list.append(estimate)
-                #     print('bingbong')
-                #     project = ProjectView.objects.filter(estimate_id=estimate.id)
-                #     project_list.append(project)
-            elif group == 'Project Managers':
-                search_list = []
-                template = 'bom/search_estimates_projectmanagers.html'
-                search_list = EstimateView.objects.filter(project_manager=username,status__in=EstimateView.OPEN)
-                #search_list = raw_estimates.filter(status='Estimate') | raw_estimates.filter(status='Warehouse') | raw_estimates.filter(status='Ordered') | raw_estimates.filter(status='Approved')
-
-            else:
-                search_list = EstimateView.objects.filter(project_manager=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_engineer=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_netops=username, status__in=EstimateView.OPEN)
-            
         else:  # open_workorder
             title = 'Search Open Preorders/Workorders'
             search_list = Workorder.objects.filter(status_name='Open').defer('status_name')
