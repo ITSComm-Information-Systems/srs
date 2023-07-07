@@ -9,9 +9,20 @@ import datetime, csv
 class Command(BaseCommand):
     help = 'Sync membership for StorageOwner groups with MCommunity'
 
+    def add_arguments(self, parser):
+        parser.add_argument('--group')
+
     def handle(self, *args, **options):
+
+        if options['group']:
+            group  = LDAPGroup.objects.get(name=options['group'])
+            group.update_membership()
+            return
 
         # Update LDAP Group membership used by storage, etc.
         for group in LDAPGroup.objects.order_by('name'):
             print('update', group)
             group.update_membership()
+
+
+
