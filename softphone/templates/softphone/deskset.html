@@ -85,16 +85,12 @@
           </div>
           <div id="div_room" class="form-group" style="display: none;">
               <label for="id_room">Room</label>
-              <select class="form-control change-room" name="room" id="id_room">
-                  <option></option>
-              </select>
+              <input class="form-control" name="room" id="id_room" list="rooms" placeholder="Select">
           </div>
 
           <div id="div_jack" class="form-group" style="display: none;">
               <label for="id_jack">Jack</label>
-              <select class="form-control" name="jack" id="id_jack">
-                  <option></option>
-              </select>
+              <input class="form-control" name="jack" id="id_jack" list="jacks" placeholder="Select">
           </div>
 
 
@@ -119,6 +115,13 @@
   {% endfor %}
 </datalist>
 
+<datalist id="jacks">
+
+</datalist>
+
+<datalist id="rooms">
+  <option value="33">Select</option>    
+</datalist>
 
 {% endblock content %}
 
@@ -224,23 +227,21 @@
             });
         });
 
+      document.getElementById('id_room').addEventListener("change", function() {
 
-        document.querySelectorAll('.change-room').forEach(widget => {
-            widget.addEventListener('change', function handleChange(event) {
-                target = '#' + $(this).attr('id').replace("room", "jack")
-                target_div = target.replace("id_", "div_");
+        target = '#' + $(this).attr('id').replace("room", "jack")
+        target_div = target.replace("id_", "div_");
 
-                if (this.value) {
-                    $(target_div).show();
-                    $(target).attr("required", true);
-                } else {
-                    $(target_div).hide();
-                    $(target).removeAttr("required");
-                }
-                update_jack_list('id_jack');
-            });
-        });
+        if (this.value) {
+            $(target_div).show();
+            $(target).attr("required", true);
+        } else {
+            $(target_div).hide();
+            $(target).removeAttr("required");
+        }
+        update_jack_list('id_jack');
 
+      });
 
   });
 
@@ -263,19 +264,14 @@
             success: function (data) {
 
                 //$('#buildingFloor').val(floor);
-                floor = document.getElementById(target)
-                $('#' + target).empty();
-
-                var option = document.createElement("option");
-                option.value = "";
-                option.text = "--Select--";
-                floor.appendChild(option);
+                rooms = document.getElementById('rooms')
+                $('#rooms').empty();
 
                 for (var i = 0; i < data.rooms.length; i++) {
                     var option = document.createElement("option");
                     option.value = data.rooms[i];
                     option.text = data.rooms[i];
-                    floor.appendChild(option);
+                    rooms.appendChild(option);
                 }
                 if (data.floor != '')
                     $("#roomselect").show();
@@ -303,19 +299,14 @@
             success: function (data) {
 
                 //$('#buildingFloor').val(floor);
-                floor = document.getElementById(target)
-                $('#' + target).empty();
-
-                var option = document.createElement("option");
-                option.value = "";
-                option.text = "--Select--";
-                floor.appendChild(option);
+                jacks = document.getElementById('jacks')
+                $('#jacks').empty();
 
                 for (var i = 0; i < data.jacks.length; i++) {
                     var option = document.createElement("option");
                     option.value = data.jacks[i];
                     option.text = data.jacks[i];
-                    floor.appendChild(option);
+                    jacks.appendChild(option);
                 }
                 if (data.floor != '')
                     $("#jackselect").show();
