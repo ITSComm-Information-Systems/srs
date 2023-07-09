@@ -166,7 +166,9 @@
       window.location.href = "/softphone/deskset/" + this.value + "/";
     });
 
-
+    $("#id_jack").change(function () {
+      document.getElementById('id_submit_button').disabled = false;
+    });
 
 
 
