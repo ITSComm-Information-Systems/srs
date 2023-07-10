@@ -41,7 +41,7 @@ class Command(BaseCommand):
             print(r.status_code, r.text)
             return
 
-        if 'audit' in options:
+        if options.get('audit'):
             self.shortcode_audit(data)
             return
 
