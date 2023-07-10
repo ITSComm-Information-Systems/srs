@@ -161,7 +161,7 @@ class EstimateManager(models.Manager):
         "select *  " \
         "from um_bom_estimate_search_v " \
         "where status_name = 'Open' " \
-        "and status in ('Approved' , 'Ordered') " \
+        "and status in ('Approved' , 'Ordered', 'Warehouse') " \
         "and engineer_status = 'NOT_COMPLETE' " \
         "and assigned_engineer = %s " \
         "union " \
