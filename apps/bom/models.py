@@ -165,13 +165,19 @@ class EstimateManager(models.Manager):
         "and engineer_status = 'NOT_COMPLETE' " \
         "and assigned_engineer = %s " \
         "union " \
+        "select * " \
+        "from um_bom_estimate_search_v " \
+        "where assigned_netops = %s " \
+        "and STATUS_NAME = 'Open' " \
+        "and status in ('Estimate','Ordered','Warehouse') " \
+        "union " \
         "select *  " \
         "from um_bom_estimate_search_v " \
         "where status_name = 'Open' " \
         "and status_name = 'Ordered'  " \
         "and project_manager = %s " 
 
-        return self.raw(sql, [username,username,username])
+        return self.raw(sql, [username,username,username,username])
     
 
 class EstimateView(models.Model):
