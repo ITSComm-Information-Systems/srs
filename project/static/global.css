@@ -228,7 +228,7 @@ a:focus {
 	background:#0075bc;
 	color:#ffffff;
 }
-
+/* footer is done */
 footer {
 	margin:2em 0 0 0;
 	padding:20px 0 20px 0;
@@ -336,6 +336,8 @@ footer .copyright a:hover {
 		white-space:normal;
 	}
 }
+
+/* footer is done */
 
 .jumbotron {
 	padding:1.25rem;

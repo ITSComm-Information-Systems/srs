@@ -61,3 +61,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+#Dependencies
+node_modules

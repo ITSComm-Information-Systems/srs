@@ -1,4 +1,4 @@
-@import 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/scss/bootstrap.scss';
+@import "//node_modules/select2-bootstrap-5-theme/src/select2-bootstrap-5-theme";
 .form-control {
   border: 1px solid #cecbc9;
   float: none;
@@ -14,17 +14,17 @@
   white-space: normal;
 }
 
-.aux-nav {
+#aux-nav {
   background: #00274c;
   color: white;
 }
-.aux-nav .navbar-brand {
+#aux-nav .navbar-brand {
   display: inline-block;
   width: 80%;
   margin: 0;
   padding: 20px;
 }
-.aux-nav .navbar-brand .logo {
+#aux-nav .navbar-brand .logo {
   display: block;
   width: 100%;
   max-width: 472px;
@@ -35,16 +35,137 @@
   background-size: contain;
   overflow: hidden;
 }
-.aux-nav button:focus {
+#aux-nav button:focus {
   outline: 1px dotted white;
 }
-.aux-nav .nav-item {
+#aux-nav .nav-item {
   margin-left: 15px;
+  margin-left: auto !important;
 }
-.aux-nav .dropdown-menu {
+#aux-nav .dropdown-menu {
   margin: 0;
   padding: 0;
   background: #00274c;
   border: 0;
   border-radius: 0;
+}
+
+*, ::after, ::before {
+  box-sizing: border-box;
+}
+
+.jumbotron {
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  background-color: #e9ecef;
+  border-radius: 0.3rem;
+}
+
+h2, .h2 {
+  color: #40658f;
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1.2;
+}
+h2 .lead, .h2 .lead {
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+
+.container {
+  max-width: 1280px;
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+footer {
+  margin: 2em 0 0 0;
+  padding: 20px 0 20px 0;
+  background: #333333;
+  color: #ffffff;
+  overflow: hidden;
+}
+footer a:link, footer a:visited {
+  text-decoration: none;
+}
+footer a:hover {
+  color: #ffcb05;
+  text-decoration: underline;
+}
+footer .umich {
+  float: left;
+  margin: 0 40px 2em 0;
+  padding: 0;
+}
+footer .umich a {
+  display: inline-block;
+  width: 140px;
+  height: 152px;
+  background: #00274c url("um-logo-m216.png") 0 0 no-repeat;
+  background-size: contain;
+  text-indent: -99999px;
+}
+footer .links {
+  float: left;
+  margin: 0 40px 2em 0;
+  padding: 0;
+  white-space: nowrap;
+}
+footer .links h2 {
+  margin: auto;
+  font-size: 1em;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  line-height: inherit;
+}
+footer .links ul {
+  margin: 0 0 0 10px;
+  padding: 0 0 0 10px;
+}
+footer .links li {
+  margin: 0.5em 0 0 0;
+  color: #555555;
+}
+footer .links .socialmedia {
+  margin: 0.5em 0 1em 0;
+}
+footer .links a {
+  display: inline-block;
+  width: 2.75rem;
+  height: 2.75rem;
+  line-height: 2.7rem;
+  margin-right: 0.5em;
+  border: 1px solid #555555;
+  border-radius: 100%;
+  font-size: 1.15rem;
+  font-family: "Font Awesome 5 Free";
+  text-align: center;
+}
+footer .links a:hover {
+  background: #555555;
+  text-decoration: none;
+}
+footer .right {
+  float: right;
+}
+footer .copyright {
+  clear: both;
+  font-size: 0.85em;
+}
+footer .copyright a:link, footer .copyright a:visited {
+  color: #9b9b9b;
+  text-decoration: none;
+}
+footer .copyright a:focus {
+  background: #0075bc;
+  color: #ffffff;
+}
+footer .copyright a:hover {
+  color: #ffcb05;
+  text-decoration: underline;
+}
+
+@media (min-width: 992px) {
+  footer {
+    height: 224px;
+  }
 }
