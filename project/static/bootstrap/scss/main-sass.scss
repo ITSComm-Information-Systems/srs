@@ -22,9 +22,25 @@ $background-color: #fffefe;
 $border-color: solid #cecbc9;
 $padding: 20px;
 $nav-bar-color: #00274c;
-
+$red:#CC0000;
+$btn-danger-hover: #BF0102;
 
 //template code 
+
+@media (min-width:992px) {
+    html, body {
+    	height: 100%;
+	}
+	.wrapper {
+		min-height: 100%;
+		margin-bottom: -224px;
+		padding-bottom: 224px;
+	}
+	footer {
+		height: 224px;
+	}
+}
+
 .form-control {
 	border:1px $border-color;
     float: none;
@@ -112,7 +128,7 @@ footer {
 	margin:2em 0 0 0;
 	padding:20px 0 20px 0;
 	background:#333333;
-	color:#ffffff;
+	color: white;
 	overflow:hidden;
     a:link, a:visited {
         text-decoration:none;
@@ -129,7 +145,7 @@ footer {
             display:inline-block;
             width:140px;
             height:152px;
-            background:#00274c url('um-logo-m216.png') 0 0 no-repeat;
+            background:$dark-blue url('um-logo-m216.png') 0 0 no-repeat;
             background-size:contain;
             text-indent:-99999px;
         }
@@ -194,8 +210,86 @@ footer {
     } //copyright
 } //footer
 
-@media (min-width: 992px) {
-    footer {
-      height: 224px;
+
+.dept-dropdown p {
+	display:inline-block;
+}
+.filters {
+	display:inline-block;
+	vertical-align:top;
+}
+.filter-container {
+	display:grid;
+	grid-template-columns:repeat(2, 1fr);
+	grid-column-gap:20px;
+}
+
+.doc-link {
+	padding:0;
+	border:none;
+}
+.message {
+	margin:0 auto;
+	text-align:center;
+}
+
+.switch-department {
+	text-align:center
+}
+
+.tips {
+	margin-left:10px;
+}
+
+.action {
+	display:inline-block;
+	width:100%;
+	text-align:left;
+	text-decoration:underline;
+    a {
+        display:inline;
+        padding-right:1rem;
+    } //a
+    .delete {
+        color: $red;
+        font-weight:400;
+        border-color:transparent;
+        background-color:transparent;
+        text-decoration:underline;
+        :focus {
+            background:transparent;
+        }
+    } //delete
+    .cancel {
+        color:btn-red;
+        font-weight:400;
+        border-color:transparent;
+        background-color:transparent;
+        text-decoration:underline;
+        :focus {
+            background:transparent;
+        }
+    } 
+    .edit {
+        :focus {
+        background-color:transparent;
+        background:transparent;
+        color:#0075bc;
+        }
     }
-  }
+    .ready-link {
+        white-space:nowrap;
+    }
+}//action
+
+
+.btn-danger {
+	background-color: $red;
+	border-color: $red;
+}
+
+.btn-danger:hover, .btn-danger:focus {
+	background-color: $btn-danger-hover;
+	border-color: $btn-danger-hover;
+}
+
