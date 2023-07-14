@@ -1,4 +1,13 @@
-@import "//node_modules/select2-bootstrap-5-theme/src/select2-bootstrap-5-theme";
+@import "//node_modules/bootstrap/scss/bootstrap";
+@import "//node_modules/select2/src/scss/core";
+@import "//node_modules/select2-bootstrap-5-theme/src/include-all";
+@import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);
+@import url(https://fonts.googleapis.com/css?family=Roboto:400);
+@import url(https://fonts.googleapis.com/css?family=Roboto:400i);
+@import url(https://fonts.googleapis.com/css?family=Roboto:700);
+@import url(https://fonts.googleapis.com/css?family=Roboto:700i);
+
+
 .form-control {
   border: 1px solid #cecbc9;
   float: none;

@@ -1,6 +1,17 @@
-@import "//node_modules/select2-bootstrap-5-theme/src/select2-bootstrap-5-theme";
+//bootstrap
+@import "//node_modules/bootstrap/scss/bootstrap";
+@import "//node_modules/select2/src/scss/core";
+//select2
+@import "//node_modules/select2-bootstrap-5-theme/src/include-all";
+//fontawesome
+@import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);
+//fonts
+@import url(https://fonts.googleapis.com/css?family=Roboto:400);
+@import url(https://fonts.googleapis.com/css?family=Roboto:400i);
+@import url(https://fonts.googleapis.com/css?family=Roboto:700);
+@import url(https://fonts.googleapis.com/css?family=Roboto:700i);
 
-
+//custom scss based on global.css
 
 //colors
 $dark-blue: #00274C;
