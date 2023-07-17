@@ -1,4 +1,4 @@
-@media (min-width:992px) {
+/* @media (min-width:992px) {
     html, body {
     	height: 100%;
 	}
@@ -10,8 +10,8 @@
 	footer {
 		height: 224px;
 	}
-}
-:root {
+} */
+/* :root {
 	--dark-blue:#00274C;
 	--med-blue:#40658F;
 	--light-blue:#6189b7;
@@ -23,9 +23,9 @@ body {
 	color:#333333;
 	overflow-y:scroll;
 	font-size:1em;
-}
+} */
 
-#skip-link {
+/* #skip-link {
 	position:absolute;
 	z-index:9999;
 }
@@ -33,20 +33,20 @@ body {
 .px-3 {
     padding-right:20px;
     padding-left:20px;
-}
-
+} */
+/* 
 .navbar {
 	padding:0;
-}
+} */
 @media (max-width:1199.98px) {
     .navbar-expand>.px-3, .navbar-expand>.px-3 {
         padding-right:20px;
         padding-left:20px;
     }
 }
-.navbar a:link, .navbar a:visited {
+/* .navbar a:link, .navbar a:visited {
 	color:#ffffff;
-}
+} */
 @media (min-width: 768px) {
 	.navbar .navbar-brand {
 		display:none;
@@ -56,27 +56,26 @@ body {
     white-space:normal;
 }
 
-.px-3 {
+/* .px-3 {
 	max-width:1280px;
 }
-
-#aux-nav {
+ #aux-nav {
 	background:#00274c;
-	color:#ffffff;
+	color:#ffffff; 
 }
-#aux-nav .navbar-brand {
+ #aux-nav .navbar-brand {
 	display:inline-block;
 	width:80%;
 	margin:0;
 	padding:20px 0;
-}
+} */
 @media (min-width:768px) {
 	#aux-nav .navbar-brand {
 		width:100%;
 		max-width:472px;
 	}
 }
-#aux-nav .navbar-brand .logo {
+/* #aux-nav .navbar-brand .logo {
 	display:block;
 	width:100%;
 	max-width:472px;
@@ -87,24 +86,24 @@ body {
 	background-size:contain;
 	text-indent:-999999px;
 	overflow:hidden;
-}
-#aux-nav button:focus {
+} */
+/* #aux-nav button:focus {
 	outline:1px dotted #ffffff;
-}
-#aux-nav .nav-item {
+} */
+/* #aux-nav .nav-item {
 	margin-left:15px;
-}
+} 
 #aux-nav .nav-link {
 	padding:10px;
 }
-#aux-nav .dropdown-menu {
+ #aux-nav .dropdown-menu {
 	margin:0;
 	padding:0;
 	background:#003867;
 	border:0;
 	border-radius:0;
-}
-#aux-nav .dropdown-item {
+} */
+/* #aux-nav .dropdown-item {
 	padding:.5rem 10px;
 }
 #aux-nav .dropdown-item:focus, #aux-nav .dropdown-item:hover {
@@ -119,7 +118,7 @@ body {
 }
 #aux-nav li:hover {
 	background:#003867;
-}
+} */
 @media (max-width:992px) {
 	#aux-nav .navbar-nav {
 		margin:0 -10px 10px -10px !important;
@@ -129,7 +128,7 @@ body {
 	}
 }
 
-#main-nav {
+/* #main-nav {
 	background:#40658f;
 	color:#ffffff;
 }
@@ -165,7 +164,7 @@ body {
 }
 #main-nav li:hover {
 	background:#4a719c;
-}
+} */
 @media (max-width:992px) {
 	#main-nav .navbar-nav {
 		margin:10px -10px 10px -10px;
@@ -189,7 +188,7 @@ body {
 	}
 }
 
-h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+/* h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	margin:1em 0 .5em 0;
 	font-weight:700;
 }
@@ -202,33 +201,9 @@ h2, .h2 {
 }
 h3, .h3 {
 	color:#555555;
-}
+} 
 
-.alert {
-    padding:1.25rem;
-}
-.alert .h4.alert-heading {
-    margin-top:0;
-}
-
-.border-dark {
-    border-color:#cecbc9 !important;
-}
-
-a {
-	display:inline-block;
-}
-a, a:link, a:visited {
-	color:#0075bc;
-}
-a:hover {
-	color:#0065a3; /* 0075bc - 5% */
-}
-a:focus {
-	background:#0075bc;
-	color:#ffffff;
-}
-/* footer is done */
+footer is done
 footer {
 	margin:2em 0 0 0;
 	padding:20px 0 20px 0;
@@ -318,9 +293,9 @@ footer .copyright a:focus {
 }
 footer .copyright a:hover {
 	color:#ffcb05;
-	text-decoration:underline;
-}
-@media (max-width:992px) {
+	text-decoration:underline; */
+/* } */
+/* @media (max-width:992px) {
 	footer .links, footer .links.right, footer .copyright {
 		float:none;
 		margin:0 0 2em 180px;
@@ -335,15 +310,15 @@ footer .copyright a:hover {
 		margin:0 0 2em 0;
 		white-space:normal;
 	}
-}
+} */
 
 /* footer is done */
 
-.jumbotron {
+/* .jumbotron {
 	padding:1.25rem;
-}
+} */
 
-.dept-dropdown p {
+/* .dept-dropdown p {
 	display:inline-block;
 }
 .filters {
@@ -371,17 +346,17 @@ footer .copyright a:hover {
 
 .tips {
 	margin-left:10px;
-/*	max-width:50%; */
-}
+/*	max-width:50%; 
+} */
 
-span {
+/* span {
 	text-align:center
 }
 .alert-row {
 	padding-left:20px;
 	float:right;
 	justify-content:flex-end;
-}
+} */
 @media (max-width:768px) {
 	.alert-row {
 		justify-content:flex-start;
@@ -389,13 +364,13 @@ span {
 		float:none;
 	}
 }
-
+/* 
 .dept-select {
 	display:flex;
 	align-items:center;
-}
+} */
 
-.action {
+/* .action {
 	display:inline-block;
 	width:100%;
 	text-align:left;
@@ -422,9 +397,9 @@ span {
 	border-color:transparent;
 	background-color:transparent;
 	text-decoration:underline;
-}
+} */
 
-.btn-danger {
+/* .btn-danger {
 	background-color: #CC0000;
 	border-color: #cc0000;
 }
@@ -432,9 +407,9 @@ span {
 .btn-danger:hover, .btn-danger:focus {
 	background-color: #BF0102;
 	border-color: #BF0102;
-}
+} */
 
-.action .cancel:focus {
+/* .action .cancel:focus {
 	background-color:transparent;
 	background:transparent;
 }
@@ -445,7 +420,7 @@ span {
 }
 .action .ready-link {
     white-space:nowrap;
-}
+} */
 
 @media (min-width:992px) {
 	.order-summary {
@@ -454,7 +429,7 @@ span {
 	}
 }
 
-.order-summary-list{
+/* .order-summary-list{
 	padding-inline-start:20px;
 }
 
@@ -480,9 +455,15 @@ span {
 }
 .card-group .card.col-12 {
 	padding:0;
+} */
+
+@media (max-width:575px) {
+	.card-group > .card {
+		width:100%;
+	}
 }
 
-.learn-more-link {
+/* .learn-more-link {
 	margin-bottom:0;
 	font-style:italic;
 	cursor:pointer;
@@ -507,9 +488,9 @@ span {
 	color:#0075bc;
 	border-color:transparent;
 	background-color:transparent;
-}
+} */
 
-.navbar-light .navbar-nav .nav-link {
+/* .navbar-light .navbar-nav .nav-link {
 	border-radius:4px;
 }
 .navbar-light .navbar-nav .active > .nav-link {
@@ -531,8 +512,8 @@ span {
 }
 .navbar-nav .nav-item > .nav-link.active {
 	background-color:#6189b7 !important;
-}
-
+} */
+/* 
 h2.service-menu-header {
 	margin-top:1.25rem !important;
 	font-size:1.75rem;
@@ -552,9 +533,9 @@ h2.service-menu-header {
 	background-color:#e4e1df;
 	color:#555555;
 	cursor:default;
-}
-/*.nav-pills a.nav-link:not(.active):hover*/
-.nav-pills a.nav-link:hover {
+} 
+.nav-pills a.nav-link:not(.active):hover*/
+/* .nav-pills a.nav-link:hover {
     background-color:#0075bc;
     color:#ffffff;
 }
@@ -570,7 +551,7 @@ a.nav-link.disabled:focus {
 }
 .nav-pills a.nav-link.disabled:hover {
 	cursor:default;
-}
+} */
 
 .buttons {
 	margin:auto;
