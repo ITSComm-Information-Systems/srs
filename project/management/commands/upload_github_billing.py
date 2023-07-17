@@ -103,7 +103,7 @@ class Command(BaseCommand):
 
         email = EmailMessage(
             subject,
-            'body',
+            body,
             'srs-otto@umich.edu',
             to,
             []
