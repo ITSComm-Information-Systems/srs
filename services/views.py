@@ -49,6 +49,10 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
     def get(self, request, service):
         request.session['backupStorage'] = 'cloud'
+        if service == 'midesktop':
+            return render(request, 'services/midesktop.html')
+        if service == 'midesktop-network':
+            return render(request, 'services/midesktop-network.html')
 
         try:
             form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)
@@ -150,24 +154,30 @@ class ServiceChangeView(UserPassesTestMixin, View):
 
 
 def get_service_list(request, service):
-    if hasattr(Service, service):
-        model = getattr(Service, service)
-        request.session['backupStorage'] = 'cloud'
-    else:
-        return HttpResponseNotFound('<h1>Page not found</h1>')
-
     groups = list(LDAPGroupMember.objects.filter(username=request.user).values_list('ldap_group_id',flat=True))
-
-    if service == 'gcp':
-        template = 'gcp_service_list.html'
-        service_list = GCPAccount.objects.filter(status='A',owner__in=groups).order_by('account_id')
+    if service == 'midesktop':
+        return render(request,'services/midesktop_existing.html')
+    elif service == 'midesktop-network':
+        return render(request,'services/midesktop-network_existing.html')
     else:
-        template = 'service_list.html'
-        service_list = model.objects.filter(status='A',owner__in=groups)
+        if hasattr(Service, service):
+            model = getattr(Service, service)
+            request.session['backupStorage'] = 'cloud'
+        else:
+            return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    return render(request, f'services/{template}', 
-            {'title': model._meta.verbose_name_plural,
-             'instance_label': model.instance_label,
-             'service_list': service_list,
-             'groups': groups,
-            })
+        
+
+        if service == 'gcp':
+            template = 'gcp_service_list.html'
+            service_list = GCPAccount.objects.filter(status='A',owner__in=groups).order_by('account_id')
+        else:
+            template = 'service_list.html'
+            service_list = model.objects.filter(status='A',owner__in=groups)
+
+        return render(request, f'services/{template}', 
+                {'title': model._meta.verbose_name_plural,
+                'instance_label': model.instance_label,
+                'service_list': service_list,
+                'groups': groups,
+                })

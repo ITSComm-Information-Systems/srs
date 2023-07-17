@@ -143,3 +143,46 @@ class Service():
     azure = Azure
     gcpaccount = GCPAccount
     container = Container
+
+class MiDesktop(models.Model):
+    instance_label = 'Instance'
+    account_id = models.CharField(max_length=30, default='TBD')
+    status = models.CharField(max_length=1, choices = Status.choices, default=Status.ACTIVE)
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
+    requestor = models.CharField(max_length=8)
+    created_date = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return self.account_id
+
+    class Meta:
+        abstract = True 
+
+class MiDesktopPool(MiDesktop):
+    instance_label = 'Pool Name'
+    shortcode = models.CharField(max_length=6)
+    account_id = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
+    pool_maximum = models.IntegerField()
+    pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    image_id = models.IntegerField()
+
+    class Meta:
+        verbose_name = 'MiServer Cloud Desktop Pool'
+
+class MiDesktopImage(MiDesktop):
+    instance_label = 'Image Name'
+    account_id = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
+    cpu = models.CharField(max_length=4)
+    cpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    memory = models.CharField(max_length=4)
+    memory_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    storage= models.CharField(max_length=8)
+    storage_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    gpu = models.BooleanField(blank=True, null=True)
+    gpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    total_image_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    pool_id = models.IntegerField()
+    network_id = models.IntegerField()
+
+    class Meta:
+        verbose_name = 'MiServer Cloud Desktop Pool'
