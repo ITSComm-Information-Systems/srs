@@ -538,7 +538,7 @@ class ContainerPayload(Payload):
     CONTAINER_TEAM = 7
 
     form_id = 20
-    type_id = 25
+    type_id = 218
     service_id = 13
     responsible_group_id = CONTAINER_TEAM
 
