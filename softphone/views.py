@@ -247,11 +247,11 @@ class Deskset(LoginRequiredMixin, View):
         selection.cut_date = next_cut_date() + datetime.timedelta(days=7)
 
         if self.request.POST.get('location_correct') == 'No':
-            selection.new_building = self.request.POST.get('buildingName')
-            selection.new_building_code = self.request.POST.get('buildingID')
-            selection.new_floor = self.request.POST.get('buildingFloor')
-            selection.new_room = self.request.POST.get('buildingRoom')
-            selection.new_jack = self.request.POST.get('buildingJack')
+            selection.new_building = self.request.POST.get('building_name')
+            selection.new_building_code = self.request.POST.get('building_code')
+            selection.new_floor = self.request.POST.get('floor')
+            selection.new_room = self.request.POST.get('room')
+            selection.new_jack = self.request.POST.get('jack')
         else:
             selection.new_building = selection.building
             selection.new_building_code = selection.building_code
@@ -260,6 +260,7 @@ class Deskset(LoginRequiredMixin, View):
             selection.new_jack = selection.jack
 
         selection.save()
+        selection.create_deskset_preorder()
 
         return render(request, 'softphone/deskset_confirmation.html')
 
