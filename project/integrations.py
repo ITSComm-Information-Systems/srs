@@ -164,6 +164,7 @@ class Openshift():
         if r.ok:
             self.create_role_bindings(instance)
             self.add_limits(instance)
+            self.add_network_policy(instance)
             if instance.backup == 'Yes':
                 self.add_backup(instance)
         else:
@@ -198,6 +199,14 @@ class Openshift():
 
         return requests.post(f'{self.API_ENDPOINT}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
                              , headers=self.HEADERS)
+
+    def add_network_policy(self, instance):
+        payload = self.get_yaml('networkpolicy')
+        for item in payload['items']:
+            item['metadata']['namespace'] = instance.project_name
+
+        return requests.post(f'{self.API_ENDPOINT}/api/v1/namespaces/{instance.project_name}/networkpolicies'
+                             , headers=self.HEADERS, json=payload)
 
     def get_yaml(self, file):
         file = f'{settings.BASE_DIR}/project/rosa/{file}.yaml'
