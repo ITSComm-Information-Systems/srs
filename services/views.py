@@ -49,8 +49,10 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
     def get(self, request, service):
         request.session['backupStorage'] = 'cloud'
+        print(service)
         if service == 'midesktop':
-            return render(request, 'services/midesktop.html')
+            form = MiDesktopNewForm(user=self.request.user)
+            return render(request, 'services/midesktop.html',{'form':form})
         if service == 'midesktop-network':
             return render(request, 'services/midesktop-network.html')
 
@@ -156,7 +158,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
 def get_service_list(request, service):
     groups = list(LDAPGroupMember.objects.filter(username=request.user).values_list('ldap_group_id',flat=True))
     if service == 'midesktop':
-        return render(request,'services/midesktop_existing.html')
+        return render(request,'services/midesktop_existing.html',{'groups': groups})
     elif service == 'midesktop-network':
         return render(request,'services/midesktop-network_existing.html')
     else:

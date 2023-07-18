@@ -1,1 +1,27 @@
-<h1>New Desktop</h1>
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ form.title }}</h1>
+
+<div class="container">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div id="div_formbody">
+            {% for field in form %}
+            <h6 class="form-group">
+                <label for="{{ field.label }}"><h6></h6>{{ field.label_tag }}
+                    {% if field.field.required %}<span style="color:red; font-size:12px;"> *</span>{% endif %}
+                </label>
+                {{ field }}
+            </h6>
+
+            </div>
+            {% endfor %}
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}
