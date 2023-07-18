@@ -1,7 +1,7 @@
 @charset "UTF-8";
-@import "//node_modules/bootstrap/scss/bootstrap";
-@import "//node_modules/select2/src/scss/core";
-@import "//node_modules/select2-bootstrap-5-theme/src/include-all";
+@import "/node_modules/bootstrap/scss/bootstrap";
+@import "/node_modules/select2/src/scss/core";
+@import "/node_modules/select2-bootstrap-5-theme/src/include-all";
 @import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);
 @import url(https://fonts.googleapis.com/css?family=Roboto:400);
 @import url(https://fonts.googleapis.com/css?family=Roboto:400i);
