@@ -1,7 +1,7 @@
 from django import forms
 from django.core import validators
 from project.forms.fields import *
-from .models import AWS, Azure, GCP, GCPAccount, Container
+from .models import AWS, Azure, GCP, GCPAccount, Container, MiDesktopInstantClonePool
 from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
 
@@ -291,3 +291,58 @@ class ContainerNewForm(CloudForm):
         # Create project in openshift, don't save to SRS.
         os = Openshift()
         os.create_project(self.instance, self.user.username)
+
+class MiDesktopForm(forms.Form):
+    admin_group = forms.ChoiceField(label='MCommunity Admin Group')
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
+        kwargs.pop('user', None)
+
+        super(MiDesktopForm, self).__init__(*args, **kwargs)
+
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+
+        if self.user:
+            group_list = MCommunity().get_groups(self.user.username)
+
+            choice_list = [(None, '---')]
+            for group in group_list:
+                choice_list.append((group, group,))
+
+            self.fields['admin_group'].choices = choice_list
+
+        #self.fields['admin_group'].initial = self.instance.owner
+
+    def save(self):
+        if 'admin_group' in self.changed_data:
+            self.instance.owner = LDAPGroup().lookup( self.cleaned_data.get('admin_group') )
+
+        super().save()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        for err_field in self.errors:
+            self.fields[err_field].widget.attrs['class'] += ' is-invalid'
+
+        return cleaned_data
+    
+class MiDesktopNewForm(MiDesktopForm):
+    CPU_INITIAL = 1.15
+    MEMORY_INITIAL = 0.96
+    STORAGE_INITIAL = 5.00
+    GPU_INITIAL = 0.00
+    BASE_COST = 31.31
+    TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
+
+    title = 'MiDesktop New Order Form'
+    shortcode = forms.CharField(validators=[validate_shortcode], required=False)
+
+    class Meta:
+        fields=['admin_group','shortcode']

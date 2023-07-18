@@ -1,5 +1,6 @@
 from django.db import models
 from django.forms import BooleanField
+#from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 from project.models import Choice
 from oscauth.models import LDAPGroup
@@ -146,37 +147,53 @@ class Service():
 
 class MiDesktop(models.Model):
     instance_label = 'Instance'
-    account_id = models.CharField(max_length=30, default='TBD')
+    instance_name = models.CharField(max_length=30, default='TBD')
     status = models.CharField(max_length=1, choices = Status.choices, default=Status.ACTIVE)
+    account_id = models.CharField(max_length=30, default='TBD')
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
     requestor = models.CharField(max_length=8)
     created_date = models.DateField(auto_now=True)
 
     def __str__(self):
-        return self.account_id
+        return self.instance_name
 
     class Meta:
         abstract = True 
 
-class MiDesktopPool(MiDesktop):
+class MiDesktopInstantClonePool(MiDesktop):
     instance_label = 'Pool Name'
     shortcode = models.CharField(max_length=6)
-    account_id = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
+    instance_name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
     pool_maximum = models.IntegerField()
     pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     image_id = models.IntegerField()
+    shared_network = models.BooleanField(default=True)
+    network_id = models.IntegerField(null=True)
+    
 
     class Meta:
-        verbose_name = 'MiServer Cloud Desktop Pool'
+        verbose_name = 'MiDesktop Instant Clone Pool'
+
+class MiDesktopPersistentPool(MiDesktop):
+    instance_label = 'Pool Name'
+    shortcode = models.CharField(max_length=6)
+    instance_name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
+    pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    #images = ArrayField(models.IntegerField(), null=False)
+
+
+    class Meta:
+        verbose_name = 'MiDesktop Persistent Pool'
+
 
 class MiDesktopImage(MiDesktop):
     instance_label = 'Image Name'
-    account_id = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
+    instance_name = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
     cpu = models.CharField(max_length=4)
     cpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     memory = models.CharField(max_length=4)
     memory_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    storage= models.CharField(max_length=8)
+    #storage= ArrayField(models.CharField(max_length=8), null=False)
     storage_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     gpu = models.BooleanField(blank=True, null=True)
     gpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
@@ -185,4 +202,16 @@ class MiDesktopImage(MiDesktop):
     network_id = models.IntegerField()
 
     class Meta:
-        verbose_name = 'MiServer Cloud Desktop Pool'
+        verbose_name = 'MiDesktop Image'
+
+class MiDesktopNetwork(MiDesktop):
+    instance_label = 'Network Name'
+    access_internet = models.BooleanField(default=False, blank=True)
+    subnet_mask = models.CharField(blank=True, max_length=80)
+    ips_protection = models.BooleanField(default=False, blank=True)
+    technical_contact = models.CharField(blank=True, max_length=80)
+    business_contact = models.CharField(blank=True, max_length=80)
+    security_contact = models.CharField(blank=True, max_length=80)
+
+    class Meta:
+        verbose_name = 'MiDesktop Network'
