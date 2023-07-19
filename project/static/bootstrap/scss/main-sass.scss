@@ -1,6 +1,7 @@
 //bootstrap
 @import "../../../../node_modules/bootstrap/scss/bootstrap";
 //select2
+$s2bs5-border-color: $border-color;
 @import "../../../../node_modules/select2-bootstrap-5-theme/src/include-all";
 //fontawesome
 @import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);
