@@ -205,8 +205,8 @@ class Openshift():
         for item in payload['items']:
             item['metadata']['namespace'] = instance.project_name
 
-        return requests.post(f'{self.API_ENDPOINT}/api/v1/namespaces/{instance.project_name}/networkpolicies'
-                             , headers=self.HEADERS, json=payload)
+            r = requests.post(f'{self.API_ENDPOINT}/apis/networking.k8s.io/v1/namespaces/{instance.project_name}/networkpolicies'
+                                , headers=self.HEADERS, json=item)
 
     def get_yaml(self, file):
         file = f'{settings.BASE_DIR}/project/rosa/{file}.yaml'
