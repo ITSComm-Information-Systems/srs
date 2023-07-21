@@ -32,6 +32,17 @@ $grass-green: #28A745;
  
 
 //@media related
+@media (max-width:576px) {
+	footer {
+		padding:20px 0;
+		.umich, .links, .right, .copyright {
+			float:none;
+			margin:0 0 2em 0;
+			white-space:normal;
+		}
+	} //attention, might need to change .right to .links.right
+} 
+
 @media (max-width:599px) {
 	.card-columns {
 		column-count:1;
@@ -56,6 +67,17 @@ $grass-green: #28A745;
 	}
 	.service-menu-link {
 		display:none;
+	}
+	.navbar {
+		.navbar-brand {
+			display:none;
+		}
+	}
+	#aux-nav {
+		.navbar-brand {
+			width:100%;
+			max-width:472px;
+		}
 	}
 }
 
@@ -88,7 +110,53 @@ $grass-green: #28A745;
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
 	}
+	#aux-nav {
+		.navbar-nav {
+			margin:0 -10px 10px -10px !important;
+		}
+		.nav-item {
+			margin:0;
+		}
+	}
 }
+
+@media (max-width:992px) {
+	#main-nav {
+		.navbar-nav {
+			margin:10px -10px 10px -10px;
+		}
+		.nav-link {
+			padding:10px;
+			text-align:left;
+		}
+		dropdown-item {
+			padding:10px;
+		}
+	}//main-nav
+	footer {
+		.links, .right, .copyright {
+			float:none;
+			margin:0 0 2em 180px;
+		}
+	} //attention!!
+}
+
+@media (max-width:1199.98px) {
+    .navbar-expand>.px-3 {
+        padding-right:20px;
+        padding-left:20px;
+    }
+}
+@media (min-width:1200px) {
+	.dropdown:hover > .dropdown-menu {
+		display:block;
+	}
+	.dropdown > .dropdown-toggle:active {
+		/*Without this, clicking will make it sticky*/
+		pointer-events:none;
+	}
+}
+
 
 //template code
 body {
@@ -172,7 +240,7 @@ body {
             height:0;
             margin:0;
             padding:10% 0 0 0;
-            background:url('/project/static/srs-banner.png') 50% 50% no-repeat;
+            background:url('/static/srs-banner.png') 50% 50% no-repeat;
             background-size:contain;
             overflow:hidden;
         }
@@ -272,10 +340,10 @@ footer {
 	margin:2em 0 0 0;
 	padding:20px 0 20px 0;
 	background:$dark-charcoal;
-	color: white;
 	overflow:hidden;
     a:link, a:visited {
         text-decoration:none;
+		color: white;
     }
     a:hover {
         color:#ffcb05;
@@ -289,7 +357,7 @@ footer {
             display:inline-block;
             width:140px;
             height:152px;
-            background:$dark-blue url('um-logo-m216.png') 0 0 no-repeat;
+            background:$dark-blue url('/static/um-logo-m216.png') 0 0 no-repeat;
             background-size:contain;
             text-indent:-99999px;
         }
@@ -300,6 +368,7 @@ footer {
         padding:0;
         white-space:nowrap;
         h2 {
+			color:white;
             margin:auto;
             font-size:1em;
             font-family:Roboto,Arial,Helvetica,sans-serif;
@@ -315,23 +384,23 @@ footer {
         } //li
         .socialmedia {
             margin:.5em 0 1em 0;
+			a:hover {
+				background:$light-charcoal;
+				text-decoration:none;
+			} //a:hover
+			a {
+				display:inline-block;
+				width:2.75rem;
+				height:2.75rem;
+				line-height:2.7rem;
+				margin-right:.5em;
+				border:1px solid $light-charcoal;
+				border-radius:100%;
+				font-size:1.15rem;
+				font-family:'Font Awesome 5 Free';
+				text-align:center;
+			} //a
         } //social media
-        a {
-            display:inline-block;
-            width:2.75rem;
-            height:2.75rem;
-            line-height:2.7rem;
-            margin-right:.5em;
-            border:1px solid $light-charcoal;
-            border-radius:100%;
-            font-size:1.15rem;
-            font-family:'Font Awesome 5 Free';
-            text-align:center;
-        } //a
-        a:hover {
-            background:$light-charcoal;
-            text-decoration:none;
-        } //a:hover
     } //links
     .right{
         float:right;
@@ -790,7 +859,7 @@ a.popover-icon:hover {
 	bottom:20px;
 	right:30px;
 	z-index:99;
-	font-size:18px;
+	font-size:1.125rem;
 	border:none;
 	outline:none;
 	background-color:#D6D8DB;
@@ -1180,7 +1249,7 @@ legend {
 }
 
 .invLocTable {
-	font-size: 12px;
+	font-size: 0.75rem;
 }
 
 pre {
