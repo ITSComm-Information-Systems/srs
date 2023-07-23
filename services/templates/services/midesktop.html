@@ -54,12 +54,18 @@
                     <br/>{{ field }} <span style="color:red; font-size:12px;">*</span>I have read and acknowledge the Service Level Expectations</span>
                 
                 {% else %}
-                <div class="form-group" id="wrapper_{{ field.auto_id }}">
-                    <h6>{% if field.field.required %}<span style="color:red; font-size:12px;">* </span>{% endif %}
-                    <label for="{{ field.label }}">{{ field.label_tag }}</label>
-                    {{ field }}
-                    </h6>
-                </div>
+                    {% if field.auto_id == 'id_pool_name' %}
+                        <h2>Order New Pool</h2>
+                    {% endif %}
+                    {% if field.auto_id == 'id_auto_logout' %}
+                        <h2>Connection Options</h2>
+                    {% endif %}
+                    <div class="form-group" id="wrapper_{{ field.auto_id }}">
+                        <h6>{% if field.field.required %}<span style="color:red; font-size:12px;">* </span>{% endif %}
+                        <label for="{{ field.label }}">{{ field.label_tag }}</label>
+                        {{ field }}
+                        </h6>
+                    </div>
                 {% endif %}
             {% endfor %}
 
@@ -81,6 +87,8 @@
     const storage_cost = document.getElementById("id_storage_cost");
     const gpu_cost = document.getElementById("id_gpu_cost");
     const total_cost = document.getElementById("{{ form.total.id_for_label }}");
+    const network_type = document.getElementById("{{ form.network_type.id_for_label }}");
+    const networks = document.getElementById("id_networks");
 
     //Choice Selectors
     const cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}");
@@ -90,11 +98,11 @@
 
     //Wrapper selectors
     const access_internet_wrapper = document.getElementById("wrapper_id_access_internet");
+    const base_image_wrapper  = document.getElementById("wrapper_id_base_image");
     const base_image_name_wrapper  = document.getElementById("wrapper_id_base_image_name");
     const billing_contact_wrapper = document.getElementById("wrapper_id_billing_contact");
     const initial_image_wrapper  = document.getElementById("wrapper_id_initial_image");
     const mask_wrapper = document.getElementById("wrapper_id_mask");
-    const network_choices_wrapper = document.getElementById("wrapper_id_network_choices");
     const operating_system_wrapper  = document.getElementById("wrapper_id_operating_system");
     const protection_wrapper = document.getElementById("wrapper_id_protection");
     const purpose_wrapper = document.getElementById("wrapper_id_purpose");
@@ -116,6 +124,9 @@
     const min_desktops_wrapper = document.getElementById("wrapper_id_min_desktops");
     const ad_container_wrapper = document.getElementById("wrapper_id_ad_container");
     const ad_groups_wrapper = document.getElementById("wrapper_id_ad_groups");
+    const calculator_wrapper = document.getElementById("wrapper_calculator");
+    const networks_wrapper = document.getElementById("wrapper_id_networks");
+    
 
     window.addEventListener("load", (event) => {page_load()})
     
@@ -127,35 +138,84 @@
     }
 
     function hide_initial_elements(){
-        wrappers = [access_internet_wrapper,billing_contact_wrapper,mask_wrapper,network_choices_wrapper,
-                    protection_wrapper,purpose_wrapper,security_contact_wrapper,technical_contact_wrapper,network_type_wrapper,
-                    pool_name_wrapper,auto_logout_wrapper,pool_maximum_wrapper,powered_on_desktops_wrapper,
-                    min_desktops_wrapper,ad_container_wrapper,ad_groups_wrapper
-        ]
-        for (wrapper in wrappers){
-            hide_element(wrappers[wrapper])
-        }
+        hide_new_network_fields()
+        hide_elements([networks_wrapper])
     }
 
     function read_only_initial_elements(){
         elements = [cpu_cost,memory_cost,storage_cost,gpu_cost,total_cost]
-        for (element in elements){
-            read_only_element(elements[element])
-        }
+        read_only_elements(elements)
 
     }
+
+    network_type.addEventListener("change", () => {
+        handle_network_type_change()
+    })
+
+    networks.addEventListener("change", () => {
+        handle_networks_change()
+    })
+
     pool_type.addEventListener("change", () => {
         handle_pool_type_change()
     })
 
+    function handle_network_type_change(){
+        if (network_type.value == "dedicated"){
+            show_elements([networks_wrapper])
+            handle_networks_change()
+        } else {
+            hide_new_network_fields()
+            hide_elements([networks_wrapper])
+        }
+    }
+
+    function handle_networks_change(){
+        if(networks.value == "-- New Dedicated Network"){
+            show_new_network_fields()
+        } else{
+            hide_new_network_fields()
+        }
+    }
+
+    function show_new_network_fields(){
+        wrappers = [access_internet_wrapper,billing_contact_wrapper,mask_wrapper,
+                    protection_wrapper,purpose_wrapper,security_contact_wrapper,technical_contact_wrapper,networks_wrapper
+        ]
+
+        show_elements(wrappers)
+    }
+
+    function hide_new_network_fields(){
+        wrappers = [access_internet_wrapper,billing_contact_wrapper,mask_wrapper,
+                    protection_wrapper,purpose_wrapper,security_contact_wrapper,technical_contact_wrapper
+        ]
+
+        hide_elements(wrappers)
+    }
+
     function handle_pool_type_change(){
         if (pool_type.value == 'instant_clone'){
-            console.log('Instant Yo')
+            handle_instant_clone_selected()
         }
 
         if (pool_type.value == 'persistent'){
-            console.log('Persistent Yo')
+            handle_persistent_selected()
         }
+    }
+
+    function handle_instant_clone_selected(){
+        visible_fields = [base_image_name_wrapper,calculator_wrapper]
+        show_elements(visible_fields)
+
+        console.log('Instant')
+    }
+
+    function handle_persistent_selected(){
+        hidden_fields = [base_image_name_wrapper,calculator_wrapper]
+        hide_elements(hidden_fields)
+
+        console.log('Persistent')
     }
 
     cpu_choice.addEventListener("change", () => {
@@ -184,16 +244,22 @@
         cost = base_cost + parseFloat(cpu_cost.value) + parseFloat(memory_cost.value) + parseFloat(storage_cost.value) + parseFloat(gpu_cost.value)
         total_cost.value = cost.toFixed(2)
     }
-    function hide_element(element){
-        element.setAttribute('hidden', "hidden");
+    function hide_elements(elements){
+        for (element in elements){
+            elements[element].setAttribute('hidden', "hidden");
+        }
     }
 
-    function show_element(element){
-        element.removeAttribute('hidden', "hidden");
+    function show_elements(elements){
+        for (element in elements){
+            elements[element].removeAttribute('hidden', "hidden");
+        }
     }
 
-    function read_only_element(element){
-        element.setAttribute('readonly',"readonly")
+    function read_only_elements(elements){
+        for (element in elements){
+            elements[element].setAttribute('readonly',"readonly");
+        }
     }
 
 </script>

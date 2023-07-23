@@ -61,12 +61,8 @@ class ServiceRequestView(UserPassesTestMixin, View):
         request.session['backupStorage'] = 'cloud'
         if service == 'midesktop':
             form = MiDesktopNewForm(user=self.request.user)
-            persistent_form = MiDesktopPersistentForm(user=self.request.user)
-            instant_clone_form = MiDesktopInstantCloneForm(user=self.request.user)
             return render(request, 'services/midesktop.html',{
-                'form':form,
-                'persistent_form':persistent_form,
-                'instant_clone_form':instant_clone_form})
+                'form':form})
         if service == 'midesktop-network':
             return render(request, 'services/midesktop-network.html')
 
