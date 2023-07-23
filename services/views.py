@@ -27,21 +27,31 @@ class ServiceRequestView(UserPassesTestMixin, View):
             return False
 
     def post(self, request, service):
-        model = getattr(Service, service)
-        form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)
-        title = f'Request {model._meta.verbose_name.title()} {model.instance_label}'
-
-        if form.is_valid():
-            form.save()
-            r = create_ticket('New', form.instance, request, title=title)
-
-            if model == Container:
-                project_url = f'{Openshift.PROJECT_URL}/{form.instance.project_name}'
-                return render(request, 'services/new_container.html', {'link': project_url, 'title': 'New Container Service Project'})
-            else:
+        if service == 'midesktop':
+            form = MiDesktopNewForm(request.POST, user=self.request.user)
+            print('bing bong')
+            if form.is_valid():
+                form.save()
                 return HttpResponseRedirect('/requestsent')
+            else:
+                print(form.errors)
+
         else:
-            print(form.errors)
+            model = getattr(Service, service)
+            form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)
+            title = f'Request {model._meta.verbose_name.title()} {model.instance_label}'
+
+            if form.is_valid():
+                form.save()
+                r = create_ticket('New', form.instance, request, title=title)
+
+                if model == Container:
+                    project_url = f'{Openshift.PROJECT_URL}/{form.instance.project_name}'
+                    return render(request, 'services/new_container.html', {'link': project_url, 'title': 'New Container Service Project'})
+                else:
+                    return HttpResponseRedirect('/requestsent')
+            else:
+                print(form.errors)
 
         return render(request, self.template,
                       {'title': form.title,
@@ -49,10 +59,14 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
     def get(self, request, service):
         request.session['backupStorage'] = 'cloud'
-        print(service)
         if service == 'midesktop':
             form = MiDesktopNewForm(user=self.request.user)
-            return render(request, 'services/midesktop.html',{'form':form})
+            persistent_form = MiDesktopPersistentForm(user=self.request.user)
+            instant_clone_form = MiDesktopInstantCloneForm(user=self.request.user)
+            return render(request, 'services/midesktop.html',{
+                'form':form,
+                'persistent_form':persistent_form,
+                'instant_clone_form':instant_clone_form})
         if service == 'midesktop-network':
             return render(request, 'services/midesktop-network.html')
 
