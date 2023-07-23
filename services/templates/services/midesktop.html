@@ -10,18 +10,194 @@
 
         <div id="div_formbody">
             {% for field in form %}
-            <h6 class="form-group">
-                <label for="{{ field.label }}"><h6></h6>{{ field.label_tag }}
-                    {% if field.field.required %}<span style="color:red; font-size:12px;"> *</span>{% endif %}
-                </label>
-                {{ field }}
-            </h6>
-
-            </div>
+                {% if field.auto_id == 'id_cpu' %}
+                    <div class="form-group" id="wrapper_calculator">
+                        <div id="wrapper_id_cpu">
+                            <div class="row">
+                                <div class="col"><h6>CPU</label>{{ field }}</h6></div>
+                {% elif field.auto_id == 'id_cpu_cost' %}
+                            <div class="col"><h6>CPU Total</label>{{ field }}</h6></div>
+                        </div>
+                    </div>
+                {% elif field.auto_id == 'id_memory' %}
+                <div id="wrapper_id_memory">
+                    <div class="row">
+                        <div class="col"><h6>Memory</label>{{ field }}</h6></div>
+                {% elif field.auto_id == 'id_memory_cost' %}
+                    <div class="col"><h6>RAM Total</label>{{ field }}</h6></div>
+                    </div>
+                </div>
+                {% elif field.auto_id == 'id_storage' %}
+                <div id="wrapper_id_storage">
+                    <div class="row">
+                        <div class="col"><h6>Disk Space</label>{{ field }}</h6></div>
+                {% elif field.auto_id == 'id_storage_cost' %}
+                    <div class="col"><h6>Disk Space Total</label>{{ field }}</h6></div>
+                    </div>
+                    </div>
+                {% elif field.auto_id == 'id_gpu' %}
+                <div id="wrapper_id_gpu">
+                    <div class="row">
+                        <div class="col"><h6>GPU (optional)</label>{{ field }}</h6></div>
+                {% elif field.auto_id == 'id_gpu_cost' %}
+                    <div class="col"><h6>GPU Total</label>{{ field }}</h6></div>
+                    </div>
+                </div>
+                {% elif field.auto_id == 'id_total' %}
+                    <label for="id_total"><h6>Base Image Total</h6></label>
+                    {{ field }}
+                    </div>
+                {% elif field.auto_id == 'id_sla' %}
+                    <h2>Service Level Expectations</h2>
+                    <hr/>
+                    <a href="https://its.umich.edu/computing/computers-software/midesktop" target="_blank">Click here for Service Level Expectations</a>
+                    <br/>{{ field }} <span style="color:red; font-size:12px;">*</span>I have read and acknowledge the Service Level Expectations</span>
+                
+                {% else %}
+                <div class="form-group" id="wrapper_{{ field.auto_id }}">
+                    <h6>{% if field.field.required %}<span style="color:red; font-size:12px;">* </span>{% endif %}
+                    <label for="{{ field.label }}">{{ field.label_tag }}</label>
+                    {{ field }}
+                    </h6>
+                </div>
+                {% endif %}
             {% endfor %}
+
         </div>
 
+    <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
 
+{% endblock %}
+
+{% block js %}
+<script>
+    //Element Selectors
+    const pool_type = document.getElementById("{{ form.pool_type.id_for_label }}");
+    const sla = document.getElementById("id_sla");
+    const cpu_cost = document.getElementById("id_cpu_cost");
+    const memory_cost = document.getElementById("id_memory_cost");
+    const storage_cost = document.getElementById("id_storage_cost");
+    const gpu_cost = document.getElementById("id_gpu_cost");
+    const total_cost = document.getElementById("{{ form.total.id_for_label }}");
+
+    //Choice Selectors
+    const cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}");
+    const memory_choice = document.getElementById("{{ form.memory.id_for_label }}");
+    const storage_choice = document.getElementById("{{ form.storage.id_for_label }}");
+    const gpu_choice = document.getElementById("{{ form.gpu.id_for_label }}");
+
+    //Wrapper selectors
+    const access_internet_wrapper = document.getElementById("wrapper_id_access_internet");
+    const base_image_name_wrapper  = document.getElementById("wrapper_id_base_image_name");
+    const billing_contact_wrapper = document.getElementById("wrapper_id_billing_contact");
+    const initial_image_wrapper  = document.getElementById("wrapper_id_initial_image");
+    const mask_wrapper = document.getElementById("wrapper_id_mask");
+    const network_choices_wrapper = document.getElementById("wrapper_id_network_choices");
+    const operating_system_wrapper  = document.getElementById("wrapper_id_operating_system");
+    const protection_wrapper = document.getElementById("wrapper_id_protection");
+    const purpose_wrapper = document.getElementById("wrapper_id_purpose");
+    const security_contact_wrapper = document.getElementById("wrapper_id_security_contact");
+    const technical_contact_wrapper = document.getElementById("wrapper_id_technical_contact");
+
+    const network_type_wrapper = document.getElementById("wrapper_id_network_type")
+
+    const cpu_wrapper = document.getElementById("wrapper_id_cpu");
+    const memory_wrapper = document.getElementById("wrapper_id_memory");
+    const memory_cost_wrapper = document.getElementById("wrapper_id_memory_cost");
+    const storage_wrapper = document.getElementById("wrapper_id_storage");
+    const storage_cost_wrapper = document.getElementById("wrapper_id_storage_cost");
+    const gpu_wrapper = document.getElementById("wrapper_id_gpu");
+    const gpu_cost_wrapper = document.getElementById("wrapper_id_gpu_cost");
+    const total_wrapper = document.getElementById("wrapper_id_total");
+
+    const pool_name_wrapper = document.getElementById("wrapper_id_pool_name");
+    const auto_logout_wrapper = document.getElementById("wrapper_id_auto_logout");
+    const pool_maximum_wrapper = document.getElementById("wrapper_id_pool_maximum");
+    const powered_on_desktops_wrapper = document.getElementById("wrapper_id_powered_on_desktops");
+    const min_desktops_wrapper = document.getElementById("wrapper_id_min_desktops");
+    const ad_container_wrapper = document.getElementById("wrapper_id_ad_container");
+    const ad_groups_wrapper = document.getElementById("wrapper_id_ad_groups");
+
+    window.addEventListener("load", (event) => {page_load()})
+    
+    function page_load(){
+        hide_initial_elements()
+        read_only_initial_elements()
+        sla.classList.remove("form-control")
+        
+    }
+
+    function hide_initial_elements(){
+        wrappers = [access_internet_wrapper,billing_contact_wrapper,mask_wrapper,network_choices_wrapper,
+                    protection_wrapper,purpose_wrapper,security_contact_wrapper,technical_contact_wrapper,network_type_wrapper,
+                    pool_name_wrapper,auto_logout_wrapper,pool_maximum_wrapper,powered_on_desktops_wrapper,
+                    min_desktops_wrapper,ad_container_wrapper,ad_groups_wrapper
+        ]
+        for (wrapper in wrappers){
+            hide_element(wrappers[wrapper])
+        }
+    }
+
+    function read_only_initial_elements(){
+        elements = [cpu_cost,memory_cost,storage_cost,gpu_cost,total_cost]
+        for (element in elements){
+            read_only_element(elements[element])
+        }
+
+    }
+    pool_type.addEventListener("change", () => {
+        handle_pool_type_change()
+    })
+
+    function handle_pool_type_change(){
+        if (pool_type.value == 'instant_clone'){
+            console.log('Instant Yo')
+        }
+
+        if (pool_type.value == 'persistent'){
+            console.log('Persistent Yo')
+        }
+    }
+
+    cpu_choice.addEventListener("change", () => {
+        cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
+        calculateBaseImageCost()
+    })
+
+    memory_choice.addEventListener("change", () => {
+        memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
+        calculateBaseImageCost()
+    })
+
+    storage_choice.addEventListener("change", () => {
+        storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
+        calculateBaseImageCost()
+    })
+
+    gpu_choice.addEventListener("change", () => {
+        gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+        calculateBaseImageCost()
+    })
+
+
+    function calculateBaseImageCost(){
+        base_cost = 31.31
+        cost = base_cost + parseFloat(cpu_cost.value) + parseFloat(memory_cost.value) + parseFloat(storage_cost.value) + parseFloat(gpu_cost.value)
+        total_cost.value = cost.toFixed(2)
+    }
+    function hide_element(element){
+        element.setAttribute('hidden', "hidden");
+    }
+
+    function show_element(element){
+        element.removeAttribute('hidden', "hidden");
+    }
+
+    function read_only_element(element){
+        element.setAttribute('readonly',"readonly")
+    }
+
+</script>
 {% endblock %}

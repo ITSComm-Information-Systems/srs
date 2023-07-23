@@ -4,6 +4,8 @@ from project.forms.fields import *
 from .models import AWS, Azure, GCP, GCPAccount, Container, MiDesktopInstantClonePool
 from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
+from .midesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
+
 
 # Defaults
 CharField = forms.CharField( widget=forms.TextInput(attrs={'class': 'form-control'}) )
@@ -314,9 +316,9 @@ class MiDesktopForm(forms.Form):
 
     def save(self):
         if 'admin_group' in self.changed_data:
-            self.instance.owner = LDAPGroup().lookup( self.cleaned_data.get('admin_group') )
+            self.owner = LDAPGroup().lookup( self.cleaned_data.get('admin_group') )
 
-        super().save()
+        #super().save()
 
     def clean(self):
         cleaned_data = super().clean()
@@ -325,8 +327,13 @@ class MiDesktopForm(forms.Form):
             self.fields[err_field].widget.attrs['class'] += ' is-invalid'
 
         return cleaned_data
-    
+
+ACCESS_INTERNET_CHOICES = (('True','Yes, my desktop needs internet access (outside of U of M sites)'),('False','No, my desktop do not need internet access to any network outside of U of M'))
+MASK_CHOICES = [["/28", "/28 (16 addresses)"], ["/27", "/27 (32 addresses)"], ["/26", "/26 (64 addresses)"], 
+                    ["/25", "/25 (128 addresses)"], ["/24", "/24 (256 addresses)"]]
+
 class MiDesktopNewForm(MiDesktopForm):
+
     CPU_INITIAL = 1.15
     MEMORY_INITIAL = 0.96
     STORAGE_INITIAL = 5.00
@@ -335,7 +342,54 @@ class MiDesktopNewForm(MiDesktopForm):
     TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
 
     title = 'MiDesktop New Order Form'
-    shortcode = forms.CharField(validators=[validate_shortcode], required=False)
+    shortcode = forms.CharField(validators=[validate_shortcode], required=True)
+    pool_type = forms.ChoiceField(label='Pool Type', help_text='Lorem', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent")))
+    network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("1","Shared Network (Private)"),("2","Shared Network (Web-Access)"),("3","Dedicated Network")))
+    network_choices = forms.ChoiceField(required=False, choices=(('New','New Dedicated Network'),('Existing','List of Networks')))
+    purpose = forms.CharField(required=False)
+    access_internet = forms.ChoiceField(required=False,choices=ACCESS_INTERNET_CHOICES)
+    mask = forms.ChoiceField(choices=MASK_CHOICES, required=False)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, required=False)
+    technical_contact = forms.CharField(required=False)
+    billing_contact = forms.CharField(required=False)
+    security_contact = forms.CharField(required=False)
+    base_image = forms.ChoiceField(label='Base Image', choices = (("1","New Image"),("2","List of Images")))
+    base_image_name = forms.CharField(required=False)
+    initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
+    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),))
+    cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
+    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL)
+    memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
+    memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL)
+    storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
+    storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL)
+    gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
+    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL)
+    total = forms.DecimalField(required=False,initial=TOTAL_INITIAL)
+    pool_name = forms.CharField(required=False)
+    auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
+    pool_maximum = forms.IntegerField(required=False,)
+    powered_on_desktops = forms.IntegerField(required=False,) 
+    min_desktops = forms.IntegerField(required=False,)
+    ad_container = forms.CharField(required=False,)
+    ad_groups = forms.CharField(required=False,)
+    additional_details = forms.CharField(required=False)
+    sla = forms.BooleanField(required=False)
+
 
     class Meta:
         fields=['admin_group','shortcode']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        pool_type = cleaned_data.get("pool_type")
+        if pool_type == 'instant_clone':
+            print('Instant-Clone')
+        elif pool_type == 'persistent':
+            print('Persistent')
+
+class MiDesktopPersistentForm(MiDesktopForm):
+    pass
+
+class MiDesktopInstantCloneForm(MiDesktopForm):
+    pass
