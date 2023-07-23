@@ -344,8 +344,8 @@ class MiDesktopNewForm(MiDesktopForm):
     title = 'MiDesktop New Order Form'
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
     pool_type = forms.ChoiceField(label='Pool Type', help_text='Lorem', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent")))
-    network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("1","Shared Network (Private)"),("2","Shared Network (Web-Access)"),("3","Dedicated Network")))
-    network_choices = forms.ChoiceField(required=False, choices=(('New','New Dedicated Network'),('Existing','List of Networks')))
+    network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
+    networks = forms.ChoiceField(label='Dedicated Network')
     purpose = forms.CharField(required=False)
     access_internet = forms.ChoiceField(required=False,choices=ACCESS_INTERNET_CHOICES)
     mask = forms.ChoiceField(choices=MASK_CHOICES, required=False)
@@ -380,6 +380,16 @@ class MiDesktopNewForm(MiDesktopForm):
     class Meta:
         fields=['admin_group','shortcode']
 
+    def __init__(self, *args, **kwargs):
+        super(MiDesktopNewForm, self).__init__(*args, **kwargs)
+
+        if self.user:
+            network_list = ['Here I will implement this','-- New Dedicated Network']
+            choice_list = [(None, '---')]
+            for network in network_list:
+                choice_list.append((network, network))
+            self.fields['networks'].choices = choice_list
+
     def clean(self):
         cleaned_data = super().clean()
         pool_type = cleaned_data.get("pool_type")
@@ -387,9 +397,3 @@ class MiDesktopNewForm(MiDesktopForm):
             print('Instant-Clone')
         elif pool_type == 'persistent':
             print('Persistent')
-
-class MiDesktopPersistentForm(MiDesktopForm):
-    pass
-
-class MiDesktopInstantCloneForm(MiDesktopForm):
-    pass
