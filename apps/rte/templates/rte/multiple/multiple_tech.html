@@ -1,12 +1,12 @@
 <form id='workOrderForm' method='post' action='' onsubmit='return validate_search_multiple()'>{% csrf_token %}
-    <div class="form-group" id="searchWorkOrder">
+    <div class="mb-3" id="searchWorkOrder">
         <label for="workOrderSearchMultiple" id="labelWorkOrderSearch">
             <strong>Search for a Work Order</strong>
         </label>
         <small id="workOrderBlock" class="form-text text-muted">
             Search for the work order for which like to enter time.
         </small>
-        <div class='form-group'>
+        <div class='mb-3'>
             <input name='workOrderSearchMultiple' autocomplete='off' id="workOrderSearchMultiple" class="form-control col-5" type="text" aria-describedby="workOrderBlock"
                 placeholder="Search...">
             <div role=”alert” class="invalid-feedback" id='error-work-order'><i class="fas fa-exclamation-triangle"
@@ -30,7 +30,7 @@
 </form>
 
 
-<div class='form-group col-4 mt-4 hidden' id='selected-wo'>
+<div class='mb-3 col-4 mt-4 hidden' id='selected-wo'>
     <label for="work-order" id="workOrderLabel">
         <strong>Selected Work Order</strong>
     </label>

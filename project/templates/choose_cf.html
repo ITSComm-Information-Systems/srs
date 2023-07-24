@@ -7,12 +7,12 @@
     <div class="col-md-5 offset-md-2">
         <div id="cf_shortcode_form">
             <div class="input-group" id="cf_shortcode_group">
-                <div class="input-group-prepend">
+                
                     <label class="input-group-text" for="cf_shortcode_dr">
                         Select Shortcode
                     </label>
                 </div>
-                <select class="custom-select" id="cf_shortcode_dr">
+                <select class="form-select" id="cf_shortcode_dr">
                     {% for cf in cf_info %}
                     {% if cf.short_code != ''%}
                     <option name="dept" value="{{ cf|jsonify }}">{{ cf.short_code }}</option>
@@ -24,12 +24,12 @@
         <form id="cf_chartfield_form" method="POST" name="cfs" style="display: none;">
             {% csrf_token %}
             <div class="input-group" id="cf_chartfield_group">
-                <div class="input-group-prepend">
+                
                     <label class="input-group-text" for="cf_chartfield">
                         Select Chartfield
                     </label>
                 </div>
-                <select name="chartcom" class="custom-select" id="cf_chartfield">
+                <select name="chartcom" class="form-select" id="cf_chartfield">
                     {% for cf in cf_info %}
                     <option name="dept" value="{{ cf|jsonify }}">{{ cf.account_number }}</option>
                     {% endfor %}

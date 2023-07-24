@@ -140,23 +140,23 @@
                 {% csrf_token %}
                 <div class="modal-body">
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput">Location</label>
                         <input type="text" class="form-control" name="item_location" maxlength="30">
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput2">Manufacturer</label>
                         <input type="text" class="form-control" name="item_manufacturer">
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput2">Manufacturer Part Number</label>
                         <input type="text" class="form-control" name="item_manufacturer_part_number">
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput2">Price</label>
                         <input type="decimal" class="form-control" name="item_price">
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput2">Quantity</label>
                         <input type="number" class="form-control" name="item_quantity">
                     </div>
@@ -188,28 +188,28 @@
                 <div class="modal-body">
                     <input type="hidden" name="estimate_id" value="{{ estimate.id }}">
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput">Location</label>
                         <input id="new_location" list="material-locations" type="text" class="form-control" name="item_location">
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput2">Manufacturer</label>
                         <input id="new_manufacturer" type="text" class="form-control" name="item_manufacturer">
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput2">Manufacturer Part Number</label>
                         <input id="new_manufacturer_part_number" type="text" class="form-control" name="item_manufacturer_part_number">
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput2">Item Description<p style="color:red; display: inline">*</p></label>
                         <input id="new_item_description" type="text" class="form-control" name="item_description" maxlength='100' onkeyup="countChar(this)" required/>
                         <small id='charNum'>100 characters left</small>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput2">Price<p style="color:red; display: inline">*</p></label>
                         <input id="new_price" type="number" step="any" class="form-control" name="item_price"required/>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput2">Quantity<p style="color:red; display: inline">*</p></label>
                         <input id="new_quantity" type="number" class="form-control" name="item_quantity" required/>
                     </div>
@@ -245,15 +245,15 @@
                 <div class="modal-body">
                     <input type="hidden" name="estimate_id" value="{{ estimate.id }}">
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput">Location</label>
                         <input list="material-locations" class="form-control" name="item_location" value="Main">
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput2">Z-Code</label>
                         <input type="text" class="form-control" name="item_code">
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput2">Quantity</label>
                         <input type="number" class="form-control" name="item_quantity">
                     </div>
@@ -284,12 +284,12 @@
                 {% csrf_token %}
                 <input type="hidden" id="material_location_id" name="material_location_id">
                 <div class="modal-body">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput">Location</label>
                         <input list="material-locations" class="form-control" id="material_location" name="material_location" value="Main">
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="formGroupExampleInput">Description</label>
                         <input class="form-control" id="material_location_description" name="material_location_description" value="Main">
                     </div>

@@ -7,7 +7,7 @@
         {% csrf_token %}
         {% for field in form %}
 
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="exampleInputEmail1"><strong>{{ field.label }}</strong></label>
                 <small id="emailHelp" class="form-text text-muted">{{ field.help_text }}</small>
                 {{ field }}

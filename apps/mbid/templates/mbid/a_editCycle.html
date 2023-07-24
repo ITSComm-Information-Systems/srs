@@ -10,12 +10,12 @@
     {% csrf_token %}
     <div class='col-5' id='selectCycle'>
         <div class="input-group col-auto">
-            <div class="input-group-prepend">
+            
                 <label class="input-group-text" for="pickCycle">
                     Select Cycle
                 </label>
             </div>
-            <select class="custom-select" name="info">
+            <select class="form-select" name="info">
                 <option value=''>--Select--</option>
                 {% for cycle in cycles %}
                 <option value='{{cycle.info}}'>

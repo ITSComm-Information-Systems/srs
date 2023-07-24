@@ -18,7 +18,7 @@
       </strong>
     </div>
     {% for res in category.res %}
-    <div class="custom-control custom-radio">
+    <div class="form-check">
       <input class="form-check-input" type="radio" value="{{res.id}}" name="resrescat{{category.id}}"
         id="cat-{{category.id}}-{{res.id}}" required>
       <label class="form-check-label" for="cat-{{category.id}}-{{res.id}}">{{res}}</label>

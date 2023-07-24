@@ -13,12 +13,12 @@
 			<div id="dept_dropdown_3" method="POST" name="dept_dropdown">
 				{% csrf_token %}
 				<div class="input-group">
-					<div class="input-group-prepend">
+					
 						<label class="input-group-text" for="select_dept_3">
 							Select New Department
 						</label>
 					</div>
-					<select name="select_dept" class="custom-select" id="select_dept_3">
+					<select name="select_dept" class="form-select" id="select_dept_3">
 						<option></option>
 						{% for dept in deptids %}
 						<option name="dept" value="{{dept.dept}}">
@@ -31,24 +31,24 @@
 		<div class="col">
 			<form id="cf_dropdown_3" method="POST" name="cf_dropdown" style="display: none;">{% csrf_token %}
 				<div class="input-group">
-					<div class="input-group-prepend">
+					
 						<label class="input-group-text" for="select_cf_3">
 							Select New Chartfield
 						</label>
 					</div>
-					<select name="select_cf" class="custom-select" id="select_cf_3">
+					<select name="select_cf" class="form-select" id="select_cf_3">
 						<!-- Will be filled by JS -->
 					</select>
 				</div>
 			</form>
 			<div id="cf_shortcode_form_3">
 				<div class="input-group" id="cf_chartfield_group">
-					<div class="input-group-prepend">
+					
 						<label class="input-group-text" for="cf_shortcode_3">
 							Select New Shortcode
 						</label>
 					</div>
-					<select name="chartcom" class="custom-select" id="cf_shortcode_3">
+					<select name="chartcom" class="form-select" id="cf_shortcode_3">
 						<!-- Will be filled by JS -->
 					</select>
 				</div>

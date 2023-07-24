@@ -2,14 +2,14 @@
 
 {% if perms.rte.add_umrtetechnicianv %}
 <form id='techForm' method='post' action='' onsubmit='return validate_search()'>{% csrf_token %}
-    <div class="form-group" id="searchTech">
+    <div class="mb-3" id="searchTech">
         <label for="techSearch" id="labelTechSearch">
             <strong>Search for a Tech Name or Tech ID</strong>
         </label>
         <small id="buildingTechBlock" class="form-text text-muted">
             Search for the tech name or tech ID whose time you'd like to enter.
         </small>
-        <div class='form-group'>
+        <div class='mb-3'>
             <input name='techSearch' autocomplete='off' id="techSearch" class="form-control col-5" type="text" aria-describedby="buildingTechBlock"
                 placeholder="Search...">
             <div role=”alert” class="invalid-feedback" id='error-tech-id'><i class="fas fa-exclamation-triangle"
@@ -31,7 +31,7 @@
     </div>
 </form>
 <div id='chosen_techid' hidden>
-    <div class='form-group col-4 mt-4'>
+    <div class='mb-3 col-4 mt-4'>
         <label for="tech_id" id="teachIdLabel">
             <strong>Tech ID</strong>
         </label>
@@ -45,12 +45,12 @@
         <label for="agSelect" id="labelAGSelect" class='mt-2'>
             <strong>Assigned Group </strong>
         </label>
-        <select class='custom-select' id='agSelect'></select>
+        <select class='form-select' id='agSelect'></select>
     </div>
 </div>
 {% else %}
 <form id='techForm' method='post' action=''>{% csrf_token %}
-    <div class='form-group'>
+    <div class='mb-3'>
         <label for="techSelect" id="labelTechSelect">
             <strong>Select Your Tech ID</strong>
         </label>
@@ -64,7 +64,7 @@
     </div>
 </form>
 
-<div class='form-group col-4 mt-4'>
+<div class='mb-3 col-4 mt-4'>
     <label for="tech_id" id="teachIdLabel">
         <strong>Tech ID</strong>
     </label>
@@ -78,7 +78,7 @@
     <label for="agSelect" id="labelAGSelect" class='mt-2'>
         <strong>Assigned Group </strong>
     </label>
-    <select class='custom-select' id='agSelect'>
+    <select class='form-select' id='agSelect'>
         {% for group in assigned_groups %}
             <option>{{ group.wo_group_name }}</option>
         {% endfor %}
@@ -88,7 +88,7 @@
 
 {% comment %}
 {% if tech_name %}
-    <div class='form-group col-4 mt-4'>
+    <div class='mb-3 col-4 mt-4'>
         <label for="tech_id" id="teachIdLabel">
             <strong>Tech ID</strong>
         </label>
@@ -102,7 +102,7 @@
         <label for="agSelect" id="labelAGSelect" class='mt-2'>
             <strong>Assigned Group </strong>
         </label>
-        <select class='custom-select' id='agSelect'>
+        <select class='form-select' id='agSelect'>
             {% for group in assigned_groups %}
                 <option>{{ group.wo_group_name }}</option>
             {% endfor %}

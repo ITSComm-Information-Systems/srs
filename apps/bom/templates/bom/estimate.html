@@ -59,7 +59,7 @@
 
 
         <div class="input-group mb-3">
-          <div class="input-group-prepend">
+          
             <span class="input-group-text" id="estimate-label">Label</span>
           </div>
 
@@ -68,14 +68,14 @@
         </div>
 
         <div class="input-group mb-3">
-          <div class="input-group-prepend">
+          
             <span class="input-group-text" id="basic-addon3">{{ form.status.label }}</span>
           </div>
           {{ form.status }}
         </div>
 
         <div class="input-group mb-3">
-          <div class="input-group-prepend">
+          
             <span class="input-group-text" id="estimate-label">Project Engineer</span>
           </div>
           {{ form.assigned_engineer }}
@@ -93,7 +93,7 @@
       <div class="col-sm">
 
         <div class="input-group mb-3">
-          <div class="input-group-prepend">
+          
             <span class="input-group-text" id="basic-addon3">Estimated Material</span>
           </div>
 
@@ -102,7 +102,7 @@
         </div>
 
         <div class="input-group mb-3">
-          <div class="input-group-prepend">
+          
             <span class="input-group-text" id="basic-addon3">Estimated Labor</span>
           </div>
           <input disabled type="text" value="{{ estimate.labor_total|intcomma }}" class="form-control text-right"
@@ -110,12 +110,12 @@
         </div>
 
         <div class="form-row" id="contingency">
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label for="contingency_amount">Contingency Amount</label>
             <input type="number" class="form-control" value="{{ estimate.contingency_amount|intcomma }}"
               name="contingency_amount" id="contingency_amount" placeholder="$ Amount">
           </div>
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label for="contingency_percentage">Contingency Percentage</label>
             <input type="number" min="0" class="form-control" value="{{ estimate.contingency_percentage }}"
               id="contingency_percentage" name="contingency_percentage" placeholder="%">
@@ -123,7 +123,7 @@
         </div>
 
         <div class="input-group mb-3">
-          <div class="input-group-prepend">
+          
             <span class="input-group-text" id="basic-addon3">Contingency Total</span>
           </div>
           <input disabled type="text" value="{{ estimate.contingency_total }}" name="contingency_amount"
@@ -131,7 +131,7 @@
         </div>
 
         <div class="input-group mb-3">
-          <div class="input-group-prepend">
+          
             <span class="input-group-text" id="basic-addon3">Estimated Total</span>
           </div>
           <input disabled type="text" value="${{ estimate.total|intcomma }}" class="form-control text-right"
@@ -146,7 +146,7 @@
           <button type="submit" class="btn btn-primary">Save</button>
           <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split always-enabled" data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">Actions
-            <span class="sr-only">Toggle Dropdown</span>
+            <span class="visually-hidden">Toggle Dropdown</span>
           </button>
           <div class="dropdown-menu">
             <a class="dropdown-item" href="#" id="notifyWarehouse">Notify Warehouse</a>
@@ -232,7 +232,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Pinnacle Note</h5>
-        <button type="button" class="close always-enabled" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="btn-close always-enabled" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -242,7 +242,7 @@
         <input class="always-enabled" type="hidden" id="note_estimate_id" name="note_estimate_id" value="{{ estimate.id }}">
         <input class="always-enabled" type="hidden" id="note_woid" name="note_woid" value="{{ estimate.woid }}">
         <div class="modal-body">
-          <div class="form-group">
+          <div class="mb-3">
             <label for="formGroupExampleInput">Subject</label>
             <select required class="form-control always-enabled" id="note_subject" name="note_subject">
               <option value="" disabled selected>---</option>
@@ -252,7 +252,7 @@
             </select>
           </div>
 
-          <div class="form-group">
+          <div class="mb-3">
             <label for="formGroupExampleInput">Body</label>
             <textarea required class="form-control always-enabled" id="note_body" name="note_body"></textarea>
           </div>
@@ -308,7 +308,7 @@
     });
 
     // Class form up with bootstrap
-    $("select").addClass("form-control custom-select");
+    $("select").addClass("form-control form-select");
     $('input:not(:checkbox)').addClass("form-control");
 
     status = $("#id_status").val()

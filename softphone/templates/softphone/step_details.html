@@ -88,7 +88,7 @@
                 &nbsp;
                 <div class="row">
 
-                    <div class="form-group col-sm upgrade_to_softphone" id="div_{{ form.migrate.id_for_label }}" data-location="{{ phone.building }}">
+                    <div class="mb-3 col-sm upgrade_to_softphone" id="div_{{ form.migrate.id_for_label }}" data-location="{{ phone.building }}">
                         <label>Upgrade to New Softphone?</label>
                         <div>
                             {{ form.migrate }}
@@ -96,7 +96,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-sm">
+                    <div class="mb-3 col-sm">
                         {% if phone.user %}
                         <label for="uniqname_correct">Is uniqname <b>{{ phone.user }}</b> correct?</label>
                         {% else %}
@@ -116,7 +116,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-sm">
+                    <div class="mb-3 col-sm">
                         <div>
                             <label>Category</label>
                             {{ form.category }}
@@ -131,7 +131,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-sm" id="div_{{ form.location_correct.id_for_label }}" style="display: none;">
+                    <div class="mb-3 col-sm" id="div_{{ form.location_correct.id_for_label }}" style="display: none;">
                         <div>
                             <label>Is Location Correct?</label>
                             {{ form.location_correct }}
@@ -140,7 +140,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-2">
+                    <div class="mb-3 col-2">
                         <br>
                         <a id="{{ form.prefix }}_clear" class="clear-selections" style="float: right"
                             href="javascript:void(0);">Clear Responses</a>
@@ -156,7 +156,7 @@
 
                 &nbsp;
                 <div class="row" id="div_{{ form.notes.id_for_label }}" {% if not form.notes.value %}style="display: none;"{% endif %}>
-                    <div class="form-group col-sm upgrade_to_softphone" >
+                    <div class="mb-3 col-sm upgrade_to_softphone" >
                         <label>Notes<br><small>(Limit 200 characters)</small></label>
 
                         <div>
@@ -264,7 +264,7 @@
         });
 
         // Class form up with bootstrap
-        $("select").addClass("form-control custom-select");
+        $("select").addClass("form-control form-select");
         $('input:not(:checkbox)').addClass("form-control");
 
         $(".verify-uniqname").bind('change', function () {

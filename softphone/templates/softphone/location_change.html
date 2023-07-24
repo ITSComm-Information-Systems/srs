@@ -46,25 +46,25 @@
                     </label>
                 </div><br>
                 
-                <div id="div_{{ form.prefix }}-building" class="form-group" 
+                <div id="div_{{ form.prefix }}-building" class="mb-3" 
                         {% if form.initial.location_correct != False %} style="display: none;" {% endif %}>
                     <label for="browser">Search by building Name or Number:</label>
                     <input class='form-control change-building' list="buildings" name="{{ form.prefix }}-building_code" id="id_{{ form.prefix }}-building_code">
                     <input class="form-control-plaintext form-control-sm" readonly tabindex="-1" type="text" 
                             name="{{ form.prefix }}-building_name" id="id_{{ form.prefix }}-building_name">
                 </div>
-                <div id="div_{{ form.prefix }}-floor" class="form-group" style="display: none;">
+                <div id="div_{{ form.prefix }}-floor" class="mb-3" style="display: none;">
                     <label for="id_{{ form.prefix }}-floor">Floor</label>
                     <input type="text" class="form-control change-floor" name="{{ form.prefix }}-floor" id="id_{{ form.prefix }}-floor">
                 </div>
-                <div id="div_{{ form.prefix }}-room" class="form-group" style="display: none;">
+                <div id="div_{{ form.prefix }}-room" class="mb-3" style="display: none;">
                     <label for="id_{{ form.prefix }}-room">Room</label>
                     <select class="form-control change-room" name="{{ form.prefix }}-room" id="id_{{ form.prefix }}-room">
                         <option></option>
                     </select>
                 </div>
 
-                <div id="div_{{ form.prefix }}-jack" class="form-group" style="display: none;">
+                <div id="div_{{ form.prefix }}-jack" class="mb-3" style="display: none;">
                     <label for="id_{{ form.prefix }}-jack">Jack</label>
                     <select class="form-control" name="{{ form.prefix }}-jack" id="id_{{ form.prefix }}-jack">
                         <option></option>

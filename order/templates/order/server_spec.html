@@ -11,7 +11,7 @@
 
 <div class="row">
     <div class="col-6">
-        <div class="form-group form-inline">
+        <div class="mb-3 form-inline">
             <div class="form-inline">
                 {{ field }}
                 <input tabindex="-1" id="id_name" name="name" class="form-control" type="text" readonly>
@@ -30,7 +30,7 @@
 {% elif field.name == 'diskSize' %}
 <div class="row">
     <div class="col-6 cost-driver">
-        <div id="disk_list" class="form-group">
+        <div id="disk_list" class="mb-3">
             <label for="disks">
                 <strong>{{ field.label }}</strong>
             </label>
@@ -88,7 +88,7 @@
 {% elif field.name == 'ram' %}
 <div class="row cost-driver">
     <div class="col-6">
-        <div class="form-group" id="div_ram">
+        <div class="mb-3" id="div_ram">
             <label for="id_ram">
                 <strong>{{ tab.form.ram.label }}</strong>
             </label>

@@ -16,12 +16,12 @@
                 <form action="/orders/cart/" id="cart-department-dropdown" method="POST" class="cart-form">
                     {% csrf_token %}
                     <div class="input-group dept-dropdown">
-                        <div class="input-group-prepend">
+                        
                             <label class="input-group-text" for="department-dropdown">
                                 Switch Department
                             </label>
                         </div>
-                        <select name="deptid" class="custom-select order-status-dropdown" onchange="this.form.submit()"
+                        <select name="deptid" class="form-select order-status-dropdown" onchange="this.form.submit()"
                             id="department-dropdown">
                             {% for dept in dept_list %}
                                 {% if dept.active == 'A' %}
@@ -85,19 +85,19 @@
                                     <td>{{ item.description }}</td>
                                     <td class="action">
                                         <a class="delete" href="#" data-toggle="modal" data-target="#deleteCartItem"
-                                            data-item="{{item.id}}" role="button">Delete<span class="sr-only"> item that
+                                            data-item="{{item.id}}" role="button">Delete<span class="visually-hidden"> item that
                                                 was created on {{ item.create_date|date:"m/d/y" }} by
                                                 {{ item.created_by }}. Item description: {{ item.description }}. Item
                                                 Id: {{item.id}}. Item chartfield: {{item.chartcom}}</span></a>
                                         {% if section == status|first %}
                                         <a class="ready-link" onclick="moveRow(this)" href="#">Save for
-                                            Later<span class="sr-only"> item that was created on
+                                            Later<span class="visually-hidden"> item that was created on
                                                 {{ item.create_date|date:"m/d/y" }} by {{ item.created_by }}. Item
                                                 description: {{ item.description }}. Item Id: {{item.id}}. Item
                                                 chartfield: {{item.chartcom}}</span></a>
                                         {% else %}
                                         <a class="saved-for-later" onclick="moveRow(this)" href="#">Move to
-                                            Cart<span class="sr-only"> item that was created on
+                                            Cart<span class="visually-hidden"> item that was created on
                                                 {{ item.create_date|date:"m/d/y" }} by {{ item.created_by }}. Item
                                                 description: {{ item.description }}. Item Id: {{item.id}}. Item
                                                 chartfield: {{item.chartcom}}</span></a>
@@ -138,7 +138,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteCartItem">Delete Cart Item</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>

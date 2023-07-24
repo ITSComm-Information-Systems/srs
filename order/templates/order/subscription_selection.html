@@ -23,7 +23,7 @@
                         <td style="text-align:center">{{ sub.node_count }}
                             <a tabindex="0" role="button" data-toggle="popover" data-container="body"
                             data-trigger="focus" data-placement="bottom" 
-                            data-content="{% for node in sub.node_list %} <li>{{node}}</li> {% endfor %}"><i class="fa fa-info-circle"></i> <span class="sr-only">{{ field.help_text }}</span>
+                            data-content="{% for node in sub.node_list %} <li>{{node}}</li> {% endfor %}"><i class="fa fa-info-circle"></i> <span class="visually-hidden">{{ field.help_text }}</span>
                             </a>
                         </td>
                         <td>{{ sub.shortcode }}</td>

@@ -1,7 +1,7 @@
 {{widget.optgroups.options}}
 {% for group, options, index in widget.optgroups %}
 {% for choice in options %}
-<div class="form-group form-check">
+<div class="mb-3 form-check">
     <input class="form-check-input {{ widget.attrs.class }}" type="checkbox" value="{{ choice.value }}" name="{{ widget.name }}" id="{{ choice.name }}_{{ index }}" required
     {%if choice.selected %} checked {% endif %}>
     <label class="form-check-label " for="{{ choice.name }}_{{ index }}">{%autoescape off%}{{ choice.label }}{%endautoescape%}</label>

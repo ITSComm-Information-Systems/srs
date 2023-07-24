@@ -6,12 +6,12 @@
 <form method="POST">
     {% csrf_token %}
     <div class="input-group col-auto">
-        <div class="input-group-prepend">
+        
             <label class="input-group-text" for='pickCycle'>
                 Select Cycle
             </label>
         </div>
-        <select class="custom-select" id="pickCycle" name='pickCycle'>
+        <select class="form-select" id="pickCycle" name='pickCycle'>
             <option value=''>--Select--</option>
             {% for cycle in cycles %}
             <option value='{{cycle.3}} {{cycle.0}}'>

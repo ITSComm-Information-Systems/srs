@@ -16,7 +16,7 @@
             {% elif field.name in form.custom %}
                 {% include 'services/'|add:field.name|add:'.html' %}
             {% else %}
-                <div class="form-group {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
+                <div class="mb-3 {{ field.field.div_class }} col-6" id="div_{{ field.name }}">
                     <label for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
                     <small class="form-text text-muted">{{ field.help_text }}</small>
                     {{ field }}

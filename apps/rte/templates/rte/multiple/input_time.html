@@ -10,7 +10,7 @@
 <h3>Enter time</h3>
 
 <div class='row'>
-	<div class="form-group col-2" id="searchTechMultiple">
+	<div class="mb-3 col-2" id="searchTechMultiple">
 		<label for="techSearchMultiple" id="labelTechSearchMultiple">
 	        <strong>Tech ID/Name</strong>
 	    </label>
@@ -22,31 +22,31 @@
 		</select>
 	</div>
 
-	<div class="form-group col-2" id="selectAssignedGroupMultiple">
+	<div class="mb-3 col-2" id="selectAssignedGroupMultiple">
 		<label for="assignedGroupSelectMultiple" id="labelAssignedGroupSelectMultiple">
 		    <strong>Assigned Group</strong>
 		</label>
-		<select class='custom-select' id='assignedGroupSelectMultiple' disabled>
+		<select class='form-select' id='assignedGroupSelectMultiple' disabled>
 		</select>
 	</div>
 
-	<div class="form-group col-2" id="selectRateLevelMultiple">
+	<div class="mb-3 col-2" id="selectRateLevelMultiple">
 		<label for="rateSelectMultiple" id="labelRateSelectMultiple">
 		    <strong>Rate Level </strong>
 		</label>
-		<select class='custom-select' id='rateSelectMultiple' disabled>
+		<select class='form-select' id='rateSelectMultiple' disabled>
 			{% for rate in rate_levels %}
 				<option>{{ rate.labor_rate_level_name }}</option>
 			{% endfor %}
 		</select>
 	</div>
 
-	<div class='form-group col-2'>
+	<div class='mb-3 col-2'>
 		<label for="assigned_date_multiple"><strong>Assigned Date</strong></label>
 	    <input type="date" class="form-control" id="assigned_date_multiple" name='assigned_date_multiple' readonly>
 	</div>	
 
-	<div class='form-group col-2'>
+	<div class='mb-3 col-2'>
 		<label for="duration_multiple"><strong>Duration</strong></label>
 		<div class='form-inline' id='duration_multiple'>
 			<input class='form-control col-6' type="text" name="duration-hours-multiple" id="duration-hours-multiple" placeholder='HH' readonly>
@@ -54,7 +54,7 @@
 		</div>
 	</div>
 
-	<div class='form-group col-2'>
+	<div class='mb-3 col-2'>
 		<label for="notes-multiple"><strong>Notes</strong></label>
 		<input type="text" class="form-control" id="notes-multiple" name='notes-multiple' readonly>
 	</div>

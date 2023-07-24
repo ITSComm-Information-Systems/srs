@@ -1016,14 +1016,14 @@ h3.alert-heading {
 .input-group {
     margin:0.2rem;
 }
-.custom-select {
+.form-select {
 	border:1px solid #cecbc9;
 }
-.custom-select.order-status-dropdown {
+.form-select.order-status-dropdown {
     border-top-right-radius:.25rem;
     border-bottom-right-radius:.25rem;
 }
-.input-group>.custom-select.order-status-dropdown {
+.input-group>.form-select.order-status-dropdown {
     border-top-right-radius:.25rem;
     border-bottom-right-radius:.25rem;
 }
@@ -1032,7 +1032,7 @@ h3.alert-heading {
 	background-color:#f4f3f2;
 	color:#333333;
 }
-.input-group>.custom-select:not(:last-child), .input-group>.form-control:not(:last-child) {
+.input-group>.form-select:not(:last-child), .input-group>.form-control:not(:last-child) {
 	border-top-right-radius:reset;
 	border-bottom-right-radius:reset;
 }

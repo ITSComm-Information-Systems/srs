@@ -5,7 +5,7 @@
 <h1>{{ title }}</h1>
 
 <form action='display/' method='post' id='view-times-form'>{% csrf_token %}
-	<div class="form-group" id="searchTech">
+	<div class="mb-3" id="searchTech">
         <label for="techSearch" id="labelTechSearch">
             <strong>Search for a Tech Name or Tech ID</strong>
         </label>
@@ -30,14 +30,14 @@
 
 	<p>Please select one of the following:</p>
 
-	<div class="form-group indented-form-input">
+	<div class="mb-3 indented-form-input">
 		<input type="radio" name="secondSearchOption" id="selectByWorkOrder" aria-labelledby="selectByWorkOrderLabel" value='1' aria-describedby="form-instruction selectByWorkOrderLabel">
 		<label for="selectByWorkOrder" id="selectByWorkOrderLabel">
 			<strong>Search by Work Order</strong>
 		</label>
 
 	    <div id="selectByWorkOrderDiv" class="indented-form-input">
-	        <div class="form-group" id="searchWorkOrder">
+	        <div class="mb-3" id="searchWorkOrder">
 		        <small id="workOrderBlock" class="form-text text-muted">
 		            Select the work order for which you would like to view time.
 		        </small>
@@ -59,14 +59,14 @@
 	    </div>
 	</div>
 
-	<div class="form-group indented-form-input">
+	<div class="mb-3 indented-form-input">
 		<input type="radio" name="secondSearchOption" id="selectByCalendarRange" aria-labelledby="selectByCalendarRangeLabel" value='2' aria-describedby="form-instruction selectByCalendarRangeLabel">
 		<label for="selectByCalendarRange" id="selectByCalendarRangeLabel">
 			<strong>Search by Calendar</strong>
 		</label>
 
 	    <div id="selectByCalendarRangeDiv" class="indented-form-input">
-	        <div class="form-group" id="selectCalendarRange">
+	        <div class="mb-3" id="selectCalendarRange">
 		        <small id="dateCalendarBlock" class="form-text text-muted">
 		            Select the dates for which you would like to view time.
 		        </small>
@@ -78,14 +78,14 @@
 	    </div>
 	</div>
 
-	<div class="form-group indented-form-input">
+	<div class="mb-3 indented-form-input">
 		<input type="radio" name="secondSearchOption" id="selectByDateRange" aria-labelledby="selectByDateRangeLabel" value='2' aria-describedby="form-instruction selectByDateRangeLabel">
 		<label for="selectByDateRange" id="selectByDateRangeLabel">
 			<strong>Search by Date Range</strong>
 		</label>
 
 	    <div id="selectByDateRangeDiv" class="indented-form-input">
-	        <div class="form-group" id="selectDateRange">
+	        <div class="mb-3" id="selectDateRange">
 		        <small id="dateDateBlock" class="form-text text-muted">
 		            Select the date range for which you would like to view time.
 		        </small>

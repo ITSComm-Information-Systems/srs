@@ -19,18 +19,18 @@
 {% endif %}
 
 
-<fieldset class="form-group row col-md-8 col-12" id="div{{field.name}}">
+<fieldset class="mb-3 row col-md-8 col-12" id="div{{field.name}}">
     <legend id="legend_{{field.name}}">
         <strong>
             {{ field.label }}
         </strong>
     </legend>
     <div class="input-group mb-4">
-        <span class="sr-only">
+        <span class="visually-hidden">
             <label for="dept_{{ field.name }}">Select a Department</label>
         </span>
-        <div class="input-group-prepend">
-            <select class="custom-select dccsel" id="dept_{{ field.name }}" data-target="{{ field.name }}"
+        
+            <select class="form-select dccsel" id="dept_{{ field.name }}" data-target="{{ field.name }}"
                 onchange="filterChartcom(this)" style="border-radius:0.25rem 0rem 0rem 0.25rem;">
                 <option value="all">All Depts</option>
                 {% for dept in tab.form.dept_list %}
@@ -39,11 +39,11 @@
             </select>
         </div> 
 
-        <span class="sr-only">
+        <span class="visually-hidden">
             <label for="name_{{ field.name }}">Select a Chartfield</label>
         </span>
 
-        <select data-label="{{ field.label }}" data-tabid="{{tab.id}}" class="custom-select ccsel" id="name_{{ field.name }}" onchange="chartcomChange(this)" onload="chartcomChange(this)">
+        <select data-label="{{ field.label }}" data-tabid="{{tab.id}}" class="form-select ccsel" id="name_{{ field.name }}" onchange="chartcomChange(this)" onload="chartcomChange(this)">
             {% for chartcom in tab.form.chartcom_list %}
             <option data-dept="{{ chartcom.dept }}" data-chartcom="{{ chartcom.account_number }}" data-chartcom-id="{{ chartcom.chartcom_id }}">{{ chartcom.name }}</option>
             {% endfor %}

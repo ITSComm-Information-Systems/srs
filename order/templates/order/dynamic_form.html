@@ -10,7 +10,7 @@
         {% endif %}
     </legend>
     {% for choice in field.field.choices %}
-    <div class="form-check custom-radio">
+    <div class="form-check">
         <input type="radio" class="form-check-input" id="{{ field.name }}_{{ choice|first }}" value="{{ choice|first }}"
             name="{{ field.name }}" required>
         <label class="form-check-label" for="{{ field.name }}_{{ choice|first }}">{{ choice|last }}</label>
@@ -31,7 +31,7 @@
     <label>{{ field.label }}</label>
 </div>
 {% else %}
-<div class="form-group row col-md-4" id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}"
+<div class="mb-3 row col-md-4" id="{{ field.name }}" data-sequence="{{ field.field.display_seq_no }}"
     data-condition="{{ field.field.display_condition }}">
     <div class="form-check">
         {{ field.errors }}

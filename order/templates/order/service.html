@@ -22,7 +22,7 @@
         <div class="tab-pane fade {{ service.active }}" id="{{ service.name }}" role="tabpanel" aria-labelledby="v-pills-profile-tab">
             <div class="row service" id="{{service.name}}" name="serviceCards">
                 <h3 class="lead">{{ service }}</h3>
-                <div class="col-md-12 card-deck">
+                <div class="col-md-12 card-group">
                     {% for action in service.actions %}
                     <div class="card col-12">
                         <div class="card-body">
@@ -34,7 +34,7 @@
                             <p class="learn-more-link">
                                 <a tabindex="0" role="button" data-toggle="popover" data-container="body"
                                     data-trigger="focus" data-placement="bottom" title="{{action.label}}"
-                                    data-content="{{action.description}}"> Learn more <span class="sr-only"> about
+                                    data-content="{{action.description}}"> Learn more <span class="visually-hidden"> about
                                         {{ action.label }}</span>
                                 </a>
                             </p>

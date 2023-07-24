@@ -18,12 +18,12 @@
                 <div class="col-12 dept-select">
                     <form action="/orders/chartcom/" id="cart-department-dropdown" method="POST">{% csrf_token %}
                         <div class="input-group dept-dropdown">
-                            <div class="input-group-prepend">
+                            
                                 <label class="input-group-text" for="deptid">
                                     Switch Department
                                 </label>
                             </div>
-                            <select class="custom-select order-status-dropdown" id="deptid" name="deptid">
+                            <select class="form-select order-status-dropdown" id="deptid" name="deptid">
                                 {% for dept in dept_list %}
                                 <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
                                 {% endfor %}
@@ -105,11 +105,11 @@
                                     <td class="action">
                                         <a id="{{chartcom.id}}" class="edit" href="#" data-toggle="modal"
                                             data-target="#editChartfieldModal1">
-                                            Edit <span class="sr-only">{{chartcom.name}}</span>
+                                            Edit <span class="visually-hidden">{{chartcom.name}}</span>
                                         </a>
                                         <a id="{{chartcom.id}}" class="delete" href="#" role="button"
                                             data-toggle="modal" data-target="#deleteChartfieldModal1">
-                                            Remove <span class="sr-only">{{chartcom.name}}</span>
+                                            Remove <span class="visually-hidden">{{chartcom.name}}</span>
                                         </a>
                                     </td>
                                 </tr>
@@ -128,13 +128,13 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="addChartfieldToShortlist">Add Chartfield to List</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <form id="addChartfieldForm" method="POST" action="/orders/chartcom/">{% csrf_token %}
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label for="chartfieldSelectSearch">Select a Chartfield</label>
                                 <!-- Replace this select widget to be searchable select widget with column headings (see Paco's wireframe for example) -->
                                 <select class="form-control" id="chartfieldSelectSearch" name="chartfieldSelection">
@@ -146,13 +146,13 @@
                                 </select>
                             </div>
                             <!-- After user select a chartfield from the select widget above, the chartfield should authomatically populate the following text input (read only so the user can't change the chartfield) -->
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label for="chartfieldSelected">Chartfield</label>
                                 <input type="text" class="form-control" id="chartfieldSelected" name="chartfieldCode"
                                     readonly>
                             </div>
                             <!-- After user select a chartfield from the select widget above, the shortcode assocaited to chartfield (if any) should authomatically populate the following text input (read only so the user can't change the shortcode) -->
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label for="chartfieldSelectedShortcode">
                                     Shortcode
                                 </label>
@@ -166,7 +166,7 @@
                                 </script>
                             </div>
                             <!-- user enters description/nickname in following text input field -->
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label for="chartfieldDescription">
                                     Associated Name<span style="color:red;">*</span> <span style="color:red; font-size: 8px;">(This is a required field)</span>
                                 </label>
@@ -198,27 +198,27 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editChartfield">Edit Chartfield</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <form id="editChartfieldForm" method="POST" action="/orders/chartcom/">{% csrf_token %}
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label for="chartfieldComponent">Chartfield Selected</label>
                                 <!-- Replace the value of the input form to be the chartfield that the user selected to edit -->
                                 <input type="text" class="form-control" id="chartfieldComponent" name="chartfieldVal"
                                      readonly>
                             </div>
 
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label for="shortCode1">Shortcode</label>
                                 <!-- Replace the value of the input form below to be the shortcode (if any) of the chartfield that the user selected to edit -->
                                 <input type="text" class="form-control" id="shortCode1" name="shortcodeVal"
                                      readonly>
                             </div>
 
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <label for="newChartfieldDescription" id="chartComDescr1">
                                     Enter a New Associated Name<span style="color:red;">*</span> <span style="color:red; font-size: 8px;">(This is a required field)</span>
 
@@ -251,7 +251,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="deleteChartfield">Remove Chartfield</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
