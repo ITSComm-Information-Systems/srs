@@ -1,7 +1,7 @@
 from django import forms
 from django.core import validators
 from project.forms.fields import *
-from .models import AWS, Azure, GCP, GCPAccount, Container, MiDesktopInstantClonePool
+from .models import AWS, Azure, GCP, GCPAccount, Container, MiDesktopNetwork
 from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from .midesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
@@ -404,3 +404,58 @@ class MiDesktopNewForm(MiDesktopForm):
             print('Instant-Clone')
         elif pool_type == 'persistent':
             print('Persistent')
+
+class MiDesktopNewNetworkForm(MiDesktopForm):
+    title = 'MiDesktop New Network Order Form'
+    purpose = forms.CharField()
+    access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
+    mask = forms.ChoiceField(choices=MASK_CHOICES)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False)
+    technical_contact = forms.CharField()
+    business_contact = forms.CharField()
+    security_contact = forms.CharField()
+
+
+    class Meta:
+        fields=['admin_group']
+
+    def save(self, commit=True):
+        super().save()
+        data = self.cleaned_data
+        new_network = MiDesktopNetwork(
+            purpose=data['purpose'],
+            access_internet=data['access_internet'],
+            subnet_mask=data['mask'],
+            ips_protection=data['protection'],
+            technical_contact=data['technical_contact'],
+            business_contact=data['business_contact'],
+            security_contact=data['security_contact'],
+            owner=self.owner,  # This field comes from the Meta class
+        )
+        if commit:
+            new_network.save()
+        return new_network
+    
+class MiDesktopChangeNetworkForm(forms.ModelForm):
+    access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
+    subnet_mask = forms.ChoiceField(choices=MASK_CHOICES)
+    ips_protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False)
+    technical_contact = forms.CharField()
+    business_contact = forms.CharField()
+    security_contact = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
+        kwargs.pop('user', None)
+
+        super(MiDesktopChangeNetworkForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+
+    class Meta:
+        model = MiDesktopNetwork
+        fields = ['purpose','access_internet','subnet_mask','ips_protection','technical_contact','business_contact','security_contact']
