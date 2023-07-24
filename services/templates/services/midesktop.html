@@ -51,7 +51,7 @@
                     <h2>Service Level Expectations</h2>
                     <hr/>
                     <a href="https://its.umich.edu/computing/computers-software/midesktop" target="_blank">Click here for Service Level Expectations</a>
-                    <br/>{{ field }} <span style="color:red; font-size:12px;">*</span>I have read and acknowledge the Service Level Expectations</span>
+                    <br/>{{ field }} <span style="color:red; font-size:12px;">*</span>I have read and acknowledge the Service Level Expectations
                 
                 {% else %}
                     {% if field.auto_id == 'id_pool_name' %}
@@ -60,12 +60,18 @@
                     {% if field.auto_id == 'id_auto_logout' %}
                         <h2>Connection Options</h2>
                     {% endif %}
+                    {% if field.auto_id == 'id_purpose' or field.auto_id == 'id_base_image_name' %}
+                        <div class="container">
+                    {% endif %}
                     <div class="form-group" id="wrapper_{{ field.auto_id }}">
                         <h6>{% if field.field.required %}<span style="color:red; font-size:12px;">* </span>{% endif %}
                         <label for="{{ field.label }}">{{ field.label_tag }}</label>
                         {{ field }}
                         </h6>
                     </div>
+                {% endif %}
+                {% if field.auto_id == 'id_security_contact' or field.auto_id == 'id_total' %}
+                        </div>
                 {% endif %}
             {% endfor %}
 
