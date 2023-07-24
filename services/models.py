@@ -151,7 +151,6 @@ class MiDesktop(models.Model):
     status = models.CharField(max_length=1, choices = Status.choices, default=Status.ACTIVE)
     account_id = models.CharField(max_length=30, default='TBD')
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
-    requestor = models.CharField(max_length=8)
     created_date = models.DateField(auto_now=True)
 
     def __str__(self):
@@ -160,52 +159,53 @@ class MiDesktop(models.Model):
     class Meta:
         abstract = True 
 
-class MiDesktopInstantClonePool(MiDesktop):
-    instance_label = 'Pool Name'
-    shortcode = models.CharField(max_length=6)
-    instance_name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
-    pool_maximum = models.IntegerField()
-    pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    image_id = models.IntegerField()
-    shared_network = models.BooleanField(default=True)
-    network_id = models.IntegerField(null=True)
+# class MiDesktopInstantClonePool(MiDesktop):
+#     instance_label = 'Pool Name'
+#     shortcode = models.CharField(max_length=6)
+#     instance_name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
+#     pool_maximum = models.IntegerField()
+#     pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+#     image_id = models.IntegerField()
+#     shared_network = models.BooleanField(default=True)
+#     network_id = models.IntegerField(null=True)
     
 
-    class Meta:
-        verbose_name = 'MiDesktop Instant Clone Pool'
+#     class Meta:
+#         verbose_name = 'MiDesktop Instant Clone Pool'
 
-class MiDesktopPersistentPool(MiDesktop):
-    instance_label = 'Pool Name'
-    shortcode = models.CharField(max_length=6)
-    instance_name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
-    pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    #images = ArrayField(models.IntegerField(), null=False)
-
-
-    class Meta:
-        verbose_name = 'MiDesktop Persistent Pool'
+# class MiDesktopPersistentPool(MiDesktop):
+#     instance_label = 'Pool Name'
+#     shortcode = models.CharField(max_length=6)
+#     instance_name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
+#     pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+#     #images = ArrayField(models.IntegerField(), null=False)
 
 
-class MiDesktopImage(MiDesktop):
-    instance_label = 'Image Name'
-    instance_name = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
-    cpu = models.CharField(max_length=4)
-    cpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    memory = models.CharField(max_length=4)
-    memory_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    #storage= ArrayField(models.CharField(max_length=8), null=False)
-    storage_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    gpu = models.BooleanField(blank=True, null=True)
-    gpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    total_image_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    pool_id = models.IntegerField()
-    network_id = models.IntegerField()
+#     class Meta:
+#         verbose_name = 'MiDesktop Persistent Pool'
 
-    class Meta:
-        verbose_name = 'MiDesktop Image'
+
+# class MiDesktopImage(MiDesktop):
+#     instance_label = 'Image Name'
+#     instance_name = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
+#     cpu = models.CharField(max_length=4)
+#     cpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+#     memory = models.CharField(max_length=4)
+#     memory_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+#     #storage= ArrayField(models.CharField(max_length=8), null=False)
+#     storage_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+#     gpu = models.BooleanField(blank=True, null=True)
+#     gpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+#     total_image_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+#     pool_id = models.IntegerField()
+#     network_id = models.IntegerField()
+
+#     class Meta:
+#         verbose_name = 'MiDesktop Image'
 
 class MiDesktopNetwork(MiDesktop):
     instance_label = 'Network Name'
+    purpose = models.CharField(blank=True, max_length=80)
     access_internet = models.BooleanField(default=False, blank=True)
     subnet_mask = models.CharField(blank=True, max_length=80)
     ips_protection = models.BooleanField(default=False, blank=True)

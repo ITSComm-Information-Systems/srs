@@ -35,7 +35,13 @@ class ServiceRequestView(UserPassesTestMixin, View):
                 return HttpResponseRedirect('/requestsent')
             else:
                 print(form.errors)
-
+        elif service == 'midesktop-network':
+            form = MiDesktopNewNetworkForm(request.POST, user=self.request.user)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/requestsent')
+            else:
+                print(form.errors)
         else:
             model = getattr(Service, service)
             form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)
@@ -64,7 +70,9 @@ class ServiceRequestView(UserPassesTestMixin, View):
             return render(request, 'services/midesktop.html',{
                 'form':form})
         if service == 'midesktop-network':
-            return render(request, 'services/midesktop-network.html')
+            form = MiDesktopNewNetworkForm(user=self.request.user)
+            return render(request, 'services/midesktop-network.html',{
+                'form':form})
 
         try:
             form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)
@@ -86,37 +94,54 @@ class ServiceDeleteView(UserPassesTestMixin, View):
             return False
 
     def post(self, request, service, id):
+        if service == 'midesktop-network':
+            instance = get_object_or_404(MiDesktopNetwork, pk=id)
+            if not user_has_access(request.user, instance.owner):
+                return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            instance.status = Status.ENDED
+            instance.save()
+            return HttpResponseRedirect('/requestsent')
+        else:
 
-        if request.POST.get('confirm_delete') != 'on':
-            return HttpResponseRedirect(request.path) 
+            if request.POST.get('confirm_delete') != 'on':
+                return HttpResponseRedirect(request.path) 
 
-        if request.POST.get('instance') != str(id):
-            return HttpResponseRedirect(request.path) 
+            if request.POST.get('instance') != str(id):
+                return HttpResponseRedirect(request.path) 
 
-        model = getattr(Service, service)
-        instance = get_object_or_404(model, pk=id)
+            model = getattr(Service, service)
+            instance = get_object_or_404(model, pk=id)
 
-        if not user_has_access(request.user, instance.owner):
-            return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            if not user_has_access(request.user, instance.owner):
+                return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
 
-        create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
-        instance.status = Status.ENDED
-        instance.save()
+            create_ticket('Delete', instance, request, title=f'Delete {instance._meta.verbose_name.title()}') # {model.instance_label}
+            instance.status = Status.ENDED
+            instance.save()
 
-        return HttpResponseRedirect('/requestsent')
+            return HttpResponseRedirect('/requestsent')
 
     def get(self, request, service, id):
-        request.session['backupStorage'] = 'cloud'
-        model = getattr(Service, service)
-        instance = get_object_or_404(model, pk=id)
-        title = f'Delete {instance._meta.verbose_name.title()}'
+        if service == 'midesktop-network':
+            #template = 'services/midesktop-network_delete.html'
+            instance = get_object_or_404(MiDesktopNetwork, pk=id)
+            if not user_has_access(request.user, instance.owner):
+                return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            return render(request, self.template,
+                        {
+                        'instance': instance, })
+        else:
+            request.session['backupStorage'] = 'cloud'
+            model = getattr(Service, service)
+            instance = get_object_or_404(model, pk=id)
+            title = f'Delete {instance._meta.verbose_name.title()}'
 
-        if not user_has_access(request.user, instance.owner):
-            return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            if not user_has_access(request.user, instance.owner):
+                return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
 
-        return render(request, self.template,
-                      {'title': title,
-                       'instance': instance, })
+            return render(request, self.template,
+                        {'title': title,
+                        'instance': instance, })
 
 
 class ServiceChangeView(UserPassesTestMixin, View):
@@ -129,40 +154,63 @@ class ServiceChangeView(UserPassesTestMixin, View):
             return False
 
     def post(self, request, service, id):
-        model = getattr(Service, service)
-        instance = model.objects.get(id=id)        
-        
-        form = globals()[service.capitalize() + 'ChangeForm'](request.POST, user=self.request.user, instance=instance)
+        if service == 'midesktop-network':
+            template = 'services/midesktop-network_change.html'
+            instance = MiDesktopNetwork.objects.get(id=id)
+            title = 'Modify ' + instance._meta.verbose_name.title()
+            form = MiDesktopChangeNetworkForm(request.POST, user=self.request.user, instance=instance)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/requestsent')
+            return render(request, template,
+                        {'title': title,
+                        'form': form, })
+        else:
+            model = getattr(Service, service)
+            instance = model.objects.get(id=id)        
+            
+            form = globals()[service.capitalize() + 'ChangeForm'](request.POST, user=self.request.user, instance=instance)
 
-        if form.is_valid():
-            form.save()
-            if not service == 'gcpaccount':
-                create_ticket('Modify', instance, request, title=f'Modify {instance._meta.verbose_name.title()} {model.instance_label}')
+            if form.is_valid():
+                form.save()
+                if not service == 'gcpaccount':
+                    create_ticket('Modify', instance, request, title=f'Modify {instance._meta.verbose_name.title()} {model.instance_label}')
 
-            return HttpResponseRedirect('/requestsent')
+                return HttpResponseRedirect('/requestsent')
 
-        return render(request, self.template,
-                      {'title': f'Modify {instance._meta.verbose_name.title()}',
-                       'form': form, })
+            return render(request, self.template,
+                        {'title': f'Modify {instance._meta.verbose_name.title()}',
+                        'form': form, })
 
     def get(self, request, service, id):
-        request.session['backupStorage'] = 'cloud'
-        model = getattr(Service, service)
-        instance = get_object_or_404(model, pk=id, status=Status.ACTIVE)
+        if service == 'midesktop-network':
+            template = 'services/midesktop-network_change.html'
+            instance = get_object_or_404(MiDesktopNetwork,pk=id, status=Status.ACTIVE)
+            if not user_has_access(request.user, instance.owner):
+                return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            title = 'Modify ' + instance._meta.verbose_name.title()
+            form = MiDesktopChangeNetworkForm(user=self.request.user, instance=instance)
+            return render(request, template,
+                        {'title': title,
+                        'form': form, })
+        else:
+            request.session['backupStorage'] = 'cloud'
+            model = getattr(Service, service)
+            instance = get_object_or_404(model, pk=id, status=Status.ACTIVE)
 
-        if not user_has_access(request.user, instance.owner):
-            return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            if not user_has_access(request.user, instance.owner):
+                return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
 
-        title = 'Modify ' + instance._meta.verbose_name.title()
+            title = 'Modify ' + instance._meta.verbose_name.title()
 
-        try:
-            form = globals()[service.capitalize() + 'ChangeForm'](user=self.request.user, instance=instance)
-        except KeyError:
-            return HttpResponseNotFound('<h1>Page not found</h1>')
+            try:
+                form = globals()[service.capitalize() + 'ChangeForm'](user=self.request.user, instance=instance)
+            except KeyError:
+                return HttpResponseNotFound('<h1>Page not found</h1>')
 
-        return render(request, self.template,
-                      {'title': title,
-                       'form': form, })
+            return render(request, self.template,
+                        {'title': title,
+                        'form': form, })
 
 
 def get_service_list(request, service):
@@ -170,7 +218,11 @@ def get_service_list(request, service):
     if service == 'midesktop':
         return render(request,'services/midesktop_existing.html',{'groups': groups})
     elif service == 'midesktop-network':
-        return render(request,'services/midesktop-network_existing.html')
+        template = 'services/midesktop-network_existing.html'
+        service_list = MiDesktopNetwork.objects.filter(status='A',owner__in=groups).order_by('purpose')
+        return render(request,template,{
+                'service_list': service_list,
+                'groups': groups,})
     else:
         if hasattr(Service, service):
             model = getattr(Service, service)
