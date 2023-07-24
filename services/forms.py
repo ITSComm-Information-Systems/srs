@@ -351,15 +351,13 @@ class MiDesktopNewForm(MiDesktopForm):
     title = 'MiDesktop New Order Form'
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
     pool_type = forms.ChoiceField(label='Pool Type', help_text='Lorem', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent")))
-    network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
-    networks = forms.ChoiceField(label='Dedicated Network')
-    purpose = forms.CharField(required=False)
-    access_internet = forms.ChoiceField(required=False,choices=ACCESS_INTERNET_CHOICES)
-    mask = forms.ChoiceField(choices=MASK_CHOICES, required=False)
-    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, required=False)
-    technical_contact = forms.CharField(required=False)
-    billing_contact = forms.CharField(required=False)
-    security_contact = forms.CharField(required=False)
+    pool_name = forms.CharField(required=False)
+    auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
+    pool_maximum = forms.IntegerField(required=False,)
+    powered_on_desktops = forms.IntegerField(required=False,) 
+    min_desktops = forms.IntegerField(required=False,)
+    ad_container = forms.CharField(required=False,)
+    ad_groups = forms.CharField(required=False,)
     base_image = forms.ChoiceField(label='Base Image', choices = (("1","New Image"),("2","List of Images")))
     base_image_name = forms.CharField(required=False)
     initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
@@ -373,13 +371,15 @@ class MiDesktopNewForm(MiDesktopForm):
     gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL)
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL)
-    pool_name = forms.CharField(required=False)
-    auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
-    pool_maximum = forms.IntegerField(required=False,)
-    powered_on_desktops = forms.IntegerField(required=False,) 
-    min_desktops = forms.IntegerField(required=False,)
-    ad_container = forms.CharField(required=False,)
-    ad_groups = forms.CharField(required=False,)
+    network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
+    networks = forms.ChoiceField(label='Dedicated Network')
+    purpose = forms.CharField(required=False)
+    access_internet = forms.ChoiceField(required=False,choices=ACCESS_INTERNET_CHOICES)
+    mask = forms.ChoiceField(choices=MASK_CHOICES, required=False)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, required=False)
+    technical_contact = forms.CharField(required=False)
+    billing_contact = forms.CharField(required=False)
+    security_contact = forms.CharField(required=False)
     additional_details = forms.CharField(required=False)
     sla = forms.BooleanField(required=False)
 
@@ -391,10 +391,12 @@ class MiDesktopNewForm(MiDesktopForm):
         super(MiDesktopNewForm, self).__init__(*args, **kwargs)
 
         if self.user:
-            network_list = ['Here I will implement this','-- New Dedicated Network']
+            groups = list(LDAPGroupMember.objects.filter(username=self.user).values_list('ldap_group_id',flat=True))
+            network_list = MiDesktopNetwork.objects.filter(status='A',owner__in=groups).order_by('purpose')
             choice_list = [(None, '---')]
             for network in network_list:
-                choice_list.append((network, network))
+                choice_list.append((network.purpose, network.purpose))
+            choice_list.append(('-- New Dedicated Network',"-- New Dedicated Network"))
             self.fields['networks'].choices = choice_list
 
     def clean(self):
