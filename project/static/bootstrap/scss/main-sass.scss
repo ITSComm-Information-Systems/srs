@@ -110,13 +110,9 @@ $grass-green: #28A745;
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
 	}
-	#aux-nav {
-		.navbar-nav {
-			margin:0 -10px 10px -10px !important;
-		}
-		.nav-item {
-			margin:0;
-		}
+	.order-summary {
+		padding-left:30px;
+		margin:auto;
 	}
 }
 
