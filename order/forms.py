@@ -865,7 +865,63 @@ class ServerSupportForm(TabForm):
 
         if kwargs['request'].POST.get('backup') == 'False':
             self.fields.pop('backup_time')
-            
+    def clean_reboot_time(self):
+        patch_time_map = {
+            '38':1,
+            '39':3,
+            '40':5,
+            '41':7,
+        }
+
+        patch_day_map = {
+            '96': 'THURSDAY',
+            '97': 'FRIDAY',
+            '98': 'SATURDAY',
+            '99': 'SUNDAY'
+        }
+
+        reboot_time_map = {
+            '51':0,
+            '52':0,
+            '53':1,
+            '54':1,
+            '55':2,
+            '56':2,
+            '57':3,
+            '58':3,
+            '59':4,
+            '60':4,
+            '61':5,
+            '62':5,
+            '63':6,
+            '64':6,
+        }
+
+        reboot_day_map = {
+            '103': 'SUNDAY',
+            '107': 'THURSDAY',
+            '108': 'FRIDAY',
+            '109': 'SATURDAY'
+        }
+
+        reboot_day = self.cleaned_data.get('reboot_day')
+        reboot_time = self.cleaned_data.get('reboot_time')
+        patch_day = self.cleaned_data.get('patch_day')
+        patch_time = self.cleaned_data.get('patch_time')
+
+        if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
+            if patch_time == 38 or 39 or 40 or 41:
+                if patch_time_map[patch_time] - reboot_time_map[reboot_time] < 2 and patch_time_map[patch_time] - reboot_time_map[reboot_time] > -2:
+                    raise ValidationError("Reboot time cannot be within 2 hours of patch time.")
+                    print(patch_time_map[patch_time] - reboot_time_map[reboot_time])
+                    print(patch_time_map[patch_time])
+        
+        def PatchTimeError():
+            raise ValidationError("Reboot time must be 2 hours from patch time.")
+
+        super().clean()
+
+
 
 class ServerDataForm(TabForm):
     template = 'order/server_data.html'
