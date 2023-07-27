@@ -916,7 +916,7 @@ class Order(models.Model):
                         noteid = cursor.callproc('pinn_custom.um_note_procedures_k.um_make_blob_an_attachment_p',  ['Note', id,'files', filename, lob] )
 
 
-    def create_preorder(self):
+    def create_preorder(self, tries=3):
 
         self.add_contact()
 
@@ -1001,7 +1001,7 @@ class Order(models.Model):
 
         cursor = connections['pinnacle'].cursor()
 
-        for attempt in range(3):
+        for attempt in range(1, tries):
 
             try:
                 print('attempt', attempt)
@@ -1019,9 +1019,12 @@ class Order(models.Model):
                 num = str(self.id)
                 url = settings.SITE_URL + '/orders/integration/'  + num
                 #send_mail('SRS Order # ' + num + ' failed to submit', url, 'itscomm.information.systems@umich.edu', ['itscomm.information.systems@umich.edu'])
-                print('error pause for 33')
-                time.sleep(33)
-                continue
+                if attempt == tries:
+                    self.order_reference = 'Submitting'  # Indicate this is done with reattempts.
+                    self.save()
+                else:
+                    print('error pause for 33')
+                    time.sleep(33)
 
         dbms_output = ''
 
