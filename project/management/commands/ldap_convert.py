@@ -4,6 +4,7 @@ from oscauth.models import LDAPGroup, LDAPGroupMember
 from django.db import models
 from project.integrations import MCommunity
 import datetime, csv
+from oscauth.utils import get_mc_group
 
 # Throwaway program to convert LDAP id to use GID 
 
@@ -31,6 +32,19 @@ class Command(BaseCommand):
         mc = MCommunity()
 
         for group in GroupTemp.objects.all().order_by('id'):
-            print(group.name)
+            #print(group.name)
             mc_group = mc.get_group(group.name)
-            print(mc_group)
+            #mc_group = get_mc_group(group.name)
+            #print(mc.response)
+            if mc.conn.entries:
+                entry = mc.conn.entries[0]
+
+                #print('group', type(entry.gidNumber))
+                if entry.umichExpiryNoticeTimestamp:
+                    print(group.name, 'expires', entry.umichExpiryNoticeTimestamp)
+                group.gid = int(entry.gidNumber.value)
+                group.save()
+            #else:
+            #    print('expired')
+
+            
