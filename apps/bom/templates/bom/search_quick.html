@@ -17,8 +17,10 @@
 
     $(document).ready(function () {
         //Set bootstrap theme
-        $.fn.select2.defaults.set("theme", "bootstrap4");
-
+        $( '#select-field' ).select2( {
+		theme: 'bootstrap-5'
+	} );
+	
         function formatEstimate(estimate) {
             console.log(estimate, estimate.id)
             if (!estimate.id) {
