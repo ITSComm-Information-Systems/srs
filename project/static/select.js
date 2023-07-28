@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function(event) {
 	//Set bootstrap theme
-	// $.fn.select2.defaults.set( "theme", "bootstrap4" );
 	$( '#select-field' ).select2( {
 		theme: 'bootstrap-5'
 	} );
