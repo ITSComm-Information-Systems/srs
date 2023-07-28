@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', function(event) {
 	//Set bootstrap theme
-	$.fn.select2.defaults.set( "theme", "bootstrap4" );
-
+	// $.fn.select2.defaults.set( "theme", "bootstrap4" );
+	$( '#select-field' ).select2( {
+		theme: 'bootstrap-5'
+	} );
+	
 	// Search results limited to "starts with"
 	function matchStart(params, data) {
 	    params.term = params.term || '';

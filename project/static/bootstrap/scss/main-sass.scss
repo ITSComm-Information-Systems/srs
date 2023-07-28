@@ -155,6 +155,10 @@ $grass-green: #28A745;
 
 
 //template code
+.jumbo-bg {
+	background-color: #e9ecef;
+}
+
 body {
 	background:$background-color;
 	font-family:Roboto,sans-serif;
@@ -189,7 +193,7 @@ body {
         white-space:normal;
     }
     a:link, a:visited {
-        color: white;
+        color: white !important;
     }
     
 } //navbar
@@ -200,26 +204,25 @@ body {
             border-radius:4px; 
         }
         .active {
-            nav-link {
+            .nav-link {
                 background-color: $navbar-bckground;
+				padding: 10px;
             }
         }
         .nav-item {
             .nav-link  {
                 padding: 10px;
             }
-            .nav-link.active {
-                background-color:$light-blue !important;
-            }
         } 
-        .show > .nav-link, .active > .nav-link, .nav-link.show, .nav-link.active {
-            background-color: $navbar-bckground;
-        }
-        .nav-link:focus {
+        .show > .nav-link, .active > .nav-link, .nav-link.show, .nav-link.active, .nav-link:focus{
             background-color: $navbar-bckground;
         }
     } //navbar-nav
 } //navbar-light
+
+.navbar-nav .nav-item > .nav-link.active {
+	background-color:$light-blue !important;
+} 
 
 #aux-nav {
     background:$dark-blue;
@@ -1120,15 +1123,20 @@ h3.alert-heading {
 .table-sm td, .table-sm th {
 	padding:.5rem 1rem;
 }
-.table-striped tbody tr:nth-of-type(odd), .table-striped tbody tr:nth-of-type(even) {
-	background-color:transparent;
+.table-striped {
+	tbody {
+		tr:nth-of-type(odd), tr:nth-of-type(even) {
+			background-color:transparent;
+		}
+		tr:nth-of-type(odd):hover, tr:nth-of-type(even):hover {
+			background-color:$pale-white;
+		}
+		tr:hover {
+			background-color:inherit;
+		}
+	}
 }
-.table-striped tbody tr:nth-of-type(odd):hover, .table-striped tbody tr:nth-of-type(even):hover {
-	background-color:$pale-white;
-}
-.table-hover tbody tr:hover {
-	background-color:inherit;
-}
+
 td.action {
 	width:auto;
 	display:table-cell;
