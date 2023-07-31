@@ -179,7 +179,7 @@ class SelectionAbstract(models.Model):
         return self.uniqname
 
 class Selection(SelectionAbstract):
-    pass
+    PROJECT_OCC = '81000-676800-ADMIN-71000-P874478'
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection'
@@ -226,6 +226,7 @@ class Selection(SelectionAbstract):
         preorder.comment_text = comment_text
         preorder.subscriber_id = self.subscriber
         preorder.assigned_labor_code = 'SRS'
+        preorder.default_one_time_expense_acct = self.PROJECT_OCC
         preorder.save()
         print('saved')
 
