@@ -883,19 +883,19 @@ class ServerSupportForm(TabForm):
 
         reboot_time_map = {
             '51':0,
-            '52':0,
+            '52':0.5,
             '53':1,
-            '54':1,
+            '54':1.5,
             '55':2,
-            '56':2,
+            '56':2.5,
             '57':3,
-            '58':3,
+            '58':3.5,
             '59':4,
-            '60':4,
+            '60':4.5,
             '61':5,
-            '62':5,
+            '62':5.5,
             '63':6,
-            '64':6,
+            '64':6.5,
         }
 
         reboot_day_map = {
@@ -912,7 +912,8 @@ class ServerSupportForm(TabForm):
 
         if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
             if patch_time == 38 or 39 or 40 or 41:
-                if patch_time_map[patch_time] - reboot_time_map[reboot_time] < 2 and patch_time_map[patch_time] - reboot_time_map[reboot_time] > -2:
+                print(patch_time_map[patch_time] - reboot_time_map[reboot_time])
+                if patch_time_map[patch_time] - reboot_time_map[reboot_time] >= -2 and patch_time_map[patch_time] - reboot_time_map[reboot_time] <= 0:
                     raise ValidationError("Reboot time cannot be within 2 hours of patch time.")
                 
         super().clean()
