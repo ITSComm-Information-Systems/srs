@@ -213,7 +213,7 @@ class Selection(SelectionAbstract):
         except:
             print('error updating subscriber_api_v')
 
-    def create_deskset_preorder(self):
+    def create_deskset_preorder(self, user):
         print('create preorder')
         comment_text = 'Project funded Set Request'
         if self.new_building:
@@ -227,6 +227,10 @@ class Selection(SelectionAbstract):
         preorder.subscriber_id = self.subscriber
         preorder.assigned_labor_code = 'SRS'
         preorder.default_one_time_expense_acct = self.PROJECT_OCC
+        preorder.contact_id = user.username
+        preorder.contact_email_address = user.email
+        preorder.contact_first_name = user.first_name
+        preorder.contact_last_name = user.last_name
         preorder.save()
         print('saved')
 

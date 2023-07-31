@@ -260,7 +260,7 @@ class Deskset(LoginRequiredMixin, View):
             selection.new_jack = selection.jack
 
         selection.save()
-        selection.create_deskset_preorder()
+        selection.create_deskset_preorder(request.user)
 
         return render(request, 'softphone/deskset_confirmation.html')
 
