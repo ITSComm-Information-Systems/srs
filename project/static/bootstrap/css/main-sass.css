@@ -13124,10 +13124,6 @@ h2.service-menu-header, .service-menu-header.h2 {
   flex-direction: column;
 }
 
-.service-menu-header {
-  display: none;
-}
-
 .chartfield-search-field {
   border-bottom-right-radius: 0.25rem !important;
   border-top-right-radius: 0.25rem !important;
