@@ -23,10 +23,12 @@
             <div class="row service" id="{{service.name}}" name="serviceCards">
                 <h3 class="lead">{{ service }}</h3>
                 <!-- <div class="col-md-12 card-group"> -->
-                    <div class="row row-cols-3">
+                    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
                     {% for action in service.actions %}
-                        <div class="col card m-3 p-0">
+                    <div class = col>
+                        <div class="card p-0">
                             <div class="card-body">
+                        
                                 <strong>
                                     <a href="{{action.target}}">
                                         {{action.label}}
@@ -40,6 +42,7 @@
                                     </a>
                                 </p>
                             </div>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
