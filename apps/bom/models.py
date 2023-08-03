@@ -173,6 +173,7 @@ class EstimateManager(models.Manager):
         "select *  " \
         "from um_bom_estimate_search_v " \
         "where status_name = 'Open' " \
+        "and status <> 'Rejected' " \
         "and project_manager = %s " 
 
         return self.raw(sql, [username,username,username,username])
