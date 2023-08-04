@@ -1001,10 +1001,9 @@ class Order(models.Model):
 
         cursor = connections['pinnacle'].cursor()
 
-        for attempt in range(1, tries):
+        for attempt in range(1, tries+1):
 
             try:
-                print('attempt', attempt)
                 cursor.callproc("dbms_output.enable")
                 ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
 
@@ -1012,6 +1011,7 @@ class Order(models.Model):
                 self.save()
                 
                 self.add_attachments()
+                print(self.id, 'Created', ponum)
                 break
 
             except cx_Oracle.DatabaseError as e:
@@ -1019,11 +1019,11 @@ class Order(models.Model):
                 num = str(self.id)
                 url = settings.SITE_URL + '/orders/integration/'  + num
                 #send_mail('SRS Order # ' + num + ' failed to submit', url, 'itscomm.information.systems@umich.edu', ['itscomm.information.systems@umich.edu'])
+                print(self.id, 'attempt', attempt, 'of', tries, 'failed.')
                 if attempt == tries:
                     self.order_reference = 'Submitting'  # Indicate this is done with reattempts.
                     self.save()
                 else:
-                    print('error pause for 33')
                     time.sleep(33)
 
         dbms_output = ''
