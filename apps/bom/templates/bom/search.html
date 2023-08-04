@@ -10,8 +10,8 @@
     <!-- {{ forloop.counter }} -->
     <div class="card">
         <div class="card-header" id="heading-1">
-            <div class="form-inline">
-                <input type="search" id="workorder_search" class="form-control form-inline""
+            <div class="d-flex flex-row align-items-center flex-wrap">
+                <input type="search" id="workorder_search" class="form-control d-flex flex-row align-items-center flex-wrap""
                 aria-label=" Search through site content"><i class="fa fa-filter" aria-hidden="true"></i>
                 <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-1"
                     aria-expanded="true" aria-controls="collapse-{{ forloop.counter }}">
@@ -31,10 +31,10 @@
                 <div id="criterion_list">
 
 
-                    <div class="form-inline" >
-                        <input disabled class="form-control form-inline" type="text"
+                    <div class="d-flex flex-row align-items-center flex-wrap" >
+                        <input disabled class="form-control d-flex flex-row align-items-center flex-wrap" type="text"
                             value="Pinnacle Status" aria-describedy="hostsText">
-                        <input disabled class="form-control form-inline" type="text" value="Equals"
+                        <input disabled class="form-control d-flex flex-row align-items-center flex-wrap" type="text" value="Equals"
                             aria-describedy="hostsText">
                         <select name="status_name" class="form-control">
                             <option value="Any">Any</option>
@@ -44,7 +44,7 @@
                     </div>
                 </div>
 
-                <div class="form-inline" id="criterion_new" style="display: none;">
+                <div class="d-flex flex-row align-items-center flex-wrap" id="criterion_new" style="display: none;">
                     <p><br>AND</p>
                     <select id="search_field" class="form-control search-field">
                         <option value="">Select a field</option>

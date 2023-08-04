@@ -54,7 +54,7 @@
         <label for="techSelect" id="labelTechSelect">
             <strong>Select Your Tech ID</strong>
         </label>
-        <div class='form-inline'>
+        <div class='d-flex flex-row align-items-center flex-wrap'>
             <select id='techSelect' class='form-control col-3' name='techSearch'>
                 {% for tech in all_techs %}
                     <option>{{ tech.labor_code }} ({{ tech.labor_name_display2 }})</option>

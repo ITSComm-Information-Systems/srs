@@ -11,8 +11,8 @@
 
 <div class="row">
     <div class="col-6">
-        <div class="mb-3 form-inline">
-            <div class="form-inline">
+        <div class="mb-3 d-flex flex-row align-items-center flex-wrap">
+            <div class="d-flex flex-row align-items-center flex-wrap">
                 {{ field }}
                 <input tabindex="-1" id="id_name" name="name" class="form-control" type="text" readonly>
             </div>
@@ -37,10 +37,10 @@
 
             <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
 
-            <div id="formset_wrapper" class="form-inline disk-div" style="display: block;">
+            <div id="formset_wrapper" class="d-flex flex-row align-items-center flex-wrap disk-div" style="display: block;">
                 {{ tab.form.disk_formset.management_form }}
                 {% for diskform in tab.form.disk_formset %}
-                <div class="form-inline disk-div" style="display: block;">
+                <div class="d-flex flex-row align-items-center flex-wrap disk-div" style="display: block;">
                     {{ diskform.id }}
                     {{ diskform.name }}
                     {% if diskform.initial.device == None %}
@@ -61,7 +61,7 @@
                 {% endfor %}
             </div>
             <div id="emptyform_wrapper" style="display: none">
-                <div id="diskdiv__prefix__" class="form-inline disk-div" style="display: block;">
+                <div id="diskdiv__prefix__" class="d-flex flex-row align-items-center flex-wrap disk-div" style="display: block;">
                 {{ tab.form.disk_formset.empty_form.name }}
                 <input type="text" class="form-control col-2" readonly="" id="id_form-__prefix__-scsi">
                 {{ tab.form.disk_formset.empty_form.size }}

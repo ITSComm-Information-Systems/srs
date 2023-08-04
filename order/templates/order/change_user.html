@@ -1,7 +1,7 @@
 <div class="mb-3">
     <label for="id_phone_number">Enter Phone Number (eg: 7341234567):</label>
 
-    <div class="form-inline">
+    <div class="d-flex flex-row align-items-center flex-wrap">
         <input data-label="Phone Number" type="tel" class="form-control" id="id_phone_number" name="phone" required>
         <button type="button" class="btn btn-primary findBtn" id="phoneLookup">Find</button>
         <div role=”alert” class="invalid-feedback">
@@ -19,7 +19,7 @@
 <div class="mb-3" id="div_new_uniqname" style="display: None;">
     <label for="id_new_uniqname">Enter New Uniqname:</label>
 
-    <div class="form-inline">
+    <div class="d-flex flex-row align-items-center flex-wrap">
         <input type="text" name="new_uniqname" required id="id_new_uniqname">
         <div role=”alert” class="invalid-feedback"><i class="fas fa-exclamation-triangle"
             aria-label="Icon signfying that user must enter a value"></i>Uniqname not found.</div>
@@ -32,7 +32,7 @@
 
 <div class="mb-3" id="div_new_building" style="display: None;">
     <label for="id_building">Search for the building name or building ID of where you want the new service to be activated or equipment to be delivered.</label> 
-    <div class="form-inline">
+    <div class="d-flex flex-row align-items-center flex-wrap">
         <input list="buildings" type="text" name="new_building" required id="id_building">
     </div>
     <span id="building_name"></span>

@@ -9,8 +9,8 @@
 
             <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
 
-            <div class="form-inline" id="host_new" style="display: none;">
-                <input class="form-control form-inline nodeName" name="nodeNames" type="text" value="{{ host.name }}"
+            <div class="d-flex flex-row align-items-center flex-wrap" id="host_new" style="display: none;">
+                <input class="form-control d-flex flex-row align-items-center flex-wrap nodeName" name="nodeNames" type="text" value="{{ host.name }}"
                     aria-describedy="hostsText">
                 <select name="backupTime" id="backupTime" class="form-control">
                     {% for opt in tab.form.time_list %}
@@ -27,8 +27,8 @@
             </div>
 
             {% for node in tab.form.node_list %}
-            <div class="form-inline" id="host_{{ host.id }}">
-                <input class="form-control form-inline" name="nodeNames" type="text" value="{{ node.name }}"
+            <div class="d-flex flex-row align-items-center flex-wrap" id="host_{{ host.id }}">
+                <input class="form-control d-flex flex-row align-items-center flex-wrap" name="nodeNames" type="text" value="{{ node.name }}"
                     aria-describedy="hostsText">
                 <select name="backupTime" class="form-control">
                     {% for opt in tab.form.time_list %}
