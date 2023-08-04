@@ -242,9 +242,6 @@ class Deskset(LoginRequiredMixin, View):
     def post(self, request, dept_id):
         subscriber = self.request.POST.get('subscriber')
         selection = Selection.objects.get(subscriber=subscriber)
-        selection.migrate = 'YES_SET'
-        selection.processing_status = 'Selected'
-        selection.cut_date = next_cut_date() + datetime.timedelta(days=7)
 
         if self.request.POST.get('location_correct') == 'No':
             selection.new_building = self.request.POST.get('building_name')
@@ -259,7 +256,6 @@ class Deskset(LoginRequiredMixin, View):
             selection.new_room = selection.room
             selection.new_jack = selection.jack
 
-        selection.save()
         selection.create_deskset_preorder(request.user)
 
         return render(request, 'softphone/deskset_confirmation.html')
