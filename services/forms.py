@@ -339,23 +339,19 @@ ACCESS_INTERNET_CHOICES = (('True','Yes, my desktop needs internet access (outsi
 MASK_CHOICES = [["/28", "/28 (16 addresses)"], ["/27", "/27 (32 addresses)"], ["/26", "/26 (64 addresses)"], 
                     ["/25", "/25 (128 addresses)"], ["/24", "/24 (256 addresses)"]]
 
+CPU_INITIAL = 1.15
+MEMORY_INITIAL = 0.96
+STORAGE_INITIAL = 5.00
+GPU_INITIAL = 0.00
+BASE_COST = 31.31
+TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
+
 class MiDesktopNewForm(MiDesktopForm):
-
-    CPU_INITIAL = 1.15
-    MEMORY_INITIAL = 0.96
-    STORAGE_INITIAL = 5.00
-    GPU_INITIAL = 0.00
-    BASE_COST = 31.31
-    TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
-
     title = 'MiDesktop New Order Form'
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
     pool_type = forms.ChoiceField(label='Pool Type', help_text='Lorem', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent")))
     pool_name = forms.CharField(required=False)
     auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
-    pool_maximum = forms.IntegerField(required=False,)
-    powered_on_desktops = forms.IntegerField(required=False,) 
-    min_desktops = forms.IntegerField(required=False,)
     ad_container = forms.CharField(required=False,)
     ad_groups = forms.CharField(required=False,)
     base_image = forms.ChoiceField(label='Base Image', choices = (("1","New Image"),("2","List of Images")))
@@ -397,6 +393,7 @@ class MiDesktopNewForm(MiDesktopForm):
             for network in network_list:
                 choice_list.append((network.purpose, network.purpose))
             choice_list.append(('-- New Dedicated Network',"-- New Dedicated Network"))
+            choice_list.pop(0)
             self.fields['networks'].choices = choice_list
 
     def clean(self):
@@ -406,6 +403,40 @@ class MiDesktopNewForm(MiDesktopForm):
             print('Instant-Clone')
         elif pool_type == 'persistent':
             print('Persistent')
+
+class MiDesktopNewImageForm(MiDesktopForm):
+    title = 'MiDesktop New Image Order Form'
+    base_image_name = forms.CharField(required=False)
+    initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
+    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),))
+    cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
+    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL)
+    memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
+    memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL)
+    storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
+    storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL)
+    gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
+    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL)
+    total = forms.DecimalField(required=False,initial=TOTAL_INITIAL)
+    network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
+    networks = forms.ChoiceField(label='Dedicated Network')
+    purpose = forms.CharField(required=False)
+    
+    class Meta:
+        fields=['admin_group']
+
+    def __init__(self, *args, **kwargs):
+        super(MiDesktopNewImageForm, self).__init__(*args, **kwargs)
+
+        if self.user:
+            groups = list(LDAPGroupMember.objects.filter(username=self.user).values_list('ldap_group_id',flat=True))
+            network_list = MiDesktopNetwork.objects.filter(status='A',owner__in=groups).order_by('purpose')
+            choice_list = [(None, '---')]
+            for network in network_list:
+                choice_list.append((network.purpose, network.purpose))
+            choice_list.append(('-- New Dedicated Network',"-- New Dedicated Network"))
+            choice_list.pop(0)
+            self.fields['networks'].choices = choice_list
 
 class MiDesktopNewNetworkForm(MiDesktopForm):
     title = 'MiDesktop New Network Order Form'
@@ -426,6 +457,7 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
         data = self.cleaned_data
         new_network = MiDesktopNetwork(
             purpose=data['purpose'],
+            instance_name = data['purpose'],
             access_internet=data['access_internet'],
             subnet_mask=data['mask'],
             ips_protection=data['protection'],
