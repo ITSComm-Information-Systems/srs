@@ -746,6 +746,8 @@ class Services(UserPassesTestMixin, View):
             elif service.name == 'midesktop':
                 service.actions = [{'label': 'Order MiDesktop','target': '/services/midesktop/add/'},
                                    {'label': 'View/Change MiDesktop','target': '/services/midesktop/'},
+                                   {'label': 'Create Image','target': '/services/midesktop-image/add'},
+                                   {'label': 'View/Change Image','target': '/services/midesktop-image/'},
                                    {'label': 'Create Network','target': '/services/midesktop-network/add'},
                                    {'label': 'View/Change Network','target': '/services/midesktop-network/'}]
             elif service.name == 'container':

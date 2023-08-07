@@ -73,7 +73,10 @@ class ServiceRequestView(UserPassesTestMixin, View):
             form = MiDesktopNewNetworkForm(user=self.request.user)
             return render(request, 'services/midesktop-network.html',{
                 'form':form})
-
+        if service == 'midesktop-image':
+            form = MiDesktopNewImageForm(user=self.request.user)
+            return render(request, 'services/midesktop-image.html',{
+                'form':form})
         try:
             form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)
         except KeyError:
