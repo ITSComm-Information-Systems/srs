@@ -872,6 +872,7 @@ class ServerSupportForm(TabForm):
             '39':3,
             '40':5,
             '41':7,
+            '49':11
         }
 
         patch_day_map = {
@@ -905,17 +906,31 @@ class ServerSupportForm(TabForm):
             '109': 'SATURDAY'
         }
 
+        error = False
+
         reboot_day = self.cleaned_data.get('reboot_day')
         reboot_time = self.cleaned_data.get('reboot_time')
         patch_day = self.cleaned_data.get('patch_day')
         patch_time = self.cleaned_data.get('patch_time')
 
+        if patch_time == '49':
+            if reboot_time == '51' or reboot_time == '52' or reboot_time == '53':
+                if patch_day == '96' and reboot_day == '108':
+                    error = True
+                if patch_day == '97' and reboot_day == '109':
+                    error = True
+                if patch_day == '98' and reboot_day == '103':
+                    error = True
+                if patch_day == '99' and reboot_day == '104':
+                    error = True
+
         if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
             if patch_time == 38 or 39 or 40 or 41:
-                print(patch_time_map[patch_time] - reboot_time_map[reboot_time])
                 if patch_time_map[patch_time] - reboot_time_map[reboot_time] >= -2 and patch_time_map[patch_time] - reboot_time_map[reboot_time] <= 0:
-                    raise ValidationError("Reboot time cannot be within 2 hours of patch time.")
-                
+                    error = True
+
+        if error:
+            raise ValidationError("Reboot time cannot be within 2 hours of patch time.")
         super().clean()
 
 
