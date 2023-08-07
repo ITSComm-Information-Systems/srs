@@ -900,7 +900,12 @@ class ServerSupportForm(TabForm):
         }
 
         reboot_day_map = {
+            '101': 'NONE',
+            '102': 'DAILY',
             '103': 'SUNDAY',
+            '104': 'MONDAY',
+            '105': 'TUESDAY',
+            '106': 'WEDNESDAY',
             '107': 'THURSDAY',
             '108': 'FRIDAY',
             '109': 'SATURDAY'
@@ -923,11 +928,11 @@ class ServerSupportForm(TabForm):
                     error = True
                 if patch_day == '99' and reboot_day == '104':
                     error = True
-
-        if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
-            if patch_time == 38 or 39 or 40 or 41:
-                if patch_time_map[patch_time] - reboot_time_map[reboot_time] >= -2 and patch_time_map[patch_time] - reboot_time_map[reboot_time] <= 0:
-                    error = True
+        if reboot_day_map[reboot_day] and patch_day_map[patch_day]:
+            if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
+                if patch_time == 38 or 39 or 40 or 41:
+                    if patch_time_map[patch_time] - reboot_time_map[reboot_time] >= -2 and patch_time_map[patch_time] - reboot_time_map[reboot_time] <= 0:
+                        error = True
 
         if error:
             raise ValidationError("Reboot time cannot be within 2 hours of patch time.")
