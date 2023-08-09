@@ -22,7 +22,6 @@
         <div class="tab-pane fade {{ service.active }}" id="{{ service.name }}" role="tabpanel" aria-labelledby="v-pills-profile-tab">
             <div class="row service" id="{{service.name}}" name="serviceCards">
                 <h3 class="lead">{{ service }}</h3>
-                <!-- <div class="col-md-12 card-group"> -->
                     <div class="row row-cols-1 row-cols-md-2">
                     {% for action in service.actions %}
                     <div class = "col my-md-3">

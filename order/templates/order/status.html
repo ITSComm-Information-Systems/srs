@@ -21,9 +21,7 @@
                         </label>
                     </div>
                     <select class="form-select order-status-dropdown" id="selectDept">
-                        <!--                         <option id="alldepts" name="dept" data-filter="dept" value="all_departments">
-                            All Departments
-                        </option> -->
+                    
                         {% for dept in dept_list %}
 
                         <option id="mydept{{dept.deptid}}" name="dept" data-filter="dept" value="{{dept.deptid}}">
@@ -41,21 +39,6 @@
 <div role="contentinfo">
     <div class="row cart-table">
         <div class="col-12">
-            <!-- Beginning of Filter/Search -->
-            <!-- <div class="filter-container"> -->
-            <!-- Beginning of Search Bar -->
-            <!-- <div class="input-group mb-3 search-bar">
-                    
-                        <span class="input-group-text">
-                            <i class="fas fa-search" aria-label="Search Icon"></i>
-                        </span>
-                    </div>
-                    <input id="orderSearch" type="text" class="form-control"
-                        placeholder="Search by pre-order or uniqname…" aria-label="Search by pre-order or uniqname…"
-                        aria-describedby="basic-addon2">
-                </div> -->
-            <!-- End of Search -->
-            <!-- Beginning of Order Status Filter Dropdown -->
             <div class="mt-2 mb-2">
                 <strong>Filter By:</strong>
             </div>
@@ -130,9 +113,7 @@
                             <th scope="col" class="wismo-order-details">Order Details</th>
                             <th scope="col">Chartfield Billed</th>
                             <th scope="col">Status
-                                <!-- <i class="fas fa-question-circle btn-link"
-                                    aria-label="More Information icon" data-toggle="modal"
-                                    data-target="#statusIndicatorModal"></i> -->
+
                             </th>
                             <th scope="col">Action</th>
                         </tr>
@@ -164,7 +145,6 @@
                             <td>{{ order.chartcom.name }} ({{order.chartcom.account_number}})</td>
                             <td>{{order.srs_status}}</td>
                             <td class="action">
-                                <!-- <a class="delete" href="#">Cancel</a> -->
                                 <a class="cancel" href="#" data-toggle="modal" data-target="#cancelOrderModal"
                                     data-order="{{order.id}}">
                                     Cancel <span class="visually-hidden">Order Number: {{order.order_reference}}</span>
