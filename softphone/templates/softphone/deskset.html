@@ -1,0 +1,333 @@
+{% extends 'softphone/base_softphone.html' %}
+
+{% block styles %}
+<style>
+  .card {
+    position: relative;
+    margin-bottom: 20px;
+    margin-right: 20px;
+    max-width: 200px;
+    background-color: aliceblue;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% load humanize %}
+
+<h1>{{ title }}</h1>
+
+<ul>
+  <li>Request a project-funded deskset for a number that has <b>already transitioned to softphone only</b>.</li>
+  <li>Eligibility for a Desket</li>
+    <ul>
+      <li>If a user transitioned <b>before</b> August 1, 2023, submitters and ambassadors will have until January 31, 2023, to request a deskset.</li>
+      <li>If a user transitioned <b>after</b> August 1, 2023, submitters and ambassadors will have six months following the transition date to request a deskset.</li>
+    </ul>
+    Note: If you are unable to find the phone number you are looking for please contact <a href="mailto:its-inf-csr@umich.edu" >its-inf-csr@umich.edu</a>
+</ul>
+<br>
+
+<div class="container">
+
+  <select type='select' name="dept_parm" id="deptf" size="1" class="form-control text-field-short col-4">
+    {% if dept_list.zero %}
+    <option selected>No Authorized Departments</option>
+    {% endif %}
+
+    {% for dept in dept_list %}
+    <option {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.dept_id }} - {{ dept.dept_name }}</option>
+    {% endfor %}
+  </select>
+
+  <form id="div_form" method="post">
+    <h5 style="color: blue">Select phone number / user:</h5>
+    {% csrf_token %}
+
+
+    <strong class="">Search:</strong>
+    <div class="col-4">
+
+      <select id="id_phone_search" name="subscriber" class="form-control col-4" placeholder="Search for Number">
+        <option></option>
+        {% for line in full_list %}
+        <option href="/" data-location="{{ line.building }} <br> Floor:{{ line.floor }} <br> Room:{{ line.room }}  <br> Jack:{{ line.jack }}"
+          value="{{ line.subscriber }}">{{ line.service_number }} - {{ line.subscriber_first_name }} {{line.subscriber_last_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <br>
+    <div class="col-">
+
+      <div style="display: none;" id="div_verify_location">
+        <b>Previous location of phone:</b>
+        <p id="address_text" class="col-4" style="white-space: pre;"></p>
+        <br>
+        <label for="id_location_correct"><b>Verify Location for Deskset Delivery</b></label>
+        <select class="form-control col-4" id="id_location_correct" name="location_correct"
+          aria-label="Location Correct">
+          <option selected>Select</option>
+          <option value="Yes">Correct</option>
+          <option value="No">Incorrect</option>
+        </select>
+      </div>
+
+
+
+      <br>
+      <div style="display: none;" id="div_new_location" class="col-4">
+          <div id="id_building">
+
+              <label for="browser">Search by building Name or Number:</label>
+              <input class='form-control change-building' list="buildings" name="building_code" id="id_building_code">
+              <input class="form-control-plaintext form-control-sm" readonly tabindex="-1" type="text" 
+                      name="building_name" id="id_building_name">
+          </div>
+          <div id="div_floor" class="form-group" style="display: none;">
+              <label for="id_floor">Floor</label>
+              <input type="text" class="form-control change-floor" name="floor" id="id_floor">
+          </div>
+          <div id="div_room" class="form-group" style="display: none;">
+              <label for="id_room">Room</label>
+              <input class="form-control" name="room" id="id_room" list="rooms" placeholder="Select">
+          </div>
+
+          <div id="div_jack" class="form-group" style="display: none;">
+              <label for="id_jack">Jack</label>
+              <input class="form-control" name="jack" id="id_jack" list="jacks" placeholder="Select">
+          </div>
+
+
+
+      </div>
+
+    </div>
+
+
+    <br>
+    <div class="container mt-1 mb-1">
+      <button disabled id="id_submit_button" type="submit" class="btn" style="background-color: #0068A8; color:white">Submit
+        Order</button>&nbsp;<span></span>
+    </div>
+
+  </form>
+</div>
+
+<datalist id="buildings">
+  {% for building in building_list %}
+      <option value="{{ building.building_code }}">{{ building.building_name }}</option>    
+  {% endfor %}
+</datalist>
+
+<datalist id="jacks">
+
+</datalist>
+
+<datalist id="rooms">
+  <option value="33">Select</option>    
+</datalist>
+
+{% endblock content %}
+
+
+{% block js %}
+
+<script>
+
+
+  $(document).ready(function () {
+
+    $.fn.select2.defaults.set("theme", "bootstrap4");
+    $('#id_phone_search').select2({
+      placeholder: "Search",
+      display: "inline",
+    });
+
+    $('#id_phone_search').on('change', function () {
+      $("#id_location_correct").val($("#id_location_correct option:first").val());
+      document.getElementById('id_submit_button').disabled = true;
+      $('#div_new_location').hide();
+
+      x = $(this).find(':selected').data('location');
+
+      $('#div_verify_location').show();
+
+      $('#address_text').html(x);
+      document.getElementById('id_submit_button').scrollIntoView();
+
+    });
+
+    $('#id_location_correct').on('change', function () {
+      if (this.value == 'No') {
+        $('#div_new_location').show();
+        document.getElementById('id_submit_button').scrollIntoView();
+        document.getElementById('id_submit_button').disabled = true;
+      } else {
+        $('#div_new_location').hide();
+        document.getElementById('id_submit_button').disabled = false;
+      }
+    });
+
+    $("#deptf").change(function () {
+      $('#div_form').hide();
+      window.location.href = "/softphone/deskset/" + this.value + "/";
+    });
+
+    $("#id_jack").change(function () {
+      document.getElementById('id_submit_button').disabled = false;
+    });
+
+
+
+    document.querySelectorAll('.change-building').forEach(widget => {
+
+            widget.addEventListener('input', function handleChange(event) {
+                document.getElementById(`div_floor`).style.display = "none";
+                document.getElementById(`div_room`).style.display = "none";
+                document.getElementById(`div_jack`).style.display = "none";
+                document.getElementById('id_submit_button').disabled = true;
+                //fld = document.getElementById(`id_floor`).required = true;
+            });
+
+            widget.addEventListener('change', function handleChange(event) {
+                //prefix = getFormPrefix(this.id)
+
+                document.getElementById(`id_building_name`).value = "";
+                document.getElementById(`id_floor`).value = "";
+                document.getElementById(`id_room`).value = "";
+                document.getElementById(`id_jack`).value = "";
+
+                if (this.value) {
+
+                    var opts = document.getElementById('buildings').childNodes;
+                    for (var i = 0; i < opts.length; i++) {
+                        if (opts[i].value === this.value) {
+                            document.getElementById(`id_building_name`).value = opts[i].text;
+
+                            document.getElementById(`div_floor`).style.display = "block";
+                            fld = document.getElementById(`id_floor`).required = true;
+
+                            break;
+                        }
+                    }
+
+                } else {
+                    hideDivs(prefix, 'floor', 'room');
+                }
+            });
+        });
+
+        document.querySelectorAll('.change-floor').forEach(widget => {
+            widget.addEventListener('input', function handleChange(event) {
+                target = '#' + $(this).attr('id').replace("floor", "room")
+                target_div = target.replace("id_", "div_");
+                if (this.value) { 
+                    $(target_div).show();
+                    $(target).attr("required", true);
+                } else {
+                    $(target_div).hide();
+                    $(target).removeAttr("required");
+                }
+                update_room_list('id_room');
+            });
+        });
+
+      document.getElementById('id_room').addEventListener("change", function() {
+
+        target = '#' + $(this).attr('id').replace("room", "jack")
+        target_div = target.replace("id_", "div_");
+
+        if (this.value) {
+            $(target_div).show();
+            $(target).attr("required", true);
+        } else {
+            $(target_div).hide();
+            $(target).removeAttr("required");
+        }
+        update_jack_list('id_jack');
+
+      });
+
+  });
+
+
+
+
+
+  function update_room_list(target) {
+        code = $('#' + target.replace("room", "building_code")).val();
+        floor = $('#' + target.replace("room", "floor")).val();
+
+        $.ajax({
+            type: "GET",
+            url: "/tools/voip/floor/",
+            data: {
+                "buildingID": code,
+                "buildingFloor": floor,
+            },
+            dataType: 'json',
+            success: function (data) {
+
+                //$('#buildingFloor').val(floor);
+                rooms = document.getElementById('rooms')
+                $('#rooms').empty();
+
+                for (var i = 0; i < data.rooms.length; i++) {
+                    var option = document.createElement("option");
+                    option.value = data.rooms[i];
+                    option.text = data.rooms[i];
+                    rooms.appendChild(option);
+                }
+                if (data.floor != '')
+                    $("#roomselect").show();
+            },
+            error: function (data) {
+                console.log("ajax error");
+            }
+        });
+    }
+
+    function update_jack_list(target) {
+        code = $('#' + target.replace("jack", "building_code")).val();
+        floor = $('#' + target.replace("jack", "floor")).val();
+        room = $('#' + target.replace("jack", "room")).val();
+
+        $.ajax({
+            type: "GET",
+            url: "/tools/voip/room/",
+            data: {
+                "buildingID": code,
+                "buildingFloor": floor,
+                "buildingRoom": room,
+            },
+            dataType: 'json',
+            success: function (data) {
+
+                //$('#buildingFloor').val(floor);
+                jacks = document.getElementById('jacks')
+                $('#jacks').empty();
+
+                for (var i = 0; i < data.jacks.length; i++) {
+                    var option = document.createElement("option");
+                    option.value = data.jacks[i];
+                    option.text = data.jacks[i];
+                    jacks.appendChild(option);
+                }
+                if (data.floor != '')
+                    $("#jackselect").show();
+            },
+            error: function (data) {
+                console.log("ajax error");
+            }
+        });
+    }
+
+
+
+
+
+</script>
+
+{% endblock %}

@@ -164,6 +164,7 @@ class Openshift():
         if r.ok:
             self.create_role_bindings(instance)
             self.add_limits(instance)
+            self.add_network_policy(instance)
             if instance.backup == 'Yes':
                 self.add_backup(instance)
         else:
@@ -198,6 +199,14 @@ class Openshift():
 
         return requests.post(f'{self.API_ENDPOINT}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
                              , headers=self.HEADERS)
+
+    def add_network_policy(self, instance):
+        payload = self.get_yaml('networkpolicy')
+        for item in payload['items']:
+            item['metadata']['namespace'] = instance.project_name
+
+            r = requests.post(f'{self.API_ENDPOINT}/apis/networking.k8s.io/v1/namespaces/{instance.project_name}/networkpolicies'
+                                , headers=self.HEADERS, json=item)
 
     def get_yaml(self, file):
         file = f'{settings.BASE_DIR}/project/rosa/{file}.yaml'
@@ -538,7 +547,7 @@ class ContainerPayload(Payload):
     CONTAINER_TEAM = 7
 
     form_id = 20
-    type_id = 25
+    type_id = 218
     service_id = 13
     responsible_group_id = CONTAINER_TEAM
 

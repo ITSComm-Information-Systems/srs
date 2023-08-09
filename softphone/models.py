@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from django.db import models, connections
 from django.conf import settings
 from django.db.models.fields import IntegerField
-from project.pinnmodels import UmMpathDwCurrDepartment
+from project.pinnmodels import UmMpathDwCurrDepartment, UmOscPreorderApiV
 
 # Selection = um_softphone_selection - Main table with user selections and processing data.
 # SelectionV = um_softphone_selection_v - Selects off above table, does not have CANCEL records but has extra fields from subscriber
@@ -179,7 +179,7 @@ class SelectionAbstract(models.Model):
         return self.uniqname
 
 class Selection(SelectionAbstract):
-    pass
+    PROJECT_OCC = '81000-676800-ADMIN-71000-P874478'
 
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection'
@@ -212,6 +212,26 @@ class Selection(SelectionAbstract):
             print(cursor.rowcount, 'update subscriber_id')
         except:
             print('error updating subscriber_api_v')
+
+    def create_deskset_preorder(self, user):
+        print('create preorder')
+        comment_text = 'Project funded Set Request'
+        if self.new_building:
+            comment_text = comment_text + f'\n{self.new_building} \n {self.new_building_code} \nFloor: {self.new_floor} \nRoom: {self.new_room} \nJack: {self.new_jack}'
+        preorder = UmOscPreorderApiV()
+        preorder.wo_type_code = 'AR'
+        preorder.action_code = '2' # Change
+        preorder.project_id = 16017
+        preorder.work_status_id = 64 # Zoom phone
+        preorder.comment_text = comment_text
+        preorder.subscriber_id = self.subscriber
+        preorder.assigned_labor_code = 'SRS'
+        preorder.default_one_time_expense_acct = self.PROJECT_OCC
+        preorder.contact_email_address = user.email
+        preorder.contact_first_name = user.first_name
+        preorder.contact_last_name = user.last_name
+        preorder.save()
+        print('saved')
 
 
 class SelectionV(SelectionAbstract):
