@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+<script type='text/javascript'>
+    var groups = {{ groups_json|safe }};
+    var networklist = {{ network_json|safe }};
+    var eventBus = new Vue();
+</script>
+
+
 <h1>New Image</h1>
 
 <div class="container">
@@ -9,7 +18,21 @@
 
         <div id="div_formbody">
             {% for field in form %}
-            {% if field.auto_id == 'id_cpu' %}
+            {% if field.auto_id == 'id_admin_group' %}
+                <div id="group">
+                    <h6>McCommunity Admin Group:
+                    <select class="form-control" name="admin_group" id="id_admin_group" v-model="selectedGroup" @change="handleGroupChange">
+                        <option v-for="group in groups" :value="group.id" :key="group.id">[[group.name]] </option>
+                    </select></h6>
+                </div>
+            {% elif field.auto_id == 'id_networks' %}
+                <div id="network" v-show="visible">
+                    <h6>Networks:
+                    <select class="form-control" name="network" id="id_network" v-model="selectedNetwork" width="350px">
+                        <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
+                    </select></h6>
+                </div>
+            {% elif field.auto_id == 'id_cpu' %}
                     <div class="form-group" id="wrapper_calculator">
                         <div id="wrapper_id_cpu">
                             <div class="row">
@@ -60,7 +83,8 @@
     </form>
 
 </div>
-
+<script src="/static/vue-components/admin-group/admin-group.js"></script>
+<script src="/static/vue-components/midesktop-networks/midesktop-networks.js"></script>
 
 {% endblock %}
 
@@ -80,7 +104,7 @@
     const gpu_choice = document.getElementById("{{ form.gpu.id_for_label }}");
 
     const network_type_wrapper = document.getElementById("wrapper_id_network_type")
-    const purpose_wrapper = document.getElementById("wrapper_id_purpose");
+    const name_wrapper = document.getElementById("wrapper_id_name");
     const networks_wrapper = document.getElementById("wrapper_id_networks");
 
 
@@ -88,7 +112,7 @@
     
     function page_load(){
         read_only_initial_elements()
-        hide_initial_elements()
+        //hide_initial_elements()
     }
 
     function hide_initial_elements(){
@@ -100,12 +124,12 @@
         handle_network_type_change()
     })
 
-    networks.addEventListener("change", () => {
-        handle_networks_change()
-    })
+    // networks.addEventListener("change", () => {
+    //     handle_networks_change()
+    // })
 
     function hide_new_network_fields(){
-        wrappers = [purpose_wrapper
+        wrappers = [name_wrapper
         ]
 
         hide_elements(wrappers)
@@ -136,14 +160,14 @@
     }
 
     function show_new_network_fields(){
-        wrappers = [purpose_wrapper,networks_wrapper
+        wrappers = [name_wrapper,networks_wrapper
         ]
 
         show_elements(wrappers)
     }
 
     function hide_new_network_fields(){
-        wrappers = [purpose_wrapper
+        wrappers = [name_wrapper
         ]
 
         hide_elements(wrappers)
