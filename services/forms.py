@@ -445,25 +445,26 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
     class Meta:
         fields=['admin_group']
 
-    def save(self, commit=True):
-        super().save()
-        data = self.cleaned_data
-        new_network = MiDesktopNetwork(
-            purpose=data['purpose'],
-            instance_name = data['purpose'],
-            access_internet=data['access_internet'],
-            subnet_mask=data['mask'],
-            ips_protection=data['protection'],
-            technical_contact=data['technical_contact'],
-            business_contact=data['business_contact'],
-            security_contact=data['security_contact'],
-            owner=self.owner,  # This field comes from the Meta class
-        )
-        if commit:
-            new_network.save()
-        return new_network
+    # def save(self, commit=True):
+    #     super().save()
+    #     data = self.cleaned_data
+    #     new_network = MiDesktopNetwork(
+    #         purpose=data['purpose'],
+    #         instance_name = data['purpose'],
+    #         access_internet=data['access_internet'],
+    #         subnet_mask=data['mask'],
+    #         ips_protection=data['protection'],
+    #         technical_contact=data['technical_contact'],
+    #         business_contact=data['business_contact'],
+    #         security_contact=data['security_contact'],
+    #         owner=self.owner,  # This field comes from the Meta class
+    #     )
+    #     if commit:
+    #         new_network.save()
+    #     return new_network
     
 class MiDesktopChangeNetworkForm(forms.ModelForm):
+    purpose = forms.CharField()
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
     subnet_mask = forms.ChoiceField(choices=MASK_CHOICES)
     ips_protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False)
