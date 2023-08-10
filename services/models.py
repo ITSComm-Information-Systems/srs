@@ -5,6 +5,7 @@ from django.utils import timezone
 from project.models import Choice
 from oscauth.models import LDAPGroup
 from django.contrib.auth.models import User
+from django.utils.functional import cached_property
 
 
 class Status(models.TextChoices):
@@ -159,19 +160,7 @@ class MiDesktop(models.Model):
     class Meta:
         abstract = True 
 
-# class MiDesktopInstantClonePool(MiDesktop):
-#     instance_label = 'Pool Name'
-#     shortcode = models.CharField(max_length=6)
-#     instance_name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
-#     pool_maximum = models.IntegerField()
-#     pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-#     image_id = models.IntegerField()
-#     shared_network = models.BooleanField(default=True)
-#     network_id = models.IntegerField(null=True)
-    
 
-#     class Meta:
-#         verbose_name = 'MiDesktop Instant Clone Pool'
 
 # class MiDesktopPersistentPool(MiDesktop):
 #     instance_label = 'Pool Name'
@@ -185,33 +174,57 @@ class MiDesktop(models.Model):
 #         verbose_name = 'MiDesktop Persistent Pool'
 
 
-# class MiDesktopImage(MiDesktop):
-#     instance_label = 'Image Name'
-#     instance_name = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
-#     cpu = models.CharField(max_length=4)
-#     cpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-#     memory = models.CharField(max_length=4)
-#     memory_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-#     #storage= ArrayField(models.CharField(max_length=8), null=False)
-#     storage_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-#     gpu = models.BooleanField(blank=True, null=True)
-#     gpu_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-#     total_image_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-#     pool_id = models.IntegerField()
-#     network_id = models.IntegerField()
+class MiDesktopImage(MiDesktop):
+    instance_label = 'Image Name'
+    instance_name = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
+    cpu = models.CharField(max_length=4)
+    memory = models.CharField(max_length=4)
+    gpu = models.BooleanField(blank=True, null=True)
+    total_image_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    pool_id = models.IntegerField()
+    network_id = models.IntegerField()
 
-#     class Meta:
-#         verbose_name = 'MiDesktop Image'
+    @cached_property
+    def total_storage_size(self):
+        storage = ImageDisk.objects.filter(server=self).aggregate(models.Sum('size'))
+        if storage:
+            sum = storage['size__sum']
+            if sum:
+                return storage['size__sum']
+
+        return 0
+
+    class Meta:
+        verbose_name = 'MiDesktop Image'
 
 class MiDesktopNetwork(MiDesktop):
     instance_label = 'Network Name'
-    purpose = models.CharField(blank=True, max_length=80)
-    access_internet = models.BooleanField(default=False, blank=True)
-    subnet_mask = models.CharField(blank=True, max_length=80)
-    ips_protection = models.BooleanField(default=False, blank=True)
-    technical_contact = models.CharField(blank=True, max_length=80)
-    business_contact = models.CharField(blank=True, max_length=80)
-    security_contact = models.CharField(blank=True, max_length=80)
+    name = models.CharField(blank=True, max_length=80)
+    size = models.CharField(blank=True, max_length=80)
 
     class Meta:
         verbose_name = 'MiDesktop Network'
+
+class ImageDisk(models.Model):
+    image = models.ForeignKey(MiDesktopImage, related_name='storage', on_delete=models.CASCADE)
+    name = models.CharField(max_length=10)
+    size = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+    
+class MiDesktopInstantClonePool(MiDesktop):
+    instance_label = 'Pool Name'
+    shortcode = models.CharField(max_length=6)
+    instance_name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
+    pool_quantity = models.IntegerField()
+    pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    image = models.ManyToManyField(MiDesktopImage)
+    shared_network = models.BooleanField(default=True)
+    network = models.ManyToManyField(MiDesktopNetwork, null=True)
+    
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'MiDesktop Instant Clone Pool'
