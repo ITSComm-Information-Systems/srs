@@ -499,12 +499,7 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
     
 class MiDesktopChangeNetworkForm(forms.ModelForm):
     name = forms.CharField()
-    access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
     size = forms.ChoiceField(choices=MASK_CHOICES)
-    ips_protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False)
-    technical_contact = forms.CharField()
-    business_contact = forms.CharField()
-    security_contact = forms.CharField()
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user')
