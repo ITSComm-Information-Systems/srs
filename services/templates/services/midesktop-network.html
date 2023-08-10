@@ -17,16 +17,16 @@
                 </h6>
             </div>
             {% endfor %}
+            {{ form.network_form.management_form }}
+                {% for form in form.network_formset.forms %}
+                    {% with template_name="services/network.html" %}
+                        {% include template_name with form=form %}
+                    {% endwith %}
+                {% endfor %}
         </div>
         <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
 
 
-{% endblock %}
-
-{% block js %}
-<script>
-
-</script>
 {% endblock %}

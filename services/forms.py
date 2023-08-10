@@ -1,10 +1,11 @@
 from django import forms
 from django.core import validators
 from project.forms.fields import *
-from .models import AWS, Azure, GCP, GCPAccount, Container, MiDesktopNetwork
+from .models import AWS, Azure, GCP, GCPAccount, Container, MiDesktopNetwork, ImageDisk
 from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from .midesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
+from django.forms import ModelForm, formset_factory
 
 
 # Defaults
@@ -329,8 +330,8 @@ class MiDesktopForm(forms.Form):
         return cleaned_data
 
 ACCESS_INTERNET_CHOICES = (('True','Yes, my desktop needs internet access (outside of U of M sites)'),('False','No, my desktop do not need internet access to any network outside of U of M'))
-MASK_CHOICES = [["/28", "/28 (16 addresses)"], ["/27", "/27 (32 addresses)"], ["/26", "/26 (64 addresses)"], 
-                    ["/25", "/25 (128 addresses)"], ["/24", "/24 (256 addresses)"]]
+MASK_CHOICES = [["16", "/28 (16 addresses)"], ["32", "/27 (32 addresses)"], ["64", "/26 (64 addresses)"], 
+                    ["128", "/25 (128 addresses)"], ["256", "/24 (256 addresses)"]]
 
 CPU_INITIAL = 1.15
 MEMORY_INITIAL = 0.96
@@ -362,7 +363,7 @@ class MiDesktopNewForm(MiDesktopForm):
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL)
     network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
     networks = forms.ChoiceField(label='Dedicated Network')
-    purpose = forms.CharField(required=False)
+    name = forms.CharField(required=False)
     access_internet = forms.ChoiceField(required=False,choices=ACCESS_INTERNET_CHOICES)
     mask = forms.ChoiceField(choices=MASK_CHOICES, required=False)
     protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, required=False)
@@ -381,10 +382,10 @@ class MiDesktopNewForm(MiDesktopForm):
 
         if self.user:
             groups = list(LDAPGroupMember.objects.filter(username=self.user).values_list('ldap_group_id',flat=True))
-            network_list = MiDesktopNetwork.objects.filter(status='A',owner__in=groups).order_by('purpose')
+            network_list = MiDesktopNetwork.objects.filter(status='A',owner__in=groups).order_by('name')
             choice_list = [(None, '---')]
             for network in network_list:
-                choice_list.append((network.purpose, network.purpose))
+                choice_list.append((network.name, network.name))
             choice_list.append(('-- New Dedicated Network',"-- New Dedicated Network"))
             choice_list.pop(0)
             self.fields['networks'].choices = choice_list
@@ -397,6 +398,18 @@ class MiDesktopNewForm(MiDesktopForm):
         elif pool_type == 'persistent':
             print('Persistent')
 
+class DiskForm(forms.ModelForm):
+    id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    name = forms.CharField()
+    name.widget.attrs.update({'class': 'form-control col-2', 'readonly': True})  
+
+    size = forms.IntegerField(initial=10)
+    size.widget.attrs.update({'class': 'form-control disk-size validate-integer', 'step': 10, 'min': '10'})  
+
+    class Meta:
+        model = ImageDisk
+        fields = ['id', 'name', 'size']
+
 class MiDesktopNewImageForm(MiDesktopForm):
     title = 'MiDesktop New Image Order Form'
     base_image_name = forms.CharField(required=False)
@@ -407,33 +420,40 @@ class MiDesktopNewImageForm(MiDesktopForm):
     memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
     memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL)
     storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
+    DiskFormSet = formset_factory(DiskForm, extra=0)
     storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL)
     gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL)
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL)
     network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
     networks = forms.ChoiceField(label='Dedicated Network')
-    purpose = forms.CharField(required=False)
+    name = forms.CharField(required=False)
     
     class Meta:
         fields=['admin_group']
 
     def __init__(self, *args, **kwargs):
         super(MiDesktopNewImageForm, self).__init__(*args, **kwargs)
+        
+        if self.is_bound:
+            instance_id = self.request.POST.get('instance_id')
+            self.disk_formset = self.DiskFormSet(self.request.POST, initial=ImageDisk.objects.filter(image_id=instance_id).order_by('name').values())
+            #x = self.disk_formset.is_valid()
+        else:
+            self.disk_formset = self.DiskFormSet(initial=[{'name': 'disk0', 'size': 50}])
 
-        if self.user:
-            groups = list(LDAPGroupMember.objects.filter(username=self.user).values_list('ldap_group_id',flat=True))
-            network_list = MiDesktopNetwork.objects.filter(status='A',owner__in=groups).order_by('purpose')
-            choice_list = [(None, '---')]
-            for network in network_list:
-                choice_list.append((network.purpose, network.purpose))
-            choice_list.append(('-- New Dedicated Network',"-- New Dedicated Network"))
-            choice_list.pop(0)
-            self.fields['networks'].choices = choice_list
+        # if self.user:
+        #     #groups = list(LDAPGroupMember.objects.filter(username=self.user).values_list('ldap_group_id',flat=True))
+        #     #network_list = MiDesktopNetwork.objects.filter(status='A',owner__in=groups).order_by('name')
+        #     choice_list = [(None, '---')]
+        #     #for network in network_list:
+        #         #choice_list.append((network.name, network.name))
+        #     choice_list.append(('-- New Dedicated Network',"-- New Dedicated Network"))
+        #     choice_list.pop(0)
+        #     self.fields['networks'].choices = choice_list
 
-class MiDesktopNewNetworkForm(MiDesktopForm):
-    title = 'MiDesktop New Network Order Form'
-    purpose = forms.CharField()
+class NetworkForm(forms.Form):
+    name = forms.CharField()
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
     mask = forms.ChoiceField(choices=MASK_CHOICES)
     protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False)
@@ -441,32 +461,46 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
     business_contact = forms.CharField()
     security_contact = forms.CharField()
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
+        kwargs.pop('user', None)
+
+        super(NetworkForm, self).__init__(*args, **kwargs)
+
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+
+NetworkFormSet = formset_factory(NetworkForm, extra=1)
+class MiDesktopNewNetworkForm(MiDesktopForm):
+    title = 'MiDesktop New Network Order Form'
+    network_formset = NetworkFormSet(prefix="network")
+
 
     class Meta:
         fields=['admin_group']
 
-    # def save(self, commit=True):
-    #     super().save()
-    #     data = self.cleaned_data
-    #     new_network = MiDesktopNetwork(
-    #         purpose=data['purpose'],
-    #         instance_name = data['purpose'],
-    #         access_internet=data['access_internet'],
-    #         subnet_mask=data['mask'],
-    #         ips_protection=data['protection'],
-    #         technical_contact=data['technical_contact'],
-    #         business_contact=data['business_contact'],
-    #         security_contact=data['security_contact'],
-    #         owner=self.owner,  # This field comes from the Meta class
-    #     )
-    #     if commit:
-    #         new_network.save()
-    #     return new_network
+    def save(self, commit=True):
+        super().save()
+        data = self.cleaned_data
+        print(self.data['network-0-name'])
+        new_network = MiDesktopNetwork(
+            name=self.data['network-0-name'],
+            instance_name = self.data['network-0-name'],
+            size = self.data['network-0-mask'],
+            owner=self.owner,  # This field comes from the Meta class
+        )
+        if commit:
+            new_network.save()
+        return new_network
     
 class MiDesktopChangeNetworkForm(forms.ModelForm):
-    purpose = forms.CharField()
+    name = forms.CharField()
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
-    subnet_mask = forms.ChoiceField(choices=MASK_CHOICES)
+    size = forms.ChoiceField(choices=MASK_CHOICES)
     ips_protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False)
     technical_contact = forms.CharField()
     business_contact = forms.CharField()
@@ -486,4 +520,5 @@ class MiDesktopChangeNetworkForm(forms.ModelForm):
 
     class Meta:
         model = MiDesktopNetwork
-        fields = ['purpose','access_internet','subnet_mask','ips_protection','technical_contact','business_contact','security_contact']
+        fields = ['name','size']
+
