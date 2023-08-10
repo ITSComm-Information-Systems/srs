@@ -866,6 +866,103 @@ class ServerSupportForm(TabForm):
         if kwargs['request'].POST.get('backup') == 'False':
             self.fields.pop('backup_time')
             
+    def clean_reboot_time(self):
+        patch_time_map = {
+            '38':1,
+            '39':3,
+            '40':5,
+            '41':7,
+            '49':11
+        }
+
+        patch_day_map = {
+            '96': 'THURSDAY',
+            '97': 'FRIDAY',
+            '98': 'SATURDAY',
+            '99': 'SUNDAY'
+        }
+
+        reboot_time_map = {
+            '51':0,
+            '52':0.5,
+            '53':1,
+            '54':1.5,
+            '55':2,
+            '56':2.5,
+            '57':3,
+            '58':3.5,
+            '59':4,
+            '60':4.5,
+            '61':5,
+            '62':5.5,
+            '63':6,
+            '64':6.5,
+        }
+
+        reboot_day_map = {
+            '101': 'NONE',
+            '102': 'DAILY',
+            '103': 'SUNDAY',
+            '104': 'MONDAY',
+            '105': 'TUESDAY',
+            '106': 'WEDNESDAY',
+            '107': 'THURSDAY',
+            '108': 'FRIDAY',
+            '109': 'SATURDAY'
+        }
+
+        error = False
+
+        reboot_day = self.cleaned_data.get('reboot_day')
+        reboot_time = self.cleaned_data.get('reboot_time')
+        patch_day = self.cleaned_data.get('patch_day')
+        patch_time = self.cleaned_data.get('patch_time')
+
+        # if patch_time == '49':
+        #     if reboot_time == '51' or reboot_time == '52' or reboot_time == '53':
+        #         if patch_day == '96' and reboot_day == '108':
+        #             error = True
+        #         if patch_day == '97' and reboot_day == '109':
+        #             error = True
+        #         if patch_day == '98' and reboot_day == '103':
+        #             error = True
+        #         if patch_day == '99' and reboot_day == '104':
+        #             error = True
+
+        #This checks that a reboot isnt scheduled early morning the following day if patch time is at 11pm
+        # Check if patch_time is '49'(11pm) and reboot_time is one of '51', '52', or '53'(12:00am, 12:30am, 1:00am the following day)
+        if patch_time == '49' and reboot_time in ['51', '52', '53']:
+            # Check if the combination of patch_day and reboot_day matches any of the specified tuples
+            if (patch_day, reboot_day) in [('96', '108'), ('97', '109'), ('98', '103'), ('99', '104')]:
+                # Set the error flag to True if the conditions are met
+                error = True
+
+
+        # Check if the corresponding values exist in both the reboot_day_map and patch_day_map
+        if reboot_day_map.get(reboot_day) and patch_day_map.get(patch_day):
+            # Check if the values for reboot_day and patch_day match
+            if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
+                # Check if patch_time is one of the specified values
+                if patch_time == 38 or 39 or 40 or 41:
+                    # Calculate the time difference between patch_time and reboot_time
+                    time_difference = patch_time_map[patch_time] - reboot_time_map[reboot_time]
+                    # Check if the time difference is within the desired range
+                    if -2 <= time_difference <= 0:
+                        # Set the error flag to True if all conditions are satisfied
+                        error = True
+
+
+        # if reboot_day_map[reboot_day] and patch_day_map[patch_day]:
+        #     if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
+        #         if patch_time == 38 or 39 or 40 or 41:
+        #             if patch_time_map[patch_time] - reboot_time_map[reboot_time] >= -2 and patch_time_map[patch_time] - reboot_time_map[reboot_time] <= 0:
+        #                 error = True
+
+        if error:
+            raise ValidationError("Reboot time cannot be within 2 hours of patch time.")
+        super().clean()
+
+
 
 class ServerDataForm(TabForm):
     template = 'order/server_data.html'
