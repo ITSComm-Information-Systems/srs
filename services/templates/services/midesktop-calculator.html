@@ -1,0 +1,42 @@
+{% for field in form.visible_fields %}
+{% if field.auto_id == 'id_calculator-0-cpu' %}
+    <div class="form-group" id="wrapper_calculator">
+        <div id="wrapper_id_calculator-0-cpu">
+            <div class="row">
+                <div class="col"><h6>CPU</label>{{ field }}</h6></div>
+{% elif field.auto_id == 'id_calculator-0-cpu_cost' %}
+                <div class="col"><h6>CPU Total</label>{{ field }}</h6></div>
+            </div>
+        </div>
+{% elif field.auto_id == 'id_calculator-0-memory' %}
+        <div id="wrapper_id_calculator-0-memory">
+            <div class="row">
+                <div class="col"><h6>Memory</label>{{ field }}</h6></div>
+{% elif field.auto_id == 'id_calculator-0-memory_cost' %}
+                <div class="col"><h6>RAM Total</label>{{ field }}</h6></div>
+            </div>
+        </div>
+{% elif field.auto_id == 'id_calculator-0-storage' %}
+        <div id="wrapper_id_calculator-0-storage">
+            <div class="row">
+                <div class="col"><h6>Disk Space</label>{{ field }}</h6></div>
+{% elif field.auto_id == 'id_calculator-0-storage_cost' %}
+                <div class="col"><h6>Disk Space Total</label>{{ field }}</h6></div>
+            </div>
+        </div>
+{% elif field.auto_id == 'id_calculator-0-gpu' %}
+        <div id="wrapper_id_calculator-0-gpu">
+            <div class="row">
+                <div class="col"><h6>GPU (optional)</label>{{ field }}</h6></div>
+{% elif field.auto_id == 'id_calculator-0-gpu_cost' %}
+                <div class="col"><h6>GPU Total</label>{{ field }}</h6></div>
+            </div>
+        </div>
+{% elif field.auto_id == 'id_calculator-0-total' %}
+        <label for="id_calculator-0-total"><h6>Base Image Total</h6></label>
+            {{ field }}
+        </div>
+{% else %}
+        {{field}}
+{% endif %}
+{% endfor %}

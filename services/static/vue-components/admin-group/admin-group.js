@@ -11,12 +11,13 @@ const admin_group = new Vue({
         selectedGroup: function (newVal) {
             // Emit the custom event when the selected group changes using the global event bus
             eventBus.$emit('group-selected', newVal);
+            console.log(newVal);
         }
     },
 
     methods: {
         handleGroupChange() {
-            this.selectedGroup = parseInt(this.selectedGroup); // Ensure selectedGroup is an integer
+            this.selectedGroup = this.selectedGroup;
         }
     }
 });
