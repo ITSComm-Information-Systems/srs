@@ -43,6 +43,13 @@ class ServiceRequestView(UserPassesTestMixin, View):
                 return HttpResponseRedirect('/requestsent')
             else:
                 print(form.errors)
+        elif service == 'midesktop-image':
+            form = MiDesktopNewImageForm(request.POST, user=self.request.user)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/requestsent')
+            else:
+                print(form.errors)
         else:
             model = getattr(Service, service)
             form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)

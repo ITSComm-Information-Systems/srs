@@ -1,7 +1,7 @@
 from django import forms
 from django.core import validators
 from project.forms.fields import *
-from .models import AWS, Azure, GCP, GCPAccount, Container, MiDesktopNetwork, ImageDisk
+from .models import AWS, Azure, GCP, GCPAccount, Container, MiDesktopNetwork, ImageDisk, MiDesktopImage
 from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from .midesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
@@ -410,47 +410,51 @@ class DiskForm(forms.ModelForm):
         model = ImageDisk
         fields = ['id', 'name', 'size']
 
-class MiDesktopNewImageForm(MiDesktopForm):
-    title = 'MiDesktop New Image Order Form'
-    base_image_name = forms.CharField(required=False)
-    initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
-    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),))
+class CalculatorForm(forms.Form):
     cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
-    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL)
+    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
-    memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL)
+    memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
-    DiskFormSet = formset_factory(DiskForm, extra=0)
-    storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL)
+    storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
-    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL)
-    total = forms.DecimalField(required=False,initial=TOTAL_INITIAL)
-    network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
-    networks = forms.ChoiceField(label='Dedicated Network')
-    name = forms.CharField(required=False)
-    
-    class Meta:
-        fields=['admin_group']
+    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
 
     def __init__(self, *args, **kwargs):
-        super(MiDesktopNewImageForm, self).__init__(*args, **kwargs)
-        
-        if self.is_bound:
-            instance_id = self.request.POST.get('instance_id')
-            self.disk_formset = self.DiskFormSet(self.request.POST, initial=ImageDisk.objects.filter(image_id=instance_id).order_by('name').values())
-            #x = self.disk_formset.is_valid()
-        else:
-            self.disk_formset = self.DiskFormSet(initial=[{'name': 'disk0', 'size': 50}])
+        self.user = kwargs.get('user')
+        kwargs.pop('user', None)
 
-        # if self.user:
-        #     #groups = list(LDAPGroupMember.objects.filter(username=self.user).values_list('ldap_group_id',flat=True))
-        #     #network_list = MiDesktopNetwork.objects.filter(status='A',owner__in=groups).order_by('name')
-        #     choice_list = [(None, '---')]
-        #     #for network in network_list:
-        #         #choice_list.append((network.name, network.name))
-        #     choice_list.append(('-- New Dedicated Network',"-- New Dedicated Network"))
-        #     choice_list.pop(0)
-        #     self.fields['networks'].choices = choice_list
+        super(CalculatorForm, self).__init__(*args, **kwargs)
+
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+
+CalculatorFormSet = formset_factory(CalculatorForm, extra=1)
+
+class ImageForm(forms.Form):
+    name = forms.CharField(required=False)
+    initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
+    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),))
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
+        kwargs.pop('user', None)
+
+        super(ImageForm, self).__init__(*args, **kwargs)
+
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+
+ImageFormSet = formset_factory(ImageForm, extra=1)
 
 class NetworkForm(forms.Form):
     name = forms.CharField()
@@ -475,6 +479,56 @@ class NetworkForm(forms.Form):
                 print('no widget for', field)
 
 NetworkFormSet = formset_factory(NetworkForm, extra=1)
+
+class MiDesktopNewImageForm(MiDesktopForm):
+    image_formset = ImageFormSet(prefix="image")
+    calculator_formset = CalculatorFormSet(prefix="calculator")
+    network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
+    network_formset = NetworkFormSet(prefix="network")
+    networks = forms.ChoiceField(label='Dedicated Network', required=False)
+    title='lorem'
+    
+    class Meta:
+        fields=['admin_group']
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+    def save(self, commit=True):
+        instance = super().save()
+        network_type = self.data['network_type']
+        network_name = self.data['network-0-name']
+
+        print(network_type)
+        print(len(network_name))
+
+        if(network_type == 'dedicated' and len(network_name) == 0):
+
+            # new_network = MiDesktopNetwork(
+            #     name=network_name,
+            #     instance_name = network_name,
+            #     size = self.data['network-0-mask'],
+            #     owner=self.owner,  # This field comes from the Meta class
+            # )
+
+            new_image = MiDesktopImage(
+                instance_name = self.data['image-0-name'],
+                cpu = self.data['calculator-0-cpu'],
+                memory = self.data['calculator-0-memory'],
+                gpu = self.data['calculator-0-gpu'],
+                total_image_cost = self.data['calculator-0-total'],
+                pool_id=None,
+                network_id=self.data['network']
+            )
+
+            new_image.storage.set(None)
+
+        if commit:
+            new_image.save()
+        
+        return new_image
+
+
 class MiDesktopNewNetworkForm(MiDesktopForm):
     title = 'MiDesktop New Network Order Form'
     network_formset = NetworkFormSet(prefix="network")
@@ -485,8 +539,6 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
 
     def save(self, commit=True):
         super().save()
-        data = self.cleaned_data
-        print(self.data['network-0-name'])
         new_network = MiDesktopNetwork(
             name=self.data['network-0-name'],
             instance_name = self.data['network-0-name'],

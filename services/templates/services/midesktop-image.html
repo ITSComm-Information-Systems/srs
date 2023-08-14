@@ -5,6 +5,11 @@
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
 <script type='text/javascript'>
     var groups = {{ groups_json|safe }};
+    var network_choice_list = [
+        {'key': 'private', 'label':'Shared Network (Private)'},
+        {'key': 'web-access', 'label':'Shared Network (Web-Access)'},
+        {'key': 'dedicated', 'label':'Dedicated Network'},
+    ]
     var networklist = {{ network_json|safe }};
     var eventBus = new Vue();
 </script>
@@ -18,213 +23,245 @@
 
         <div id="div_formbody">
             {% for field in form %}
-            {% if field.auto_id == 'id_admin_group' %}
+                {% if field.auto_id == 'id_admin_group' %}
                 <div id="group">
                     <h6>McCommunity Admin Group:
-                    <select class="form-control" name="admin_group" id="id_admin_group" v-model="selectedGroup" @change="handleGroupChange">
-                        <option v-for="group in groups" :value="group.id" :key="group.id">[[group.name]] </option>
-                    </select></h6>
+                        <select class="form-control" name="admin_group" id="id_admin_group" v-model="selectedGroup" @change="handleGroupChange">
+                            <option v-for="group in groups" :value="group.name" :key="group.id">[[group.name]]</option>
+                        </select>
+                    </h6>
                 </div>
-            {% elif field.auto_id == 'id_networks' %}
-                <div id="network" v-show="visible">
-                    <h6>Networks:
-                    <select class="form-control" name="network" id="id_network" v-model="selectedNetwork" width="350px">
-                        <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
-                    </select></h6>
-                </div>
-            {% elif field.auto_id == 'id_cpu' %}
-                    <div class="form-group" id="wrapper_calculator">
-                        <div id="wrapper_id_cpu">
-                            <div class="row">
-                                <div class="col"><h6>CPU</label>{{ field }}</h6></div>
-            {% elif field.auto_id == 'id_cpu_cost' %}
-                            <div class="col"><h6>CPU Total</label>{{ field }}</h6></div>
-                        </div>
+                    {{ form.image_form.management_form }}
+                        {% for form in form.image_formset.forms %}
+                            {% with template_name="services/image.html" %}
+                                {% include template_name with form=form %}
+                            {% endwith %}
+                        {% endfor %}
+
+                    {{ form.calculator_form.management_form }}
+                        {% for form in form.calculator_formset.forms %}
+                            {% with template_name="services/midesktop-calculator.html" %}
+                                {% include template_name with form=form %}
+                            {% endwith %}
+                        {% endfor %}
+                {% elif field.auto_id == 'id_network_type' %}
+
+                    <div id="network_type">
+                        <h6>Will you be using a shared network or a dedicated network?
+                            <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
+                                <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
+                            </select>
+                        </h6>
                     </div>
-            {% elif field.auto_id == 'id_memory' %}
-                <div id="wrapper_id_memory">
+                    
+                {% elif field.auto_id == 'id_networks' %}
+                    <div id="network" v-show="visible">
+                        <h6>Networks:
+                            <select class="form-control" name="network" id="id_network" v-model="selectedNetwork">
+                                <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
+                            </select>
+                        </h6>
+                    </div>
+                {% else %}
                     <div class="row">
-                        <div class="col"><h6>Memory</label>{{ field }}</h6></div>
-            {% elif field.auto_id == 'id_memory_cost' %}
-                    <div class="col"><h6>RAM Total</label>{{ field }}</h6></div>
-                    </div>
-                </div>
-            {% elif field.auto_id == 'id_storage' %}
-                <div id="wrapper_id_storage">
-                    <div class="row">
-                        <div class="col"><h6>Disk Space</label>{{ field }}</h6></div>
-            {% elif field.auto_id == 'id_storage_cost' %}
-                    <div class="col"><h6>Disk Space Total</label>{{ field }}</h6></div>
-                    </div>
-                    </div>
-            {% elif field.auto_id == 'id_gpu' %}
-                <div id="wrapper_id_gpu">
-                    <div class="row">
-                        <div class="col"><h6>GPU (optional)</label>{{ field }}</h6></div>
-            {% elif field.auto_id == 'id_gpu_cost' %}
-                    <div class="col"><h6>GPU Total</label>{{ field }}</h6></div>
-                    </div>
-                </div>
-            {% elif field.auto_id == 'id_total' %}
-                    <label for="id_total"><h6>Base Image Total</h6></label>
-                    {{ field }}
-                    </div>
-            {% else %}
-            <div class="form-group" id="wrapper_{{ field.auto_id }}">
-                <h6>{% if field.field.required %}<span style="color:red; font-size:12px;">* </span>{% endif %}
-                <label for="{{ field.label }}">{{ field.label_tag }}</label>
-                {{ field }}
-                </h6>
-            </div>
-            {% endif %}
+                        <div class="col"><h6>{{ field.label_tag }}</label>{{ field }}</h6></div></div>
+                {% endif %}
             {% endfor %}
+
+
+            <div id="networks-wrapper" v-show="visible">
+            {{ form.network_form.management_form }}
+                {% for form in form.network_formset.forms %}
+                    {% with template_name="services/network.html" %}
+                        {% include template_name with form=form %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            
         </div>
         <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
     </form>
-
 </div>
+
+
 <script src="/static/vue-components/admin-group/admin-group.js"></script>
 <script src="/static/vue-components/midesktop-networks/midesktop-networks.js"></script>
+<script src="/static/vue-components/networks-wrapper/networks-wrapper.js"></script>
+<script>
+const midesktop_network_type = new Vue({
+    el: '#network_type',
+    delimiters: ['[[', ']]'],
+    data: {
+        selectedNetworkType: null,
+    },
+    mounted() {
+        console.log('mount')
+        // Listen for the custom event emitted by the global event bus
+    },
+    // methods: {
+    //     handleGroupChange(selectedGroup) {
+    //         // Update the selectedGroup value when the group selection changes
+    //         this.selectedGroup = selectedGroup;
+    //         this.updateFilteredNetworks();
+    //     },
+    //     updateFilteredNetworks() {
+    //         if (!this.selectedGroup) {
+    //             // If no group is selected, show all networks
+    //             this.filteredNetworks = [];
+    //         } else {
+    //             // Filter networks based on the selected group's id
+    //             this.filteredNetworks = networklist.filter(network => network.owner === this.selectedGroup);
+    //         }
+    //     },
+    // },
+    watch: {
+        selectedNetworkType: function (newVal) {
+            eventBus.$emit('network-type-selected', newVal);
+        }
+        
+    },
+});
+</script>
 
 {% endblock %}
 
 {% block js %}
 <script>
-    const cpu_cost = document.getElementById("id_cpu_cost");
-    const memory_cost = document.getElementById("id_memory_cost");
-    const storage_cost = document.getElementById("id_storage_cost");
-    const gpu_cost = document.getElementById("id_gpu_cost");
-    const total_cost = document.getElementById("{{ form.total.id_for_label }}");
-    const network_type = document.getElementById("{{ form.network_type.id_for_label }}");
-    const networks = document.getElementById("id_networks");
+    // const cpu_cost = document.getElementById("id_cpu_cost");
+    // const memory_cost = document.getElementById("id_memory_cost");
+    // const storage_cost = document.getElementById("id_storage_cost");
+    // const gpu_cost = document.getElementById("id_gpu_cost");
+    // const total_cost = document.getElementById("{{ form.total.id_for_label }}");
+    // const network_type = document.getElementById("{{ form.network_type.id_for_label }}");
+    // const networks = document.getElementById("id_networks");
 
-    const cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}");
-    const memory_choice = document.getElementById("{{ form.memory.id_for_label }}");
-    const storage_choice = document.getElementById("{{ form.storage.id_for_label }}");
-    const gpu_choice = document.getElementById("{{ form.gpu.id_for_label }}");
+    // const cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}");
+    // const memory_choice = document.getElementById("{{ form.memory.id_for_label }}");
+    // const storage_choice = document.getElementById("{{ form.storage.id_for_label }}");
+    // const gpu_choice = document.getElementById("{{ form.gpu.id_for_label }}");
 
-    const network_type_wrapper = document.getElementById("wrapper_id_network_type")
-    const name_wrapper = document.getElementById("wrapper_id_name");
-    const networks_wrapper = document.getElementById("wrapper_id_networks");
+    // const network_type_wrapper = document.getElementById("wrapper_id_network_type")
+    // const name_wrapper = document.getElementById("wrapper_id_name");
+    // const networks_wrapper = document.getElementById("wrapper_id_networks");
 
 
-    window.addEventListener("load", (event) => {page_load()})
+    // window.addEventListener("load", (event) => {page_load()})
     
-    function page_load(){
-        read_only_initial_elements()
-        //hide_initial_elements()
-    }
+    // function page_load(){
+    //     read_only_initial_elements()
+    //     //hide_initial_elements()
+    // }
 
-    function hide_initial_elements(){
-        hide_new_network_fields()
-        hide_elements([networks_wrapper])
-    }
+    // function hide_initial_elements(){
+    //     hide_new_network_fields()
+    //     hide_elements([networks_wrapper])
+    // }
 
-    network_type.addEventListener("change", () => {
-        handle_network_type_change()
-    })
-
-    // networks.addEventListener("change", () => {
-    //     handle_networks_change()
+    // network_type.addEventListener("change", () => {
+    //     handle_network_type_change()
     // })
 
-    function hide_new_network_fields(){
-        wrappers = [name_wrapper
-        ]
+    // // networks.addEventListener("change", () => {
+    // //     handle_networks_change()
+    // // })
 
-        hide_elements(wrappers)
-    }
+    // function hide_new_network_fields(){
+    //     wrappers = [name_wrapper
+    //     ]
 
-    function hide_elements(elements){
-        for (element in elements){
-            elements[element].setAttribute('hidden', "hidden");
-        }
-    }
+    //     hide_elements(wrappers)
+    // }
 
-    function handle_network_type_change(){
-        if (network_type.value == "dedicated"){
-            show_elements([networks_wrapper])
-            handle_networks_change()
-        } else {
-            hide_new_network_fields()
-            hide_elements([networks_wrapper])
-        }
-    }
+    // function hide_elements(elements){
+    //     for (element in elements){
+    //         elements[element].setAttribute('hidden', "hidden");
+    //     }
+    // }
 
-    function handle_networks_change(){
-        if(networks.value == "-- New Dedicated Network"){
-            show_new_network_fields()
-        } else{
-            hide_new_network_fields()
-        }
-    }
+    // function handle_network_type_change(){
+    //     if (network_type.value == "dedicated"){
+    //         show_elements([networks_wrapper])
+    //         handle_networks_change()
+    //     } else {
+    //         hide_new_network_fields()
+    //         hide_elements([networks_wrapper])
+    //     }
+    // }
 
-    function show_new_network_fields(){
-        wrappers = [name_wrapper,networks_wrapper
-        ]
+    // function handle_networks_change(){
+    //     if(networks.value == "-- New Dedicated Network"){
+    //         show_new_network_fields()
+    //     } else{
+    //         hide_new_network_fields()
+    //     }
+    // }
 
-        show_elements(wrappers)
-    }
+    // function show_new_network_fields(){
+    //     wrappers = [name_wrapper,networks_wrapper
+    //     ]
 
-    function hide_new_network_fields(){
-        wrappers = [name_wrapper
-        ]
+    //     show_elements(wrappers)
+    // }
 
-        hide_elements(wrappers)
-    }
+    // function hide_new_network_fields(){
+    //     wrappers = [name_wrapper
+    //     ]
 
-    cpu_choice.addEventListener("change", () => {
-        cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
-        calculateBaseImageCost()
-    })
+    //     hide_elements(wrappers)
+    // }
 
-    memory_choice.addEventListener("change", () => {
-        memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
-        calculateBaseImageCost()
-    })
+    // cpu_choice.addEventListener("change", () => {
+    //     cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
+    //     calculateBaseImageCost()
+    // })
 
-    storage_choice.addEventListener("change", () => {
-        storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
-        calculateBaseImageCost()
-    })
+    // memory_choice.addEventListener("change", () => {
+    //     memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
+    //     calculateBaseImageCost()
+    // })
 
-    gpu_choice.addEventListener("change", () => {
-        gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
-        calculateBaseImageCost()
-    })
+    // storage_choice.addEventListener("change", () => {
+    //     storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
+    //     calculateBaseImageCost()
+    // })
+
+    // gpu_choice.addEventListener("change", () => {
+    //     gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+    //     calculateBaseImageCost()
+    // })
 
 
-    function calculateBaseImageCost(){
-        base_cost = 31.31
-        cost = base_cost + parseFloat(cpu_cost.value) + parseFloat(memory_cost.value) + parseFloat(storage_cost.value) + parseFloat(gpu_cost.value)
-        total_cost.value = cost.toFixed(2)
-    }
+    // function calculateBaseImageCost(){
+    //     base_cost = 31.31
+    //     cost = base_cost + parseFloat(cpu_cost.value) + parseFloat(memory_cost.value) + parseFloat(storage_cost.value) + parseFloat(gpu_cost.value)
+    //     total_cost.value = cost.toFixed(2)
+    // }
     
-    function read_only_initial_elements(){
-        elements = [cpu_cost,memory_cost,storage_cost,gpu_cost,total_cost]
-        read_only_elements(elements)
+    // function read_only_initial_elements(){
+    //     elements = [cpu_cost,memory_cost,storage_cost,gpu_cost,total_cost]
+    //     read_only_elements(elements)
 
-    }
+    // }
 
-    function hide_elements(elements){
-        for (element in elements){
-            elements[element].setAttribute('hidden', "hidden");
-        }
-    }
-
-
-    function show_elements(elements){
-        for (element in elements){
-            elements[element].removeAttribute('hidden', "hidden");
-        }
-    }
+    // function hide_elements(elements){
+    //     for (element in elements){
+    //         elements[element].setAttribute('hidden', "hidden");
+    //     }
+    // }
 
 
+    // function show_elements(elements){
+    //     for (element in elements){
+    //         elements[element].removeAttribute('hidden', "hidden");
+    //     }
+    // }
 
-    function read_only_elements(elements){
-        for (element in elements){
-            elements[element].setAttribute('readonly',"readonly");
-        }
-    }
+
+
+    // function read_only_elements(elements){
+    //     for (element in elements){
+    //         elements[element].setAttribute('readonly',"readonly");
+    //     }
+    // }
 </script>
 {% endblock %}
