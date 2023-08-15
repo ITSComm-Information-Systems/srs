@@ -29,7 +29,7 @@ class Command(BaseCommand):
 
         csvfile = io.StringIO()
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(['id','cpu','created_date','os_id','os_code','managed','ad_group','shortcode','size','name','rate_name','total_cost','owner'])
+        csvwriter.writerow(['product','unit_type','quantity','total'])
 
         URL = 'https://admin.github.umich.edu/api/v1/billing/srs'
         DEV_URL = 'https://admin.beta.github.umich.edu/api/v1/billing/srs'
@@ -64,7 +64,8 @@ class Command(BaseCommand):
                 total_cost = total_cost + decimal.Decimal(rec.total_amount)
                 x+=1
 
-                csvwriter.writerow(rec.__dict__)
+                csvwriter.writerow(line.values())
+
 
         print(datetime.now(), f'{x} Records Uploaded, Total Cost: {total_cost}')
 
