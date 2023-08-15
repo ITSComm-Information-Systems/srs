@@ -293,7 +293,7 @@ class ContainerNewForm(CloudForm):
     def save(self):
         # Create project in openshift, don't save to SRS.
         os = Openshift()
-        os.create_project(self.instance, self.user.username)
+        os.create_project(self.instaance, self.user.username)
 
 class MiDesktopForm(forms.Form):
     admin_group = forms.ChoiceField(label='MCommunity Admin Group')
@@ -491,9 +491,9 @@ class MiDesktopNewImageForm(MiDesktopForm):
     image_formset = ImageFormSet(prefix="image")
     calculator_formset = CalculatorFormSet(prefix="calculator")
     network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
-    network_formset = NetworkFormSet(prefix="network")
+    network_form = NetworkForm(prefix="network")
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
-    title='lorem'
+    title = 'MiDesktop New Image Order Form'
     
     class Meta:
         fields=['admin_group']
@@ -504,12 +504,13 @@ class MiDesktopNewImageForm(MiDesktopForm):
     def save(self, commit=True):
         instance = super().save()
         network_type = self.data['network_type']
-        network_name = self.data['network-0-name']
+        network_name = self.data['network-name']
 
         print(network_type)
         print(len(network_name))
 
         if(network_type == 'dedicated' and len(network_name) == 0):
+            print('do it')
 
             # new_network = MiDesktopNetwork(
             #     name=network_name,
@@ -518,39 +519,43 @@ class MiDesktopNewImageForm(MiDesktopForm):
             #     owner=self.owner,  # This field comes from the Meta class
             # )
 
-            new_image = MiDesktopImage(
-                instance_name = self.data['image-0-name'],
-                cpu = self.data['calculator-0-cpu'],
-                memory = self.data['calculator-0-memory'],
-                gpu = self.data['calculator-0-gpu'],
-                total_image_cost = self.data['calculator-0-total'],
-                pool_id=None,
-                network_id=self.data['network']
-            )
+            # new_image = MiDesktopImage(
+            #     instance_name = self.data['image-0-name'],
+            #     cpu = self.data['calculator-0-cpu'],
+            #     memory = self.data['calculator-0-memory'],
+            #     gpu = self.data['calculator-0-gpu'],
+            #     total_image_cost = self.data['calculator-0-total'],
+            #     pool_id=None,
+            #     network_id=self.data['network']
+            # )
 
-            new_image.storage.set(None)
+            # new_image.storage.set(None)
 
-        if commit:
-            new_image.save()
+            # if commit:
+            #     new_image.save()
         
-        return new_image
+            # return new_image
 
 
 class MiDesktopNewNetworkForm(MiDesktopForm):
     title = 'MiDesktop New Network Order Form'
-    network_formset = NetworkFormSet(prefix="network")
-
-
+    network_form = NetworkForm(prefix="network")
+    
     class Meta:
-        fields=['admin_group']
+        fields = ['admin_group']
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        return cleaned_data
 
     def save(self, commit=True):
         super().save()
         new_network = MiDesktopNetwork(
-            name=self.data['network-0-name'],
-            instance_name = self.data['network-0-name'],
-            size = self.data['network-0-mask'],
-            owner=self.owner,  # This field comes from the Meta class
+            name=self.data['network-name'],
+            instance_name=self.data['network-name'],
+            size=self.data['network-mask'],
+            owner=self.owner,
         )
         if commit:
             new_network.save()
