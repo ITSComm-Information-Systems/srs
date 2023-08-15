@@ -224,6 +224,7 @@ class Pool(MiDesktop):
     shared_network = models.BooleanField(default=True)
     network = models.ManyToManyField(Network)
 
+    @cached_property
     def total_cost(self):
         total_cost = 0
         for image in self.images:
