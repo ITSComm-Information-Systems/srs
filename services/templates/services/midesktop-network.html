@@ -11,15 +11,12 @@
             <h6>
                 {{ form.admin_group.label_tag }} {{ form.admin_group }}
                 {{ form.admin_group.errors }}
+                </h6>
                 
                 <!-- Network Form Fields -->
-                {% for field in form.network_form %}
-                    {{ field.label_tag }}{{ field }}
-                    {{ field.errors }}
+                {{ form.network_form }}
                     
-                    
-                {% endfor %}
-    </h6>
+   
         </div>
         <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
     </form>
