@@ -298,11 +298,12 @@ class MiDesktopForm(forms.Form):
         super(MiDesktopForm, self).__init__(*args, **kwargs)
 
         for field in self.fields:
-            if hasattr(self.fields[field], 'widget'):
-                if not self.fields[field].widget.attrs.get('class',None):
-                    self.fields[field].widget.attrs.update({'class': 'form-control'})
-            else:
-                print('no widget for', field)
+            if field != 'sla':
+                if hasattr(self.fields[field], 'widget'):
+                    if not self.fields[field].widget.attrs.get('class',None):
+                        self.fields[field].widget.attrs.update({'class': 'form-control'})
+                else:
+                    print('no widget for', field)
 
         if self.user:
             group_list = MCommunity().get_groups(self.user.username)
@@ -340,6 +341,76 @@ GPU_INITIAL = 0.00
 BASE_COST = 31.31
 TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
 
+class CalculatorForm(forms.Form):
+    cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
+    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
+    memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
+    storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
+    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+
+    template_name = 'services/midesktop-calculator.html'
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
+        kwargs.pop('user', None)
+
+        super(CalculatorForm, self).__init__(*args, **kwargs)
+
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+
+class NetworkForm(forms.Form):
+    name = forms.CharField(required=False)
+    access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
+    mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False,required=False)
+    technical_contact = forms.CharField(required=False)
+    business_contact = forms.CharField(required=False)
+    security_contact = forms.CharField(required=False)
+
+    template_name = 'services/network.html'
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
+        kwargs.pop('user', None)
+
+        super(NetworkForm, self).__init__(*args, **kwargs)
+
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+
+class ImageForm(forms.Form):
+    name = forms.CharField(required=False)
+    initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
+    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),))
+
+    template_name = 'services/image.html'
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
+        kwargs.pop('user', None)
+
+        super(ImageForm, self).__init__(*args, **kwargs)
+
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+
 class MiDesktopNewForm(MiDesktopForm):
     title = 'MiDesktop New Order Form'
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
@@ -349,33 +420,17 @@ class MiDesktopNewForm(MiDesktopForm):
     ad_container = forms.CharField(required=False,)
     ad_groups = forms.CharField(required=False,)
     base_image = forms.ChoiceField(label='Base Image', choices = (("1","New Image"),("2","List of Images")))
-    base_image_name = forms.CharField(required=False)
-    initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
-    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),))
-    cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
-    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL)
-    memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
-    memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL)
-    storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
-    storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL)
-    gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
-    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL)
-    total = forms.DecimalField(required=False,initial=TOTAL_INITIAL)
+    image_form = ImageForm(prefix="image")
+    calculator_form = CalculatorForm(prefix="calculator")
     network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
-    networks = forms.ChoiceField(label='Dedicated Network')
-    name = forms.CharField(required=False)
-    access_internet = forms.ChoiceField(required=False,choices=ACCESS_INTERNET_CHOICES)
-    mask = forms.ChoiceField(choices=MASK_CHOICES, required=False)
-    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, required=False)
-    technical_contact = forms.CharField(required=False)
-    billing_contact = forms.CharField(required=False)
-    security_contact = forms.CharField(required=False)
-    additional_details = forms.CharField(required=False)
+    network_form = NetworkForm(prefix="network")
+    networks = forms.ChoiceField(label='Dedicated Network', required=False)
+    
     sla = forms.BooleanField(required=False)
 
 
     class Meta:
-        fields=['admin_group','shortcode']
+        fields=['admin_group',]
 
     def __init__(self, *args, **kwargs):
         super(MiDesktopNewForm, self).__init__(*args, **kwargs)
@@ -409,82 +464,6 @@ class DiskForm(forms.ModelForm):
     class Meta:
         model = ImageDisk
         fields = ['id', 'name', 'size']
-
-class CalculatorForm(forms.Form):
-    cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
-    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
-    memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
-    memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
-    storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
-    storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
-    gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
-    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
-    total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
-
-    template_name = 'services/midesktop-calculator.html'
-
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.get('user')
-        kwargs.pop('user', None)
-
-        super(CalculatorForm, self).__init__(*args, **kwargs)
-
-        for field in self.fields:
-            if hasattr(self.fields[field], 'widget'):
-                if not self.fields[field].widget.attrs.get('class',None):
-                    self.fields[field].widget.attrs.update({'class': 'form-control'})
-            else:
-                print('no widget for', field)
-
-CalculatorFormSet = formset_factory(CalculatorForm, extra=1)
-
-class ImageForm(forms.Form):
-    name = forms.CharField(required=False)
-    initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
-    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),))
-
-    template_name = 'services/image.html'
-
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.get('user')
-        kwargs.pop('user', None)
-
-        super(ImageForm, self).__init__(*args, **kwargs)
-
-        for field in self.fields:
-            if hasattr(self.fields[field], 'widget'):
-                if not self.fields[field].widget.attrs.get('class',None):
-                    self.fields[field].widget.attrs.update({'class': 'form-control'})
-            else:
-                print('no widget for', field)
-
-ImageFormSet = formset_factory(ImageForm, extra=1)
-
-class NetworkForm(forms.Form):
-    name = forms.CharField(required=False)
-    access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
-    mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
-    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False,required=False)
-    technical_contact = forms.CharField(required=False)
-    business_contact = forms.CharField(required=False)
-    security_contact = forms.CharField(required=False)
-
-    template_name = 'services/network.html'
-
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.get('user')
-        kwargs.pop('user', None)
-
-        super(NetworkForm, self).__init__(*args, **kwargs)
-
-        for field in self.fields:
-            if hasattr(self.fields[field], 'widget'):
-                if not self.fields[field].widget.attrs.get('class',None):
-                    self.fields[field].widget.attrs.update({'class': 'form-control'})
-            else:
-                print('no widget for', field)
-
-NetworkFormSet = formset_factory(NetworkForm, extra=1)
 
 class MiDesktopNewImageForm(MiDesktopForm):
     image_form = ImageForm(prefix="image")
