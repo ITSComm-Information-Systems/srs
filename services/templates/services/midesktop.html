@@ -12,6 +12,7 @@
         {'key': 'dedicated', 'label':'Dedicated Network'},
     ]
     var networklist = {{ network_json|safe }};
+    var imagelist = {{ image_json|safe }};
     var eventBus = new Vue();
 </script>
 
@@ -37,29 +38,37 @@
             <h6>{{form.auto_logout.label_tag}}{{form.auto_logout}}</h6>
             <h6>{{form.ad_container.label_tag}}{{form.ad_container}}</h6>
             <h6>{{form.ad_groups.label_tag}}{{form.ad_groups}}</h6>
-            <h6>{{form.base_image.label_tag}}{{form.base_image}}</h6>
-            <div class="new-image-wrapper">
+            <div id="base_image"> <h6>{{form.base_image.label_tag}}
+                <select class="form-control" name="base_image" id="id_base_image" v-model="selectedBaseImage">
+                    <option v-for="image in filteredImages" :value="image.id" :key="image.id">[[image.name]] </option>
+                </select></h6></div>
+                <div>
+            <div id="new-image-wrapper" v-show="visible">
                 {{ form.image_form }}
                 {{ form.calculator_form }}
             </div>
-            <div id="network_type">
-                <h6>Will you be using a shared network or a dedicated network?
-                    <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
-                        <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
-                    </select>
-                </h6>
-            </div>
-            <div id="network" v-show="visible">
-                <h6>Networks:
-                    <select class="form-control" name="network" id="id_network" v-model="selectedNetwork">
-                        <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
-                    </select>
-                </h6>
-            </div>
-            <div id="networks-wrapper" v-show="visible">
-                {{ form.network_form }}
-                
-            </div>
+            
+                <div id="network_type" v-show="visible">
+                    <h6>Will you be using a shared network or a dedicated network?..
+                        <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
+                            <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
+                        </select>
+                    </h6>
+                </div>
+            
+                <div id="network" v-show="visible">
+                    <h6>Networks:
+                        <select class="form-control" name="network" id="id_network" v-model="selectedNetwork">
+                            <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
+                        </select>
+                    </h6>
+                </div>
+        
+                <div id="networks-wrapper" v-show="visible">
+                    {{ form.network_form }}
+                    
+                </div>
+            
             <h2>Service Level Expectations</h2>
                 <hr/>
                 <a href="https://its.umich.edu/computing/computers-software/midesktop" target="_blank">Click here for Service Level Expectations</a>
@@ -73,5 +82,79 @@
 
 <script src="/static/vue-components/vue-components.js"></script>
 
+<script>
+    const new_image_wrapper = new Vue({
+        el: '#new-image-wrapper',
+        delimiters: ['[[', ']]'],
+        data: {
+            visible: false,
+        },
+        mounted() {
+            eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+        },
+        watch: {
+        },
 
+        methods: {
+            handleBaseImageSelected(selectedBaseImage){
+                this.selectedBaseImage = selectedBaseImage
+                this.updateVisibility();
+
+            },
+            updateVisibility(){
+                if(this.selectedBaseImage === 'new'){
+                    this.visible = true
+                } else {
+                    this.visible = false
+                }
+            }
+        }
+    });
+
+    const base_image = new Vue({
+    el: '#base_image',
+    delimiters: ['[[', ']]'],
+    data: {
+        selectedBaseImage: null,
+        filteredImages: [], // Add a data property to store filtered networks
+        groups: groups
+    },
+    mounted(){
+        eventBus.$on('group-selected', this.handleGroupChange);
+        this.updateFilteredImages();
+    },
+    methods:{
+        handleGroupChange(selectedGroup) {
+            // Update the selectedGroup value when the group selection changes
+            this.selectedGroup = selectedGroup;
+            this.selectedGroupID = this.getGroupIdByName(selectedGroup)
+            this.updateFilteredImages();
+        },
+        updateFilteredImages() {
+            if (!this.selectedGroup) {
+                // If no group is selected, show all images
+                this.filteredImages = [];
+            } else {
+                // Filter images based on the selected group's id
+                this.filteredImages = imagelist.filter(image => image.owner === this.selectedGroupID);
+            }
+
+            this.filteredImages.push({
+                'id': 'new',
+                "name": '-- New Base Image',
+                "owner": 'None'
+            })
+        },
+        getGroupIdByName(groupName) {
+            const group = this.groups.find(group => group.name === groupName);
+            return group ? group.id : null;
+        }
+    },
+    watch: {
+        selectedBaseImage: function (newVal) {
+            eventBus.$emit('new-base-image-selected', newVal);
+        }
+    },
+})
+</script>
 {% endblock %}

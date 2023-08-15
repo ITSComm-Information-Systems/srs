@@ -11,7 +11,6 @@ const admin_group = new Vue({
         selectedGroup: function (newVal) {
             // Emit the custom event when the selected group changes using the global event bus
             eventBus.$emit('group-selected', newVal);
-            console.log(newVal);
         }
     },
 
@@ -84,40 +83,35 @@ const midesktop_networks = new Vue({
     },
 });
 
-const networks_wrapper = new Vue({
+const networksWrapper = new Vue({
     el: '#networks-wrapper',
     delimiters: ['[[', ']]'],
     data: {
-        visible: false
+        visible: false,
+        selectedDedicatedType: '',
+        selectedNetworkType: '',
     },
     mounted() {
-        // Listen for the custom event emitted by the global event bus
-        console.log('ted')
+        // Listen for the custom events emitted by the global event bus
         eventBus.$on('new-dedicated-network-selected', this.handleDedicatedNetworkSelected);
         eventBus.$on('network-type-selected', this.handleNetworkTypeSelected);
-        
     },
     methods: {
-        handleDedicatedNetworkSelected(selectedDedicatedType){
-            if (selectedDedicatedType == 'new'){
-                this.selectedDedicatedType = selectedDedicatedType
-                this.visible = true
-            }
-            else{
-                this.visible = false
-            }
-    
+        handleDedicatedNetworkSelected(selectedDedicatedType) {
+            this.selectedDedicatedType = selectedDedicatedType;
+            this.updateVisibility();
         },
-        handleNetworkTypeSelected(selectedNetworkType){
-            console.log(selectedNetworkType)
-            if(selectedNetworkType == 'dedicated' && this.selectedDedicatedType == 'new'){
-                this.selectedNetworkType = selectedNetworkType
-                this.visible = true
-            }else{
-                this.selectedNetworkType = selectedNetworkType
-                this.visible = false
+        handleNetworkTypeSelected(selectedNetworkType) {
+            this.selectedNetworkType = selectedNetworkType;
+            this.updateVisibility();
+        },
+        updateVisibility() {
+            if (this.selectedDedicatedType === 'new' && this.selectedNetworkType === 'dedicated') {
+                this.visible = true;
+            } else {
+                this.visible = false;
             }
-     }
+        },
     },
 });
 
@@ -126,16 +120,27 @@ const midesktop_network_type = new Vue({
     delimiters: ['[[', ']]'],
     data: {
         selectedNetworkType: null,
+        visible:false
     },
-    mounted() {
-        console.log('mount')
-        // Listen for the custom event emitted by the global event bus
+    methods:{
+        handleBaseImageSelected(selectedBaseImage){
+            this.selectedBaseImage = selectedBaseImage
+            this.updateVisibility();
+        },
+        updateVisibility(){
+            if(this.selectedBaseImage === 'new'){
+                this.visible = true
+            } else {
+                this.visible = false
+            }
+        }
     },
-    
+    mounted(){
+        eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+    },
     watch: {
         selectedNetworkType: function (newVal) {
             eventBus.$emit('network-type-selected', newVal);
         }
-        
     },
 });
