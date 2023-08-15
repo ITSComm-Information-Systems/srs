@@ -84,44 +84,8 @@
 </div>
 
 
-<script src="/static/vue-components/admin-group/admin-group.js"></script>
-<script src="/static/vue-components/midesktop-networks/midesktop-networks.js"></script>
-<script src="/static/vue-components/networks-wrapper/networks-wrapper.js"></script>
-<script>
-const midesktop_network_type = new Vue({
-    el: '#network_type',
-    delimiters: ['[[', ']]'],
-    data: {
-        selectedNetworkType: null,
-    },
-    mounted() {
-        console.log('mount')
-        // Listen for the custom event emitted by the global event bus
-    },
-    // methods: {
-    //     handleGroupChange(selectedGroup) {
-    //         // Update the selectedGroup value when the group selection changes
-    //         this.selectedGroup = selectedGroup;
-    //         this.updateFilteredNetworks();
-    //     },
-    //     updateFilteredNetworks() {
-    //         if (!this.selectedGroup) {
-    //             // If no group is selected, show all networks
-    //             this.filteredNetworks = [];
-    //         } else {
-    //             // Filter networks based on the selected group's id
-    //             this.filteredNetworks = networklist.filter(network => network.owner === this.selectedGroup);
-    //         }
-    //     },
-    // },
-    watch: {
-        selectedNetworkType: function (newVal) {
-            eventBus.$emit('network-type-selected', newVal);
-        }
-        
-    },
-});
-</script>
+<script src="/static/vue-components/vue-components.js"></script>
+
 
 {% endblock %}
 

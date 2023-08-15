@@ -8,21 +8,18 @@
         {% csrf_token %}
 
         <div id="div_formbody">
-            {% for field in form %}
-            
-                <div id="{{ field.auto_id }}">
-                <h6>{% if field.field.required %}<span style="color:red; font-size:12px;">* </span>{% endif %}
-                    <label for="{{ field.label }}">{{ field.label_tag }}</label>
-                    {{ field }}
-                </h6>
-            </div>
-            {% endfor %}
-            {{ form.network_form.management_form }}
-                {% for form in form.network_formset.forms %}
-                    {% with template_name="services/network.html" %}
-                        {% include template_name with form=form %}
-                    {% endwith %}
+            <h6>
+                {{ form.admin_group.label_tag }} {{ form.admin_group }}
+                {{ form.admin_group.errors }}
+                
+                <!-- Network Form Fields -->
+                {% for field in form.network_form %}
+                    {{ field.label_tag }}{{ field }}
+                    {{ field.errors }}
+                    
+                    
                 {% endfor %}
+    </h6>
         </div>
         <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
     </form>
