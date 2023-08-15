@@ -1,7 +1,7 @@
 from django import forms
 from django.core import validators
 from project.forms.fields import *
-from .models import AWS, Azure, GCP, GCPAccount, Container, MiDesktopNetwork, ImageDisk, MiDesktopImage
+from .models import AWS, Azure, GCP, GCPAccount, Container, Network, ImageDisk, Image
 from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from .midesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
@@ -437,7 +437,7 @@ class MiDesktopNewForm(MiDesktopForm):
 
         if self.user:
             groups = list(LDAPGroupMember.objects.filter(username=self.user).values_list('ldap_group_id',flat=True))
-            network_list = MiDesktopNetwork.objects.filter(status='A',owner__in=groups).order_by('name')
+            network_list = Network.objects.filter(status='A',owner__in=groups).order_by('name')
             choice_list = [(None, '---')]
             for network in network_list:
                 choice_list.append((network.name, network.name))
@@ -510,7 +510,7 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
 
     def save(self, commit=True):
         super().save()
-        new_network = MiDesktopNetwork(
+        new_network = Network(
             name=self.data['network-name'],
             instance_name=self.data['network-name'],
             size=self.data['network-mask'],
@@ -537,6 +537,6 @@ class MiDesktopChangeNetworkForm(forms.ModelForm):
                 print('no widget for', field)
 
     class Meta:
-        model = MiDesktopNetwork
+        model = Network
         fields = ['name','size']
 

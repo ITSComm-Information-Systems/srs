@@ -6,6 +6,7 @@ from project.models import Choice
 from oscauth.models import LDAPGroup
 from django.contrib.auth.models import User
 from django.utils.functional import cached_property
+from order.models import StorageRate
 
 
 class Status(models.TextChoices):
@@ -148,9 +149,8 @@ class Service():
 
 class MiDesktop(models.Model):
     instance_label = 'Instance'
-    instance_name = models.CharField(max_length=30, default='TBD')
+    name = models.CharField(max_length=30, default='TBD')
     status = models.CharField(max_length=1, choices = Status.choices, default=Status.ACTIVE)
-    account_id = models.CharField(max_length=30, default='TBD')
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
     created_date = models.DateField(auto_now=True)
 
@@ -160,29 +160,12 @@ class MiDesktop(models.Model):
     class Meta:
         abstract = True 
 
-
-
-# class MiDesktopPersistentPool(MiDesktop):
-#     instance_label = 'Pool Name'
-#     shortcode = models.CharField(max_length=6)
-#     instance_name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
-#     pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-#     #images = ArrayField(models.IntegerField(), null=False)
-
-
-#     class Meta:
-#         verbose_name = 'MiDesktop Persistent Pool'
-
-
-class MiDesktopImage(MiDesktop):
+class Image(MiDesktop):
     instance_label = 'Image Name'
-    instance_name = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
-    cpu = models.CharField(max_length=4)
-    memory = models.CharField(max_length=4)
+    name = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
+    cpu = models.IntegerField()
+    memory = models.IntegerField()
     gpu = models.BooleanField(blank=True, null=True)
-    total_image_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    pool_id = models.IntegerField()
-    network_id = models.IntegerField()
 
     @cached_property
     def total_storage_size(self):
@@ -193,11 +176,29 @@ class MiDesktopImage(MiDesktop):
                 return storage['size__sum']
 
         return 0
+    
+    @cached_property
+    def total_cost(self):
+        import decimal
+        for rate in StorageRate.objects.filter(service__name='midesktop'):
+            print(rate.label, rate.rate)
+            if rate.label == 'Base':
+                total_cost = rate.rate
+            if rate.label == 'CPU':
+                total_cost = total_cost + (rate.rate * decimal.Decimal(self.cpu))
+            if rate.label == 'Memory':
+                total_cost = total_cost + (rate.rate * decimal.Decimal(self.memory))
+            if rate.label == 'Storage':
+                total_cost = total_cost + (rate.rate * self.total_storage_size)
+            if rate.label[:3] == 'GPU' and self.gpu == True:
+                total_cost = total_cost + rate.rate
+
+        return total_cost
 
     class Meta:
         verbose_name = 'MiDesktop Image'
 
-class MiDesktopNetwork(MiDesktop):
+class Network(MiDesktop):
     instance_label = 'Network Name'
     name = models.CharField(blank=True, max_length=80)
     size = models.CharField(blank=True, max_length=80)
@@ -206,25 +207,32 @@ class MiDesktopNetwork(MiDesktop):
         verbose_name = 'MiDesktop Network'
 
 class ImageDisk(models.Model):
-    image = models.ForeignKey(MiDesktopImage, related_name='storage', on_delete=models.CASCADE)
+    image = models.ForeignKey(Image, related_name='storage', on_delete=models.CASCADE)
     name = models.CharField(max_length=10)
     size = models.IntegerField()
 
     def __str__(self):
         return self.name
     
-class MiDesktopInstantClonePool(MiDesktop):
+class Pool(MiDesktop):
     instance_label = 'Pool Name'
     shortcode = models.CharField(max_length=6)
-    instance_name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
-    pool_quantity = models.IntegerField()
-    pool_cost = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    image = models.ManyToManyField(MiDesktopImage)
+    name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
+    type = models.CharField(default='instant-clone',max_length=30,)
+    quantity = models.IntegerField()
+    images = models.ManyToManyField(Image)
     shared_network = models.BooleanField(default=True)
-    network = models.ManyToManyField(MiDesktopNetwork, null=True)
+    network = models.ManyToManyField(Network)
+
+    def total_cost(self):
+        total_cost = 0
+        for image in self.images:
+            total_cost =+ image.total_cost
+
+        return total_cost
     
     def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = 'MiDesktop Instant Clone Pool'
+        verbose_name = 'MiDesktop Pool'
