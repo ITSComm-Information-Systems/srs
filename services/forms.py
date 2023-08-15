@@ -428,6 +428,8 @@ class CalculatorForm(forms.Form):
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
 
+    template_name = 'services/midesktop-calculator.html'
+
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user')
         kwargs.pop('user', None)
@@ -448,6 +450,8 @@ class ImageForm(forms.Form):
     initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
     operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),))
 
+    template_name = 'services/image.html'
+
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user')
         kwargs.pop('user', None)
@@ -464,13 +468,15 @@ class ImageForm(forms.Form):
 ImageFormSet = formset_factory(ImageForm, extra=1)
 
 class NetworkForm(forms.Form):
-    name = forms.CharField()
-    access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
-    mask = forms.ChoiceField(choices=MASK_CHOICES)
-    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False)
-    technical_contact = forms.CharField()
-    business_contact = forms.CharField()
-    security_contact = forms.CharField()
+    name = forms.CharField(required=False)
+    access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
+    mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False,required=False)
+    technical_contact = forms.CharField(required=False)
+    business_contact = forms.CharField(required=False)
+    security_contact = forms.CharField(required=False)
+
+    template_name = 'services/network.html'
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user')
@@ -488,12 +494,14 @@ class NetworkForm(forms.Form):
 NetworkFormSet = formset_factory(NetworkForm, extra=1)
 
 class MiDesktopNewImageForm(MiDesktopForm):
-    image_formset = ImageFormSet(prefix="image")
-    calculator_formset = CalculatorFormSet(prefix="calculator")
+    image_form = ImageForm(prefix="image")
+    calculator_form = CalculatorForm(prefix="calculator")
     network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
     network_form = NetworkForm(prefix="network")
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
     title = 'MiDesktop New Image Order Form'
+
+    
     
     class Meta:
         fields=['admin_group']
@@ -506,35 +514,14 @@ class MiDesktopNewImageForm(MiDesktopForm):
         network_type = self.data['network_type']
         network_name = self.data['network-name']
 
-        print(network_type)
-        print(len(network_name))
-
         if(network_type == 'dedicated' and len(network_name) == 0):
-            print('do it')
+            print('New Image on Network thats already created')
 
-            # new_network = MiDesktopNetwork(
-            #     name=network_name,
-            #     instance_name = network_name,
-            #     size = self.data['network-0-mask'],
-            #     owner=self.owner,  # This field comes from the Meta class
-            # )
+        elif(network_type == 'dedicated' and len(network_name) > 0):
+            print('New Image on New Network')
+        else:
+            print('New Image on Shared Network')
 
-            # new_image = MiDesktopImage(
-            #     instance_name = self.data['image-0-name'],
-            #     cpu = self.data['calculator-0-cpu'],
-            #     memory = self.data['calculator-0-memory'],
-            #     gpu = self.data['calculator-0-gpu'],
-            #     total_image_cost = self.data['calculator-0-total'],
-            #     pool_id=None,
-            #     network_id=self.data['network']
-            # )
-
-            # new_image.storage.set(None)
-
-            # if commit:
-            #     new_image.save()
-        
-            # return new_image
 
 
 class MiDesktopNewNetworkForm(MiDesktopForm):
