@@ -77,7 +77,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
             form = MiDesktopNewForm(user=self.request.user)
             groups = LDAPGroupMember.objects.filter(username=self.request.user).order_by('ldap_group')
             network_groups = list(LDAPGroupMember.objects.filter(username=self.request.user).values_list('ldap_group_id',flat=True))
-            networks = MiDesktopNetwork.objects.filter(status='A',owner__in=network_groups).order_by('name')
+            networks = Network.objects.filter(status='A',owner__in=network_groups).order_by('name')
             network_list = []
             for network in networks:
                 network_list.append({
@@ -105,7 +105,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
             #groups = MCommunity().get_groups(self.request.user.username)
             groups = LDAPGroupMember.objects.filter(username=self.request.user).order_by('ldap_group')
             network_groups = list(LDAPGroupMember.objects.filter(username=self.request.user).values_list('ldap_group_id',flat=True))
-            networks = MiDesktopNetwork.objects.filter(status='A',owner__in=network_groups).order_by('name')
+            networks = Network.objects.filter(status='A',owner__in=network_groups).order_by('name')
             network_list = []
             for network in networks:
                 network_list.append({
@@ -145,7 +145,7 @@ class ServiceDeleteView(UserPassesTestMixin, View):
 
     def post(self, request, service, id):
         if service == 'midesktop-network':
-            instance = get_object_or_404(MiDesktopNetwork, pk=id)
+            instance = get_object_or_404(Network, pk=id)
             if not user_has_access(request.user, instance.owner):
                 return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
             instance.status = Status.ENDED
@@ -174,7 +174,7 @@ class ServiceDeleteView(UserPassesTestMixin, View):
     def get(self, request, service, id):
         if service == 'midesktop-network':
             #template = 'services/midesktop-network_delete.html'
-            instance = get_object_or_404(MiDesktopNetwork, pk=id)
+            instance = get_object_or_404(Network, pk=id)
             if not user_has_access(request.user, instance.owner):
                 return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
             return render(request, self.template,
@@ -206,7 +206,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
     def post(self, request, service, id):
         if service == 'midesktop-network':
             template = 'services/midesktop-network_change.html'
-            instance = MiDesktopNetwork.objects.get(id=id)
+            instance = Network.objects.get(id=id)
             title = 'Modify ' + instance._meta.verbose_name.title()
             form = MiDesktopChangeNetworkForm(request.POST, user=self.request.user, instance=instance)
             if form.is_valid():
@@ -235,7 +235,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
     def get(self, request, service, id):
         if service == 'midesktop-network':
             template = 'services/midesktop-network_change.html'
-            instance = get_object_or_404(MiDesktopNetwork,pk=id, status=Status.ACTIVE)
+            instance = get_object_or_404(Network,pk=id, status=Status.ACTIVE)
             if not user_has_access(request.user, instance.owner):
                 return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
             title = 'Modify ' + instance._meta.verbose_name.title()
@@ -269,7 +269,7 @@ def get_service_list(request, service):
         return render(request,'services/midesktop_existing.html',{'groups': groups})
     elif service == 'midesktop-network':
         template = 'services/midesktop-network_existing.html'
-        service_list = MiDesktopNetwork.objects.filter(status='A',owner__in=groups).order_by('name')
+        service_list = Network.objects.filter(status='A',owner__in=groups).order_by('name')
         return render(request,template,{
                 'service_list': service_list,
                 'groups': groups,})

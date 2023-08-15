@@ -512,7 +512,6 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
         super().save()
         new_network = Network(
             name=self.data['network-name'],
-            instance_name=self.data['network-name'],
             size=self.data['network-mask'],
             owner=self.owner,
         )
