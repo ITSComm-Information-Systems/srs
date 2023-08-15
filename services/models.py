@@ -228,7 +228,7 @@ class Pool(MiDesktop):
     def total_cost(self):
         total_cost = 0
         for image in self.images:
-            total_cost =+ image.total_cost
+            total_cost += image.total_cost
 
         return total_cost
     
