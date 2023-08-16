@@ -1,7 +1,7 @@
 from django import forms
 from django.core import validators
 from project.forms.fields import *
-from .models import AWS, Azure, GCP, GCPAccount, Container, Network, ImageDisk, Image
+from .models import AWS, Azure, GCP, GCPAccount, Container, Network, ImageDisk, Image, Pool
 from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from .midesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
@@ -426,10 +426,10 @@ class MiDesktopNewForm(MiDesktopForm):
     auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
     ad_container = forms.CharField(required=False,)
     ad_groups = forms.CharField(required=False,)
-    base_image = forms.ChoiceField(label='Base Image', choices = (("1","New Image"),("2","List of Images")))
+    base_image = forms.IntegerField()
     image_form = ImageForm(prefix="image")
     calculator_form = CalculatorForm(prefix="calculator")
-    network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
+    network_type = forms.ChoiceField(required=False,label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
     network_form = NetworkForm(prefix="network")
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
     
@@ -460,6 +460,30 @@ class MiDesktopNewForm(MiDesktopForm):
         elif pool_type == 'persistent':
             print('Persistent')
 
+    def save(self):
+        super().save()
+        shortcode = self.cleaned_data.get("shortcode")
+        name = self.cleaned_data.get("pool_name")
+        base_image_id = int(self.cleaned_data.get("base_image"))
+        print(base_image_id)
+
+        if base_image_id == 999999999:
+            pass
+        else:
+            base_image_object = Image.objects.get(id = base_image_id)
+            print(base_image_object)
+            new_pool = Pool(
+                shortcode = shortcode,
+                name = name,
+                quantity = 1,
+                owner=self.owner
+            )
+            new_pool.save()
+
+            new_pool.images.add(base_image_object)
+            return new_pool
+
+
 class DiskForm(forms.ModelForm):
     id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     name = forms.CharField()
@@ -487,9 +511,9 @@ class MiDesktopNewImageForm(MiDesktopForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        return cleaned_data
 
     def save(self, commit=True):
-        instance = super().save()
         image_name = self.data['image-name']
 
         cpu = self.data['calculator-cpu']
