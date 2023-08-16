@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>MiDesktop Images</h1>
+<table class="table table-hover table-striped table-sm">
+    <tr>
+        <th>Name</th>
+        <th>Owner</th>
+    </tr>
+
+    {% for rec in image_list %}
+    <tr>
+        <td>{{ rec.name }}</td>  
+        <td>{{ rec.owner }}</td>  
+        <td>
+            <a href="/services/midesktop-image/{{ rec.id }}/change/">
+                <i class="fas fa-edit"></i>
+            </a>
+            &nbsp;
+            <a href="/services/midesktop-image/{{ rec.id }}/delete/">
+                <i class="fas fa-trash"></i>
+            </a>
+        </td>
+    </tr>
+
+
+    {% endfor %}
+
+</table>
+{% endblock %}

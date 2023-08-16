@@ -56,6 +56,9 @@
     window.addEventListener("load", (event) => {
         storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
         gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+        cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
+        memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
+        calculateBaseImageCost()
     })
 
     cpu_choice.addEventListener("change", () => {

@@ -164,6 +164,13 @@ class ServiceDeleteView(UserPassesTestMixin, View):
             instance.status = Status.ENDED
             instance.save()
             return HttpResponseRedirect('/requestsent')
+        elif service == 'midesktop-image':
+            instance = get_object_or_404(Image, pk=id)
+            if not user_has_access(request.user, instance.owner):
+                return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            instance.status = Status.ENDED
+            instance.save()
+            return HttpResponseRedirect('/requestsent')
         else:
 
             if request.POST.get('confirm_delete') != 'on':
@@ -188,6 +195,13 @@ class ServiceDeleteView(UserPassesTestMixin, View):
         if service == 'midesktop-network':
             #template = 'services/midesktop-network_delete.html'
             instance = get_object_or_404(Network, pk=id)
+            if not user_has_access(request.user, instance.owner):
+                return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            return render(request, self.template,
+                        {
+                        'instance': instance, })
+        elif service == 'midesktop-image':
+            instance = get_object_or_404(Image, pk=id)
             if not user_has_access(request.user, instance.owner):
                 return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
             return render(request, self.template,
@@ -228,6 +242,19 @@ class ServiceChangeView(UserPassesTestMixin, View):
             return render(request, template,
                         {'title': title,
                         'form': form, })
+        elif service == 'midesktop-image':
+            template = 'services/midesktop-image_change.html'
+            instance = Image.objects.get(id=id)
+            image_form = ImageForm(initial={'name':instance.name})
+            title = 'Modify ' + instance._meta.verbose_name.title()
+            form = MiDesktopChangeImageForm(request.POST, user=self.request.user,instance = instance)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/requestsent')
+            return render(request, template,
+                        {'title': title,
+                        'form': form, })
+
         else:
             model = getattr(Service, service)
             instance = model.objects.get(id=id)        
@@ -256,6 +283,20 @@ class ServiceChangeView(UserPassesTestMixin, View):
             return render(request, template,
                         {'title': title,
                         'form': form, })
+        elif service =='midesktop-image':
+            template = 'services/midesktop-image_change.html'
+            instance = get_object_or_404(Image,pk=id, status=Status.ACTIVE)
+            calculator_form = CalculatorForm(initial={'cpu':instance.cpu,'memory':instance.memory,'gpu':instance.gpu,})
+            image_form = ImageForm(initial={'name':instance.name})
+            if not user_has_access(request.user, instance.owner):
+                return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            title = 'Modify ' + instance._meta.verbose_name.title()
+            form = MiDesktopChangeImageForm(user=self.request.user, instance=instance)
+            return render(request, template,
+                        {'title': title,
+                        'form': form,
+                        'calculator_form': calculator_form,
+                        'image_form':image_form })
         else:
             request.session['backupStorage'] = 'cloud'
             model = getattr(Service, service)
@@ -280,6 +321,9 @@ def get_service_list(request, service):
     groups = list(LDAPGroupMember.objects.filter(username=request.user).values_list('ldap_group_id',flat=True))
     if service == 'midesktop':
         return render(request,'services/midesktop_existing.html',{'groups': groups})
+    elif service == 'midesktop-image':
+        image_list = Image.objects.filter(status='A',owner__in=groups).order_by('name')
+        return render(request,'services/midesktop-image_existing.html',{'groups': groups,'image_list':image_list})
     elif service == 'midesktop-network':
         template = 'services/midesktop-network_existing.html'
         service_list = Network.objects.filter(status='A',owner__in=groups).order_by('name')
