@@ -490,13 +490,10 @@ class MiDesktopNewImageForm(MiDesktopForm):
 
     def save(self, commit=True):
         instance = super().save()
-        admin_group = self.data['admin_group']
         image_name = self.data['image-name']
-        image_initial = self.data['image-initial_image']
-        image_operating_system = self.data['image-operating_system']
+
         cpu = self.data['calculator-cpu']
         memory = self.data['calculator-memory']
-        storage = self.data['calculator-storage']
         gpu = self.data['calculator-gpu']
         
         network_type = self.data['network_type']
@@ -557,6 +554,33 @@ class MiDesktopNewImageForm(MiDesktopForm):
             
             return new_image
 
+class MiDesktopChangeImageForm(forms.ModelForm):
+    name = forms.CharField(required=False)
+    calculator_form = CalculatorForm(prefix="calculator")
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
+
+    def save(self):
+        self.network = self.instance.network
+        self.shared_network = self.instance.shared_network
+
+        super().save()
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
+        kwargs.pop('user', None)
+
+        super(MiDesktopChangeImageForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+    class Meta:
+        model = Image
+        exclude=['admin_group','network','owner','status']
 
 
 class MiDesktopNewNetworkForm(MiDesktopForm):
@@ -564,7 +588,7 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
     network_form = NetworkForm(prefix="network")
     
     class Meta:
-        fields = ['admin_group']
+        fields = ['admin_group','network_form']
 
     def clean(self):
         cleaned_data = super().clean()
