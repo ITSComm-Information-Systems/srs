@@ -31,9 +31,9 @@
                     </select>
             </div>
             <h6>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
-            <h6>{{form.pool_type.label_tag}}{{form.pool_type}}</h6>
             <h2>Order New Pool</h2>
             <h6>{{form.pool_name.label_tag}}{{form.pool_name}}</h6>
+            <h6>{{form.pool_type.label_tag}}{{form.pool_type}}</h6>
             <h2>Connection Options</h2>
             <h6>{{form.auto_logout.label_tag}}{{form.auto_logout}}</h6>
             <h6>{{form.ad_container.label_tag}}{{form.ad_container}}</h6>
@@ -48,32 +48,30 @@
                 {{ form.calculator_form }}
             </div>
             
-                <div id="network_type" v-show="visible">
-                    <h6>Will you be using a shared network or a dedicated network?..
-                        <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
-                            <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
-                        </select>
-                    </h6>
-                </div>
+            <div id="network_type" v-show="visible">
+                <h6>Will you be using a shared network or a dedicated network?..
+                    <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
+                        <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
+                    </select>
+                </h6>
+            </div>
             
-                <div id="network" v-show="visible">
-                    <h6>Networks:
-                        <select class="form-control" name="network" id="id_network" v-model="selectedNetwork">
-                            <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
-                        </select>
-                    </h6>
-                </div>
+            <div id="network" v-show="visible">
+                <h6>Networks:
+                    <select class="form-control" name="network" id="id_network" v-model="selectedNetwork">
+                        <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
+                    </select>
+                </h6>
+            </div>
         
-                <div id="networks-wrapper" v-show="visible">
-                    {{ form.network_form }}
-                    
-                </div>
+            <div id="networks-wrapper" v-show="visible">
+                {{ form.network_form }}
+            </div>
             
             <h2>Service Level Expectations</h2>
-                <hr/>
-                <a href="https://its.umich.edu/computing/computers-software/midesktop" target="_blank">Click here for Service Level Expectations</a>
-                <br/>{{ form.sla }} <span style="color:red; font-size:12px;">*</span>I have read and acknowledge the Service Level Expectations
-            
+            <hr/>
+            <a href="https://its.umich.edu/computing/computers-software/midesktop" target="_blank">Click here for Service Level Expectations</a>
+            <br/>{{ form.sla }} <span style="color:red; font-size:12px;">*</span>I have read and acknowledge the Service Level Expectations
         </div>
         <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
     </form>
