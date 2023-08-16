@@ -490,16 +490,72 @@ class MiDesktopNewImageForm(MiDesktopForm):
 
     def save(self, commit=True):
         instance = super().save()
+        admin_group = self.data['admin_group']
+        image_name = self.data['image-name']
+        image_initial = self.data['image-initial_image']
+        image_operating_system = self.data['image-operating_system']
+        cpu = self.data['calculator-cpu']
+        memory = self.data['calculator-memory']
+        storage = self.data['calculator-storage']
+        gpu = self.data['calculator-gpu']
+        
         network_type = self.data['network_type']
         network_name = self.data['network-name']
 
+        super().save()
+
         if(network_type == 'dedicated' and len(network_name) == 0):
             print('New Image on Network thats already created')
+            network_id = int(self.data['network'])
+
+            new_image = Image(
+                name = image_name,
+                cpu = cpu,
+                memory = memory,
+                gpu = gpu,
+                shared_network = False,
+                network = Network.objects.get(pk = network_id),
+                owner=self.owner
+            )
+            new_image.save()
+            return new_image
 
         elif(network_type == 'dedicated' and len(network_name) > 0):
             print('New Image on New Network')
+            new_network = Network(
+                name=self.data['network-name'],
+                size=self.data['network-mask'],
+                owner=self.owner,
+            )
+            new_network.save()
+
+            new_image = Image(
+                    name = image_name,
+                    cpu = cpu,
+                    memory = memory,
+                    gpu = gpu,
+                    shared_network = False,
+                    network = new_network,
+                    owner=self.owner
+                )
+            new_image.save()
+            
+            return new_image
+
         else:
             print('New Image on Shared Network')
+            new_image = Image(
+                    name = image_name,
+                    cpu = cpu,
+                    memory = memory,
+                    gpu = gpu,
+                    shared_network = True,
+                    network = None,
+                    owner=self.owner
+                )
+            new_image.save()
+            
+            return new_image
 
 
 
