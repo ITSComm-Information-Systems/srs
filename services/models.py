@@ -166,6 +166,8 @@ class Image(MiDesktop):
     cpu = models.IntegerField()
     memory = models.IntegerField()
     gpu = models.BooleanField(blank=True, null=True)
+    shared_network = models.BooleanField(default=True)
+    network = models.ForeignKey("Network", on_delete=models.CASCADE)
 
     @cached_property
     def total_storage_size(self):
@@ -221,8 +223,6 @@ class Pool(MiDesktop):
     type = models.CharField(default='instant-clone',max_length=30,)
     quantity = models.IntegerField()
     images = models.ManyToManyField(Image)
-    shared_network = models.BooleanField(default=True)
-    network = models.ManyToManyField(Network)
 
     @cached_property
     def total_cost(self):
