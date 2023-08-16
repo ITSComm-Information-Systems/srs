@@ -4,7 +4,7 @@
 
 <div class="container">
     <strong>Image Name:</strong>&nbsp;{{ form.instance.name }}<br/>
-    <strong>Network:</strong>&nbsp;{{ form.instance.network.name }}
+    <strong>Network:</strong>&nbsp;<a href="/services/midesktop-network/{{ form.instance.network.id }}/change/">{{ form.instance.network.name }}</a>
     <hr>
 
         <form method="POST">

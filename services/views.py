@@ -94,11 +94,11 @@ class ServiceRequestView(UserPassesTestMixin, View):
             image_list = []
             for image in images:
                 image_list.append({
-                    {
+                    
                     "id": image.id,
                     "name": image.name,
                     "owner": image.owner_id
-                }
+                
                 })
                 print(image)
 
