@@ -51,7 +51,7 @@
             <div id="network_type" v-show="visible">
                 <h6>Will you be using a shared network or a dedicated network?..
                     <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
-                        <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
+                        <option v-for="network_type in network_choice_list" :value="network_type.label" :key="network_type.key">[[network_type.label]] </option>
                     </select>
                 </h6>
             </div>
@@ -138,7 +138,7 @@
             }
 
             this.filteredImages.push({
-                'id': 'new',
+                'id': 999999999,
                 "name": '-- New Base Image',
                 "owner": 'None'
             })
