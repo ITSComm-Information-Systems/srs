@@ -155,7 +155,7 @@ class MiDesktop(models.Model):
     created_date = models.DateField(auto_now=True)
 
     def __str__(self):
-        return self.instance_name
+        return self.name
 
     class Meta:
         abstract = True 
@@ -167,7 +167,7 @@ class Image(MiDesktop):
     memory = models.IntegerField()
     gpu = models.BooleanField(blank=True, null=True)
     shared_network = models.BooleanField(default=True)
-    network = models.ForeignKey("Network", on_delete=models.CASCADE)
+    network = models.ForeignKey("Network", on_delete=models.CASCADE, null=True, blank=True)
 
     @cached_property
     def total_storage_size(self):
