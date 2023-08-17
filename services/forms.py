@@ -6,7 +6,7 @@ from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from .midesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
 from django.forms import ModelForm, formset_factory
-
+from django.core.validators import MinValueValidator
 
 # Defaults
 CharField = forms.CharField( widget=forms.TextInput(attrs={'class': 'form-control'}) )
@@ -411,6 +411,7 @@ class ImageForm(forms.Form):
             else:
                 print('no widget for', field)
 
+
 class MiDesktopNewForm(MiDesktopForm):
     title = 'MiDesktop New Order Form'
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
@@ -420,6 +421,8 @@ class MiDesktopNewForm(MiDesktopForm):
     ad_container = forms.CharField(required=False,)
     ad_groups = forms.CharField(required=False,)
     base_image = forms.IntegerField()
+    pool_quantity = forms.IntegerField(validators=[MinValueValidator(1)])
+    pool_total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
     image_form = ImageForm(prefix="image")
     calculator_form = CalculatorForm(prefix="calculator")
     network_type = forms.ChoiceField(required=False,label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
@@ -458,7 +461,7 @@ class MiDesktopNewForm(MiDesktopForm):
         shortcode = self.cleaned_data.get("shortcode")
         name = self.cleaned_data.get("pool_name")
         base_image_id = int(self.cleaned_data.get("base_image"))
-        print(base_image_id)
+        quantity= self.cleaned_data.get("pool_quantity")
 
         if base_image_id == 999999999:
             pass
@@ -468,7 +471,7 @@ class MiDesktopNewForm(MiDesktopForm):
             new_pool = Pool(
                 shortcode = shortcode,
                 name = name,
-                quantity = 1,
+                quantity = quantity,
                 owner=self.owner
             )
             new_pool.save()
