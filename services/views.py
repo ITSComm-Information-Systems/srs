@@ -97,7 +97,8 @@ class ServiceRequestView(UserPassesTestMixin, View):
                     
                     "id": image.id,
                     "name": image.name,
-                    "owner": image.owner_id
+                    "owner": image.owner_id,
+                    "total_cost":str(image.total_cost)
                 
                 })
                 print(image)

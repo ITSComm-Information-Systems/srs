@@ -42,11 +42,15 @@
                 <select class="form-control" name="base_image" id="id_base_image" v-model="selectedBaseImage">
                     <option v-for="image in filteredImages" :value="image.id" :key="image.id">[[image.name]] </option>
                 </select></h6></div>
-                <div>
+            <div>
+            
             <div id="new-image-wrapper" v-show="visible">
                 {{ form.image_form }}
                 {{ form.calculator_form }}
             </div>
+
+            <h6>{{form.pool_quantity.label_tag}}<input type="number" name="pool_quantity" class="form-control" id="id_pool_quantity" v-model="poolQuantity"/></h6>
+            <h6>{{form.pool_total.label_tag}}<input type="text" name="pool_total" readonly="true" class="form-control" id="id_pool_total" :value="poolTotal"></h6>
             
             <div id="network_type" v-show="visible">
                 <h6>Will you be using a shared network or a dedicated network?..
@@ -55,7 +59,6 @@
                     </select>
                 </h6>
             </div>
-            
             <div id="network" v-show="visible">
                 <h6>Networks:
                     <select class="form-control" name="network" id="id_network" v-model="selectedNetwork">
@@ -79,8 +82,80 @@
 
 
 <script src="/static/vue-components/vue-components.js"></script>
+<script>
+    const pool_quantity = document.getElementById("{{ form.pool_quantity.id_for_label }}");
+    const pool_total = document.getElementById("{{ form.pool_total.id_for_label }}");
+
+</script>
 
 <script>
+    const pool_quantity_handler = new Vue({
+        el: '#id_pool_quantity',
+        delimiters: ['[[', ']]'],
+        data: {
+            poolQuantity: 1,
+        },
+        mounted() {
+            eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+        },
+        watch: {
+            poolQuantity: function (newVal) {
+                eventBus.$emit('pool-quantity-changed', newVal);
+                this.handleQuantityChange(newVal)
+            }
+        },
+
+        methods: {
+            handleQuantityChange(quantity){
+                console.log('quant cange')
+                if (parseInt(quantity) <1){
+                    this.poolQuantity = 1
+                }
+            },
+            handleBaseImageSelected(){
+                console.log('pew')
+            }
+        }
+    });
+
+    const pool_total_handler = new Vue({
+        el: '#id_pool_total',
+        delimiters: ['[[', ']]'],
+        data: {
+            poolTotal: '0.00',
+            quantity: 1,
+            baseImageTotalCost: 0.00
+        },
+        mounted() {
+            
+            eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+            eventBus.$on('pool-quantity-changed', this.handlePoolQuantityChanged);
+        },
+
+        methods: {
+            handlePoolQuantityChanged(newQuantity){
+                
+                this.quantity = parseInt(newQuantity)
+                
+                console.log(this.quantity)
+                this.calculateTotal()
+            },
+            handleBaseImageSelected(selectedBaseImage){
+                this.selectedBaseImageID = selectedBaseImage
+                if (this.selectedBaseImageID != 999999999){
+                    this.baseImage = imagelist.filter(image => image.id === this.selectedBaseImageID)
+                    this.baseImageTotalCost = this.baseImage[0].total_cost
+                    this.calculateTotal()
+                }else{
+
+                }
+            },
+            calculateTotal(){
+                this.poolTotal = (this.quantity * this.baseImageTotalCost).toFixed(2)
+            },
+        }
+    });
+
     const new_image_wrapper = new Vue({
         el: '#new-image-wrapper',
         delimiters: ['[[', ']]'],
@@ -90,8 +165,6 @@
         mounted() {
             eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
         },
-        watch: {
-        },
 
         methods: {
             handleBaseImageSelected(selectedBaseImage){
@@ -100,7 +173,7 @@
 
             },
             updateVisibility(){
-                if(this.selectedBaseImage === 'new'){
+                if(this.selectedBaseImage === 'new' || this.selectedBaseImage === 999999999){
                     this.visible = true
                 } else {
                     this.visible = false
