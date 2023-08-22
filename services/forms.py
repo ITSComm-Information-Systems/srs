@@ -431,8 +431,16 @@ class MiDesktopNewForm(MiDesktopForm):
     pool_quantity = forms.IntegerField(validators=[MinValueValidator(1)])
     pool_total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
     image_form = ImageForm(prefix="image")
-    calculator_form = CalculatorForm(prefix="calculator")
-    network_type = forms.ChoiceField(required=False,label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
+    cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
+    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
+    memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
+    storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
+    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    network_type = forms.ChoiceField(required=False,label='Will you be using a shared network or a dedicated network?',choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
     network_form = NetworkForm(prefix="network")
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
     
@@ -471,10 +479,96 @@ class MiDesktopNewForm(MiDesktopForm):
         quantity= self.cleaned_data.get("pool_quantity")
 
         if base_image_id == 999999999:
-            pass
+            #New Pool with new Image
+            image_name=self.data.get("image-name")
+            cpu = self.cleaned_data.get("cpu")
+            memory = self.cleaned_data.get("memory")
+            gpu = self.cleaned_data.get("gpu")
+            network_id = self.data.get("network")
+            if self.data.get("network") == 'new':
+                new_network = Network(
+                    name=self.data['network-name'],
+                    size=self.data['network-mask'],
+                    owner=self.owner,
+                )
+
+                new_network.save()
+
+                new_image = Image(
+                    name = image_name,
+                    cpu = cpu,
+                    memory = memory,
+                    gpu = gpu,
+                    shared_network = False,
+                    network = new_network,
+                    owner=self.owner
+                )
+
+                new_image.save()
+
+                new_pool = Pool(
+                    shortcode = shortcode,
+                    name = name,
+                    quantity = quantity,
+                    owner=self.owner
+                )
+
+                new_pool.save()
+
+                new_pool.images.add(new_image)
+                return new_pool
+
+            elif self.cleaned_data.get('network_type') != 'dedicated':
+                new_image = Image(
+                    name = image_name,
+                    cpu = cpu,
+                    memory = memory,
+                    gpu = gpu,
+                    shared_network = True,
+                    network = None,
+                    owner=self.owner
+                )
+                new_image.save()
+
+                new_pool = Pool(
+                    shortcode = shortcode,
+                    name = name,
+                    quantity = quantity,
+                    owner=self.owner
+                )
+
+                new_pool.save()
+
+                new_pool.images.add(new_image)
+                return new_pool
+            
+            else:
+                new_image = Image(
+                    name = image_name,
+                    cpu = cpu,
+                    memory = memory,
+                    gpu = gpu,
+                    shared_network = False,
+                    network = Network.objects.get(pk = network_id),
+                    owner=self.owner
+                )
+
+                new_image.save()
+
+                new_pool = Pool(
+                    shortcode = shortcode,
+                    name = name,
+                    quantity = quantity,
+                    owner=self.owner
+                )
+
+                new_pool.save()
+
+                new_pool.images.add(new_image)
+                return new_pool
+            
         else:
             base_image_object = Image.objects.get(id = base_image_id)
-            print(base_image_object)
             new_pool = Pool(
                 shortcode = shortcode,
                 name = name,
@@ -529,7 +623,7 @@ class MiDesktopNewImageForm(MiDesktopForm):
         super().save()
 
         if(network_type == 'dedicated' and len(network_name) == 0):
-            print('New Image on Network thats already created')
+            #'New Image on Network thats already created'
             network_id = int(self.data['network'])
 
             new_image = Image(
@@ -545,7 +639,7 @@ class MiDesktopNewImageForm(MiDesktopForm):
             return new_image
 
         elif(network_type == 'dedicated' and len(network_name) > 0):
-            print('New Image on New Network')
+            #New Image on New Network'
             new_network = Network(
                 name=self.data['network-name'],
                 size=self.data['network-mask'],
@@ -567,7 +661,7 @@ class MiDesktopNewImageForm(MiDesktopForm):
             return new_image
 
         else:
-            print('New Image on Shared Network')
+            #New Image on Shared Network'
             new_image = Image(
                     name = image_name,
                     cpu = cpu,

@@ -45,17 +45,57 @@
             <div>
             
             <div id="new-image-wrapper" v-show="visible">
-                {{ form.image_form }}
-                {{ form.calculator_form }}
-            </div>
+                {{ form.image_form }}</div>
+            <div class="form-group" id="calculator-wrapper" v-show="visible">
+                    <h6>
+                    <div class="row">
+                        <div class="col">
+                            {{ form.cpu.label_tag }}{{ form.cpu }}
+                        </div>
+                        <div class="col">
+                            {{ form.cpu_cost.label_tag }}{{ form.cpu_cost }}
+                        </div>
+                    </div><br/>
+                    <div class="row">
+                        <div class="col">
+                            {{ form.memory.label_tag }}{{ form.memory }}
+                        </div>
+                        <div class="col">
+                            {{ form.memory_cost.label_tag }}{{ form.memory_cost }}
+                        </div>
+                    </div><br/>
+                    <div class="row">
+                        <div class="col">
+                            {{ form.storage.label_tag }}{{ form.storage }}
+                        </div>
+                        <div class="col">
+                            {{ form.storage_cost.label_tag }}{{ form.storage_cost }}
+                        </div>
+                    </div><br/>
+                    <div class="row">
+                        <div class="col">
+                            {{ form.gpu.label_tag }}{{ form.gpu }}
+                        </div>
+                        <div class="col">
+                            {{ form.gpu_cost.label_tag }}{{ form.gpu_cost }}
+                        </div>
+                    </div><br/>
+                    <div class="row">
+                        <div class="col">
+                            {{ form.total.label_tag }}{{ form.total }}
+                        </div>
+                    </div>
+                    </h6>
+                </div>
+
 
             <h6>{{form.pool_quantity.label_tag}}<input type="number" name="pool_quantity" class="form-control" id="id_pool_quantity" v-model="poolQuantity"/></h6>
             <h6>{{form.pool_total.label_tag}}<input type="text" name="pool_total" readonly="true" class="form-control" id="id_pool_total" :value="poolTotal"></h6>
             
             <div id="network_type" v-show="visible">
-                <h6>Will you be using a shared network or a dedicated network?..
+                <h6>Will you be using a shared network or a dedicated network?
                     <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
-                        <option v-for="network_type in network_choice_list" :value="network_type.label" :key="network_type.key">[[network_type.label]] </option>
+                        <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
                     </select>
                 </h6>
             </div>
@@ -89,6 +129,80 @@
 </script>
 
 <script>
+    const calculator_wrapper = new Vue({
+        el: '#calculator-wrapper',
+        delimiters: ['[[', ']]'],
+        data: {
+            visible: false,
+            CPU_INITIAL:1.15,
+            MEMORY_INITIAL:0.96,
+            STORAGE_INITIAL:5.00,
+            GPU_INITIAL:0.00,
+            BASE_COST:31.31,
+            TOTAL_INITIAL:this.CPU_INITIAL + this.MEMORY_INITIAL + this.STORAGE_INITIAL + this.GPU_INITIAL + this.BASE_COST
+        },
+        mounted() {
+            eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+        },
+
+        methods: {
+            handleBaseImageSelected(selectedBaseImage){
+                this.selectedBaseImage = selectedBaseImage
+                this.updateVisibility();
+                this.attachEventListeners();
+                this.handleCpuChange();
+                this.handleMemoryChange();
+                this.handleStorageChange();
+                this.calculateBaseImageCost();
+
+            },
+            updateVisibility(){
+                if(this.selectedBaseImage === 'new' || this.selectedBaseImage === 999999999){
+                    this.visible = true
+                } else {
+                    this.visible = false
+                }
+            },
+            calculateBaseImageCost(){
+                this.cost = this.BASE_COST + parseFloat(this.cpu_cost.value) + parseFloat(this.memory_cost.value) + parseFloat(this.storage_cost.value) + parseFloat(this.gpu_cost.value)
+                this.total_cost.value = this.cost.toFixed(2)
+                eventBus.$emit('new-base-image-total-changed', this.total_cost.value);
+            },
+            attachEventListeners() {
+                document.getElementById("{{ form.cpu.id_for_label }}").addEventListener('change', this.handleCpuChange);
+                document.getElementById("{{ form.memory.id_for_label }}").addEventListener('change', this.handleMemoryChange);
+                document.getElementById("{{ form.storage.id_for_label }}").addEventListener('change', this.handleStorageChange);
+                document.getElementById("{{ form.gpu.id_for_label }}").addEventListener('change', this.handleGpuChange);
+                this.cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}")
+                this.memory_choice = document.getElementById("{{ form.memory.id_for_label }}")
+                this.storage_choice = document.getElementById("{{ form.storage.id_for_label }}")
+                this.gpu_choice = document.getElementById("{{ form.gpu.id_for_label }}")
+                this.cpu_cost = document.getElementById("{{ form.cpu_cost.id_for_label }}");
+                this.memory_cost = document.getElementById("{{ form.memory_cost.id_for_label }}");
+                this.storage_cost = document.getElementById("{{ form.storage_cost.id_for_label }}");
+                this.gpu_cost = document.getElementById("{{ form.gpu_cost.id_for_label }}");
+                this.total_cost = document.getElementById("{{ form.total.id_for_label }}");
+                this.gpu_cost.value = 0.00.toFixed(2)
+
+            },
+            handleCpuChange(){
+                this.cpu_cost.value = (this.cpu_choice.value * this.CPU_INITIAL).toFixed(2)
+                this.calculateBaseImageCost()
+            },
+            handleMemoryChange(){
+                this.memory_cost.value = (this.memory_choice.value * this.MEMORY_INITIAL).toFixed(2)
+                this.calculateBaseImageCost()
+            },
+            handleStorageChange(){
+                this.storage_cost.value = (this.storage_choice.value * 0.10) .toFixed(2)
+                this.calculateBaseImageCost()
+            },
+            handleGpuChange(){
+                this.gpu_cost.value = this.gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+                this.calculateBaseImageCost()
+            },
+        }
+    });
     const pool_quantity_handler = new Vue({
         el: '#id_pool_quantity',
         delimiters: ['[[', ']]'],
@@ -107,7 +221,6 @@
 
         methods: {
             handleQuantityChange(quantity){
-                console.log('quant cange')
                 if (parseInt(quantity) <1){
                     this.poolQuantity = 1
                 }
@@ -127,7 +240,7 @@
             baseImageTotalCost: 0.00
         },
         mounted() {
-            
+            eventBus.$on('new-base-image-total-changed', this.handleBaseImageTotalChanged);
             eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
             eventBus.$on('pool-quantity-changed', this.handlePoolQuantityChanged);
         },
@@ -140,6 +253,10 @@
                 console.log(this.quantity)
                 this.calculateTotal()
             },
+            handleBaseImageTotalChanged(imageTotal){
+                this.baseImageTotalCost = imageTotal
+                this.calculateTotal()
+            },
             handleBaseImageSelected(selectedBaseImage){
                 this.selectedBaseImageID = selectedBaseImage
                 if (this.selectedBaseImageID != 999999999){
@@ -147,7 +264,7 @@
                     this.baseImageTotalCost = this.baseImage[0].total_cost
                     this.calculateTotal()
                 }else{
-
+                    this.calculateTotal()
                 }
             },
             calculateTotal(){
