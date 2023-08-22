@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>New Network</h1>
+
+<div class="container">
+    <form method="POST">
+        {% csrf_token %}
+
+        <div id="div_formbody">
+            <h6>
+                {{ form.admin_group.label_tag }} {{ form.admin_group }}
+                {{ form.admin_group.errors }}
+                </h6>
+                
+                <!-- Network Form Fields -->
+                {{ form.network_form }}
+                    
+   
+        </div>
+        <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+
+{% endblock %}

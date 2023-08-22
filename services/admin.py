@@ -32,3 +32,16 @@ class GCPAccountAdmin(CloudAdmin):
     inlines = [GCPInline]
     
 
+@admin.register(Image)
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ['name', 'owner']
+
+
+@admin.register(Network)
+class NetworkAdmin(admin.ModelAdmin):
+    list_display = ['name', 'owner']
+
+
+@admin.register(Pool)
+class PoolAdmin(admin.ModelAdmin):
+    list_display = ['name', 'owner', 'shortcode']

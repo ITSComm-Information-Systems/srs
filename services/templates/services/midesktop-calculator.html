@@ -1,0 +1,90 @@
+
+<div class="form-group" id="wrapper_calculator">
+    <h6>
+    <div class="row">
+        <div class="col">
+            {{ form.cpu.label_tag }}{{ form.cpu }}
+        </div>
+        <div class="col">
+            {{ form.cpu_cost.label_tag }}{{ form.cpu_cost }}
+        </div>
+    </div><br/>
+    <div class="row">
+        <div class="col">
+            {{ form.memory.label_tag }}{{ form.memory }}
+        </div>
+        <div class="col">
+            {{ form.memory_cost.label_tag }}{{ form.memory_cost }}
+        </div>
+    </div><br/>
+    <div class="row">
+        <div class="col">
+            {{ form.storage.label_tag }}{{ form.storage }}
+        </div>
+        <div class="col">
+            {{ form.storage_cost.label_tag }}{{ form.storage_cost }}
+        </div>
+    </div><br/>
+    <div class="row">
+        <div class="col">
+            {{ form.gpu.label_tag }}{{ form.gpu }}
+        </div>
+        <div class="col">
+            {{ form.gpu_cost.label_tag }}{{ form.gpu_cost }}
+        </div>
+    </div><br/>
+    <div class="row">
+        <div class="col">
+            {{ form.total.label_tag }}{{ form.total }}
+        </div>
+    </div>
+    </h6>
+</div>
+
+
+<script>
+    const cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}");
+    const memory_choice = document.getElementById("{{ form.memory.id_for_label }}");
+    const storage_choice = document.getElementById("{{ form.storage.id_for_label }}");
+    const gpu_choice = document.getElementById("{{ form.gpu.id_for_label }}");
+    const cpu_cost = document.getElementById("{{ form.cpu_cost.id_for_label }}");
+    const memory_cost = document.getElementById("{{ form.memory_cost.id_for_label }}");
+    const storage_cost = document.getElementById("{{ form.storage_cost.id_for_label }}");
+    const gpu_cost = document.getElementById("{{ form.gpu_cost.id_for_label }}");
+    const total_cost = document.getElementById("{{ form.total.id_for_label }}");
+
+    window.addEventListener("load", (event) => {
+        storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
+        gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+        cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
+        memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
+        calculateBaseImageCost()
+    })
+
+    cpu_choice.addEventListener("change", () => {
+        cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
+        calculateBaseImageCost()
+    })
+
+    memory_choice.addEventListener("change", () => {
+        memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
+        calculateBaseImageCost()
+    })
+
+    storage_choice.addEventListener("change", () => {
+        storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
+        calculateBaseImageCost()
+    })
+
+    gpu_choice.addEventListener("change", () => {
+        gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+        calculateBaseImageCost()
+    })
+
+
+    function calculateBaseImageCost(){
+        base_cost = 31.31
+        cost = base_cost + parseFloat(cpu_cost.value) + parseFloat(memory_cost.value) + parseFloat(storage_cost.value) + parseFloat(gpu_cost.value)
+        total_cost.value = cost.toFixed(2)
+    }
+</script>

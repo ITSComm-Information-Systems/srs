@@ -743,6 +743,13 @@ class Services(UserPassesTestMixin, View):
                                    {'label': 'View/Change Microsoft Azure', 'target': '/services/azure'},
                                    {'label': 'Order AWS', 'target': '/services/aws/add/'},
                                    {'label': 'View/Change AWS', 'target': '/services/aws/'} ]
+            elif service.name == 'midesktop':
+                service.actions = [{'label': 'Order MiDesktop','target': '/services/midesktop/add/'},
+                                   {'label': 'View/Change MiDesktop','target': '/services/midesktop/'},
+                                   {'label': 'Create Image','target': '/services/midesktop-image/add'},
+                                   {'label': 'View/Change Image','target': '/services/midesktop-image/'},
+                                   {'label': 'Create Network','target': '/services/midesktop-network/add'},
+                                   {'label': 'View/Change Network','target': '/services/midesktop-network/'}]
             elif service.name == 'container':
                 service.actions = [{'label': 'Request Container Project', 'target': '/services/container/add/',
                                     'description': 'The ITS Container Service hosts containerized applications. A Container Project is a development environment for creating or hosting a containerized app.'}]

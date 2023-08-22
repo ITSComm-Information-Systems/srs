@@ -1,9 +1,12 @@
 from django.db import models
 from django.forms import BooleanField
+#from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 from project.models import Choice
 from oscauth.models import LDAPGroup
 from django.contrib.auth.models import User
+from django.utils.functional import cached_property
+from order.models import StorageRate
 
 
 class Status(models.TextChoices):
@@ -143,3 +146,94 @@ class Service():
     azure = Azure
     gcpaccount = GCPAccount
     container = Container
+
+class MiDesktop(models.Model):
+    instance_label = 'Instance'
+    name = models.CharField(max_length=30, default='TBD')
+    status = models.CharField(max_length=1, choices = Status.choices, default=Status.ACTIVE)
+    owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)
+    created_date = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True 
+
+class Image(MiDesktop):
+    instance_label = 'Image Name'
+    name = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
+    cpu = models.IntegerField()
+    memory = models.IntegerField()
+    gpu = models.BooleanField(blank=True, null=True)
+    shared_network = models.BooleanField(default=True)
+    network = models.ForeignKey("Network", on_delete=models.CASCADE, null=True, blank=True)
+
+    @cached_property
+    def total_storage_size(self):
+        storage = ImageDisk.objects.filter(server=self).aggregate(models.Sum('size'))
+        if storage:
+            sum = storage['size__sum']
+            if sum:
+                return storage['size__sum']
+
+        return 0
+    
+    @cached_property
+    def total_cost(self):
+        import decimal
+        for rate in StorageRate.objects.filter(service__name='midesktop'):
+            print(rate.label, rate.rate)
+            if rate.label == 'Base':
+                total_cost = rate.rate
+            if rate.label == 'CPU':
+                total_cost = total_cost + (rate.rate * decimal.Decimal(self.cpu))
+            if rate.label == 'Memory':
+                total_cost = total_cost + (rate.rate * decimal.Decimal(self.memory))
+            if rate.label == 'Storage':
+                total_cost = total_cost + (rate.rate * 50)
+            if rate.label[:3] == 'GPU' and self.gpu == True:
+                total_cost = total_cost + rate.rate
+
+        return total_cost
+
+    class Meta:
+        verbose_name = 'MiDesktop Image'
+
+class Network(MiDesktop):
+    instance_label = 'Network Name'
+    name = models.CharField(blank=True, max_length=80)
+    size = models.CharField(blank=True, max_length=80)
+
+    class Meta:
+        verbose_name = 'MiDesktop Network'
+
+class ImageDisk(models.Model):
+    image = models.ForeignKey(Image, related_name='storage', on_delete=models.CASCADE)
+    name = models.CharField(max_length=10)
+    size = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+    
+class Pool(MiDesktop):
+    instance_label = 'Pool Name'
+    shortcode = models.CharField(max_length=6)
+    name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
+    type = models.CharField(default='instant-clone',max_length=30,)
+    quantity = models.IntegerField()
+    images = models.ManyToManyField(Image)
+
+    @cached_property
+    def total_cost(self):
+        total_cost = 0
+        for image in self.images:
+            total_cost += image.total_cost
+
+        return total_cost
+    
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'MiDesktop Pool'
