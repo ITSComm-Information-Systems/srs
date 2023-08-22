@@ -101,7 +101,6 @@ class ServiceRequestView(UserPassesTestMixin, View):
                     "total_cost":str(image.total_cost)
                 
                 })
-                print(image)
 
             context = {}
             context["form"] = form
@@ -172,6 +171,13 @@ class ServiceDeleteView(UserPassesTestMixin, View):
             instance.status = Status.ENDED
             instance.save()
             return HttpResponseRedirect('/requestsent')
+        elif service == 'midesktop':
+            instance = get_object_or_404(Pool, pk=id)
+            if not user_has_access(request.user, instance.owner):
+                return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            instance.status = Status.ENDED
+            instance.save()
+            return HttpResponseRedirect('/requestsent')
         else:
 
             if request.POST.get('confirm_delete') != 'on':
@@ -203,6 +209,13 @@ class ServiceDeleteView(UserPassesTestMixin, View):
                         'instance': instance, })
         elif service == 'midesktop-image':
             instance = get_object_or_404(Image, pk=id)
+            if not user_has_access(request.user, instance.owner):
+                return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            return render(request, self.template,
+                        {
+                        'instance': instance, })
+        elif service == 'midesktop':
+            instance = get_object_or_404(Pool, pk=id)
             if not user_has_access(request.user, instance.owner):
                 return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
             return render(request, self.template,
@@ -321,7 +334,11 @@ class ServiceChangeView(UserPassesTestMixin, View):
 def get_service_list(request, service):
     groups = list(LDAPGroupMember.objects.filter(username=request.user).values_list('ldap_group_id',flat=True))
     if service == 'midesktop':
-        return render(request,'services/midesktop_existing.html',{'groups': groups})
+        template = 'services/midesktop_existing.html'
+        pool_list = Pool.objects.filter(status='A',owner__in=groups).order_by('name')
+        return render(request,template,{
+                'pool_list': pool_list,
+                'groups': groups,})
     elif service == 'midesktop-image':
         image_list = Image.objects.filter(status='A',owner__in=groups).order_by('name')
         return render(request,'services/midesktop-image_existing.html',{'groups': groups,'image_list':image_list})
