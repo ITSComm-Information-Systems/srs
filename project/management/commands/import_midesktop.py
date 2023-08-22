@@ -64,12 +64,19 @@ class Images():
 
     def process_record(row):
         # 0Base images    1GPU 2CPU 3RAM 4Storage 5Owner
+
+        try:
+            net = Network.objects.get(name=row[6].strip("'"))
+        except:
+            net = None
+    
         image = Image()
         image.name = row[0].strip("'")
         image.gpu = row[1].strip("'").capitalize()
         image.cpu = row[2].strip("'")
         image.memory = row[3].strip("'")
         image.owner = LDAPGroup().lookup(row[5].strip("'"))
+        image.network = net
         image.save()
 
         disk = ImageDisk()
@@ -95,6 +102,3 @@ class Pools():
 
         images = Image.objects.filter(name=row[3].strip("'"))
         pool.images.set(images)
-
-        networks = Image.objects.filter(name=row[4].strip("'"))
-        pool.network.set(networks)
