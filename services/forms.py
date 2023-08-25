@@ -747,3 +747,43 @@ class MiDesktopChangeNetworkForm(forms.ModelForm):
         model = Network
         fields = ['name','size']
 
+
+class InstantClonePoolChangeForm(forms.ModelForm):
+    shortcode = forms.CharField(validators=[validate_shortcode], required=True)
+    name = forms.CharField(required=True)
+    images = forms.ChoiceField(label='Image', required=True)
+    quantity = forms.IntegerField(validators=[MinValueValidator(1)])
+    total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
+        self.image = kwargs.pop('image', None)
+        self.total = round(self.image.total_cost,2)
+        kwargs.pop('user', None)
+
+        super(InstantClonePoolChangeForm, self).__init__(*args, **kwargs)
+        if self.user:
+            #owner = LDAPGroup.lookup(self.instance.owner['name'])
+            # print(type(self.instance.owner.name))
+            # print(self.instance.owner.id)
+            # print(LDAPGroup.objects.filter(id=self.instance.owner.id))
+            # groups = list(LDAPGroupMember.objects.filter(username=self.user).values_list('ldap_group_id',flat=True))
+            # print(groups)
+            image_list = Image.objects.filter(status='A',owner__in=[self.instance.owner.id]).order_by('name')
+            choice_list = [(None, '---')]
+            for image in image_list:
+                choice_list.append((image.name, image.name))
+            self.fields['images'].choices = choice_list
+
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+        self.fields['total'].initial = self.total
+        
+
+    class Meta:
+        model = Pool
+        fields = ['shortcode','name','quantity']
