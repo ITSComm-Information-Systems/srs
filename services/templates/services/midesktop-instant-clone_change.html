@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+<script type='text/javascript'>var eventBus = new Vue();</script>
+<h1>Modify MiDesktop Pool</h1>
+
+<div class="container">
+    <strong>Pool Name:</strong>&nbsp;{{ form.instance.name }}<br/>
+    
+    <strong>Image:</strong>&nbsp;<a href="/services/midesktop-network/{{ form.image.id }}/change/">{{ form.image.name }}</a><br/>
+    <hr>
+
+        <form method="POST">
+            {% csrf_token %}
+    
+            <div id="div_formbody">
+                <h6>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
+                <h6>{{form.name.label_tag}}{{form.name}}</h6>
+                <h6>{{form.images.label_tag}}{{form.images}}</h6>
+                <h6>{{form.quantity.label_tag}}<input type="number" name="quantity" class="form-control" id="id_quantity" v-model="poolQuantity"/></h6>
+
+                <h6>{{form.total.label_tag}}<input type="text" name="total" readonly="true" class="form-control" id="id_total" :value="poolTotal"></h6>
+
+            </div>
+            <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    
+
+</div>
+<script>
+    const pool_quantity_handler = new Vue({
+        el: '#id_quantity',
+        delimiters: ['[[', ']]'],
+        data: {
+            poolQuantity: 1,
+        },
+        mounted() {
+            this.poolQuantity = "{{form.quantity.value}}"
+            eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+        },
+        watch: {
+            poolQuantity: function (newVal) {
+                eventBus.$emit('pool-quantity-changed', newVal);
+                this.handleQuantityChange(newVal)
+            }
+        },
+
+        methods: {
+            handleQuantityChange(quantity){
+                if (parseInt(quantity) <1){
+                    this.poolQuantity = 1
+                }
+            },
+            handleBaseImageSelected(){
+                console.log('pew')
+            }
+        }
+    });
+    const pool_total_handler = new Vue({
+        el: '#id_total',
+        delimiters: ['[[', ']]'],
+        data: {
+            poolTotal: '0.00',
+            quantity: 1,
+            baseImageTotalCost: 0.00
+        },
+        mounted() {
+            this.quantity = "{{form.quantity.value}}"
+            this.baseImageTotalCost = "{{form.total.value}}"
+            this.calculateTotal()
+            eventBus.$on('new-base-image-total-changed', this.handleBaseImageTotalChanged);
+            eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+            eventBus.$on('pool-quantity-changed', this.handlePoolQuantityChanged);
+        },
+
+        methods: {
+            handlePoolQuantityChanged(newQuantity){
+                
+                this.quantity = parseInt(newQuantity)
+                this.calculateTotal()
+            },
+            handleBaseImageSelected(selectedBaseImage){
+                this.selectedBaseImageID = selectedBaseImage
+                if (this.selectedBaseImageID != 999999999){
+                    this.baseImage = imagelist.filter(image => image.id === this.selectedBaseImageID)
+                    this.baseImageTotalCost = this.baseImage[0].total_cost
+                    this.calculateTotal()
+                }else{
+                    this.calculateTotal()
+                }
+            },
+            calculateTotal(){
+                this.poolTotal = (this.quantity * this.baseImageTotalCost).toFixed(2)
+            },
+        }
+    });
+</script>
+{% endblock %}
