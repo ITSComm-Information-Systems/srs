@@ -660,7 +660,6 @@ class Server(models.Model):
     domain = models.CharField(max_length=100)
     datacenter = models.CharField(max_length=100)
     firewall_requests = models.CharField(max_length=100)
-    legacy_data = models.TextField()
 
     @cached_property
     def total_disk_size(self):
@@ -804,7 +803,6 @@ class Database(models.Model):
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
     server = models.ForeignKey(Server, null=True, blank=True, on_delete=models.SET_NULL)
-    legacy_data = models.TextField()
 
 
     def __str__(self):

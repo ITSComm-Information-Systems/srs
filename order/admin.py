@@ -158,6 +158,7 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
                 choice_related.append(field.name)
 
         writer.writerow(row)
+        print(choice_related)
 
         instance_list = list(self.model.objects.all().select_related(*choice_related))
         for instance in instance_list:
@@ -202,7 +203,7 @@ class DatabaseAdmin(ServiceInstanceAdmin):
     list_display = ['name', 'owner','type', 'shared']
     list_filter = ('in_service','type')
     ordering = ('name',)
-    readonly_fields = ('legacy_data','server','shared')
+    readonly_fields = ('server','shared')
     search_fields = ['name','owner__name']
     autocomplete_fields = ['owner']
     list_select_related = ['owner','type','server']
@@ -214,10 +215,6 @@ class DatabaseAdmin(ServiceInstanceAdmin):
             ('shared', 'size'),
             'purpose'
             )
-        }),
-        ('Legacy Data', {
-            'classes': ('collapse',),
-            'fields': ('legacy_data',),
         }),
     )
 
@@ -243,7 +240,7 @@ class ServerAdmin(ServiceInstanceAdmin):
     list_select_related = ['owner','os']
     inlines = [ServerDiskInline,]
 
-    readonly_fields = ('legacy_data','created_date','total_cost','total_disk_size')
+    readonly_fields = ('created_date','total_cost','total_disk_size')
 
     fieldsets = (
         (None, {
@@ -259,10 +256,6 @@ class ServerAdmin(ServiceInstanceAdmin):
             'classes': ('managed-section',),
             'fields': (('patch_day','patch_time'),
                     ('reboot_day', 'reboot_time'),),
-        }),
-        ('Legacy Data', {
-            'classes': ('collapse',),
-            'fields': ('legacy_data',),
         }),
         (None, {
             'fields': (('total_disk_size','total_cost'),),
