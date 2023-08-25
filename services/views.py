@@ -311,6 +311,17 @@ class ServiceChangeView(UserPassesTestMixin, View):
                         'form': form,
                         'calculator_form': calculator_form,
                         'image_form':image_form })
+        elif service == 'midesktop':
+            template = 'services/midesktop-instant-clone_change.html'
+            instance = get_object_or_404(Pool,pk=id, status=Status.ACTIVE)
+            image = instance.images.all()[0]
+
+            title = 'Modify ' + instance._meta.verbose_name.title()
+            form = InstantClonePoolChangeForm(user=self.request.user, instance=instance, image=image)
+            return render(request, template,
+                        {'title': title,
+                        'form': form,})
+
         else:
             request.session['backupStorage'] = 'cloud'
             model = getattr(Service, service)
