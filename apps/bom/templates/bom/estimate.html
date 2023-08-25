@@ -319,8 +319,8 @@
 
     status = $("#id_status").val()
     element = $("#element").val()
-    // Lockdown all fields once rejected, completed or cancelled
-    if (status == 0 || status > 3) {
+    // Lockdown all fields once rejected(0), completed(4) or cancelled(5)
+    if (status == 0 || status == 4 || status == 5) {
       $(':input').not('.always-enabled').prop("disabled", true);
       $("#pinNote :input").prop("disabled", false)
       $('#notifyWarehouse').hide();
@@ -343,7 +343,7 @@
       });
     }
     // One ITS
-    if (status != 1) {
+    if (status != 1 && status != 6) {  // Not estimate or approved
       $("#nav-location :input[name^='material-']").prop("readonly", true);
       $('#addEstimateBtn').hide();
     }

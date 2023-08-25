@@ -148,33 +148,29 @@ class PreOrder(models.Model):
 class EstimateManager(models.Manager):
     def assigned_to(self, username):
 
-        sql = "select * " \
-        "from um_bom_estimate_search_v est " \
-        "where status_name = 'Open' " \
-        "and status = 'Estimate' " \
-        "and assigned_engineer = %s " \
-        "and engineer_status = 'NOT_COMPLETE' " \
-        "and not exists (select 'x' from um_bom_estimate_search_v " \
-        "                where pre_order_number = est.pre_order_number " \
-        "                and (engineer_status <> 'NOT_COMPLETE' or status <> 'Estimate')) " \
-        "union " \
-        "select *  " \
-        "from um_bom_estimate_search_v " \
-        "where status_name = 'Open' " \
-        "and status in ('Approved' , 'Ordered', 'Warehouse') " \
-        "and engineer_status = 'NOT_COMPLETE' " \
-        "and assigned_engineer = %s " \
-        "union " \
-        "select * " \
-        "from um_bom_estimate_search_v " \
-        "where assigned_netops = %s " \
-        " and pre_order_number in (select pre_order_number from um_bom_project_v where status > 1) " \
-        "union " \
-        "select *  " \
-        "from um_bom_estimate_search_v " \
-        "where status_name = 'Open' " \
-        "and status <> 'Rejected' " \
-        "and project_manager = %s " 
+        sql = '''
+            select *
+            from um_bom_estimate_search_v est 
+            where (status_name = 'Open'
+                    and status = 'Estimate' 
+                    and assigned_engineer = %s
+                    and engineer_status = 'NOT_COMPLETE' 
+                    and not exists (select 'x' from um_bom_estimate_search_v 
+                                    where pre_order_number = est.pre_order_number 
+                                    and (engineer_status <> 'NOT_COMPLETE' or status <> 'Estimate')) )
+            or
+                    (assigned_netops = %s
+                    and pre_order_number in (select pre_order_number from um_bom_project_v where status > 1) )
+            or 
+                    (status_name = 'Open' 
+                    and status <> 'Rejected' 
+                    and project_manager = %s)
+            or
+                    (status_name = 'Open' 
+                    and status in ('Approved' , 'Ordered', 'Warehouse') 
+                    and engineer_status = 'NOT_COMPLETE' 
+                    and assigned_engineer = %s)
+        '''
 
         return self.raw(sql, [username,username,username,username])
     
