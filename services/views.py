@@ -315,7 +315,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
             template = 'services/midesktop-instant-clone_change.html'
             instance = get_object_or_404(Pool,pk=id, status=Status.ACTIVE)
             image = instance.images.all()[0]
-
+            images = Image.objects.filter(status='A',owner__in=[instance.owner.id]).order_by('name')
             title = 'Modify ' + instance._meta.verbose_name.title()
             form = InstantClonePoolChangeForm(user=self.request.user, instance=instance, image=image)
             return render(request, template,
