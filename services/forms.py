@@ -756,12 +756,7 @@ class InstantClonePoolChangeForm(forms.ModelForm):
 
         super(InstantClonePoolChangeForm, self).__init__(*args, **kwargs)
         if self.user:
-            #owner = LDAPGroup.lookup(self.instance.owner['name'])
-            # print(type(self.instance.owner.name))
-            # print(self.instance.owner.id)
-            # print(LDAPGroup.objects.filter(id=self.instance.owner.id))
-            # groups = list(LDAPGroupMember.objects.filter(username=self.user).values_list('ldap_group_id',flat=True))
-            # print(groups)
+
             image_list = Image.objects.filter(status='A',owner__in=[self.instance.owner.id]).order_by('name')
             choice_list = [(None, '---')]
             for image in image_list:
@@ -775,6 +770,7 @@ class InstantClonePoolChangeForm(forms.ModelForm):
             else:
                 print('no widget for', field)
         self.fields['total'].initial = self.total
+        self.fields['images'].initial = self.image.name
         
 
     class Meta:

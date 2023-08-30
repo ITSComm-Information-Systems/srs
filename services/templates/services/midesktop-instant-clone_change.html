@@ -16,6 +16,7 @@
             <div id="div_formbody">
                 <h6>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
                 <h6>{{form.name.label_tag}}{{form.name}}</h6>
+
                 <h6>{{form.images.label_tag}}{{form.images}}</h6>
                 <h6>{{form.quantity.label_tag}}<input type="number" name="quantity" class="form-control" id="id_quantity" v-model="poolQuantity"/></h6>
 
@@ -80,19 +81,33 @@
                 this.calculateTotal()
             },
             handleBaseImageSelected(selectedBaseImage){
-                this.selectedBaseImageID = selectedBaseImage
-                if (this.selectedBaseImageID != 999999999){
-                    this.baseImage = imagelist.filter(image => image.id === this.selectedBaseImageID)
-                    this.baseImageTotalCost = this.baseImage[0].total_cost
-                    this.calculateTotal()
-                }else{
-                    this.calculateTotal()
-                }
+                console.log('base image change')
+                this.baseImageTotalCost = "{{form.total.value}}"
+                this.calculateTotal()
             },
             calculateTotal(){
                 this.poolTotal = (this.quantity * this.baseImageTotalCost).toFixed(2)
             },
         }
     });
+
+    const base_image = new Vue({
+    el: '#id_images',
+    delimiters: ['[[', ']]'],
+    data: {
+        selectedBaseImage: null,
+    },
+    mounted(){
+        this.selectedBaseImage = "{{form.images.value}}"
+    },
+    methods:{},
+
+    watch: {
+        selectedBaseImage: function (newVal) {
+            eventBus.$emit('new-base-image-selected', newVal);
+            console.log(newVal)
+        }
+    },
+})
 </script>
 {% endblock %}
