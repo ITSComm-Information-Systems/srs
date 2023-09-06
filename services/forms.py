@@ -792,6 +792,7 @@ class InstantClonePoolChangeForm(forms.ModelForm):
 class PersistentPoolChangeForm(forms.ModelForm):
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
     name = forms.CharField(required=True)
+    multi_image = forms.CharField(required=False)
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
 
     def __init__(self, *args, **kwargs):
@@ -815,6 +816,18 @@ class PersistentPoolChangeForm(forms.ModelForm):
                 print('no widget for', field)
         #self.fields['total'].initial = self.total
 
+    def save(self):
+        data = self.cleaned_data
+        self.instance.images.clear()
+        multi_image = data['multi_image']
+        images = [int(x) for x in multi_image.split(',')]
+        for image_id in images:
+            image = Image.objects.get(id = image_id)
+            self.instance.images.add(image)
+        
+        super().save()
+            
+
     class Meta:
         model = Pool
-        fields = ['shortcode','name','quantity']
+        fields = ['shortcode','name']
