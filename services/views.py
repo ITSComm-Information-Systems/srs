@@ -268,6 +268,26 @@ class ServiceChangeView(UserPassesTestMixin, View):
             return render(request, template,
                         {'title': title,
                         'form': form, })
+        elif service == 'midesktop':
+            instance = Pool.objects.get(id=id)
+            title = 'Modify ' + instance._meta.verbose_name.title()
+            if instance.type == 'instant-clone':
+                template = 'services/midesktop-instant-clone_change.html'
+                form = InstantClonePoolChangeForm(request.POST, user = self.request.user, instance = instance)
+            if instance.type == 'persistent':
+                template = 'services/midesktop-persistent_change.html'
+                form = PersistentPoolChangeForm(request.POST, user = self.request.user, instance = instance)
+            if instance.type == 'external':
+                pass
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/requestsent')
+            else:
+                print(form.errors)
+            return render(request, template,
+                        {'title': title,
+                        'form': form, })
+
 
         else:
             model = getattr(Service, service)

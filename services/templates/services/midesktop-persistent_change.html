@@ -32,8 +32,7 @@
                         :multiple="true"
                         :taggable="true"
                     /></multiselect>
-                    <pre class="language-json"><code> [[pickedImages]]  </code></pre>
-                    <input type="text" name="multi_image" id="id_multi_image" :value=[[pickedImages]]>
+                    <input type="text" name="multi_image" hidden="true" id="id_multi_image" :value=[[pickedImages]]>
                     <h6>{{form.total.label_tag}}<input type="text" name="total" readonly="true" class="form-control" id="id_total" :value="poolTotal"></h6>
                 </div>
                 
