@@ -312,15 +312,57 @@ class ServiceChangeView(UserPassesTestMixin, View):
                         'calculator_form': calculator_form,
                         'image_form':image_form })
         elif service == 'midesktop':
-            template = 'services/midesktop-instant-clone_change.html'
             instance = get_object_or_404(Pool,pk=id, status=Status.ACTIVE)
-            image = instance.images.all()[0]
-            images = Image.objects.filter(status='A',owner__in=[instance.owner.id]).order_by('name')
             title = 'Modify ' + instance._meta.verbose_name.title()
-            form = InstantClonePoolChangeForm(user=self.request.user, instance=instance, image=image)
-            return render(request, template,
+            if instance.type == 'instant-clone':
+                
+                template = 'services/midesktop-instant-clone_change.html'
+                image = instance.images.all()[0]
+                form = InstantClonePoolChangeForm(user=self.request.user, instance=instance, image=image)
+
+                return render(request, template,
                         {'title': title,
                         'form': form,})
+
+            if instance.type == 'persistent':
+                template = 'services/midesktop-persistent_change.html'
+                pool_images = instance.images.all()
+                form = PersistentPoolChangeForm(user=self.request.user, instance=instance)
+                images = Image.objects.filter(status='A',owner__in=[instance.owner.id]).order_by('name')
+                current_images = instance.images.all()
+                current_image_list = []
+                for image in current_images:
+                    print(image.total_cost)
+                    current_image_list.append({
+                        "id": image.id,
+                        "name": image.name,
+                        "owner": instance.owner.id,
+                        "total_cost": json.dumps(image.total_cost, default=float)
+                    })
+                image_list = []
+                for image in images:
+                    image_list.append({
+                        "id": image.id,
+                        "name": image.name,
+                        "owner": instance.owner.id,
+                        "total_cost": json.dumps(image.total_cost, default=float)
+                    })
+                image_json = json.dumps(image_list)
+                current_images_json = json.dumps(current_image_list)
+
+                return render(request, template,
+                        {'title': title,
+                        'form': form,
+                        'image_json': image_json,
+                        'pool_images': pool_images,
+                        'current_images_json': current_images_json})
+            if instance.type == 'external':
+                template = 'services/midesktop-external_change.html'
+            
+            #images = Image.objects.filter(status='A',owner__in=[instance.owner.id]).order_by('name')
+            title = 'Modify ' + instance._meta.verbose_name.title()
+            
+            
 
         else:
             request.session['backupStorage'] = 'cloud'
