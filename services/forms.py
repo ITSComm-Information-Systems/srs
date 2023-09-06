@@ -470,6 +470,7 @@ class MiDesktopNewForm(MiDesktopForm):
         name = self.cleaned_data.get("pool_name")
         base_image_id = int(self.cleaned_data.get("base_image"))
         quantity= self.cleaned_data.get("pool_quantity")
+        pool_type = self.cleaned_data.get("pool_type")
 
         if base_image_id == 999999999:
             #New Pool with new Image
@@ -503,7 +504,8 @@ class MiDesktopNewForm(MiDesktopForm):
                     shortcode = shortcode,
                     name = name,
                     quantity = quantity,
-                    owner=self.owner
+                    owner=self.owner,
+                    type = pool_type
                 )
 
                 new_pool.save()
@@ -527,7 +529,8 @@ class MiDesktopNewForm(MiDesktopForm):
                     shortcode = shortcode,
                     name = name,
                     quantity = quantity,
-                    owner=self.owner
+                    owner=self.owner,
+                    type = pool_type
                 )
 
                 new_pool.save()
@@ -552,7 +555,8 @@ class MiDesktopNewForm(MiDesktopForm):
                     shortcode = shortcode,
                     name = name,
                     quantity = quantity,
-                    owner=self.owner
+                    owner=self.owner,
+                    type = pool_type
                 )
 
                 new_pool.save()
@@ -566,7 +570,8 @@ class MiDesktopNewForm(MiDesktopForm):
                 shortcode = shortcode,
                 name = name,
                 quantity = quantity,
-                owner=self.owner
+                owner=self.owner,
+                type = pool_type
             )
             new_pool.save()
 
@@ -772,6 +777,36 @@ class InstantClonePoolChangeForm(forms.ModelForm):
         self.fields['total'].initial = self.total
         self.fields['images'].initial = self.image.name
         
+
+    class Meta:
+        model = Pool
+        fields = ['shortcode','name','quantity']
+
+class PersistentPoolChangeForm(forms.ModelForm):
+    shortcode = forms.CharField(validators=[validate_shortcode], required=True)
+    name = forms.CharField(required=True)
+    total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
+        #self.total = round(self.image.total_cost,2)
+        kwargs.pop('user', None)
+
+        super(PersistentPoolChangeForm, self).__init__(*args, **kwargs)
+        if self.user:
+            image_list = Image.objects.filter(status='A',owner__in=[self.instance.owner.id]).order_by('name')
+            choice_list = [(None, '---')]
+            for image in image_list:
+                choice_list.append((image.name, image.name))
+            #self.fields['images'].choices = choice_list
+
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+        #self.fields['total'].initial = self.total
 
     class Meta:
         model = Pool

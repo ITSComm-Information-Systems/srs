@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+<script src="https://unpkg.com/vue-multiselect@2.1.6"></script>
+<link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.6/dist/vue-multiselect.min.css">
+<script type='text/javascript'>
+    var eventBus = new Vue();
+    var imagelist = {{ image_json|safe }};
+    var currentImageList = {{ current_images_json|safe }};
+</script>
+<h1>Modify MiDesktop Pool</h1>
+
+<div class="container">
+    <strong>Pool Name:</strong>&nbsp;{{ form.instance.name }}<br/>
+    <hr>
+
+        <form method="POST">
+            {% csrf_token %}
+    
+            <div id="div_formbody">
+                <h6>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
+                <h6>{{form.name.label_tag}}{{form.name}}</h6>
+                <h6>Images:</h6>
+                <div id="app">
+                    <multiselect
+                        v-model="value"
+                        placeholder="Add Images"
+                        label="name" track-by="name"
+                        id="id_multi_image"
+                        name="multi_image"
+                        :options="options"
+                        :multiple="true"
+                        :taggable="true"
+                    /></multiselect>
+                    <pre class="language-json"><code> [[pickedImages]]  </code></pre>
+                    <input type="text" name="multi_image" id="id_multi_image" :value=[[pickedImages]]>
+                    <h6>{{form.total.label_tag}}<input type="text" name="total" readonly="true" class="form-control" id="id_total" :value="poolTotal"></h6>
+                </div>
+                
+
+            </div>
+            <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    
+
+</div>
+<script>
+var app = new Vue({
+    el: '#app',
+    delimiters: ['[[', ']]'],
+    components: { Multiselect: window.VueMultiselect.default },
+    mounted() {
+            this.options = imagelist
+            currentImageList.forEach(image=>{
+                this.value.push({name: image.name, id: image.id, total_cost: image.total_cost})
+            });
+        },
+    methods: {
+        calculateTotal(){
+            runningTotal = 0.00
+            this.value.forEach(image=>{
+                runningTotal = runningTotal + parseFloat(image.total_cost)
+            })
+            this.poolTotal = runningTotal
+        },
+        },
+    watch:{
+        value: function (newVal) {
+            this.pickedImages = []
+            newVal.forEach(image => {
+                this.pickedImages.push(image.id)
+            });
+            this.calculateTotal()
+        },
+    },
+    data () {
+        return {
+            value: [],
+            pickedImages: [],
+            options: [{}],
+            poolTotal: '1.00'
+        }
+    }
+})
+</script>
+{% endblock %}
