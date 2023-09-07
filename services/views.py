@@ -30,7 +30,6 @@ class ServiceRequestView(UserPassesTestMixin, View):
     def post(self, request, service):
         if service == 'midesktop':
             form = MiDesktopNewForm(request.POST, user=self.request.user)
-            print('bing bong')
             if form.is_valid():
                 form.save()
                 return HttpResponseRedirect('/requestsent')
@@ -335,7 +334,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
         elif service == 'midesktop':
             instance = get_object_or_404(Pool,pk=id, status=Status.ACTIVE)
             title = 'Modify ' + instance._meta.verbose_name.title()
-            if instance.type == 'instant-clone':
+            if instance.type == 'instant_clone':
                 
                 template = 'services/midesktop-instant-clone_change.html'
                 image = instance.images.all()[0]
@@ -353,7 +352,6 @@ class ServiceChangeView(UserPassesTestMixin, View):
                 current_images = instance.images.all()
                 current_image_list = []
                 for image in current_images:
-                    print(image.total_cost)
                     current_image_list.append({
                         "id": image.id,
                         "name": image.name,

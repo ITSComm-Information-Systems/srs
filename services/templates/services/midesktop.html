@@ -99,8 +99,9 @@
                     </h6>
                 </div>
 
-
-            <h6>{{form.pool_quantity.label_tag}}<input type="number" name="pool_quantity" class="form-control" id="id_pool_quantity" v-model="poolQuantity"/></h6>
+            <div id="id_pool_quantity" v-show="visible">
+                <h6>{{form.pool_quantity.label_tag}}<input type="number" name="pool_quantity" class="form-control"  v-model="poolQuantity"/></h6>
+            </div>
             <h6>{{form.pool_total.label_tag}}<input type="text" name="pool_total" readonly="true" class="form-control" id="id_pool_total" :value="poolTotal"></h6>
             
             <div id="network_type" v-show="visible">
@@ -250,9 +251,10 @@
         delimiters: ['[[', ']]'],
         data: {
             poolQuantity: 1,
+            visible: true
         },
         mounted() {
-            eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+            eventBus.$on('pool-type-selected', this.handlePoolTypeSelected);
         },
         watch: {
             poolQuantity: function (newVal) {
@@ -262,14 +264,18 @@
         },
 
         methods: {
+            handlePoolTypeSelected(poolType){
+                if (poolType == 'persistent'){
+                    this.visible = false
+                }else{
+                    this.visible = true
+                }
+            },
             handleQuantityChange(quantity){
                 if (parseInt(quantity) <1){
                     this.poolQuantity = 1
                 }
             },
-            handleBaseImageSelected(){
-                console.log('pew')
-            }
         }
     });
 
@@ -298,8 +304,6 @@
             handlePoolQuantityChanged(newQuantity){
                 
                 this.quantity = parseInt(newQuantity)
-                
-                console.log(this.quantity)
                 this.calculateTotal()
             },
             handleBaseImageTotalChanged(imageTotal){
