@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Modify MiDesktop Pool</h1>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div id="div_formbody">
+        <h6>{{form.name.label_tag}}{{form.name}}</h6>
+        <h6>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
+        <h6>{{form.quantity.label_tag}}{{form.quantity}}</h6>
+        <h6>{{form.total.label_tag}}{{form.total}}</h6>
+    </div>
+    <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<script>
+    const quantityField = document.getElementById("{{ form.quantity.id_for_label }}");
+    const totalField = document.getElementById("{{ form.total.id_for_label }}");
+
+
+    window.addEventListener("load", (event) => {
+        calculateBaseImageCost()
+    })
+
+    quantityField.addEventListener('change',()=>{
+        calculateBaseImageCost()
+    })
+
+
+    function calculateBaseImageCost(){
+        base_cost = 10.00
+        cost = base_cost * parseFloat(quantityField.value)
+        totalField.value = cost.toFixed(2)
+    }
+</script>
+{% endblock %}

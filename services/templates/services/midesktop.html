@@ -11,6 +11,9 @@
         {'key': 'web-access', 'label':'Shared Network (Web-Access)'},
         {'key': 'dedicated', 'label':'Dedicated Network'},
     ]
+    var pool_type_choices = [
+        {'key': 'instant-clone', 'label':'Instant Clone'},{'key': 'persistent', 'label':'Persistent'},{'key': 'external', 'label':'External'}
+    ]
     var networklist = {{ network_json|safe }};
     var imagelist = {{ image_json|safe }};
     var eventBus = new Vue();
@@ -33,12 +36,20 @@
             <h6>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
             <h2>Order New Pool</h2>
             <h6>{{form.pool_name.label_tag}}{{form.pool_name}}</h6>
-            <h6>{{form.pool_type.label_tag}}{{form.pool_type}}</h6>
-            <h2>Connection Options</h2>
-            <h6>{{form.auto_logout.label_tag}}{{form.auto_logout}}</h6>
-            <h6>{{form.ad_container.label_tag}}{{form.ad_container}}</h6>
-            <h6>{{form.ad_groups.label_tag}}{{form.ad_groups}}</h6>
-            <div id="base_image"> <h6>{{form.base_image.label_tag}}
+            <div id="pool_type">
+                <h6>Pool Type:
+                    <select class="form-control" name="pool_type" id="id_pool_type" v-model="selectedPoolType">
+                        <option v-for="pool_type in pool_type_choices" :value="pool_type.key" :key="pool_type.key">[[pool_type.label]] </option>
+                    </select>
+                </h6>
+            </div>
+            <div id="connection_options" v-show="visible">
+                <h2>Connection Options</h2>
+                <h6>{{form.auto_logout.label_tag}}{{form.auto_logout}}</h6>
+                <h6>{{form.ad_container.label_tag}}{{form.ad_container}}</h6>
+                <h6>{{form.ad_groups.label_tag}}{{form.ad_groups}}</h6>
+            </div>
+            <div id="base_image" v-show="visible"> <h6>{{form.base_image.label_tag}}
                 <select class="form-control" name="base_image" id="id_base_image" v-model="selectedBaseImage">
                     <option v-for="image in filteredImages" :value="image.id" :key="image.id">[[image.name]] </option>
                 </select></h6></div>
@@ -129,6 +140,37 @@
 </script>
 
 <script>
+    const connection_options_handler = new Vue({
+    el: '#connection_options',
+    delimiters: ['[[', ']]'],
+    data: {
+        visible: true,
+    },
+    mounted() {
+        eventBus.$on('pool-type-selected', this.handlePoolTypeSelected);
+    },
+    methods:{
+        handlePoolTypeSelected(poolType){
+            if (poolType == 'external'){
+                this.visible = false
+            }else{
+                this.visible = true
+            }
+        }
+    }
+});
+    const pool_type_handler = new Vue({
+    el: '#pool_type',
+    delimiters: ['[[', ']]'],
+    data: {
+        selectedPoolType: 'instant-clone',
+    },
+    watch: {
+        selectedPoolType: function (newVal) {
+            eventBus.$emit('pool-type-selected', newVal);
+        }
+    },
+});
     const calculator_wrapper = new Vue({
         el: '#calculator-wrapper',
         delimiters: ['[[', ']]'],
@@ -243,9 +285,16 @@
             eventBus.$on('new-base-image-total-changed', this.handleBaseImageTotalChanged);
             eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
             eventBus.$on('pool-quantity-changed', this.handlePoolQuantityChanged);
+            eventBus.$on('pool-type-selected', this.handlePoolTypeSelected);
         },
 
         methods: {
+            handlePoolTypeSelected(poolType){
+                if (poolType == 'external'){
+                    this.baseImageTotalCost = 10
+                }
+                this.calculateTotal()
+            },
             handlePoolQuantityChanged(newQuantity){
                 
                 this.quantity = parseInt(newQuantity)
@@ -303,15 +352,24 @@
     el: '#base_image',
     delimiters: ['[[', ']]'],
     data: {
+        visible: true,
         selectedBaseImage: null,
         filteredImages: [], // Add a data property to store filtered networks
         groups: groups
     },
     mounted(){
         eventBus.$on('group-selected', this.handleGroupChange);
+        eventBus.$on('pool-type-selected', this.handlePoolTypeSelected);
         this.updateFilteredImages();
     },
     methods:{
+        handlePoolTypeSelected(poolType){
+            if (poolType == 'external'){
+                this.visible = false
+            }else{
+                this.visible = true
+            }
+        },
         handleGroupChange(selectedGroup) {
             // Update the selectedGroup value when the group selection changes
             this.selectedGroup = selectedGroup;

@@ -415,12 +415,12 @@ class ImageForm(forms.Form):
 class MiDesktopNewForm(MiDesktopForm):
     title = 'MiDesktop New Order Form'
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
-    pool_type = forms.ChoiceField(label='Pool Type', help_text='Lorem', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent")))
+    pool_type = forms.ChoiceField(label='Pool Type', help_text='Lorem', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent"),("external","External")))
     pool_name = forms.CharField(required=False)
     auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
     ad_container = forms.CharField(required=False,)
     ad_groups = forms.CharField(required=False,)
-    base_image = forms.IntegerField()
+    base_image = forms.IntegerField(required=False)
     pool_quantity = forms.IntegerField(validators=[MinValueValidator(1)])
     pool_total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
     image_form = ImageForm(prefix="image")
@@ -463,120 +463,135 @@ class MiDesktopNewForm(MiDesktopForm):
             print('Instant-Clone')
         elif pool_type == 'persistent':
             print('Persistent')
+        elif pool_type == 'external':
+            print('external')
 
     def save(self):
         super().save()
         shortcode = self.cleaned_data.get("shortcode")
         name = self.cleaned_data.get("pool_name")
-        base_image_id = int(self.cleaned_data.get("base_image"))
-        quantity= self.cleaned_data.get("pool_quantity")
         pool_type = self.cleaned_data.get("pool_type")
 
-        if base_image_id == 999999999:
-            #New Pool with new Image
-            image_name=self.data.get("image-name")
-            cpu = self.cleaned_data.get("cpu")
-            memory = self.cleaned_data.get("memory")
-            gpu = self.cleaned_data.get("gpu")
-            network_id = self.data.get("network")
-            if self.data.get("network") == 'new':
-                new_network = Network(
-                    name=self.data['network-name'],
-                    size=self.data['network-mask'],
-                    owner=self.owner,
-                )
-
-                new_network.save()
-
-                new_image = Image(
-                    name = image_name,
-                    cpu = cpu,
-                    memory = memory,
-                    gpu = gpu,
-                    shared_network = False,
-                    network = new_network,
-                    owner=self.owner
-                )
-
-                new_image.save()
-
-                new_pool = Pool(
-                    shortcode = shortcode,
-                    name = name,
-                    quantity = quantity,
-                    owner=self.owner,
-                    type = pool_type
-                )
-
-                new_pool.save()
-
-                new_pool.images.add(new_image)
-                return new_pool
-
-            elif self.cleaned_data.get('network_type') != 'dedicated':
-                new_image = Image(
-                    name = image_name,
-                    cpu = cpu,
-                    memory = memory,
-                    gpu = gpu,
-                    shared_network = True,
-                    network = None,
-                    owner=self.owner
-                )
-                new_image.save()
-
-                new_pool = Pool(
-                    shortcode = shortcode,
-                    name = name,
-                    quantity = quantity,
-                    owner=self.owner,
-                    type = pool_type
-                )
-
-                new_pool.save()
-
-                new_pool.images.add(new_image)
-                return new_pool
-            
-            else:
-                new_image = Image(
-                    name = image_name,
-                    cpu = cpu,
-                    memory = memory,
-                    gpu = gpu,
-                    shared_network = False,
-                    network = Network.objects.get(pk = network_id),
-                    owner=self.owner
-                )
-
-                new_image.save()
-
-                new_pool = Pool(
-                    shortcode = shortcode,
-                    name = name,
-                    quantity = quantity,
-                    owner=self.owner,
-                    type = pool_type
-                )
-
-                new_pool.save()
-
-                new_pool.images.add(new_image)
-                return new_pool
-            
-        else:
-            base_image_object = Image.objects.get(id = base_image_id)
+        if pool_type == 'external':
+            quantity= self.cleaned_data.get("pool_quantity")
             new_pool = Pool(
-                shortcode = shortcode,
-                name = name,
-                quantity = quantity,
-                owner=self.owner,
-                type = pool_type
-            )
-            new_pool.save()
+                        shortcode = shortcode,
+                        name = name,
+                        quantity = quantity,
+                        owner=self.owner,
+                        type = pool_type
+                    )
 
-            new_pool.images.add(base_image_object)
+            new_pool.save()
             return new_pool
+        else:
+            base_image_id = int(self.cleaned_data.get("base_image"))
+            quantity= self.cleaned_data.get("pool_quantity")
+            if base_image_id == 999999999:
+                #New Pool with new Image
+                image_name=self.data.get("image-name")
+                cpu = self.cleaned_data.get("cpu")
+                memory = self.cleaned_data.get("memory")
+                gpu = self.cleaned_data.get("gpu")
+                network_id = self.data.get("network")
+                if self.data.get("network") == 'new':
+                    new_network = Network(
+                        name=self.data['network-name'],
+                        size=self.data['network-mask'],
+                        owner=self.owner,
+                    )
+
+                    new_network.save()
+
+                    new_image = Image(
+                        name = image_name,
+                        cpu = cpu,
+                        memory = memory,
+                        gpu = gpu,
+                        shared_network = False,
+                        network = new_network,
+                        owner=self.owner
+                    )
+
+                    new_image.save()
+
+                    new_pool = Pool(
+                        shortcode = shortcode,
+                        name = name,
+                        quantity = quantity,
+                        owner=self.owner,
+                        type = pool_type
+                    )
+
+                    new_pool.save()
+
+                    new_pool.images.add(new_image)
+                    return new_pool
+
+                elif self.cleaned_data.get('network_type') != 'dedicated':
+                    new_image = Image(
+                        name = image_name,
+                        cpu = cpu,
+                        memory = memory,
+                        gpu = gpu,
+                        shared_network = True,
+                        network = None,
+                        owner=self.owner
+                    )
+                    new_image.save()
+
+                    new_pool = Pool(
+                        shortcode = shortcode,
+                        name = name,
+                        quantity = quantity,
+                        owner=self.owner,
+                        type = pool_type
+                    )
+
+                    new_pool.save()
+
+                    new_pool.images.add(new_image)
+                    return new_pool
+                
+                else:
+                    new_image = Image(
+                        name = image_name,
+                        cpu = cpu,
+                        memory = memory,
+                        gpu = gpu,
+                        shared_network = False,
+                        network = Network.objects.get(pk = network_id),
+                        owner=self.owner
+                    )
+
+                    new_image.save()
+
+                    new_pool = Pool(
+                        shortcode = shortcode,
+                        name = name,
+                        quantity = quantity,
+                        owner=self.owner,
+                        type = pool_type
+                    )
+
+                    new_pool.save()
+
+                    new_pool.images.add(new_image)
+                    return new_pool
+                
+            else:
+                base_image_object = Image.objects.get(id = base_image_id)
+                new_pool = Pool(
+                    shortcode = shortcode,
+                    name = name,
+                    quantity = quantity,
+                    owner=self.owner,
+                    type = pool_type
+                )
+                new_pool.save()
+
+                new_pool.images.add(base_image_object)
+                return new_pool
 
 
 class DiskForm(forms.ModelForm):
@@ -824,3 +839,27 @@ class PersistentPoolChangeForm(forms.ModelForm):
     class Meta:
         model = Pool
         fields = ['shortcode','name']
+
+
+class ExternalPoolChangeForm(forms.ModelForm):
+    shortcode = forms.CharField(validators=[validate_shortcode], required=True)
+    name = forms.CharField(required=True)
+    quantity = forms.IntegerField(validators=[MinValueValidator(1)])
+    total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
+        kwargs.pop('user', None)
+
+        super(ExternalPoolChangeForm, self).__init__(*args, **kwargs)
+
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget'):
+                if not self.fields[field].widget.attrs.get('class',None):
+                    self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                print('no widget for', field)
+
+    class Meta:
+        model = Pool
+        fields = ['shortcode','name','quantity']

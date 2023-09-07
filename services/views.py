@@ -278,7 +278,8 @@ class ServiceChangeView(UserPassesTestMixin, View):
                 template = 'services/midesktop-persistent_change.html'
                 form = PersistentPoolChangeForm(request.POST, user = self.request.user, instance = instance)
             if instance.type == 'external':
-                pass
+                template = 'services/midesktop-external_change.html'
+                form = ExternalPoolChangeForm(request.POST, user = self.request.user, instance = instance)
             if form.is_valid():
                 form.save()
                 return HttpResponseRedirect('/requestsent')
@@ -378,9 +379,8 @@ class ServiceChangeView(UserPassesTestMixin, View):
                         'current_images_json': current_images_json})
             if instance.type == 'external':
                 template = 'services/midesktop-external_change.html'
-            
-            #images = Image.objects.filter(status='A',owner__in=[instance.owner.id]).order_by('name')
-            title = 'Modify ' + instance._meta.verbose_name.title()
+                form = ExternalPoolChangeForm(user=self.request.user, instance=instance)
+                return render(request, template,{'title':title,'form': form,})
             
             
 
