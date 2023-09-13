@@ -140,21 +140,32 @@ def send_tab_data(request):
             item.save()
             return JsonResponse({'redirect': f'/orders/cart/{item.deptid}'}, safe=False)
         else:
-            data = item.data
-            review_summary = data['reviewSummary']
-            pattern = r'^\*'
-            data_changed_not_shortcode = False
-            for entry in review_summary:
-                row = entry['fields']
-                for data in row:
-                    label = data['label']
-                    if re.match(pattern, label):
-                        if label != '*Enter a Billing Shortcode for costs to be billed to':
-                            data_changed_not_shortcode = True
+            action_name = request.POST.get('action')
+            if action_name == 'Modify MiServer':
+                print('first')
+                data = item.data
+                review_summary = data['reviewSummary']
+                pattern = r'^\*'
+                data_changed_not_shortcode = False
+                for entry in review_summary:
+                    row = entry['fields']
+                    for data in row:
+                        label = data['label']
+                        if re.match(pattern, label):
+                            if label != '*Enter a Billing Shortcode for costs to be billed to':
+                                data_changed_not_shortcode = True
+
             item.description = label
             item.save()
-            if data_changed_not_shortcode:
-                item.route()
+
+            if action_name == 'Modify MiServer':
+                print('second')
+                if data_changed_not_shortcode:
+                    item.route()
+            
+            item.route()
+
+            
             return JsonResponse({'redirect': '/requestsent'}, safe=False)
 
     step = Step.objects.get(name=tab_name)
