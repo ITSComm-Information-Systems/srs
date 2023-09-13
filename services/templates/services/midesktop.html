@@ -12,7 +12,7 @@
         {'key': 'dedicated', 'label':'Dedicated Network'},
     ]
     var pool_type_choices = [
-        {'key': 'instant-clone', 'label':'Instant Clone'},{'key': 'persistent', 'label':'Persistent'},{'key': 'external', 'label':'External'}
+        {'key': 'instant_clone', 'label':'Instant Clone'},{'key': 'persistent', 'label':'Persistent'},{'key': 'external', 'label':'External'}
     ]
     var networklist = {{ network_json|safe }};
     var imagelist = {{ image_json|safe }};
@@ -164,7 +164,7 @@
     el: '#pool_type',
     delimiters: ['[[', ']]'],
     data: {
-        selectedPoolType: 'instant-clone',
+        selectedPoolType: 'instant_clone',
     },
     watch: {
         selectedPoolType: function (newVal) {

@@ -423,7 +423,7 @@ class MiDesktopNewForm(MiDesktopForm):
     title = 'MiDesktop New Order Form'
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
     pool_type = forms.ChoiceField(label='Pool Type', help_text='Lorem', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent"),("external","External")))
-    pool_name = forms.CharField(required=False)
+    pool_name = forms.CharField(required=True)
     auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
     ad_container = forms.CharField(required=False,)
     ad_groups = forms.CharField(required=False,)
