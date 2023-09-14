@@ -60,7 +60,7 @@ var app = new Vue({
             this.value.forEach(image=>{
                 runningTotal = runningTotal + parseFloat(image.total_cost)
             })
-            this.poolTotal = runningTotal
+            this.poolTotal = runningTotal.toFixed(2)
         },
         },
     watch:{
