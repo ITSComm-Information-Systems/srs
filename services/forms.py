@@ -611,11 +611,17 @@ class MiDesktopNewImageForm(MiDesktopForm):
     initial_image = forms.ChoiceField(choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
     operating_system = forms.ChoiceField(choices=(('Windows10 64bit','Windows10 64bit'),('Windows 11 64bit','Windows 11 64bit')))
 
-
-
     calculator_form = CalculatorForm(prefix="calculator")
     network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
-    network_form = NetworkForm(prefix="network")
+
+    network_name = forms.CharField(required=False)
+    access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
+    mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False,required=False)
+    technical_contact = forms.CharField(required=False)
+    business_contact = forms.CharField(required=False)
+    security_contact = forms.CharField(required=False)
+    
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
     title = 'MiDesktop New Image Order Form'
 
@@ -636,7 +642,7 @@ class MiDesktopNewImageForm(MiDesktopForm):
         gpu = self.data['calculator-gpu']
         
         network_type = self.data['network_type']
-        network_name = self.data['network-name']
+        network_name = self.data['network_name']
 
         super().save()
 
@@ -659,8 +665,8 @@ class MiDesktopNewImageForm(MiDesktopForm):
         elif(network_type == 'dedicated' and len(network_name) > 0):
             #New Image on New Network'
             new_network = Network(
-                name=self.data['network-name'],
-                size=self.data['network-mask'],
+                name=self.data['network_name'],
+                size=self.data['mask'],
                 owner=self.owner,
             )
             new_network.save()

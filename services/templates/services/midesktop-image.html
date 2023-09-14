@@ -61,7 +61,28 @@
 
 
             <div id="networks-wrapper" v-show="visible">
-                {{ form.network_form }}
+                <h6>
+                <span style="color:red; font-size:12px;">*</span>{{ form.network_name.label_tag }} {{ form.network_name }}
+                {{ form.network_name.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.access_internet.label_tag }} {{ form.access_internet }}
+                {{ form.access_internet.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.mask.label_tag }} {{ form.mask }}
+                {{ form.mask.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.protection.label_tag }} {{ form.protection }}
+                {{ form.protection.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.technical_contact.label_tag }} {{ form.technical_contact }}
+                {{ form.technical_contact.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.business_contact.label_tag }} {{ form.business_contact }}
+                {{ form.business_contact.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.security_contact.label_tag }} {{ form.security_contact }}
+                {{ form.security_contact.errors }}<br/>
+            </h6>
                 
             </div>
             
