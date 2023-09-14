@@ -726,10 +726,16 @@ class MiDesktopChangeImageForm(forms.ModelForm):
 
 class MiDesktopNewNetworkForm(MiDesktopForm):
     title = 'MiDesktop New Network Order Form'
-    network_form = NetworkForm(prefix="network")
+    name = forms.CharField()
+    access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
+    mask = forms.ChoiceField(choices=MASK_CHOICES)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False)
+    technical_contact = forms.CharField()
+    business_contact = forms.CharField()
+    security_contact = forms.CharField()
     
     class Meta:
-        fields = ['admin_group','network_form']
+        fields = ['admin_group']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -739,8 +745,8 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
     def save(self, commit=True):
         super().save()
         new_network = Network(
-            name=self.data['network-name'],
-            size=self.data['network-mask'],
+            name=self.data['name'],
+            size=self.data['mask'],
             owner=self.owner,
         )
         if commit:

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>New Network</h1>
+<h1>MiDesktop New Network</h1>
 
 <div class="container">
     <form method="POST">
@@ -9,14 +9,30 @@
 
         <div id="div_formbody">
             <h6>
-                {{ form.admin_group.label_tag }} {{ form.admin_group }}
-                {{ form.admin_group.errors }}
-                </h6>
-                
-                <!-- Network Form Fields -->
-                {{ form.network_form }}
-                    
-   
+                <span style="color:red; font-size:12px;">*</span>{{ form.admin_group.label_tag }} {{ form.admin_group }}
+                {{ form.admin_group.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.name.label_tag }} {{ form.name }}
+                {{ form.name.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.access_internet.label_tag }} {{ form.access_internet }}
+                {{ form.access_internet.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.mask.label_tag }} {{ form.mask }}
+                {{ form.mask.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.protection.label_tag }} {{ form.protection }}
+                {{ form.protection.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.technical_contact.label_tag }} {{ form.technical_contact }}
+                {{ form.technical_contact.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.business_contact.label_tag }} {{ form.business_contact }}
+                {{ form.business_contact.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.security_contact.label_tag }} {{ form.security_contact }}
+                {{ form.security_contact.errors }}<br/>
+
         </div>
         <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
     </form>
