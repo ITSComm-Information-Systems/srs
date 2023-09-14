@@ -28,16 +28,16 @@
 
         <div id="div_formbody">
             <div id="group">
-                <h6>McCommunity Admin Group:</h6>
+                <h6><span style="color:red; font-size:12px;">*</span>McCommunity Admin Group:</h6>
                     <select class="form-control" name="admin_group" id="id_admin_group" v-model="selectedGroup" @change="handleGroupChange">
                         <option v-for="group in groups" :value="group.name" :key="group.id">[[group.name]]</option>
                     </select>
             </div>
-            <h6>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
+            <h6><span style="color:red; font-size:12px;">*</span>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
             <h2>Order New Pool</h2>
-            <h6>{{form.pool_name.label_tag}}{{form.pool_name}}</h6>
+            <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_name.label_tag}}{{form.pool_name}}</h6>
             <div id="pool_type">
-                <h6>Pool Type:
+                <h6><span style="color:red; font-size:12px;">*</span>Pool Type:
                     <select class="form-control" name="pool_type" id="id_pool_type" v-model="selectedPoolType">
                         <option v-for="pool_type in pool_type_choices" :value="pool_type.key" :key="pool_type.key">[[pool_type.label]] </option>
                     </select>
@@ -45,18 +45,27 @@
             </div>
             <div id="connection_options" v-show="visible">
                 <h2>Connection Options</h2>
-                <h6>{{form.auto_logout.label_tag}}{{form.auto_logout}}</h6>
-                <h6>{{form.ad_container.label_tag}}{{form.ad_container}}</h6>
+                <h6><span style="color:red; font-size:12px;">*</span>{{form.auto_logout.label_tag}}{{form.auto_logout}}</h6>
+                <h6><span style="color:red; font-size:12px;">*</span>{{form.ad_container.label_tag}}{{form.ad_container}}</h6>
                 <h6>{{form.ad_groups.label_tag}}{{form.ad_groups}}</h6>
             </div>
-            <div id="base_image" v-show="visible"> <h6>{{form.base_image.label_tag}}
+            <div id="base_image" v-show="visible"> <h6><span style="color:red; font-size:12px;">*</span>{{form.base_image.label_tag}}
                 <select class="form-control" name="base_image" id="id_base_image" v-model="selectedBaseImage">
                     <option v-for="image in filteredImages" :value="image.id" :key="image.id">[[image.name]] </option>
                 </select></h6></div>
             <div>
             
             <div id="new-image-wrapper" v-show="visible">
-                {{ form.image_form }}</div>
+                <h6><span style="color:red; font-size:12px;">*</span>{{ form.image_name.label_tag }} {{ form.image_name }}
+                {{ form.image_name.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.initial_image.label_tag }} {{ form.initial_image }}
+                {{ form.initial_image.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.operating_system.label_tag }} {{ form.operating_system }}
+                {{ form.operating_system.errors }}<br/></h6>
+            </div>
+
             <div class="form-group" id="calculator-wrapper" v-show="visible">
                     <h6>
                     <div class="row">
@@ -100,9 +109,9 @@
                 </div>
 
             <div id="id_pool_quantity" v-show="visible">
-                <h6>{{form.pool_quantity.label_tag}}<input type="number" name="pool_quantity" class="form-control"  v-model="poolQuantity"/></h6>
+                <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_quantity.label_tag}}<input type="number" name="pool_quantity" class="form-control"  v-model="poolQuantity"/></h6>
             </div>
-            <h6>{{form.pool_total.label_tag}}<input type="text" name="pool_total" readonly="true" class="form-control" id="id_pool_total" :value="poolTotal"></h6>
+            <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_total.label_tag}}<input type="text" name="pool_total" readonly="true" class="form-control" id="id_pool_total" :value="poolTotal"></h6>
             
             <div id="network_type" v-show="visible">
                 <h6>Will you be using a shared network or a dedicated network?
@@ -120,7 +129,29 @@
             </div>
         
             <div id="networks-wrapper" v-show="visible">
-                {{ form.network_form }}
+                <h6>
+                <span style="color:red; font-size:12px;">*</span>{{ form.network_name.label_tag }} {{ form.network_name }}
+                {{ form.network_name.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.access_internet.label_tag }} {{ form.access_internet }}
+                {{ form.access_internet.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.mask.label_tag }} {{ form.mask }}
+                {{ form.mask.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.protection.label_tag }} {{ form.protection }}
+                {{ form.protection.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.technical_contact.label_tag }} {{ form.technical_contact }}
+                {{ form.technical_contact.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.business_contact.label_tag }} {{ form.business_contact }}
+                {{ form.business_contact.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.security_contact.label_tag }} {{ form.security_contact }}
+                {{ form.security_contact.errors }}<br/>
+            </h6>
+                
             </div>
             
             <h2>Service Level Expectations</h2>

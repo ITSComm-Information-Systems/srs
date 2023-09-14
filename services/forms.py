@@ -415,7 +415,7 @@ class ImageForm(forms.Form):
 class MiDesktopNewForm(MiDesktopForm):
     title = 'MiDesktop New Order Form'
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
-    pool_type = forms.ChoiceField(label='Pool Type', help_text='Lorem', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent"),("external","External")))
+    pool_type = forms.ChoiceField(label='Pool Type', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent"),("external","External")))
     pool_name = forms.CharField(required=True)
     auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
     ad_container = forms.CharField(required=False,)
@@ -423,7 +423,11 @@ class MiDesktopNewForm(MiDesktopForm):
     base_image = forms.IntegerField(required=False)
     pool_quantity = forms.IntegerField(validators=[MinValueValidator(1)])
     pool_total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
-    image_form = ImageForm(prefix="image")
+
+    image_name = forms.CharField(required=False)
+    initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
+    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),('Windows11 64bit','Windows11 64bit')))
+
     cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
     cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
@@ -434,7 +438,15 @@ class MiDesktopNewForm(MiDesktopForm):
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     network_type = forms.ChoiceField(required=False,label='Will you be using a shared network or a dedicated network?',choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
-    network_form = NetworkForm(prefix="network")
+
+    network_name = forms.CharField(required=False)
+    access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
+    mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False,required=False)
+    technical_contact = forms.CharField(required=False)
+    business_contact = forms.CharField(required=False)
+    security_contact = forms.CharField(required=False)
+
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
     
     sla = forms.BooleanField(required=False)
@@ -489,15 +501,15 @@ class MiDesktopNewForm(MiDesktopForm):
             quantity= self.cleaned_data.get("pool_quantity")
             if base_image_id == 999999999:
                 #New Pool with new Image
-                image_name=self.data.get("image-name")
+                image_name=self.cleaned_data.get("image_name")
                 cpu = self.cleaned_data.get("cpu")
                 memory = self.cleaned_data.get("memory")
                 gpu = self.cleaned_data.get("gpu")
                 network_id = self.data.get("network")
                 if self.data.get("network") == 'new':
                     new_network = Network(
-                        name=self.data['network-name'],
-                        size=self.data['network-mask'],
+                        name=self.data['network_name'],
+                        size=self.data['mask'],
                         owner=self.owner,
                     )
 
