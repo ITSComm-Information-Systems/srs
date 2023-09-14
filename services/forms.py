@@ -508,8 +508,8 @@ class MiDesktopNewForm(MiDesktopForm):
                 network_id = self.data.get("network")
                 if self.data.get("network") == 'new':
                     new_network = Network(
-                        name=self.data['network_name'],
-                        size=self.data['mask'],
+                        name=self.cleaned_data.get('network_name'),
+                        size=self.cleaned_data.get('mask'),
                         owner=self.owner,
                     )
 
