@@ -1,4 +1,4 @@
 {% for field in form.visible_fields %}
 <div class="row">
-    <div class="col"><h6>{{ field.label_tag }}</label>{{ field }}</h6></div></div>
+    <div class="col"><h6><span style="color:red; font-size:12px;">*</span>{{ field.label_tag }}</label>{{ field }}</h6></div></div>
 {% endfor %}

@@ -401,7 +401,7 @@ class NetworkForm(forms.Form):
 class ImageForm(forms.Form):
     name = forms.CharField(required=False)
     initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
-    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),))
+    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),('Windows11 64bit','Windows11 64bit')))
 
     template_name = 'services/image.html'
 
