@@ -22,8 +22,7 @@
         {% csrf_token %}
 
         <div id="div_formbody">
-            {% for field in form %}
-                {% if field.auto_id == 'id_admin_group' %}
+            <h6>
                 <div id="group">
                     <h6><span style="color:red; font-size:12px;">*</span>McCommunity Admin Group:
                         <select class="form-control" name="admin_group" id="id_admin_group" v-model="selectedGroup" @change="handleGroupChange">
@@ -31,33 +30,34 @@
                         </select>
                     </h6>
                 </div>
-                    {{ form.image_form }}
 
-                    {{ form.calculator_form }}
-                    
-                {% elif field.auto_id == 'id_network_type' %}
+                <span style="color:red; font-size:12px;">*</span>{{ form.name.label_tag }} {{ form.name }}
+                {{ form.name.errors }}<br/>
 
-                    <div id="network_type">
-                        <h6><span style="color:red; font-size:12px;">*</span>Will you be using a shared network or a dedicated network?
-                            <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
-                                <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
-                            </select>
-                        </h6>
-                    </div>
-                    
-                {% elif field.auto_id == 'id_networks' %}
-                    <div id="network" v-show="visible">
-                        <h6><span style="color:red; font-size:12px;">*</span>Networks:
-                            <select class="form-control" name="network" id="id_network" v-model="selectedNetwork">
-                                <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
-                            </select>
-                        </h6>
-                    </div>
-                {% else %}
-                    <div class="row">
-                        <div class="col"><h6>{{ field.label_tag }}</label>{{ field }}</h6></div></div>
-                {% endif %}
-            {% endfor %}
+                <span style="color:red; font-size:12px;">*</span>{{ form.initial_image.label_tag }} {{ form.initial_image }}
+                {{ form.initial_image.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.operating_system.label_tag }} {{ form.operating_system }}
+                {{ form.operating_system.errors }}<br/>
+
+                {{ form.calculator_form }}
+
+                <div id="network_type">
+                    <h6><span style="color:red; font-size:12px;">*</span>Will you be using a shared network or a dedicated network?
+                        <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
+                            <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
+                        </select>
+                    </h6>
+                </div>
+
+                <div id="network" v-show="visible">
+                    <h6><span style="color:red; font-size:12px;">*</span>Networks:
+                        <select class="form-control" name="network" id="id_network" v-model="selectedNetwork">
+                            <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
+                        </select>
+                    </h6>
+                </div>
+            </h6>
 
 
             <div id="networks-wrapper" v-show="visible">
@@ -76,143 +76,3 @@
 
 {% endblock %}
 
-{% block js %}
-<script>
-    // const cpu_cost = document.getElementById("id_cpu_cost");
-    // const memory_cost = document.getElementById("id_memory_cost");
-    // const storage_cost = document.getElementById("id_storage_cost");
-    // const gpu_cost = document.getElementById("id_gpu_cost");
-    // const total_cost = document.getElementById("{{ form.total.id_for_label }}");
-    // const network_type = document.getElementById("{{ form.network_type.id_for_label }}");
-    // const networks = document.getElementById("id_networks");
-
-    // const cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}");
-    // const memory_choice = document.getElementById("{{ form.memory.id_for_label }}");
-    // const storage_choice = document.getElementById("{{ form.storage.id_for_label }}");
-    // const gpu_choice = document.getElementById("{{ form.gpu.id_for_label }}");
-
-    // const network_type_wrapper = document.getElementById("wrapper_id_network_type")
-    // const name_wrapper = document.getElementById("wrapper_id_name");
-    // const networks_wrapper = document.getElementById("wrapper_id_networks");
-
-
-    // window.addEventListener("load", (event) => {page_load()})
-    
-    // function page_load(){
-    //     read_only_initial_elements()
-    //     //hide_initial_elements()
-    // }
-
-    // function hide_initial_elements(){
-    //     hide_new_network_fields()
-    //     hide_elements([networks_wrapper])
-    // }
-
-    // network_type.addEventListener("change", () => {
-    //     handle_network_type_change()
-    // })
-
-    // // networks.addEventListener("change", () => {
-    // //     handle_networks_change()
-    // // })
-
-    // function hide_new_network_fields(){
-    //     wrappers = [name_wrapper
-    //     ]
-
-    //     hide_elements(wrappers)
-    // }
-
-    // function hide_elements(elements){
-    //     for (element in elements){
-    //         elements[element].setAttribute('hidden', "hidden");
-    //     }
-    // }
-
-    // function handle_network_type_change(){
-    //     if (network_type.value == "dedicated"){
-    //         show_elements([networks_wrapper])
-    //         handle_networks_change()
-    //     } else {
-    //         hide_new_network_fields()
-    //         hide_elements([networks_wrapper])
-    //     }
-    // }
-
-    // function handle_networks_change(){
-    //     if(networks.value == "-- New Dedicated Network"){
-    //         show_new_network_fields()
-    //     } else{
-    //         hide_new_network_fields()
-    //     }
-    // }
-
-    // function show_new_network_fields(){
-    //     wrappers = [name_wrapper,networks_wrapper
-    //     ]
-
-    //     show_elements(wrappers)
-    // }
-
-    // function hide_new_network_fields(){
-    //     wrappers = [name_wrapper
-    //     ]
-
-    //     hide_elements(wrappers)
-    // }
-
-    // cpu_choice.addEventListener("change", () => {
-    //     cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
-    //     calculateBaseImageCost()
-    // })
-
-    // memory_choice.addEventListener("change", () => {
-    //     memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
-    //     calculateBaseImageCost()
-    // })
-
-    // storage_choice.addEventListener("change", () => {
-    //     storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
-    //     calculateBaseImageCost()
-    // })
-
-    // gpu_choice.addEventListener("change", () => {
-    //     gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
-    //     calculateBaseImageCost()
-    // })
-
-
-    // function calculateBaseImageCost(){
-    //     base_cost = 31.31
-    //     cost = base_cost + parseFloat(cpu_cost.value) + parseFloat(memory_cost.value) + parseFloat(storage_cost.value) + parseFloat(gpu_cost.value)
-    //     total_cost.value = cost.toFixed(2)
-    // }
-    
-    // function read_only_initial_elements(){
-    //     elements = [cpu_cost,memory_cost,storage_cost,gpu_cost,total_cost]
-    //     read_only_elements(elements)
-
-    // }
-
-    // function hide_elements(elements){
-    //     for (element in elements){
-    //         elements[element].setAttribute('hidden', "hidden");
-    //     }
-    // }
-
-
-    // function show_elements(elements){
-    //     for (element in elements){
-    //         elements[element].removeAttribute('hidden', "hidden");
-    //     }
-    // }
-
-
-
-    // function read_only_elements(elements){
-    //     for (element in elements){
-    //         elements[element].setAttribute('readonly',"readonly");
-    //     }
-    // }
-</script>
-{% endblock %}
