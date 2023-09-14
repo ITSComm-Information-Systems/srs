@@ -1,6 +1,6 @@
 import csv
 from django.http import HttpResponse 
-from django.db import connections
+from django.db import connections, connection
 from project.integrations import MCommunity
 
 def download_csv_from_queryset(queryset, file_name='full_list'):
@@ -70,3 +70,21 @@ def get_or_create_contact(user, dept_id=None):  # Return Pinnacle contact ID for
                 return resp[1]
     except:
         print('error getting Pinnacle contact')
+
+def get_query_result(sql, parms=()):  # Take raw SQL string and return a list of dict
+
+    with connection.cursor() as cursor:
+        cursor.execute(sql, parms)
+        instances = dictfetchall(cursor)
+
+    return instances
+
+
+def dictfetchall(cursor): # Return all rows from a cursor as a dict
+
+    columns = [col[0].lower() for col in cursor.description]
+
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+    ]
