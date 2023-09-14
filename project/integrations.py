@@ -67,7 +67,7 @@ class MCommunity:
         print('add', x, self.conn.response)
 
     def get_user(self, uniqname):
-        self.conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","umichDisplaySn","umichInstRoles","umichHR"])
+        self.conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","umichDisplaySn","umichInstRoles","umichHR","telephoneNumber"])
 
         if self.conn.entries:
             return self.conn.entries[0]
