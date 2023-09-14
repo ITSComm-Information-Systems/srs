@@ -3,6 +3,7 @@ from django.db import models, connections
 from django.conf import settings
 from django.db.models.fields import IntegerField
 from project.pinnmodels import UmMpathDwCurrDepartment, UmOscPreorderApiV
+from project.utils import get_or_create_contact
 
 # Selection = um_softphone_selection - Main table with user selections and processing data.
 # SelectionV = um_softphone_selection_v - Selects off above table, does not have CANCEL records but has extra fields from subscriber
@@ -227,6 +228,7 @@ class Selection(SelectionAbstract):
         preorder.subscriber_id = self.subscriber
         preorder.assigned_labor_code = 'SRS'
         preorder.default_one_time_expense_acct = self.PROJECT_OCC
+        preorder.contact_id = get_or_create_contact(user)
         preorder.contact_email_address = user.email
         preorder.contact_first_name = user.first_name
         preorder.contact_last_name = user.last_name
