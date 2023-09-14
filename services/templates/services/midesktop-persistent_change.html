@@ -18,9 +18,9 @@
             {% csrf_token %}
     
             <div id="div_formbody">
-                <h6>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
-                <h6>{{form.name.label_tag}}{{form.name}}</h6>
-                <h6>Images:</h6>
+                <h6><span style="color:red; font-size:12px;">*</span>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
+                <h6><span style="color:red; font-size:12px;">*</span>{{form.name.label_tag}}{{form.name}}</h6>
+                <h6><span style="color:red; font-size:12px;">*</span>Images:</h6>
                 <div id="app">
                     <multiselect
                         v-model="value"

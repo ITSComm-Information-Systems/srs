@@ -3,7 +3,7 @@
     <h6>
     <div class="row">
         <div class="col">
-            {{ form.cpu.label_tag }}{{ form.cpu }}
+            <span style="color:red; font-size:12px;">*</span>{{ form.cpu.label_tag }}{{ form.cpu }}
         </div>
         <div class="col">
             {{ form.cpu_cost.label_tag }}{{ form.cpu_cost }}
@@ -11,7 +11,7 @@
     </div><br/>
     <div class="row">
         <div class="col">
-            {{ form.memory.label_tag }}{{ form.memory }}
+            <span style="color:red; font-size:12px;">*</span>{{ form.memory.label_tag }}{{ form.memory }}
         </div>
         <div class="col">
             {{ form.memory_cost.label_tag }}{{ form.memory_cost }}
@@ -19,7 +19,7 @@
     </div><br/>
     <div class="row">
         <div class="col">
-            {{ form.storage.label_tag }}{{ form.storage }}
+            <span style="color:red; font-size:12px;">*</span>{{ form.storage.label_tag }}{{ form.storage }}
         </div>
         <div class="col">
             {{ form.storage_cost.label_tag }}{{ form.storage_cost }}
@@ -27,7 +27,7 @@
     </div><br/>
     <div class="row">
         <div class="col">
-            {{ form.gpu.label_tag }}{{ form.gpu }}
+            <span style="color:red; font-size:12px;">*</span>{{ form.gpu.label_tag }}{{ form.gpu }}
         </div>
         <div class="col">
             {{ form.gpu_cost.label_tag }}{{ form.gpu_cost }}
