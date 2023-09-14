@@ -424,7 +424,9 @@ class MiDesktopNewForm(MiDesktopForm):
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
     pool_type = forms.ChoiceField(label='Pool Type', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent"),("external","External")))
     pool_name = forms.CharField(required=True)
-    auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('[Custom]','[Custom]')))
+    auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('1min','1 Minute'),('5min','5 Minutes'),('15min','15 Minutes'),('30min','30 Minutes'),
+                                                                ('1hr','1 Hour'),('2hr','2 Hours'),('4hr','4 Hours'),('8hr','8 Hours'),('12hr','12 Hours'),
+                                                                ('16hr','16 Hours'),('20hr','20 Hours'),('24hr','24 Hours')))
     ad_container = forms.CharField(required=False,)
     ad_groups = forms.CharField(required=False,)
     base_image = forms.IntegerField(required=False)
