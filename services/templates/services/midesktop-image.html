@@ -15,7 +15,7 @@
 </script>
 
 
-<h1>New Image</h1>
+<h1>MiDesktop New Image</h1>
 
 <div class="container">
     <form method="POST">
@@ -25,7 +25,7 @@
             {% for field in form %}
                 {% if field.auto_id == 'id_admin_group' %}
                 <div id="group">
-                    <h6>McCommunity Admin Group:
+                    <h6><span style="color:red; font-size:12px;">*</span>McCommunity Admin Group:
                         <select class="form-control" name="admin_group" id="id_admin_group" v-model="selectedGroup" @change="handleGroupChange">
                             <option v-for="group in groups" :value="group.name" :key="group.id">[[group.name]]</option>
                         </select>
@@ -38,7 +38,7 @@
                 {% elif field.auto_id == 'id_network_type' %}
 
                     <div id="network_type">
-                        <h6>Will you be using a shared network or a dedicated network?
+                        <h6><span style="color:red; font-size:12px;">*</span>Will you be using a shared network or a dedicated network?
                             <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
                                 <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
                             </select>
@@ -47,7 +47,7 @@
                     
                 {% elif field.auto_id == 'id_networks' %}
                     <div id="network" v-show="visible">
-                        <h6>Networks:
+                        <h6><span style="color:red; font-size:12px;">*</span>Networks:
                             <select class="form-control" name="network" id="id_network" v-model="selectedNetwork">
                                 <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
                             </select>

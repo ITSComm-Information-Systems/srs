@@ -11,7 +11,7 @@
             {% csrf_token %}
     
             <div id="div_formbody">
-                <h6>{{form.name.label_tag}}{{form.name}}</h6>
+                <h6><span style="color:red; font-size:12px;">*</span>{{form.name.label_tag}}{{form.name}}</h6>
 
                 {{ calculator_form }}
             </div>
