@@ -29,12 +29,48 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
     def post(self, request, service):
         if service == 'midesktop':
+            groups = LDAPGroupMember.objects.filter(username=self.request.user).order_by('ldap_group')
+            network_groups = list(LDAPGroupMember.objects.filter(username=self.request.user).values_list('ldap_group_id',flat=True))
+            networks = Network.objects.filter(status='A',owner__in=network_groups).order_by('name')
+            images = Image.objects.filter(status='A',owner__in=network_groups).order_by('name')
             form = MiDesktopNewForm(request.POST, user=self.request.user)
+
+            network_list = []
+            for network in networks:
+                network_list.append({
+                    "id": network.id,
+                    "name": network.name,
+                    "owner": network.owner_id
+                })
+            
+            group_list = []
+            for group in groups:
+                group_list.append({'name':group.ldap_group.name,'id':group.ldap_group_id})
+
+            image_list = []
+            for image in images:
+                image_list.append({
+                    
+                    "id": image.id,
+                    "name": image.name,
+                    "owner": image.owner_id,
+                    "total_cost":str(image.total_cost)
+                
+                })
+
+            context = {}
+            context["form"] = form
+            context["groups_json"] = json.dumps(group_list)
+            context["network_json"] = json.dumps(network_list)
+            context["image_json"] = json.dumps(image_list)
+
+            
             if form.is_valid():
                 form.save()
                 return HttpResponseRedirect('/requestsent')
             else:
                 print(form.errors)
+                return render(request, 'services/midesktop.html',context)
         elif service == 'midesktop-network':
             form = MiDesktopNewNetworkForm(request.POST, user=self.request.user)
             if form.is_valid():
