@@ -607,7 +607,12 @@ class DiskForm(forms.ModelForm):
         fields = ['id', 'name', 'size']
 
 class MiDesktopNewImageForm(MiDesktopForm):
-    image_form = ImageForm(prefix="image")
+    name = forms.CharField()
+    initial_image = forms.ChoiceField(choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
+    operating_system = forms.ChoiceField(choices=(('Windows10 64bit','Windows10 64bit'),('Windows 11 64bit','Windows 11 64bit')))
+
+
+
     calculator_form = CalculatorForm(prefix="calculator")
     network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
     network_form = NetworkForm(prefix="network")
@@ -624,7 +629,7 @@ class MiDesktopNewImageForm(MiDesktopForm):
         return cleaned_data
 
     def save(self, commit=True):
-        image_name = self.data['image-name']
+        image_name = self.data['name']
 
         cpu = self.data['calculator-cpu']
         memory = self.data['calculator-memory']
