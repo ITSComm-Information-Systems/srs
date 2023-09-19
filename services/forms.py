@@ -447,7 +447,7 @@ class MiDesktopNewForm(MiDesktopForm):
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     network_type = forms.ChoiceField(required=False,label='Will you be using a shared network or a dedicated network?',choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
-
+    network = image_name = forms.CharField(required=False)
     network_name = forms.CharField(required=False)
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
@@ -457,6 +457,7 @@ class MiDesktopNewForm(MiDesktopForm):
     security_contact = forms.CharField(required=False)
 
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
+
     
     sla = forms.BooleanField(required=False)
 
@@ -479,13 +480,40 @@ class MiDesktopNewForm(MiDesktopForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        pool_type = cleaned_data.get("pool_type")
-        if pool_type == 'instant_clone':
-            print('Instant-Clone')
-        elif pool_type == 'persistent':
-            print('Persistent')
-        elif pool_type == 'external':
-            print('external')
+        pool_type = cleaned_data.get('pool_type')
+        base_image_id = cleaned_data.get('base_image')
+        network = cleaned_data.get('network')
+
+
+        # Define a list of fields to make required based on pool_type
+
+        if pool_type == 'instant_clone' or pool_type == 'persistent':
+            self.fields['base_image'].required = True
+            self.fields['ad_container'].required = True
+
+        else:
+            self.fields['base_image'].required = False
+            self.fields['ad_container'].required = False
+
+        if base_image_id == 999999999:
+            self.fields['image_name'].required = True
+            self.fields['network_type'].required = True
+        else:
+            self.fields['image_name'].required = False
+            self.fields['network_type'].required = False
+
+        if network == 'new':
+            self.fields['network_name'].required = True
+            self.fields['technical_contact'].required = True
+            self.fields['business_contact'].required = True
+            self.fields['security_contact'].required = True
+        else:
+            self.fields['network_name'].required = False
+            self.fields['technical_contact'].required = False
+            self.fields['business_contact'].required = False
+            self.fields['security_contact'].required = False
+
+        return cleaned_data
 
     def save(self):
         super().save()
@@ -515,7 +543,7 @@ class MiDesktopNewForm(MiDesktopForm):
                 memory = self.cleaned_data.get("memory")
                 gpu = self.cleaned_data.get("gpu")
                 network_id = self.data.get("network")
-                if self.data.get("network") == 'new':
+                if self.cleaned_data.get("network") == 'new':
                     new_network = Network(
                         name=self.cleaned_data.get('network_name'),
                         size=self.cleaned_data.get('mask'),
