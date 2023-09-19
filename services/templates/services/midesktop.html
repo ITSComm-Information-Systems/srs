@@ -114,7 +114,7 @@
             <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_total.label_tag}}<input type="text" name="pool_total" readonly="true" class="form-control" id="id_pool_total" :value="poolTotal"></h6>
             
             <div id="network_type" v-show="visible">
-                <h6>Will you be using a shared network or a dedicated network?
+                <h6><span style="color:red; font-size:12px;">*</span>Will you be using a shared network or a dedicated network?
                     <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
                         <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
                     </select>
