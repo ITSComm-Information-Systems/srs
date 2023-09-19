@@ -107,6 +107,8 @@ LOGIN_REDIRECT_URL = SITE_URL
 LOGOUT_REDIRECT_URL = SITE_URL
 LOGIN_URL = '/oidc/authenticate'
 
+SLACK_AUTH_TOKEN = os.getenv('SLACK_AUTH_TOKEN', 'N/A')
+
 EMAIL_HOST = 'vdc-relay.us-east-2.a.mail.umich.edu'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

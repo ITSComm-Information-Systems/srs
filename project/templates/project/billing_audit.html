@@ -1,0 +1,8 @@
+{% load humanize %}
+<https://srs.it.umich.edu/admin/|*Infrastructure Billing*>
+
+```
+                  Records   Total Cost  | vs. Pinnacle | vs. Last Month
+{% for instance in instances %}{{ instance.data_source|ljust:14 }}   {{ instance.recs|intcomma|rjust:8 }} {{ instance.cost|intcomma|rjust:12 }}  {{ instance.pinn_recs|intcomma|rjust:4 }}  {{ instance.pinn_cost|intcomma|rjust:7 }}   {{ instance.prev_recs|intcomma|rjust:4 }}  {{ instance.prev_cost|intcomma|rjust:10 }}
+{% endfor %}
+```

@@ -67,7 +67,7 @@ class MCommunity:
         print('add', x, self.conn.response)
 
     def get_user(self, uniqname):
-        self.conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","umichDisplaySn","umichInstRoles","umichHR"])
+        self.conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","umichDisplaySn","umichInstRoles","umichHR","telephoneNumber"])
 
         if self.conn.entries:
             return self.conn.entries[0]
@@ -655,3 +655,23 @@ def create_ticket_database_modify(instance, user, description):
     }
 
     TDx().create_ticket(payload)
+
+
+class Slack:
+    AUTH_TOKEN = settings.SLACK_AUTH_TOKEN
+    BASE_URL = 'https://slack.com/api/chat.postMessage'
+
+    def send_message(self, message, channel):
+        
+        headers = { 
+            'Authorization': f'Bearer {self.AUTH_TOKEN}',
+            'accept': 'application/json'
+            }
+        
+        body =  {
+            "channel": channel,
+            "text": message,
+        }
+
+        url = self.BASE_URL
+        response = requests.post(url, headers=headers, json=body)
