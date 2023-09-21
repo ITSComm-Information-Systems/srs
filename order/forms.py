@@ -29,7 +29,7 @@ def get_storage_options(action):
 
 def get_softphone_categories():
     cat_list = []
-    for cat in Category.objects.filter(sequence__isnull=False).order_by('sequence'):
+    for cat in Category.objects.filter(sequence__isnull=False).exclude(sequence__in=(8,9)).order_by('sequence'):
         cat_list.append((cat.code, cat.label))
 
     return cat_list
