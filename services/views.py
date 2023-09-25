@@ -66,7 +66,8 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
             
             if form.is_valid():
-                form.save()
+                instance = form.save()
+                r = create_ticket('New', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             else:
                 print(form.errors)
@@ -74,14 +75,16 @@ class ServiceRequestView(UserPassesTestMixin, View):
         elif service == 'midesktop-network':
             form = MiDesktopNewNetworkForm(request.POST, user=self.request.user)
             if form.is_valid():
-                form.save()
+                instance = form.save()
+                r = create_ticket('New', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             else:
                 print(form.errors)
         elif service == 'midesktop-image':
             form = MiDesktopNewImageForm(request.POST, user=self.request.user)
             if form.is_valid():
-                form.save()
+                instance = form.save()
+                r = create_ticket('New', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             else:
                 print(form.errors)
@@ -198,6 +201,7 @@ class ServiceDeleteView(UserPassesTestMixin, View):
                 return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
             instance.status = Status.ENDED
             instance.save()
+            r = create_ticket('Delete', instance, request)
             return HttpResponseRedirect('/requestsent')
         elif service == 'midesktop-image':
             instance = get_object_or_404(Image, pk=id)
@@ -205,6 +209,7 @@ class ServiceDeleteView(UserPassesTestMixin, View):
                 return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
             instance.status = Status.ENDED
             instance.save()
+            r = create_ticket('Delete', instance, request)
             return HttpResponseRedirect('/requestsent')
         elif service == 'midesktop':
             instance = get_object_or_404(Pool, pk=id)
@@ -212,6 +217,7 @@ class ServiceDeleteView(UserPassesTestMixin, View):
                 return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
             instance.status = Status.ENDED
             instance.save()
+            r = create_ticket('Delete', instance, request)
             return HttpResponseRedirect('/requestsent')
         else:
 
@@ -287,6 +293,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
             form = MiDesktopChangeNetworkForm(request.POST, user=self.request.user, instance=instance)
             if form.is_valid():
                 form.save()
+                r = create_ticket('Modify', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             return render(request, template,
                         {'title': title,
@@ -299,6 +306,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
             form = MiDesktopChangeImageForm(request.POST, user=self.request.user,instance = instance)
             if form.is_valid():
                 form.save()
+                r = create_ticket('Modify', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             return render(request, template,
                         {'title': title,
@@ -317,6 +325,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
                 form = ExternalPoolChangeForm(request.POST, user = self.request.user, instance = instance)
             if form.is_valid():
                 form.save()
+                r = create_ticket('Modify', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             else:
                 print(form.errors)
