@@ -611,9 +611,10 @@ class MiDesktopPayload(Payload):
 
         #service_id = 58              # ITS-MiDesktop New Order
         #form_id = 85                 # ITS-MiDesktop New Order - Form
-        form = kwargs['form']
+        self.description = f'MCommunity Group: {instance.owner} \n'
 
-        if action == 'Modify':
+        if action != 'Delete':
+            form = kwargs['form']
             for key, val in form.cleaned_data.items():
                 if key in form.changed_data:
                     key = '*' + key
@@ -629,14 +630,12 @@ class MiDesktopPayload(Payload):
             "Title": self.title,
             "RequestorEmail": request.user.email,
             "Description": self.description,
-            } #"Attributes": [] } | kwargs
+            "Attributes": [] }      #| kwargs
 
 
 class PoolPayload(MiDesktopPayload):
 
     def __init__(self, action, instance, request, **kwargs):
-
-        #self.add_attribute(self.pool_name.id, instance.name)
 
         if action == 'Delete':
             self.service_id = 65	 # ITS-MiDesktop Delete Pool
@@ -649,11 +648,11 @@ class PoolPayload(MiDesktopPayload):
 
         super().__init__(action, instance, request, **kwargs)
 
+        self.add_attribute(self.pool_name.id, instance.name)
+
 class ImagePayload(MiDesktopPayload):
 
     def __init__(self, action, instance, request, **kwargs):
-
-        #self.add_attribute(self.image_name.id, instance.name)
 
         if action == 'Delete':
             self.service_id = 63	 # ITS-MiDesktop Delete Base Image
@@ -666,6 +665,8 @@ class ImagePayload(MiDesktopPayload):
 
         super().__init__(action, instance, request, **kwargs)
 
+        self.add_attribute(self.image_name.id, instance.name)
+
 
 class NetworkPayload(MiDesktopPayload):
     def __init__(self, action, instance, request, **kwargs):
@@ -676,6 +677,8 @@ class NetworkPayload(MiDesktopPayload):
             self.title = f'MiDesktop {action} Network'
 
         super().__init__(action, instance, request, **kwargs)
+
+        self.description = self.description + f'Network: {instance.name}'
 
 
 
