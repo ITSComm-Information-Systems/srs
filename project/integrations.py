@@ -593,6 +593,91 @@ class ContainerPayload(Payload):
             title = 'Add contact group to notification group'
             self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.CONTAINER_TEAM} )
 
+class MiDesktopPayload(Payload):
+    title = 'MiDesktop New Order'
+    description = 'SRS MiDesktop Request \n'
+    type_id = 7                  # Compute Services
+    responsible_group_id = 86    # ITS-CloudComputeServices
+    service_id = 14              # ITS-MiDesktop
+    form_id = 555	             # ITS-MiDesktop - Form
+
+    new_customer = ChoiceAttribute(2342, Yes=0, No=0)  # midesktop_New Existing dropdown
+    owner = TextAttribute(2343)         # midesktop_MComm group textbox
+    shared = ChoiceAttribute(2344, Yes=0, No=0)        # midesktop_Shared Dedicated dropdown
+    image_name = TextAttribute(2347)    # midesktop_Base Image Name textbox
+    pool_name = TextAttribute(2348)     # midesktop_Pool Display Name textbox
+
+    def __init__(self, action, instance, request, **kwargs):
+
+        #service_id = 58              # ITS-MiDesktop New Order
+        #form_id = 85                 # ITS-MiDesktop New Order - Form
+        form = kwargs['form']
+
+        if action == 'Modify':
+            for key, val in form.cleaned_data.items():
+                if key in form.changed_data:
+                    key = '*' + key
+                self.description = self.description + f'{key}: {val} \n'
+
+        self.data = {
+            "FormID": self.form_id,
+            "TypeID": self.type_id,
+            "SourceID": self.source_id,
+            "StatusID": self.status_id,
+            "ServiceID": self.service_id,
+            "ResponsibleGroupID": self.responsible_group_id,
+            "Title": self.title,
+            "RequestorEmail": request.user.email,
+            "Description": self.description,
+            } #"Attributes": [] } | kwargs
+
+
+class PoolPayload(MiDesktopPayload):
+
+    def __init__(self, action, instance, request, **kwargs):
+
+        #self.add_attribute(self.pool_name.id, instance.name)
+
+        if action == 'Delete':
+            self.service_id = 65	 # ITS-MiDesktop Delete Pool
+            self.form_id = 112	     # ITS-MiDesktop Delete Pool
+            self.title = 'MiDesktop Delete Pool'
+        else:
+            self.service_id = 64	 # ITS-MiDesktop Modify Pool
+            self.form_id = 111	     # ITS-MiDesktop Modify Pool
+            self.title = f'MiDesktop {action} Pool'
+
+        super().__init__(action, instance, request, **kwargs)
+
+class ImagePayload(MiDesktopPayload):
+
+    def __init__(self, action, instance, request, **kwargs):
+
+        #self.add_attribute(self.image_name.id, instance.name)
+
+        if action == 'Delete':
+            self.service_id = 63	 # ITS-MiDesktop Delete Base Image
+            self.form_id = 110	     # ITS-MiDesktop Delete Base Image
+            self.title = 'MiDesktop Delete Base Image'
+        else:
+            self.service_id = 61	 # ITS-MiDesktop Modify Base Image
+            self.form_id = 109	     # ITS-MiDesktop Modify Base Image
+            self.title = f'MiDesktop {action} Base Image'
+
+        super().__init__(action, instance, request, **kwargs)
+
+
+class NetworkPayload(MiDesktopPayload):
+    def __init__(self, action, instance, request, **kwargs):
+
+        if action == 'Delete':
+            self.title = 'MiDesktop Delete Network'
+        else:
+            self.title = f'MiDesktop {action} Network'
+
+        super().__init__(action, instance, request, **kwargs)
+
+
 
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
