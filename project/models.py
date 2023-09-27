@@ -3,7 +3,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 import re
-
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
 from django.forms import CharField, JSONField
 from project.integrations import ShortCodesAPI
 from django.db.models.signals import class_prepared
@@ -125,6 +126,9 @@ class Webhooks(models.Model):
 
 
 class Email(models.Model):
+     team_shared_email = 'itscomm.information.systems.shared.account@umich.edu'
+     context = {}
+
      code = models.CharField(max_length=20)
      sender = models.CharField(max_length=100)
      to = models.CharField(max_length=100)
@@ -149,3 +153,20 @@ class Email(models.Model):
 
           context = {'cut_date': cut_date, 'week_of': week_of}
           return Template(self.body).render(Context(context))
+
+     def send(self):
+          text_message = self.subject
+
+          body = Template(self.body).render(Context(self.context))
+
+          if settings.ENVIRONMENT != 'Production':
+               print('Non-prod, do not send to:', self.to)
+               self.to = 'djamison@umich.edu'
+               self.cc = ''
+               self.bcc = ''
+               self.subject = f'{settings.ENVIRONMENT} - {self.subject}'
+
+          # Send Distribution List to Leads
+          msg = EmailMultiAlternatives(self.subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc])
+          msg.attach_alternative(body, "text/html")
+          msg.send()
