@@ -156,6 +156,7 @@ class Email(models.Model):
 
      def send(self):
           text_message = self.subject
+          subject = self.subject
 
           body = Template(self.body).render(Context(self.context))
 
@@ -163,10 +164,10 @@ class Email(models.Model):
                print('Non-prod, do not send to:', self.to)
                self.to = 'djamison@umich.edu'
                self.cc = ''
-               self.bcc = ''
-               self.subject = f'{settings.ENVIRONMENT} - {self.subject}'
+               self.bcc = self.team_shared_email
+               subject = f'{settings.ENVIRONMENT} - {self.subject}'
 
           # Send Distribution List to Leads
-          msg = EmailMultiAlternatives(self.subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc])
+          msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc])
           msg.attach_alternative(body, "text/html")
           msg.send()

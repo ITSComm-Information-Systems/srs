@@ -26,7 +26,7 @@ class Command(BaseCommand):
         '''
 
         for record in get_query_result(sql):
-            email.context = {"instances": json.loads(record['instances'])}
+            email.context = {"service": record['service'], "instances": json.loads(record['instances'])}
             email.to = record['owner']
             email.cc = 'djamison@umich.edu,djams35@gmail.com'
             email.send()
