@@ -130,6 +130,7 @@ class LDAPGroup(models.Model):
         except:
             lg = LDAPGroup()
             lg.name = mc.dn
+            lg.id = mc.gidnumber
             lg.save()
 
             for member in mc.members:   # Add members since this is a new group
