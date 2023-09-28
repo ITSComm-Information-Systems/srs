@@ -24,7 +24,7 @@ class MCommunity:
         return sorted_list
 
     def get_group(self, name):
-        self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member"])
+        self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member","gidnumber"])
 
         if self.conn.entries:
             self.response = self.conn.entries
