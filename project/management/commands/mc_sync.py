@@ -20,11 +20,11 @@ class Command(BaseCommand):
             return
 
         # Update LDAP Group membership used by storage, etc.
-        for group in LDAPGroup.objects.order_by('name').filter(name__gt='arcts-hitsres-project-admins'):
+        for group in LDAPGroup.objects.order_by('name'):
             try:
                 group.update_membership()
             except:
-                print('error')
+                print('error updating group:', group)
 
 
 
