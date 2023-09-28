@@ -128,6 +128,7 @@ class Webhooks(models.Model):
 class Email(models.Model):
      team_shared_email = 'itscomm.information.systems.shared.account@umich.edu'
      context = {}
+     reply_to = None
 
      code = models.CharField(max_length=20)
      sender = models.CharField(max_length=100)
@@ -168,6 +169,6 @@ class Email(models.Model):
                subject = f'{settings.ENVIRONMENT} - {self.subject}'
 
           # Send Distribution List to Leads
-          msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc])
+          msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc], reply_to=[self.reply_to])
           msg.attach_alternative(body, "text/html")
           msg.send()
