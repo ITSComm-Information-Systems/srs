@@ -33,9 +33,7 @@ class Command(BaseCommand):
                         KEY 'shortcode' IS shortcode)
                         ,',') within group (order by i.name) || ']' instances
                     from SRS_SERVICES_INSTANCES_V i
-                    left join um_mpath_accts
-                    on i.shortcode = um_mpath_accts.legacy_account
-                    where legacy_account_status <> 'O' or legacy_account_status is null
+                    where shortcode_status <> 'O' or shortcode_status is null
                     group by service, owner
         '''
 
