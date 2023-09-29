@@ -770,7 +770,7 @@ class ServerData(models.Model):
 
 
 class Database(models.Model):
-    MDB_ADMIN_GROUP = 1110
+    MDB_ADMIN_GROUP = 2349226
 
     MYSQL = 0
     MSSQL = 1

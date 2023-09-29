@@ -149,6 +149,10 @@ class LDAPGroup(models.Model):
             self.active = False
             self.save()
             return None
+        
+        if self.active == False:  # Reactivate group
+            self.active = True
+            self.save()
 
         db_members = set(LDAPGroupMember.objects.filter(ldap_group=self).values_list('username', flat=True) )
 
