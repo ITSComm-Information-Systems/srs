@@ -140,12 +140,12 @@ def send_tab_data(request):
             item.save()
             return JsonResponse({'redirect': f'/orders/cart/{item.deptid}'}, safe=False)
         else:
+            data_changed_not_shortcode = False
             action_name = request.POST.get('action')
             if action_name == 'Modify MiServer':
                 data = item.data
                 review_summary = data['reviewSummary']
                 pattern = r'^\*'
-                data_changed_not_shortcode = False
                 for entry in review_summary:
                     row = entry['fields']
                     for data in row:
