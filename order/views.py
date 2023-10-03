@@ -142,7 +142,6 @@ def send_tab_data(request):
         else:
             action_name = request.POST.get('action')
             if action_name == 'Modify MiServer':
-                print('first')
                 data = item.data
                 review_summary = data['reviewSummary']
                 pattern = r'^\*'
@@ -158,12 +157,11 @@ def send_tab_data(request):
             item.description = label
             item.save()
 
-            if action_name == 'Modify MiServer':
-                print('second')
-                if data_changed_not_shortcode:
-                    item.route()
             
-            item.route()
+            if data_changed_not_shortcode: item.route()
+            else: 
+                if action_name == 'Modify MiServer':
+                    item.route(skip_submit_incident=True)
 
             
             return JsonResponse({'redirect': '/requestsent'}, safe=False)
