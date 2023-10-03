@@ -17,6 +17,7 @@ from project.integrations import create_ticket_server_delete
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from ast import literal_eval
+import re
 import cx_Oracle
 import json
 from django.core.files.storage import FileSystemStorage
@@ -139,9 +140,30 @@ def send_tab_data(request):
             item.save()
             return JsonResponse({'redirect': f'/orders/cart/{item.deptid}'}, safe=False)
         else:
+            action_name = request.POST.get('action')
+            if action_name == 'Modify MiServer':
+                data = item.data
+                review_summary = data['reviewSummary']
+                pattern = r'^\*'
+                data_changed_not_shortcode = False
+                for entry in review_summary:
+                    row = entry['fields']
+                    for data in row:
+                        label = data['label']
+                        if re.match(pattern, label):
+                            if label != '*Enter a Billing Shortcode for costs to be billed to':
+                                data_changed_not_shortcode = True
+
             item.description = label
             item.save()
-            item.route()
+
+            
+            if data_changed_not_shortcode: item.route()
+            else: 
+                if action_name == 'Modify MiServer':
+                    item.route(skip_submit_incident=True)
+
+            
             return JsonResponse({'redirect': '/requestsent'}, safe=False)
 
     step = Step.objects.get(name=tab_name)
