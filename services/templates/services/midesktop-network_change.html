@@ -15,12 +15,11 @@
                     <div id="{{ field.auto_id }}">
                     <h6>{% if field.field.required %}<span style="color:red; font-size:12px;">* </span>{% endif %}
                         <label for="{{ field.label }}">{{ field.label_tag }}</label>
-                        {{ field }}
+                        {{ field.value }}
                     </h6>
                 </div>
                 {% endfor %}
             </div>
-            <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
         </form>
     
 
