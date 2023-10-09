@@ -428,7 +428,6 @@ class MiDesktopNewForm(MiDesktopForm):
                                                                 ('1hr','1 Hour'),('2hr','2 Hours'),('4hr','4 Hours'),('8hr','8 Hours'),('12hr','12 Hours'),
                                                                 ('16hr','16 Hours'),('20hr','20 Hours'),('24hr','24 Hours')))
     ad_container = forms.CharField(required=False,)
-    ad_groups = forms.CharField(required=False,)
     base_image = forms.IntegerField(required=False)
     pool_quantity = forms.IntegerField(validators=[MinValueValidator(1)])
     pool_total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
@@ -459,7 +458,7 @@ class MiDesktopNewForm(MiDesktopForm):
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
 
     
-    sla = forms.BooleanField(required=False)
+    sla = forms.BooleanField(required=True)
 
 
     class Meta:
@@ -489,7 +488,6 @@ class MiDesktopNewForm(MiDesktopForm):
 
         if pool_type == 'instant_clone' or pool_type == 'persistent':
             self.fields['base_image'].required = True
-            self.fields['ad_container'].required = True
 
         else:
             self.fields['base_image'].required = False
@@ -782,7 +780,7 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
     name = forms.CharField()
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
     mask = forms.ChoiceField(choices=MASK_CHOICES)
-    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False)
+    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="Firewall Protection")
     technical_contact = forms.CharField()
     business_contact = forms.CharField()
     security_contact = forms.CharField()
