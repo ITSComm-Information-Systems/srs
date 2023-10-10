@@ -1,0 +1,27 @@
+<style>
+    .chg-bld {
+  font-weight: bold;
+    }
+</style>
+<table class="table table-bordered table-condensed table-hover table-striped" style="width: 100%">
+    <caption><h4>Image</h4></caption>
+    <tbody>
+        <tr><td>Name</td><td>{{ image.name }}</td></tr>
+        <tr {%if 'cpu' in changed_data %}class="chg-bld"{% endif %}><td>CPU</td><td>{{ image.cpu }}</td></tr>
+        <tr {%if 'memory' in changed_data %}class="changed"{% endif %}><td>Memory</td><td>{{ image.memory }}</td></tr>
+        <tr {%if 'storage' in changed_data %}class="changed"{% endif %}><td>Storage</td><td>{{ image.storage }}</td></tr>
+        <tr class="chg-bld"><td>GPU</td><td>{{ image.gpu }}</td></tr>
+        <tr><td>Network</td><td>{{ image.network.name }}</td></tr>
+        <tr><td>Network Size</td><td>{{ image.network.size }}</td></tr>
+        <tr><td>Disk</td><td>
+            <table>
+                {% for disk in image.storage.all %}
+                <tr>
+                    <td>{{ disk.name }}</td>
+                    <td>{{ disk.size }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td></tr>
+    </tbody>
+</table>
