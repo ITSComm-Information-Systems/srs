@@ -153,15 +153,18 @@ def send_tab_data(request):
                         if re.match(pattern, label):
                             if label != '*Enter a Billing Shortcode for costs to be billed to':
                                 data_changed_not_shortcode = True
-
-            item.description = label
-            item.save()
+                item.description = label
+                item.save()
+                if data_changed_not_shortcode: item.route()
+                else: 
+                    item.route(skip_submit_incident=True)
+            else:
+                item.description = label
+                item.save()
+                item.route()
 
             
-            if data_changed_not_shortcode: item.route()
-            else: 
-                if action_name == 'Modify MiServer':
-                    item.route(skip_submit_incident=True)
+            
 
             
             return JsonResponse({'redirect': '/requestsent'}, safe=False)
