@@ -753,6 +753,25 @@ $(document).ready(function() {
     //x[i].style.backgroundColor = "red";
   }
   
+  
+  
+  $(document).on("change", "#id_phoneCategory" , function() {
+    var zoomCat = $('#id_phoneCategory').find(":selected").val();
+    if (zoomCat == 'LN-STAFF' || zoomCat == 'LN-FACULTY' ) {
+      $('#div_Uniqname').show();
+    } else {
+      $('#div_Uniqname').hide();
+      $('#id_Uniqname').val('');
+    }
+
+    if (zoomCat == 'OTHER') {
+      $('#div_otherSoftphoneCat').show();
+    } else {
+      $('#div_otherSoftphoneCat').hide();
+    }
+
+  });
+
 
 
   // Addl info
@@ -767,13 +786,24 @@ $(document).ready(function() {
       $('[data-phoneset="advanced"]').hide();
       $('[data-phoneset="basic"]').show();
       $('[data-phoneset="voip"]').hide();
+      $('[data-tab="zoomOptions"]').hide();
+      $('[data-tab="Restrictions"]').show();
+      $('[data-tab="SelectFeatures"]').show();
     }
     if(this.value=='advanced'){
       $('[data-phoneset="advanced"]').show();
       $('[data-phoneset="basic"]').hide();
       $('[data-phoneset="voip"]').hide();
+      $('[data-tab="zoomOptions"]').hide();
+      $('[data-tab="Restrictions"]').show();
+      $('[data-tab="SelectFeatures"]').show();
     }
-    if(this.value=='voip'){
+    if(this.value=='voip'){  // Zoom
+      $('#div_otherSoftphoneCat').hide();
+      $('[data-tab="Restrictions"]').hide();
+      $('[data-tab="SelectFeatures"]').hide();
+      $('[data-tab="zoomOptions"]').show();
+
       $('[data-phoneset="advanced"]').hide();
       $('[data-phoneset="basic"]').hide();
       $('[data-phoneset="voip"]').show();

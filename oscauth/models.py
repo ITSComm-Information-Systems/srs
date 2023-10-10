@@ -130,6 +130,7 @@ class LDAPGroup(models.Model):
         except:
             lg = LDAPGroup()
             lg.name = mc.dn
+            lg.id = mc.gidnumber
             lg.save()
 
             for member in mc.members:   # Add members since this is a new group
@@ -148,6 +149,10 @@ class LDAPGroup(models.Model):
             self.active = False
             self.save()
             return None
+        
+        if self.active == False:  # Reactivate group
+            self.active = True
+            self.save()
 
         db_members = set(LDAPGroupMember.objects.filter(ldap_group=self).values_list('username', flat=True) )
 

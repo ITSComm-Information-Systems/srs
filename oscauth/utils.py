@@ -106,11 +106,12 @@ class McGroup:
                         password=settings.MCOMMUNITY['PASSWORD'],
                         auto_bind=True)
 
-        conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member"])
-        
+        conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member","gidnumber"])
+
         if conn.entries:
             self.response = conn.entries
             self.dn = conn.entries[0].entry_dn[3:conn.entries[0].entry_dn.find(',')]
+            self.gidnumber = conn.entries[0].gidnumber.value
 
             self.members = set()
 

@@ -4,6 +4,7 @@ from django.core import validators
 from django.forms import ModelForm, formset_factory
 #from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember, StorageHost, StorageRate
 from .models import *
+from softphone.models import Category
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 from oscauth.models import LDAPGroupMember
@@ -25,6 +26,13 @@ def get_storage_options(action):
         opt_list.append((opt.id, label))
 
     return opt_list
+
+def get_softphone_categories():
+    cat_list = []
+    for cat in Category.objects.filter(sequence__isnull=False).exclude(sequence__in=(8,9)).order_by('sequence'):
+        cat_list.append((cat.code, cat.label))
+
+    return cat_list
 
 class TabForm(forms.Form):
 
