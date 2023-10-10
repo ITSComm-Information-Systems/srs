@@ -14,13 +14,13 @@
             {% csrf_token %}
     
             <div id="div_formbody">
-                <h6>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
                 <h6><span style="color:red; font-size:12px;">*</span>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
 
                 <h6><span style="color:red; font-size:12px;">*</span>{{form.images.label_tag}}{{form.images}}</h6>
                 <h6><span style="color:red; font-size:12px;">*</span>{{form.quantity.label_tag}}<input type="number" name="quantity" class="form-control" id="id_quantity" v-model="poolQuantity"/></h6>
 
                 <h6>{{form.total.label_tag}}<input type="text" name="total" readonly="true" class="form-control" id="id_total" :value="poolTotal"></h6>
+                <h6>{{form.additional_details.label_tag}}{{form.additional_details}}</h6>
 
             </div>
             <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>

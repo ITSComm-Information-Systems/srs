@@ -371,7 +371,7 @@ class NetworkForm(forms.Form):
     name = forms.CharField(required=False)
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
-    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False,required=False)
+    protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('ips','IPS'),('none','None')), widget=forms.Select(), initial=False,required=False)
     technical_contact = forms.CharField(required=False)
     business_contact = forms.CharField(required=False)
     security_contact = forms.CharField(required=False)
@@ -443,14 +443,14 @@ class MiDesktopNewForm(MiDesktopForm):
     network_name = forms.CharField(required=False)
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
-    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False,required=False)
+    protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('ips','IPS'),('none','None')), widget=forms.Select(), initial=False,required=False)
     technical_contact = forms.CharField(required=False)
     business_contact = forms.CharField(required=False)
     security_contact = forms.CharField(required=False)
 
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
 
-    
+    additional_details = forms.CharField(required=False, label="Additional Details")
     sla = forms.BooleanField(required=True)
 
 
@@ -657,7 +657,7 @@ class MiDesktopNewImageForm(MiDesktopForm):
     network_name = forms.CharField(required=False)
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
-    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False,required=False)
+    protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('ips','IPS'),('none','None')), widget=forms.Select(), initial=False,required=False)
     technical_contact = forms.CharField(required=False)
     business_contact = forms.CharField(required=False)
     security_contact = forms.CharField(required=False)
@@ -742,6 +742,7 @@ class MiDesktopNewImageForm(MiDesktopForm):
 class MiDesktopChangeImageForm(forms.ModelForm):
     name = forms.CharField(required=False)
     calculator_form = CalculatorForm(prefix="calculator")
+    additional_details = forms.CharField(required=False, label="Additional Details")
     def clean(self):
         cleaned_data = super().clean()
         return cleaned_data
@@ -773,7 +774,7 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
     name = forms.CharField()
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
     mask = forms.ChoiceField(choices=MASK_CHOICES)
-    protection = forms.ChoiceField(choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="Firewall Protection")
+    protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('ips','IPS'),('none','None')), widget=forms.Select(), initial=False, label="Firewall Protection")
     technical_contact = forms.CharField()
     business_contact = forms.CharField()
     security_contact = forms.CharField()
@@ -824,6 +825,7 @@ class InstantClonePoolChangeForm(forms.ModelForm):
     images = forms.ChoiceField(label='Image', required=True)
     quantity = forms.IntegerField(validators=[MinValueValidator(1)])
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
+    additional_details = forms.CharField(required=False, label="Additional Details")
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user')
@@ -859,6 +861,7 @@ class PersistentPoolChangeForm(forms.ModelForm):
     name = forms.CharField(required=True)
     multi_image = forms.CharField(required=False)
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
+    additional_details = forms.CharField(required=False, label="Additional Details")
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user')
@@ -903,6 +906,7 @@ class ExternalPoolChangeForm(forms.ModelForm):
     name = forms.CharField(required=True)
     quantity = forms.IntegerField(validators=[MinValueValidator(1)])
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
+    additional_details = forms.CharField(required=False, label="Additional Details")
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user')
