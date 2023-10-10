@@ -221,6 +221,8 @@ class GcpaccountChangeForm(CloudForm):
 
 
 def validate_project_name(value):
+    if len(value) > 40:
+        raise ValidationError(f'A project name must be 40 characters or less. Please select a different name.')
     if Openshift().get_project(value).ok:
         raise ValidationError(f'A project with this name already exists.  Please select a different name.')
     
