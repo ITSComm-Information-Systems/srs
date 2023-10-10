@@ -1,6 +1,7 @@
 import json, yaml, requests
 from django.conf import settings
 from ldap3 import Server, Connection, ALL, MODIFY_ADD
+from django.template.loader import render_to_string
 
 class MCommunity:
 
@@ -596,10 +597,13 @@ class ContainerPayload(Payload):
 class MiDesktopPayload(Payload):
     title = 'MiDesktop New Order'
     description = 'SRS MiDesktop Request \n'
+    template = 'project/tdx_midesktop_new.html'
+    context = {}
     type_id = 7                  # Compute Services
     responsible_group_id = 86    # ITS-CloudComputeServices
     service_id = 14              # ITS-MiDesktop
     form_id = 555	             # ITS-MiDesktop - Form
+    attributes = []
 
     new_customer = ChoiceAttribute(2342, Yes=0, No=0)  # midesktop_New Existing dropdown
     owner = TextAttribute(2343)         # midesktop_MComm group textbox
@@ -608,19 +612,30 @@ class MiDesktopPayload(Payload):
     pool_name = TextAttribute(2348)     # midesktop_Pool Display Name textbox
 
     def __init__(self, action, instance, request, **kwargs):
+        self.request = request
 
-        #service_id = 58              # ITS-MiDesktop New Order
-        #form_id = 85                 # ITS-MiDesktop New Order - Form
-        self.description = f'MCommunity Group: {instance.owner} \n'
+        if 'form' in kwargs:
+            self.form = kwargs['form']
+            self.context['changed_data'] = self.form.changed_data
+            print(self.context)
 
-        if action != 'Delete':
-            form = kwargs['form']
-            for key, val in form.cleaned_data.items():
-                if key in form.changed_data:
-                    key = '*' + key
-                self.description = self.description + f'{key}: {val} \n'
+        self.add_attribute(self.owner.id, instance.owner.name)
+        self.description = render_to_string(self.template, self.context)
 
-        self.data = {
+        print(self.description)
+        
+
+    def add_attribute(self, id, value):
+        self.attributes.append(
+            {
+                "ID": id, 
+                "Value": value
+            }
+        )
+
+    @property
+    def data(self):
+        return {
             "FormID": self.form_id,
             "TypeID": self.type_id,
             "SourceID": self.source_id,
@@ -628,44 +643,42 @@ class MiDesktopPayload(Payload):
             "ServiceID": self.service_id,
             "ResponsibleGroupID": self.responsible_group_id,
             "Title": self.title,
-            "RequestorEmail": request.user.email,
+            "RequestorEmail": self.request.user.email,
             "Description": self.description,
-            "Attributes": [] }      #| kwargs
+            "IsRichHtml": True,
+            "Attributes": self.attributes }      #| kwargs
+
 
 
 class PoolPayload(MiDesktopPayload):
+    service_id = 58  # New Order
+    form_id = 85
 
     def __init__(self, action, instance, request, **kwargs):
-
-        if action == 'Delete':
-            self.service_id = 65	 # ITS-MiDesktop Delete Pool
-            self.form_id = 112	     # ITS-MiDesktop Delete Pool
-            self.title = 'MiDesktop Delete Pool'
-        else:
-            self.service_id = 64	 # ITS-MiDesktop Modify Pool
-            self.form_id = 111	     # ITS-MiDesktop Modify Pool
-            self.title = f'MiDesktop {action} Pool'
-
-        super().__init__(action, instance, request, **kwargs)
+        if action == 'Modify':
+            self.service_id = 64  # Modify Pool
+            self.form_id = 111      
+        elif action == 'Delete':
+            self.service_id = 65  # Delete Pool
+            self.form_id = 112
 
         self.add_attribute(self.pool_name.id, instance.name)
-
-class ImagePayload(MiDesktopPayload):
-
-    def __init__(self, action, instance, request, **kwargs):
-
-        if action == 'Delete':
-            self.service_id = 63	 # ITS-MiDesktop Delete Base Image
-            self.form_id = 110	     # ITS-MiDesktop Delete Base Image
-            self.title = 'MiDesktop Delete Base Image'
-        else:
-            self.service_id = 61	 # ITS-MiDesktop Modify Base Image
-            self.form_id = 109	     # ITS-MiDesktop Modify Base Image
-            self.title = f'MiDesktop {action} Base Image'
-
+        self.context = {'pool': instance}
         super().__init__(action, instance, request, **kwargs)
 
+class ImagePayload(MiDesktopPayload):
+    service_id = 61
+    form_id = 109
+    template = 'project/tdx_midesktop_image.html'
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.title = f'MiDesktop {action} Image'
+        if action == 'Delete':
+            self.service_id = 63
+            self.form_id = 110 
         self.add_attribute(self.image_name.id, instance.name)
+        self.context = {'image': instance}
+        super().__init__(action, instance, request, **kwargs)
 
 
 class NetworkPayload(MiDesktopPayload):
@@ -687,6 +700,7 @@ def create_ticket(action, instance, request, **kwargs):
     service = service.upper()
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
+    print(type(payload), action)
 
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
