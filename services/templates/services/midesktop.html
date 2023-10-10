@@ -46,7 +46,7 @@
             <div id="connection_options" v-show="visible">
                 <h2>Connection Options</h2>
                 <h6><span style="color:red; font-size:12px;">*</span>{{form.auto_logout.label_tag}}{{form.auto_logout}}</h6>
-                <h6><span style="color:red; font-size:12px;">*</span>{{form.ad_container.label_tag}}{{form.ad_container}}</h6>
+                <h6>{{form.ad_container.label_tag}}{{form.ad_container}}</h6>
                 <h6>{{form.ad_groups.label_tag}}{{form.ad_groups}}</h6>
             </div>
             <div id="base_image" v-show="visible"> <h6><span style="color:red; font-size:12px;">*</span>{{form.base_image.label_tag}}
@@ -154,6 +154,9 @@
                 
             </div>
             
+            <h6>{{ form.additional_details.label_tag }} {{ form.additional_details }}
+                {{ form.additional_details.errors }}</h6>
+
             <h2>Service Level Expectations</h2>
             <hr/>
             <a href="https://its.umich.edu/computing/computers-software/midesktop" target="_blank">Click here for Service Level Expectations</a>

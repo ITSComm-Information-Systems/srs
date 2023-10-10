@@ -182,7 +182,7 @@ class Image(MiDesktop):
     @cached_property
     def total_cost(self):
         import decimal
-        for rate in StorageRate.objects.filter(service__name='midesktop'):
+        for rate in StorageRate.objects.filter(service__name='midesktop').order_by('display_seq_no'):
             print(rate.label, rate.rate)
             if rate.label == 'Base':
                 total_cost = rate.rate

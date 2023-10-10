@@ -1,28 +1,30 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>{{ title }}</h1>
+<h1>View MiDesktop Network</h1>
 
 <div class="container">
-    <strong>Network Name:</strong>&nbsp;{{ form.instance.name }}
-    <hr>
 
         <form method="POST">
             {% csrf_token %}
-    
             <div id="div_formbody">
-                {% for field in form %}
-                
-                    <div id="{{ field.auto_id }}">
-                    <h6>{% if field.field.required %}<span style="color:red; font-size:12px;">* </span>{% endif %}
-                        <label for="{{ field.label }}">{{ field.label_tag }}</label>
-                        {{ field }}
-                    </h6>
-                </div>
-                {% endfor %}
+                <h6>
+                    <div id="{{ form.name.auto_id }}">Purpose: {{ form.name.value }}</div>
+                    <div id="{{ form.size.auto_id }}">Size: {{ form.size.value }}</div>
+                    <div id="cidr"></div>
+                </h6>
             </div>
-            <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
         </form>
     
 
 </div>
+<script>
+    const subnet_size_field = document.getElementById("{{ form.size.id_for_label }}");
+    const cidr_field = document.getElementById("cidr");
+
+    window.addEventListener("load", (event) => {
+        let subnet_size = parseInt(subnet_size_field.textContent.match(/\d+/)[0])
+        let cidrMask = 32 - Math.log2(subnet_size);
+        cidr_field.innerHTML = 'Network CIDR: /' + cidrMask
+    })
+</script>
 {% endblock %}
