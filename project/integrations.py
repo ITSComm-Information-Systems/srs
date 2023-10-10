@@ -617,13 +617,11 @@ class MiDesktopPayload(Payload):
         if 'form' in kwargs:
             self.form = kwargs['form']
             self.context['changed_data'] = self.form.changed_data
+            self.context['additional_details'] = self.form.cleaned_data.get('additional_details')
             print(self.context)
 
         self.add_attribute(self.owner.id, instance.owner.name)
         self.description = render_to_string(self.template, self.context)
-
-        print(self.description)
-        
 
     def add_attribute(self, id, value):
         self.attributes.append(
