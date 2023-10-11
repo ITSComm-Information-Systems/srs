@@ -171,7 +171,7 @@ class Image(MiDesktop):
 
     @cached_property
     def total_storage_size(self):
-        storage = ImageDisk.objects.filter(server=self).aggregate(models.Sum('size'))
+        storage = ImageDisk.objects.filter(image=self).aggregate(models.Sum('size'))
         if storage:
             sum = storage['size__sum']
             if sum:
