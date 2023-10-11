@@ -341,6 +341,19 @@ GPU_INITIAL = 0.00
 BASE_COST = 31.31
 TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
 
+class StorageForm(forms.Form):
+    cost = forms.DecimalField(label="Disk Cost",initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    size = forms.ChoiceField(required=False,choices=STORAGE_CHOICES, label="Disk", initial='50 GB')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['size'].widget.attrs['class'] = 'form-control'
+        self.fields['cost'].widget.attrs['class'] = 'form-control'
+        
+
+StorageFormSet = formset_factory(StorageForm, extra=1)
+
 class CalculatorForm(forms.Form):
     cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
     cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
@@ -434,7 +447,10 @@ class MiDesktopNewForm(MiDesktopForm):
     memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
     memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
-    storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    storage_cost = forms.DecimalField(label="Total Storage Cost",required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+
+    storage_formset = StorageFormSet()
+
     gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
