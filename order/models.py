@@ -770,7 +770,7 @@ class ServerData(models.Model):
 
 
 class Database(models.Model):
-    MDB_ADMIN_GROUP = 1110
+    MDB_ADMIN_GROUP = 2349226
 
     MYSQL = 0
     MSSQL = 1
@@ -1069,7 +1069,7 @@ class Item(models.Model):
 
         return note
 
-    def route(self):
+    def route(self, skip_submit_incident=False):
         action = Action.objects.get(id=self.data['action_id'])
         routing = action.service.routing
 
@@ -1084,7 +1084,7 @@ class Item(models.Model):
             self.save()
 
         for route in routing['routes']:
-            if route['target'] == 'tdx':
+            if route['target'] == 'tdx' and skip_submit_incident==False:
                 self.submit_incident(route, action) 
 
             if route['target'] == 'database':
