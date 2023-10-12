@@ -41,7 +41,7 @@ class Command(BaseCommand):
             email.context = {"path": PATH, "service": record['service'], "instances": json.loads(record['instances'])}
             email.to = record['owner']
             email.reply_to = self.REPLY_TO.get(record['service'])
-            email.cc = 'djamison@umich.edu,djams35@gmail.com'
+            email.cc = self.REPLY_TO.get(record['service'])
             email.send()
 
 
