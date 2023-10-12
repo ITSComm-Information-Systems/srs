@@ -275,13 +275,12 @@ class Estimate(BOM):
         super().save(*args, **kwargs)  # Call the "real" save() method.
 
         if self.initial_engineer_status == 'NOT_COMPLETE' and self.engineer_status == 'COMPLETE':
+            self.get_workorder()  # TODO make these properties.
             email_list = [f'{self.workorder.add_info_list_value_code_2}@umich.edu']
             Notification.send_email('BOM Engineer Work Complete', self, email_list)
 
         if self.status != self.initial_status:
             Notification.objects.notify(self)
-            # if self.initial_status == self.ESTIMATE and self.status != self.REJECTED:
-            #     Estimate.objects.filter(woid=self.woid,status=self.ESTIMATE,legacy_id='0').update(status=self.REJECTED)
 
             if self.initial_status != self.APPROVED and self.status == self.APPROVED:
                 Estimate.objects.filter(woid=self.woid,status=self.ESTIMATE).update(status=self.REJECTED)
