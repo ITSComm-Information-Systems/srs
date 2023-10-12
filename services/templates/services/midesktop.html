@@ -97,7 +97,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col"><br/><a onclick="addDisk()" style="margin-top: 23px" class="form-control">Add Additional Disk</a></div>
+                        <div class="col"><br/><a onclick="addDisk()" style="margin-top: 23px" class="form-control btn btn-secondary"><strong>Add Additional Disk</strong></a></div>
                         <div class="col">
                             <h6>{{ form.storage_cost.label_tag }}{{ form.storage_cost }}</h6>
                         </div>
@@ -191,9 +191,7 @@
         if (delbuttons.length > 1){
             delbuttons[delbuttons.length - 1].style.display="block"
         }
-        console.log('before emit')
         eventBus.$emit('disk-number-changed', totalForms);
-        console.log('after emit')
     }
 
     function addDisk(){
@@ -207,13 +205,13 @@
 
         var inputs = newForm.querySelectorAll("input, select, textarea");
         inputs.forEach(function(input) {
-            input.value = "";
+            //input.value = "";
             // Update input names and IDs to reflect the new form index
             input.name = input.name.replace("-0-", "-" + totalForms + "-");
             input.id = "id_" + input.name;
 
             if (input.name.includes("cost")) {
-                input.value = "0.0";  // Set the initial cost value
+                input.value = "5.00";  // Set the initial cost value
             }
         });
             
@@ -332,7 +330,6 @@
 
             },
             calculateTotalStorageCost(){
-                console.log('alc')
                 this.total_storage_cost.value = 0.00.toFixed(2);
                 this.diskCostFields.forEach(diskCost => {
                     this.total_storage_cost.value = +parseFloat(this.total_storage_cost.value) + +parseFloat(diskCost.value)
