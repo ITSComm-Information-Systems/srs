@@ -181,11 +181,6 @@
 
 <script src="/static/vue-components/vue-components.js"></script>
 <script>
-    const pool_quantity = document.getElementById("{{ form.pool_quantity.id_for_label }}");
-    const pool_total = document.getElementById("{{ form.pool_total.id_for_label }}");
-</script>
-
-<script>
     function deleteDisk(disk){
         var totalFormsInput = document.getElementById("id_form-TOTAL_FORMS");
         var totalForms = parseInt(totalFormsInput.value);
@@ -196,6 +191,9 @@
         if (delbuttons.length > 1){
             delbuttons[delbuttons.length - 1].style.display="block"
         }
+        console.log('before emit')
+        eventBus.$emit('disk-number-changed', totalForms);
+        console.log('after emit')
     }
 
     function addDisk(){
@@ -230,6 +228,8 @@
         if (delbuttons.length > 1){
             delbuttons[delbuttons.length - 1].style.display="block"
         }
+
+        eventBus.$emit('disk-number-changed', totalForms);
 
     }
 
@@ -280,10 +280,13 @@
         },
         mounted() {
             eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+            eventBus.$on('disk-number-changed', this.handleDiskNumberChanged);
+            eventBus.$on('calculate-total-storage-cost', this.calculateTotalStorageCost);
+            
         },
         watch: {
             totalForms: function (newVal) {
-                console.log(newVal)
+                
             }
         },
 
@@ -292,9 +295,10 @@
                 this.selectedBaseImage = selectedBaseImage
                 this.updateVisibility();
                 this.attachEventListeners();
+                this.handleDiskNumberChanged();
+                this.attachEventListeners();
                 this.handleCpuChange();
                 this.handleMemoryChange();
-                // this.handleStorageChange();
                 this.calculateBaseImageCost();
 
             },
@@ -311,19 +315,9 @@
                 eventBus.$emit('new-base-image-total-changed', this.total_cost.value);
             },
             attachEventListeners() {
-                document.getElementById("id_form-0-size").addEventListener('change', this.handledisk0Change);
-                this.storage_disk_0_cost = document.getElementById("id_form-0-cost");
-                this.storage_disk_0_cost.value = 5.00.toFixed(2)
-                this.storage_disk_0_size = document.getElementById("id_form-0-size");
                 this.total_storage_cost = document.getElementById("{{ form.storage_cost.id_for_label }}");
                 this.total_storage_cost.value = 5.00.toFixed(2);
-                // this.diskSizeSelectors = document.querySelectorAll('[id$="-size"]');
-                // document.getElementById("id_form-TOTAL_FORMS").addEventListener('change', this.handleDiskFormsChange);
-                // this.totalFormsInput = document.getElementById("id_form-TOTAL_FORMS");
-                // console.log(this.totalFormsInput.value)
-
-
-
+                document.getElementById("id_form-0-cost").value = 5.00.toFixed(2)
                 document.getElementById("{{ form.cpu.id_for_label }}").addEventListener('change', this.handleCpuChange);
                 document.getElementById("{{ form.memory.id_for_label }}").addEventListener('change', this.handleMemoryChange);
                 document.getElementById("{{ form.gpu.id_for_label }}").addEventListener('change', this.handleGpuChange);
@@ -337,19 +331,35 @@
                 this.gpu_cost.value = 0.00.toFixed(2)
 
             },
-            handleDiskFormsChange(){
-                this.totalFormsInput = document.getElementById("id_form-TOTAL_FORMS")
-                this.totalForms = parseInt(this.totalFormsInput.value);
-                console.log(this.totalForms)
-            },
             calculateTotalStorageCost(){
-                this.diskSizeSelectors = document.querySelectorAll('[id$="-size"]');
-                console.log(this.diskSizeSelectors)
-                this.total_storage_cost.value = this.storage_disk_0_cost.value
+                console.log('alc')
+                this.total_storage_cost.value = 0.00.toFixed(2);
+                this.diskCostFields.forEach(diskCost => {
+                    this.total_storage_cost.value = +parseFloat(this.total_storage_cost.value) + +parseFloat(diskCost.value)
+                });
+                this.total_storage_cost.value = parseFloat(this.total_storage_cost.value).toFixed(2)
+
                 this.calculateBaseImageCost()
             },
-            handledisk0Change(){
-                this.storage_disk_0_cost.value = (this.storage_disk_0_size.value * 0.10).toFixed(2)
+            handleDiskNumberChanged(number){
+                this.diskSizeSelectors = document.querySelectorAll('[id$="-size"]');
+                this.diskCostFields = document.querySelectorAll('[id$="-cost"]');
+                this.totalForms = number
+                this.diskSizeSelectors.forEach(diskSelector => {
+                    diskSelector.addEventListener('change', function(){
+                        var regex = /(\d+)/;
+                        var id_full = diskSelector.id
+                        var id = regex.exec(id_full)[0]
+                        var storage_disk_cost_string = 'id_form-' + id + '-cost'
+                        var storage_disk_cost = document.getElementById(storage_disk_cost_string)
+                        var diskSize = (parseInt(diskSelector.value))
+                        var storageTotal = document.getElementById("id_total")
+                        storage_disk_cost.value = (diskSize * 0.10).toFixed(2)
+                        eventBus.$emit('calculate-total-storage-cost', null);
+                        
+                    })
+                });
+
                 this.calculateTotalStorageCost()
             },
             handleCpuChange(){
