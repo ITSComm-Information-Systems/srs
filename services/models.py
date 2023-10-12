@@ -191,7 +191,7 @@ class Image(MiDesktop):
             if rate.label == 'Memory':
                 total_cost = total_cost + (rate.rate * decimal.Decimal(self.memory))
             if rate.label == 'Storage':
-                total_cost = total_cost + (rate.rate * 50)
+                total_cost = total_cost + (rate.rate * self.total_storage_size)
             if rate.label[:3] == 'GPU' and self.gpu == True:
                 total_cost = total_cost + rate.rate
 

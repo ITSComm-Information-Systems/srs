@@ -48,7 +48,6 @@ const midesktop_networks = new Vue({
             this.updateFilteredNetworks();
         },
         handleVisibility(selectedNetworkType){
-            console.log(selectedNetworkType)
             if (selectedNetworkType == 'dedicated'){
                 this.visible = true
             }

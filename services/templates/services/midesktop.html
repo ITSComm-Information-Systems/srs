@@ -100,6 +100,7 @@
                         <div class="col"><br/><a onclick="addDisk()" style="margin-top: 23px" class="form-control btn btn-secondary"><strong>Add Additional Disk</strong></a></div>
                         <div class="col">
                             <h6>{{ form.storage_cost.label_tag }}{{ form.storage_cost }}</h6>
+                            <input type="text" name="multi_disk" hidden="true" id="id_multi_disk" />
                         </div>
                     </div>
                     {% endfor %}
@@ -182,7 +183,7 @@
 <script src="/static/vue-components/vue-components.js"></script>
 <script>
     function deleteDisk(disk){
-        var totalFormsInput = document.getElementById("id_form-TOTAL_FORMS");
+        var totalFormsInput = document.getElementById("id_disk-TOTAL_FORMS");
         var totalForms = parseInt(totalFormsInput.value);
         disk.parentElement.parentElement.remove();
         totalForms--;
@@ -195,7 +196,7 @@
     }
 
     function addDisk(){
-        var totalFormsInput = document.getElementById("id_form-TOTAL_FORMS");
+        var totalFormsInput = document.getElementById("id_disk-TOTAL_FORMS");
         var totalForms = parseInt(totalFormsInput.value);
 
          // Clone the first form in the formset and clear its input values
@@ -315,7 +316,7 @@
             attachEventListeners() {
                 this.total_storage_cost = document.getElementById("{{ form.storage_cost.id_for_label }}");
                 this.total_storage_cost.value = 5.00.toFixed(2);
-                document.getElementById("id_form-0-cost").value = 5.00.toFixed(2)
+                document.getElementById("id_disk-0-cost").value = 5.00.toFixed(2)
                 document.getElementById("{{ form.cpu.id_for_label }}").addEventListener('change', this.handleCpuChange);
                 document.getElementById("{{ form.memory.id_for_label }}").addEventListener('change', this.handleMemoryChange);
                 document.getElementById("{{ form.gpu.id_for_label }}").addEventListener('change', this.handleGpuChange);
@@ -326,6 +327,7 @@
                 this.memory_cost = document.getElementById("{{ form.memory_cost.id_for_label }}");
                 this.gpu_cost = document.getElementById("{{ form.gpu_cost.id_for_label }}");
                 this.total_cost = document.getElementById("{{ form.total.id_for_label }}");
+                this.multi_disk_field = document.getElementById("id_multi_disk");
                 this.gpu_cost.value = 0.00.toFixed(2)
 
             },
@@ -336,18 +338,27 @@
                 });
                 this.total_storage_cost.value = parseFloat(this.total_storage_cost.value).toFixed(2)
 
+                this.multi_disk_field.value = ''
+                this.diskSizeSelectors.forEach(diskSelector => {
+                    this.multi_disk_field.value = this.multi_disk_field.value + diskSelector.value + ','
+                })
+                console.log(this.multi_disk_field.value)
+
                 this.calculateBaseImageCost()
             },
             handleDiskNumberChanged(number){
                 this.diskSizeSelectors = document.querySelectorAll('[id$="-size"]');
                 this.diskCostFields = document.querySelectorAll('[id$="-cost"]');
                 this.totalForms = number
+
+                this.multi_disk_field.value = '';
+
                 this.diskSizeSelectors.forEach(diskSelector => {
                     diskSelector.addEventListener('change', function(){
                         var regex = /(\d+)/;
                         var id_full = diskSelector.id
                         var id = regex.exec(id_full)[0]
-                        var storage_disk_cost_string = 'id_form-' + id + '-cost'
+                        var storage_disk_cost_string = 'id_disk-' + id + '-cost'
                         var storage_disk_cost = document.getElementById(storage_disk_cost_string)
                         var diskSize = (parseInt(diskSelector.value))
                         var storageTotal = document.getElementById("id_total")
@@ -355,8 +366,8 @@
                         eventBus.$emit('calculate-total-storage-cost', null);
                         
                     })
-                });
 
+                });
                 this.calculateTotalStorageCost()
             },
             handleCpuChange(){

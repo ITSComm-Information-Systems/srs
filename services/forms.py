@@ -349,7 +349,7 @@ BASE_COST = 31.31
 TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
 
 class StorageForm(forms.Form):
-    cost = forms.DecimalField(label="Disk Cost",initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    cost = forms.DecimalField(required=False,label="Disk Cost",initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     size = forms.ChoiceField(required=False,choices=STORAGE_CHOICES, label="Disk", initial='50 GB')
 
     def __init__(self, *args, **kwargs):
@@ -456,7 +456,8 @@ class MiDesktopNewForm(MiDesktopForm):
     storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
     storage_cost = forms.DecimalField(label="Total Storage Cost",required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
 
-    storage_formset = StorageFormSet()
+    storage_formset = StorageFormSet(prefix='disk')
+    multi_disk = forms.CharField(required=False)
 
     gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
@@ -551,6 +552,9 @@ class MiDesktopNewForm(MiDesktopForm):
             base_image_id = int(self.cleaned_data.get("base_image"))
             quantity= self.cleaned_data.get("pool_quantity")
             if base_image_id == 999999999:
+                multi_disk = self.cleaned_data.get("multi_disk")
+                disks = multi_disk.split(",")
+
                 #New Pool with new Image
                 image_name=self.cleaned_data.get("image_name")
                 cpu = self.cleaned_data.get("cpu")
@@ -602,6 +606,16 @@ class MiDesktopNewForm(MiDesktopForm):
                         owner=self.owner
                     )
                     new_image.save()
+                    num_disks = 0
+                    for disk in disks:
+                        if len(disk) > 0 :
+                            new_disk = ImageDisk(
+                                image = new_image,
+                                name = 'disk_' + str(num_disks),
+                                size = int(disk)
+                            )
+                            num_disks += 1
+                            new_disk.save()
 
                     new_pool = Pool(
                         shortcode = shortcode,
