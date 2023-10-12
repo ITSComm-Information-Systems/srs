@@ -277,7 +277,7 @@ class Estimate(BOM):
         if self.initial_engineer_status == 'NOT_COMPLETE' and self.engineer_status == 'COMPLETE':
             self.get_workorder()  # TODO make these properties.
             email_list = [f'{self.workorder.add_info_list_value_code_2}@umich.edu']
-            Notification.send_email('BOM Engineer Work Complete', self, email_list)
+            Notification.objects.send_email('BOM Engineer Work Complete', self, email_list)
 
         if self.status != self.initial_status:
             Notification.objects.notify(self)
