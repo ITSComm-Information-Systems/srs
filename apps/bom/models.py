@@ -269,15 +269,18 @@ class Estimate(BOM):
     def __init__(self, *args, **kwargs):
         super(Estimate, self).__init__(*args, **kwargs)
         self.initial_status = self.status
+        self.initial_engineer_status = self.engineer_status
 
     def save(self, *args, **kwargs):
-        print(self.status, self.initial_status)
         super().save(*args, **kwargs)  # Call the "real" save() method.
+
+        if self.initial_engineer_status == 'NOT_COMPLETE' and self.engineer_status == 'COMPLETE':
+            self.get_workorder()  # TODO make these properties.
+            email_list = [f'{self.workorder.add_info_list_value_code_2}@umich.edu']
+            Notification.objects.send_email('BOM Engineer Work Complete', self, email_list)
 
         if self.status != self.initial_status:
             Notification.objects.notify(self)
-            # if self.initial_status == self.ESTIMATE and self.status != self.REJECTED:
-            #     Estimate.objects.filter(woid=self.woid,status=self.ESTIMATE,legacy_id='0').update(status=self.REJECTED)
 
             if self.initial_status != self.APPROVED and self.status == self.APPROVED:
                 Estimate.objects.filter(woid=self.woid,status=self.ESTIMATE).update(status=self.REJECTED)
@@ -671,9 +674,9 @@ class PreDefinedNote(models.Model):
 
 class Notification(models.Model):
 
-    WAREHOUSE = 'BOM - Notify Warehouse'
-    ROUTE_PM = 'BOM - Route to Project Manager'
-    ORDERED = 'BOM - Material Ordered'
+    WAREHOUSE = 'BOM - Notify Warehouse (Send Email)'
+    ROUTE_PM = 'BOM - Route to Project Manager (Send Email)'
+    ORDERED = 'BOM - Material Ordered (Send Email)'
 
     NOTE_SUBJECTS = [WAREHOUSE, ROUTE_PM, ORDERED]
  
