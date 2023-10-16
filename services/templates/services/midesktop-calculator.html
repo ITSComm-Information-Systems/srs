@@ -160,6 +160,7 @@ function addEventListeners(){
         diskSizeSelectors[index].addEventListener("change", function(){
             var diskTotal = parseInt(diskSizeSelectors[index].value) * 0.10
             diskCostFields[index].value=diskTotal.toFixed(2)
+            updateStorageTotal()
         })
     }
 }
