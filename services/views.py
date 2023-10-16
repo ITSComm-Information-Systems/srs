@@ -81,6 +81,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
             else:
                 print(form.errors)
         elif service == 'midesktop-image':
+            
             form = MiDesktopNewImageForm(request.POST, user=self.request.user)
             if form.is_valid():
                 instance = form.save()
@@ -112,7 +113,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
     def get(self, request, service):
         request.session['backupStorage'] = 'cloud'
         if service == 'midesktop':
-            form = MiDesktopNewForm(user=self.request.user)
+            form = MiDesktopChangeImageForm(user=self.request.user)
             groups = LDAPGroupMember.objects.filter(username=self.request.user).order_by('ldap_group')
             network_groups = list(LDAPGroupMember.objects.filter(username=self.request.user).values_list('ldap_group_id',flat=True))
             networks = Network.objects.filter(status='A',owner__in=network_groups).order_by('name')
@@ -173,6 +174,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
             context["form"] = form
             context["groups_json"] = json.dumps(group_list)
             context["network_json"] = json.dumps(network_list)
+            context["calculator_form"] = CalculatorForm()
 
             return render(request, 'services/midesktop-image.html',context)
         try:
@@ -365,17 +367,32 @@ class ServiceChangeView(UserPassesTestMixin, View):
         elif service =='midesktop-image':
             template = 'services/midesktop-image_change.html'
             instance = get_object_or_404(Image,pk=id, status=Status.ACTIVE)
-            calculator_form = CalculatorForm(initial={'cpu':instance.cpu,'memory':instance.memory,'gpu':instance.gpu,})
-            image_form = ImageForm(initial={'name':instance.name})
             if not user_has_access(request.user, instance.owner):
                 return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
+            
+            # Fetch disks related to the instance
+            disks = ImageDisk.objects.filter(image=instance.id)
+
+            # Prepare initial data for the formset
+            disk_data = [{'size': disk.size} for disk in disks]
+            multi_disk_string = ''
+            for disk in disk_data:
+                multi_disk_string = multi_disk_string + str(disk['size']) + ','
+
+            calculator_form = CalculatorForm(initial={
+                'cpu': instance.cpu,
+                'memory': instance.memory,
+                'gpu': instance.gpu,
+                'multi_disk': multi_disk_string
+            })
+
+            print(multi_disk_string)
             title = 'Modify ' + instance._meta.verbose_name.title()
             form = MiDesktopChangeImageForm(user=self.request.user, instance=instance)
             return render(request, template,
                         {'title': title,
                         'form': form,
-                        'calculator_form': calculator_form,
-                        'image_form':image_form })
+                        'calculator_form': calculator_form})
         elif service == 'midesktop':
             instance = get_object_or_404(Pool,pk=id, status=Status.ACTIVE)
             title = 'Modify ' + instance._meta.verbose_name.title()

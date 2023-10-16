@@ -366,11 +366,13 @@ class CalculatorForm(forms.Form):
     cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
     memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
-    storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
     storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+
+    storage_formset = StorageFormSet(prefix='disk')
+    multi_disk = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     template_name = 'services/midesktop-calculator.html'
 
@@ -582,6 +584,17 @@ class MiDesktopNewForm(MiDesktopForm):
 
                     new_image.save()
 
+                    num_disks = 0
+                    for disk in disks:
+                        if len(disk) > 0 :
+                            new_disk = ImageDisk(
+                                image = new_image,
+                                name = 'disk_' + str(num_disks),
+                                size = int(disk)
+                            )
+                            num_disks += 1
+                            new_disk.save()
+
                     new_pool = Pool(
                         shortcode = shortcode,
                         name = name,
@@ -642,6 +655,16 @@ class MiDesktopNewForm(MiDesktopForm):
                     )
 
                     new_image.save()
+                    num_disks = 0
+                    for disk in disks:
+                        if len(disk) > 0 :
+                            new_disk = ImageDisk(
+                                image = new_image,
+                                name = 'disk_' + str(num_disks),
+                                size = int(disk)
+                            )
+                            num_disks += 1
+                            new_disk.save()
 
                     new_pool = Pool(
                         shortcode = shortcode,
