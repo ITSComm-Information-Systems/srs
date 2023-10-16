@@ -104,7 +104,7 @@ function addDisk(){
     }
 
     addEventListeners()
-    refreshStorageData()
+    updateStorageTotal()
 
 }
 const cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}");
@@ -153,13 +153,16 @@ function calculateBaseImageCost(){
 function addEventListeners(){
     var diskSizeSelectors = document.querySelectorAll('[id$="-size"]');
     var diskCostFields = document.querySelectorAll('[id$="-cost"]');
-        for (let index = 0; index < diskSizeSelectors.length; index++) {
-            diskSizeSelectors[index].addEventListener("change", function(){
-                var diskTotal = parseInt(diskSizeSelectors[index].value) * 0.10
-                diskCostFields[index].value=diskTotal.toFixed(2)
-            })
-        }
+
+    
+
+    for (let index = 0; index < diskSizeSelectors.length; index++) {
+        diskSizeSelectors[index].addEventListener("change", function(){
+            var diskTotal = parseInt(diskSizeSelectors[index].value) * 0.10
+            diskCostFields[index].value=diskTotal.toFixed(2)
+        })
     }
+}
 
 function handleStorageData(){
     disk_array = multi_disk.value.slice(0, -1).split(",")
@@ -182,6 +185,7 @@ function handleStorageData(){
 function refreshStorageData(){
     var diskSizeSelectors = document.querySelectorAll('[id$="-size"]');
     var diskCostFields = document.querySelectorAll('[id$="-cost"]');
+    disk_array = multi_disk.value.slice(0, -1).split(",")
 
     for (let index = 0; index < diskSizeSelectors.length; index++) {
         const disk_size = disk_array[index];
@@ -194,10 +198,10 @@ function refreshStorageData(){
 }
 
 function updateStorageTotal(){
-    disk_array = multi_disk.value.slice(0, -1).split(",")
+    var diskCostFields = document.querySelectorAll('[id$="-cost"]');
     runningTotal = 0
-    disk_array.forEach(size => {
-        runningTotal = runningTotal + (parseInt(size) *0.10)
+    diskCostFields.forEach(disk => {
+        runningTotal = runningTotal + parseInt(disk.value)
     });
     storageTotal.value = runningTotal.toFixed(2)
     calculateBaseImageCost()
