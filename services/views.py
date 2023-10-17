@@ -303,11 +303,23 @@ class ServiceChangeView(UserPassesTestMixin, View):
         elif service == 'midesktop-image':
             template = 'services/midesktop-image_change.html'
             instance = Image.objects.get(id=id)
-            image_form = ImageForm(initial={'name':instance.name})
             title = 'Modify ' + instance._meta.verbose_name.title()
             form = MiDesktopChangeImageForm(request.POST, user=self.request.user,instance = instance)
             if form.is_valid():
                 form.save()
+                multi_disk = request.POST.get('multi_disk')
+                disks = multi_disk.split(",")
+                ImageDisk.objects.filter(image=instance.id).delete()
+                num_disks = 0
+                for disk in disks:
+                    if len(disk) > 0 :
+                        new_disk = ImageDisk(
+                            image = instance,
+                            name = 'disk_' + str(num_disks),
+                            size = int(disk)
+                        )
+                        num_disks += 1
+                        new_disk.save()
                 r = create_ticket('Modify', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             return render(request, template,
@@ -371,7 +383,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
                 return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
             
             # Fetch disks related to the instance
-            disks = ImageDisk.objects.filter(image=instance.id)
+            disks = ImageDisk.objects.filter(image=instance.id).order_by('name')
 
             # Prepare initial data for the formset
             disk_data = [{'size': disk.size} for disk in disks]
@@ -385,8 +397,6 @@ class ServiceChangeView(UserPassesTestMixin, View):
                 'gpu': instance.gpu,
                 'multi_disk': multi_disk_string
             })
-
-            print(multi_disk_string)
             title = 'Modify ' + instance._meta.verbose_name.title()
             form = MiDesktopChangeImageForm(user=self.request.user, instance=instance)
             return render(request, template,

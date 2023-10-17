@@ -104,7 +104,9 @@ function addDisk(){
     }
 
     addEventListeners()
+    handleMultiDisk()
     updateStorageTotal()
+    calculateBaseImageCost()
 
 }
 const cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}");
@@ -160,6 +162,7 @@ function addEventListeners(){
         diskSizeSelectors[index].addEventListener("change", function(){
             var diskTotal = parseInt(diskSizeSelectors[index].value) * 0.10
             diskCostFields[index].value=diskTotal.toFixed(2)
+            handleMultiDisk()
             updateStorageTotal()
         })
     }
@@ -178,7 +181,9 @@ function handleStorageData(){
             diskElement.value = disk_size
         }
         addEventListeners()
+        handleMultiDisk()
         refreshStorageData()
+        updateStorageTotal()
     }
 
 
@@ -195,7 +200,7 @@ function refreshStorageData(){
         disk_total = disk_size * 0.10
         costElement.value = parseFloat(disk_total).toFixed(2)
     }
-    updateStorageTotal()
+    
 }
 
 function updateStorageTotal(){
@@ -206,6 +211,21 @@ function updateStorageTotal(){
     });
     storageTotal.value = runningTotal.toFixed(2)
     calculateBaseImageCost()
+}
+
+function handleMultiDisk(){
+    var diskSizeSelectors = document.querySelectorAll('[id$="-size"]');
+    var multi_disk = document.getElementById("{{ form.multi_disk.id_for_label }}");
+
+    var multi_disk_string = ''
+
+    diskSizeSelectors.forEach(disk => {
+        multi_disk_string += disk.value + ","
+    });
+
+    multi_disk.value = multi_disk_string
+
+    console.log(multi_disk_string)
 }
 
 </script>
