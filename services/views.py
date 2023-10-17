@@ -85,6 +85,18 @@ class ServiceRequestView(UserPassesTestMixin, View):
             form = MiDesktopNewImageForm(request.POST, user=self.request.user)
             if form.is_valid():
                 instance = form.save()
+                multi_disk = request.POST.get('multi_disk')
+                disks = multi_disk.split(",")
+                num_disks = 0
+                for disk in disks:
+                    if len(disk) > 0 :
+                        new_disk = ImageDisk(
+                            image = instance,
+                            name = 'disk_' + str(num_disks),
+                            size = int(disk)
+                        )
+                        num_disks += 1
+                        new_disk.save()
                 r = create_ticket('New', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             else:
@@ -174,7 +186,9 @@ class ServiceRequestView(UserPassesTestMixin, View):
             context["form"] = form
             context["groups_json"] = json.dumps(group_list)
             context["network_json"] = json.dumps(network_list)
-            context["calculator_form"] = CalculatorForm()
+            context["calculator_form"] = CalculatorForm(initial={
+                'multi_disk': '50,'
+            })
 
             return render(request, 'services/midesktop-image.html',context)
         try:

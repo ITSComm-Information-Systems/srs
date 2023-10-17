@@ -737,9 +737,9 @@ class MiDesktopNewImageForm(MiDesktopForm):
     def save(self, commit=True):
         image_name = self.data['name']
 
-        cpu = self.data['calculator-cpu']
-        memory = self.data['calculator-memory']
-        gpu = self.data['calculator-gpu']
+        cpu = self.data['cpu']
+        memory = self.data['memory']
+        gpu = self.data['gpu']
         
         network_type = self.data['network_type']
         network_name = self.data['network_name']
