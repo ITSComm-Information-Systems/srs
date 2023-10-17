@@ -39,11 +39,8 @@ class Command(BaseCommand):
 
         for record in get_query_result(sql):
             email.context = {"path": PATH, "service": record['service'], "instances": json.loads(record['instances'])}
-            email.to = record['owner']
+            email.to = record['owner'] + '@umich.edu'
             email.reply_to = self.REPLY_TO.get(record['service'])
-            email.cc = 'djamison@umich.edu,djams35@gmail.com'
+            email.cc = self.REPLY_TO.get(record['service'])
+            email.bcc = email.team_shared_email
             email.send()
-
-
-
-
