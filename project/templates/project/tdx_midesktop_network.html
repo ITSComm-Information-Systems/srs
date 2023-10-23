@@ -1,0 +1,11 @@
+<div class="table-responsive">
+    <table class="table table-bordered table-condensed table-hover table-striped" style="width: 100%">
+        <caption><h4>Network</h4></caption>
+        <tbody>
+            {% for key, value in cleaned_data.items %}
+            <tr><td>{{ key }}</td><td>{{ value }}</td></tr>            
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+

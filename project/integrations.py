@@ -617,6 +617,7 @@ class MiDesktopPayload(Payload):
         if 'form' in kwargs:
             self.form = kwargs['form']
             self.context['changed_data'] = self.form.changed_data
+            self.context['cleaned_data'] = self.form.cleaned_data
             self.context['additional_details'] = self.form.cleaned_data.get('additional_details')
             self.context['network_type'] = self.form.cleaned_data.get('network_type')
             print(self.context)
@@ -681,6 +682,7 @@ class ImagePayload(MiDesktopPayload):
 
 
 class NetworkPayload(MiDesktopPayload):
+    template = 'project/tdx_midesktop_network.html'
     def __init__(self, action, instance, request, **kwargs):
 
         if action == 'Delete':
