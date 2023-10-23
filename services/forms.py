@@ -465,7 +465,7 @@ class MiDesktopNewForm(MiDesktopForm):
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     network_type = forms.ChoiceField(required=False,label='Will you be using a shared network or a dedicated network?',choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
-    network = image_name = forms.CharField(required=False)
+    network  = forms.CharField(required=False)
     network_name = forms.CharField(required=False)
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
@@ -803,12 +803,12 @@ class MiDesktopChangeImageForm(forms.ModelForm):
     name = forms.CharField(required=False)
     calculator_form = CalculatorForm(prefix="calculator")
     additional_details = forms.CharField(required=False, label="Additional Details")
+    network_name = forms.CharField(required=False)
     def clean(self):
         cleaned_data = super().clean()
         return cleaned_data
 
     def save(self):
-        self.network = self.instance.network
         self.shared_network = self.instance.shared_network
 
         super().save()

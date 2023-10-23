@@ -321,6 +321,8 @@ class ServiceChangeView(UserPassesTestMixin, View):
             form = MiDesktopChangeImageForm(request.POST, user=self.request.user,instance = instance)
             if form.is_valid():
                 form.save()
+                instance.network_id = int(form.data['network'])
+                instance.save()
                 multi_disk = request.POST.get('multi_disk')
                 disks = multi_disk.split(",")
                 ImageDisk.objects.filter(image=instance.id).delete()
@@ -334,6 +336,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
                         )
                         num_disks += 1
                         new_disk.save()
+                
                 r = create_ticket('Modify', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             return render(request, template,
@@ -396,6 +399,16 @@ class ServiceChangeView(UserPassesTestMixin, View):
             if not user_has_access(request.user, instance.owner):
                 return HttpResponseNotFound(f'<h1>User { request.user } does not have access to that {instance.instance_label}</h1>')
             
+            network_groups = list(LDAPGroupMember.objects.filter(username=self.request.user).values_list('ldap_group_id',flat=True))
+
+            networks = Network.objects.filter(status='A',owner__in=network_groups).order_by('name')
+            network_list = []
+            for network in networks:
+                network_list.append({
+                    "id": network.id,
+                    "name": network.name,
+                    "owner": network.owner_id
+                })
             # Fetch disks related to the instance
             disks = ImageDisk.objects.filter(image=instance.id).order_by('name')
 
@@ -416,7 +429,9 @@ class ServiceChangeView(UserPassesTestMixin, View):
             return render(request, template,
                         {'title': title,
                         'form': form,
-                        'calculator_form': calculator_form})
+                        'calculator_form': calculator_form,
+                        'network_json': json.dumps(network_list)},
+                        )
         elif service == 'midesktop':
             instance = get_object_or_404(Pool,pk=id, status=Status.ACTIVE)
             title = 'Modify ' + instance._meta.verbose_name.title()
