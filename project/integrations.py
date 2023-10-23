@@ -618,6 +618,7 @@ class MiDesktopPayload(Payload):
             self.form = kwargs['form']
             self.context['changed_data'] = self.form.changed_data
             self.context['additional_details'] = self.form.cleaned_data.get('additional_details')
+            self.context['network_type'] = self.form.cleaned_data.get('network_type')
             print(self.context)
 
         self.add_attribute(self.owner.id, instance.owner.name)
