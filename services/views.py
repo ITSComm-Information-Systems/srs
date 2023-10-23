@@ -125,7 +125,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
     def get(self, request, service):
         request.session['backupStorage'] = 'cloud'
         if service == 'midesktop':
-            form = MiDesktopChangeImageForm(user=self.request.user)
+            form = MiDesktopNewForm(user=self.request.user)
             groups = LDAPGroupMember.objects.filter(username=self.request.user).order_by('ldap_group')
             network_groups = list(LDAPGroupMember.objects.filter(username=self.request.user).values_list('ldap_group_id',flat=True))
             networks = Network.objects.filter(status='A',owner__in=network_groups).order_by('name')
