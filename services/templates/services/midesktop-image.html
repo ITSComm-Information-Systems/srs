@@ -24,7 +24,7 @@
         <div id="div_formbody">
             <h6>
                 <div id="group">
-                    <h6><span style="color:red; font-size:12px;">*</span>McCommunity Admin Group:
+                    <h6><span style="color:red; font-size:12px;">*</span>MCommunity Admin Group:
                         <select class="form-control" name="admin_group" id="id_admin_group" v-model="selectedGroup" @change="handleGroupChange">
                             <option v-for="group in groups" :value="group.name" :key="group.id">[[group.name]]</option>
                         </select>
