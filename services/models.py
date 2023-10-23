@@ -171,7 +171,7 @@ class Image(MiDesktop):
 
     @cached_property
     def total_storage_size(self):
-        storage = ImageDisk.objects.filter(server=self).aggregate(models.Sum('size'))
+        storage = ImageDisk.objects.filter(image=self).aggregate(models.Sum('size'))
         if storage:
             sum = storage['size__sum']
             if sum:
@@ -183,7 +183,6 @@ class Image(MiDesktop):
     def total_cost(self):
         import decimal
         for rate in StorageRate.objects.filter(service__name='midesktop').order_by('display_seq_no'):
-            print(rate.label, rate.rate)
             if rate.label == 'Base':
                 total_cost = rate.rate
             if rate.label == 'CPU':
@@ -191,7 +190,7 @@ class Image(MiDesktop):
             if rate.label == 'Memory':
                 total_cost = total_cost + (rate.rate * decimal.Decimal(self.memory))
             if rate.label == 'Storage':
-                total_cost = total_cost + (rate.rate * 50)
+                total_cost = total_cost + (rate.rate * self.total_storage_size)
             if rate.label[:3] == 'GPU' and self.gpu == True:
                 total_cost = total_cost + rate.rate
 

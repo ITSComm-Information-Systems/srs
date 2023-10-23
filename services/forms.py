@@ -348,16 +348,31 @@ GPU_INITIAL = 0.00
 BASE_COST = 31.31
 TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
 
+class StorageForm(forms.Form):
+    cost = forms.DecimalField(required=False,label="Disk Cost",initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    size = forms.ChoiceField(required=False,choices=STORAGE_CHOICES, label="Disk", initial='50 GB')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['size'].widget.attrs['class'] = 'form-control'
+        self.fields['cost'].widget.attrs['class'] = 'form-control'
+        
+
+StorageFormSet = formset_factory(StorageForm, extra=1)
+
 class CalculatorForm(forms.Form):
     cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
     cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
     memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
-    storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
     storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+
+    storage_formset = StorageFormSet(prefix='disk')
+    multi_disk = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     template_name = 'services/midesktop-calculator.html'
 
@@ -441,12 +456,16 @@ class MiDesktopNewForm(MiDesktopForm):
     memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
     memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
-    storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    storage_cost = forms.DecimalField(label="Total Storage Cost",required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+
+    storage_formset = StorageFormSet(prefix='disk')
+    multi_disk = forms.CharField(required=False)
+
     gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     network_type = forms.ChoiceField(required=False,label='Will you be using a shared network or a dedicated network?',choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
-    network = image_name = forms.CharField(required=False)
+    network  = forms.CharField(required=False)
     network_name = forms.CharField(required=False)
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
@@ -535,6 +554,9 @@ class MiDesktopNewForm(MiDesktopForm):
             base_image_id = int(self.cleaned_data.get("base_image"))
             quantity= self.cleaned_data.get("pool_quantity")
             if base_image_id == 999999999:
+                multi_disk = self.cleaned_data.get("multi_disk")
+                disks = multi_disk.split(",")
+
                 #New Pool with new Image
                 image_name=self.cleaned_data.get("image_name")
                 cpu = self.cleaned_data.get("cpu")
@@ -562,6 +584,17 @@ class MiDesktopNewForm(MiDesktopForm):
 
                     new_image.save()
 
+                    num_disks = 0
+                    for disk in disks:
+                        if len(disk) > 0 :
+                            new_disk = ImageDisk(
+                                image = new_image,
+                                name = 'disk_' + str(num_disks),
+                                size = int(disk)
+                            )
+                            num_disks += 1
+                            new_disk.save()
+
                     new_pool = Pool(
                         shortcode = shortcode,
                         name = name,
@@ -586,6 +619,16 @@ class MiDesktopNewForm(MiDesktopForm):
                         owner=self.owner
                     )
                     new_image.save()
+                    num_disks = 0
+                    for disk in disks:
+                        if len(disk) > 0 :
+                            new_disk = ImageDisk(
+                                image = new_image,
+                                name = 'disk_' + str(num_disks),
+                                size = int(disk)
+                            )
+                            num_disks += 1
+                            new_disk.save()
 
                     new_pool = Pool(
                         shortcode = shortcode,
@@ -612,6 +655,16 @@ class MiDesktopNewForm(MiDesktopForm):
                     )
 
                     new_image.save()
+                    num_disks = 0
+                    for disk in disks:
+                        if len(disk) > 0 :
+                            new_disk = ImageDisk(
+                                image = new_image,
+                                name = 'disk_' + str(num_disks),
+                                size = int(disk)
+                            )
+                            num_disks += 1
+                            new_disk.save()
 
                     new_pool = Pool(
                         shortcode = shortcode,
@@ -684,9 +737,9 @@ class MiDesktopNewImageForm(MiDesktopForm):
     def save(self, commit=True):
         image_name = self.data['name']
 
-        cpu = self.data['calculator-cpu']
-        memory = self.data['calculator-memory']
-        gpu = self.data['calculator-gpu']
+        cpu = self.data['cpu']
+        memory = self.data['memory']
+        gpu = self.data['gpu']
         
         network_type = self.data['network_type']
         network_name = self.data['network_name']
@@ -750,12 +803,12 @@ class MiDesktopChangeImageForm(forms.ModelForm):
     name = forms.CharField(required=False)
     calculator_form = CalculatorForm(prefix="calculator")
     additional_details = forms.CharField(required=False, label="Additional Details")
+    network_name = forms.CharField(required=False)
     def clean(self):
         cleaned_data = super().clean()
         return cleaned_data
 
     def save(self):
-        self.network = self.instance.network
         self.shared_network = self.instance.shared_network
 
         super().save()
