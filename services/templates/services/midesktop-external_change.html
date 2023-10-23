@@ -6,7 +6,6 @@
     {% csrf_token %}
 
     <div id="div_formbody">
-        <h6><span style="color:red; font-size:12px;">*</span>{{form.name.label_tag}}{{form.name}}</h6>
         <h6><span style="color:red; font-size:12px;">*</span>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
         <h6><span style="color:red; font-size:12px;">*</span>{{form.quantity.label_tag}}{{form.quantity}}</h6>
         <h6>{{form.total.label_tag}}{{form.total}}</h6>
