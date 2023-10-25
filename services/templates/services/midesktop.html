@@ -1,0 +1,548 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+<script type='text/javascript'>
+    var groups = {{ groups_json|safe }};
+    var network_choice_list = [
+        {'key': 'private', 'label':'Shared Network (Private)'},
+        {'key': 'web-access', 'label':'Shared Network (Web-Access)'},
+        {'key': 'dedicated', 'label':'Dedicated Network'},
+    ]
+    var pool_type_choices = [
+        {'key': 'instant_clone', 'label':'Instant Clone'},{'key': 'persistent', 'label':'Persistent'},{'key': 'external', 'label':'External'}
+    ]
+    var networklist = {{ network_json|safe }};
+    var imagelist = {{ image_json|safe }};
+    var eventBus = new Vue();
+</script>
+
+
+<h1>MiDesktop New Order Form</h1>
+
+<div class="container">
+    <form method="POST">
+        {% csrf_token %}
+
+        <div id="div_formbody">
+            <div id="group">
+                <h6><span style="color:red; font-size:12px;">*</span>MCommunity Admin Group:</h6>
+                    <select class="form-control" name="admin_group" id="id_admin_group" v-model="selectedGroup" @change="handleGroupChange">
+                        <option v-for="group in groups" :value="group.name" :key="group.id">[[group.name]]</option>
+                    </select>
+            </div>
+            <h6><span style="color:red; font-size:12px;">*</span>{{form.shortcode.label_tag}}{{form.shortcode}}</h6>
+            <h2>Order New Pool</h2>
+            <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_name.label_tag}}{{form.pool_name}}</h6>
+            <div id="pool_type">
+                <h6><span style="color:red; font-size:12px;">*</span>Pool Type:
+                    <select class="form-control" name="pool_type" id="id_pool_type" v-model="selectedPoolType">
+                        <option v-for="pool_type in pool_type_choices" :value="pool_type.key" :key="pool_type.key">[[pool_type.label]] </option>
+                    </select>
+                </h6>
+            </div>
+            <div id="connection_options" v-show="visible">
+                <h2>Connection Options</h2>
+                <h6><span style="color:red; font-size:12px;">*</span>{{form.auto_logout.label_tag}}{{form.auto_logout}}</h6>
+                <h6>{{form.ad_container.label_tag}}{{form.ad_container}}</h6>
+                <h6>{{form.ad_groups.label_tag}}{{form.ad_groups}}</h6>
+            </div>
+            <div id="base_image" v-show="visible"> <h6><span style="color:red; font-size:12px;">*</span>{{form.base_image.label_tag}}
+                <select class="form-control" name="base_image" id="id_base_image" v-model="selectedBaseImage">
+                    <option v-for="image in filteredImages" :value="image.id" :key="image.id">[[image.name]] </option>
+                </select></h6></div>
+            <div>
+            
+            <div id="new-image-wrapper" v-show="visible">
+                <h6><span style="color:red; font-size:12px;">*</span>{{ form.image_name.label_tag }} {{ form.image_name }}
+                {{ form.image_name.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.initial_image.label_tag }} {{ form.initial_image }}
+                {{ form.initial_image.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.operating_system.label_tag }} {{ form.operating_system }}
+                {{ form.operating_system.errors }}<br/></h6>
+            </div>
+
+            <div class="form-group" id="calculator-wrapper" v-show="visible">
+                    <h6>
+                    <div class="row">
+                        <div class="col">
+                            {{ form.cpu.label_tag }}{{ form.cpu }}
+                        </div>
+                        <div class="col">
+                            {{ form.cpu_cost.label_tag }}{{ form.cpu_cost }}
+                        </div>
+                    </div><br/>
+                    <div class="row">
+                        <div class="col">
+                            {{ form.memory.label_tag }}{{ form.memory }}
+                        </div>
+                        <div class="col">
+                            {{ form.memory_cost.label_tag }}{{ form.memory_cost }}
+                        </div>
+                    </div><br/>
+                    <div id="disks">
+                        {{form.storage_formset.management_form}}
+                        {% for storage_form in form.storage_formset %}
+                        <div class="row" id="storage_disk">
+                            <div class="col">
+                                {{ storage_form.size.label_tag }} <a onclick="deleteDisk(this)" href="javascript:void(0)"><i class="fas fa-minus-circle" style="display:none"></i></a>{{ storage_form.size }}
+                            </div>
+                            <div class="col">
+                                {{ storage_form.cost.label_tag }}{{ storage_form.cost }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col"><br/><a onclick="addDisk()" style="margin-top: 23px" class="form-control btn btn-secondary"><strong>Add Additional Disk</strong></a></div>
+                        <div class="col">
+                            <h6>{{ form.storage_cost.label_tag }}{{ form.storage_cost }}</h6>
+                            <input type="text" name="multi_disk" hidden="true" id="id_multi_disk" />
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <br/>
+                    <div class="row">
+                        <div class="col">
+                            {{ form.gpu.label_tag }}{{ form.gpu }}
+                        </div>
+                        <div class="col">
+                            {{ form.gpu_cost.label_tag }}{{ form.gpu_cost }}
+                        </div>
+                    </div><br/>
+                    <div class="row">
+                        <div class="col">
+                            {{ form.total.label_tag }}{{ form.total }}
+                        </div>
+                    </div>
+                    </h6>
+                </div>
+
+            <div id="id_pool_quantity" v-show="visible">
+                <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_quantity.label_tag}}<input type="number" name="pool_quantity" class="form-control"  v-model="poolQuantity"/></h6>
+            </div>
+            <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_total.label_tag}}<input type="text" name="pool_total" readonly="true" class="form-control" id="id_pool_total" :value="poolTotal"></h6>
+            
+            <div id="network_type" v-show="visible">
+                <h6><span style="color:red; font-size:12px;">*</span>Will you be using a shared network or a dedicated network?
+                    <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
+                        <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
+                    </select>
+                </h6>
+            </div>
+            <div id="network" v-show="visible">
+                <h6>Networks:
+                    <select class="form-control" name="network" id="id_network" v-model="selectedNetwork">
+                        <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
+                    </select>
+                </h6>
+            </div>
+        
+            <div id="networks-wrapper" v-show="visible">
+                <h6>
+                <span style="color:red; font-size:12px;">*</span>{{ form.network_name.label_tag }} {{ form.network_name }}
+                {{ form.network_name.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.access_internet.label_tag }} {{ form.access_internet }}
+                {{ form.access_internet.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.mask.label_tag }} {{ form.mask }}
+                {{ form.mask.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.protection.label_tag }} {{ form.protection }}
+                {{ form.protection.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.technical_contact.label_tag }} {{ form.technical_contact }}
+                {{ form.technical_contact.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.business_contact.label_tag }} {{ form.business_contact }}
+                {{ form.business_contact.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.security_contact.label_tag }} {{ form.security_contact }}
+                {{ form.security_contact.errors }}<br/>
+            </h6>
+                
+            </div>
+            
+            <h6>{{ form.additional_details.label_tag }} {{ form.additional_details }}
+                {{ form.additional_details.errors }}</h6>
+
+            <h2>Service Level Expectations</h2>
+            <hr/>
+            <a href="https://its.umich.edu/computing/computers-software/midesktop" target="_blank">Click here for Service Level Expectations</a>
+            <br/>{{ form.sla }} <span style="color:red; font-size:12px;">*</span>I have read and acknowledge the Service Level Expectations
+        </div>
+        <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+
+<script src="/static/vue-components/vue-components.js"></script>
+<script>
+    function deleteDisk(disk){
+        var totalFormsInput = document.getElementById("id_disk-TOTAL_FORMS");
+        var totalForms = parseInt(totalFormsInput.value);
+        disk.parentElement.parentElement.remove();
+        totalForms--;
+        totalFormsInput.value = totalForms;
+        var delbuttons = document.getElementsByClassName('fa-minus-circle')
+        if (delbuttons.length > 1){
+            delbuttons[delbuttons.length - 1].style.display="block"
+        }
+        eventBus.$emit('disk-number-changed', totalForms);
+    }
+
+    function addDisk(){
+        var totalFormsInput = document.getElementById("id_disk-TOTAL_FORMS");
+        var totalForms = parseInt(totalFormsInput.value);
+
+         // Clone the first form in the formset and clear its input values
+        var firstForm = document.getElementById("storage_disk")
+        var newForm = firstForm.cloneNode(true);
+        
+
+        var inputs = newForm.querySelectorAll("input, select, textarea");
+        inputs.forEach(function(input) {
+            //input.value = "";
+            // Update input names and IDs to reflect the new form index
+            input.name = input.name.replace("-0-", "-" + totalForms + "-");
+            input.id = "id_" + input.name;
+
+            if (input.name.includes("cost")) {
+                input.value = "5.00";  // Set the initial cost value
+            }
+        });
+            
+        totalForms++;
+        totalFormsInput.value = totalForms;
+        
+        newForm.id = firstForm.id + '_' + totalForms
+        newForm.style.marginTop="20px";
+            // Append the new form to the formset container
+        document.getElementById("disks").appendChild(newForm);
+        var delbuttons = document.getElementsByClassName('fa-minus-circle')
+        if (delbuttons.length > 1){
+            delbuttons[delbuttons.length - 1].style.display="block"
+        }
+
+        eventBus.$emit('disk-number-changed', totalForms);
+
+    }
+
+
+    const connection_options_handler = new Vue({
+    el: '#connection_options',
+    delimiters: ['[[', ']]'],
+    data: {
+        visible: true,
+    },
+    mounted() {
+        eventBus.$on('pool-type-selected', this.handlePoolTypeSelected);
+    },
+    methods:{
+        handlePoolTypeSelected(poolType){
+            if (poolType == 'external'){
+                this.visible = false
+            }else{
+                this.visible = true
+            }
+        }
+    }
+});
+    const pool_type_handler = new Vue({
+    el: '#pool_type',
+    delimiters: ['[[', ']]'],
+    data: {
+        selectedPoolType: 'instant_clone',
+    },
+    watch: {
+        selectedPoolType: function (newVal) {
+            eventBus.$emit('pool-type-selected', newVal);
+        }
+    },
+});
+    const calculator_wrapper = new Vue({
+        el: '#calculator-wrapper',
+        delimiters: ['[[', ']]'],
+        data: {
+            visible: false,
+            CPU_INITIAL:1.15,
+            MEMORY_INITIAL:0.96,
+            STORAGE_INITIAL:5.00,
+            GPU_INITIAL:0.00,
+            BASE_COST:31.31,
+            TOTAL_INITIAL:this.CPU_INITIAL + this.MEMORY_INITIAL + this.GPU_INITIAL + this.BASE_COST,
+            totalForms: null,
+        },
+        mounted() {
+            eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+            eventBus.$on('disk-number-changed', this.handleDiskNumberChanged);
+            eventBus.$on('calculate-total-storage-cost', this.calculateTotalStorageCost);
+            
+        },
+        watch: {
+            totalForms: function (newVal) {
+                
+            }
+        },
+
+        methods: {
+            handleBaseImageSelected(selectedBaseImage){
+                this.selectedBaseImage = selectedBaseImage
+                this.updateVisibility();
+                this.attachEventListeners();
+                this.handleDiskNumberChanged();
+                this.attachEventListeners();
+                this.handleCpuChange();
+                this.handleMemoryChange();
+                this.calculateBaseImageCost();
+
+            },
+            updateVisibility(){
+                if(this.selectedBaseImage === 'new' || this.selectedBaseImage === 999999999){
+                    this.visible = true
+                } else {
+                    this.visible = false
+                }
+            },
+            calculateBaseImageCost(){
+                this.cost = this.BASE_COST + parseFloat(this.cpu_cost.value) + parseFloat(this.memory_cost.value) + parseFloat(this.total_storage_cost.value) + parseFloat(this.gpu_cost.value)
+                this.total_cost.value = this.cost.toFixed(2)
+                eventBus.$emit('new-base-image-total-changed', this.total_cost.value);
+            },
+            attachEventListeners() {
+                this.total_storage_cost = document.getElementById("{{ form.storage_cost.id_for_label }}");
+                this.total_storage_cost.value = 5.00.toFixed(2);
+                document.getElementById("id_disk-0-cost").value = 5.00.toFixed(2)
+                document.getElementById("{{ form.cpu.id_for_label }}").addEventListener('change', this.handleCpuChange);
+                document.getElementById("{{ form.memory.id_for_label }}").addEventListener('change', this.handleMemoryChange);
+                document.getElementById("{{ form.gpu.id_for_label }}").addEventListener('change', this.handleGpuChange);
+                this.cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}")
+                this.memory_choice = document.getElementById("{{ form.memory.id_for_label }}")
+                this.gpu_choice = document.getElementById("{{ form.gpu.id_for_label }}")
+                this.cpu_cost = document.getElementById("{{ form.cpu_cost.id_for_label }}");
+                this.memory_cost = document.getElementById("{{ form.memory_cost.id_for_label }}");
+                this.gpu_cost = document.getElementById("{{ form.gpu_cost.id_for_label }}");
+                this.total_cost = document.getElementById("{{ form.total.id_for_label }}");
+                this.multi_disk_field = document.getElementById("id_multi_disk");
+                this.gpu_cost.value = 0.00.toFixed(2)
+
+            },
+            calculateTotalStorageCost(){
+                this.total_storage_cost.value = 0.00.toFixed(2);
+                this.diskCostFields.forEach(diskCost => {
+                    this.total_storage_cost.value = +parseFloat(this.total_storage_cost.value) + +parseFloat(diskCost.value)
+                });
+                this.total_storage_cost.value = parseFloat(this.total_storage_cost.value).toFixed(2)
+
+                this.multi_disk_field.value = ''
+                this.diskSizeSelectors.forEach(diskSelector => {
+                    this.multi_disk_field.value = this.multi_disk_field.value + diskSelector.value + ','
+                })
+                console.log(this.multi_disk_field.value)
+
+                this.calculateBaseImageCost()
+            },
+            handleDiskNumberChanged(number){
+                this.diskSizeSelectors = document.querySelectorAll('[id$="-size"]');
+                this.diskCostFields = document.querySelectorAll('[id$="-cost"]');
+                this.totalForms = number
+
+                this.multi_disk_field.value = '';
+
+                this.diskSizeSelectors.forEach(diskSelector => {
+                    diskSelector.addEventListener('change', function(){
+                        var regex = /(\d+)/;
+                        var id_full = diskSelector.id
+                        var id = regex.exec(id_full)[0]
+                        var storage_disk_cost_string = 'id_disk-' + id + '-cost'
+                        var storage_disk_cost = document.getElementById(storage_disk_cost_string)
+                        var diskSize = (parseInt(diskSelector.value))
+                        var storageTotal = document.getElementById("id_total")
+                        storage_disk_cost.value = (diskSize * 0.10).toFixed(2)
+                        eventBus.$emit('calculate-total-storage-cost', null);
+                        
+                    })
+
+                });
+                this.calculateTotalStorageCost()
+            },
+            handleCpuChange(){
+                this.cpu_cost.value = (this.cpu_choice.value * this.CPU_INITIAL).toFixed(2)
+                this.calculateBaseImageCost()
+            },
+            handleMemoryChange(){
+                this.memory_cost.value = (this.memory_choice.value * this.MEMORY_INITIAL).toFixed(2)
+                this.calculateBaseImageCost()
+            },
+            handleGpuChange(){
+                this.gpu_cost.value = this.gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+                this.calculateBaseImageCost()
+            },
+        }
+    });
+    const pool_quantity_handler = new Vue({
+        el: '#id_pool_quantity',
+        delimiters: ['[[', ']]'],
+        data: {
+            poolQuantity: 1,
+            visible: true
+        },
+        mounted() {
+            eventBus.$on('pool-type-selected', this.handlePoolTypeSelected);
+        },
+        watch: {
+            poolQuantity: function (newVal) {
+                eventBus.$emit('pool-quantity-changed', newVal);
+                this.handleQuantityChange(newVal)
+            }
+        },
+
+        methods: {
+            handlePoolTypeSelected(poolType){
+                if (poolType == 'persistent'){
+                    this.visible = false
+                }else{
+                    this.visible = true
+                }
+            },
+            handleQuantityChange(quantity){
+                if (parseInt(quantity) <1){
+                    this.poolQuantity = 1
+                }
+            },
+        }
+    });
+
+    const pool_total_handler = new Vue({
+        el: '#id_pool_total',
+        delimiters: ['[[', ']]'],
+        data: {
+            poolTotal: '0.00',
+            quantity: 1,
+            baseImageTotalCost: 0.00
+        },
+        mounted() {
+            eventBus.$on('new-base-image-total-changed', this.handleBaseImageTotalChanged);
+            eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+            eventBus.$on('pool-quantity-changed', this.handlePoolQuantityChanged);
+            eventBus.$on('pool-type-selected', this.handlePoolTypeSelected);
+        },
+
+        methods: {
+            handlePoolTypeSelected(poolType){
+                if (poolType == 'external'){
+                    this.baseImageTotalCost = 10
+                }
+                this.calculateTotal()
+            },
+            handlePoolQuantityChanged(newQuantity){
+                
+                this.quantity = parseInt(newQuantity)
+                this.calculateTotal()
+            },
+            handleBaseImageTotalChanged(imageTotal){
+                this.baseImageTotalCost = imageTotal
+                this.calculateTotal()
+            },
+            handleBaseImageSelected(selectedBaseImage){
+                this.selectedBaseImageID = selectedBaseImage
+                if (this.selectedBaseImageID != 999999999){
+                    this.baseImage = imagelist.filter(image => image.id === this.selectedBaseImageID)
+                    this.baseImageTotalCost = this.baseImage[0].total_cost
+                    this.calculateTotal()
+                }else{
+                    this.calculateTotal()
+                }
+            },
+            calculateTotal(){
+                this.poolTotal = (this.quantity * this.baseImageTotalCost).toFixed(2)
+            },
+        }
+    });
+
+    const new_image_wrapper = new Vue({
+        el: '#new-image-wrapper',
+        delimiters: ['[[', ']]'],
+        data: {
+            visible: false,
+        },
+        mounted() {
+            eventBus.$on('new-base-image-selected', this.handleBaseImageSelected);
+        },
+
+        methods: {
+            handleBaseImageSelected(selectedBaseImage){
+                this.selectedBaseImage = selectedBaseImage
+                this.updateVisibility();
+
+            },
+            updateVisibility(){
+                if(this.selectedBaseImage === 'new' || this.selectedBaseImage === 999999999){
+                    this.visible = true
+                } else {
+                    this.visible = false
+                }
+            }
+        }
+    });
+
+    const base_image = new Vue({
+    el: '#base_image',
+    delimiters: ['[[', ']]'],
+    data: {
+        visible: true,
+        selectedBaseImage: null,
+        filteredImages: [], // Add a data property to store filtered networks
+        groups: groups
+    },
+    mounted(){
+        eventBus.$on('group-selected', this.handleGroupChange);
+        eventBus.$on('pool-type-selected', this.handlePoolTypeSelected);
+        this.updateFilteredImages();
+    },
+    methods:{
+        handlePoolTypeSelected(poolType){
+            if (poolType == 'external'){
+                this.visible = false
+            }else{
+                this.visible = true
+            }
+        },
+        handleGroupChange(selectedGroup) {
+            // Update the selectedGroup value when the group selection changes
+            this.selectedGroup = selectedGroup;
+            this.selectedGroupID = this.getGroupIdByName(selectedGroup)
+            this.updateFilteredImages();
+        },
+        updateFilteredImages() {
+            if (!this.selectedGroup) {
+                // If no group is selected, show all images
+                this.filteredImages = [];
+            } else {
+                // Filter images based on the selected group's id
+                this.filteredImages = imagelist.filter(image => image.owner === this.selectedGroupID);
+            }
+
+            this.filteredImages.push({
+                'id': 999999999,
+                "name": '-- New Base Image',
+                "owner": 'None'
+            })
+        },
+        getGroupIdByName(groupName) {
+            const group = this.groups.find(group => group.name === groupName);
+            return group ? group.id : null;
+        }
+    },
+    watch: {
+        selectedBaseImage: function (newVal) {
+            eventBus.$emit('new-base-image-selected', newVal);
+        }
+    },
+})
+</script>
+{% endblock %}

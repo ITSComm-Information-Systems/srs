@@ -1,6 +1,7 @@
 import json, yaml, requests
 from django.conf import settings
 from ldap3 import Server, Connection, ALL, MODIFY_ADD
+from django.template.loader import render_to_string
 
 class MCommunity:
 
@@ -593,12 +594,114 @@ class ContainerPayload(Payload):
             title = 'Add contact group to notification group'
             self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.CONTAINER_TEAM} )
 
+class MiDesktopPayload(Payload):
+    title = 'MiDesktop New Order'
+    description = 'SRS MiDesktop Request \n'
+    template = 'project/tdx_midesktop_new.html'
+    context = {}
+    type_id = 7                  # Compute Services
+    responsible_group_id = 86    # ITS-CloudComputeServices
+    service_id = 14              # ITS-MiDesktop
+    form_id = 555	             # ITS-MiDesktop - Form
+    attributes = []
+
+    new_customer = ChoiceAttribute(2342, Yes=0, No=0)  # midesktop_New Existing dropdown
+    owner = TextAttribute(2343)         # midesktop_MComm group textbox
+    shared = ChoiceAttribute(2344, Yes=0, No=0)        # midesktop_Shared Dedicated dropdown
+    image_name = TextAttribute(2347)    # midesktop_Base Image Name textbox
+    pool_name = TextAttribute(2348)     # midesktop_Pool Display Name textbox
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.request = request
+
+        if 'form' in kwargs:
+            self.form = kwargs['form']
+            self.context['changed_data'] = self.form.changed_data
+            self.context['cleaned_data'] = self.form.cleaned_data
+            self.context['additional_details'] = self.form.cleaned_data.get('additional_details')
+            self.context['network_type'] = self.form.cleaned_data.get('network_type')
+            print(self.context)
+
+        self.add_attribute(self.owner.id, instance.owner.name)
+        self.description = render_to_string(self.template, self.context)
+
+    def add_attribute(self, id, value):
+        self.attributes.append(
+            {
+                "ID": id, 
+                "Value": value
+            }
+        )
+
+    @property
+    def data(self):
+        return {
+            "FormID": self.form_id,
+            "TypeID": self.type_id,
+            "SourceID": self.source_id,
+            "StatusID": self.status_id,
+            "ServiceID": self.service_id,
+            "ResponsibleGroupID": self.responsible_group_id,
+            "Title": self.title,
+            "RequestorEmail": self.request.user.email,
+            "Description": self.description,
+            "IsRichHtml": True,
+            "Attributes": self.attributes }      #| kwargs
+
+
+
+class PoolPayload(MiDesktopPayload):
+    service_id = 58  # New Order
+    form_id = 85
+
+    def __init__(self, action, instance, request, **kwargs):
+        if action == 'Modify':
+            self.service_id = 64  # Modify Pool
+            self.form_id = 111      
+        elif action == 'Delete':
+            self.service_id = 65  # Delete Pool
+            self.form_id = 112
+
+        self.add_attribute(self.pool_name.id, instance.name)
+        self.context = {'pool': instance}
+        super().__init__(action, instance, request, **kwargs)
+
+class ImagePayload(MiDesktopPayload):
+    service_id = 61
+    form_id = 109
+    template = 'project/tdx_midesktop_image.html'
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.title = f'MiDesktop {action} Image'
+        if action == 'Delete':
+            self.service_id = 63
+            self.form_id = 110 
+        self.add_attribute(self.image_name.id, instance.name)
+        self.context = {'image': instance}
+        super().__init__(action, instance, request, **kwargs)
+
+
+class NetworkPayload(MiDesktopPayload):
+    template = 'project/tdx_midesktop_network.html'
+    def __init__(self, action, instance, request, **kwargs):
+
+        if action == 'Delete':
+            self.title = 'MiDesktop Delete Network'
+        else:
+            self.title = f'MiDesktop {action} Network'
+
+        super().__init__(action, instance, request, **kwargs)
+
+        self.description = self.description + f'Network: {instance.name}'
+
+
 
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
     service = service.upper()
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
+    print(type(payload), action)
 
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
