@@ -147,7 +147,16 @@ def send_tab_data(request):
                 review_summary = data['reviewSummary']
                 pattern = r'^\*'
                 for entry in review_summary:
+                    title = entry['title']
                     row = entry['fields']
+                    if (title == 'Server Specification'):
+                        for data in row:
+                            label = data['label']
+                            if label == 'Disk Space':
+                                disk_list = data['list']
+                                for disk in disk_list:
+                                    if disk[-1] == '*':
+                                        data_changed_not_shortcode = True
                     for data in row:
                         label = data['label']
                         if re.match(pattern, label):
