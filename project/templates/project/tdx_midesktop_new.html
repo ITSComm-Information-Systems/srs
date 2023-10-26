@@ -6,6 +6,16 @@
             <tr><td>Size</td><td>{{ pool.quantity }}</td></tr>
             <tr><td>Shortcode</td><td>{{ pool.shortcode }}</td></tr>
             <tr><td>Owner</td><td>{{ pool.owner }}</td></tr>
+            {% if form.cleaned_data.pool_type %}
+            <tr><td>Pool Type</td><td>{{ form.cleaned_data.pool_type }}</td></tr>
+            {% endif %}
+            {% if form.cleaned_data.auto_logout %}
+            <tr><td>Auto Logoout</td><td>{{ form.cleaned_data.auto_logout }}</td></tr>
+            {% endif %}
+            {% if form.cleaned_data.ad_container %}
+            <tr><td>AD Container</td><td>{{ form.cleaned_data.ad_container }}</td></tr>
+            {% endif %}
+
         </tbody>
     </table>
 </div>
