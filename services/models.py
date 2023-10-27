@@ -218,7 +218,7 @@ class ImageDisk(models.Model):
 class Pool(MiDesktop):
     instance_label = 'Pool Name'
     shortcode = models.CharField(max_length=6)
-    name = models.CharField(max_length=30, verbose_name='Pool Name', default='TBD')
+    name = models.CharField(max_length=40, verbose_name='Pool Name', default='TBD')
     type = models.CharField(default='instant-clone',max_length=30,)
     quantity = models.IntegerField()
     images = models.ManyToManyField(Image)
