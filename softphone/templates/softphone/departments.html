@@ -16,7 +16,7 @@
         </p>
         <ul>
             {% for dept in dept_list %}
-            <li><a href="/softphone/dept/{{ dept.dept_id }}/">{{ dept.dept_id }}</a> - {{ dept.dept_name }}</li>
+            <li><a href="/softphone/dept/{{ dept.dept_id }}/">{{ dept.dept_id }}</a> - {{ dept.dept_name }} ({{ dept.remaining}} remaining)</li>
             {% endfor %}
 
         </ul>
