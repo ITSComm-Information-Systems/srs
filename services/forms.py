@@ -531,6 +531,30 @@ class MiDesktopNewForm(MiDesktopForm):
             self.fields['security_contact'].required = False
 
         return cleaned_data
+    
+    def clean_pool_name(self):
+        pool_name = self.cleaned_data['pool_name']
+        # Check if an item with the same name already exists in the database
+        if Pool.objects.filter(name=pool_name).exists():
+            raise forms.ValidationError("A pool with this name already exists.")
+        return pool_name
+    
+    def clean_image_name(self):
+        base_image_id = self.cleaned_data.get('base_image')
+        image_name = self.cleaned_data['image_name']
+        if base_image_id == 999999999:
+            if Image.objects.filter(name=image_name).exists():
+                raise forms.ValidationError("Please choose a unique image name.")
+        return image_name
+    
+    def clean_network_name(self):
+        network_name = self.cleaned_data['network_name']
+        network = self.cleaned_data.get('network')
+        
+        if network == 'new':
+            if Network.objects.filter(name=network_name).exists():
+                raise forms.ValidationError("Please choose a unique network name.")
+        return network_name
 
     def save(self):
         super().save()
@@ -733,6 +757,13 @@ class MiDesktopNewImageForm(MiDesktopForm):
     def clean(self):
         cleaned_data = super().clean()
         return cleaned_data
+    
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        # Check if an item with the same name already exists in the database
+        if Image.objects.filter(name=name).exists():
+            raise forms.ValidationError("An Image with this name already exists.")
+        return name
 
     def save(self, commit=True):
         image_name = self.data['name']
@@ -846,6 +877,13 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
         cleaned_data = super().clean()
 
         return cleaned_data
+    
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        # Check if an item with the same name already exists in the database
+        if Network.objects.filter(name=name).exists():
+            raise forms.ValidationError("A Network with this name already exists.")
+        return name
 
     def save(self, commit=True):
         super().save()

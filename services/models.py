@@ -162,7 +162,7 @@ class MiDesktop(models.Model):
 
 class Image(MiDesktop):
     instance_label = 'Image Name'
-    name = models.CharField(max_length=30, verbose_name='Image Name', default='TBD')
+    name = models.CharField(unique=True,max_length=30, verbose_name='Image Name', default='TBD')
     cpu = models.IntegerField()
     memory = models.IntegerField()
     gpu = models.BooleanField(blank=True, null=True)
@@ -201,7 +201,7 @@ class Image(MiDesktop):
 
 class Network(MiDesktop):
     instance_label = 'Network Name'
-    name = models.CharField(blank=True, max_length=80)
+    name = models.CharField(unique=True,blank=True, max_length=80)
     size = models.CharField(blank=True, max_length=80)
 
     class Meta:
@@ -218,7 +218,7 @@ class ImageDisk(models.Model):
 class Pool(MiDesktop):
     instance_label = 'Pool Name'
     shortcode = models.CharField(max_length=6)
-    name = models.CharField(max_length=40, verbose_name='Pool Name', default='TBD')
+    name = models.CharField(unique=True,max_length=40, verbose_name='Pool Name', default='TBD')
     type = models.CharField(default='instant-clone',max_length=30,)
     quantity = models.IntegerField()
     images = models.ManyToManyField(Image)

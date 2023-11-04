@@ -58,6 +58,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
                 
                 })
 
+
             context = {}
             context["form"] = form
             context["groups_json"] = json.dumps(group_list)
@@ -67,16 +68,15 @@ class ServiceRequestView(UserPassesTestMixin, View):
             
             if form.is_valid():
                 instance = form.save()
-                r = create_ticket('New', instance, request, form=form)
+                #r = create_ticket('New', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             else:
-                print(form.errors)
                 return render(request, 'services/midesktop.html',context)
         elif service == 'midesktop-network':
             form = MiDesktopNewNetworkForm(request.POST, user=self.request.user)
             if form.is_valid():
                 instance = form.save()
-                r = create_ticket('New', instance, request, form=form)
+                #r = create_ticket('New', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             else:
                 print(form.errors)
@@ -97,10 +97,32 @@ class ServiceRequestView(UserPassesTestMixin, View):
                         )
                         num_disks += 1
                         new_disk.save()
-                r = create_ticket('New', instance, request, form=form)
+                #r = create_ticket('New', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             else:
-                print(form.errors)
+                groups = LDAPGroupMember.objects.filter(username=self.request.user).order_by('ldap_group')
+                network_groups = list(LDAPGroupMember.objects.filter(username=self.request.user).values_list('ldap_group_id',flat=True))
+                networks = Network.objects.filter(status='A',owner__in=network_groups).order_by('name')
+                network_list = []
+                for network in networks:
+                    network_list.append({
+                        "id": network.id,
+                        "name": network.name,
+                        "owner": network.owner_id
+                    })
+            
+                group_list = []
+                for group in groups:
+                    group_list.append({'name':group.ldap_group.name,'id':group.ldap_group_id})
+
+                context = {}
+                context["form"] = form
+                context["groups_json"] = json.dumps(group_list)
+                context["network_json"] = json.dumps(network_list)
+                context["calculator_form"] = CalculatorForm(initial={
+                    'multi_disk': '50,'
+                })
+                return render(request, 'services/midesktop-image.html',context)
         else:
             model = getattr(Service, service)
             form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)
@@ -309,7 +331,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
             form = MiDesktopChangeNetworkForm(request.POST, user=self.request.user, instance=instance)
             if form.is_valid():
                 form.save()
-                r = create_ticket('Modify', instance, request, form=form)
+                #r = create_ticket('Modify', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             return render(request, template,
                         {'title': title,
