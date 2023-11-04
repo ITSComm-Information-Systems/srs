@@ -47,8 +47,10 @@
             <div id="connection_options" v-show="visible">
                 <h2>Connection Options</h2>
                 <h6><span style="color:red; font-size:12px;">*</span>{{form.auto_logout.label_tag}}{{form.auto_logout}}</h6>
-                <h6>{{form.ad_container.label_tag}}{{form.ad_container}}</h6>
                 <h6>{{form.ad_groups.label_tag}}{{form.ad_groups}}</h6>
+            </div>
+            <div id="id_ad_container" v-show="visible">
+                <h6>{{form.ad_container.label_tag}}{{form.ad_container}}</h6>
             </div>
             <div id="base_image" v-show="visible"> <h6><span style="color:red; font-size:12px;">*</span>{{form.base_image.label_tag}}
                 <select class="form-control" name="base_image" id="id_base_image" v-model="selectedBaseImage">
@@ -413,6 +415,29 @@
             handleQuantityChange(quantity){
                 if (parseInt(quantity) <1){
                     this.poolQuantity = 1
+                }
+            },
+        }
+    });
+
+    const ad_container_handler = new Vue({
+        el: '#id_ad_container',
+        delimiters: ['[[', ']]'],
+        data: {
+            visible: true
+        },
+        mounted() {
+            eventBus.$on('pool-type-selected', this.handlePoolTypeSelected);
+        },
+
+        methods: {
+            handlePoolTypeSelected(poolType){
+                console.log(poolType)
+                if (poolType == 'persistent'){
+                    this.visible = false
+                    console.log('invisible')
+                }else{
+                    this.visible = true
                 }
             },
         }
