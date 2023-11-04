@@ -394,9 +394,9 @@ class NetworkForm(forms.Form):
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
     protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False,required=False)
-    technical_contact = forms.CharField(required=False)
-    business_contact = forms.CharField(required=False)
-    security_contact = forms.CharField(required=False)
+    technical_contact = forms.EmailField(required=False)
+    business_contact = forms.EmailField(required=False)
+    security_contact = forms.EmailField(required=False)
 
     template_name = 'services/network.html'
 
@@ -470,9 +470,9 @@ class MiDesktopNewForm(MiDesktopForm):
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
     protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False,required=False)
-    technical_contact = forms.CharField(required=False)
-    business_contact = forms.CharField(required=False)
-    security_contact = forms.CharField(required=False)
+    technical_contact = forms.EmailField(required=False)
+    business_contact = forms.EmailField(required=False)
+    security_contact = forms.EmailField(required=False)
 
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
 
@@ -531,6 +531,30 @@ class MiDesktopNewForm(MiDesktopForm):
             self.fields['security_contact'].required = False
 
         return cleaned_data
+    
+    def clean_pool_name(self):
+        pool_name = self.cleaned_data['pool_name']
+        # Check if an item with the same name already exists in the database
+        if Pool.objects.filter(name=pool_name).exists():
+            raise forms.ValidationError("A pool with this name already exists.")
+        return pool_name
+    
+    def clean_image_name(self):
+        base_image_id = self.cleaned_data.get('base_image')
+        image_name = self.cleaned_data['image_name']
+        if base_image_id == 999999999:
+            if Image.objects.filter(name=image_name).exists():
+                raise forms.ValidationError("Please choose a unique image name.")
+        return image_name
+    
+    def clean_network_name(self):
+        network_name = self.cleaned_data['network_name']
+        network = self.cleaned_data.get('network')
+        
+        if network == 'new':
+            if Network.objects.filter(name=network_name).exists():
+                raise forms.ValidationError("Please choose a unique network name.")
+        return network_name
 
     def save(self):
         super().save()
@@ -718,9 +742,9 @@ class MiDesktopNewImageForm(MiDesktopForm):
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
     protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False,required=False)
-    technical_contact = forms.CharField(required=False)
-    business_contact = forms.CharField(required=False)
-    security_contact = forms.CharField(required=False)
+    technical_contact = forms.EmailField(required=False)
+    business_contact = forms.EmailField(required=False)
+    security_contact = forms.EmailField(required=False)
     
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
     title = 'MiDesktop New Image Order Form'
@@ -733,6 +757,13 @@ class MiDesktopNewImageForm(MiDesktopForm):
     def clean(self):
         cleaned_data = super().clean()
         return cleaned_data
+    
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        # Check if an item with the same name already exists in the database
+        if Image.objects.filter(name=name).exists():
+            raise forms.ValidationError("An Image with this name already exists.")
+        return name
 
     def save(self, commit=True):
         image_name = self.data['name']
@@ -835,9 +866,9 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
     mask = forms.ChoiceField(choices=MASK_CHOICES)
     protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False, label="Firewall Protection")
-    technical_contact = forms.CharField()
-    business_contact = forms.CharField()
-    security_contact = forms.CharField()
+    technical_contact = forms.EmailField()
+    business_contact = forms.EmailField()
+    security_contact = forms.EmailField()
     
     class Meta:
         fields = ['admin_group']
@@ -846,6 +877,13 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
         cleaned_data = super().clean()
 
         return cleaned_data
+    
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        # Check if an item with the same name already exists in the database
+        if Network.objects.filter(name=name).exists():
+            raise forms.ValidationError("A Network with this name already exists.")
+        return name
 
     def save(self, commit=True):
         super().save()
