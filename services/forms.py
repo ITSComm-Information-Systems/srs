@@ -394,9 +394,9 @@ class NetworkForm(forms.Form):
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
     protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False,required=False)
-    technical_contact = forms.CharField(required=False)
-    business_contact = forms.CharField(required=False)
-    security_contact = forms.CharField(required=False)
+    technical_contact = forms.EmailField(required=False)
+    business_contact = forms.EmailField(required=False)
+    security_contact = forms.EmailField(required=False)
 
     template_name = 'services/network.html'
 
@@ -470,9 +470,9 @@ class MiDesktopNewForm(MiDesktopForm):
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
     protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False,required=False)
-    technical_contact = forms.CharField(required=False)
-    business_contact = forms.CharField(required=False)
-    security_contact = forms.CharField(required=False)
+    technical_contact = forms.EmailField(required=False)
+    business_contact = forms.EmailField(required=False)
+    security_contact = forms.EmailField(required=False)
 
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
 
@@ -742,9 +742,9 @@ class MiDesktopNewImageForm(MiDesktopForm):
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
     mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
     protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False,required=False)
-    technical_contact = forms.CharField(required=False)
-    business_contact = forms.CharField(required=False)
-    security_contact = forms.CharField(required=False)
+    technical_contact = forms.EmailField(required=False)
+    business_contact = forms.EmailField(required=False)
+    security_contact = forms.EmailField(required=False)
     
     networks = forms.ChoiceField(label='Dedicated Network', required=False)
     title = 'MiDesktop New Image Order Form'
@@ -866,9 +866,9 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
     mask = forms.ChoiceField(choices=MASK_CHOICES)
     protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False, label="Firewall Protection")
-    technical_contact = forms.CharField()
-    business_contact = forms.CharField()
-    security_contact = forms.CharField()
+    technical_contact = forms.EmailField()
+    business_contact = forms.EmailField()
+    security_contact = forms.EmailField()
     
     class Meta:
         fields = ['admin_group']

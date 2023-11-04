@@ -68,7 +68,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
             
             if form.is_valid():
                 instance = form.save()
-                #r = create_ticket('New', instance, request, form=form)
+                r = create_ticket('New', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             else:
                 return render(request, 'services/midesktop.html',context)
@@ -76,7 +76,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
             form = MiDesktopNewNetworkForm(request.POST, user=self.request.user)
             if form.is_valid():
                 instance = form.save()
-                #r = create_ticket('New', instance, request, form=form)
+                r = create_ticket('New', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             else:
                 print(form.errors)
@@ -97,7 +97,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
                         )
                         num_disks += 1
                         new_disk.save()
-                #r = create_ticket('New', instance, request, form=form)
+                r = create_ticket('New', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             else:
                 groups = LDAPGroupMember.objects.filter(username=self.request.user).order_by('ldap_group')
@@ -331,7 +331,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
             form = MiDesktopChangeNetworkForm(request.POST, user=self.request.user, instance=instance)
             if form.is_valid():
                 form.save()
-                #r = create_ticket('Modify', instance, request, form=form)
+                r = create_ticket('Modify', instance, request, form=form)
                 return HttpResponseRedirect('/requestsent')
             return render(request, template,
                         {'title': title,
