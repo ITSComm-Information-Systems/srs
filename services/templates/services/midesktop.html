@@ -433,9 +433,8 @@
         methods: {
             handlePoolTypeSelected(poolType){
                 console.log(poolType)
-                if (poolType == 'persistent'){
+                if (poolType == 'persistent' || poolType =='external'){
                     this.visible = false
-                    console.log('invisible')
                 }else{
                     this.visible = true
                 }
