@@ -145,7 +145,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
                        'form': form, })
 
     def get(self, request, service):
-        request.session['backupStorage'] = 'cloud'
+        request.session['backupStorage'] = 'midesktop'
         if service == 'midesktop':
             form = MiDesktopNewForm(user=self.request.user)
             groups = LDAPGroupMember.objects.filter(username=self.request.user).order_by('ldap_group')
@@ -301,7 +301,7 @@ class ServiceDeleteView(UserPassesTestMixin, View):
                         {
                         'instance': instance, })
         else:
-            request.session['backupStorage'] = 'cloud'
+            request.session['backupStorage'] = 'midesktop'
             model = getattr(Service, service)
             instance = get_object_or_404(model, pk=id)
             title = f'Delete {instance._meta.verbose_name.title()}'
@@ -506,7 +506,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
             
 
         else:
-            request.session['backupStorage'] = 'cloud'
+            request.session['backupStorage'] = 'midesktop'
             model = getattr(Service, service)
             instance = get_object_or_404(model, pk=id, status=Status.ACTIVE)
 
@@ -545,7 +545,7 @@ def get_service_list(request, service):
     else:
         if hasattr(Service, service):
             model = getattr(Service, service)
-            request.session['backupStorage'] = 'cloud'
+            request.session['backupStorage'] = 'midesktop'
         else:
             return HttpResponseNotFound('<h1>Page not found</h1>')
 

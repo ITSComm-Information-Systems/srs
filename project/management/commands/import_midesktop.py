@@ -14,6 +14,12 @@ class Command(BaseCommand):
         '"python3 manage.py import_midesktop Images" ' \
         'loads file from ~/Downloads/images.csv'
 
+    # delete from srs_services_imagedisk;
+    # delete from srs_services_pool_images;
+    # delete from srs_services_pool;
+    # delete from srs_services_image;
+    # delete from srs_services_network;
+
     def add_arguments(self, parser):
         parser.add_argument('model', type=str)
         parser.add_argument('number_of_records', nargs='?',
@@ -90,15 +96,16 @@ class Pools():
     file = 'pools.csv'
 
     # 0Pool	1Shortcode	2Customer	3Image	4Network	5GPU	6Specs	7Pool qty
+    # 0Pool,1Total pool cost,2Shortcode,3Customer,4Image,5Network,6GPU,7Specs,8Pool qty,9Desktop cost
 
     def process_record(row):
         # Base images    GPU CPU RAM Storage Owner
         pool = Pool()
         pool.name = row[0].strip("'")
-        pool.shortcode = row[1].strip("'")
-        pool.owner = LDAPGroup().lookup(row[2].strip("'"))
-        pool.quantity = row[7].strip("'")
+        pool.shortcode = row[2].strip("'")
+        pool.owner = LDAPGroup().lookup(row[3].strip("'"))
+        pool.quantity = row[8].strip("'")
         pool.save()
 
-        images = Image.objects.filter(name=row[3].strip("'"))
+        images = Image.objects.filter(name=row[4].strip("'"))
         pool.images.set(images)
