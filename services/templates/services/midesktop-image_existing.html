@@ -4,12 +4,14 @@
 <table class="table table-hover table-striped table-sm">
     <tr>
         <th>Name</th>
+        <th>Associated Pool</th>
         <th>Owner</th>
     </tr>
 
     {% for rec in image_list %}
     <tr>
-        <td>{{ rec.name }}</td>  
+        <td>{{ rec.name }}</td>
+        <td>{{ rec.pool_set.first }}</td>  
         <td>{{ rec.owner }}</td>  
         <td>
             <a href="/services/midesktop-image/{{ rec.id }}/change/">
