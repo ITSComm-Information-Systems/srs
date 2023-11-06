@@ -764,6 +764,13 @@ class MiDesktopNewImageForm(MiDesktopForm):
         if Image.objects.filter(name=name).exists():
             raise forms.ValidationError("An Image with this name already exists.")
         return name
+    
+    def clean_network_name(self):
+        network_name = self.cleaned_data['network_name']
+        if Network.objects.filter(name=network_name).exists():
+            raise forms.ValidationError("Please choose a unique network name.")
+
+        return network_name
 
     def save(self, commit=True):
         image_name = self.data['name']
