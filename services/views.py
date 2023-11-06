@@ -367,9 +367,10 @@ class ServiceChangeView(UserPassesTestMixin, View):
         elif service == 'midesktop':
             instance = Pool.objects.get(id=id)
             title = 'Modify ' + instance._meta.verbose_name.title()
-            if instance.type == 'instant-clone':
+            if instance.type == 'instant_clone':
                 template = 'services/midesktop-instant-clone_change.html'
-                form = InstantClonePoolChangeForm(request.POST, user = self.request.user, instance = instance)
+                image = instance.images.all()[0]
+                form = InstantClonePoolChangeForm(request.POST, user = self.request.user, instance = instance, image = image)
             if instance.type == 'persistent':
                 template = 'services/midesktop-persistent_change.html'
                 form = PersistentPoolChangeForm(request.POST, user = self.request.user, instance = instance)
@@ -461,8 +462,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
                 
                 template = 'services/midesktop-instant-clone_change.html'
                 image = instance.images.all()[0]
-                form = InstantClonePoolChangeForm(user=self.request.user, instance=instance, image=image)
-
+                form = InstantClonePoolChangeForm(user=self.request.user, instance=instance,  image=image)
                 return render(request, template,
                         {'title': title,
                         'form': form,})

@@ -918,18 +918,19 @@ class MiDesktopChangeNetworkForm(forms.ModelForm):
 
 
 class InstantClonePoolChangeForm(forms.ModelForm):
-    shortcode = forms.CharField(validators=[validate_shortcode], required=True)
-    name = forms.CharField(required=True)
-    images = forms.ChoiceField(label='Image', required=True)
-    quantity = forms.IntegerField(validators=[MinValueValidator(1)])
+    shortcode = forms.CharField(required=False,validators=[validate_shortcode])
+    name = forms.CharField(required=False)
+    images = forms.ChoiceField(required=False,label='Image')
+    quantity = forms.IntegerField(required=False,validators=[MinValueValidator(1)])
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
-    additional_details = forms.CharField(required=False, label="Additional Details")
+    additional_details = forms.CharField(required=False,label="Additional Details")
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user')
-        self.image = kwargs.pop('image', None)
+        self.image = kwargs.get('image')
         self.total = round(self.image.total_cost,2)
         kwargs.pop('user', None)
+        kwargs.pop('image', None)
 
         super(InstantClonePoolChangeForm, self).__init__(*args, **kwargs)
         if self.user:
