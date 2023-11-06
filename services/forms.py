@@ -957,7 +957,7 @@ class InstantClonePoolChangeForm(forms.ModelForm):
 
 class PersistentPoolChangeForm(forms.ModelForm):
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
-    name = forms.CharField(required=True)
+    name = forms.CharField(required=False)
     multi_image = forms.CharField(required=False)
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
     additional_details = forms.CharField(required=False, label="Additional Details")
