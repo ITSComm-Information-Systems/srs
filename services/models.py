@@ -226,10 +226,13 @@ class Pool(MiDesktop):
     @cached_property
     def total_cost(self):
         total_cost = 0
-        for image in self.images:
+        for image in self.images.all():
             total_cost += image.total_cost
 
-        return total_cost
+        if total_cost == 0:
+            return round(0.00,2)
+        
+        return round(total_cost,2)
     
     def __str__(self):
         return self.name
