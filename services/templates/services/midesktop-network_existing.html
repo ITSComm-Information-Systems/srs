@@ -1,21 +1,23 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 {% block content %}
 <h1>MiDesktop Networks</h1>
 <table class="table table-hover table-striped table-sm">
     <tr>
-        <th>Purpose</th>
+        <th>Name</th>
+        <th>Size</th>
+        <th>CIDR</th>
         <th>Owner</th>
+        <th></th>
     </tr>
 
     {% for rec in service_list %}
     <tr>
-        <td>{{ rec.name }}</td>  
-        <td>{{ rec.owner }}</td>  
+        <td>{{ rec.name }}</td> 
+        <td>{{ rec.size }}</td>
+        <td>{{ rec.size|format_cidr }}</td>  
+        <td>{{ rec.owner }}</td>
         <td>
-            <a href="/services/midesktop-network/{{ rec.id }}/change/">
-                <i class="fas fa-edit"></i>
-            </a>
-            &nbsp;
             <a href="/services/midesktop-network/{{ rec.id }}/delete/">
                 <i class="fas fa-trash"></i>
             </a>

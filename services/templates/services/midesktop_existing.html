@@ -16,7 +16,7 @@
     {% for rec in pool_list %}
     <tr>
         <td>{{ rec.name }}</td>
-        <td>{{ rec.type|format_string}}</td>
+        <td>{{ rec.type|format_pool_type}}</td>
         <td>
             {% for image in rec.images.all %}
                 {{image.name}}&nbsp;
