@@ -41,38 +41,38 @@ class EmailAdmin(admin.ModelAdmin):
         
         if request.POST:
             
-            if request.POST.get('submit') == 'Upload CSV':
-
-                file = request.FILES['distfile'] 
+            file = request.FILES.get('distfile')
+            if file:
+                
                 decoded_file = file.read().decode('utf-8').splitlines()
                 reader = csv.DictReader(decoded_file)
 
-                print('show preview')
-                #ontext = {}
-                context = next(reader)
-                for key, value in context.items():
-                    if key.endswith('_LIST'):
-                        context[key] = value.split(',')
+                for row in reader:
+                    for key, value in row.items():
+                        if key.endswith('_LIST'):
+                            row[key] = value.split(',')
 
-                email.update_body(context)
-                email.send()
+                    email.update_body(row)
 
-            #for row in reader:
-            #    print(row)
-                
-            to = [s + '@umich.edu' for s in request.POST.get('to').split(',') ]
-            cc = request.POST.get('cc').split(',')
-            bcc = request.POST.get('bcc').split(',')
+                    if request.POST.get('submit') == 'Upload CSV':  # Preview only
+                        break
 
-            if cc != ['']:
-                cc = [s + '@umich.edu' for s in cc ]
+                    email.send()
 
-            if bcc != ['']:
-                bcc = [s + '@umich.edu' for s in bcc ]
+            else:
+                to = [s + '@umich.edu' for s in request.POST.get('to').split(',') ]
+                cc = request.POST.get('cc').split(',')
+                bcc = request.POST.get('bcc').split(',')
 
-            #msg = EmailMultiAlternatives(email.subject, email.subject, email.sender, to, bcc=bcc, cc=cc)
-            #msg.attach_alternative(email.body, "text/html")
-            #msg.send()
+                if cc != ['']:
+                    cc = [s + '@umich.edu' for s in cc ]
+
+                if bcc != ['']:
+                    bcc = [s + '@umich.edu' for s in bcc ]
+
+                msg = EmailMultiAlternatives(email.subject, email.subject, email.sender, to, bcc=bcc, cc=cc)
+                msg.attach_alternative(email.body, "text/html")
+                msg.send()
 
         return TemplateResponse(
             request,
