@@ -764,6 +764,13 @@ class MiDesktopNewImageForm(MiDesktopForm):
         if Image.objects.filter(name=name).exists():
             raise forms.ValidationError("An Image with this name already exists.")
         return name
+    
+    def clean_network_name(self):
+        network_name = self.cleaned_data['network_name']
+        if Network.objects.filter(name=network_name).exists():
+            raise forms.ValidationError("Please choose a unique network name.")
+
+        return network_name
 
     def save(self, commit=True):
         image_name = self.data['name']
@@ -951,13 +958,21 @@ class InstantClonePoolChangeForm(forms.ModelForm):
         self.fields['images'].initial = self.image.name
         
 
+    def save(self):
+        data = self.cleaned_data
+        self.instance.images.clear()
+        image = Image.objects.get(name = data['images'])
+        self.instance.images.add(image)
+
+
+        super().save()
     class Meta:
         model = Pool
         fields = ['shortcode','name','quantity']
 
 class PersistentPoolChangeForm(forms.ModelForm):
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
-    name = forms.CharField(required=True)
+    name = forms.CharField(required=False)
     multi_image = forms.CharField(required=False)
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
     additional_details = forms.CharField(required=False, label="Additional Details")

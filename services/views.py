@@ -369,7 +369,8 @@ class ServiceChangeView(UserPassesTestMixin, View):
             title = 'Modify ' + instance._meta.verbose_name.title()
             if instance.type == 'instant_clone':
                 template = 'services/midesktop-instant-clone_change.html'
-                image = instance.images.all()[0]
+                image_name = request.POST['images']
+                image = Image.objects.get(name = image_name)
                 form = InstantClonePoolChangeForm(request.POST, user = self.request.user, instance = instance, image = image)
             if instance.type == 'persistent':
                 template = 'services/midesktop-persistent_change.html'
