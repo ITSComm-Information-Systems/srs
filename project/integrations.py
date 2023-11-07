@@ -604,6 +604,7 @@ class MiDesktopPayload(Payload):
     service_id = 14              # ITS-MiDesktop
     form_id = 555	             # ITS-MiDesktop - Form
     attributes = []
+    tasks = []
     priority_id = 19 # Medium
 
     new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
@@ -662,7 +663,9 @@ class MiDesktopPayload(Payload):
             "RequestorEmail": self.request.user.email,
             "Description": self.description,
             "IsRichHtml": True,
-            "Attributes": self.attributes }      #| kwargs
+            "Attributes": self.attributes,
+            "Tasks": self.tasks
+            }      #| kwargs
 
 
 
@@ -705,9 +708,24 @@ class ImagePayload(MiDesktopPayload):
 
 class NetworkPayload(MiDesktopPayload):
     template = 'project/tdx_midesktop_network.html'
+    UMNET = 14
+
     def __init__(self, action, instance, request, **kwargs):
 
-        self.add_attribute(self.network_type.id, self.network_type.New)
+        if action == 'New':
+            self.add_attribute(self.network_type.id, self.network_type.New)
+
+            descr = '''Please create a new VDI Network and trunk to all 10 MiDesktop hosts per the UMNet wiki instructions:
+
+                        https://wiki.umnet.umich.edu/Virtualization#.22NEW.22.C2.A0MACC_VDI_Cluster
+
+                        1. Set up the VLAN using the provided information.
+                        2. Be Sure DHCP is configured and enabled.
+                        3. Have NSO add it to the MACC-VDI firewall context.
+                        4. Contact midesktop.support@umich.edu if problems arise or additional info is needed.'''
+
+            self.tasks.append( {'Title': 'Create New VDI Network', "ResponsibleGroupID": self.UMNET, "Description": descr} )
+
 
         super().__init__(action, instance, request, **kwargs)
 
