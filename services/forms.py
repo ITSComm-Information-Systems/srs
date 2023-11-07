@@ -1017,7 +1017,7 @@ class PersistentPoolChangeForm(forms.ModelForm):
 
 class ExternalPoolChangeForm(forms.ModelForm):
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
-    name = forms.CharField(required=True)
+    name = forms.CharField(required=False)
     quantity = forms.IntegerField(validators=[MinValueValidator(1)])
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
     additional_details = forms.CharField(required=False, label="Additional Details")
