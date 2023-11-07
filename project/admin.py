@@ -38,7 +38,7 @@ class EmailAdmin(admin.ModelAdmin):
 
     def send_to_user(self, request, object_id):
        
-        
+        email = Email.objects.get(id=object_id)
         if request.POST:
 
             file = request.FILES.get('distfile')
