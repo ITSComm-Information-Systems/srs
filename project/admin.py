@@ -57,6 +57,7 @@ class EmailAdmin(admin.ModelAdmin):
                     if request.POST.get('submit') == 'Upload CSV':  # Preview only
                         break
 
+                    email.to = row['TO']
                     email.send()
 
             else:
