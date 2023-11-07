@@ -37,10 +37,10 @@ class EmailAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     def send_to_user(self, request, object_id):
-        email = Email.objects.get(id=object_id)
+       
         
         if request.POST:
-            
+
             file = request.FILES.get('distfile')
             if file:
                 
@@ -48,6 +48,7 @@ class EmailAdmin(admin.ModelAdmin):
                 reader = csv.DictReader(decoded_file)
 
                 for row in reader:
+                    email = Email.objects.get(id=object_id)
                     for key, value in row.items():
                         if key.endswith('_LIST'):
                             row[key] = value.split(',')
