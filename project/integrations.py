@@ -679,7 +679,9 @@ class PoolPayload(MiDesktopPayload):
             self.form_id = 112
 
         self.add_attribute(self.pool_name.id, instance.name)
-        self.add_attribute(self.image_name.id, instance.images.all()[0].name)
+        image_list = instance.images.all()
+        if len(image_list) > 0:
+            self.add_attribute(self.image_name.id, image_list[0].name)
         self.context = {'pool': instance}
         super().__init__(action, instance, request, **kwargs)
 
