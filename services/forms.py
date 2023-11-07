@@ -958,6 +958,14 @@ class InstantClonePoolChangeForm(forms.ModelForm):
         self.fields['images'].initial = self.image.name
         
 
+    def save(self):
+        data = self.cleaned_data
+        self.instance.images.clear()
+        image = Image.objects.get(name = data['images'])
+        self.instance.images.add(image)
+
+
+        super().save()
     class Meta:
         model = Pool
         fields = ['shortcode','name','quantity']
