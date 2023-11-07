@@ -226,9 +226,11 @@ class Pool(MiDesktop):
     @cached_property
     def total_cost(self):
         total_cost = 0
-        for image in self.images.all():
-            total_cost += image.total_cost
-
+        if self.type == "external":
+            total_cost = self.quantity * 10
+        else:
+            for image in self.images.all():
+                total_cost += image.total_cost
         if total_cost == 0:
             return round(0.00,2)
         
