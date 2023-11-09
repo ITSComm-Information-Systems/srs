@@ -696,8 +696,8 @@ class ImagePayload(MiDesktopPayload):
 
     def __init__(self, action, instance, request, **kwargs):
         if action == 'Modify':
-            service_id = 61
-            form_id = 109
+            self.service_id = 61
+            self.form_id = 109
         if action == 'Delete':
             self.service_id = 63
             self.form_id = 110 
