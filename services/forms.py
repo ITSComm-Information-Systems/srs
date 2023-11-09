@@ -841,7 +841,7 @@ class MiDesktopChangeImageForm(forms.ModelForm):
     name = forms.CharField(required=False)
     calculator_form = CalculatorForm(prefix="calculator")
     additional_details = forms.CharField(required=False, label="Additional Details")
-    network_name = forms.CharField(required=False)
+
     def clean(self):
         cleaned_data = super().clean()
         return cleaned_data
@@ -864,7 +864,7 @@ class MiDesktopChangeImageForm(forms.ModelForm):
                 print('no widget for', field)
     class Meta:
         model = Image
-        exclude=['admin_group','network','owner','status']
+        exclude=['admin_group','owner','status']
 
 
 class MiDesktopNewNetworkForm(MiDesktopForm):
