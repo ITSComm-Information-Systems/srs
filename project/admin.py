@@ -7,6 +7,7 @@ from django.core.management import call_command
 from django.template.response import TemplateResponse
 from django.core.mail import EmailMultiAlternatives
 from reports.toll.models import DownloadLog
+import csv
 
 @admin.register(Email)
 class EmailAdmin(admin.ModelAdmin):
@@ -37,21 +38,42 @@ class EmailAdmin(admin.ModelAdmin):
 
     def send_to_user(self, request, object_id):
         email = Email.objects.get(id=object_id)
-
+        
         if request.POST:
-            to = [s + '@umich.edu' for s in request.POST.get('to').split(',') ]
-            cc = request.POST.get('cc').split(',')
-            bcc = request.POST.get('bcc').split(',')
+            
+            file = request.FILES.get('distfile')
+            if file:
+                
+                decoded_file = file.read().decode('utf-8').splitlines()
+                reader = csv.DictReader(decoded_file)
 
-            if cc != ['']:
-                cc = [s + '@umich.edu' for s in cc ]
+                for row in reader:
+                    for key, value in row.items():
+                        if key.endswith('_LIST'):
+                            row[key] = value.split(',')
 
-            if bcc != ['']:
-                bcc = [s + '@umich.edu' for s in bcc ]
+                    email.update_body(row)
 
-            msg = EmailMultiAlternatives(email.subject, email.subject, email.sender, to, bcc=bcc, cc=cc)
-            msg.attach_alternative(email.body, "text/html")
-            msg.send()
+                    if request.POST.get('submit') == 'Upload CSV':  # Preview only
+                        break
+
+                    email.to = row['TO']
+                    email.send()
+
+            else:
+                to = [s + '@umich.edu' for s in request.POST.get('to').split(',') ]
+                cc = request.POST.get('cc').split(',')
+                bcc = request.POST.get('bcc').split(',')
+
+                if cc != ['']:
+                    cc = [s + '@umich.edu' for s in cc ]
+
+                if bcc != ['']:
+                    bcc = [s + '@umich.edu' for s in bcc ]
+
+                msg = EmailMultiAlternatives(email.subject, email.subject, email.sender, to, bcc=bcc, cc=cc)
+                msg.attach_alternative(email.body, "text/html")
+                msg.send()
 
         return TemplateResponse(
             request,

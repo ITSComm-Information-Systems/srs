@@ -221,7 +221,7 @@ class Selection(SelectionAbstract):
             comment_text = comment_text + f'\n{self.new_building} \n {self.new_building_code} \nFloor: {self.new_floor} \nRoom: {self.new_room} \nJack: {self.new_jack}'
         preorder = UmOscPreorderApiV()
         preorder.wo_type_code = 'AR'
-        preorder.action_code = '0' # Move
+        preorder.action_code = '2' # Change
         preorder.project_id = 16017
         preorder.work_status_id = 64 # Zoom phone
         preorder.comment_text = comment_text

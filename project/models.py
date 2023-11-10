@@ -154,6 +154,9 @@ class Email(models.Model):
 
           context = {'cut_date': cut_date, 'week_of': week_of}
           return Template(self.body).render(Context(context))
+     
+     def update_body(self, context):
+          self.body = Template(self.body).render(Context(context))
 
      def send(self):
           text_message = self.subject
