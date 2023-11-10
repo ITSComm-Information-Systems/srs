@@ -43,4 +43,6 @@ class Command(BaseCommand):
             email.reply_to = self.REPLY_TO.get(record['service'])
             email.cc = self.REPLY_TO.get(record['service'])
             email.bcc = email.team_shared_email
+            
             email.send()
+

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>View MiDesktop Network</h1>
+
+<div class="container">
+
+        <form method="POST">
+            {% csrf_token %}
+            <div id="div_formbody">
+                <h6>
+                    <div id="{{ form.name.auto_id }}">Purpose: {{ form.name.value }}</div>
+                    <div id="{{ form.size.auto_id }}">Size: {{ form.size.value }}</div>
+                    <div id="cidr"></div>
+                </h6>
+            </div>
+        </form>
+    
+
+</div>
+<script>
+    const subnet_size_field = document.getElementById("{{ form.size.id_for_label }}");
+    const cidr_field = document.getElementById("cidr");
+
+    window.addEventListener("load", (event) => {
+        let subnet_size = parseInt(subnet_size_field.textContent.match(/\d+/)[0])
+        let cidrMask = 32 - Math.log2(subnet_size);
+        cidr_field.innerHTML = 'Network CIDR: /' + cidrMask
+    })
+</script>
+{% endblock %}

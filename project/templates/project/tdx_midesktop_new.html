@@ -1,0 +1,30 @@
+<div class="table-responsive">
+    <table class="table table-bordered table-condensed table-hover table-striped" style="width: 100%">
+        <caption><h4>Pool</h4></caption>
+        <tbody>
+            <tr><td>Name</td><td>{{ pool.name }}</td></tr>
+            <tr><td>Size</td><td {%if 'quantity' in form.changed_data %}style="font-weight: bold;"{% endif %}>
+                {%if 'quantity' in form.changed_data %}*{% endif %}{{ pool.quantity }}</td></tr>
+            <tr><td>Shortcode</td><td {%if 'shortcode' in form.changed_data %}style="font-weight: bold;"{% endif %}>
+                {%if 'shortcode' in form.changed_data %}*{% endif %}{{ pool.shortcode }}</td></tr>
+            <tr><td>Owner</td><td {%if 'owner' in form.changed_data %}style="font-weight: bold;"{% endif %}>
+                {%if 'owner' in form.changed_data %}*{% endif %}{{ pool.owner }}</td></tr>
+            {% if form.cleaned_data.pool_type %}
+            <tr><td>Pool Type</td><td>{{ form.cleaned_data.pool_type }}</td></tr>
+            {% endif %}
+            {% if form.cleaned_data.auto_logout %}
+            <tr><td>Auto Logoout</td><td>{{ form.cleaned_data.auto_logout }}</td></tr>
+            {% endif %}
+            {% if form.cleaned_data.ad_container %}
+            <tr><td>AD Container</td><td>{{ form.cleaned_data.ad_container }}</td></tr>
+            {% endif %}
+
+        </tbody>
+    </table>
+</div>
+
+<div class="table-responsive">
+    {% for image in pool.images.all %}
+        {% include 'project/tdx_midesktop_image.html' %}
+    {% endfor %}
+</div>

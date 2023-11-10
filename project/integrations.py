@@ -1,6 +1,7 @@
 import json, yaml, requests
 from django.conf import settings
 from ldap3 import Server, Connection, ALL, MODIFY_ADD
+from django.template.loader import render_to_string
 
 class MCommunity:
 
@@ -593,13 +594,173 @@ class ContainerPayload(Payload):
             title = 'Add contact group to notification group'
             self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.CONTAINER_TEAM} )
 
+class MiDesktopPayload(Payload):
+    title = 'MiDesktop New Order'
+    description = ''
+    template = 'project/tdx_midesktop_new.html'
+    type_id = 7                  # Compute Services
+    responsible_group_id = 86    # ITS-CloudComputeServices
+    service_id = 14              # ITS-MiDesktop
+    form_id = 555	             # ITS-MiDesktop - Form
+    priority_id = 19 # Medium
+
+    new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
+    owner = TextAttribute(2343)         # midesktop_MComm group textbox
+    shared = ChoiceAttribute(2344, Yes=0, No=0)        # midesktop_Shared Dedicated dropdown
+    network_type = ChoiceAttribute(2345, Existing=896, New=897, Shared=898)  # private web-access dedicated
+    image_type = ChoiceAttribute(2346, Existing=899, New=900, Clone=901)
+    image_name = TextAttribute(2347)    # midesktop_Base Image Name textbox
+    pool_name = TextAttribute(2348)     # midesktop_Pool Display Name textbox
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.request = request
+
+        self.title = f'MiDesktop {action} {type(instance).__name__}'
+        if 'form' in kwargs:
+
+            self.form = kwargs['form']
+            self.context['form'] = self.form
+
+            network_type = self.form.cleaned_data.get('network_type')
+            if network_type:
+                network_display = dict(self.form.fields['network_type'].choices)[network_type]
+                if network_type == 'dedicated':
+                    network_display = network_display + ' - ' + self.form.cleaned_data.get('network_name','')
+                
+                self.context['network_display'] = network_display
+                    
+                if self.form.data.get('network') == 'new':
+                    self.add_attribute(self.network_type.id, self.network_type.New)
+
+            base_image = self.form.cleaned_data.get('base_image')
+            if base_image == 999999999:
+                self.add_attribute(self.image_type.id, self.image_type.New)
+
+        self.add_attribute(self.owner.id, instance.owner.name)
+        if self.description == '':
+            self.description = render_to_string(self.template, self.context)
+
+    def add_attribute(self, id, value):
+        self.attributes.append(
+            {
+                "ID": id, 
+                "Value": value
+            }
+        )
+
+    @property
+    def data(self):
+        return {
+            "FormID": self.form_id,
+            "TypeID": self.type_id,
+            "SourceID": self.source_id,
+            "StatusID": self.status_id,
+            "ServiceID": self.service_id,
+            "ResponsibleGroupID": self.responsible_group_id,
+            "Title": self.title,
+            "RequestorEmail": self.request.user.email,
+            "Description": self.description,
+            "IsRichHtml": True,
+            "Attributes": getattr(self, 'attributes', []),
+            "Tasks": getattr(self, 'tasks', []),
+            }      #| kwargs
+
+
+
+class PoolPayload(MiDesktopPayload):
+    service_id = 58  # New Order
+    form_id = 85
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.attributes = []
+        self.context = {}
+        self.tasks = []
+        if action == 'Modify':
+            self.service_id = 64  # Modify Pool
+            self.form_id = 111      
+        elif action == 'Delete':
+            self.service_id = 65  # Delete Pool
+            self.form_id = 112
+
+        self.add_attribute(self.pool_name.id, instance.name)
+        image_list = instance.images.all()
+        if len(image_list) > 0:
+            self.add_attribute(self.image_name.id, image_list[0].name)
+        self.context = {'pool': instance}
+        super().__init__(action, instance, request, **kwargs)
+
+class ImagePayload(MiDesktopPayload):
+    service_id = 58  # New Order
+    form_id = 85
+
+    template = 'project/tdx_midesktop_image.html'
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.attributes = []
+        self.context = {}
+        self.tasks = []
+        if action == 'Modify':
+            self.service_id = 61
+            self.form_id = 109
+
+            if 'new_disks' in kwargs:
+                changed_disks = []
+                old_disks = kwargs.get('old_disks')
+                new_disks = kwargs.get('new_disks')
+
+                for disk in range(len(new_disks)):
+                    if new_disks[disk] == '':
+                        break
+                   
+                    if disk > len(old_disks)-1:
+                        changed_disks.append(f'disk_{disk}')
+                    else:
+                        if int(new_disks[disk])  != old_disks[disk]:
+                            changed_disks.append(f'disk_{disk}')
+
+                self.context['changed_disks'] = changed_disks
+
+        if action == 'Delete':
+            self.service_id = 63
+            self.form_id = 110 
+        self.add_attribute(self.image_name.id, instance.name)
+        self.context['image'] = instance
+        super().__init__(action, instance, request, **kwargs)
+
+
+class NetworkPayload(MiDesktopPayload):
+    template = 'project/tdx_midesktop_network.html'
+    UMNET = 14
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.attributes = []
+        self.context = {}
+        self.tasks = []
+        if action == 'New':
+            self.add_attribute(self.network_type.id, self.network_type.New)
+
+            descr = '''Please create a new VDI Network and trunk to all 10 MiDesktop hosts per the UMNet wiki instructions:
+
+                        https://wiki.umnet.umich.edu/Virtualization#.22NEW.22.C2.A0MACC_VDI_Cluster
+
+                        1. Set up the VLAN using the provided information.
+                        2. Be Sure DHCP is configured and enabled.
+                        3. Have NSO add it to the MACC-VDI firewall context.
+                        4. Contact midesktop.support@umich.edu if problems arise or additional info is needed.'''
+
+            self.tasks.append( {'Title': 'Create New VDI Network', "ResponsibleGroupID": self.UMNET, "Description": descr} )
+
+        if action == 'Delete':
+            self.description = f'Delete Network: {instance.name}'
+
+        super().__init__(action, instance, request, **kwargs)
+
 
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
     service = service.upper()
 
-    payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
-
+    payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)    
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
         print('TDx response', resp.status_code, resp.text)
