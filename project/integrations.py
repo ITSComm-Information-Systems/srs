@@ -625,7 +625,7 @@ class MiDesktopPayload(Payload):
             if network_type:
                 network_display = dict(self.form.fields['network_type'].choices)[network_type]
                 if network_type == 'dedicated':
-                    network_display = network_display + ' - ' + 'netname'
+                    network_display = network_display + ' - ' + self.form.cleaned_data.get('network_name','')
                 
                 self.context['network_display'] = network_display
                     
@@ -702,11 +702,29 @@ class ImagePayload(MiDesktopPayload):
         if action == 'Modify':
             self.service_id = 61
             self.form_id = 109
+
+            if 'new_disks' in kwargs:
+                changed_disks = []
+                old_disks = kwargs.get('old_disks')
+                new_disks = kwargs.get('new_disks')
+
+                for disk in range(len(new_disks)):
+                    if new_disks[disk] == '':
+                        break
+                   
+                    if disk > len(old_disks)-1:
+                        changed_disks.append(f'disk_{disk}')
+                    else:
+                        if int(new_disks[disk])  != old_disks[disk]:
+                            changed_disks.append(f'disk_{disk}')
+
+                self.context['changed_disks'] = changed_disks
+
         if action == 'Delete':
             self.service_id = 63
             self.form_id = 110 
         self.add_attribute(self.image_name.id, instance.name)
-        self.context = {'image': instance}
+        self.context['image'] = instance
         super().__init__(action, instance, request, **kwargs)
 
 
