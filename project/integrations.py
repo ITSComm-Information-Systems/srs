@@ -596,15 +596,12 @@ class ContainerPayload(Payload):
 
 class MiDesktopPayload(Payload):
     title = 'MiDesktop New Order'
-    description = 'SRS MiDesktop Request \n'
+    description = ''
     template = 'project/tdx_midesktop_new.html'
-    context = {}
     type_id = 7                  # Compute Services
     responsible_group_id = 86    # ITS-CloudComputeServices
     service_id = 14              # ITS-MiDesktop
     form_id = 555	             # ITS-MiDesktop - Form
-    attributes = []
-    tasks = []
     priority_id = 19 # Medium
 
     new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
@@ -640,7 +637,8 @@ class MiDesktopPayload(Payload):
                 self.add_attribute(self.image_type.id, self.image_type.New)
 
         self.add_attribute(self.owner.id, instance.owner.name)
-        self.description = render_to_string(self.template, self.context)
+        if self.description == '':
+            self.description = render_to_string(self.template, self.context)
 
     def add_attribute(self, id, value):
         self.attributes.append(
@@ -663,8 +661,8 @@ class MiDesktopPayload(Payload):
             "RequestorEmail": self.request.user.email,
             "Description": self.description,
             "IsRichHtml": True,
-            "Attributes": self.attributes,
-            "Tasks": self.tasks
+            "Attributes": getattr(self, 'attributes', []),
+            "Tasks": getattr(self, 'tasks', []),
             }      #| kwargs
 
 
@@ -674,6 +672,9 @@ class PoolPayload(MiDesktopPayload):
     form_id = 85
 
     def __init__(self, action, instance, request, **kwargs):
+        self.attributes = []
+        self.context = {}
+        self.tasks = []
         if action == 'Modify':
             self.service_id = 64  # Modify Pool
             self.form_id = 111      
@@ -695,6 +696,9 @@ class ImagePayload(MiDesktopPayload):
     template = 'project/tdx_midesktop_image.html'
 
     def __init__(self, action, instance, request, **kwargs):
+        self.attributes = []
+        self.context = {}
+        self.tasks = []
         if action == 'Modify':
             self.service_id = 61
             self.form_id = 109
@@ -711,7 +715,9 @@ class NetworkPayload(MiDesktopPayload):
     UMNET = 14
 
     def __init__(self, action, instance, request, **kwargs):
-
+        self.attributes = []
+        self.context = {}
+        self.tasks = []
         if action == 'New':
             self.add_attribute(self.network_type.id, self.network_type.New)
 
@@ -726,6 +732,8 @@ class NetworkPayload(MiDesktopPayload):
 
             self.tasks.append( {'Title': 'Create New VDI Network', "ResponsibleGroupID": self.UMNET, "Description": descr} )
 
+        if action == 'Delete':
+            self.description = f'Delete Network: {instance.name}'
 
         super().__init__(action, instance, request, **kwargs)
 

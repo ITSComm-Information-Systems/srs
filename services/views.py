@@ -343,11 +343,11 @@ class ServiceChangeView(UserPassesTestMixin, View):
             form = MiDesktopChangeImageForm(request.POST, user=self.request.user,instance = instance)
             if form.is_valid():
                 form.save()
-                instance.network_id = int(form.data['network'])
-                instance.save()
                 multi_disk = request.POST.get('multi_disk')
                 disks = multi_disk.split(",")
-                ImageDisk.objects.filter(image=instance.id).delete()
+                current_disks = ImageDisk.objects.filter(image=instance.id).order_by('name')
+                old_disks = list(current_disks.values_list('size', flat=True))
+                current_disks.delete()
                 num_disks = 0
                 for disk in disks:
                     if len(disk) > 0 :
@@ -358,8 +358,8 @@ class ServiceChangeView(UserPassesTestMixin, View):
                         )
                         num_disks += 1
                         new_disk.save()
-                
-                r = create_ticket('Modify', instance, request, form=form)
+
+                r = create_ticket('Modify', instance, request, form=form, old_disks=old_disks, new_disks=disks)
                 return HttpResponseRedirect('/requestsent')
             return render(request, template,
                         {'title': title,
