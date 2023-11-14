@@ -37,8 +37,8 @@ class EmailAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     def send_to_user(self, request, object_id):
-        email = Email.objects.get(id=object_id)
-        
+       
+        email = Email.objects.get(id=object_id)     
         if request.POST:
             
             file = request.FILES.get('distfile')
@@ -64,7 +64,6 @@ class EmailAdmin(admin.ModelAdmin):
                 to = [s + '@umich.edu' for s in request.POST.get('to').split(',') ]
                 cc = request.POST.get('cc').split(',')
                 bcc = request.POST.get('bcc').split(',')
-
                 if cc != ['']:
                     cc = [s + '@umich.edu' for s in cc ]
 
