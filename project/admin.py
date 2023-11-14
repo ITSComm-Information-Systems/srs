@@ -38,9 +38,9 @@ class EmailAdmin(admin.ModelAdmin):
 
     def send_to_user(self, request, object_id):
        
-        email = Email.objects.get(id=object_id)
+        email = Email.objects.get(id=object_id)     
         if request.POST:
-
+            
             file = request.FILES.get('distfile')
             if file:
                 
@@ -48,7 +48,6 @@ class EmailAdmin(admin.ModelAdmin):
                 reader = csv.DictReader(decoded_file)
 
                 for row in reader:
-                    email = Email.objects.get(id=object_id)
                     for key, value in row.items():
                         if key.endswith('_LIST'):
                             row[key] = value.split(',')
@@ -65,7 +64,6 @@ class EmailAdmin(admin.ModelAdmin):
                 to = [s + '@umich.edu' for s in request.POST.get('to').split(',') ]
                 cc = request.POST.get('cc').split(',')
                 bcc = request.POST.get('bcc').split(',')
-
                 if cc != ['']:
                     cc = [s + '@umich.edu' for s in cc ]
 

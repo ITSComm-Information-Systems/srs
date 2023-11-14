@@ -13,7 +13,7 @@ from datetime import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
 
-from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, ProjectView, EstimateView, UmOscNoteProfileV, NotificationManager, Notification
+from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, ProjectView, EstimateView, UmOscNoteProfileV, NotificationManager, Notification, Technician
 from .forms import FavoriteForm, EstimateForm, ProjectForm, MaterialForm, MaterialLocationForm, LaborForm
 
 
@@ -544,4 +544,18 @@ class NetOpsSearch(PermissionRequiredMixin, View):
         search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3)).order_by('-woid')
         return render(request, template,
                       {'title': 'UMNet Projects',
+                       'search_list': search_list})
+    
+
+class EngineeringSearch(PermissionRequiredMixin, View):
+    permission_required = 'bom.can_access_bom'
+
+
+    def get(self, request):
+        template = 'bom/netops.html'
+        engineers = ['achawan','amylieb','craigmax','dok','grundler','imanz','jarhelz','jhehnlin','waltr','eklund']
+        technicians = Technician.objects.filter(user_name__in=engineers)
+        search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3), netops_engineer__in=technicians).order_by('-due_date')
+        return render(request, template,
+                      {'title': 'Engineering Projects',
                        'search_list': search_list})
