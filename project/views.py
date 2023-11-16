@@ -22,7 +22,7 @@ from ldap3 import Server, Connection, ALL
 
 from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput, UmOscChartfieldV, UmOscAcctChangeRequest, UmOscNameChangeV
 from order.models import Chartcom
-from oscauth.models import AuthUserDept, AuthUserDeptV
+from oscauth.models import AuthUserDept, AuthUserDeptV, DepartmentSecurityV
 from oscauth.utils import get_mc_user
 from datetime import datetime, date
 from django.contrib.auth.decorators import login_required, permission_required
@@ -90,7 +90,8 @@ def chartchange(request):
 	if request.user.has_perm('oscauth.can_report_all'):
 		user_depts = UmOscDeptProfileV.objects.filter(deptid__iregex=r'^[0-9]*$').annotate(dept=F('deptid')).order_by('deptid')
 	else:
-		user_depts = AuthUserDept.get_order_departments(request.user.id)
+		user_depts = DepartmentSecurityV.objects.filter(srs_role__in=['Department Manager', 'Orderer', 'Proxy'],username=request.user.username)
+		#user_depts = AuthUserDept.get_order_departments(request.user.id)
 
 	# Get notice
 	notice = Page.objects.get(permalink='/ccr')

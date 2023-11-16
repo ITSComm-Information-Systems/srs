@@ -45,8 +45,8 @@
       </div>
       <select name="deptids" class="custom-select" id="chart_deptids">
         {% for dept in deptids %}
-        <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}">
-          {{ dept.dept }} - {{ dept.dept_name }}</option>
+        <option value="{{ dept.deptid }} - {{ dept.dept_descr }}?{{ dept.dept_mgr }}">
+          {{ dept.deptid }} - {{ dept.dept_descr }}</option>
         {% endfor %}
       </select>
     </div>
