@@ -550,11 +550,17 @@ class NetOpsSearch(PermissionRequiredMixin, View):
 class EngineeringSearch(PermissionRequiredMixin, View):
     permission_required = 'bom.can_access_bom'
 
+    # def test_func(self):
+    #     return self.request.user.has_perm(self.permission_required) and \
+    #            self.request.user.groups.filter(name='Network Engineering').exists()
+
 
     def get(self, request):
         template = 'bom/engineering_search.html'
         engineers = Technician.objects.filter(wo_group_code='Network Engineering').values_list('user_name', flat=True)
 
+        for group in request.user.groups.all():
+            print(group.name)
         search_list = EstimateView.objects.filter(
             Q(
                 assigned_engineer__in=engineers,
