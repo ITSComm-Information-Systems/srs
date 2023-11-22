@@ -1,4 +1,4 @@
-import csv
+import csv, json
 from django.http import HttpResponse 
 from django.db import connections, connection
 from project.integrations import MCommunity
@@ -71,20 +71,29 @@ def get_or_create_contact(user, dept_id=None):  # Return Pinnacle contact ID for
     except:
         print('error getting Pinnacle contact')
 
-def get_query_result(sql, parms=()):  # Take raw SQL string and return a list of dict
+def get_query_result(sql, parms=(), json_fields=None):  # Take raw SQL string and return a list of dict
 
     with connection.cursor() as cursor:
         cursor.execute(sql, parms)
-        instances = dictfetchall(cursor)
+        instances = dictfetchall(cursor, json_fields)
 
     return instances
 
 
-def dictfetchall(cursor): # Return all rows from a cursor as a dict
+def dictfetchall(cursor, json_fields): # Return all rows from a cursor as a dict
 
     columns = [col[0].lower() for col in cursor.description]
 
-    return [
-        dict(zip(columns, row))
-        for row in cursor.fetchall()
-    ]
+    result_array = []
+
+    for row in cursor.fetchall():
+
+        row_as_dict = dict(zip(columns, row))
+
+        if json_fields != None:
+            for field in json_fields:
+                row_as_dict[field] = json.loads(row_as_dict[field])
+
+        result_array.append(row_as_dict)
+
+    return result_array

@@ -9,6 +9,7 @@ from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
 from project.integrations import MCommunity, TDx
 from project.models import ShortCodeField, Choice
+from project.utils import get_query_result
 from softphone.models import Selection
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
@@ -518,6 +519,34 @@ class ArcInstance(Volume):
             
     def get_shortcodes(self):
         return ArcBilling.objects.filter(arc_instance=self)
+
+    def get_user_volumes(self, user, vol_type):
+
+        sql = '''
+            select arc.id, arc.name, grp.name as owner, arc."SIZE",
+
+            (select JSON_ARRAYAGG(json_object('shortcode': shortcode, 'size': "SIZE")  )
+                from srs_order_arcbilling where arc_instance_id = arc.id) as shortcode_list,
+
+            (select label from srs_order_storagerate where id = arc.rate_id) as rate
+
+            from srs_order_arcinstance arc
+
+            , srs_oscauth_ldapgroup grp
+            
+            where arc.owner_id = grp.id
+              and arc.owner_id in (select ldap_group_id
+                                   from srs_oscauth_ldapgroupmember mbr
+                                   where mbr.username = %s)
+
+            and arc.service_id = 9
+            and type = %s
+            order by arc.name
+        '''
+
+        queryset = get_query_result(sql, (user.username,vol_type), json_fields=['shortcode_list'])
+
+        return queryset
 
 
 class ArcHost(VolumeHost):

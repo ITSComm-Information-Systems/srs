@@ -549,6 +549,9 @@ class VolumeSelectionForm(TabForm):
                 vol_type = action.override['storage_type']
                 if service.id == 7:
                     self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service')
+                elif service.id == 9:
+                    self.template = 'order/turbo_volume_selection.html'
+                    self.volume_list = ArcInstance().get_user_volumes(self.request.user, vol_type)
                 else:  #Prefetch shortcodes
                     self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service').prefetch_related('shortcodes')
                 return

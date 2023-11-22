@@ -45,6 +45,31 @@ class Role(models.Model):
             ('can_report_all', 'Can run all reports without restrictions'), 
         ]
 
+
+class DepartmentSecurityV(models.Model):
+    username = models.CharField(max_length=150, blank=True, primary_key=True)             
+    first_name = models.CharField(max_length=150, blank=True)           
+    last_name = models.CharField(max_length=150, blank=True)           
+    srs_role = models.CharField(max_length=150, blank=True)             
+    deptid = models.CharField(max_length=10, blank=True)                
+    dept_effdt = models.DateField()                                     
+    dept_eff_status = models.CharField(max_length=1, blank=True)        
+    dept_descr = models.CharField(max_length=30, blank=True)            
+    emplid = models.CharField(max_length=11, blank=True)                
+    dept_grp = models.CharField(max_length=20, blank=True)              
+    dept_grp_descr = models.CharField(max_length=30, blank=True)        
+    dept_grp_vp_area = models.CharField(max_length=20, blank=True)      
+    dept_grp_vp_area_descr = models.CharField(max_length=30, blank=True)
+    dept_grp_campus = models.CharField(max_length=20, blank=True)       
+    dept_grp_campus_descr = models.CharField(max_length=30, blank=True) 
+    dept_bud_seq = models.CharField(max_length=20, blank=True)          
+    dept_bud_seq_descr = models.CharField(max_length=30, blank=True)    
+
+    class Meta:
+        managed = False
+        db_table = 'department_security_v'
+    
+
 class AuthUserDeptV(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     codename = models.CharField(max_length=20, blank=True)
