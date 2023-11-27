@@ -165,7 +165,8 @@ TEMPLATES = {
                 'tags': 'reports.soc.templatetags.tags',
                 'ccr_tags': 'project.templatetags.ccr_tags',
                 'descr': 'reports.nonteleph.templatetags.descr',
-                'rte_tags': 'apps.rte.templatetags.rte_tags'
+                'rte_tags': 'apps.rte.templatetags.rte_tags',
+                'group_filters': 'apps.bom.templatetags.group_filters'
             }
         },
 },
