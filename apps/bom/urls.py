@@ -24,4 +24,5 @@ urlpatterns = [
     path('checkout-list-report/<int:estimate_id>', reports.checkout_list_report),
     path('summary-report/<int:estimate_id>', reports.summary_report),
     path('netops/', views.NetOpsSearch.as_view()),
+    path('engineering/', views.EngineeringSearch.as_view()),
 ]
