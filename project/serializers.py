@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from project.models import Choice
+from services.models import Pool, Image, Network
 from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database, ServerDisk
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from django.db import models
@@ -137,6 +138,26 @@ class ArcBillingSerializer(serializers.ModelSerializer):
         model = ArcBilling
         fields = ['id', 'arc_instance', 'size', 'shortcode']
 
+
+class PoolSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        exclude = ['id']
+        model = Pool
+
+
+class NetworkSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        exclude = ['id']
+        model = Network
+
+
+class ImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        exclude = ['id']
+        model = Image
 
 class LDAPGroupMemberSerializer(serializers.ModelSerializer):
     ldap_group = serializers.StringRelatedField()
