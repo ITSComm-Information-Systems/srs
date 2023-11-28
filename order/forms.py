@@ -1229,6 +1229,7 @@ class ServerSpecForm(TabForm):
 
         ram = self.cleaned_data.get('ram', None)
         cpu = self.cleaned_data.get('cpu', None)
+        production = self.cleaned_data.get('production', None)
         if ram != None and cpu != None:
             if ram / cpu < 2:
                 self.add_error('ram', 'Ram must be at least double cpu.')

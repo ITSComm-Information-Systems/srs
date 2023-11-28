@@ -651,6 +651,7 @@ class Server(models.Model):
     created_date = models.DateTimeField(default=timezone.now, null=True)
     #shortcode = models.CharField(max_length=100) 
     public_facing = models.BooleanField(default=False)
+    production = models.BooleanField(default=False,blank=True)
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
 
     os = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={'parent__code__in': ['SERVER_UNMANAGED_OS','LINUX','WINDOWS']}
