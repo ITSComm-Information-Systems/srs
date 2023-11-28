@@ -764,6 +764,13 @@ $(document).ready(function() {
       $('#id_Uniqname').val('');
     }
 
+    if (zoomCat == 'LN-CONFRM' || zoomCat == 'OTHER' ) {
+      $('#div_zoomRoom').show();
+    } else {
+      $('#div_zoomRoom').hide();
+      $('#id_zoomRoom').val('');
+    }
+
     if (zoomCat == 'OTHER') {
       $('#div_otherSoftphoneCat').show();
     } else {
@@ -800,6 +807,7 @@ $(document).ready(function() {
     }
     if(this.value=='voip'){  // Zoom
       $('#div_otherSoftphoneCat').hide();
+      $('#div_zoomRoom').hide();
       $('[data-tab="Restrictions"]').hide();
       $('[data-tab="SelectFeatures"]').hide();
       $('[data-tab="zoomOptions"]').show();
