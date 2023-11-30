@@ -9,6 +9,7 @@ from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
 from project.integrations import MCommunity, TDx
 from project.models import ShortCodeField, Choice
+from project.utils import get_query_result
 from softphone.models import Selection
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
@@ -519,6 +520,34 @@ class ArcInstance(Volume):
     def get_shortcodes(self):
         return ArcBilling.objects.filter(arc_instance=self)
 
+    def get_user_volumes(self, user, vol_type):
+
+        sql = '''
+            select arc.id, arc.name, grp.name as owner, arc."SIZE",
+
+            (select JSON_ARRAYAGG(json_object('shortcode': shortcode, 'size': "SIZE")  )
+                from srs_order_arcbilling where arc_instance_id = arc.id) as shortcode_list,
+
+            (select label from srs_order_storagerate where id = arc.rate_id) as rate
+
+            from srs_order_arcinstance arc
+
+            , srs_oscauth_ldapgroup grp
+            
+            where arc.owner_id = grp.id
+              and arc.owner_id in (select ldap_group_id
+                                   from srs_oscauth_ldapgroupmember mbr
+                                   where mbr.username = %s)
+
+            and arc.service_id = 9
+            and type = %s
+            order by arc.name
+        '''
+
+        queryset = get_query_result(sql, (user.username,vol_type), json_fields=['shortcode_list'])
+
+        return queryset
+
 
 class ArcHost(VolumeHost):
     arc_instance = models.ForeignKey(ArcInstance, related_name='hosts', on_delete=models.CASCADE)
@@ -622,6 +651,7 @@ class Server(models.Model):
     created_date = models.DateTimeField(default=timezone.now, null=True)
     #shortcode = models.CharField(max_length=100) 
     public_facing = models.BooleanField(default=False)
+    production = models.BooleanField(default=False,blank=True)
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
 
     os = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={'parent__code__in': ['SERVER_UNMANAGED_OS','LINUX','WINDOWS']}
@@ -1241,6 +1271,7 @@ class Item(models.Model):
                     attributes.append({'ID': 1967, 'Value': 'secure'})
 
             db = self.data.get('database')
+            production = self.data.get('production')
             if db:
                 attributes.append({'ID': 1874, 'Value': 93}) # Dedicated DB
 
@@ -1350,7 +1381,7 @@ class Item(models.Model):
 
         MCommunity().add_entitlement(rec.admin_group.name)
 
-        for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing']:
+        for field in ['production','cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing']:
             value = self.data.get(field)
             if value:
                 setattr(rec, field, value)

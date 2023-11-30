@@ -8,12 +8,12 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.forms import modelform_factory, modelformset_factory, inlineformset_factory
 from project.pinnmodels import UmOscPreorderApiV,UmRteTechnicianV, UmRteLaborGroupV
-from django.db.models import Q, Sum
+from django.db.models import Q,F, Sum
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
 
-from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, ProjectView, EstimateView, UmOscNoteProfileV, NotificationManager, Notification
+from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, ProjectView, EstimateView, UmOscNoteProfileV, NotificationManager, Notification, Technician
 from .forms import FavoriteForm, EstimateForm, ProjectForm, MaterialForm, MaterialLocationForm, LaborForm
 
 
@@ -543,5 +543,36 @@ class NetOpsSearch(PermissionRequiredMixin, View):
 
         search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3)).order_by('-woid')
         return render(request, template,
-                      {'title': 'UMNet Projects',
+                      {'title': 'UMNet Projects', 
                        'search_list': search_list})
+    
+
+class EngineeringSearch(PermissionRequiredMixin, View):
+    permission_required = 'bom.can_access_bom'
+
+    # def test_func(self):
+    #     return self.request.user.has_perm(self.permission_required) and \
+    #            self.request.user.groups.filter(name='Network Engineering').exists()
+
+
+    def get(self, request):
+        template = 'bom/engineering_search.html'
+        engineers = Technician.objects.filter(wo_group_code='Network Engineering').values_list('user_name', flat=True)
+
+        for group in request.user.groups.all():
+            print(group.name)
+        search_list = EstimateView.objects.filter(
+            Q(
+                assigned_engineer__in=engineers,
+                status='Estimate',
+                engineer_status='NOT_COMPLETE',
+                status_name='Open') |
+            Q(
+                status_name='Open',
+                status__in=('Approved', 'Ordered', 'Warehouse'),
+                engineer_status = 'NOT_COMPLETE',
+                assigned_engineer__in=engineers)
+            ).order_by(F('estimated_completion_date').desc(nulls_last=True))
+        return render(request, template,
+                    {'title': 'Engineering Projects',
+                    'search_list': search_list})

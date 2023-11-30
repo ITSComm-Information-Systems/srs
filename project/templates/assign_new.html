@@ -21,8 +21,8 @@
 					<select name="select_dept" class="custom-select" id="select_dept_3">
 						<option></option>
 						{% for dept in deptids %}
-						<option name="dept" value="{{dept.dept}}">
-							{{ dept.dept }} - {{ dept.dept_name }}</option>
+						<option name="dept" value="{{dept.deptid}}">
+							{{ dept.deptid }} - {{ dept.dept_descr }}</option>
 						{% endfor %}
 					</select>
 				</div>

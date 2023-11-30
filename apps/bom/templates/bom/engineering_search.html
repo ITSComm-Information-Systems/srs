@@ -1,0 +1,92 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+<h2>{{ title }}</h2>
+
+
+<div class="form-inline">
+    <input type="search" id="workorder_search" class="form-control form-inline"
+    aria-label = "Search through site content" placeholder="filter">
+    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-1"
+        aria-expanded="true" aria-controls="collapse-{{ forloop.counter }}">
+    </button>
+</div>
+<br>
+<div id="div_workorder_table">
+    <table id="workorder_table" class="table table-hover table-striped sortable" aria-live=”polite”>
+        <thead>
+            <tr>
+                <th>Workorder</th>
+                <th>Preorder</th>
+                <th>Project</th>
+                <th>Estimate Label</th>
+                <th>Estimate Status</th>
+                <th>PM</th>
+                <th>Engineer Status</th>
+                <th>Start Date</th>
+                <th>Engineering Due Date</th>
+            </tr>
+        </thead>
+        <tbody id="workOrderTableBody">
+            {% for record in search_list %}
+            <tr data-estimate_id="{{ record.id }}" data-pre_order_id="{{ record.pre_order_id }}">
+                <td>{{ record.wo_number_display }}</td>
+                <td>{{ record.pre_order_number }}</td>
+                <td>{{ record.project_display }}</td>
+                <td>{{ record.label }}</td>
+                <td>{{ record.status }}</td>
+                <td>{{ record.project_manager }}</td>
+                {% if record.engineer_status == 'COMPLETE' %}
+                    <td>Complete</td>
+                {% else %}
+                    <td>Not Complete</td>
+                {% endif %}
+                
+                <td>{{ record.estimated_start_date|date:"Y-m-d" }}</td>
+                <td>{{ record.estimated_completion_date|date:"Y-m-d" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include 'bom/modal_add_estimate.html' %}
+
+{% endblock content %}
+
+
+{% block js %}
+<script>
+
+    //$("#div_workorder_table").hide();
+
+    $("#workorder_search").on("keyup", function () {
+        $("#div_workorder_table").show();
+        var value = $(this).val().toLowerCase();
+        $("#workOrderTableBody tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    $('#workOrderTableBody tr').click(function () {
+        //var estimate = $(this).dataset.estimate_id
+        var estimate_id = this.getAttribute('data-estimate_id');
+        if (estimate_id != 'None') {
+            window.location.replace("/apps/bom/estimate/" + estimate_id + "/");
+        } else {
+            var pre_order_id = this.getAttribute('data-pre_order_id');
+            //row = $("tr[data-pre_order_id='" + pre_order_id + "']");
+            //$("#workorder").text(row.find("td").eq(0).html());
+            //$("#preorder").text(row.find("td").eq(1).html());
+            //$("#description").html(row.find("td").eq(2).html());
+            console.log(pre_order_id,'pid');
+            $("#pre_order_id").val(pre_order_id);
+            $('#addEstimate').modal('show');
+        }
+
+    });
+
+
+</script>
+
+
+{% endblock js %}
