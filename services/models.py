@@ -203,6 +203,7 @@ class Network(MiDesktop):
     instance_label = 'Network Name'
     name = models.CharField(unique=True,blank=True, max_length=80)
     size = models.CharField(blank=True, max_length=80)
+    vlan_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'MiDesktop Network'

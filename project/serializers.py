@@ -149,7 +149,7 @@ class PoolSerializer(serializers.ModelSerializer):
 class NetworkSerializer(serializers.ModelSerializer):
 
     class Meta:
-        exclude = ['id']
+        fields = ['id','status','name','created_date','size','owner']
         model = Network
 
 
