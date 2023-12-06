@@ -164,12 +164,12 @@ class Email(models.Model):
 
           body = Template(self.body).render(Context(self.context))
 
-          #if settings.ENVIRONMENT != 'Production':
-          #     print('Non-prod, do not send to:', self.to)
-          #     self.to = 'djamison@umich.edu'
-          #     self.cc = ''
-          #     self.bcc = self.team_shared_email
-          #     subject = f'{settings.ENVIRONMENT} - {self.subject}'
+          if settings.ENVIRONMENT != 'Production':
+               print('Non-prod, do not send to:', self.to)
+               self.to = 'djamison@umich.edu'
+               self.cc = ''
+               self.bcc = self.team_shared_email
+               subject = f'{settings.ENVIRONMENT} - {self.subject}'
           
           msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc], reply_to=[self.reply_to])
           msg.attach_alternative(body, "text/html")
