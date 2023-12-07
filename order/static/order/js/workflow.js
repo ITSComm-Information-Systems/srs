@@ -768,7 +768,6 @@ $(document).ready(function() {
       $('#div_zoomRoom').show();
     } else {
       $('#div_zoomRoom').hide();
-      $('#id_zoomRoom').val('');
     }
 
     if (zoomCat == 'OTHER') {
@@ -779,6 +778,15 @@ $(document).ready(function() {
 
   });
 
+
+  $(document).on("change", "#id_zoomRoom" , function() {
+    var zoomRoomYN = $('#id_zoomRoom').find(":selected").val();
+    if (zoomRoomYN == 'Yes') {
+      $('#div_zoomRoomName').show();
+    } else {
+      $('#div_zoomRoomName').hide();
+    }
+  });
 
 
   // Addl info
@@ -808,6 +816,7 @@ $(document).ready(function() {
     if(this.value=='voip'){  // Zoom
       $('#div_otherSoftphoneCat').hide();
       $('#div_zoomRoom').hide();
+      $('#div_zoomRoomName').hide();
       $('[data-tab="Restrictions"]').hide();
       $('[data-tab="SelectFeatures"]').hide();
       $('[data-tab="zoomOptions"]').show();
