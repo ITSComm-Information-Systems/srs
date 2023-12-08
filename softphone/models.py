@@ -248,7 +248,6 @@ class SelectionV(SelectionAbstract):
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_softphone_selection_v'
         verbose_name = 'Selection'
-        verbose_name_plural = 'Selection Report'
         managed = False
 
 
