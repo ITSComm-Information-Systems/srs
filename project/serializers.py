@@ -149,7 +149,7 @@ class PoolSerializer(serializers.ModelSerializer):
 class NetworkSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ['id','status','name','created_date','size','owner']
+        fields = ['id','status','name','created_date','size','vlan_id','owner']
         model = Network
 
 
