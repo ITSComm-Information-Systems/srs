@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from project.utils import get_query_result
 from project.models import Email
 from project.integrations import Slack, MCommunity
+
 import json
 from django.conf import settings
 
@@ -62,7 +63,7 @@ class Command(BaseCommand):
             if not record['owner']:
                 Slack().send_message('Shortcode Audit, no owner found', 'srs-errors')
                 continue
-
+                
             to = mc.get_group_email(record['owner'])
 
             if to:
@@ -74,3 +75,11 @@ class Command(BaseCommand):
                 email.send()
             else:
                 Slack().send_message('Shortcode Audit, no email found', 'srs-errors')
+
+            email.context = {"path": PATH, "service": record['service'], "instances": json.loads(record['instances'])}
+            email.to = record['owner'] + '@umich.edu'
+            email.reply_to = self.REPLY_TO.get(record['service'])
+            email.cc = self.REPLY_TO.get(record['service'])
+            email.bcc = email.team_shared_email
+            email.send()
+
