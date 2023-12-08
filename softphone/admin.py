@@ -107,15 +107,16 @@ class CutDateListFilter(admin.SimpleListFilter):
             return queryset.filter(cut_date=self.value())
 
 
-@admin.register(Selection)
+@admin.register(SelectionV)
 class SelectionAdmin(admin.ModelAdmin):
-    list_display = ['service_number','subscriber','uniqname','migrate','updated_by','update_date','processing_status','cut_date','building_code']
+    list_display = ['service_number','dept_id','zoom_login','subscriber','uniqname','migrate','updated_by','update_date','processing_status','cut_date','building_code']
     ordering = ['-update_date']
     search_fields = ['service_number','uniqname','updated_by','building_code']
-    list_filter = [ProcessingStatusListFilter,'migrate',CutDateListFilter, DuoListFilter,ZoomListFilter]
+    list_filter = [ProcessingStatusListFilter,'migrate',CutDateListFilter, 'duo_phone','zoom_login']
     date_hierarchy = 'cut_date'
     form = SelectionForm
     actions = ['update_selections','download_csv']
+    readonly_fields = ['zoom_login','duo_phone','dept_id','phone','subscriber_last_name','subscriber_first_name','subscriber_uniqname']
 
     def get_urls(self):
         urls = super().get_urls()
@@ -156,7 +157,7 @@ class SelectionAdmin(admin.ModelAdmin):
 
             sub.save()
  
-        return HttpResponseRedirect('/admin/softphone/selection/')
+        return HttpResponseRedirect('/admin/softphone/selectionv/')
 
 
 @admin.register(DuoUser)
