@@ -1,7 +1,11 @@
 from django.core.management.base import BaseCommand
 from project.utils import get_query_result
 from project.models import Email
+<<<<<<< HEAD
 from project.integrations import Slack, MCommunity
+=======
+from project.integrations import Slack
+>>>>>>> dj-sf-admin
 import json
 from django.conf import settings
 
