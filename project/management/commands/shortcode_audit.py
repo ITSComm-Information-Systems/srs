@@ -76,10 +76,5 @@ class Command(BaseCommand):
             else:
                 Slack().send_message('Shortcode Audit, no email found', 'srs-errors')
 
-            email.context = {"path": PATH, "service": record['service'], "instances": json.loads(record['instances'])}
-            email.to = record['owner'] + '@umich.edu'
-            email.reply_to = self.REPLY_TO.get(record['service'])
-            email.cc = self.REPLY_TO.get(record['service'])
-            email.bcc = email.team_shared_email
-            email.send()
+
 
