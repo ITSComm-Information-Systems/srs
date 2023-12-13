@@ -11,9 +11,24 @@ from django.core.mail import EmailMessage
 from apps.bom.models import Item, EstimateView, Material, MaterialLocation
 from rest_framework.response import Response
 import requests
+from django.core.files.storage import FileSystemStorage
 
 from .models import Webhooks
 import threading, time
+
+
+class TollUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # curl -u rest.toll:$PASS --data-binary 2023_11_20.zip http://127.0.0.1:8000/api/tollupload
+
+        fs = FileSystemStorage()
+        filename = fs.save('attachments/toll.zip', request.FILES['toll.zip'])  
+        print('created', filename)
+
+        return Response(status=204)
+
 
 def netboxEmails(request):
     tosend = Webhooks.objects.all().filter(emailed=False)
