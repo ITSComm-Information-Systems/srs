@@ -21,8 +21,10 @@ class TollUploadView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # curl -u rest.toll:$PASS --data-binary 2023_11_20.zip http://127.0.0.1:8000/api/tollupload
 
+        if self.request.user.username != 'rest.toll':
+            return Response(status=401)
+        
         fs = FileSystemStorage()
         filename = fs.save('attachments/toll.zip', request.FILES['toll.zip'])  
         print('created', filename)
