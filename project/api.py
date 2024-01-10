@@ -5,7 +5,7 @@ from oscauth.models import LDAPGroup, LDAPGroupMember
 from rest_framework import routers, viewsets
 from . import serializers
 from django.conf import settings
-
+from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from django.core.mail import EmailMessage
@@ -59,6 +59,35 @@ def netboxEmails(request):
             )
             email.send()
             checkagain.update(emailed=True)
+
+class TestView(APIView):
+
+    def get(self, request):
+
+        testdata = {"id": 1,
+            "name": "arcimage-archive",
+            "owner": "med-test-test",
+            "size": 160,
+            "service": "Locker Storage",
+            "type": "NFS",
+            "rate": {
+                "name": "LK-NFS-BSR",
+                "label": "Basic + Snapshots + Replication",
+                "rate": "4.530000"},
+            "nfs_group_id": "10011",
+            "multi_protocol": "false",
+            "sensitive_regulated": "false",
+            "great_lakes": "false",
+            "armis": "false",
+            "lighthouse": "false",
+            "globus": "false",
+            "globus_phi": "false",
+            "thunder_x": "false",
+            "research_computing_package": "false",
+            "amount_used": "122.00"
+        }
+
+        return JsonResponse(testdata)
 
 class BomMaterialView(APIView):
     permission_classes = [IsAuthenticated]

@@ -26,6 +26,7 @@ urlpatterns = [
     path('softphone/', include('softphone.urls')),
     path('services/', include('services.urls')),
     path('api/', include(api.router.urls)),
+    path('api/test/', api.TestView.as_view()),
     path('api/bommaterial/', api.BomMaterialView.as_view()),
     path('api/tollupload/', api.TollUploadView.as_view()),
     path('admin/', admin.site.urls),
@@ -48,6 +49,7 @@ urlpatterns = [
     path('', include('pages.urls')),
     path('tools/',include('tools.urls')),
     #path('testtest/',views.raise404)
+    
 
 ] 
 
