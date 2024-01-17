@@ -1,11 +1,8 @@
 from django.core.management.base import BaseCommand
 from project.utils import get_query_result
 from project.models import Email
-<<<<<<< HEAD
 from project.integrations import Slack, MCommunity
-=======
-from project.integrations import Slack
->>>>>>> dj-sf-admin
+
 import json
 from django.conf import settings
 
@@ -66,6 +63,21 @@ class Command(BaseCommand):
             if not record['owner']:
                 Slack().send_message('Shortcode Audit, no owner found', 'srs-errors')
                 continue
+                
+            to = mc.get_group_email(record['owner'])
+
+            if to:
+                email.context = {"path": PATH, "service": record['service'], "instances": json.loads(record['instances'])}
+                email.to = to
+                email.reply_to = self.REPLY_TO.get(record['service'])
+                email.cc = self.REPLY_TO.get(record['service'])
+                email.bcc = email.team_shared_email
+                email.send()
+            else:
+                Slack().send_message('Shortcode Audit, no email found', 'srs-errors')
+
+
+
 
             to = mc.get_group_email(record['owner'])
 

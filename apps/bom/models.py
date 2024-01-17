@@ -375,7 +375,7 @@ class Estimate(BOM):
         return Labor.objects.filter(estimate=self)
 
     def notify_warehouse(self):
-        if self.status == self.ESTIMATE or self.status == self.ORDERED:
+        if self.status == self.ESTIMATE or self.status == self.ORDERED or self.status == self.APPROVED:
             self.status = self.WAREHOUSE
             self.save()
         elif self.status == self.WAREHOUSE:

@@ -1,4 +1,4 @@
-Django~=4.2.0
+Django~=5.0.0
 whitenoise
 gunicorn
 mozilla-django-oidc
@@ -7,6 +7,6 @@ cx_Oracle
 django-debug-toolbar
 ldap3
 djangorestframework
-reportlab~=3.6.0  # Freeze until there is a fix for pycairo in 4.0
+reportlab
 django-extensions
 openpyxl
