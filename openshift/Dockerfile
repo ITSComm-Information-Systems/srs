@@ -12,6 +12,8 @@ RUN chmod g+x /usr/src/app/docker-entrypoint.sh
 
 EXPOSE 8000
 
+RUN start nginx
+
 ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
 
 CMD ["sh", "-c", "gunicorn --bind=0.0.0.0:8000 --workers=${GUNICORN_WORKERS} --threads=${GUNICORN_THREADS} --access-logfile=- --log-file=- project.wsgi"]
