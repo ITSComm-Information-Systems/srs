@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+echo entrypointer
+
+system start nginx
 
 set -e
 
