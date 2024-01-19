@@ -85,10 +85,9 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
     'oscauth.backends.UMAuthenticationBackend',
-    'django.contrib.auth.backends.ModelBackend',
     'oscauth.backends.SuBackend',
-    'django.contrib.auth.backends.ModelBackend',
 ]
 
 # mozilla-django-oidc
