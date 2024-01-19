@@ -12,7 +12,7 @@ from apps.bom.models import Item, EstimateView, Material, MaterialLocation
 from rest_framework.response import Response
 import requests
 from django.core.files.storage import FileSystemStorage
-
+from django.http import JsonResponse
 from .models import Webhooks
 import threading, time
 
@@ -58,6 +58,66 @@ def netboxEmails(request):
             )
             email.send()
             checkagain.update(emailed=True)
+
+class TestView(APIView):
+    permission_classes = []
+
+    def get(self, request):
+
+        testdata = {"id": 1,
+            "name": "arcimage-archive",
+            "owner": "med-test-test",
+            "size": 160,
+            "service": "Locker Storage",
+            "type": "NFS",
+            "rate": {
+                "name": "LK-NFS-BSR",
+                "label": "Basic + Snapshots + Replication",
+                "rate": "4.530000"},
+            "nfs_group_id": "10011",
+            "multi_protocol": "false",
+            "sensitive_regulated": "false",
+            "great_lakes": "false",
+            "armis": "false",
+            "lighthouse": "false",
+            "globus": "false",
+            "globus_phi": "false",
+            "thunder_x": "false",
+            "research_computing_package": "false",
+            "amount_used": "122.00"
+        }
+
+        return JsonResponse(testdata)
+
+
+class TestViewToo(APIView):
+
+    def get(self, request):
+
+        testdata = {"id": 1,
+            "name": "arcimage-archive",
+            "owner": "med-test-test",
+            "size": 160,
+            "service": "Locker Storage",
+            "type": "NFS",
+            "rate": {
+                "name": "LK-NFS-BSR",
+                "label": "Basic + Snapshots + Replication",
+                "rate": "4.530000"},
+            "nfs_group_id": "10011",
+            "multi_protocol": "false",
+            "sensitive_regulated": "false",
+            "great_lakes": "false",
+            "armis": "false",
+            "lighthouse": "false",
+            "globus": "false",
+            "globus_phi": "false",
+            "thunder_x": "false",
+            "research_computing_package": "false",
+            "amount_used": "122.00"
+        }
+
+        return JsonResponse(testdata)
 
 class BomMaterialView(APIView):
     permission_classes = [IsAuthenticated]
