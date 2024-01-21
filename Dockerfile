@@ -16,7 +16,7 @@ RUN apt-get install -y curl unzip libaio1 \
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
 
 
-#WORKDIR /usr/src/app
+WORKDIR /usr/src/app
 COPY requirements.txt requirements.txt
 
 RUN pip install -r requirements.txt
