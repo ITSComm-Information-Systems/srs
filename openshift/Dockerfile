@@ -1,14 +1,14 @@
-FROM python:3.11-slim
+FROM base:latest
 
 #ARG ENVIRONMENT="DEVELOPMENT"
 
-RUN rm -r /usr/src/app
+#RUN rm -r /usr/src/app
 COPY . /usr/src/app
 
 # Workaround for permission issue on OpenShift
-RUN chmod -R g+rw /usr/src/app
+#RUN chmod -R g+rw /usr/src/app
 
-RUN chmod g+x /usr/src/app/docker-entrypoint.sh
+#RUN chmod g+x /usr/src/app/docker-entrypoint.sh
 
 EXPOSE 8000
 
