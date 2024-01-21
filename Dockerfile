@@ -1,13 +1,11 @@
 FROM python:3.11-slim
 
-ENV GUNICORN_WORKERS=2
-ENV GUNICORN_THREADS=4
+#ENV GUNICORN_WORKERS=2
+#ENV GUNICORN_THREADS=4
 
 ENV PYTHONUNBUFFERED=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# gcc needed for cx_Oracle (all wheels?)
-RUN apt-get -y update && apt-get install -y libpq-dev gcc && apt-get -y install nginx
 
 #Oracle Instant Client
 RUN apt-get install -y curl unzip libaio1 \
@@ -15,6 +13,9 @@ RUN apt-get install -y curl unzip libaio1 \
     && curl --output instantclient.zip https://download.oracle.com/otn_software/linux/instantclient/19600/instantclient-basiclite-linux.x64-19.6.0.0.0dbru.zip \
     && unzip instantclient.zip && rm instantclient.zip
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
+
+# gcc needed for cx_Oracle (all wheels?)
+RUN apt-get -y update && apt-get install -y libpq-dev gcc && apt-get -y install nginx
 
 
 WORKDIR /usr/src/app
@@ -30,4 +31,4 @@ EXPOSE 8000
 
 ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
 
-CMD ["sh", "-c", "gunicorn --bind=0.0.0.0:8000 --workers=${GUNICORN_WORKERS} --threads=${GUNICORN_THREADS} --access-logfile=- --log-file=- project.wsgi"]
+#CMD ["sh", "-c", "gunicorn --bind=0.0.0.0:8000 --workers=${GUNICORN_WORKERS} --threads=${GUNICORN_THREADS} --access-logfile=- --log-file=- project.wsgi"]
