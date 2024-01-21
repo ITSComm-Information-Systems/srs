@@ -1,4 +1,4 @@
-FROM python:3.11-slim as instantclient
+FROM python:3.11-slim
 
 ENV GUNICORN_WORKERS=2
 ENV GUNICORN_THREADS=4
@@ -6,6 +6,7 @@ ENV GUNICORN_THREADS=4
 ENV PYTHONUNBUFFERED=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
+# gcc needed for cx_Oracle (all wheels?)
 RUN apt-get -y update && apt-get install -y libpq-dev gcc && apt-get -y install nginx
 
 #Oracle Instant Client
@@ -15,7 +16,6 @@ RUN apt-get install -y curl unzip libaio1 \
     && unzip instantclient.zip && rm instantclient.zip
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
 
-FROM instantclient
 
 WORKDIR /usr/src/app
 COPY requirements.txt requirements.txt
