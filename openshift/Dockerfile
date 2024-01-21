@@ -1,8 +1,5 @@
 FROM base:latest
 
-#ARG ENVIRONMENT="DEVELOPMENT"
-
-#RUN rm -r /usr/src/app
 COPY . /usr/src/app
 
 # Workaround for permission issue on OpenShift
