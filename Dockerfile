@@ -1,8 +1,8 @@
 FROM python:3.11-slim
 
-#Oracle Instant Client
+#Oracle Instant Client + gcc needed for cx_Oracle wheel
 RUN apt-get update && apt-get install -y \
-    curl unzip libaio1 \
+    curl unzip libaio1 gcc \
     && mkdir /opt/oracle && cd /opt/oracle \
     && curl --output instantclient.zip https://download.oracle.com/otn_software/linux/instantclient/19600/instantclient-basiclite-linux.x64-19.6.0.0.0dbru.zip \
     && unzip instantclient.zip && rm instantclient.zip
@@ -14,11 +14,12 @@ ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
 ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     GUNICORN_WORKERS=1 \
-    GUNICORN_THREADS=3 
+    GUNICORN_THREADS=3 \
+    VERSION=1.17
 
 
 # gcc needed for cx_Oracle (all wheels?)
-RUN apt-get install -y libpq-dev gcc
+#RUN apt-get install -y libpq-dev gcc
 
 
 WORKDIR /usr/src/app
