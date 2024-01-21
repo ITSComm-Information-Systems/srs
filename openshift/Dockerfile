@@ -6,9 +6,9 @@ FROM base:latest
 COPY . /usr/src/app
 
 # Workaround for permission issue on OpenShift
-#RUN chmod -R g+rw /usr/src/app
+RUN chmod -R g+rw /usr/src/app
 
-#RUN chmod g+x /usr/src/app/docker-entrypoint.sh
+RUN chmod g+x /usr/src/app/docker-entrypoint.sh
 
 EXPOSE 8000
 
