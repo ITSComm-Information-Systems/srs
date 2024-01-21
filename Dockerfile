@@ -16,19 +16,19 @@ RUN apt-get install -y curl unzip libaio1 \
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_19_6
 
 
-WORKDIR /usr/src/app
+#WORKDIR /usr/src/app
 COPY requirements.txt requirements.txt
 
 RUN pip install -r requirements.txt
 
-COPY . /usr/src/app
+#COPY . /usr/src/app
 
 RUN apt-get purge -y --auto-remove gcc
 
 # Workaround for permission issue on OpenShift
-RUN chmod -R g+rw /usr/src/app
+#RUN chmod -R g+rw /usr/src/app
 
-RUN chmod g+x /usr/src/app/docker-entrypoint.sh
+#RUN chmod g+x /usr/src/app/docker-entrypoint.sh
 
 ENV flag=1
 
