@@ -125,7 +125,13 @@
                 </div>
 
             <div id="id_pool_quantity" v-show="visible">
-                <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_quantity.label_tag}}<input type="number" name="pool_quantity" class="form-control"  v-model="poolQuantity"/></h6>
+                <h6>
+                    <span style="color:red; font-size:12px;">*</span>{{form.pool_quantity.label_tag}}
+                    <input type="number" name="pool_quantity" class="form-control" v-model="poolQuantity"/>
+                </h6> 
+                <h6 style="text-align: left; color:red;">
+                    {{ form.pool_quantity.errors }}
+                </h6>
             </div>
             <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_total.label_tag}}<input type="text" name="pool_total" readonly="true" class="form-control" id="id_pool_total" :value="poolTotal"></h6>
             

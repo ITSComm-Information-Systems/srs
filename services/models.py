@@ -231,7 +231,7 @@ class Pool(MiDesktop):
             total_cost = self.quantity * 10
         else:
             for image in self.images.all():
-                total_cost += image.total_cost
+                total_cost += image.total_cost * self.quantity
         if total_cost == 0:
             return round(0.00,2)
         
