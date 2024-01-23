@@ -18,9 +18,12 @@
         <td>{{ rec.size|format_cidr }}</td>  
         <td>{{ rec.owner }}</td>
         <td>
+            {% if not rec.is_foreign_key_in_image %}
             <a href="/services/midesktop-network/{{ rec.id }}/delete/">
                 <i class="fas fa-trash"></i>
             </a>
+            {% endif %}
+            
         </td>
     </tr>
 

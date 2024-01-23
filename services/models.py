@@ -169,6 +169,9 @@ class Image(MiDesktop):
     shared_network = models.BooleanField(default=True)
     network = models.ForeignKey("Network", on_delete=models.CASCADE, null=True, blank=True)
 
+    def is_foreign_key_in_pool(self):
+        return Pool.objects.filter(images=self).exists()
+
     @cached_property
     def total_storage_size(self):
         storage = ImageDisk.objects.filter(image=self).aggregate(models.Sum('size'))
@@ -205,6 +208,8 @@ class Network(MiDesktop):
     size = models.CharField(blank=True, max_length=80)
     vlan_id = models.IntegerField(blank=True, null=True)
 
+    def is_foreign_key_in_image(self):
+        return Image.objects.filter(network=self).exists()
     class Meta:
         verbose_name = 'MiDesktop Network'
 
