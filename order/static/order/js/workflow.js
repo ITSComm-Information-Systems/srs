@@ -826,6 +826,24 @@ $(document).ready(function() {
       $('[data-phoneset="voip"]').show();
     }
 
+    if(this.value=='yes_pci'){  // Zoom
+      $("#id_phoneCategory").val("LN-HYLAFAX");
+      $('#div_Uniqname').hide();
+      $("#id_phoneCategory > option").each(function() {
+        if (this.value != "OTHER" && this.value != "LN-HYLAFAX") {
+          $(this).attr('disabled','disabled');
+        }
+      });
+    }
+
+    if(this.value=='no_pci'){  // Zoom
+      $("#id_phoneCategory").val("LN-STAFF");
+      $('#div_Uniqname').show();
+      $("#id_phoneCategory > option").each(function() {
+        $(this).removeAttr('disabled');
+      });
+    }
+
     if (this.value=='buy'){
       $('[data-tab="Equipment"]').show();
     }
