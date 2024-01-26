@@ -6,7 +6,7 @@ from project.integrations import MCommunity, Openshift
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from .midesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
 from django.forms import ModelForm, formset_factory
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Defaults
 CharField = forms.CharField( widget=forms.TextInput(attrs={'class': 'form-control'}) )
@@ -444,7 +444,7 @@ class MiDesktopNewForm(MiDesktopForm):
                                                                 ('16hr','16 Hours'),('20hr','20 Hours'),('24hr','24 Hours')))
     ad_container = forms.CharField(required=False,)
     base_image = forms.IntegerField(required=False)
-    pool_quantity = forms.IntegerField(validators=[MinValueValidator(1)])
+    pool_quantity = forms.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(200)])
     pool_total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
 
     image_name = forms.CharField(required=False)
@@ -872,6 +872,7 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
     name = forms.CharField()
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
     mask = forms.ChoiceField(choices=MASK_CHOICES)
+    dhcp = forms.ChoiceField(choices=(('true','Yes'),('false','No')), widget=forms.Select(), initial=False, label="DHCP")
     protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False, label="Firewall Protection")
     technical_contact = forms.EmailField()
     business_contact = forms.EmailField()
@@ -928,7 +929,7 @@ class InstantClonePoolChangeForm(forms.ModelForm):
     shortcode = forms.CharField(required=False,validators=[validate_shortcode])
     name = forms.CharField(required=False)
     images = forms.ChoiceField(required=False,label='Image')
-    quantity = forms.IntegerField(required=False,validators=[MinValueValidator(1)])
+    quantity = forms.IntegerField(required=False,validators=[MinValueValidator(1), MaxValueValidator(200)])
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
     additional_details = forms.CharField(required=False,label="Additional Details")
 
@@ -1018,7 +1019,7 @@ class PersistentPoolChangeForm(forms.ModelForm):
 class ExternalPoolChangeForm(forms.ModelForm):
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
     name = forms.CharField(required=False)
-    quantity = forms.IntegerField(validators=[MinValueValidator(1)])
+    quantity = forms.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(200)])
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
     additional_details = forms.CharField(required=False, label="Additional Details")
 
