@@ -604,6 +604,8 @@ class MiDesktopPayload(Payload):
     form_id = 555	             # ITS-MiDesktop - Form
     priority_id = 19 # Medium
 
+    midesktop_request_type = ChoiceAttribute(14642, Pool=46858, Image=46859, Network=46860)  
+    midesktop_pool_type = ChoiceAttribute(14643, external=46861, instant_clone=46862, persistent=46863)  
     new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
     owner = TextAttribute(2343)         # midesktop_MComm group textbox
     shared = ChoiceAttribute(2344, Yes=0, No=0)        # midesktop_Shared Dedicated dropdown
@@ -616,6 +618,10 @@ class MiDesktopPayload(Payload):
         self.request = request
 
         self.title = f'MiDesktop {action} {type(instance).__name__}'
+
+        if action == 'New':
+            self.add_attribute(self.midesktop_request_type.id, getattr(self.midesktop_request_type, type(instance).__name__))
+
         if 'form' in kwargs:
 
             self.form = kwargs['form']
@@ -682,6 +688,8 @@ class PoolPayload(MiDesktopPayload):
             self.service_id = 65  # Delete Pool
             self.form_id = 112
 
+        self.add_attribute(self.midesktop_pool_type.id, getattr(self.midesktop_pool_type, instance.type))
+        print(instance.type)
         self.add_attribute(self.pool_name.id, instance.name)
         image_list = instance.images.all()
         if len(image_list) > 0:
