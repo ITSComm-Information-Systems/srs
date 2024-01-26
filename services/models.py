@@ -225,7 +225,7 @@ class Pool(MiDesktop):
     instance_label = 'Pool Name'
     shortcode = models.CharField(max_length=6)
     name = models.CharField(unique=True,max_length=40, verbose_name='Pool Name', default='TBD')
-    type = models.CharField(default='instant-clone',max_length=30,)
+    type = models.CharField(default='instant_clone',max_length=30,)
     quantity = models.IntegerField()
     images = models.ManyToManyField(Image)
 
