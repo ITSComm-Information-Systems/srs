@@ -67,7 +67,7 @@
                 var pre_order_id = this.getAttribute('data-pre_order_id');
                 console.log(pre_order_id, 'pid');
                 document.getElementById("pre_order_id").value = pre_order_id;
-                document.getElementById("addEstimate").style.display = "block";
+                $('#addEstimate').modal();
             }
         });
     });
