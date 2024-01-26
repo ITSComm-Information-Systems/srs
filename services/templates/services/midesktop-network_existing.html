@@ -6,7 +6,6 @@
     <tr>
         <th>Name</th>
         <th>Size</th>
-        <th>CIDR</th>
         <th>Owner</th>
         <th></th>
     </tr>
@@ -15,7 +14,6 @@
     <tr>
         <td>{{ rec.name }}</td> 
         <td>{{ rec.size }}</td>
-        <td>{{ rec.size|format_cidr }}</td>  
         <td>{{ rec.owner }}</td>
         <td>
             {% if not rec.is_foreign_key_in_image %}
