@@ -626,6 +626,10 @@ class MiDesktopPayload(Payload):
 
             self.form = kwargs['form']
             self.context['form'] = self.form
+            if action == 'Add':
+                self.context['cleaned_data'] = []
+            else:
+                self.context['cleaned_data'] = self.form.cleaned_data
 
             network_type = self.form.cleaned_data.get('network_type')
             if network_type:
