@@ -608,7 +608,7 @@ class MiDesktopPayload(Payload):
     midesktop_pool_type = ChoiceAttribute(14643, external=46861, instant_clone=46862, persistent=46863)  
     new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
     owner = TextAttribute(2343)         # midesktop_MComm group textbox
-    shared = ChoiceAttribute(2344, Yes=0, No=0)        # midesktop_Shared Dedicated dropdown
+    shared = ChoiceAttribute(2344, New=903, Shared=895)        # midesktop_Shared Dedicated dropdown
     network_type = ChoiceAttribute(2345, Existing=896, New=897, Shared=898)  # private web-access dedicated
     image_type = ChoiceAttribute(2346, Existing=899, New=900, Clone=901)
     image_name = TextAttribute(2347)    # midesktop_Base Image Name textbox
@@ -626,6 +626,10 @@ class MiDesktopPayload(Payload):
 
             self.form = kwargs['form']
             self.context['form'] = self.form
+            if action == 'Add':
+                self.context['cleaned_data'] = []
+            else:
+                self.context['cleaned_data'] = self.form.cleaned_data
 
             network_type = self.form.cleaned_data.get('network_type')
             if network_type:
@@ -641,6 +645,8 @@ class MiDesktopPayload(Payload):
             base_image = self.form.cleaned_data.get('base_image')
             if base_image == 999999999:
                 self.add_attribute(self.image_type.id, self.image_type.New)
+            else:
+                self.add_attribute(self.image_type.id, self.image_type.Existing)
 
         self.add_attribute(self.owner.id, instance.owner.name)
         if self.description == '':
@@ -739,6 +745,8 @@ class ImagePayload(MiDesktopPayload):
 class NetworkPayload(MiDesktopPayload):
     template = 'project/tdx_midesktop_network.html'
     UMNET = 14
+    form_id = 85
+    service_id = 58  # New Order
 
     def __init__(self, action, instance, request, **kwargs):
         self.attributes = []
@@ -746,17 +754,6 @@ class NetworkPayload(MiDesktopPayload):
         self.tasks = []
         if action == 'New':
             self.add_attribute(self.network_type.id, self.network_type.New)
-
-            descr = '''Please create a new VDI Network and trunk to all 10 MiDesktop hosts per the UMNet wiki instructions:
-
-                        https://wiki.umnet.umich.edu/Virtualization#.22NEW.22.C2.A0MACC_VDI_Cluster
-
-                        1. Set up the VLAN using the provided information.
-                        2. Be Sure DHCP is configured and enabled.
-                        3. Have NSO add it to the MACC-VDI firewall context.
-                        4. Contact midesktop.support@umich.edu if problems arise or additional info is needed.'''
-
-            self.tasks.append( {'Title': 'Create New VDI Network', "ResponsibleGroupID": self.UMNET, "Description": descr} )
 
         if action == 'Delete':
             self.description = f'Delete Network: {instance.name}'
