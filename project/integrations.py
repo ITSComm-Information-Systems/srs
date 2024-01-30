@@ -608,15 +608,15 @@ class MiDesktopPayload(Payload):
     midesktop_pool_type = ChoiceAttribute(14643, external=46861, instant_clone=46862, persistent=46863)  
     new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
     owner = TextAttribute(2343)         # midesktop_MComm group textbox
-    shared = ChoiceAttribute(2344, New=903, Shared=895)        # midesktop_Shared Dedicated dropdown
-    network_type = ChoiceAttribute(2345, Existing=896, New=897, Shared=898)  # private web-access dedicated
+    shared = ChoiceAttribute(2344, New=903, Shared=895, Existing=46881)        # midesktop_Shared Dedicated dropdown
+    #network_type = ChoiceAttribute(2345, Existing=896, New=897, Shared=898)  # private web-access dedicated
     image_type = ChoiceAttribute(2346, Existing=899, New=900, Clone=901)
     image_name = TextAttribute(2347)    # midesktop_Base Image Name textbox
     pool_name = TextAttribute(2348)     # midesktop_Pool Display Name textbox
 
     def __init__(self, action, instance, request, **kwargs):
         self.request = request
-
+        self.instance_type = type(instance).__name__
         self.title = f'MiDesktop {action} {type(instance).__name__}'
 
         if action == 'New':
@@ -626,21 +626,33 @@ class MiDesktopPayload(Payload):
 
             self.form = kwargs['form']
             self.context['form'] = self.form
-            if action == 'Add':
+            if action == 'New':
                 self.context['cleaned_data'] = []
             else:
                 self.context['cleaned_data'] = self.form.cleaned_data
 
             network_type = self.form.cleaned_data.get('network_type')
-            if network_type:
-                network_display = dict(self.form.fields['network_type'].choices)[network_type]
-                if network_type == 'dedicated':
-                    network_display = network_display + ' - ' + self.form.cleaned_data.get('network_name','')
+            network_name = self.form.cleaned_data.get('network_name')
+            if action == 'New' and network_type is None:
+                if instance.network_id:
+                    network_type = 'dedicated'
+                    network_name = instance.network.name
+                else:
+                    network_type = 'shared'
+
+            if network_type:   # web-access private dedicated
+                #network_display = dict(self.form.fields['network_type'].choices)[network_type]
+                #if network_type == 'dedicated':
+                #network_display = f'{network_type} - {network_name}'
                 
-                self.context['network_display'] = network_display
+                self.context['network_display'] = f'{network_type} - {network_name}'
                     
                 if self.form.data.get('network') == 'new':
-                    self.add_attribute(self.network_type.id, self.network_type.New)
+                    self.add_attribute(self.shared.id, self.shared.New)
+                elif network_type == 'dedicated':
+                    self.add_attribute(self.shared.id, self.shared.Existing)
+                else:
+                    self.add_attribute(self.shared.id, self.shared.Shared)
 
             base_image = self.form.cleaned_data.get('base_image')
             if base_image == 999999999:
