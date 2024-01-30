@@ -12,7 +12,11 @@
 
     {% for rec in service_list %}
     <tr>
-        <td>{{ rec.name }}</td> 
+        {% if rec.vlan_id %}
+                <td>{{ rec.name }}</td>
+        {% else %}
+                <td>pending</td>
+        {% endif %}
         <td>{{ rec.size }}</td>
         <td>{{ rec.owner }}</td>
         <td>

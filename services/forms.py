@@ -869,7 +869,7 @@ class MiDesktopChangeImageForm(forms.ModelForm):
 
 class MiDesktopNewNetworkForm(MiDesktopForm):
     title = 'MiDesktop New Network Order Form'
-    name = forms.CharField()
+    purpose = forms.CharField()
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES)
     mask = forms.ChoiceField(choices=MASK_CHOICES)
     dhcp = forms.ChoiceField(choices=(('true','Yes'),('false','No')), widget=forms.Select(), initial=False, label="DHCP")
@@ -896,7 +896,7 @@ class MiDesktopNewNetworkForm(MiDesktopForm):
     def save(self, commit=True):
         super().save()
         new_network = Network(
-            name=self.data['name'],
+            name='',
             size=self.data['mask'],
             owner=self.owner,
         )
