@@ -631,20 +631,28 @@ class MiDesktopPayload(Payload):
             else:
                 self.context['cleaned_data'] = self.form.cleaned_data
 
+            base_image = self.form.cleaned_data.get('base_image')
+            if base_image == 999999999:
+                self.add_attribute(self.image_type.id, self.image_type.New)
+            else:
+                self.add_attribute(self.image_type.id, self.image_type.Existing)
+
             network_type = self.form.cleaned_data.get('network_type')
             network_name = self.form.cleaned_data.get('network_name')
-            if action == 'New' and network_type is None:
-                if instance.network_id:
-                    network_type = 'dedicated'
-                    network_name = instance.network.name
-                else:
-                    network_type = 'shared'
 
-            if network_type:   # web-access private dedicated
-                #network_display = dict(self.form.fields['network_type'].choices)[network_type]
-                #if network_type == 'dedicated':
-                #network_display = f'{network_type} - {network_name}'
-                
+            if action == 'New' and network_type == '':
+                try:
+                    from services.models import Image as Img
+                    image = Img.objects.get(id=base_image)
+                    if image.network_id:
+                        network_type = 'dedicated'
+                        network_name = image.network.name
+                    else:
+                        network_type = 'shared'
+                except:
+                    print('error getting image', base_image)
+
+            if network_type:
                 self.context['network_display'] = f'{network_type} - {network_name}'
                     
                 if self.form.data.get('network') == 'new':
@@ -654,11 +662,7 @@ class MiDesktopPayload(Payload):
                 else:
                     self.add_attribute(self.shared.id, self.shared.Shared)
 
-            base_image = self.form.cleaned_data.get('base_image')
-            if base_image == 999999999:
-                self.add_attribute(self.image_type.id, self.image_type.New)
-            else:
-                self.add_attribute(self.image_type.id, self.image_type.Existing)
+
 
         self.add_attribute(self.owner.id, instance.owner.name)
         if self.description == '':
@@ -688,7 +692,6 @@ class MiDesktopPayload(Payload):
             "Attributes": getattr(self, 'attributes', []),
             "Tasks": getattr(self, 'tasks', []),
             }      #| kwargs
-
 
 
 class PoolPayload(MiDesktopPayload):
