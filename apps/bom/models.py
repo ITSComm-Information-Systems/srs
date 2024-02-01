@@ -452,7 +452,7 @@ class ProjectView(BOM):
 class ItemManager(models.Manager):
 
     def get_active(self):
-        return Item.objects.filter(class_code='IN') 
+        return Item.objects.exclude(class_code='OU').exclude(class_code='T') 
 
 
 class Item(models.Model):
