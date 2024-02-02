@@ -653,7 +653,7 @@ class MiDesktopPayload(Payload):
                     print('error getting image', base_image)
 
             if network_type:
-                self.context['network_display'] = f'{network_type} - {network_name}'
+                self.context['network_type'] = network_type
                     
                 if self.form.data.get('network') == 'new':
                     self.add_attribute(self.shared.id, self.shared.New)
@@ -710,7 +710,6 @@ class PoolPayload(MiDesktopPayload):
             self.form_id = 112
 
         self.add_attribute(self.midesktop_pool_type.id, getattr(self.midesktop_pool_type, instance.type))
-        print(instance.type)
         self.add_attribute(self.pool_name.id, instance.name)
         image_list = instance.images.all()
         if len(image_list) > 0:
@@ -780,7 +779,7 @@ def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
     service = service.upper()
 
-    payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)    
+    payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
         print('TDx response', resp.status_code, resp.text)

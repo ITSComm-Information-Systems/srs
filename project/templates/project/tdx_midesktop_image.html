@@ -12,7 +12,7 @@
         {% if form.cleaned_data.operating_system %}
         <tr><td>Operating System</td><td>{{ form.cleaned_data.operating_system }}</td></tr>
         {% endif %}
-        <tr {%if 'network' in changed_data %}style="font-weight: bold;"{% endif %}><td>Network</td><td>{% firstof network_display form.cleaned_data.network %}</td></tr>
+        <tr {%if 'network' in changed_data %}style="font-weight: bold;"{% endif %}><td>Network</td><td>{{ network_type }}  {{ image.network.name }}</td></tr>
         <tr><td>Disk</td><td>
             <table>
                 {% for disk in image.storage.all|dictsort:"name" %}
