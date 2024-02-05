@@ -627,9 +627,9 @@ class MiDesktopPayload(Payload):
             self.form = kwargs['form']
             self.context['form'] = self.form
             if action == 'New':
-                self.context['cleaned_data'] = []
+                self.context['changed_data'] = []
             else:
-                self.context['cleaned_data'] = self.form.cleaned_data
+                self.context['changed_data'] = self.form.changed_data
 
             base_image = self.form.cleaned_data.get('base_image')
             if base_image == 999999999:
