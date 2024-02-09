@@ -393,13 +393,11 @@ class Volume(models.Model):
 
     def get_tickets(self):
         actions = Action.objects.filter(service=self.service).values_list('id', flat=True)
-        tickets = Item.objects.filter(data__instance_id=self.id
-            , external_reference_id__isnull=False
-            , data__action_id__in=actions)
+        tickets = Ticket.objects.filter(instance_id=self.id, data__action_id__in=actions)
         ticket_list = []
         for ticket in tickets: 
-            ticket_list.append({'id': ticket.external_reference_id
-                              , 'url': f'{TDX_URL}{ticket.external_reference_id}'
+            ticket_list.append({'id': ticket.ticket_id
+                              , 'url': f'{TDX_URL}{ticket.ticket_id}'
                               , 'create_date': ticket.create_date
                               , 'fulfill': ticket.data.get('fulfill')
                               , 'note': render_to_string('order/pinnacle_note.html',
@@ -1118,9 +1116,15 @@ class Item(models.Model):
 
             if route['target'] == 'database':
                 if 'fulfill' in route:
-                    if route['fulfill'] == 'manual' and action.type != 'A':
+                    if route['fulfill'] == 'manual': #and action.type != 'A':
                         self.data['fulfill'] = 'Pending'
                         self.save()
+
+                        if action.type == 'A':
+                            rec = self.update_database(route)
+                            rec.owner = None  # Leave owner blank until order is fulfilled.
+                            rec.save()
+
                         continue
 
                 self.update_database(route)
@@ -1181,6 +1185,8 @@ class Item(models.Model):
 
                 if self.data.get('permittedHosts'):
                     rec.update_hosts(self.data.get('permittedHosts'))
+
+                return rec
 
     def submit_incident(self, route, action):
 
@@ -1563,6 +1569,7 @@ class Attachment(models.Model):
 class Ticket(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
+    create_date = models.DateTimeField()
     instance = models.ForeignKey(ArcInstance, null=True, on_delete=models.DO_NOTHING)
     ticket_id = models.PositiveIntegerField()
     status = models.CharField(max_length=10)
