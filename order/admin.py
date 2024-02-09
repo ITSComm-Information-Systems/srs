@@ -320,12 +320,19 @@ class VolumeAdmin(ServiceInstanceAdmin):
 
     def fulfill_order(self, request):
         item = Item.objects.get(external_reference_id=request.POST['ticket'])
-        instance_id = item.data['instance_id']
+        instance_id = item.data.get('instance_id', item.internal_reference_id)
 
         if request.POST['action'] == 'Cancel':
             item.data['fulfill'] = 'Cancelled'
         else:
-            item.update_database({'record': 'ArcInstance'})
+            if item.data.get('action_type') == 'A':
+                print('update owner')
+                rec = ArcInstance.objects.get(id=instance_id)
+                rec.owner = LDAPGroup().lookup( item.data['owner'] )
+                rec.save()
+            else:
+                item.update_database({'record': 'ArcInstance'})
+
             item.data['fulfill'] = 'Complete'
         
         item.save()
