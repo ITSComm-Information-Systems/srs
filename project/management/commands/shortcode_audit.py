@@ -1,11 +1,7 @@
 from django.core.management.base import BaseCommand
 from project.utils import get_query_result
 from project.models import Email
-<<<<<<< HEAD
 from project.integrations import Slack, MCommunity
-=======
-from project.integrations import Slack
->>>>>>> dj-sf-admin
 import json
 from django.conf import settings
 
@@ -55,7 +51,7 @@ class Command(BaseCommand):
 
         if len(record_list) > 10:  
             msg = f'ERROR: Shortcode Audit {len(record_list)} Records Found.'
-            Slack().send_message(msg, 'srs-errors')
+            Slack(msg)
             if not options['force']: 
                 print('abort')
                 return
@@ -64,7 +60,7 @@ class Command(BaseCommand):
 
         for record in record_list:
             if not record['owner']:
-                Slack().send_message('Shortcode Audit, no owner found', 'srs-errors')
+                Slack('Shortcode Audit, no owner found')
                 continue
 
             to = mc.get_group_email(record['owner'])
@@ -77,4 +73,7 @@ class Command(BaseCommand):
                 email.bcc = email.team_shared_email
                 email.send()
             else:
-                Slack().send_message('Shortcode Audit, no email found', 'srs-errors')
+                Slack('Shortcode Audit, no email found')
+
+
+

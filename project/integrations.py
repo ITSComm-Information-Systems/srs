@@ -838,20 +838,38 @@ def create_ticket_database_modify(instance, user, description):
 
 
 class Slack:
-    AUTH_TOKEN = settings.SLACK_AUTH_TOKEN
     BASE_URL = 'https://slack.com/api/chat.postMessage'
 
-    def send_message(self, message, channel):
-        
-        headers = { 
-            'Authorization': f'Bearer {self.AUTH_TOKEN}',
-            'accept': 'application/json'
+    HEADERS = { 
+                'Authorization': f'Bearer {settings.SLACK_AUTH_TOKEN}',
+                'accept': 'application/json'
             }
+
+    def __init__(self, message, **kwargs):
+
+        if settings.ENVIRONMENT == 'Production':
+            if 'channel' in kwargs:
+                self.channel = kwargs['channel']
+            else:
+                self.channel = 'inf-information-systems-team'
+        else:
+            self.channel = 'srs-testing'
+        
+        response = self._send_message(message)
+        if response.ok:
+            self.thread = response.json().get('ts')
+
+    def send_reply(self, message):        
+        self._send_message(message)
+
+    def _send_message(self, message):
         
         body =  {
-            "channel": channel,
+            "channel": self.channel,
             "text": message,
         }
 
-        url = self.BASE_URL
-        response = requests.post(url, headers=headers, json=body)
+        if hasattr(self,'thread'):
+            body['thread_ts'] = self.thread
+
+        return requests.post(self.BASE_URL, headers=self.HEADERS, json=body)
