@@ -81,12 +81,15 @@
           {{ form.assigned_engineer }}
         </div>
 
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="estimate-label">Engineer Work</span>
+          </div>
+          {{ form.engineer_status }}
+        </div>
+
         <a href="{{ estimate.folder }}" target="_blank"><i class="fas fa-link"></i>&nbsp; Drive Folder</a>
         {{ form.folder }}
-
-        <br>
-        <a href="https://umichprod.service-now.com/nav_to.do?uri=u_bill_of_material.do?sys_id={{ estimate.legacy_id }}"
-          target="_blank">**PRODUCTION BOM***</a>
 
       </div>
 
@@ -243,7 +246,7 @@
         <input class="always-enabled" type="hidden" id="note_woid" name="note_woid" value="{{ estimate.woid }}">
         <div class="modal-body">
           <div class="mb-3">
-            <label for="formGroupExampleInput">Subject</label>
+            <label for="formGroupExampleInput">Author</label>
             <select required class="form-control always-enabled" id="note_subject" name="note_subject">
               <option value="" disabled selected>---</option>
               {% for note_type in form.note_type_list %}
@@ -265,7 +268,6 @@
     </div>
   </div>
 </div>
-
 
 {% endblock %}
 
@@ -313,8 +315,8 @@
 
     status = $("#id_status").val()
     element = $("#element").val()
-    // Lockdown all fields once rejected, completed or cancelled
-    if (status == 0 || status > 3) {
+    // Lockdown all fields once rejected(0), completed(4) or cancelled(5)
+    if (status == 0 || status == 4 || status == 5) {
       $(':input').not('.always-enabled').prop("disabled", true);
       $("#pinNote :input").prop("disabled", false)
       $('#notifyWarehouse').hide();
@@ -337,7 +339,7 @@
       });
     }
     // One ITS
-    if (status != 1) {
+    if (status != 1 && status != 6) {  // Not estimate or approved
       $("#nav-location :input[name^='material-']").prop("readonly", true);
       $('#addEstimateBtn').hide();
     }
@@ -413,6 +415,15 @@
     }
 
   })
+
+
+
+  document.addEventListener("DOMContentLoaded", function() {
+    var selectElement = document.getElementById("id_status");
+    var statusValue = selectElement.value;
+    var selectDisabled = statusValue === "0"; // Disable if "Rejected" option is selected (value is "0")
+    selectElement.disabled = selectDisabled;
+  });
 
 </script>
 {% endblock js %}

@@ -7,13 +7,13 @@ from django.views.generic import View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.forms import modelform_factory, modelformset_factory, inlineformset_factory
-from project.pinnmodels import UmOscPreorderApiV
-from django.db.models import Q, Sum
+from project.pinnmodels import UmOscPreorderApiV,UmRteTechnicianV, UmRteLaborGroupV
+from django.db.models import Q,F, Sum
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
 
-from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, ProjectView, EstimateView, UmOscNoteProfileV, NotificationManager, Notification
+from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, ProjectView, EstimateView, UmOscNoteProfileV, NotificationManager, Notification, Technician
 from .forms import FavoriteForm, EstimateForm, ProjectForm, MaterialForm, MaterialLocationForm, LaborForm
 
 
@@ -85,11 +85,21 @@ class Search(PermissionRequiredMixin, View):
             search_list = EstimateView.objects.all()
             template = 'bom/search_estimates.html'
         elif filter == 'assigned_to_me':
+            template = 'bom/search_estimates_networkengineering.html'
             title = 'Assigned to Me'
-            username = request.user.username
-            open = ['Estimate']
-            search_list = EstimateView.objects.filter(project_manager=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_engineer=username, status__in=EstimateView.OPEN) | EstimateView.objects.filter(assigned_netops=username, status__in=EstimateView.OPEN)
-            template = 'bom/search_estimates.html'
+            search_list = EstimateView.objects.assigned_to(request.user.username)
+
+            all_techs = UmRteTechnicianV.objects.filter(uniqname=request.user.username)
+            if all_techs:
+                tech_id = all_techs[0].labor_code
+                assigned_groups = UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech_id).values_list('wo_group_name',flat=True)
+
+                if 'Network Operations' in assigned_groups:
+                    template = 'bom/search_estimates_networkoperations.html'
+
+                if 'Project Managers' in assigned_groups:
+                    template = 'bom/search_estimates_projectmanagers.html'
+
         else:  # open_workorder
             title = 'Search Open Preorders/Workorders'
             search_list = Workorder.objects.filter(status_name='Open').defer('status_name')
@@ -107,7 +117,8 @@ class Search(PermissionRequiredMixin, View):
 
         return render(request, template,
                       {'title': title,
-                       'search_list': search_list, })
+                       'search_list': search_list,
+                       })
 
 
 @permission_required('bom.can_access_bom')
@@ -294,6 +305,7 @@ class Estimates(PermissionRequiredMixin, View):
     LaborFormSet = inlineformset_factory(Estimate, Labor,  fields=(
         'group', 'description', 'hours', 'rate_type'), can_delete=True)
 
+
     def post(self, request, estimate_id):
         estimate = Estimate.objects.get(id=estimate_id)
         current_tab = request.POST.get('current_tab', '')
@@ -381,7 +393,7 @@ class Estimates(PermissionRequiredMixin, View):
                        'material_formset': material_formset,
                        'labor_formset': labor_formset,
                        'workorder': estimate.workorder,
-                       'estimate': estimate})
+                       'estimate': estimate,})
 
 
 class AddItem(PermissionRequiredMixin, View):
@@ -529,7 +541,32 @@ class NetOpsSearch(PermissionRequiredMixin, View):
     def get(self, request):
         template = 'bom/netops.html'
 
-        search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3) | Q(percent_completed__lt=100)).order_by('-woid')
+        search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3)).order_by('-woid')
         return render(request, template,
-                      {'title': 'Netops Projects',
+                      {'title': 'UMNet Projects',
                        'search_list': search_list})
+    
+class EngineeringSearch(PermissionRequiredMixin, View):
+    permission_required = 'bom.can_access_bom'
+
+    def get(self, request):
+        template = 'bom/engineering_search.html'
+        engineers = Technician.objects.filter(wo_group_code='Network Engineering').values_list('user_name', flat=True)
+
+        for group in request.user.groups.all():
+            print(group.name)
+        search_list = EstimateView.objects.filter(
+            Q(
+                assigned_engineer__in=engineers,
+                status='Estimate',
+                engineer_status='NOT_COMPLETE',
+                status_name='Open') |
+            Q(
+                status_name='Open',
+                status__in=('Approved', 'Ordered', 'Warehouse'),
+                engineer_status = 'NOT_COMPLETE',
+                assigned_engineer__in=engineers)
+            ).order_by(F('estimated_completion_date').desc(nulls_last=True))
+        return render(request, template,
+                    {'title': 'Engineering Projects',
+                    'search_list': search_list})

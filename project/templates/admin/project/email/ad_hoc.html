@@ -24,7 +24,8 @@
 <p>Enter uniqname(s) separated by a comma: <br>
 djamison,jwalfish,rhoffer
 </p>
-<form method="post">
+
+<form method="post" enctype="multipart/form-data">
 {% csrf_token %}
 
 <label for="fname">To:</label>
@@ -33,7 +34,23 @@ djamison,jwalfish,rhoffer
 <input type="text" id="id_cc" name="cc"><br><br>
 <label for="lname">BCC:</label>
 <input type="text" id="id_bcc" name="bcc"><br><br>
-<input type="submit" value="Submit">
+
+
+<label for="distfile">Or Upload a CSV:</label>
+<ul>
+    <li>One email sent per record (excluding heading).</li>
+    <li>Context will be upppercased version of header row.</li>
+    <li>If the heading ends in "_LIST" the field will be converted to a list.</li>
+</ul>
+<p></p>
+
+<input type="file" id="distfile" name="distfile" accept=".csv" />
+
+<input type="submit" name="submit" value="Upload CSV"><br><br>
+
+
+<input type="submit" value="Send Email">
+
 
 </form>
 <br>

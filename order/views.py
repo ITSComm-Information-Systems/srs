@@ -17,6 +17,7 @@ from project.integrations import create_ticket_server_delete
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from ast import literal_eval
+import re
 import cx_Oracle
 import json
 from django.core.files.storage import FileSystemStorage
@@ -139,9 +140,42 @@ def send_tab_data(request):
             item.save()
             return JsonResponse({'redirect': f'/orders/cart/{item.deptid}'}, safe=False)
         else:
-            item.description = label
-            item.save()
-            item.route()
+            data_changed_not_shortcode = False
+            action_name = request.POST.get('action')
+            if action_name == 'Modify MiServer':
+                data = item.data
+                review_summary = data['reviewSummary']
+                pattern = r'^\*'
+                for entry in review_summary:
+                    title = entry['title']
+                    row = entry['fields']
+                    if (title == 'Server Specification'):
+                        for data in row:
+                            label = data['label']
+                            if label == 'Disk Space':
+                                disk_list = data['list']
+                                for disk in disk_list:
+                                    if disk[-1] == '*':
+                                        data_changed_not_shortcode = True
+                    for data in row:
+                        label = data['label']
+                        if re.match(pattern, label):
+                            if label != '*Enter a Billing Shortcode for costs to be billed to':
+                                data_changed_not_shortcode = True
+                item.description = label
+                item.save()
+                if data_changed_not_shortcode: item.route()
+                else: 
+                    item.route(skip_submit_incident=True)
+            else:
+                item.description = label
+                item.save()
+                item.route()
+
+            
+            
+
+            
             return JsonResponse({'redirect': '/requestsent'}, safe=False)
 
     step = Step.objects.get(name=tab_name)
@@ -542,7 +576,7 @@ class Workflow(UserPassesTestMixin, View):
 
                 for element in element_list:
                     if element.type == 'Radio':
-                        field = forms.ChoiceField(label=element.label
+                        field = forms.ChoiceField(label=element.label, help_text = element.help_text
                                                 , choices=eval(element.attributes))
                     elif element.type == 'Chart':
                         field = forms.ChoiceField(label=element.label

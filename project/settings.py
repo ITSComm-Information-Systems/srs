@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'rest_framework',
+    'rest_framework.authtoken',
     'django_extensions',
     'debug_toolbar',
     'order',
@@ -67,7 +68,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAdminUser'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100
+    'PAGE_SIZE': 100,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'oscauth.backends.TokenAuthentication'
+    ]
 }
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'  # Override widgets
@@ -106,6 +112,8 @@ OIDC_RP_SIGN_ALGO = 'RS256'
 LOGIN_REDIRECT_URL = SITE_URL
 LOGOUT_REDIRECT_URL = SITE_URL
 LOGIN_URL = '/oidc/authenticate'
+
+SLACK_AUTH_TOKEN = os.getenv('SLACK_AUTH_TOKEN', 'N/A')
 
 EMAIL_HOST = 'vdc-relay.us-east-2.a.mail.umich.edu'
 EMAIL_PORT = 587
@@ -163,7 +171,8 @@ TEMPLATES = {
                 'tags': 'reports.soc.templatetags.tags',
                 'ccr_tags': 'project.templatetags.ccr_tags',
                 'descr': 'reports.nonteleph.templatetags.descr',
-                'rte_tags': 'apps.rte.templatetags.rte_tags'
+                'rte_tags': 'apps.rte.templatetags.rte_tags',
+                'group_filters': 'apps.bom.templatetags.group_filters'
             }
         },
 },

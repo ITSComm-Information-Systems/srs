@@ -753,6 +753,40 @@ $(document).ready(function() {
     //x[i].style.backgroundColor = "red";
   }
   
+  
+  
+  $(document).on("change", "#id_phoneCategory" , function() {
+    var zoomCat = $('#id_phoneCategory').find(":selected").val();
+    if (zoomCat == 'LN-STAFF' || zoomCat == 'LN-FACULTY' ) {
+      $('#div_Uniqname').show();
+    } else {
+      $('#div_Uniqname').hide();
+      $('#id_Uniqname').val('');
+    }
+
+    if (zoomCat == 'LN-CONFRM' || zoomCat == 'OTHER' ) {
+      $('#div_zoomRoom').show();
+    } else {
+      $('#div_zoomRoom').hide();
+    }
+
+    if (zoomCat == 'OTHER') {
+      $('#div_otherSoftphoneCat').show();
+    } else {
+      $('#div_otherSoftphoneCat').hide();
+    }
+
+  });
+
+
+  $(document).on("change", "#id_zoomRoom" , function() {
+    var zoomRoomYN = $('#id_zoomRoom').find(":selected").val();
+    if (zoomRoomYN == 'Yes') {
+      $('#div_zoomRoomName').show();
+    } else {
+      $('#div_zoomRoomName').hide();
+    }
+  });
 
 
   // Addl info
@@ -767,16 +801,47 @@ $(document).ready(function() {
       $('[data-phoneset="advanced"]').hide();
       $('[data-phoneset="basic"]').show();
       $('[data-phoneset="voip"]').hide();
+      $('[data-tab="zoomOptions"]').hide();
+      $('[data-tab="Restrictions"]').show();
+      $('[data-tab="SelectFeatures"]').show();
     }
     if(this.value=='advanced'){
       $('[data-phoneset="advanced"]').show();
       $('[data-phoneset="basic"]').hide();
       $('[data-phoneset="voip"]').hide();
+      $('[data-tab="zoomOptions"]').hide();
+      $('[data-tab="Restrictions"]').show();
+      $('[data-tab="SelectFeatures"]').show();
     }
-    if(this.value=='voip'){
+    if(this.value=='voip'){  // Zoom
+      $('#div_otherSoftphoneCat').hide();
+      $('#div_zoomRoom').hide();
+      $('#div_zoomRoomName').hide();
+      $('[data-tab="Restrictions"]').hide();
+      $('[data-tab="SelectFeatures"]').hide();
+      $('[data-tab="zoomOptions"]').show();
+
       $('[data-phoneset="advanced"]').hide();
       $('[data-phoneset="basic"]').hide();
       $('[data-phoneset="voip"]').show();
+    }
+
+    if(this.value=='yes_pci'){  // Zoom
+      $("#id_phoneCategory").val("LN-HYLAFAX");
+      $('#div_Uniqname').hide();
+      $("#id_phoneCategory > option").each(function() {
+        if (this.value != "OTHER" && this.value != "LN-HYLAFAX") {
+          $(this).attr('disabled','disabled');
+        }
+      });
+    }
+
+    if(this.value=='no_pci'){  // Zoom
+      $("#id_phoneCategory").val("LN-STAFF");
+      $('#div_Uniqname').show();
+      $("#id_phoneCategory > option").each(function() {
+        $(this).removeAttr('disabled');
+      });
     }
 
     if (this.value=='buy'){

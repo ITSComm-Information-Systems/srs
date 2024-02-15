@@ -6,6 +6,12 @@ from project.pinnmodels import UmRteTechnicianV, UmBomProcurementUsersV, UmEcomm
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 from oscauth.utils import upsert_user
 from oscauth.views import add_custom_permissions
+from rest_framework import authentication
+
+
+class TokenAuthentication(authentication.TokenAuthentication):
+    keyword = 'Bearer'
+
 
 class SuBackend(object):
     supports_inactive_user = False
@@ -30,6 +36,9 @@ class SuBackend(object):
             return None
 
     def has_perm(self, user_obj, perm, obj=None):
+        if not user_obj.username:
+            return
+
         if perm == 'bom.can_access_bom':
             return UmRteTechnicianV.objects.filter(uniqname=user_obj.username).exists()
         elif perm == 'bom.can_update_bom_ordered':

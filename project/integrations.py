@@ -24,7 +24,7 @@ class MCommunity:
         return sorted_list
 
     def get_group(self, name):
-        self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member"])
+        self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member","gidnumber"])
 
         if self.conn.entries:
             self.response = self.conn.entries
@@ -67,7 +67,7 @@ class MCommunity:
         print('add', x, self.conn.response)
 
     def get_user(self, uniqname):
-        self.conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","umichDisplaySn","umichInstRoles","umichHR"])
+        self.conn.search('ou=People,dc=umich,dc=edu', '(uid=' + uniqname + ')', attributes=["uid","mail","user","givenName","umichDisplaySn","umichInstRoles","umichHR","telephoneNumber"])
 
         if self.conn.entries:
             return self.conn.entries[0]
@@ -143,7 +143,8 @@ class Openshift():
                 "annotations": {
                     "openshift.io/description": instance.project_description,
                     "openshift.io/display-name": instance.project_name,
-                    "openshift.io/requester": requester
+                    "openshift.io/requester": requester,
+                    "contact-mcomm-group": instance.admin_group
                 },
         }}
 
@@ -152,11 +153,23 @@ class Openshift():
         else:
             payload['metadata']['labels']['shortcode'] = instance.shortcode
 
+            try:
+                sc = ShortCodesAPI().get_shortcode(instance.shortcode).json()
+                dept_name =  sc['ShortCodes']['ShortCode']['deptDescription']
+                payload['metadata']['annotations']['billing-dept-name'] = dept_name
+            except:
+                print('error getting shortcode')
+
         r = requests.post(f'{self.API_ENDPOINT}/apis/project.openshift.io/v1/projects', headers=self.HEADERS, json=payload)     
-        self.create_role_bindings(instance)
-        self.add_limits(instance)
-        if instance.backup == 'Yes':
-            self.add_backup(instance)
+        if r.ok:
+            self.create_role_bindings(instance)
+            self.add_limits(instance)
+            self.add_network_policy(instance)
+            if instance.backup == 'Yes':
+                self.add_backup(instance)
+        else:
+            print('error', r.status_code, r.text)
+            raise RuntimeError(r.status_code, r.text)
 
     def create_role_bindings(self, instance):
         url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
@@ -186,6 +199,14 @@ class Openshift():
 
         return requests.post(f'{self.API_ENDPOINT}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
                              , headers=self.HEADERS)
+
+    def add_network_policy(self, instance):
+        payload = self.get_yaml('networkpolicy')
+        for item in payload['items']:
+            item['metadata']['namespace'] = instance.project_name
+
+            r = requests.post(f'{self.API_ENDPOINT}/apis/networking.k8s.io/v1/namespaces/{instance.project_name}/networkpolicies'
+                                , headers=self.HEADERS, json=item)
 
     def get_yaml(self, file):
         file = f'{settings.BASE_DIR}/project/rosa/{file}.yaml'
@@ -526,7 +547,7 @@ class ContainerPayload(Payload):
     CONTAINER_TEAM = 7
 
     form_id = 20
-    type_id = 25
+    type_id = 218
     service_id = 13
     responsible_group_id = CONTAINER_TEAM
 
@@ -634,3 +655,41 @@ def create_ticket_database_modify(instance, user, description):
     }
 
     TDx().create_ticket(payload)
+
+
+class Slack:
+    BASE_URL = 'https://slack.com/api/chat.postMessage'
+
+    HEADERS = { 
+                'Authorization': f'Bearer {settings.SLACK_AUTH_TOKEN}',
+                'accept': 'application/json'
+            }
+
+    def __init__(self, message, **kwargs):
+
+        if settings.ENVIRONMENT == 'Production':
+            if 'channel' in kwargs:
+                self.channel = kwargs['channel']
+            else:
+                self.channel = 'inf-information-systems-team'
+        else:
+            self.channel = 'srs-testing'
+        
+        response = self._send_message(message)
+        if response.ok:
+            self.thread = response.json().get('ts')
+
+    def send_reply(self, message):        
+        self._send_message(message)
+
+    def _send_message(self, message):
+        
+        body =  {
+            "channel": self.channel,
+            "text": message,
+        }
+
+        if hasattr(self,'thread'):
+            body['thread_ts'] = self.thread
+
+        return requests.post(self.BASE_URL, headers=self.HEADERS, json=body)

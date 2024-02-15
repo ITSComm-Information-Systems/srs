@@ -38,8 +38,7 @@ class Command(BaseCommand):
 
         call_command('user_deactivation', update=True)
 
-        # Update LDAP Group membership used by storage, etc.
-        for group in LDAPGroup.objects.order_by('name'):
-            group.update_membership()
+        print('Start Group Sync')
+        call_command('mc_sync')
 
         print('end')

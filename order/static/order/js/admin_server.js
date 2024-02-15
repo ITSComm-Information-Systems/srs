@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function(event) { 
-    MDB_ADMIN_GROUP = 1110;
+    MDB_ADMIN_GROUP = 2349226;
 
     document.getElementById("id_managed").addEventListener("change", function(){
         if (this.checked) {

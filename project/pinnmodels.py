@@ -199,7 +199,7 @@ class UmOscServiceProfileV(models.Model):
         return self.service_number
 
 class UmOscPreorderApiAbstract(models.Model):
-   pre_order_id =  models.BigIntegerField( null=True)
+   pre_order_id =  models.BigIntegerField( null=True, primary_key=True)
    category_code =  models.CharField(max_length=4, blank=True, null=True)
    wo_type_category_id =  models.BooleanField(null=True)
    wo_type_category_name =  models.CharField(max_length=240, blank=True, null=True)
@@ -379,7 +379,7 @@ class UmOscPreorderApiAbstract(models.Model):
    add_info_text_1 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="Estimated Hours")
    add_info_text_2 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="Area Of Campus")
    add_info_text_3 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="OSC Order Number")
-   add_info_text_4 =  models.CharField(max_length=512, primary_key=True, verbose_name="OSC Order Item Number")
+   add_info_text_4 =  models.CharField(max_length=512, verbose_name="OSC Order Item Number")
    add_info_text_5 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="V.O.I.P WO")
    add_info_text_6 =  models.CharField(max_length=512, blank=True, null=True, verbose_name="# of Data Act")
    add_info_text_7 =  models.CharField(max_length=512, blank=True, null=True)

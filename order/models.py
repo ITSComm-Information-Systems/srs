@@ -9,6 +9,7 @@ from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
 from project.integrations import MCommunity, TDx
 from project.models import ShortCodeField, Choice
+from project.utils import get_query_result
 from softphone.models import Selection
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
@@ -16,7 +17,7 @@ from django.utils import timezone
 from django.db import connections
 from django.template.loader import render_to_string
 from ast import literal_eval
-import json, io, os, requests
+import json, io, os, requests, time
 import cx_Oracle
 from django.core.exceptions import ValidationError
 from oscauth.utils import get_mc_user, get_mc_group
@@ -519,6 +520,34 @@ class ArcInstance(Volume):
     def get_shortcodes(self):
         return ArcBilling.objects.filter(arc_instance=self)
 
+    def get_user_volumes(self, user, vol_type):
+
+        sql = '''
+            select arc.id, arc.name, grp.name as owner, arc."SIZE",
+
+            (select JSON_ARRAYAGG(json_object('shortcode': shortcode, 'size': "SIZE")  )
+                from srs_order_arcbilling where arc_instance_id = arc.id) as shortcode_list,
+
+            (select label from srs_order_storagerate where id = arc.rate_id) as rate
+
+            from srs_order_arcinstance arc
+
+            , srs_oscauth_ldapgroup grp
+            
+            where arc.owner_id = grp.id
+              and arc.owner_id in (select ldap_group_id
+                                   from srs_oscauth_ldapgroupmember mbr
+                                   where mbr.username = %s)
+
+            and arc.service_id = 9
+            and type = %s
+            order by arc.name
+        '''
+
+        queryset = get_query_result(sql, (user.username,vol_type), json_fields=['shortcode_list'])
+
+        return queryset
+
 
 class ArcHost(VolumeHost):
     arc_instance = models.ForeignKey(ArcInstance, related_name='hosts', on_delete=models.CASCADE)
@@ -770,7 +799,7 @@ class ServerData(models.Model):
 
 
 class Database(models.Model):
-    MDB_ADMIN_GROUP = 1110
+    MDB_ADMIN_GROUP = 2349226
 
     MYSQL = 0
     MSSQL = 1
@@ -916,7 +945,7 @@ class Order(models.Model):
                         noteid = cursor.callproc('pinn_custom.um_note_procedures_k.um_make_blob_an_attachment_p',  ['Note', id,'files', filename, lob] )
 
 
-    def create_preorder(self):
+    def create_preorder(self, tries=3):
 
         self.add_contact()
 
@@ -1001,33 +1030,42 @@ class Order(models.Model):
 
         cursor = connections['pinnacle'].cursor()
 
-        try: 
-            cursor.callproc("dbms_output.enable")
-            ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
+        for attempt in range(1, tries+1):
 
-            self.order_reference = ponum
-            self.save()
-            
-            self.add_attachments()
+            try:
+                cursor.callproc("dbms_output.enable")
+                ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
 
-        except cx_Oracle.DatabaseError as e:
-            LogItem().add_log_entry('Error', self.id, e)
-            num = str(self.id)
-            url = settings.SITE_URL + '/orders/integration/'  + num
-            send_mail('SRS Order # ' + num + ' failed to submit', url, 'itscomm.information.systems@umich.edu', ['itscomm.information.systems@umich.edu'])
-
-        finally:
-            dbms_output = ''
-
-            while True:
-                out = cursor.callproc("dbms_output.get_line", ('',0)) 
-                if out[1] > 0:
-                    break
+                self.order_reference = ponum
+                self.save()
                 
-                dbms_output = dbms_output + out[0] + '\n'
+                self.add_attachments()
+                print(self.id, 'Created', ponum)
+                break
+
+            except cx_Oracle.DatabaseError as e:
+                LogItem().add_log_entry('Error', self.id, e)
+                num = str(self.id)
+                url = settings.SITE_URL + '/orders/integration/'  + num
+                #send_mail('SRS Order # ' + num + ' failed to submit', url, 'itscomm.information.systems@umich.edu', ['itscomm.information.systems@umich.edu'])
+                print(self.id, 'attempt', attempt, 'of', tries, 'failed.')
+                if attempt == tries:
+                    self.order_reference = 'Submitting'  # Indicate this is done with reattempts.
+                    self.save()
+                else:
+                    time.sleep(33)
+
+        dbms_output = ''
+
+        while True:
+            out = cursor.callproc("dbms_output.get_line", ('',0)) 
+            if out[1] > 0:
+                break
             
-            LogItem().add_log_entry('DBMS_OUTPUT', self.id, dbms_output)
-            cursor.close()
+            dbms_output = dbms_output + out[0] + '\n'
+        
+        LogItem().add_log_entry('DBMS_OUTPUT', self.id, dbms_output)
+        cursor.close()
 
 class Item(models.Model):
     description = models.CharField(max_length=100)
@@ -1060,7 +1098,7 @@ class Item(models.Model):
 
         return note
 
-    def route(self):
+    def route(self, skip_submit_incident=False):
         action = Action.objects.get(id=self.data['action_id'])
         routing = action.service.routing
 
@@ -1075,7 +1113,7 @@ class Item(models.Model):
             self.save()
 
         for route in routing['routes']:
-            if route['target'] == 'tdx':
+            if route['target'] == 'tdx' and skip_submit_incident==False:
                 self.submit_incident(route, action) 
 
             if route['target'] == 'database':

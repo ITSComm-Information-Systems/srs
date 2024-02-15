@@ -219,8 +219,15 @@ class GcpaccountChangeForm(CloudForm):
         model = GCPAccount
         fields = ['owner','shortcode']
 
+def validate_project_description(value):
+    print(len(value))
+    if len(value) > 2500:
+        raise ValidationError(f'A project description must be 2500 characters or less. Please use a shorter description')
+
 
 def validate_project_name(value):
+    if len(value) > 40:
+        raise ValidationError(f'A project name must be 40 characters or less. Please select a shorter name.')
     if Openshift().get_project(value).ok:
         raise ValidationError(f'A project with this name already exists.  Please select a different name.')
     
@@ -236,14 +243,14 @@ class ContainerNewForm(CloudForm):
     course_info = forms.CharField(required=False)
     shortcode = forms.CharField(validators=[validate_shortcode], required=False)
     admin_group = forms.ChoiceField(label='Contact Group', help_text='The MCommunity group is used to identify a point of contact should the primary point of contact for this account change. Must be public and contain at least 2 members. The MCommunity group will not be used to define or maintain access to your project. Please omit @umich.edu from your group name in this field.')
-    project_name = forms.CharField(help_text='The project name is a unique identifier used for billing purposes and to generate your unpublished URL (project-name.webplatformsunpublished.umich.edu). Must be lowercase, contain no special characters, and contain no spaces. Hyphens are permitted.',
+    project_name = forms.CharField(help_text='A project is a logical grouping of resources that can be managed together. A project can contain multiple applications, services, and other resources. Projects are used to organize and manage resources in a way that makes sense for your team. The project name must be unique on the hosting cluster. It must be lowercase, contain no special characters, and contain no spaces. Hyphens are permitted.',
                                    validators=[validators.RegexValidator(
                                         regex='^[a-z0-9][0-9a-z\-]*[a-z0-9]$',  # lowercase and hypens, also start and end with a lowercase letter
                                         message="Label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character.",
                                         code='invalid_name'), validate_project_name]
                                    )
 
-    project_description = forms.CharField(required=False, help_text='Used to describe any charges associated with this project on billing invoices.')
+    project_description = forms.CharField(required=False, help_text='Used to describe any charges associated with this project on billing invoices.', validators=[validate_project_description])
     backup = forms.CharField(widget=NoYes, help_text='Selecting "Yes" here will automatically create a backup of the artifacts and persistent volumes associated with your application.')
     admins = forms.CharField(widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should be "Admins" for this project.  Enter one uniqname per line.')
     editors = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "Edit" access to this project.  Enter one uniqname per line.')

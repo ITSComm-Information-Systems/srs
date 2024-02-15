@@ -3,8 +3,8 @@
 <h2>{{ title }}</h2>
 
 
-<div class="d-flex flex-row align-items-center flex-wrap">
-    <input type="search" id="workorder_search" class="form-control d-flex flex-row align-items-center flex-wrap"
+<div class="form-inline">
+    <input type="search" id="workorder_search" class="form-control form-inline"
     aria-label = "Search through site content" placeholder="filter">
     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-1"
         aria-expanded="true" aria-controls="collapse-{{ forloop.counter }}">
@@ -19,10 +19,11 @@
                 <th>Preorder</th>
                 <th>Project</th>
                 <th>Estimate Label</th>
-                <th>Estimate Status</th>
                 <th>PM</th>
                 <th>Engineer</th>
-                <th>UMNet</th>
+                <th>UMNet Engineer</th>
+                <th>UMNet Status</th>
+                <th>Due Date</th>
             </tr>
         </thead>
         <tbody id="workOrderTableBody">
@@ -32,10 +33,12 @@
                 <td>{{ record.pre_order_number }}</td>
                 <td>{{ record.project_display }}</td>
                 <td>{{ record.label }}</td>
-                <td>{{ record.status }}</td>
                 <td>{{ record.project_manager }}</td>
                 <td>{{ record.assigned_engineer }}</td>
                 <td>{{ record.assigned_netops }}</td>
+                <td></td>
+                <td>{{ record.due_date }}</td>
+                
             </tr>
             {% endfor %}
         </tbody>
@@ -49,7 +52,6 @@
 
 {% block js %}
 <script>
-
 
     //$("#div_workorder_table").hide();
 
@@ -65,7 +67,7 @@
         //var estimate = $(this).dataset.estimate_id
         var estimate_id = this.getAttribute('data-estimate_id');
         if (estimate_id != 'None') {
-            window.location.replace("/apps/bom/warehouse/" + estimate_id + "/");
+            window.location.replace("/apps/bom/estimate/" + estimate_id + "/");
         } else {
             var pre_order_id = this.getAttribute('data-pre_order_id');
             //row = $("tr[data-pre_order_id='" + pre_order_id + "']");

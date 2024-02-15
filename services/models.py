@@ -122,7 +122,7 @@ class Container(Cloud):
 
     instance_label = 'Project'
     project_name = models.CharField(max_length=40)
-    project_description = models.CharField(max_length=40)
+    project_description = models.TextField()
     size = models.CharField(max_length=20, choices=SIZE_CHOICES,
                             verbose_name='Container Size',
                             help_text="This sets the upper limit of CPU and RAM available for your containerized applications. This can be changed later via request to Container Service staff. More information about container sizes and rates can be found here: <a href='https://its.umich.edu/computing/virtualization-cloud/container-service/pricing' target='_blank'>https://its.umich.edu/computing/virtualization-cloud/container-service/pricing</a>")
@@ -131,6 +131,7 @@ class Container(Cloud):
                             help_text='The MiDatabase team manages Amazon RDS databases for Container Service customers. Databases in shared instances are available at no cost. The cost of dedicated RDS instances are passed through to the shortcode provided.')
     backup = models.CharField(max_length=6)
     course_info = models.CharField(max_length=20)
+    admin_group = models.CharField(max_length=80)
 
     class Meta:
         managed = False   # We don't want a real table in Oracle but abstract models can't be instantiated.

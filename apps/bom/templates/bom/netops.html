@@ -14,11 +14,9 @@
                 <th>Workorder</th>
                 <th>Preorder</th>
                 <th>Description</th>
-                <th>Netops Engineer</th>
-                <th>SRS Status</th>
+                <th>UMNet Engineer</th>
+                <th>UMNet Status</th>
                 <th>Pinnacle Status</th>
-                <th>Percent Completed</th>
-                <th>Health</th>
                 <th>Assigned Date</th>
                 <th>Due Date</th>
                 <th>Completed Date</th>
@@ -33,8 +31,6 @@
                 <td>{{ record.netops_engineer }}</td>
                 <td>{{ record.get_status_display }}</td>
                 <td>{{ record.status_name }}</td>
-                <td>{{ record.percent_completed }}</td>
-                <td>{{ record.get_health_display }}</td>
                 <td sorttable_customkey={{ record.assigned_date|date:"Ymd" }}>{{ record.assigned_date|date:"N j, Y"|default:"None" }}</td>
                 <td sorttable_customkey={{ record.due_date|date:"Ymd" }}>{{ record.due_date|date:"N j, Y"|default:"None" }}</td>
                 <td sorttable_customkey={{ record.completed_date|date:"Ymd" }}>{{ record.completed_date|date:"N j, Y"|default:"None" }}</td>

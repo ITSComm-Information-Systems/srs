@@ -1,10 +1,12 @@
 import csv, io, requests, decimal
 from django.core.management.base import BaseCommand
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.conf import settings
 from django.core.mail import EmailMessage
-from project.pinnmodels import UmBillInputApiV
+from project.pinnmodels import UmBillInputApiV, UmOscAllActiveAcctNbrsV
 from django.db import connections, connection
+
 
 from datetime import datetime, timedelta
 
@@ -12,6 +14,9 @@ TODAY = int(datetime.now().strftime('%m%d%Y'))
 
 class Command(BaseCommand):
     help = 'Upload Github Billing data for Mi-services to Pinnacle'
+
+    def add_arguments(self, parser):
+        parser.add_argument('--audit')
 
     def handle(self, *args, **options):
 
@@ -24,7 +29,7 @@ class Command(BaseCommand):
 
         csvfile = io.StringIO()
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(['id','cpu','created_date','os_id','os_code','managed','ad_group','shortcode','size','name','rate_name','total_cost','owner'])
+        csvwriter.writerow(['product','unit_type','quantity','total'])
 
         URL = 'https://admin.github.umich.edu/api/v1/billing/srs'
         DEV_URL = 'https://admin.beta.github.umich.edu/api/v1/billing/srs'
@@ -34,6 +39,10 @@ class Command(BaseCommand):
 
         if not r.ok:
             print(r.status_code, r.text)
+            return
+
+        if options.get('audit'):
+            self.shortcode_audit(data)
             return
 
         for key, value in data['github']['shortcodes'].items():  # Loop thorugh all instances
@@ -55,12 +64,13 @@ class Command(BaseCommand):
                 total_cost = total_cost + decimal.Decimal(rec.total_amount)
                 x+=1
 
-                csvwriter.writerow(rec.__dict__)
+                csvwriter.writerow(line.values())
+
 
         print(datetime.now(), f'{x} Records Uploaded, Total Cost: {total_cost}')
 
         self.run_pinnacle_job()
-        self.send_email(csvfile)
+        self.send_email(csvfile, f'Records Loaded: {x} \nTotal Cost: {total_cost}')
 
 
     def run_pinnacle_job(self):
@@ -73,20 +83,28 @@ class Command(BaseCommand):
         
         print(datetime.now(), result)
 
+    def shortcode_audit(self, data):
+        print('Run shortcode Audit')
+        for key, value in data['github']['shortcodes'].items():  # Loop thorugh all instances
 
+            try:
+                acct = UmOscAllActiveAcctNbrsV.objects.get(short_code=value['shortcode'])
+            except ObjectDoesNotExist:
+                print('Project:', key, 'shortcode not found:', value['shortcode'])
+            
 
-    def send_email(self, csvfile):
+    def send_email(self, csvfile, body):
 
         if settings.ENVIRONMENT == 'Production':
             subject = f'GitHub Billing Records Uploaded'
-            to = ['ITComBill@umich.edu', 'itscomm.information.systems@umich.edu']
+            to = ['ITComBill@umich.edu', 'itscomm.information.systems@umich.edu', 'srs-github-billing@umich.edu']
         else:
             subject = f'GitHub Billing Records Uploaded - {settings.ENVIRONMENT}'
             to = ['itscomm.information.systems@umich.edu', 'djamison@umich.edu']
 
         email = EmailMessage(
             subject,
-            'body',
+            body,
             'srs-otto@umich.edu',
             to,
             []

@@ -10,7 +10,7 @@ from django.forms import formset_factory
 import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
-from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV
+from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV, UmOscAvailableLocsV
 from project.models import Choice
 from project.utils import download_csv_from_queryset
 from pages.models import Page
@@ -215,6 +215,51 @@ class PauseUser(LoginRequiredMixin, View):
                 rec.pause(request.user, pause_date, comment)
 
         return HttpResponseRedirect(f'/softphone/pause/{uniqname}')
+
+
+class Deskset(LoginRequiredMixin, View):
+    title = 'Add Deskset'
+    field_list = ['subscriber','service_number','subscriber_uniqname' \
+                ,'subscriber_first_name','subscriber_last_name','dept_id','migrate']
+
+    def get(self, request, dept_id):
+        dept_list = get_department_list(dept_id, request.user)
+        if dept_id == 0:
+            if len(dept_list) == 0:
+                dept_list.zero = 'True'
+            else:
+                dept_list[0].selected = 'selected'
+                dept_id = dept_list[0].dept_id
+
+        phone_list = SelectionV.objects.filter(dept_id=dept_id, migrate='YES', processing_status="Completed")
+
+        return render(request, 'softphone/deskset.html',
+                      {'title': self.title,
+                       'full_list': phone_list,
+                       'building_list': UmOSCBuildingV.objects.all(),
+                       'dept_list': dept_list})
+
+    def post(self, request, dept_id):
+        subscriber = self.request.POST.get('subscriber')
+        selection = Selection.objects.get(subscriber=subscriber)
+
+        if self.request.POST.get('location_correct') == 'No':
+            selection.new_building = self.request.POST.get('building_name')
+            selection.new_building_code = self.request.POST.get('building_code')
+            selection.new_floor = self.request.POST.get('floor')
+            selection.new_room = self.request.POST.get('room')
+            selection.new_jack = self.request.POST.get('jack')
+        else:
+            selection.new_building = selection.building
+            selection.new_building_code = selection.building_code
+            selection.new_floor = selection.floor
+            selection.new_room = selection.room
+            selection.new_jack = selection.jack
+
+        selection.create_deskset_preorder(request.user)
+
+        return render(request, 'softphone/deskset_confirmation.html')
+
 
 
 class StepSubscribers(LoginRequiredMixin, View):
