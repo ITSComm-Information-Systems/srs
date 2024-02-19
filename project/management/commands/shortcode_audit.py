@@ -78,15 +78,3 @@ class Command(BaseCommand):
 
 
 
-
-            to = mc.get_group_email(record['owner'])
-
-            if to:
-                email.context = {"path": PATH, "service": record['service'], "instances": json.loads(record['instances'])}
-                email.to = to
-                email.reply_to = self.REPLY_TO.get(record['service'])
-                email.cc = self.REPLY_TO.get(record['service'])
-                email.bcc = email.team_shared_email
-                email.send()
-            else:
-                Slack().send_message('Shortcode Audit, no email found', 'srs-errors')
