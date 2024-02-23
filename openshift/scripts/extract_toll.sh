@@ -8,7 +8,7 @@ send_slack_message "Unzip Toll File $1"
 
 echo $1
 
-if [ $1 = 'Production' ]
+if [ $1='Production' ]
 then
     DIR='/media/toll'
 else
