@@ -1121,6 +1121,7 @@ class ServerSpecForm(TabForm):
 
         self.fields['public_facing'].disabled = True
         self.fields['public_facing'].initial = False
+        
 
         if database == 'MSSQL':
             self.fields['cpu'].widget.attrs.update({'data-server': 99, 'min': 2})
@@ -1145,6 +1146,7 @@ class ServerSpecForm(TabForm):
 
         #elif database == 'MYSQL':
         else:
+            self.fields['cpu'].widget.attrs.update({'data-server': 99, 'min': 2})
             self.fields['cpu'].initial = 2
             self.fields['misevos'].initial = 8
             self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB', 'state': 'disabled'},

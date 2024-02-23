@@ -127,9 +127,17 @@ $(document).ready(function() {
       pointer = 0;
       vals = []
     }
-
+    $('a[data-toggle="tab"]').each(function(index) {
+      if (index >= currStep) {
+        $(this).addClass('disabled');
+      } else {
+        $(this).removeClass('disabled');
+      }
+    });
   })
-
+  $('body').on('click', 'a[data-toggle="tab"].disabled', function(event) {
+    event.preventDefault();
+  });
 
   var x, i;
   //x = $('input:not(:checkbox)');
