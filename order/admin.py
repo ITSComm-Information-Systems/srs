@@ -252,7 +252,7 @@ class ServerAdmin(ServiceInstanceAdmin):
                         ('on_call', 'support_email', 'support_phone'),
 
                         ('regulated_data','non_regulated_data'),
-                        'managed'
+                        ('managed','production')
                         ),
         }),
         ('Managed', {

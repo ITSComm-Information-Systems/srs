@@ -69,6 +69,9 @@ function deleteDisk(disk){
     if (delbuttons.length > 1){
         delbuttons[delbuttons.length - 1].style.display="block"
     }
+    handleMultiDisk()
+    updateStorageTotal()
+    calculateBaseImageCost()
 }
 
 function addDisk(){

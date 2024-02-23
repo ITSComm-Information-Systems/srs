@@ -604,37 +604,65 @@ class MiDesktopPayload(Payload):
     form_id = 555	             # ITS-MiDesktop - Form
     priority_id = 19 # Medium
 
+    midesktop_request_type = ChoiceAttribute(14642, Pool=46858, Image=46859, Network=46860)  
+    midesktop_pool_type = ChoiceAttribute(14643, external=46861, instant_clone=46862, persistent=46863)  
     new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
     owner = TextAttribute(2343)         # midesktop_MComm group textbox
-    shared = ChoiceAttribute(2344, Yes=0, No=0)        # midesktop_Shared Dedicated dropdown
-    network_type = ChoiceAttribute(2345, Existing=896, New=897, Shared=898)  # private web-access dedicated
+    shared = ChoiceAttribute(2344, New=903, Shared=895, Existing=46881)        # midesktop_Shared Dedicated dropdown
+    #network_type = ChoiceAttribute(2345, Existing=896, New=897, Shared=898)  # private web-access dedicated
     image_type = ChoiceAttribute(2346, Existing=899, New=900, Clone=901)
     image_name = TextAttribute(2347)    # midesktop_Base Image Name textbox
     pool_name = TextAttribute(2348)     # midesktop_Pool Display Name textbox
 
     def __init__(self, action, instance, request, **kwargs):
         self.request = request
-
+        self.instance_type = type(instance).__name__
         self.title = f'MiDesktop {action} {type(instance).__name__}'
+
+        if action == 'New':
+            self.add_attribute(self.midesktop_request_type.id, getattr(self.midesktop_request_type, type(instance).__name__))
+
         if 'form' in kwargs:
 
             self.form = kwargs['form']
             self.context['form'] = self.form
-
-            network_type = self.form.cleaned_data.get('network_type')
-            if network_type:
-                network_display = dict(self.form.fields['network_type'].choices)[network_type]
-                if network_type == 'dedicated':
-                    network_display = network_display + ' - ' + self.form.cleaned_data.get('network_name','')
-                
-                self.context['network_display'] = network_display
-                    
-                if self.form.data.get('network') == 'new':
-                    self.add_attribute(self.network_type.id, self.network_type.New)
+            if action == 'New':
+                self.context['changed_data'] = []
+            else:
+                self.context['changed_data'] = self.form.changed_data
 
             base_image = self.form.cleaned_data.get('base_image')
             if base_image == 999999999:
                 self.add_attribute(self.image_type.id, self.image_type.New)
+            else:
+                self.add_attribute(self.image_type.id, self.image_type.Existing)
+
+            network_type = self.form.cleaned_data.get('network_type')
+            network_name = self.form.cleaned_data.get('network_name')
+
+            if action == 'New' and network_type == '':
+                try:
+                    from services.models import Image as Img
+                    image = Img.objects.get(id=base_image)
+                    if image.network_id:
+                        network_type = 'dedicated'
+                        network_name = image.network.name
+                    else:
+                        network_type = 'shared'
+                except:
+                    print('error getting image', base_image)
+
+            if network_type:
+                self.context['network_type'] = network_type
+                    
+                if self.form.data.get('network') == 'new':
+                    self.add_attribute(self.shared.id, self.shared.New)
+                elif network_type == 'dedicated':
+                    self.add_attribute(self.shared.id, self.shared.Existing)
+                else:
+                    self.add_attribute(self.shared.id, self.shared.Shared)
+
+
 
         self.add_attribute(self.owner.id, instance.owner.name)
         if self.description == '':
@@ -666,7 +694,6 @@ class MiDesktopPayload(Payload):
             }      #| kwargs
 
 
-
 class PoolPayload(MiDesktopPayload):
     service_id = 58  # New Order
     form_id = 85
@@ -682,6 +709,7 @@ class PoolPayload(MiDesktopPayload):
             self.service_id = 65  # Delete Pool
             self.form_id = 112
 
+        self.add_attribute(self.midesktop_pool_type.id, getattr(self.midesktop_pool_type, instance.type))
         self.add_attribute(self.pool_name.id, instance.name)
         image_list = instance.images.all()
         if len(image_list) > 0:
@@ -731,6 +759,8 @@ class ImagePayload(MiDesktopPayload):
 class NetworkPayload(MiDesktopPayload):
     template = 'project/tdx_midesktop_network.html'
     UMNET = 14
+    form_id = 85
+    service_id = 58  # New Order
 
     def __init__(self, action, instance, request, **kwargs):
         self.attributes = []
@@ -738,17 +768,6 @@ class NetworkPayload(MiDesktopPayload):
         self.tasks = []
         if action == 'New':
             self.add_attribute(self.network_type.id, self.network_type.New)
-
-            descr = '''Please create a new VDI Network and trunk to all 10 MiDesktop hosts per the UMNet wiki instructions:
-
-                        https://wiki.umnet.umich.edu/Virtualization#.22NEW.22.C2.A0MACC_VDI_Cluster
-
-                        1. Set up the VLAN using the provided information.
-                        2. Be Sure DHCP is configured and enabled.
-                        3. Have NSO add it to the MACC-VDI firewall context.
-                        4. Contact midesktop.support@umich.edu if problems arise or additional info is needed.'''
-
-            self.tasks.append( {'Title': 'Create New VDI Network', "ResponsibleGroupID": self.UMNET, "Description": descr} )
 
         if action == 'Delete':
             self.description = f'Delete Network: {instance.name}'
@@ -760,7 +779,7 @@ def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
     service = service.upper()
 
-    payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)    
+    payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
         print('TDx response', resp.status_code, resp.text)

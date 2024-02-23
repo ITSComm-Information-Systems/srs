@@ -169,6 +169,9 @@ class Image(MiDesktop):
     shared_network = models.BooleanField(default=True)
     network = models.ForeignKey("Network", on_delete=models.CASCADE, null=True, blank=True)
 
+    def is_foreign_key_in_pool(self):
+        return Pool.objects.filter(images=self).exists()
+
     @cached_property
     def total_storage_size(self):
         storage = ImageDisk.objects.filter(image=self).aggregate(models.Sum('size'))
@@ -203,7 +206,10 @@ class Network(MiDesktop):
     instance_label = 'Network Name'
     name = models.CharField(unique=True,blank=True, max_length=80)
     size = models.CharField(blank=True, max_length=80)
+    vlan_id = models.IntegerField(blank=True, null=True)
 
+    def is_foreign_key_in_image(self):
+        return Image.objects.filter(network=self).exists()
     class Meta:
         verbose_name = 'MiDesktop Network'
 
@@ -219,7 +225,7 @@ class Pool(MiDesktop):
     instance_label = 'Pool Name'
     shortcode = models.CharField(max_length=6)
     name = models.CharField(unique=True,max_length=40, verbose_name='Pool Name', default='TBD')
-    type = models.CharField(default='instant-clone',max_length=30,)
+    type = models.CharField(default='instant_clone',max_length=30,)
     quantity = models.IntegerField()
     images = models.ManyToManyField(Image)
 
@@ -230,7 +236,7 @@ class Pool(MiDesktop):
             total_cost = self.quantity * 10
         else:
             for image in self.images.all():
-                total_cost += image.total_cost
+                total_cost += image.total_cost * self.quantity
         if total_cost == 0:
             return round(0.00,2)
         
