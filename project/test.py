@@ -7,27 +7,8 @@ from django.contrib.auth.models import User
 
 def login_as_user(username):
     c = Client()
-    c.force_login(User.objects.get(username='testymac'), backend='django.contrib.auth.backends.ModelBackend')
-
-    # TODO call change_user directly
-    user = User.objects.get(username=username)
-    response = c.post("/auth/su_login/", {'user': [user.id], 'submit': ['Change Login']})
-    print('su', response.status_code)
-
+    c.force_login(User.objects.get(username=username), backend='django.contrib.auth.backends.ModelBackend')
     return c
-
-
-class AdHoc(TestCase):
-    def setUp(self):
-        self.client = login_as_user('djamison')
-
-    def test_pools(self):
-        # New Pool, Existing Image
-        image = Image.objects.get(name='Nicktestimage')
-        new_pool = {'admin_group': ['ITSComm Information Systems'], 'shortcode': ['940479'], 'pool_name': ['dj-pool-reuse-image'], 'pool_type': ['instant_clone'], 'auto_logout': ['Never'], 'ad_container': ['1'], 'base_image': [image.id], 'image_name': [''], 'initial_image': ['Blank'], 'operating_system': ['Windows10 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['2'], 'memory_cost': ['1.92'], 'disk-TOTAL_FORMS': ['1'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'storage_cost': ['5.00'], 'multi_disk': ['50,'], 'gpu': ['False'], 'gpu_cost': ['0.00'], 'total': ['39.38'], 'pool_quantity': ['25'], 'pool_total': ['1112.25'], 
-                    'network_name': [''], 'access_internet': ['True'], 'mask': ['16'], 'protection': ['datacenter'], 'technical_contact': [''], 'business_contact': [''], 'security_contact': [''], 'additional_details': ['New Pool, Existing Image'], 'sla': ['on']}
-        response = self.client.post("/services/midesktop/add/", new_pool)
-        self.assertEqual(response.status_code, 302)
 
 
 class NewPool(TestCase):
@@ -83,5 +64,10 @@ class NewPool(TestCase):
         response = self.client.post("/services/midesktop-image/add/", data)
         self.assertEqual(response.status_code, 302)
 
+    def test_networks(self):
+        data = {'admin_group': ['ITSComm Information Systems'], 'purpose': ['Flipper'], 'access_internet': ['True'], 'mask': ['16'], 'dhcp': ['true'], 'protection': ['datacenter'], 'technical_contact': ['djamison@umich.edu'], 'business_contact': ['djamison@umich.edu'], 'security_contact': ['djamison@umich.edu']}
+        response = self.client.post("/services/midesktop-network/add/", data)
+        self.assertEqual(response.status_code, 302)
 
-
+        response = self.client.get("/services/midesktop-network/", data)  # View all networks
+        self.assertEqual(response.status_code, 200)
