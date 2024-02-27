@@ -37,6 +37,10 @@
             <h2>Order New Pool</h2>
             <h6 style="color:red; font-size:12px;">{{form.pool_name.errors}}{{form.image_name.errors}}{{form.network_name.errors}}</h6>
             <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_name.label_tag}}{{form.pool_name}}</h6>
+
+            <h6 style="color:red; font-size:12px;">{{form.pool_accessibility.errors}}</h6>
+            <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_accessibility.label_tag}}{{form.pool_accessibility}}</h6>
+
             <div id="pool_type">
                 <h6><span style="color:red; font-size:12px;">*</span>Pool Type:
                     <select class="form-control" name="pool_type" id="id_pool_type" v-model="selectedPoolType">

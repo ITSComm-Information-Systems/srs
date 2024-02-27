@@ -778,8 +778,8 @@ class NetworkPayload(MiDesktopPayload):
         self.attributes = []
         self.context = {}
         self.tasks = []
-        if action == 'New':
-            self.add_attribute(self.network_type.id, self.network_type.New)
+        #if action == 'New':
+        #    self.add_attribute(self.network_type.id, self.network_type.New)
 
         if action == 'Delete':
             self.description = f'Delete Network: {instance.name}'
