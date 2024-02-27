@@ -23,6 +23,18 @@ class MCommunity:
 
         sorted_list = sorted(group_list, key=str.casefold)
         return sorted_list
+    
+    def get_groups_with_id(self, uniqname):
+        self.conn.search('ou=Groups,dc=umich,dc=edu', '(&(umichDirectMember=uid=' + uniqname + ',ou=People,dc=umich,dc=edu)(joinable=False))'
+                        ,  attributes=["gidnumber"])
+        groups_json = []
+        for entry in self.conn.entries:
+            id = entry.entry_attributes_as_dict['gidnumber'][0]
+            name = entry.entry_dn[3:-41]
+            groups_json.append(
+                {"id": id, "name": name}
+            )
+        return groups_json
 
     def get_group(self, name):
         self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member","gidnumber"])
