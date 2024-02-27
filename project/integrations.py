@@ -34,7 +34,7 @@ class MCommunity:
             groups_json.append(
                 {"id": id, "name": name}
             )
-        return groups_json
+        return sorted(groups_json, key=lambda k: k['name'])
 
     def get_group(self, name):
         self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member","gidnumber"])
@@ -792,6 +792,7 @@ def create_ticket(action, instance, request, **kwargs):
     service = service.upper()
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
+    return
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
         print('TDx response', resp.status_code, resp.text)
