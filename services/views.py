@@ -11,10 +11,12 @@ import json
 
 
 def user_has_access(user, owner):
-    try:
-        x = LDAPGroupMember.objects.get(username=user.username, ldap_group_id=owner.id)
+    mc = MCommunity()
+    mc.get_group(owner.name)
+
+    if user.username in mc.members:
         return True
-    except:
+    else:
         return False
 
 
