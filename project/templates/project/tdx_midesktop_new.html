@@ -18,7 +18,14 @@
             {% if form.cleaned_data.ad_container %}
             <tr><td>AD Container</td><td>{{ form.cleaned_data.ad_container }}</td></tr>
             {% endif %}
-
+            {% if image_list %}
+            <tr><td>Image List</td><td>
+            {% for image in image_list %}
+                {% autoescape off %}
+                {{ image }}<br>
+                {% endautoescape %}
+            {% endfor %}</td></tr>
+            {% endif %}
         </tbody>
     </table>
 </div>

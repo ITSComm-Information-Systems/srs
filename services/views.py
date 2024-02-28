@@ -373,8 +373,9 @@ class ServiceChangeView(UserPassesTestMixin, View):
                 template = 'services/midesktop-external_change.html'
                 form = ExternalPoolChangeForm(request.POST, user = self.request.user, instance = instance)
             if form.is_valid():
+                old_images = list(form.instance.images.all().values_list('name', flat=True))  # Capture this for reference in the ticket.
                 form.save()
-                r = create_ticket('Modify', instance, request, form=form)
+                r = create_ticket('Modify', instance, request, form=form, old_images=old_images)
                 return HttpResponseRedirect('/requestsent')
             else:
                 print(form.errors)
