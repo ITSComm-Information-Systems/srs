@@ -792,7 +792,6 @@ def create_ticket(action, instance, request, **kwargs):
     service = service.upper()
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
-    return
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
         print('TDx response', resp.status_code, resp.text)
