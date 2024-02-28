@@ -34,7 +34,7 @@ class MCommunity:
             groups_json.append(
                 {"id": id, "name": name}
             )
-        return groups_json
+        return sorted(groups_json, key=lambda k: k['name'])
 
     def get_group(self, name):
         self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member","gidnumber"])
