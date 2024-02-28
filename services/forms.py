@@ -362,7 +362,7 @@ class StorageForm(forms.Form):
 StorageFormSet = formset_factory(StorageForm, extra=1)
 
 class CalculatorForm(forms.Form):
-    cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
+    cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES, label="CPU")
     cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
     memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
@@ -439,10 +439,11 @@ class MiDesktopNewForm(MiDesktopForm):
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
     pool_type = forms.ChoiceField(label='Pool Type', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent"),("external","External")))
     pool_name = forms.CharField(required=True)
+    pool_accessibility = forms.ChoiceField(choices=(('No Restriction','No Restriction'),('Publicly Available','Publicly Available'),('From UMNet Only','From UMNet Only')),required=True)
     auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('1min','1 Minute'),('5min','5 Minutes'),('15min','15 Minutes'),('30min','30 Minutes'),
                                                                 ('1hr','1 Hour'),('2hr','2 Hours'),('4hr','4 Hours'),('8hr','8 Hours'),('12hr','12 Hours'),
                                                                 ('16hr','16 Hours'),('20hr','20 Hours'),('24hr','24 Hours')))
-    ad_container = forms.CharField(required=False,)
+    ad_container = forms.CharField(required=False, label="AD Container")
     base_image = forms.IntegerField(required=False)
     pool_quantity = forms.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(200)])
     pool_total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
@@ -451,7 +452,7 @@ class MiDesktopNewForm(MiDesktopForm):
     initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
     operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),('Windows11 64bit','Windows11 64bit')))
 
-    cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES)
+    cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES, label="CPU")
     cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
     memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
@@ -511,6 +512,9 @@ class MiDesktopNewForm(MiDesktopForm):
         else:
             self.fields['base_image'].required = False
             self.fields['ad_container'].required = False
+
+        if pool_type == 'instant_clone':
+            self.fields['ad_container'].required = True
 
         if base_image_id == 999999999:
             self.fields['image_name'].required = True

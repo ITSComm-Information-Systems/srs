@@ -11,10 +11,12 @@ import json
 
 
 def user_has_access(user, owner):
-    try:
-        x = LDAPGroupMember.objects.get(username=user.username, ldap_group_id=owner.id)
+    mc = MCommunity()
+    mc.get_group(owner.name)
+
+    if user.username in mc.members:
         return True
-    except:
+    else:
         return False
 
 
@@ -148,7 +150,8 @@ class ServiceRequestView(UserPassesTestMixin, View):
         request.session['backupStorage'] = 'midesktop'
         if service == 'midesktop':
             form = MiDesktopNewForm(user=self.request.user)
-            groups = LDAPGroupMember.objects.filter(username=self.request.user).order_by('ldap_group')
+            #groups = LDAPGroupMember.objects.filter(username=self.request.user).order_by('ldap_group')
+            groups = MCommunity().get_groups_with_id(self.request.user.username)
             network_groups = list(LDAPGroupMember.objects.filter(username=self.request.user).values_list('ldap_group_id',flat=True))
             networks = Network.objects.filter(status='A',owner__in=network_groups).order_by('name')
             images = Image.objects.filter(status='A',owner__in=network_groups).order_by('name')
@@ -159,10 +162,6 @@ class ServiceRequestView(UserPassesTestMixin, View):
                     "name": network.name,
                     "owner": network.owner_id
                 })
-            
-            group_list = []
-            for group in groups:
-                group_list.append({'name':group.ldap_group.name,'id':group.ldap_group_id})
 
             image_list = []
             for image in images:
@@ -177,7 +176,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
             context = {}
             context["form"] = form
-            context["groups_json"] = json.dumps(group_list)
+            context["groups_json"] = json.dumps(groups)
             context["network_json"] = json.dumps(network_list)
             context["image_json"] = json.dumps(image_list)
 
@@ -188,8 +187,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
                 'form':form})
         if service == 'midesktop-image':
             form = MiDesktopNewImageForm(user=self.request.user)
-            #groups = MCommunity().get_groups(self.request.user.username)
-            groups = LDAPGroupMember.objects.filter(username=self.request.user).order_by('ldap_group')
+            groups = MCommunity().get_groups_with_id(self.request.user.username)
             network_groups = list(LDAPGroupMember.objects.filter(username=self.request.user).values_list('ldap_group_id',flat=True))
             networks = Network.objects.filter(status='A',owner__in=network_groups).order_by('name')
             network_list = []
@@ -199,14 +197,10 @@ class ServiceRequestView(UserPassesTestMixin, View):
                     "name": network.name,
                     "owner": network.owner_id
                 })
-            
-            group_list = []
-            for group in groups:
-                group_list.append({'name':group.ldap_group.name,'id':group.ldap_group_id})
 
             context = {}
             context["form"] = form
-            context["groups_json"] = json.dumps(group_list)
+            context["groups_json"] = json.dumps(groups)
             context["network_json"] = json.dumps(network_list)
             context["calculator_form"] = CalculatorForm(initial={
                 'multi_disk': '50,'
@@ -379,8 +373,9 @@ class ServiceChangeView(UserPassesTestMixin, View):
                 template = 'services/midesktop-external_change.html'
                 form = ExternalPoolChangeForm(request.POST, user = self.request.user, instance = instance)
             if form.is_valid():
+                old_images = list(form.instance.images.all().values_list('name', flat=True))  # Capture this for reference in the ticket.
                 form.save()
-                r = create_ticket('Modify', instance, request, form=form)
+                r = create_ticket('Modify', instance, request, form=form, old_images=old_images)
                 return HttpResponseRedirect('/requestsent')
             else:
                 print(form.errors)

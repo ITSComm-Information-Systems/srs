@@ -23,6 +23,18 @@ class MCommunity:
 
         sorted_list = sorted(group_list, key=str.casefold)
         return sorted_list
+    
+    def get_groups_with_id(self, uniqname):
+        self.conn.search('ou=Groups,dc=umich,dc=edu', '(&(umichDirectMember=uid=' + uniqname + ',ou=People,dc=umich,dc=edu)(joinable=False))'
+                        ,  attributes=["gidnumber"])
+        groups_json = []
+        for entry in self.conn.entries:
+            id = entry.entry_attributes_as_dict['gidnumber'][0]
+            name = entry.entry_dn[3:-41]
+            groups_json.append(
+                {"id": id, "name": name}
+            )
+        return sorted(groups_json, key=lambda k: k['name'])
 
     def get_group(self, name):
         self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member","gidnumber"])
@@ -630,7 +642,6 @@ class MiDesktopPayload(Payload):
                 self.context['changed_data'] = []
             else:
                 self.context['changed_data'] = self.form.changed_data
-
             base_image = self.form.cleaned_data.get('base_image')
             if base_image == 999999999:
                 self.add_attribute(self.image_type.id, self.image_type.New)
@@ -662,7 +673,20 @@ class MiDesktopPayload(Payload):
                 else:
                     self.add_attribute(self.shared.id, self.shared.Shared)
 
+            if 'old_images' in kwargs:
+                old_images = kwargs['old_images']
+                new_images = list(instance.images.all().values_list('name', flat=True))
+                image_list = []
 
+                for image in set(old_images + new_images):
+                    print(image, type(image))
+                    if image not in old_images:
+                        image = f'<b>{image} (Add)</b>'
+                    elif image not in new_images:
+                        image = f'<b>{image} (Remove)</b>'
+                    image_list.append(image)
+                    
+                self.context['image_list'] = image_list
 
         self.add_attribute(self.owner.id, instance.owner.name)
         if self.description == '':
@@ -766,8 +790,8 @@ class NetworkPayload(MiDesktopPayload):
         self.attributes = []
         self.context = {}
         self.tasks = []
-        if action == 'New':
-            self.add_attribute(self.network_type.id, self.network_type.New)
+        #if action == 'New':
+        #    self.add_attribute(self.network_type.id, self.network_type.New)
 
         if action == 'Delete':
             self.description = f'Delete Network: {instance.name}'

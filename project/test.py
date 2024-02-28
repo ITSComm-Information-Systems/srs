@@ -7,81 +7,94 @@ from django.contrib.auth.models import User
 
 def login_as_user(username):
     c = Client()
-    c.force_login(User.objects.get(username='testymac'), backend='django.contrib.auth.backends.ModelBackend')
-
-    # TODO call change_user directly
-    user = User.objects.get(username=username)
-    response = c.post("/auth/su_login/", {'user': [user.id], 'submit': ['Change Login']})
-    print('su', response.status_code)
-
+    c.force_login(User.objects.get(username=username), backend='django.contrib.auth.backends.ModelBackend')
     return c
 
 
-class AdHoc(TestCase):
+class MiDesktop(TestCase):
     def setUp(self):
         self.client = login_as_user('djamison')
 
     def test_pools(self):
-        # New Pool, Existing Image
-        image = Image.objects.get(name='Nicktestimage')
-        new_pool = {'admin_group': ['ITSComm Information Systems'], 'shortcode': ['940479'], 'pool_name': ['dj-pool-reuse-image'], 'pool_type': ['instant_clone'], 'auto_logout': ['Never'], 'ad_container': ['1'], 'base_image': [image.id], 'image_name': [''], 'initial_image': ['Blank'], 'operating_system': ['Windows10 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['2'], 'memory_cost': ['1.92'], 'disk-TOTAL_FORMS': ['1'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'storage_cost': ['5.00'], 'multi_disk': ['50,'], 'gpu': ['False'], 'gpu_cost': ['0.00'], 'total': ['39.38'], 'pool_quantity': ['25'], 'pool_total': ['1112.25'], 
-                    'network_name': [''], 'access_internet': ['True'], 'mask': ['16'], 'protection': ['datacenter'], 'technical_contact': [''], 'business_contact': [''], 'security_contact': [''], 'additional_details': ['New Pool, Existing Image'], 'sla': ['on']}
-        response = self.client.post("/services/midesktop/add/", new_pool)
-        self.assertEqual(response.status_code, 302)
-
-
-class NewPool(TestCase):
-    def setUp(self):
-        self.client = login_as_user('djamison')
-
-    def test_pools(self):
-        # New Pool, New Image, New Network
-        # dj-pool-allnew, dj-bass-image, dj-newnet32
-        data = {'admin_group': ['ITSComm Information Systems'], 'shortcode': ['940479'], 'pool_name': ['dj-pool-allnew'], 'pool_type': ['instant_clone'], 'auto_logout': ['Never'], 'ad_container': ['1'], 'base_image': ['999999999'], 'image_name': ['dj-bass-image'], 'initial_image': ['Blank'], 'operating_system': ['Windows10 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['2'], 'memory_cost': ['1.92'], 'disk-TOTAL_FORMS': ['1'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'storage_cost': ['5.00'], 'multi_disk': ['50,'], 'gpu': ['False'], 'gpu_cost': ['0.00'], 'total': ['39.38'], 'pool_quantity': ['10'], 'pool_total': ['393.80'], 
-                'network_type': ['dedicated'], 'network': ['new'], 'network_name': ['dj-newnet32'], 'access_internet': ['True'], 'mask': ['32'], 'protection': ['datacenter'], 'technical_contact': ['djamison@umich.edu'], 'business_contact': ['djamison@umich.edu'], 'security_contact': ['djamison@umich.edu'], 'additional_details': ['New Pool, New Image, New Network'], 'sla': ['on']}
+        test = 'New Instant Clone Pool, New Image, New Network'
+        data = {'admin_group': ['ITSComm Information Systems'], 'shortcode': ['940314'], 'pool_name': ['dj-pool-instant'], 'pool_accessibility': ['From UMNet Only'], 'pool_type': ['instant_clone'], 'auto_logout': ['Never'], 'ad_container': [''], 'base_image': ['999999999'], 'image_name': ['dj-bass-image'], 'initial_image': ['Standard'], 'operating_system': ['Windows10 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['2'], 'memory_cost': ['1.92'], 'disk-TOTAL_FORMS': ['2'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'disk-1-size': ['100'], 'disk-1-cost': ['10.00'], 'storage_cost': ['15.00'], 'multi_disk': ['50,100,'], 'gpu': ['True'], 'gpu_cost': ['6.07'], 'total': ['55.45'], 'pool_quantity': ['1'], 'pool_total': ['55.45'], 'network_type': ['dedicated'], 'network': ['new'], 'network_name': ['dj-net-32'], 'access_internet': ['True'], 'mask': ['32'], 'protection': ['datacenter'], 'technical_contact': ['djamison@umich.edu'], 'business_contact': ['rhoffer@umich.edu'], 'security_contact': ['jwalfish@umich.edu'], 'additional_details': [test], 'sla': ['on']}
         response = self.client.post("/services/midesktop/add/", data)
-        self.assertEqual(response.status_code, 302)
-        network = Network.objects.get(name='dj-newnet32')
+        self.assertEqual(response.status_code, 302, test)
+        network = Network.objects.get(name='dj-net-32')
 
-        # New Pool, New Image, Shared Web Access Network
-        new_image = {'admin_group': ['ITSComm Information Systems'], 'shortcode': ['940479'], 'pool_name': ['dj-newimage'], 'pool_type': ['instant_clone'], 'auto_logout': ['Never'], 'ad_container': [''], 'base_image': ['999999999'], 'image_name': ['dj-base-10'], 'initial_image': ['Blank'], 'operating_system': ['Windows11 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['2'], 'memory_cost': ['1.92'], 'disk-TOTAL_FORMS': ['1'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'storage_cost': ['5.00'], 'multi_disk': ['50,'], 'gpu': ['True'], 'gpu_cost': ['6.07'], 'total': ['45.45'], 'pool_quantity': ['20'], 'pool_total': ['909.00'], 
-                     'network_type': ['web-access'], 'network_name': [''], 'access_internet': ['True'], 'mask': ['16'], 'protection': ['datacenter'], 'technical_contact': [''], 'business_contact': [''], 'security_contact': [''], 'additional_details': ['New Pool, New Image, Shared Web Access Network'], 'sla': ['on']}
-        response = self.client.post("/services/midesktop/add/", new_image)
-        self.assertEqual(response.status_code, 302)
-
-        # New Pool, New Image, Existing Dedicated
-        data = {'admin_group': ['ITSComm Information Systems'], 'shortcode': ['940479'], 'pool_name': ['dj-pool-new-image-existingnetwork'], 'pool_type': ['instant_clone'], 'auto_logout': ['Never'], 'ad_container': [''], 'base_image': ['999999999'], 'image_name': ['dj-base-2'], 'initial_image': ['Blank'], 'operating_system': ['Windows10 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['2'], 'memory_cost': ['1.92'], 'disk-TOTAL_FORMS': ['1'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'storage_cost': ['5.00'], 'multi_disk': ['50,'], 'gpu': ['False'], 'gpu_cost': ['0.00'], 'total': ['39.38'], 'pool_quantity': ['1'], 'pool_total': ['39.38'], 
-                'network_type': ['dedicated'], 'network': [network.id], 'network_name': [''], 'access_internet': ['True'], 'mask': ['16'], 'protection': ['datacenter'], 'technical_contact': [''], 'business_contact': [''], 'security_contact': [''], 'additional_details': ['New Pool, New Image, Existing Dedicated'], 'sla': ['on']}
+        test = 'New Persistent Pool, New image, Shared Network (Web-Access)'
+        data = {'admin_group': ['ITSComm Information Systems'], 'shortcode': ['940314'], 'pool_name': ['dj-pool-persistent'], 'pool_accessibility': ['Publicly Available'], 'pool_type': ['persistent'], 'auto_logout': ['Never'], 'ad_container': [''], 'base_image': ['999999999'], 'image_name': ['dj-image-large'], 'initial_image': ['Blank'], 'operating_system': ['Windows11 64bit'], 'cpu': ['2'], 'cpu_cost': ['2.30'], 'memory': ['4'], 'memory_cost': ['3.84'], 'disk-TOTAL_FORMS': ['1'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'storage_cost': ['5.00'], 'multi_disk': ['50,'], 'gpu': ['True'], 'gpu_cost': ['6.07'], 'total': ['48.52'], 'pool_quantity': ['1'], 'pool_total': ['48.52'], 'network_type': ['web-access'], 'network_name': [''], 'access_internet': ['True'], 'mask': ['16'], 'protection': ['datacenter'], 'technical_contact': [''], 'business_contact': [''], 'security_contact': [''], 'additional_details': [test], 'sla': ['on']}
         response = self.client.post("/services/midesktop/add/", data)
-        self.assertEqual(response.status_code, 302)
-        image = Image.objects.get(name='dj-base-2')
-        self.assertEqual(image.memory, 2)
+        self.assertEqual(response.status_code, 302, test)
+        large_image = Image.objects.get(name='dj-image-large')
 
-        # New Pool, Existing Image
-        new_pool = {'admin_group': ['ITSComm Information Systems'], 'shortcode': ['940479'], 'pool_name': ['dj-pool-reuse-image'], 'pool_type': ['instant_clone'], 'auto_logout': ['Never'], 'ad_container': ['1'], 'base_image': [image.id], 'image_name': [''], 'initial_image': ['Blank'], 'operating_system': ['Windows10 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['2'], 'memory_cost': ['1.92'], 'disk-TOTAL_FORMS': ['1'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'storage_cost': ['5.00'], 'multi_disk': ['50,'], 'gpu': ['False'], 'gpu_cost': ['0.00'], 'total': ['39.38'], 'pool_quantity': ['25'], 'pool_total': ['1112.25'], 
-                    'network_name': [''], 'access_internet': ['True'], 'mask': ['16'], 'protection': ['datacenter'], 'technical_contact': [''], 'business_contact': [''], 'security_contact': [''], 'additional_details': ['New Pool, Existing Image'], 'sla': ['on']}
-        response = self.client.post("/services/midesktop/add/", new_pool)
-        self.assertEqual(response.status_code, 302)
+        test = 'New Instant Clone Pool, reuse image+network.'
+        bass_image = Image.objects.get(name='dj-bass-image')
+        data = {'admin_group': ['ITSComm Information Systems'], 'shortcode': ['940314'], 'pool_name': ['dj-pool-reuse-image'], 'pool_accessibility': ['No Restriction'], 'pool_type': ['instant_clone'], 'auto_logout': ['Never'], 'ad_container': [''], 'base_image': [bass_image.id], 'image_name': [''], 'initial_image': ['Blank'], 'operating_system': ['Windows10 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['2'], 'memory_cost': ['1.92'], 'disk-TOTAL_FORMS': ['1'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'storage_cost': ['5.00'], 'multi_disk': ['50,'], 'gpu': ['False'], 'gpu_cost': ['0.00'], 'total': ['39.38'], 'pool_quantity': ['25'], 'pool_total': ['1362.25'], 'network_name': [''], 'access_internet': ['True'], 'mask': ['16'], 'protection': ['datacenter'], 'technical_contact': [''], 'business_contact': [''], 'security_contact': [''], 'additional_details': [test], 'sla': ['on']}
+        response = self.client.post("/services/midesktop/add/", data)
+        self.assertEqual(response.status_code, 302, test)
+
+        test = 'New external pool'
+        data = {'admin_group': ['ITSComm Information Systems'], 'shortcode': ['940314'], 'pool_name': ['dj-pool-external'], 'pool_accessibility': ['No Restriction'], 'pool_type': ['external'], 'auto_logout': ['Never'], 'ad_container': [''], 'image_name': [''], 'initial_image': ['Blank'], 'operating_system': ['Windows10 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['2'], 'memory_cost': ['0.96'], 'disk-TOTAL_FORMS': ['1'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.0'], 'storage_cost': ['5.0'], 'multi_disk': [''], 'gpu': ['False'], 'gpu_cost': ['0.0'], 'total': ['38.42'], 'pool_quantity': ['10'], 'pool_total': ['100.00'], 'network_name': [''], 'access_internet': ['True'], 'mask': ['16'], 'protection': ['datacenter'], 'technical_contact': [''], 'business_contact': [''], 'security_contact': [''], 'additional_details': [test], 'sla': ['on']}
+        response = self.client.post("/services/midesktop/add/", data)
+        self.assertEqual(response.status_code, 302, test)
+        
+        response = self.client.get("/services/midesktop/")
+        self.assertEqual(response.status_code, 200, 'View all Desktops')
+
+        test = 'Change dj-pool-external quantity to 20.'
+        data = {'shortcode': ['940314'], 'quantity': ['20'], 'total': ['200.00'], 'additional_details': [test]}
+        pool = Pool.objects.get(name='dj-pool-external')
+        response = self.client.post(f"/services/midesktop/{pool.id}/change/", data)
+        self.assertEqual(response.status_code, 302, test)
+
+        # No indication image was changed.
+        test = 'Change dj-pool-instant image from dj-bass-image to dj-image-large and quantity from 1 to 5.'
+        data = {'shortcode': ['940314'], 'images': ['dj-image-large'], 'quantity': ['5'], 'total': ['272.45'], 'additional_details': [test]}
+        pool = Pool.objects.get(name='dj-pool-instant')
+        response = self.client.post(f"/services/midesktop/{pool.id}/change/", data)
+        self.assertEqual(response.status_code, 302, test)
+
+        response = self.client.get(f"/services/midesktop/{pool.id}/delete/")
+        self.assertEqual(response.status_code, 200, 'Display Delete page')
+        
+        test = 'delete dj-pool-instant'
+        data = {'instance': [pool.id], 'confirm_delete': ['on']}
+        print(f"/services/midesktop/{pool.id}/delete/")
+        response = self.client.post(f"/services/midesktop/{pool.id}/delete/", data)
+        self.assertEqual(response.status_code, 302, test)
+
+        # No indication which image was added
+        test = 'Modify dj-pool-persistent add dj-bass-image'
+        data = {'shortcode': ['940314'], 'multi_image': ['', f'{large_image.id},{bass_image.id}'], 'total': ['101.09'], 'additional_details': [test]}
+        pool = Pool.objects.get(name='dj-pool-persistent')
+        response = self.client.post(f"/services/midesktop/{pool.id}/change/", data)
+        self.assertEqual(response.status_code, 302, test)
 
     def test_images(self):
-        # New Image, New Network (dj-network-break)
+        test = 'New Image, New Network (dj-network-break)'
         data = {'admin_group': ['ITSComm Information Systems'], 'name': ['dj-newimage-newnetwork'], 'initial_image': ['Standard'], 'operating_system': ['Windows 11 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['2'], 'memory_cost': ['0.96'], 'disk-TOTAL_FORMS': ['1'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'storage_cost': ['5.00'], 'multi_disk': ['50,'], 'gpu': ['False'], 'gpu_cost': ['0.00'], 'total': ['38.42'], 
                 'network_type': ['dedicated'], 'network': ['new'], 'network_name': ['dj-network-break'], 'access_internet': ['True'], 'mask': ['256'], 'protection': ['none'], 'technical_contact': ['djamison@umich.edu'], 'business_contact': ['djamison@umich.edu'], 'security_contact': ['djamison@umich.edu']}
         response = self.client.post("/services/midesktop-image/add/", data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 302, test)
 
-        # New Image, Existing Dedicated Network
+        test = 'New Image, Existing Dedicated Network'
         network = Network.objects.get(name='dj-network-break')
         data = {'admin_group': ['ITSComm Information Systems'], 'name': ['dj-just-image'], 'initial_image': ['Standard'], 'operating_system': ['Windows 11 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['4'], 'memory_cost': ['1.92'], 'disk-TOTAL_FORMS': ['2'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'disk-1-size': ['100'], 'disk-1-cost': ['10.00'], 'storage_cost': ['15.00'], 'multi_disk': ['50,100,'], 'gpu': ['True'], 'gpu_cost': ['6.07'], 'total': ['55.45'], 
                 'network_type': ['dedicated'], 'network': [network.id], 'network_name': [''], 'access_internet': ['True'], 'mask': ['16'], 'protection': ['datacenter'], 'technical_contact': [''], 'business_contact': [''], 'security_contact': ['']}
         response = self.client.post("/services/midesktop-image/add/", data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 302, test)
 
-        # New Image, Private Network
+        test = 'New Image, Private Network'
         data = {'admin_group': ['ITSComm Information Systems'], 'name': ['dj-newimage-privatenet'], 'initial_image': ['Blank'], 'operating_system': ['Windows10 64bit'], 'cpu': ['1'], 'cpu_cost': ['1.15'], 'memory': ['2'], 'memory_cost': ['0.96'], 'disk-TOTAL_FORMS': ['1'], 'disk-INITIAL_FORMS': ['0'], 'disk-MIN_NUM_FORMS': ['0'], 'disk-MAX_NUM_FORMS': ['1000'], 'disk-0-size': ['50'], 'disk-0-cost': ['5.00'], 'storage_cost': ['5.00'], 'multi_disk': ['50,'], 'gpu': ['False'], 'gpu_cost': ['0.00'], 'total': ['38.42'], 
                 'network_type': ['private'], 'network_name': [''], 'access_internet': ['True'], 'mask': ['16'], 'protection': ['datacenter'], 'technical_contact': [''], 'business_contact': [''], 'security_contact': ['']}
         response = self.client.post("/services/midesktop-image/add/", data)
+        self.assertEqual(response.status_code, 302, test)
+
+    def test_networks(self):
+        data = {'admin_group': ['ITSComm Information Systems'], 'purpose': ['Flipper'], 'access_internet': ['True'], 'mask': ['16'], 'dhcp': ['true'], 'protection': ['datacenter'], 'technical_contact': ['djamison@umich.edu'], 'business_contact': ['djamison@umich.edu'], 'security_contact': ['djamison@umich.edu']}
+        response = self.client.post("/services/midesktop-network/add/", data)
         self.assertEqual(response.status_code, 302)
 
-
-
+        response = self.client.get("/services/midesktop-network/", data)  # View all networks
+        self.assertEqual(response.status_code, 200)
