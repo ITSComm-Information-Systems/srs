@@ -48,6 +48,7 @@ class MiDesktop(TestCase):
         response = self.client.post(f"/services/midesktop/{pool.id}/change/", data)
         self.assertEqual(response.status_code, 302, test)
 
+        # No indication image was changed.
         test = 'Change dj-pool-instant image from dj-bass-image to dj-image-large and quantity from 1 to 5.'
         data = {'shortcode': ['940314'], 'images': ['dj-image-large'], 'quantity': ['5'], 'total': ['272.45'], 'additional_details': [test]}
         pool = Pool.objects.get(name='dj-pool-instant')
@@ -63,6 +64,7 @@ class MiDesktop(TestCase):
         response = self.client.post(f"/services/midesktop/{pool.id}/delete/", data)
         self.assertEqual(response.status_code, 302, test)
 
+        # No indication which image was added
         test = 'Modify dj-pool-persistent add dj-bass-image'
         data = {'shortcode': ['940314'], 'multi_image': ['', f'{large_image.id},{bass_image.id}'], 'total': ['101.09'], 'additional_details': [test]}
         pool = Pool.objects.get(name='dj-pool-persistent')

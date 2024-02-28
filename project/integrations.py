@@ -642,7 +642,6 @@ class MiDesktopPayload(Payload):
                 self.context['changed_data'] = []
             else:
                 self.context['changed_data'] = self.form.changed_data
-
             base_image = self.form.cleaned_data.get('base_image')
             if base_image == 999999999:
                 self.add_attribute(self.image_type.id, self.image_type.New)
@@ -674,7 +673,20 @@ class MiDesktopPayload(Payload):
                 else:
                     self.add_attribute(self.shared.id, self.shared.Shared)
 
+            if 'old_images' in kwargs:
+                old_images = kwargs['old_images']
+                new_images = list(instance.images.all().values_list('name', flat=True))
+                image_list = []
 
+                for image in set(old_images + new_images):
+                    print(image, type(image))
+                    if image not in old_images:
+                        image = f'<b>{image} (Add)</b>'
+                    elif image not in new_images:
+                        image = f'<b>{image} (Remove)</b>'
+                    image_list.append(image)
+                    
+                self.context['image_list'] = image_list
 
         self.add_attribute(self.owner.id, instance.owner.name)
         if self.description == '':
