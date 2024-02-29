@@ -58,54 +58,96 @@ class Networks():
     def process_record(row):
         network = Network()
         network.name = row[0].strip("'")
-        # network.vlan = row[1].strip("'")
+        network.vlan_id = row[1].strip("'")
         # network.network = row[2].strip("'")
-        network.size = row[3].strip("'")
+        network.size = row[2].strip("'")
         network.owner = LDAPGroup().lookup(row[4].strip("'"))
         network.save()
 
 
 class Images():
+
+    # Base images	CPU	RAM	Storage	GPU	Network	Owner
     file = 'images.csv'
 
     def process_record(row):
         # 0Base images    1GPU 2CPU 3RAM 4Storage 5Owner
 
         try:
-            net = Network.objects.get(name=row[6].strip("'"))
+            net = Network.objects.get(name=row[5].strip("'"))
         except:
             net = None
     
         image = Image()
         image.name = row[0].strip("'")
-        image.gpu = row[1].strip("'").capitalize()
-        image.cpu = row[2].strip("'")
-        image.memory = row[3].strip("'")
-        image.owner = LDAPGroup().lookup(row[5].strip("'"))
+        image.cpu = row[1].strip("'")
+        image.memory = row[2].strip("'")
+        image.gpu = row[4].strip("'").capitalize()
+
+
+        image.owner = LDAPGroup().lookup(row[6].strip("'"))
         image.network = net
         image.save()
 
         disk = ImageDisk()
         disk.image = image
         disk.name = 'disk0'
-        disk.size = row[4].strip("'")
+        disk.size = row[3].strip("'")
         disk.save()
 
 
-class Pools():
-    file = 'pools.csv'
+class InstantClonePools():
+    file = 'pools_instant_clone.csv'
 
-    # 0Pool	1Shortcode	2Customer	3Image	4Network	5GPU	6Specs	7Pool qty
-    # 0Pool,1Total pool cost,2Shortcode,3Customer,4Image,5Network,6GPU,7Specs,8Pool qty,9Desktop cost
+    #0Shortcode	1Pool	2GPU	3Specs	4Pool qty	5Desktop cost	6Total pool cost	7Customer	8Attached image	9Active
 
     def process_record(row):
         # Base images    GPU CPU RAM Storage Owner
         pool = Pool()
-        pool.name = row[0].strip("'")
-        pool.shortcode = row[2].strip("'")
-        pool.owner = LDAPGroup().lookup(row[3].strip("'"))
-        pool.quantity = row[8].strip("'")
+        pool.name = row[1].strip("'")
+        pool.shortcode = row[0].strip("'")
+        pool.owner = LDAPGroup().lookup(row[7].strip("'"))
+        pool.quantity = row[4].strip("'")
         pool.save()
 
-        images = Image.objects.filter(name=row[4].strip("'"))
+        images = Image.objects.filter(name=row[8].strip("'"))
         pool.images.set(images)
+
+
+class PersistentPools():
+    file = 'pools_persistent.csv'
+
+    #0Shortcode	1Pool	2GPU	3Specs	4Pool qty	5Desktop cost	6Total pool cost	7Customer	8Attached image	9Active
+    
+    def process_record(row):
+        # Base images    GPU CPU RAM Storage Owner
+        pool = Pool()
+        pool.type = 'persistent'
+        pool.name = row[1].strip("'")
+        pool.shortcode = row[0].strip("'")
+        pool.owner = LDAPGroup().lookup(row[7].strip("'"))
+        pool.quantity = row[4].strip("'")
+        pool.save()
+
+        images = Image.objects.filter(name=row[8].strip("'"))
+        pool.images.set(images)
+
+
+
+class ExternalPools():
+    file = 'pools_external.csv'
+
+    #0Shortcode,1Pool,2GPU,3Specs,4Pool qty,5Desktop cost,6Total pool cost,7Customer,8Attached image,9Active
+    
+    def process_record(row):
+        # Base images    GPU CPU RAM Storage Owner
+        pool = Pool()
+        pool.type = 'external'
+        pool.name = row[1].strip("'")
+        pool.shortcode = row[0].strip("'")
+        pool.owner = LDAPGroup().lookup(row[7].strip("'"))
+        pool.quantity = row[4].strip("'")
+        pool.save()
+
+        #images = Image.objects.filter(name=row[8].strip("'"))
+        #pool.images.set(images)
