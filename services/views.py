@@ -10,6 +10,17 @@ from oscauth.models import LDAPGroupMember
 import json
 
 
+SLUGS = {'midesktop': Pool,
+         'midesktop-image': Image,
+         'midesktop-network': Network}
+
+
+def get_instance(service, id):
+    model = SLUGS(service)
+    instance = get_object_or_404(model, pk=id)
+    return instance
+
+
 def user_has_access(user, owner):
     mc = MCommunity()
     mc.get_group(owner.name)
@@ -221,10 +232,16 @@ class ServiceDeleteView(UserPassesTestMixin, View):
     template = 'services/delete.html'
 
     def test_func(self):
-        if self.request.user.is_authenticated:
-            return True
-        else:
+        if not self.request.user.is_authenticated:
             return False
+        
+        service = self.kwargs.get('service')
+        id = self.kwargs.get('id')
+        self.model = SLUGS.get(service)
+        self.instance = get_object_or_404(self.model, pk=id)
+
+        if user_has_access(self.request.user, self.instance.owner):
+            return True
 
     def post(self, request, service, id):
         if service == 'midesktop-network':
@@ -312,10 +329,16 @@ class ServiceChangeView(UserPassesTestMixin, View):
     template = 'services/change.html'
 
     def test_func(self):
-        if self.request.user.is_authenticated:
-            return True
-        else:
+        if not self.request.user.is_authenticated:
             return False
+        
+        service = self.kwargs.get('service')
+        id = self.kwargs.get('id')
+        self.model = SLUGS.get(service)
+        self.instance = get_object_or_404(self.model, pk=id)
+
+        if user_has_access(self.request.user, self.instance.owner):
+            return True
 
     def post(self, request, service, id):
         if service == 'midesktop-network':
