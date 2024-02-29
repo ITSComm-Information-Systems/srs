@@ -576,7 +576,7 @@ class Workflow(UserPassesTestMixin, View):
 
                 for element in element_list:
                     if element.type == 'Radio':
-                        field = forms.ChoiceField(label=element.label
+                        field = forms.ChoiceField(label=element.label, help_text = element.help_text
                                                 , choices=eval(element.attributes))
                     elif element.type == 'Chart':
                         field = forms.ChoiceField(label=element.label

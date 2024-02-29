@@ -27,6 +27,7 @@ urlpatterns = [
     path('services/', include('services.urls')),
     path('api/', include(api.router.urls)),
     path('api/bommaterial/', api.BomMaterialView.as_view()),
+    path('api/tollupload/', api.TollUploadView.as_view()),
     path('admin/', admin.site.urls),
     path('reports/',include('reports.urls')),
     path('uniqname/', views.get_uniqname),

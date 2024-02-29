@@ -44,7 +44,7 @@ class Command(BaseCommand):
 
         message = render_to_string('project/billing_audit.html', {'instances': instances})
 
-        Slack().send_message(message, 'inf-information_systems_no-interns')
+        Slack(message, channel='inf-billing')
 
 
 

@@ -6,6 +6,12 @@ from project.pinnmodels import UmRteTechnicianV, UmBomProcurementUsersV, UmEcomm
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 from oscauth.utils import upsert_user
 from oscauth.views import add_custom_permissions
+from rest_framework import authentication
+
+
+class TokenAuthentication(authentication.TokenAuthentication):
+    keyword = 'Bearer'
+
 
 class SuBackend(object):
     supports_inactive_user = False

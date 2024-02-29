@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand
 from project.utils import get_query_result
 from project.models import Email
+from project.integrations import Slack, MCommunity
+
 import json
 from django.conf import settings
 
@@ -18,6 +20,14 @@ class Command(BaseCommand):
         'MiDesktop': 'midesktop.support@umich.edu',
     }
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--force",
+            action="store_true",  # Set to true if present.
+            help="Ignore Quantity Warning",
+        )
+
+
     def handle(self, *args, **options):
         print('Get Email')
 
@@ -33,16 +43,38 @@ class Command(BaseCommand):
                         KEY 'shortcode' IS shortcode)
                         ,',') within group (order by i.name) || ']' instances
                     from SRS_SERVICES_INSTANCES_V i
-                    where shortcode_status <> 'O' or shortcode_status is null
+                    where service <> 'MiDatabase'
+                    and (shortcode_status <> 'O' or shortcode_status is null)
                     group by service, owner
         '''
 
-        for record in get_query_result(sql):
-            email.context = {"path": PATH, "service": record['service'], "instances": json.loads(record['instances'])}
-            email.to = record['owner'] + '@umich.edu'
-            email.reply_to = self.REPLY_TO.get(record['service'])
-            email.cc = self.REPLY_TO.get(record['service'])
-            email.bcc = email.team_shared_email
-            
-            email.send()
+        record_list = get_query_result(sql)
+
+        if len(record_list) > 10:  
+            msg = f'ERROR: Shortcode Audit {len(record_list)} Records Found.'
+            Slack(msg)
+            if not options['force']: 
+                print('abort')
+                return
+
+        mc = MCommunity()
+
+        for record in record_list:
+            if not record['owner']:
+                Slack('Shortcode Audit, no owner found')
+                continue
+                
+            to = mc.get_group_email(record['owner'])
+
+            if to:
+                email.context = {"path": PATH, "service": record['service'], "instances": json.loads(record['instances'])}
+                email.to = to
+                email.reply_to = self.REPLY_TO.get(record['service'])
+                email.cc = self.REPLY_TO.get(record['service'])
+                email.bcc = email.team_shared_email
+                email.send()
+            else:
+                Slack('Shortcode Audit, no email found')
+
+
 

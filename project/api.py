@@ -12,9 +12,28 @@ from django.core.mail import EmailMessage
 from apps.bom.models import Item, EstimateView, Material, MaterialLocation
 from rest_framework.response import Response
 import requests
+from django.core.files.storage import FileSystemStorage
 
 from .models import Webhooks
-import threading, time
+import threading, time, subprocess
+
+
+class TollUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):  # Called from powershell script on report server.
+
+        if self.request.user.username != 'rest.toll':
+            return Response(status=401)
+        
+        fs = FileSystemStorage()
+        filename = fs.save('pload/toll.zip', request.FILES['toll.zip'])  
+        print('created', filename)
+
+        subprocess.Popen(['sh', 'openshift/scripts/extract_toll.sh', settings.ENVIRONMENT])  # Start extraction in background and continue.
+
+        return Response(status=204)
+
 
 def netboxEmails(request):
     tosend = Webhooks.objects.all().filter(emailed=False)

@@ -375,7 +375,7 @@ class Estimate(BOM):
         return Labor.objects.filter(estimate=self)
 
     def notify_warehouse(self):
-        if self.status == self.ESTIMATE or self.status == self.ORDERED:
+        if self.status == self.ESTIMATE or self.status == self.ORDERED or self.status == self.APPROVED:
             self.status = self.WAREHOUSE
             self.save()
         elif self.status == self.WAREHOUSE:
@@ -452,7 +452,7 @@ class ProjectView(BOM):
 class ItemManager(models.Manager):
 
     def get_active(self):
-        return Item.objects.filter(class_code='IN') 
+        return Item.objects.exclude(class_code='OU').exclude(class_code='T') 
 
 
 class Item(models.Model):

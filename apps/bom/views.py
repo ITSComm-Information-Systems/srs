@@ -543,17 +543,11 @@ class NetOpsSearch(PermissionRequiredMixin, View):
 
         search_list = ProjectView.objects.filter(Q(status=2) | Q(status=3)).order_by('-woid')
         return render(request, template,
-                      {'title': 'UMNet Projects', 
+                      {'title': 'UMNet Projects',
                        'search_list': search_list})
     
-
 class EngineeringSearch(PermissionRequiredMixin, View):
     permission_required = 'bom.can_access_bom'
-
-    # def test_func(self):
-    #     return self.request.user.has_perm(self.permission_required) and \
-    #            self.request.user.groups.filter(name='Network Engineering').exists()
-
 
     def get(self, request):
         template = 'bom/engineering_search.html'
