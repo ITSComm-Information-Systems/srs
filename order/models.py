@@ -651,7 +651,6 @@ class Server(models.Model):
     created_date = models.DateTimeField(default=timezone.now, null=True)
     #shortcode = models.CharField(max_length=100) 
     public_facing = models.BooleanField(default=False)
-    production = models.BooleanField(default=False,blank=True)
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
 
     os = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={'parent__code__in': ['SERVER_UNMANAGED_OS','LINUX','WINDOWS']}
@@ -1271,7 +1270,6 @@ class Item(models.Model):
                     attributes.append({'ID': 1967, 'Value': 'secure'})
 
             db = self.data.get('database')
-            production = self.data.get('production')
             if db:
                 attributes.append({'ID': 1874, 'Value': 93}) # Dedicated DB
 
@@ -1381,7 +1379,7 @@ class Item(models.Model):
 
         MCommunity().add_entitlement(rec.admin_group.name)
 
-        for field in ['production','cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing']:
+        for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing']:
             value = self.data.get(field)
             if value:
                 setattr(rec, field, value)

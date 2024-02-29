@@ -1,17 +1,14 @@
-{% with server=tab.form.instance %}
-{% if server.non_regulated_data.all or server.regulated_data.all %}
-    <div id="sensitive_data_present" hidden></div>
-{% endif %}
-{% endwith %}
 <span id="server_rates" data-ram_rate="{{ tab.form.ram_rate }}" data-disk_replicated="{{ tab.form.disk_replicated }}"
     data-disk_no_replication="{{ tab.form.disk_no_replication }}" data-disk_backup="{{ tab.form.disk_backup }}"></span>
 
 {% for field in tab.form %}
+
 {% if field.name == 'serverName' %}
 <label for="name">
     <strong>{{ field.label }}</strong>
     <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
 </label>
+
 <div class="row">
     <div class="col-6">
         <div class="form-group form-inline">
@@ -25,9 +22,11 @@
                 aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
         {% endfor %}
     </div>
+
 </div>
 {% elif field.name == 'size_edit' %}
 {{ field }}
+
 {% elif field.name == 'diskSize' %}
 <div class="row">
     <div class="col-6 cost-driver">
@@ -35,7 +34,9 @@
             <label for="disks">
                 <strong>{{ field.label }}</strong>
             </label>
+
             <small class="text-muted form-text" id="hostsText">{{ field.field.description }}</small>
+
             <div id="formset_wrapper" class="form-inline disk-div" style="display: block;">
                 {{ tab.form.disk_formset.management_form }}
                 {% for diskform in tab.form.disk_formset %}
@@ -51,10 +52,12 @@
                     {{ diskform.uom }}
                     <span class="float-right disk-cost"></span>
                 </div>
+
                 {% for error in diskform.size.errors %}
                 <div role="alert" class="invalid-feedback-"><i class="fas fa-exclamation-triangle"
                         aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
                 {% endfor %}
+
                 {% endfor %}
             </div>
             <div id="emptyform_wrapper" style="display: none">
@@ -64,6 +67,7 @@
                 {{ tab.form.disk_formset.empty_form.size }}
                 {{ tab.form.disk_formset.empty_form.uom }}&nbsp;&nbsp;
                     <a onclick="deleteDisk(this);" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>
+
                 <span class="float-right disk-cost"></span>
                 </div>
             </div>
@@ -79,6 +83,7 @@
     <a id="add_disk_link" href="javascript:addDisk('disk')"><i class="fas fa-plus-circle"></i>Add another
         disk</a><br><br>
 </div>
+
 {% elif field.name == 'misevdiskuom' %}
 {% elif field.name == 'ram' %}
 <div class="row cost-driver">
@@ -102,6 +107,7 @@
 {% elif field.name == 'backup' %}
 <div class="row cost-driver">
     <div class="col-6">
+
         <span id="backup_cost" class="float-right">$0.00</span>
         {% include field.field.template_name %}
     </div>
@@ -114,6 +120,8 @@
 </div>
 {% endif %}
 {% endfor %}
+
+
 <div class="col-6">
     <hr>
     <span id="total_cost" class="float-right">$</span>
