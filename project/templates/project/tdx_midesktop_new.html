@@ -33,5 +33,9 @@
 <div class="table-responsive">
     {% for image in pool.images.all %}
         {% include 'project/tdx_midesktop_image.html' %}
+    {% empty %}
+        <p>
+            {{ form.cleaned_data.additional_details }}
+        </p>
     {% endfor %}
 </div>

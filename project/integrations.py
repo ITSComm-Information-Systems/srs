@@ -679,7 +679,6 @@ class MiDesktopPayload(Payload):
                 image_list = []
 
                 for image in set(old_images + new_images):
-                    print(image, type(image))
                     if image not in old_images:
                         image = f'<b>{image} (Add)</b>'
                     elif image not in new_images:
