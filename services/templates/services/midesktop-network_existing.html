@@ -5,7 +5,8 @@
 <table class="table table-hover table-striped table-sm">
     <tr>
         <th>Name</th>
-        <th>Size</th>
+        <th>Network/CIDR</th>
+        <th>VLAN ID</th>
         <th>Owner</th>
         <th></th>
     </tr>
@@ -18,6 +19,7 @@
                 <td>pending</td>
         {% endif %}
         <td>{{ rec.size }}</td>
+        <td>{{ rec.vlan_id }}</td>
         <td>{{ rec.owner }}</td>
         <td>
             {% if not rec.is_foreign_key_in_image %}
