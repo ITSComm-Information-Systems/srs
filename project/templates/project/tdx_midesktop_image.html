@@ -1,0 +1,32 @@
+<table class="table table-bordered table-condensed table-hover table-striped" style="width: 100%">
+    <caption><h4>Image</h4></caption>
+    <tbody>
+        <tr><td>Name</td><td>{{ image.name }}</td></tr>
+        <tr {%if 'cpu' in changed_data %}style="font-weight: bold;"{% endif %}><td>CPU</td><td>{%if 'cpu' in changed_data %}*{% endif %}{{ image.cpu }}</td></tr>
+        <tr {%if 'memory' in changed_data %}style="font-weight: bold;"{% endif %}><td>Memory</td><td>{%if 'memory' in changed_data %}*{% endif %}{{ image.memory }}</td></tr>
+        <tr {%if 'storage' in changed_data %}style="font-weight: bold;"{% endif %}><td>Storage</td><td>{%if 'storage' in changed_data %}*{% endif %}{{ image.total_storage_size }} GB</td></tr>
+        <tr {%if 'gpu' in changed_data %}style="font-weight: bold;"{% endif %}><td>GPU</td><td>{%if 'gpu' in changed_data %}*{% endif %}{{ image.gpu }}</td></tr>
+        {% if form.cleaned_data.initial_image %}
+        <tr><td>Initial Image</td><td>{{ form.cleaned_data.initial_image }}</td></tr>
+        {% endif %}
+        {% if form.cleaned_data.operating_system %}
+        <tr><td>Operating System</td><td>{{ form.cleaned_data.operating_system }}</td></tr>
+        {% endif %}
+        <tr {%if 'network' in changed_data %}style="font-weight: bold;"{% endif %}><td>Network</td><td>{{ network_type }}  {{ image.network.name }}</td></tr>
+        <tr><td>Disk</td><td>
+            <table>
+                {% for disk in image.storage.all|dictsort:"name" %}
+                <tr {%if disk.name in changed_disks %}style="font-weight: bold;"{% endif %}><td>{{ disk.name }}</td><td>{{ disk.size }} GB</td></tr>
+                {% endfor %}
+            </table>
+        </td></tr>
+    </tbody>
+</table>
+
+{% if form.data.network == 'new' %}
+{% include 'project/tdx_midesktop_network.html' %}
+{% endif %}
+
+<p>
+    {{ form.cleaned_data.additional_details }}
+</p>

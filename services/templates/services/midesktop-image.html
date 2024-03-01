@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+<script type='text/javascript'>
+    var groups = {{ groups_json|safe }};
+    var network_choice_list = [
+        {'key': 'private', 'label':'Shared Network (Private)'},
+        {'key': 'web-access', 'label':'Shared Network (Web-Access)'},
+        {'key': 'dedicated', 'label':'Dedicated Network'},
+    ]
+    var networklist = {{ network_json|safe }};
+    var eventBus = new Vue();
+</script>
+
+
+<h1>MiDesktop New Image</h1>
+
+<div class="container">
+    <form method="POST">
+        {% csrf_token %}
+
+        <div id="div_formbody">
+            <h6>
+                <div id="group">
+                    <h6><span style="color:red; font-size:12px;">*</span>MCommunity Admin Group:
+                        <select class="form-control" name="admin_group" id="id_admin_group" v-model="selectedGroup" @change="handleGroupChange">
+                            <option v-for="group in groups" :value="group.name" :key="group.id">[[group.name]]</option>
+                        </select>
+                    </h6>
+                </div>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.name.label_tag }} {{ form.name }}
+                {{ form.name.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.initial_image.label_tag }} {{ form.initial_image }}
+                {{ form.initial_image.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.operating_system.label_tag }} {{ form.operating_system }}
+                {{ form.operating_system.errors }}<br/>
+
+                {{ calculator_form }}
+
+                <div id="network_type">
+                    <h6><span style="color:red; font-size:12px;">*</span>Will you be using a shared network or a dedicated network?
+                        <select class="form-control" name="network_type" id="id_network_type" v-model="selectedNetworkType">
+                            <option v-for="network_type in network_choice_list" :value="network_type.key" :key="network_type.key">[[network_type.label]] </option>
+                        </select>
+                    </h6>
+                </div>
+
+                <div id="network" v-show="visible">
+                    <h6><span style="color:red; font-size:12px;">*</span>Networks:
+                        <select class="form-control" name="network" id="id_network" v-model="selectedNetwork">
+                            <option v-for="network in filteredNetworks" :value="network.id" :key="network.id">[[network.name]] </option>
+                        </select>
+                    </h6>
+                </div>
+            </h6>
+
+
+            <div id="networks-wrapper" v-show="visible">
+                <h6>
+                <span style="color:red; font-size:12px;">*</span>{{ form.network_name.label_tag }} {{ form.network_name }}
+                {{ form.network_name.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.access_internet.label_tag }} {{ form.access_internet }}
+                {{ form.access_internet.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.mask.label_tag }} {{ form.mask }}
+                {{ form.mask.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.protection.label_tag }} {{ form.protection }}
+                {{ form.protection.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.technical_contact.label_tag }} {{ form.technical_contact }}
+                {{ form.technical_contact.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.business_contact.label_tag }} {{ form.business_contact }}
+                {{ form.business_contact.errors }}<br/>
+
+                <span style="color:red; font-size:12px;">*</span>{{ form.security_contact.label_tag }} {{ form.security_contact }}
+                {{ form.security_contact.errors }}<br/>
+            </h6>
+                
+            </div>
+            
+        </div>
+        <h6 style="color:red; font-size:12px;">{{form.network_name.errors}}</h6>
+        <button id="submit_btn" type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+
+<script src="/static/vue-components/vue-components.js"></script>
+
+
+{% endblock %}
+

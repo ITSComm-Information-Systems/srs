@@ -1,0 +1,232 @@
+
+<div class="form-group" id="wrapper_calculator">
+    <h6>
+    <div class="row">
+        <div class="col">
+            <span style="color:red; font-size:12px;">*</span>{{ form.cpu.label_tag }}{{ form.cpu }}
+        </div>
+        <div class="col">
+            {{ form.cpu_cost.label_tag }}{{ form.cpu_cost }}
+        </div>
+    </div><br/>
+    <div class="row">
+        <div class="col">
+            <span style="color:red; font-size:12px;">*</span>{{ form.memory.label_tag }}{{ form.memory }}
+        </div>
+        <div class="col">
+            {{ form.memory_cost.label_tag }}{{ form.memory_cost }}
+        </div>
+    </div><br/>
+
+    <div id="disks">
+        {{form.storage_formset.management_form}}
+        {% for storage_form in form.storage_formset %}
+        <div class="row" id="storage_disk">
+            <div class="col">
+                {{ storage_form.size.label_tag }} <a onclick="deleteDisk(this)" href="javascript:void(0)"><i class="fas fa-minus-circle" style="display:none"></i></a>{{ storage_form.size }}
+            </div>
+            <div class="col">
+                {{ storage_form.cost.label_tag }}{{ storage_form.cost }}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col"><br/><a onclick="addDisk()" style="margin-top: 23px" class="form-control btn btn-secondary"><strong>Add Additional Disk</strong></a></div>
+        <div class="col">
+            <h6>{{ form.storage_cost.label_tag }}{{ form.storage_cost }}</h6>
+            {{ form.multi_disk }}
+        </div>
+    </div>
+    {% endfor %}
+    <br/>
+    
+    <div class="row">
+        <div class="col">
+            <span style="color:red; font-size:12px;">*</span>{{ form.gpu.label_tag }}{{ form.gpu }}
+        </div>
+        <div class="col">
+            {{ form.gpu_cost.label_tag }}{{ form.gpu_cost }}
+        </div>
+    </div><br/>
+    <div class="row">
+        <div class="col">
+            {{ form.total.label_tag }}{{ form.total }}
+        </div>
+    </div>
+    </h6>
+</div>
+
+
+<script>
+
+function deleteDisk(disk){
+    var totalFormsInput = document.getElementById("id_disk-TOTAL_FORMS");
+    var totalForms = parseInt(totalFormsInput.value);
+    disk.parentElement.parentElement.remove();
+    totalForms--;
+    totalFormsInput.value = totalForms;
+    var delbuttons = document.getElementsByClassName('fa-minus-circle')
+    if (delbuttons.length > 1){
+        delbuttons[delbuttons.length - 1].style.display="block"
+    }
+    handleMultiDisk()
+    updateStorageTotal()
+    calculateBaseImageCost()
+}
+
+function addDisk(){
+    var totalFormsInput = document.getElementById("id_disk-TOTAL_FORMS");
+    var totalForms = parseInt(totalFormsInput.value);
+
+    // Clone the first form in the formset and clear its input values
+    var firstForm = document.getElementById("storage_disk")
+    var newForm = firstForm.cloneNode(true);
+
+    var inputs = newForm.querySelectorAll("input, select, textarea");
+    inputs.forEach(function(input) {
+        //input.value = "";
+        // Update input names and IDs to reflect the new form index
+        input.name = input.name.replace("-0-", "-" + totalForms + "-");
+        input.id = "id_" + input.name;
+
+        if (input.name.includes("cost")) {
+            input.value = "5.00";  // Set the initial cost value
+        }
+    });
+            
+    totalForms++;
+    totalFormsInput.value = totalForms;
+        
+    newForm.id = firstForm.id + '_' + totalForms
+    newForm.style.marginTop="20px";
+        // Append the new form to the formset container
+    document.getElementById("disks").appendChild(newForm);
+    var delbuttons = document.getElementsByClassName('fa-minus-circle')
+    if (delbuttons.length > 1){
+        delbuttons[delbuttons.length - 1].style.display="block"
+    }
+
+    addEventListeners()
+    handleMultiDisk()
+    updateStorageTotal()
+    calculateBaseImageCost()
+
+}
+const cpu_choice = document.getElementById("{{ form.cpu.id_for_label }}");
+const memory_choice = document.getElementById("{{ form.memory.id_for_label }}");
+const gpu_choice = document.getElementById("{{ form.gpu.id_for_label }}");
+const cpu_cost = document.getElementById("{{ form.cpu_cost.id_for_label }}");
+const memory_cost = document.getElementById("{{ form.memory_cost.id_for_label }}");
+const storage_cost = document.getElementById("{{ form.storage_cost.id_for_label }}");
+const gpu_cost = document.getElementById("{{ form.gpu_cost.id_for_label }}");
+const total_cost = document.getElementById("{{ form.total.id_for_label }}");
+const multi_disk = document.getElementById("{{ form.multi_disk.id_for_label }}");
+var storageTotal = document.getElementById("id_storage_cost");
+
+window.addEventListener("load", (event) => {
+    //storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
+    var page_loaded = false
+    gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+    cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
+    memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
+    handleStorageData()
+    calculateBaseImageCost()
+})
+
+cpu_choice.addEventListener("change", () => {
+    cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
+    calculateBaseImageCost()
+})
+
+memory_choice.addEventListener("change", () => {
+    memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
+    calculateBaseImageCost()
+})
+
+gpu_choice.addEventListener("change", () => {
+    gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+    calculateBaseImageCost()
+})
+
+function calculateBaseImageCost(){
+    base_cost = 31.31
+    cost = base_cost + parseFloat(cpu_cost.value) + parseFloat(memory_cost.value) + parseFloat(gpu_cost.value) + parseFloat(storageTotal.value)
+    total_cost.value = cost.toFixed(2)
+}
+
+
+function addEventListeners(){
+    var diskSizeSelectors = document.querySelectorAll('[id$="-size"]');
+    var diskCostFields = document.querySelectorAll('[id$="-cost"]');
+
+    
+
+    for (let index = 0; index < diskSizeSelectors.length; index++) {
+        diskSizeSelectors[index].addEventListener("change", function(){
+            var diskTotal = parseInt(diskSizeSelectors[index].value) * 0.10
+            diskCostFields[index].value=diskTotal.toFixed(2)
+            handleMultiDisk()
+            updateStorageTotal()
+        })
+    }
+}
+
+function handleStorageData(){
+    disk_array = multi_disk.value.slice(0, -1).split(",")
+
+        for (let index = 0; index < disk_array.length; index++) {
+            if (index != 0) {
+                addDisk()
+            }
+            const disk_size = disk_array[index];
+            elementID = "id_disk-" + index + "-size"
+            var diskElement = document.getElementById(elementID)
+            diskElement.value = disk_size
+        }
+        addEventListeners()
+        handleMultiDisk()
+        refreshStorageData()
+        updateStorageTotal()
+    }
+
+
+
+function refreshStorageData(){
+    var diskSizeSelectors = document.querySelectorAll('[id$="-size"]');
+    var diskCostFields = document.querySelectorAll('[id$="-cost"]');
+    disk_array = multi_disk.value.slice(0, -1).split(",")
+
+    for (let index = 0; index < diskSizeSelectors.length; index++) {
+        const disk_size = disk_array[index];
+        costFieldID = "id_disk-" + index + "-cost"
+        var costElement = document.getElementById(costFieldID)
+        disk_total = disk_size * 0.10
+        costElement.value = parseFloat(disk_total).toFixed(2)
+    }
+    
+}
+
+function updateStorageTotal(){
+    var diskCostFields = document.querySelectorAll('[id$="-cost"]');
+    runningTotal = 0
+    diskCostFields.forEach(disk => {
+        runningTotal = runningTotal + parseInt(disk.value)
+    });
+    storageTotal.value = runningTotal.toFixed(2)
+    calculateBaseImageCost()
+}
+
+function handleMultiDisk(){
+    var diskSizeSelectors = document.querySelectorAll('[id$="-size"]');
+    var multi_disk = document.getElementById("{{ form.multi_disk.id_for_label }}");
+
+    var multi_disk_string = ''
+
+    diskSizeSelectors.forEach(disk => {
+        multi_disk_string += disk.value + ","
+    });
+
+    multi_disk.value = multi_disk_string
+}
+
+</script>

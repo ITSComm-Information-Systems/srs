@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block content %}
+<h1>MiDesktop Networks</h1>
+<table class="table table-hover table-striped table-sm">
+    <tr>
+        <th>Name</th>
+        <th>Size</th>
+        <th>Owner</th>
+        <th></th>
+    </tr>
+
+    {% for rec in service_list %}
+    <tr>
+        {% if rec.vlan_id %}
+                <td>{{ rec.name }}</td>
+        {% else %}
+                <td>pending</td>
+        {% endif %}
+        <td>{{ rec.size }}</td>
+        <td>{{ rec.owner }}</td>
+        <td>
+            {% if not rec.is_foreign_key_in_image %}
+            <a href="/services/midesktop-network/{{ rec.id }}/delete/">
+                <i class="fas fa-trash"></i>
+            </a>
+            {% endif %}
+            
+        </td>
+    </tr>
+
+
+    {% endfor %}
+
+</table>
+{% endblock %}
