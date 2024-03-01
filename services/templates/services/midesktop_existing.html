@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block content %}
+<h1>MiDesktop Pools</h1>
+<table class="table table-hover table-striped table-sm">
+    <tr>
+        <th>Name</th>
+        <th>Pool Type</th>
+        <th>Associated Base Image</th>
+        <th>Owner</th>
+
+        <th>Total Price</th>
+        <th></th>
+    </tr>
+
+    {% for rec in pool_list %}
+    <tr>
+        <td>{{ rec.name }}</td>
+        <td>{{ rec.type|format_pool_type}}</td>
+        <td>
+            {% for image in rec.images.all %}
+                {{image.name}}&nbsp;
+            {% endfor %}
+        </td>
+        <td>{{ rec.owner }}</td>  
+        <td>{{ rec.total_cost|floatformat:2}}</td>
+        <td>
+            <a href="/services/midesktop/{{ rec.id }}/change/">
+                <i class="fas fa-edit"></i>
+            </a>
+            &nbsp;
+            <a href="/services/midesktop/{{ rec.id }}/delete/">
+                <i class="fas fa-trash"></i>
+            </a>
+        </td>
+    </tr>
+
+
+    {% endfor %}
+
+</table>
+
+
+<script>
+
+</script>
+{% endblock %}

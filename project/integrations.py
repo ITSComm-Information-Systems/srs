@@ -1,6 +1,7 @@
 import json, yaml, requests
 from django.conf import settings
 from ldap3 import Server, Connection, ALL, MODIFY_ADD
+from django.template.loader import render_to_string
 
 class MCommunity:
 
@@ -22,6 +23,18 @@ class MCommunity:
 
         sorted_list = sorted(group_list, key=str.casefold)
         return sorted_list
+    
+    def get_groups_with_id(self, uniqname):
+        self.conn.search('ou=Groups,dc=umich,dc=edu', '(&(umichDirectMember=uid=' + uniqname + ',ou=People,dc=umich,dc=edu)(joinable=False))'
+                        ,  attributes=["gidnumber"])
+        groups_json = []
+        for entry in self.conn.entries:
+            id = entry.entry_attributes_as_dict['gidnumber'][0]
+            name = entry.entry_dn[3:-41]
+            groups_json.append(
+                {"id": id, "name": name}
+            )
+        return sorted(groups_json, key=lambda k: k['name'])
 
     def get_group(self, name):
         self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member","gidnumber"])
@@ -593,13 +606,203 @@ class ContainerPayload(Payload):
             title = 'Add contact group to notification group'
             self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.CONTAINER_TEAM} )
 
+class MiDesktopPayload(Payload):
+    title = 'MiDesktop New Order'
+    description = ''
+    template = 'project/tdx_midesktop_new.html'
+    type_id = 7                  # Compute Services
+    responsible_group_id = 86    # ITS-CloudComputeServices
+    service_id = 14              # ITS-MiDesktop
+    form_id = 555	             # ITS-MiDesktop - Form
+    priority_id = 19 # Medium
+
+    midesktop_request_type = ChoiceAttribute(14642, Pool=46858, Image=46859, Network=46860)  
+    midesktop_pool_type = ChoiceAttribute(14643, external=46861, instant_clone=46862, persistent=46863)  
+    new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
+    owner = TextAttribute(2343)         # midesktop_MComm group textbox
+    shared = ChoiceAttribute(2344, New=903, Shared=895, Existing=46881)        # midesktop_Shared Dedicated dropdown
+    #network_type = ChoiceAttribute(2345, Existing=896, New=897, Shared=898)  # private web-access dedicated
+    image_type = ChoiceAttribute(2346, Existing=899, New=900, Clone=901)
+    image_name = TextAttribute(2347)    # midesktop_Base Image Name textbox
+    pool_name = TextAttribute(2348)     # midesktop_Pool Display Name textbox
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.request = request
+        self.instance_type = type(instance).__name__
+        self.title = f'MiDesktop {action} {type(instance).__name__}'
+
+        if action == 'New':
+            self.add_attribute(self.midesktop_request_type.id, getattr(self.midesktop_request_type, type(instance).__name__))
+
+        if 'form' in kwargs:
+
+            self.form = kwargs['form']
+            self.context['form'] = self.form
+            if action == 'New':
+                self.context['changed_data'] = []
+            else:
+                self.context['changed_data'] = self.form.changed_data
+            base_image = self.form.cleaned_data.get('base_image')
+            if base_image == 999999999:
+                self.add_attribute(self.image_type.id, self.image_type.New)
+            else:
+                self.add_attribute(self.image_type.id, self.image_type.Existing)
+
+            network_type = self.form.cleaned_data.get('network_type')
+            network_name = self.form.cleaned_data.get('network_name')
+
+            if action == 'New' and network_type == '':
+                try:
+                    from services.models import Image as Img
+                    image = Img.objects.get(id=base_image)
+                    if image.network_id:
+                        network_type = 'dedicated'
+                        network_name = image.network.name
+                    else:
+                        network_type = 'shared'
+                except:
+                    print('error getting image', base_image)
+
+            if network_type:
+                self.context['network_type'] = network_type
+                    
+                if self.form.data.get('network') == 'new':
+                    self.add_attribute(self.shared.id, self.shared.New)
+                elif network_type == 'dedicated':
+                    self.add_attribute(self.shared.id, self.shared.Existing)
+                else:
+                    self.add_attribute(self.shared.id, self.shared.Shared)
+
+            if 'old_images' in kwargs:
+                old_images = kwargs['old_images']
+                new_images = list(instance.images.all().values_list('name', flat=True))
+                image_list = []
+
+                for image in set(old_images + new_images):
+                    if image not in old_images:
+                        image = f'<b>{image} (Add)</b>'
+                    elif image not in new_images:
+                        image = f'<b>{image} (Remove)</b>'
+                    image_list.append(image)
+                    
+                self.context['image_list'] = image_list
+
+        self.add_attribute(self.owner.id, instance.owner.name)
+        if self.description == '':
+            self.description = render_to_string(self.template, self.context)
+
+    def add_attribute(self, id, value):
+        self.attributes.append(
+            {
+                "ID": id, 
+                "Value": value
+            }
+        )
+
+    @property
+    def data(self):
+        return {
+            "FormID": self.form_id,
+            "TypeID": self.type_id,
+            "SourceID": self.source_id,
+            "StatusID": self.status_id,
+            "ServiceID": self.service_id,
+            "ResponsibleGroupID": self.responsible_group_id,
+            "Title": self.title,
+            "RequestorEmail": self.request.user.email,
+            "Description": self.description,
+            "IsRichHtml": True,
+            "Attributes": getattr(self, 'attributes', []),
+            "Tasks": getattr(self, 'tasks', []),
+            }      #| kwargs
+
+
+class PoolPayload(MiDesktopPayload):
+    service_id = 58  # New Order
+    form_id = 85
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.attributes = []
+        self.context = {}
+        self.tasks = []
+        if action == 'Modify':
+            self.service_id = 64  # Modify Pool
+            self.form_id = 111      
+        elif action == 'Delete':
+            self.service_id = 65  # Delete Pool
+            self.form_id = 112
+
+        self.add_attribute(self.midesktop_pool_type.id, getattr(self.midesktop_pool_type, instance.type))
+        self.add_attribute(self.pool_name.id, instance.name)
+        image_list = instance.images.all()
+        if len(image_list) > 0:
+            self.add_attribute(self.image_name.id, image_list[0].name)
+        self.context = {'pool': instance}
+        super().__init__(action, instance, request, **kwargs)
+
+class ImagePayload(MiDesktopPayload):
+    service_id = 58  # New Order
+    form_id = 85
+
+    template = 'project/tdx_midesktop_image.html'
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.attributes = []
+        self.context = {}
+        self.tasks = []
+        if action == 'Modify':
+            self.service_id = 61
+            self.form_id = 109
+
+            if 'new_disks' in kwargs:
+                changed_disks = []
+                old_disks = kwargs.get('old_disks')
+                new_disks = kwargs.get('new_disks')
+
+                for disk in range(len(new_disks)):
+                    if new_disks[disk] == '':
+                        break
+                   
+                    if disk > len(old_disks)-1:
+                        changed_disks.append(f'disk_{disk}')
+                    else:
+                        if int(new_disks[disk])  != old_disks[disk]:
+                            changed_disks.append(f'disk_{disk}')
+
+                self.context['changed_disks'] = changed_disks
+
+        if action == 'Delete':
+            self.service_id = 63
+            self.form_id = 110 
+        self.add_attribute(self.image_name.id, instance.name)
+        self.context['image'] = instance
+        super().__init__(action, instance, request, **kwargs)
+
+
+class NetworkPayload(MiDesktopPayload):
+    template = 'project/tdx_midesktop_network.html'
+    UMNET = 14
+    form_id = 85
+    service_id = 58  # New Order
+
+    def __init__(self, action, instance, request, **kwargs):
+        self.attributes = []
+        self.context = {}
+        self.tasks = []
+        #if action == 'New':
+        #    self.add_attribute(self.network_type.id, self.network_type.New)
+
+        if action == 'Delete':
+            self.description = f'Delete Network: {instance.name}'
+
+        super().__init__(action, instance, request, **kwargs)
+
 
 def create_ticket(action, instance, request, **kwargs):
     service = type(instance).__name__
     service = service.upper()
 
     payload = globals()[service.capitalize() + 'Payload'](action, instance, request, **kwargs)
-
     resp = TDx().create_ticket(payload.data)
     if not resp.ok:
         print('TDx response', resp.status_code, resp.text)

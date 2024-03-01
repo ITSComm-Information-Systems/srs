@@ -32,3 +32,21 @@ class GCPAccountAdmin(CloudAdmin):
     inlines = [GCPInline]
     
 
+class ImageDiskInline(admin.TabularInline):
+    model = ImageDisk
+    ordering = ('name',)
+
+
+@admin.register(Image)
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ['name', 'owner']
+    inlines = (ImageDiskInline,)
+
+@admin.register(Network)
+class NetworkAdmin(admin.ModelAdmin):
+    list_display = ['name', 'owner']
+
+
+@admin.register(Pool)
+class PoolAdmin(admin.ModelAdmin):
+    list_display = ['name', 'owner', 'shortcode']

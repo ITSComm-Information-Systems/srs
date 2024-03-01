@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>MiDesktop Images</h1>
+<table class="table table-hover table-striped table-sm">
+    <tr>
+        <th>Name</th>
+        <th>Associated Pools</th>
+        <th>Owner</th>
+        <th></th>
+    </tr>
+
+    {% for rec in image_list %}
+    <tr>
+        <td>{{ rec.name }}</td>
+        <td>
+            {% for pool in rec.pool_set.all %}
+                {{ pool }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </td>  
+        <td>{{ rec.owner }}</td>  
+        <td>
+            <a href="/services/midesktop-image/{{ rec.id }}/change/">
+                <i class="fas fa-edit"></i>
+            </a>
+            &nbsp;
+            {% if not rec.is_foreign_key_in_pool %}
+                <a href="/services/midesktop-image/{{ rec.id }}/delete/">
+                    <i class="fas fa-trash"></i>
+                </a>
+            {% endif %}
+            
+        </td>
+    </tr>
+
+
+    {% endfor %}
+
+</table>
+{% endblock %}
