@@ -93,7 +93,7 @@
                 <strong>{{ tab.form.ram.label }}</strong>
             </label>
             <small class="text-muted form-text" id="ram"> {{ tab.form.ram.field.description }}</small>
-            <input style="display: inline;" type="number" name="ram" min="2" class="form-control form-inlin col-2"
+            <input style="display: inline;" type="number" name="ram" min="4" class="form-control form-inlin col-2"
                 max="64" required="" id="id_ram" value="{{ tab.form.ram.value }}">
             <span id="ram_cost" data-rate="{{ tab.form.ram_rate }}" class="float-right">{{ tab.form.ram_cost }}</span>
             {% for error in field.errors %}
@@ -129,3 +129,12 @@
 </div>
 <input type="hidden" name="total_cost" id="total_cost_field">
 
+
+<script>
+    cpu = document.getElementById("id_cpu");
+    cpu.addEventListener("change", function () {
+        if (cpu.value < 2) {
+            cpu.value = 2
+        } 
+    });
+</script>

@@ -231,7 +231,10 @@ class Deskset(LoginRequiredMixin, View):
                 dept_list[0].selected = 'selected'
                 dept_id = dept_list[0].dept_id
 
-        phone_list = SelectionV.objects.filter(dept_id=dept_id, migrate='YES', processing_status="Completed")
+        phone_list = SelectionV.objects.filter(dept_id=dept_id, migrate='YES'
+                                               , processing_status="Completed"
+                                               , cut_date__gte=datetime.datetime.now()-datetime.timedelta(days=188)  # > six months no matter how you slice it.
+                                               )
 
         return render(request, 'softphone/deskset.html',
                       {'title': self.title,

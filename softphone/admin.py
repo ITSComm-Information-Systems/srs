@@ -37,54 +37,53 @@ class SelectionBulkUpdateForm(forms.Form):
     cut_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
 
 
-class ZoomListFilter(admin.SimpleListFilter):
-    title = 'Zoom Login'
-    parameter_name = 'zoom'
-
-    def lookups(self, request, model_admin):
-        return (('YES', 'Yes'), ('NO', 'No'),)
+class DefaultListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
-        if self.value() == 'YES':
-            subscriber_list = list(SelectionV.objects.filter(zoom_login='Y').values_list('subscriber', flat=True))
-            return queryset.filter(subscriber__in=subscriber_list)
-        if self.value() == 'NO':
-            subscriber_list = list(SelectionV.objects.filter(zoom_login='N').values_list('subscriber', flat=True))
-            return queryset.filter(subscriber__in=subscriber_list)
- 
+        if self.value():
+            if self.value() == 'None':  # User selects 'None' vs no parameter selected.
+                return queryset.filter(**{self.parameter_name + '__isnull': True}) 
+            else:
+                return queryset.filter(**{self.parameter_name: self.value()}) 
 
-class ProcessingStatusListFilter(admin.SimpleListFilter):
+    def lookups(self, request, model_admin):
+        return self.static_lookups
+
+
+class ZoomListFilter(DefaultListFilter):
+    title = 'Zoom Login'
+    parameter_name = 'zoom_login'
+    static_lookups = (('Y', 'Yes'), ('N', 'No'),)
+
+
+class ProcessingStatusListFilter(DefaultListFilter):
     title = 'Processing Status'
     parameter_name = 'processing_status'
+    static_lookups =  (('Selected', 'Selected'), ('Completed', 'Completed'),  ('On Hold', 'On Hold'),('Disconnected', 'Disconnected'), ('None', 'None'), )
+
+
+class DuoListFilter(DefaultListFilter):
+    title = 'Duo Phone'
+    parameter_name = 'duo_phone'
+    static_lookups =  (('Y', True), ('N', False))
+
+
+class MigrateFilter(DefaultListFilter):
+    title = 'Migrate'
+    parameter_name = 'migrate'
 
     def lookups(self, request, model_admin):
-        return (('Selected', 'Selected'), ('Completed', 'Completed'),  ('On Hold', 'On Hold'),('Disconnected', 'Disconnected'), ('None', 'None'), )
+        migrate_list = []
+        for migrate in Selection.objects.distinct().order_by('migrate').values_list('migrate', flat=True):
+            if migrate == None:
+                migrate_list.append(('None',migrate))            
+            else:
+                migrate_list.append((migrate,migrate))
 
-    def queryset(self, request, queryset):
-        if self.value() == None:
-            return queryset
-        elif self.value() == 'None':
-            return queryset.filter(processing_status__isnull=True)
-        else:
-            return queryset.filter(processing_status=self.value())
-
-
-class DuoListFilter(admin.SimpleListFilter):
-    title = 'Duo User'
-    parameter_name = 'duo'
-
-    def lookups(self, request, model_admin):
-        return (('True', True), ('False', False))
-
-    def queryset(self, request, queryset):
-        service_number_list = list(DuoUser.objects.values_list('service_number', flat=True))
-        if self.value() == 'True':
-            return queryset.filter(service_number__in=service_number_list)
-        if self.value() == 'False':
-            return queryset.exclude(service_number__in=service_number_list)
+        return migrate_list
 
 
-class CutDateListFilter(admin.SimpleListFilter):
+class CutDateListFilter(DefaultListFilter):
     title = 'Cut Date'
     parameter_name = 'cut_date'
 
@@ -97,23 +96,20 @@ class CutDateListFilter(admin.SimpleListFilter):
                 cut_date_list.append((cut_date,cut_date))
 
         return cut_date_list
-
-    def queryset(self, request, queryset):
-        if self.value() == None:
-            return queryset
-        elif self.value() == 'None':
-            return queryset.filter(cut_date__isnull=True)
-        else:
-            return queryset.filter(cut_date=self.value())
-
+    
 
 @admin.register(SelectionV)
 class SelectionAdmin(admin.ModelAdmin):
+    show_full_result_count = False   # Removes one of the two count(*) queries
     list_display = ['service_number','dept_id','zoom_login','subscriber','uniqname','migrate','updated_by','update_date','processing_status','cut_date','building_code']
     ordering = ['-update_date']
     search_fields = ['service_number','uniqname','updated_by','building_code']
-    list_filter = [ProcessingStatusListFilter,'migrate',CutDateListFilter, 'duo_phone','zoom_login']
-    date_hierarchy = 'cut_date'
+    list_filter = [ProcessingStatusListFilter
+                   ,MigrateFilter
+                   ,CutDateListFilter
+                   ,DuoListFilter
+                   ,ZoomListFilter]
+    date_hierarchy = 'cut_date'   # Adds two queries
     form = SelectionForm
     actions = ['update_selections','download_csv']
     readonly_fields = ['zoom_login','duo_phone','dept_id','phone','subscriber_last_name','subscriber_first_name','subscriber_uniqname']
