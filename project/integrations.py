@@ -687,6 +687,17 @@ class MiDesktopPayload(Payload):
                     
                 self.context['image_list'] = image_list
 
+            # get display values for network
+            netlabs = {}
+            from services.forms import MiDesktopNewNetworkForm
+            netfields = MiDesktopNewNetworkForm().fields
+            for field in ['mask','dhcp','protection','access_internet']:
+                value = self.form.cleaned_data.get(field)
+                if value:
+                    netlabs[field] = dict(netfields[field].choices)[value]
+
+            self.context['netlabs'] = netlabs
+
         self.add_attribute(self.owner.id, instance.owner.name)
         if self.description == '':
             self.description = render_to_string(self.template, self.context)
