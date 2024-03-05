@@ -645,7 +645,7 @@ class MiDesktopPayload(Payload):
             base_image = self.form.cleaned_data.get('base_image')
             if base_image == 999999999:
                 self.add_attribute(self.image_type.id, self.image_type.New)
-            else:
+            elif base_image:
                 self.add_attribute(self.image_type.id, self.image_type.Existing)
 
             network_type = self.form.cleaned_data.get('network_type')
@@ -686,6 +686,17 @@ class MiDesktopPayload(Payload):
                     image_list.append(image)
                     
                 self.context['image_list'] = image_list
+
+            # get display values for network
+            netlabs = {}
+            from services.forms import MiDesktopNewNetworkForm
+            netfields = MiDesktopNewNetworkForm().fields
+            for field in ['mask','dhcp','protection','access_internet']:
+                value = self.form.cleaned_data.get(field)
+                if value:
+                    netlabs[field] = dict(netfields[field].choices)[value]
+
+            self.context['netlabs'] = netlabs
 
         self.add_attribute(self.owner.id, instance.owner.name)
         if self.description == '':

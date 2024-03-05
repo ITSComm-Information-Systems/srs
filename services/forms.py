@@ -363,12 +363,12 @@ StorageFormSet = formset_factory(StorageForm, extra=1)
 
 class CalculatorForm(forms.Form):
     cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES, label="CPU")
-    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, label="CPU Cost", widget=forms.TextInput(attrs={'readonly':'true'}))
     memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
     memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
-    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, label="GPU Cost", widget=forms.TextInput(attrs={'readonly':'true'}))
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
 
     storage_formset = StorageFormSet(prefix='disk')
@@ -453,7 +453,7 @@ class MiDesktopNewForm(MiDesktopForm):
     operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),('Windows11 64bit','Windows11 64bit')))
 
     cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES, label="CPU")
-    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, label="CPU Cost", widget=forms.TextInput(attrs={'readonly':'true'}))
     memory = forms.ChoiceField(required=False,choices=RAM_CHOICES)
     memory_cost = forms.DecimalField(required=False,initial=MEMORY_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     storage = forms.ChoiceField(required=False,choices=STORAGE_CHOICES)
@@ -463,7 +463,7 @@ class MiDesktopNewForm(MiDesktopForm):
     multi_disk = forms.CharField(required=False)
 
     gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
-    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
+    gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, label="GPU Cost", widget=forms.TextInput(attrs={'readonly':'true'}))
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     network_type = forms.ChoiceField(required=False,label='Will you be using a shared network or a dedicated network?',choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
     network  = forms.CharField(required=False)

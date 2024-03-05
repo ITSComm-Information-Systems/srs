@@ -9,6 +9,9 @@
                 {%if 'shortcode' in changed_data %}*{% endif %}{{ pool.shortcode }}</td></tr>
             <tr><td>Owner</td><td {%if 'owner' in changed_data %}style="font-weight: bold;"{% endif %}>
                 {%if 'owner' in changed_data %}*{% endif %}{{ pool.owner }}</td></tr>
+            {% if form.cleaned_data.pool_accessibility %}
+            <tr><td>Pool Accessibility</td><td>{{ form.cleaned_data.pool_accessibility }}</td></tr>
+            {% endif %}
             {% if form.cleaned_data.pool_type %}
             <tr><td>Pool Type</td><td>{{ form.cleaned_data.pool_type }}</td></tr>
             {% endif %}
