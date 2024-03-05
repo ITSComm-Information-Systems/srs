@@ -616,11 +616,11 @@ class MiDesktopPayload(Payload):
     form_id = 555	             # ITS-MiDesktop - Form
     priority_id = 19 # Medium
 
-    midesktop_request_type = ChoiceAttribute(14642, Pool=46858, Image=46859, Network=46860)  
-    midesktop_pool_type = ChoiceAttribute(14643, external=46861, instant_clone=46862, persistent=46863)  
+    midesktop_request_type = ChoiceAttribute(14923, Pool=56252, Image=56253, Network=56254)  
+    midesktop_pool_type = ChoiceAttribute(14924, external=56255, instant_clone=56256, persistent=56257)  
     new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
     owner = TextAttribute(2343)         # midesktop_MComm group textbox
-    shared = ChoiceAttribute(2344, New=903, Shared=895, Existing=46881)        # midesktop_Shared Dedicated dropdown
+    shared = ChoiceAttribute(2344, New=903, Shared=895, Existing=56259)        # midesktop_Shared Dedicated dropdown
     #network_type = ChoiceAttribute(2345, Existing=896, New=897, Shared=898)  # private web-access dedicated
     image_type = ChoiceAttribute(2346, Existing=899, New=900, Clone=901)
     image_name = TextAttribute(2347)    # midesktop_Base Image Name textbox
