@@ -3,9 +3,11 @@
         <caption><h4>Network</h4></caption>
         <tbody>
             <tr><td>Network Name</td><td>{% firstof form.cleaned_data.network_name form.cleaned_data.name %}</td></tr>
-            <tr><td>Internet</td><td>{{ form.cleaned_data.access_internet }}</td></tr>
+            <tr><td>Purpose</td><td>{{ form.cleaned_data.purpose }}</td></tr>
+            <tr><td>Access Internet</td><td>{{ form.cleaned_data.access_internet }}</td></tr>
             <tr><td>Mask</td><td>{{ form.cleaned_data.mask }}</td></tr>
-            <tr><td>Protection</td><td>{{ form.cleaned_data.protection }}</td></tr>
+            <tr><td>DHCP</td><td>{{ form.cleaned_data.dpcp }}</td></tr>
+            <tr><td>Firewall Protection</td><td>{{ form.cleaned_data.protection }}</td></tr>
             <tr><td>Technical Contact</td><td>{{ form.cleaned_data.technical_contact }}</td></tr>
             <tr><td>Business Contact</td><td>{{ form.cleaned_data.business_contact }}</td></tr>
             <tr><td>Security Contact</td><td>{{ form.cleaned_data.security_contact }}</td></tr>

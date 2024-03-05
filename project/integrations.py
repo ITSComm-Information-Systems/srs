@@ -645,7 +645,7 @@ class MiDesktopPayload(Payload):
             base_image = self.form.cleaned_data.get('base_image')
             if base_image == 999999999:
                 self.add_attribute(self.image_type.id, self.image_type.New)
-            else:
+            elif base_image:
                 self.add_attribute(self.image_type.id, self.image_type.Existing)
 
             network_type = self.form.cleaned_data.get('network_type')
