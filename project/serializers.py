@@ -152,6 +152,17 @@ class NetworkSerializer(serializers.ModelSerializer):
         fields = ['id','status','name','created_date','size','vlan_id','owner']
         model = Network
 
+    def create(self, validated_data):
+        instance = super().create(validated_data)    
+
+        r = self.context['request']
+        image = r.data.get('image')
+        if image:
+            i = Image.objects.get(name=image)
+            i.network_id=instance.id
+            i.save()
+
+        return instance
 
 class ImageSerializer(serializers.ModelSerializer):
 
