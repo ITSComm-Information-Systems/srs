@@ -178,7 +178,7 @@ class PauseUser(LoginRequiredMixin, View):
 
         date_list = [(None,'---')]
 
-        for rec in CutDate.objects.filter(cut_date__gt=cut_date).order_by('cut_date')[:3]:
+        for rec in CutDate.objects.filter(cut_date__gt=cut_date).order_by('cut_date')[:1]:
             date_list.append((rec.cut_date.strftime("%Y-%m-%d"), f'Until {rec.cut_date.strftime("%B %d, %Y")}'))
 
         date_list.append(('Never', 'Do not implement softphone'))
