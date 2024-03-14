@@ -1,0 +1,28 @@
+
+{% if numbers|length > 0 %}
+<table class="table table-hover table-striped table-sm">
+    <thead>
+        <tr>
+            <th scope="col">
+                Number
+            </th>
+            <th scope="col">
+                Unique ID
+            </th>
+        </tr> 
+    </thead>
+    <tbody>
+        {% for number in numbers %}
+        <tr>
+            <td>
+                {{ number }}
+            </td>
+            <td>
+                {{ unique_id }}
+            </td>
+        </tr>
+        {% endfor %}
+</table>
+{% else %}
+    <p>No numbers found for this user.</p>
+{% endif %}

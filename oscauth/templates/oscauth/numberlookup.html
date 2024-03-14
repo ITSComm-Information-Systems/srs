@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<h1>{{ title }}</h1>
+<form method="POST" class="needs-validation" novalidate hx-post="{% url 'get-numbers' %}" hx-target="#message" hx-swap="innerHTML">{% csrf_token %}
+    <label for="deptf">
+        <strong>Enter the Uniqname to search for associated numbers.</strong>
+    </label>
+    <br>
+    <span id="user_param">
+        <input type='text' name="user_param" class="form-control text-field-short col-4" placeholder='Uniqname'>
+    </span>
+    <input type='submit' class='btn btn-primary'>
+</form>
+<br/>
+
+<div id="message"></div>
+
+
+{% endblock %}
+
+{% block js %}
+<!-- <script type="text/javascript" src="/static/select.js"></script> -->
+{% endblock %}
