@@ -1,28 +1,35 @@
 
-{% if numbers|length > 0 %}
+{% if records|length > 0 %}
+<h2>Results for: {{ unique_id }}</h2>
 <table class="table table-hover table-striped table-sm">
     <thead>
         <tr>
             <th scope="col">
-                Number
+                User ID
             </th>
             <th scope="col">
-                Unique ID
+                Subscriber ID
             </th>
         </tr> 
     </thead>
     <tbody>
-        {% for number in numbers %}
+        {% for record in records %}
         <tr>
             <td>
-                {{ number }}
+                {{ record.user_defined_id }}
             </td>
             <td>
-                {{ unique_id }}
+                {{ record.subscriber_id }}
             </td>
         </tr>
         {% endfor %}
 </table>
+
 {% else %}
     <p>No numbers found for this user.</p>
 {% endif %}
+
+<!-- This is an out of band replacement of the uniqname field. This will replace the input with a blank input field when the user submits data -->
+<span id="user_param" hx-swap-oob="true">
+    <input name="user_param" type='text' name="user_param" class="form-control text-field-short col-4" placeholder='Uniqname'>
+</span>

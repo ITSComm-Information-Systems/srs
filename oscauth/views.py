@@ -699,16 +699,16 @@ def numberlookup(request):
 
 def get_numbers(request, *args, **kwargs):
     user_param = request.POST.get('user_param', '') 
-    number_list=[]
+    record_list=[]
     try:
         osc_user = User.objects.get(username=user_param)
         print(osc_user)
     except:
         return HttpResponse('<div>User not found</div>')
     
-    
-    for record in UmOscServiceProfileV.objects.filter(uniqname=osc_user, service_status_code="In Service", subscriber_status="Active", service_type__in=["Vendor Voice", "VoIP"]):
-        number_list.append(record.service_number)
-    print(number_list)
+    # service_type__in=["Vendor Voice", "VoIP"]
+    for record in UmOscServiceProfileV.objects.filter(uniqname=osc_user, service_status_code="In Service", subscriber_status="Active"):
+        record_list.append(record)
 
-    return render(request, 'oscauth/numbertable.html', {'numbers': number_list,'unique_id':osc_user}) 
+
+    return render(request, 'oscauth/numbertable.html', {'records': record_list,'unique_id':osc_user}) 

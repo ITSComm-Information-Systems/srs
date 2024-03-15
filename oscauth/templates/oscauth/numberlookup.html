@@ -3,7 +3,7 @@
 
 
 <h1>{{ title }}</h1>
-<form method="POST" class="needs-validation" novalidate hx-post="{% url 'get-numbers' %}" hx-target="#message" hx-swap="innerHTML">{% csrf_token %}
+<form method="POST" hx-post="{% url 'get-numbers' %}" hx-target="#message" name="number_lookup_form">{% csrf_token %}
     <label for="deptf">
         <strong>Enter the Uniqname to search for associated numbers.</strong>
     </label>
