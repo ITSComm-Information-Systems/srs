@@ -23,7 +23,6 @@ urlpatterns = [
     path('modpriv/', views.modpriv),
 
     path('userid/',views.userid),
-    path('numberlookup/',views.numberlookup),
-    path('get_numbers/',views.get_numbers,name='get-numbers'),
+    path('numberlookup/',views.numberlookup,name='number-lookup'),
 
 ]

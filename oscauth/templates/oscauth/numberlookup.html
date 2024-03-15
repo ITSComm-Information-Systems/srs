@@ -3,7 +3,7 @@
 
 
 <h1>{{ title }}</h1>
-<form method="POST" hx-post="{% url 'get-numbers' %}" hx-target="#message" name="number_lookup_form">{% csrf_token %}
+<form method="POST" hx-post="{% url 'number-lookup' %}" hx-target="#message" name="number_lookup_form" hx-disabled-elt="#submit-button">{% csrf_token %}
     <label for="deptf">
         <strong>Enter the Uniqname to search for associated numbers.</strong>
     </label>
@@ -11,7 +11,7 @@
     <span id="user_param">
         <input type='text' name="user_param" class="form-control text-field-short col-4" placeholder='Uniqname'>
     </span>
-    <input type='submit' class='btn btn-primary'>
+    <input id='submit-button' type='submit' class='btn btn-primary'>
 </form>
 <br/>
 

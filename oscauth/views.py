@@ -695,22 +695,26 @@ def userid(request):
     return HttpResponse(template.render(context, request))
 
 def numberlookup(request):
-    return render(request, 'oscauth/numberlookup.html', {'title': 'Number Look Up'})
+    if request.method == 'GET':
+        return render(request, 'oscauth/numberlookup.html', {'title': 'Number Look Up'})
 
-def get_numbers(request):
-    user_param = request.POST.get('user_param', '') 
-    try:
-        osc_user = User.objects.get(username=user_param)
-    except User.DoesNotExist:
-        return HttpResponse('<div>User not found</div>')
-    
-    dept_list = AuthUserDept.objects.filter(user=osc_user).values_list('dept', flat=True)
+    elif request.method == 'POST':
+        user_param = request.POST.get('user_param', '') 
+        try:
+            osc_user = User.objects.get(username=user_param)
+        except User.DoesNotExist:
+            return HttpResponse('<div>User not found</div>')
+        
+        dept_list = AuthUserDept.objects.filter(user=osc_user).values_list('dept', flat=True)
 
-    record_list = UmOscServiceProfileV.objects.filter(
-        uniqname=osc_user, 
-        service_status_code="In Service", 
-        subscriber_status="Active", 
-        deptid__in=dept_list
-    )
+        record_list = UmOscServiceProfileV.objects.filter(
+            uniqname=osc_user, 
+            service_status_code="In Service", 
+            subscriber_status="Active", 
+            deptid__in=dept_list
+        )
 
-    return render(request, 'oscauth/numbertable.html', {'records': record_list,'unique_id':osc_user})
+        return render(request, 'oscauth/numbertable.html', {'records': record_list,'unique_id':osc_user})
+
+    else:
+        return HttpResponse('<div>Invalid request method</div>')
