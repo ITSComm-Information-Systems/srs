@@ -697,18 +697,20 @@ def userid(request):
 def numberlookup(request):
     return render(request, 'oscauth/numberlookup.html', {'title': 'Number Look Up'})
 
-def get_numbers(request, *args, **kwargs):
+def get_numbers(request):
     user_param = request.POST.get('user_param', '') 
-    record_list=[]
     try:
         osc_user = User.objects.get(username=user_param)
-        print(osc_user)
-    except:
+    except User.DoesNotExist:
         return HttpResponse('<div>User not found</div>')
     
-    # service_type__in=["Vendor Voice", "VoIP"]
-    for record in UmOscServiceProfileV.objects.filter(uniqname=osc_user, service_status_code="In Service", subscriber_status="Active"):
-        record_list.append(record)
+    dept_list = AuthUserDept.objects.filter(user=osc_user).values_list('dept', flat=True)
 
+    record_list = UmOscServiceProfileV.objects.filter(
+        uniqname=osc_user, 
+        service_status_code="In Service", 
+        subscriber_status="Active", 
+        deptid__in=dept_list
+    )
 
-    return render(request, 'oscauth/numbertable.html', {'records': record_list,'unique_id':osc_user}) 
+    return render(request, 'oscauth/numbertable.html', {'records': record_list,'unique_id':osc_user})
