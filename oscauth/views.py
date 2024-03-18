@@ -711,7 +711,6 @@ def numberlookup(request):
             uniqname=osc_user, 
             service_status_code="In Service", 
             subscriber_status="Active", 
-            deptid__in=dept_list
         )
 
         return render(request, 'oscauth/numbertable.html', {'records': record_list,'unique_id':osc_user})
