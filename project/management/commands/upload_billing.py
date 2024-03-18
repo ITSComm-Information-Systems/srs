@@ -13,9 +13,12 @@ class ServiceBilling():
     help = 'Upload Billing data for Mi-services to Pinnacle'
     heading = ['shortcode','size','name','date_created','rate_name','total_cost','owner']
 
-    def get_records(self):
+    def __init__(self):
+        today = datetime.now().strftime('%m%d%Y')
+        self.today = int(today)
         self.service = self.__class__.__name__
 
+    def get_records(self):
         with connection.cursor() as cursor:
             cursor.execute(self.sql)
             instances = self.dictfetchall(cursor)
@@ -33,8 +36,6 @@ class ServiceBilling():
     def upload_data(self, instances):
         print(datetime.now(), 'Upload Records')
 
-        today = datetime.now().strftime('%m%d%Y')
-        self.today = int(today)
         x = 0
         total_cost = 0
 
@@ -98,7 +99,7 @@ class ServiceBilling():
         
 
 class MiDesktop(ServiceBilling):
-    owner_email = 'MiServer.Support@umich.edu'
+    owner_email = 'midesktop.support@umich.edu'
     heading = ['shortcode','size','name','date_created','rate_name','total_cost','voucher_comment']
     sql = '''
             select shortcode,quantity as "TOTAL_SIZE",name,CREATED_DATE,'MD-MIDSKTP V' as rate_name,
@@ -114,6 +115,7 @@ class MiDesktop(ServiceBilling):
             on pi.pool_id = pool.id
             left join srs_services_image_cost_v image
             on pi.image_id = image.id
+            where pool.status = 'A'
             group by pool.name, shortcode, quantity, pool.created_date, pool.owner_id, pool."TYPE"
             ) 
             order by name
