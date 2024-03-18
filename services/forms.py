@@ -293,7 +293,7 @@ class ContainerNewForm(CloudForm):
     def save(self):
         # Create project in openshift, don't save to SRS.
         os = Openshift()
-        os.create_project(self.instaance, self.user.username)
+        os.create_project(self.instance, self.user.username)
 
 class MiDesktopForm(forms.Form):
     admin_group = forms.ChoiceField(label='MCommunity Admin Group')
