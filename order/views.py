@@ -963,6 +963,12 @@ class ServerView(UserPassesTestMixin, View):
         instance = get_object_or_404(Server, pk=instance_id)
         create_ticket_server_delete(instance, request.user, f'End Service for {instance.name}')
 
+        current_time = datetime.datetime.now()
+        formatted_date = current_time.strftime('%Y%m%d')
+        suffix = "-Ended-" + formatted_date
+        instance.name = instance.name + suffix
+
+
         instance.in_service = False
         instance.save()
 
