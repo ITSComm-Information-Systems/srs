@@ -24,7 +24,7 @@ def validate_shortcode(value):
                request = api.get_shortcode(value)
                if request.ok:
                     json = request.json()
-                    shortcode = json['ShortCodes']['ShortCode']
+                    shortcode = json['ShortCodes']['ShortCode'][0]
                     descr = shortcode['shortCodeDescription']
                     status = shortcode['ShortCodeStatusDescription']
                else:

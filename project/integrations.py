@@ -2,7 +2,7 @@ import json, yaml, requests
 from django.conf import settings
 from ldap3 import Server, Connection, ALL, MODIFY_ADD
 from django.template.loader import render_to_string
-
+from django.core.mail import mail_admins
 class MCommunity:
 
     def __init__(self):
@@ -134,7 +134,7 @@ class ShortCodesAPI(UmAPI):
         self._get_token(self.SCOPE)
 
     def get_shortcode(self, shortcode):        
-        url = f'{self.BASE_URL}/um/bf/ShortCodes/ShortCodes/{shortcode}'
+        url = f'{self.BASE_URL}/um/bf/ShortCodes/v2/ShortCodes/{shortcode}'
         return requests.get(url, headers=self.headers)
 
 class Openshift():
@@ -168,7 +168,7 @@ class Openshift():
 
             try:
                 sc = ShortCodesAPI().get_shortcode(instance.shortcode).json()
-                dept_name =  sc['ShortCodes']['ShortCode']['deptDescription']
+                dept_name =  sc['ShortCodes']['ShortCode'][0]['deptDescription']
                 payload['metadata']['annotations']['billing-dept-name'] = dept_name
             except:
                 print('error getting shortcode')
@@ -182,6 +182,7 @@ class Openshift():
                 self.add_backup(instance)
         else:
             print('error', r.status_code, r.text)
+            mail_admins('Error Openshift.create_project()', r.text, fail_silently=True)
             raise RuntimeError(r.status_code, r.text)
 
     def create_role_bindings(self, instance):
@@ -199,19 +200,27 @@ class Openshift():
                 }
                 
                 r = requests.post(url, headers=self.HEADERS, json=body)
+                if not r.ok:
+                    mail_admins('Error Openshift.create_role_bindings()', r.text, fail_silently=True)
 
     def add_limits(self, instance):
         limits = self.get_yaml(instance.size)
-        return requests.post(f'{self.API_ENDPOINT}/api/v1/namespaces/{instance.project_name}/limitranges'
+        r = requests.post(f'{self.API_ENDPOINT}/api/v1/namespaces/{instance.project_name}/limitranges'
                              , headers=self.HEADERS, json=limits)
+        if not r.ok:
+            mail_admins('Error Openshift.add_limits()', r.text, fail_silently=True)
+        return r
 
     def add_backup(self, instance):
         payload = self.get_yaml('backup')
         payload['metadata']['name'] = f'backup-schedule-{instance.project_name}'
         payload['spec']['template']['includedNamespaces'][0] = instance.project_name
 
-        return requests.post(f'{self.API_ENDPOINT}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
+        r = requests.post(f'{self.API_ENDPOINT}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
                              , headers=self.HEADERS)
+        if not r.ok:
+            mail_admins('Error Openshift.add_backup()', r.text, fail_silently=True)
+        return r
 
     def add_network_policy(self, instance):
         payload = self.get_yaml('networkpolicy')
@@ -220,6 +229,9 @@ class Openshift():
 
             r = requests.post(f'{self.API_ENDPOINT}/apis/networking.k8s.io/v1/namespaces/{instance.project_name}/networkpolicies'
                                 , headers=self.HEADERS, json=item)
+
+            if not r.ok:
+                mail_admins('Error Openshift.add_network_policy()', r.text, fail_silently=True)
 
     def get_yaml(self, file):
         file = f'{settings.BASE_DIR}/project/rosa/{file}.yaml'
