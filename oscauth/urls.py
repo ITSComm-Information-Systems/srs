@@ -23,5 +23,6 @@ urlpatterns = [
     path('modpriv/', views.modpriv),
 
     path('userid/',views.userid),
+    path('numberlookup/',views.numberlookup,name='number-lookup'),
 
 ]

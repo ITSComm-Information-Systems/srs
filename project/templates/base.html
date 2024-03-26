@@ -28,6 +28,9 @@
 	<!-- Searchable select -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" />
 	<link rel="stylesheet" href="/static/select2-bootstrap4.css">
+
+	<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+	
 	{% block styles %}
 	<style>
 		#aux-nav {
@@ -78,6 +81,7 @@
 								{% endif %}
 								<a class="dropdown-item" href="/auth/deptpriv/">Department Look Up</a>
 								<a class="dropdown-item" href="/auth/userid/">User ID Look Up</a>
+								<a class="dropdown-item" href="/auth/numberlookup/">Number Look Up</a>
 								{% if perms.oscauth.can_administer_access %}
 								<a class="dropdown-item" href="/orders/chartcom/0">Manage Chartfields</a>
 								{% endif %}
