@@ -693,3 +693,44 @@ def userid(request):
         'user_list':user_list,
     }
     return HttpResponse(template.render(context, request))
+
+from django import template
+
+register = template.Library()
+
+
+def numberlookup(request):
+    if request.method == 'GET':
+        return render(request, 'oscauth/numberlookup.html', {'title': 'Number Look Up'})
+
+    elif request.method == 'POST':
+        user_param = request.POST.get('user_param', '') 
+        try:
+            osc_user = User.objects.get(username=user_param)
+        except User.DoesNotExist:
+            return HttpResponse('<div>User not found</div>')
+        
+        dept_list = AuthUserDept.objects.filter(user=osc_user).values_list('dept', flat=True)
+
+        service_list = UmOscServiceProfileV.objects.filter(
+            uniqname=osc_user, 
+            service_status_code="In Service", 
+            subscriber_status="Active", 
+            deptid__in=dept_list,
+        )
+
+        
+        record_list = []
+        for record in service_list:
+            parts = record.mrc_exp_chartfield.split('-')
+            record.fund = parts[0]
+            record.program = parts[2]
+            record.chartcom_class = parts[3]
+
+            record_list.append(record)
+
+
+        return render(request, 'oscauth/numbertable.html', {'records': record_list,'unique_id':osc_user})
+
+    else:
+        return HttpResponse('<div>Invalid request method</div>')
