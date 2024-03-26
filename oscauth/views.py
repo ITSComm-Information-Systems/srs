@@ -694,6 +694,11 @@ def userid(request):
     }
     return HttpResponse(template.render(context, request))
 
+from django import template
+
+register = template.Library()
+
+
 def numberlookup(request):
     if request.method == 'GET':
         return render(request, 'oscauth/numberlookup.html', {'title': 'Number Look Up'})
@@ -707,12 +712,23 @@ def numberlookup(request):
         
         dept_list = AuthUserDept.objects.filter(user=osc_user).values_list('dept', flat=True)
 
-        record_list = UmOscServiceProfileV.objects.filter(
+        service_list = UmOscServiceProfileV.objects.filter(
             uniqname=osc_user, 
             service_status_code="In Service", 
             subscriber_status="Active", 
             deptid__in=dept_list,
         )
+
+        
+        record_list = []
+        for record in service_list:
+            parts = record.mrc_exp_chartfield.split('-')
+            record.fund = parts[0]
+            record.program = parts[2]
+            record.chartcom_class = parts[3]
+
+            record_list.append(record)
+
 
         return render(request, 'oscauth/numbertable.html', {'records': record_list,'unique_id':osc_user})
 

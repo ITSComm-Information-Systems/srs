@@ -4,23 +4,33 @@
 <table class="table table-hover table-striped table-sm">
     <thead>
         <tr>
-            <th scope="col">
-                User ID
-            </th>
-            <th scope="col">
-                Subscriber ID
-            </th>
+            <th scope="col">User ID</th>
+            <th scope="col">Subscriber ID</th>
+            <th scope="col">Service Type</th>
+            <th scope="col">Fund</th>
+            <th scope="col">Dept. ID</th>
+            <th scope="col">Program</th>
+            <th scope="col">Class</th>
+            <th scope="col">Building</th>
+            <th scope="col">Floor</th>
+            <th scope="col">Room</th>
+            <th scope="col">Jack</th>
         </tr> 
     </thead>
     <tbody>
         {% for record in records %}
         <tr>
-            <td>
-                {{ record.user_defined_id }}
-            </td>
-            <td>
-                {{ record.subscriber_id }}
-            </td>
+            <td>{{ record.user_defined_id }}</td>
+            <td>{{ record.subscriber_id }}</td>
+            <td>{{ record.service_type }}</td>
+            <td>{{ record.fund }}</td>
+            <td>{{ record.deptid }}</td>
+            <td>{{ record.program }}</td>
+            <td>{{ record.chartcom_class }}</td>
+            <td>{{ record.building_name }}</td>
+            <td>{{ record.floor_name }}</td>
+            <td>{{ record.room_name }}</td>
+            <td>{{ record.jack_name }}</td>
         </tr>
         {% endfor %}
 </table>
