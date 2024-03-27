@@ -4,24 +4,15 @@ from django.core.mail import send_mail
 
 from pages.models import Page
 
+from project.models import Email
 
 class Command(BaseCommand):
-    help = 'Test Email'
+    help = 'Send Email'
+    bcc = 'itscomm.information.systems.shared.account@umich.edu'
+
+    def add_arguments(self, parser):
+        parser.add_argument('--email')  
 
     def handle(self, *args, **options):
-        print('start')
-
-        #html = Page.objects.get(permalink='/restriction')
-        html = Page.objects.get(permalink='test')
-        #html = '<h1>SF Email</h1>'
-
-        send_mail(
-            'Your U-M phone number is scheduled to transition to U-M Zoom Phone on Thursday',
-            'See attachment.',
-            'Testy McTestface',
-            ['djamison@umich.edu','jwalfish@umich.edu'],
-            fail_silently=False,
-            html_message=html.bodytext
-        )
-
-        print('end')
+        email = Email.objects.get(code=options['email'])
+        email.send()

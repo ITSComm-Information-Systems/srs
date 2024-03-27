@@ -1,24 +1,24 @@
 send_slack_message () {
     curl -s --header "Authorization: Bearer $SLACK_AUTH_TOKEN" \
-        --form  channel=srs-testing --form text="$1" \
+        --form  channel=$CHANNEL --form text="$1" \
          https://slack.com/api/chat.postMessage > slack.log
 }
-
-send_slack_message "Unzip Toll File $1" 
-
-echo $1
 
 if [ $1 == 'Production' ]
 then
     DIR='/media/toll'
+    CHANNEL='inf-information-systems_no-interns'
 else
     DIR='/media/test'
+    CHANNEL='srs-testing'
 fi
+
+send_slack_message "Unzip Toll File $1" 
 
 unzip -q /media/pload/toll.zip -d $DIR
 rm /media/pload/toll.zip
 
-send_slack_message "Unzip complete, delete folders older than 13"
+send_slack_message "Unzip complete, delete folders older than 13 months."
 
 for FILE in `ls $DIR -r | sed -n '14,19p'`
 do
@@ -26,3 +26,5 @@ do
 done
 
 send_slack_message "Toll Statements Complete"
+
+python3 manage.py send_email --mail TOLL_COMPLETE
