@@ -705,12 +705,13 @@ def numberlookup(request):
 
     elif request.method == 'POST':
         user_param = request.POST.get('user_param', '') 
+        logged_in_user = request.user
         try:
             osc_user = User.objects.get(username=user_param)
         except User.DoesNotExist:
             return HttpResponse('<div>User not found</div>')
         
-        dept_list = AuthUserDept.objects.filter(user=osc_user).values_list('dept', flat=True)
+        dept_list = AuthUserDept.objects.filter(user=logged_in_user).values_list('dept', flat=True)
 
         service_list = UmOscServiceProfileV.objects.filter(
             uniqname=osc_user, 
@@ -729,6 +730,8 @@ def numberlookup(request):
 
             record_list.append(record)
 
+        print(osc_user)
+        print(logged_in_user)
 
         return render(request, 'oscauth/numbertable.html', {'records': record_list,'unique_id':osc_user})
 
