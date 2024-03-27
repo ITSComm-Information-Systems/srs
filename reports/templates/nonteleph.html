@@ -111,6 +111,13 @@
 							<th scope='col'>Description</th>
 							<th scope="col">Transaction Type</th>
 							<th scope='col' class='total-col'>Total Charge</th>
+							{% elif key == 'MiDesktop' %} 
+							<th scope='col' class='first-col'>Pool Name</th>
+							<th scope="col">Date</th>
+							<th scope="col">Detail</th>
+							<th scope='col'>Shortcode</th>
+							<th scope="col">Quantity</th>
+							<th scope='col' class='total-col'>Total Charge</th>
 							{% else %}
 							<th scope='col' class="first-col">Billing ID</th>
 							<th scope="col">Description</th>
@@ -175,6 +182,14 @@
 							<td>{{ v.shortcode }}</td>
 							<td>{{ v.type }}</td>
 							<td class='total-col'>{{ v.total_charges }}</td>
+							{% elif key == 'MiDesktop' %}
+							<td>{{ v.unique_id }}</td>
+							<td>{{ v.date }}</td>
+							<td>{{ v.voucher_comment }}</td>
+							<td>{{ v.shortcode }}</td>
+							<td>{{ v.quantity_vouchered }}</td>
+
+							<td class='total-col'>{{ v.total_charges }}</td>
 							{% else %}
 							{% if key == 'Container Services' %}
 							<td class='first-col'>{{ v.project_name }}</td>
@@ -183,7 +198,6 @@
 							<td>{{ v.invoice_id }}</td>
 							<td>{{ v.voucher_comment }}</td>
 							<td></td>
-
 							{% else %}
 							<td class='first-col'>{{ v.user_defined_id }}</td>
 							{% endif %}
