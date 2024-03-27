@@ -730,9 +730,6 @@ def numberlookup(request):
 
             record_list.append(record)
 
-        print(osc_user)
-        print(logged_in_user)
-
         return render(request, 'oscauth/numbertable.html', {'records': record_list,'unique_id':osc_user})
 
     else:
