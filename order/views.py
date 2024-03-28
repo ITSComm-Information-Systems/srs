@@ -56,6 +56,30 @@ def get_phone_location(request, phone_number):
     return JsonResponse(locations, safe=False)
 
 
+
+@permission_required('oscauth.can_order')
+def get_phone_information(request, uniqname):
+    authorized_departments = AuthUserDept.get_order_departments(request.user)
+
+    service_list = list(UmOscServiceProfileV.objects.filter(
+            uniqname=uniqname, 
+            service_status_code="In Service", 
+            subscriber_status="Active", 
+            deptid__in=authorized_departments,
+        ).values())
+
+    record_list = []
+    for record in service_list:
+        parts = record["mrc_exp_chartfield"].split('-')
+        record["fund"] = parts[0]
+        record["program"] = parts[2]
+        record["chartcom_class"] = parts[3]
+
+        record_list.append(record)
+    
+    return JsonResponse(record_list, safe=False)
+
+
 def querydict_to_dict(query_dict):  # Kudos to QFXC on StackOverflow
     data = {}
     for key in query_dict.keys():
