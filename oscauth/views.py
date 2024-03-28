@@ -701,7 +701,7 @@ register = template.Library()
 
 def numberlookup(request):
     if request.method == 'GET':
-        return render(request, 'oscauth/numberlookup.html', {'title': 'Number Look Up'})
+        return render(request, 'oscauth/numberlookup.html', {'title': 'Uniqname Look Up'})
 
     elif request.method == 'POST':
         user_param = request.POST.get('user_param', '') 
