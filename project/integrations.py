@@ -242,6 +242,57 @@ class Openshift():
         return(body)
 
 
+class Zoom():
+    INFO_URL = 'https://info.zoom.umich.edu/phoneapi/getuser/'  
+    BASE_URL = 'https://api.zoom.us/v2/phone/users/'
+
+    def get_user_info(self, uniqname):
+        r = requests.get( self.INFO_URL + uniqname, headers={'ZOOMAPITOKEN': self.zoom_token} )
+
+        if not r.ok:
+            print(r.status_code, r.text)
+
+        return r
+
+    def get_zoom_info(self, id):
+        r = requests.get(self.BASE_URL + id, headers={'Authorization': f'Bearer {self.zoom_token}'})
+
+        if not r.ok:
+            print(r.status_code, r.text)
+
+        return r
+
+    def user_sms_elig(self, uniqname):
+        print('get status for', uniqname)
+        r = self.get_user_info(uniqname)
+
+        if not r.ok:   # API Error
+            mail_admins('Error Zoom.get_user_sms_status', r.text, fail_silently=True)
+            return {'message': 'Error getting user.'}
+        
+        try:
+            id = r.json().get('zoom').get('id')
+        except:
+            return {'message': 'Not a zoom user.'}
+
+        try:
+            r = self.get_zoom_info(id)
+
+            if r.status_code == 404:
+                return {'message': 'Not a zoom phone user.'}
+
+            sms = r.json().get('policy').get('sms')
+            if sms.get('enable') == True:
+                return {'message': 'SMS already enabled for this user.'}
+            return {'phone_numbers': r.json().get('phone_numbers')}
+        except:
+            return {'message': 'Error getting zoom phone.'}
+
+    def __init__(self):
+        from softphone.models import ZoomToken
+        self.zoom_token = ZoomToken.objects.all()[0].token
+
+
 class TDx():
     BASE_URL = settings.TDX['URL']
     USERNAME = settings.TDX['USERNAME']

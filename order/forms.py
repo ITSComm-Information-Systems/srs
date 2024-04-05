@@ -8,7 +8,7 @@ from softphone.models import Category
 from pages.models import Page
 from project.pinnmodels import UmOSCBuildingV
 from oscauth.models import LDAPGroupMember
-from project.integrations import MCommunity, create_ticket_database_modify
+from project.integrations import MCommunity, create_ticket_database_modify, Zoom
 import math
 from project.models import Choice
 
@@ -1586,3 +1586,21 @@ class DatabaseForm(ModelForm):
             create_ticket_database_modify(self.instance, self.user, description)
 
         super().save(*args, **kwargs)  # Call the "real" save() method.
+
+
+class AddSMSForm(forms.Form):
+    uniqname = forms.CharField(label='Uniqname',
+                               widget=forms.TextInput(attrs={'class': 'form-control'}),
+                               help_text = 'Uniqname of zoom user.')
+
+    def clean(self):
+        zoom = Zoom().user_sms_elig(self.cleaned_data.get('uniqname'))
+        if 'phone_numbers' in zoom:
+            self.phone_numbers = [pn['number'][2:12] for pn in zoom.get('phone_numbers')]
+            if 'dept' not in []:
+                self.add_error('uniqname', 'No order access for dept 420') 
+        else:
+            self.add_error('uniqname', zoom.get('message')) 
+            self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
+
+        super().clean()
