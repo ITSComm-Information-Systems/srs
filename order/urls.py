@@ -15,6 +15,7 @@ urlpatterns = [
     path('review/', views.Review.as_view()),
     path('services/<int:group_id>', Services.as_view()),
     path('wf/<int:action_id>', Workflow.as_view()),
+    path('sp/AddSMS', views.AddSMS.as_view(), name='AddSMS'),
     path('database/<int:instance_id>', views.DatabaseView.as_view()),
     path('server/<int:instance_id>/<str:action>/', views.ServerView.as_view()),
 
