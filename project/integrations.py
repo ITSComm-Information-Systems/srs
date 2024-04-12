@@ -263,7 +263,6 @@ class Zoom():
         return r
 
     def user_sms_elig(self, uniqname):
-        print('get status for', uniqname)
         r = self.get_user_info(uniqname)
 
         if not r.ok:   # API Error

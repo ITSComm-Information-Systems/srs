@@ -991,10 +991,8 @@ class AddSMS(PermissionRequiredMixin, View):
 
     
     def post(self, request):
-        print(request.POST)
 
         if request.POST.get('submit'):  # Already validated uniqname and retrieved associated phone numbers.
-            print('call proc', request.POST.getlist('service_number'))
             user_id = request.POST.get('user_id')
             service_numbers = request.POST.getlist('service_number')
 
@@ -1008,7 +1006,7 @@ class AddSMS(PermissionRequiredMixin, View):
 
             return HttpResponseRedirect('/requestsent')
 
-        form = self.form(request.POST)
+        form = self.form(request.POST, request=request)
         form.is_valid()
 
         return render(request, self.template, 
