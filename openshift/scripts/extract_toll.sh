@@ -4,6 +4,17 @@ send_slack_message () {
          https://slack.com/api/chat.postMessage > slack.log
 }
 
+
+case $1 in
+    Production)
+        DIR='/media/toll'
+        CHANNEL='inf-information-systems_no-interns';;
+    *)
+        DIR='/media/test'
+        CHANNEL='srs-testing';;
+esac
+
+
 if [ $1 == 'Production' ]
 then
     DIR='/media/toll'
