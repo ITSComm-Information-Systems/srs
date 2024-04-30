@@ -6,9 +6,9 @@ from django.forms import ModelForm, formset_factory
 from .models import *
 from softphone.models import Category
 from pages.models import Page
-from project.pinnmodels import UmOSCBuildingV
+from project.pinnmodels import UmOSCBuildingV, UmMpathDwCurrDepartment
 from oscauth.models import LDAPGroupMember
-from project.integrations import MCommunity, create_ticket_database_modify
+from project.integrations import MCommunity, create_ticket_database_modify, Zoom
 import math
 from project.models import Choice
 
@@ -1586,3 +1586,41 @@ class DatabaseForm(ModelForm):
             create_ticket_database_modify(self.instance, self.user, description)
 
         super().save(*args, **kwargs)  # Call the "real" save() method.
+
+
+class AddSMSForm(forms.Form):
+    uniqname = forms.CharField(label='Uniqname',
+                               widget=forms.TextInput(attrs={'class': 'form-control'}),
+                               help_text = 'Uniqname of zoom user.')
+
+    def clean(self):
+        zoom = Zoom().user_sms_elig(self.cleaned_data.get('uniqname'))
+        if 'phone_numbers' in zoom:
+            self.phone_numbers = [pn['number'][2:12] for pn in zoom.get('phone_numbers')]
+            loc = UmOscServiceProfileV.objects.filter(service_number__in=self.phone_numbers)
+            user_depts = AuthUserDept.get_order_departments(self.request.user.id).values_list('dept', flat=True)
+            for loc in UmOscServiceProfileV.objects.filter(service_number__in=self.phone_numbers):
+                if loc.deptid not in user_depts:
+                    self.add_error('uniqname', f'No order access for dept {loc.deptid}.') 
+                    self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
+                    self.phone_numbers = None
+                    break
+                else:
+                    dept = UmMpathDwCurrDepartment.objects.get(deptid=loc.deptid)
+                    print(dept.dept_grp_campus)
+                    if dept.dept_grp_campus == 'UM_FLINT':
+                        self.add_error('uniqname', f'Flint not rolling out SMS until fall 2024 (dept {loc.deptid}).') 
+                        self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
+                        self.phone_numbers = None
+                        break
+        else:
+            self.add_error('uniqname', zoom.get('message')) 
+            self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
+
+        super().clean()
+
+    def __init__(self, *args, **kwargs):
+        if 'request' in kwargs:
+            self.request = kwargs['request']
+            self.kwargs = kwargs.pop('request', None)
+        super(AddSMSForm, self).__init__(*args, **kwargs)
