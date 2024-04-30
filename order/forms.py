@@ -6,7 +6,7 @@ from django.forms import ModelForm, formset_factory
 from .models import *
 from softphone.models import Category
 from pages.models import Page
-from project.pinnmodels import UmOSCBuildingV
+from project.pinnmodels import UmOSCBuildingV, UmMpathDwCurrDepartment
 from oscauth.models import LDAPGroupMember
 from project.integrations import MCommunity, create_ticket_database_modify, Zoom
 import math
@@ -1605,6 +1605,14 @@ class AddSMSForm(forms.Form):
                     self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
                     self.phone_numbers = None
                     break
+                else:
+                    dept = UmMpathDwCurrDepartment.objects.get(deptid=loc.deptid)
+                    print(dept.dept_grp_campus)
+                    if dept.dept_grp_campus == 'UM_FLINT':
+                        self.add_error('uniqname', f'Flint not rolling out SMS until fall 2024 (dept {loc.deptid}).') 
+                        self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
+                        self.phone_numbers = None
+                        break
         else:
             self.add_error('uniqname', zoom.get('message')) 
             self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
