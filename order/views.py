@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceProfileV, UmOscChartfieldV
+from project.models import Email
 from oscauth.models import AuthUserDept
 from pages.models import Page
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
@@ -1000,9 +1001,14 @@ class AddSMS(PermissionRequiredMixin, View):
             for number in ServiceNumbers.objects.filter(service_number__in=service_numbers, service_status_code='In Service', uniqname=user_id):
                 print(number, number.mrc_exp_chartfield)
 
-                with connections['pinnacle'].cursor() as cursor:
-                    cursor.callproc('pinn_custom.um_osc_util_k.um_add_generic_mrc_p', 
-                                    [number.subscriber_id, number.service_id, 'FT-ZOOM-SMS', 1, number.mrc_exp_chartfield])
+                #with connections['pinnacle'].cursor() as cursor:
+                #    cursor.callproc('pinn_custom.um_osc_util_k.um_add_generic_mrc_p', 
+                #                    [number.subscriber_id, number.service_id, 'FT-ZOOM-SMS', 1, number.mrc_exp_chartfield])
+
+            email = Email.objects.get(code='SMS_REQUEST')
+            email.to = [user_id + '@umich.edu', request.user.email]
+            email.context = {"uniqname": user_id }
+            email.send()
 
             return HttpResponseRedirect('/requestsent')
 
