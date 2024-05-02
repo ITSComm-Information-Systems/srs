@@ -651,6 +651,7 @@ class Server(models.Model):
     created_date = models.DateTimeField(default=timezone.now, null=True)
     #shortcode = models.CharField(max_length=100) 
     public_facing = models.BooleanField(default=False)
+    production = models.BooleanField(default=False)
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
 
     os = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={'parent__code__in': ['SERVER_UNMANAGED_OS','LINUX','WINDOWS']}
@@ -667,7 +668,7 @@ class Server(models.Model):
     in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
 
     firewall = models.CharField(max_length=100)
-    backup = models.BooleanField(default=False)
+    backup = models.BooleanField(default=True)
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
     backup_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_BACKUP_TIME"}
@@ -1379,7 +1380,7 @@ class Item(models.Model):
 
         MCommunity().add_entitlement(rec.admin_group.name)
 
-        for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing']:
+        for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing','production']:
             value = self.data.get(field)
             if value:
                 setattr(rec, field, value)

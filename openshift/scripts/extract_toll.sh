@@ -4,14 +4,14 @@ send_slack_message () {
          https://slack.com/api/chat.postMessage > slack.log
 }
 
-if [ $1 == 'Production' ]
-then
-    DIR='/media/toll'
-    CHANNEL='inf-information-systems_no-interns'
-else
-    DIR='/media/test'
-    CHANNEL='srs-testing'
-fi
+case $1 in
+    Production)
+        DIR='/media/toll'
+        CHANNEL='inf-information-systems_no-interns';;
+    *)
+        DIR='/media/test'
+        CHANNEL='srs-testing';;
+esac
 
 send_slack_message "Unzip Toll File $1" 
 
