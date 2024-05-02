@@ -663,7 +663,6 @@ class Server(models.Model):
     regulated_data = models.ManyToManyField(Choice, blank=True, limit_choices_to={"parent__code": "REGULATED_SENSITIVE_DATA"}, related_name='regulated')
     non_regulated_data = models.ManyToManyField(Choice, blank=True, limit_choices_to={"parent__code": "NON_REGULATED_SENSITIVE_DATA"})
     replicated = models.BooleanField(default=True)
-    replicated = models.BooleanField(default=True)
 
     on_call = models.PositiveSmallIntegerField(null=True, choices=ON_CALL_CHOICES)   #<monitoringsystem>businesshours</monitoringsystem>
     in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
