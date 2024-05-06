@@ -815,7 +815,10 @@ class Services(UserPassesTestMixin, View):
             else:
                 service.actions = action_list.filter(service=service)
                 for action in service.actions:
-                    action.target = f'/orders/wf/{action.id}'
+                    if action.id == 76:   # ToDo add target to action.
+                        action.target = '/orders/sp/AddSMS'
+                    else:
+                        action.target = f'/orders/wf/{action.id}'
 
             if service.name == selected_service:
                 service.active = 'active show'
