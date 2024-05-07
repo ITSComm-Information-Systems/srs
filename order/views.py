@@ -1004,9 +1004,12 @@ class AddSMS(PermissionRequiredMixin, View):
             for number in ServiceNumbers.objects.filter(service_number__in=service_numbers, service_status_code='In Service', uniqname=user_id):
                 print(number, number.mrc_exp_chartfield)
 
-                #with connections['pinnacle'].cursor() as cursor:
-                #    cursor.callproc('pinn_custom.um_osc_util_k.um_add_generic_mrc_p', 
-                #                    [number.subscriber_id, number.service_id, 'FT-ZOOM-SMS', 1, number.mrc_exp_chartfield])
+                with connections['pinnacle'].cursor() as cursor:
+                    cursor.callproc('pinn_custom.um_osc_util_k.um_add_generic_mrc_p', 
+                                    [number.subscriber_id, number.service_id, 'FT-ZOOM-SMS', 1, number.mrc_exp_chartfield])
+
+            Item.objects.create(description='Add SMS Text', chartcom_id=14388, created_by_id=request.user.id, internal_reference_id=76
+                                , data={'user_id': user_id, 'service_numbers': service_numbers})
 
             email = Email.objects.get(code='SMS_REQUEST')
             email.to = [user_id + '@umich.edu', request.user.email]
