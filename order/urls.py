@@ -27,6 +27,7 @@ urlpatterns = [
     path('chartcom/', views.ManageChartcom.as_view()),
 
     path('ajax/get_phone_location/<str:phone_number>', views.get_phone_location, name='get_phone_location'),
+    path('ajax/get_phone_information/<str:uniqname>', views.get_phone_information, name='get_phone_information'),
     path('ajax/send_tab_data/', views.send_tab_data, name='send_tab_data'),
 
 ]
