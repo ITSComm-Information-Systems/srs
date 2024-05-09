@@ -1036,7 +1036,8 @@ class AddSMS(PermissionRequiredMixin, View):
                                 , data={'user_id': user_id, 'service_numbers': service_numbers})
 
             email = Email.objects.get(code='SMS_REQUEST')
-            email.to = [user_id + '@umich.edu', request.user.email]
+            email.to = user_id + '@umich.edu'
+            email.cc = request.user.email
             email.context = {"uniqname": user_id }
             email.send()
 
