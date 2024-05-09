@@ -1613,10 +1613,6 @@ class AddSMSForm(forms.Form):
                         self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
                         self.phone_numbers = None
                         break
-            else:
-                self.add_error('uniqname', f'No record for phone number {loc[0]} found.') 
-                self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
-                self.phone_numbers = None
                 
         else:
             self.add_error('uniqname', zoom.get('message')) 
