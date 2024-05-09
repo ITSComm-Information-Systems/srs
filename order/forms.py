@@ -1599,7 +1599,7 @@ class AddSMSForm(forms.Form):
             self.phone_numbers = [pn['number'][2:12] for pn in zoom.get('phone_numbers')]
             loc = UmOscServiceProfileV.objects.filter(service_number__in=self.phone_numbers)
             user_depts = AuthUserDept.get_order_departments(self.request.user.id).values_list('dept', flat=True)
-            for loc in UmOscServiceProfileV.objects.filter(service_number__in=self.phone_numbers):
+            for loc in UmOscServiceProfileV.objects.filter(service_number__in=self.phone_numbers, service_type='VoIP', service_status_code='In Service'):
                 if loc.deptid not in user_depts:
                     self.add_error('uniqname', f'No order access for dept {loc.deptid}.') 
                     self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
@@ -1613,6 +1613,11 @@ class AddSMSForm(forms.Form):
                         self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
                         self.phone_numbers = None
                         break
+            else:
+                self.add_error('uniqname', f'No record for phone number {loc[0]} found.') 
+                self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
+                self.phone_numbers = None
+                
         else:
             self.add_error('uniqname', zoom.get('message')) 
             self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
