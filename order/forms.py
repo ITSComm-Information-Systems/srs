@@ -847,6 +847,11 @@ class ServerSupportForm(TabForm):
             os_id = None
             db = None
 
+        if self.request.POST.get('production') == 'False':
+            self.fields['on_call'].initial = '0'
+            self.fields['on_call'].disabled = True
+
+
         if self.request.POST.get('database', db):
             db = self.request.POST.get('database', db)
             if db == 'MSSQL':
