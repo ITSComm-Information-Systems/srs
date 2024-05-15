@@ -523,6 +523,23 @@ def get_order_list(request):
     return HttpResponse(template.render(context, request))
 
 
+class SMS(PermissionRequiredMixin, View):
+    permission_required = 'oscauth.can_order'
+
+    def post(self, request):
+        item = Item.objects.get(id=request.POST.get('item'))
+        item.external_reference_id = 0
+        item.save()
+
+        return HttpResponseRedirect('/orders/integration/sms') 
+
+
+    def get(self, request):
+        item_list = Item.objects.filter(description='Add SMS Text').order_by('-create_date')
+
+        return render(request, 'order/integration_sms_list.html',  {'item_list': item_list,})
+
+
 class Integration(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
