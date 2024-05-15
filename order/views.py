@@ -523,6 +523,23 @@ def get_order_list(request):
     return HttpResponse(template.render(context, request))
 
 
+class SMS(PermissionRequiredMixin, View):
+    permission_required = 'oscauth.can_order'
+
+    def post(self, request):
+        item = Item.objects.get(id=request.POST.get('item'))
+        item.external_reference_id = 0
+        item.save()
+
+        return HttpResponseRedirect('/orders/integration/sms') 
+
+
+    def get(self, request):
+        item_list = Item.objects.filter(description='Add SMS Text').order_by('-create_date')
+
+        return render(request, 'order/integration_sms_list.html',  {'item_list': item_list,})
+
+
 class Integration(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
@@ -1028,12 +1045,16 @@ class AddSMS(PermissionRequiredMixin, View):
             for number in ServiceNumbers.objects.filter(service_number__in=service_numbers, service_status_code='In Service', uniqname=user_id):
                 print(number, number.mrc_exp_chartfield)
 
-                #with connections['pinnacle'].cursor() as cursor:
-                #    cursor.callproc('pinn_custom.um_osc_util_k.um_add_generic_mrc_p', 
-                #                    [number.subscriber_id, number.service_id, 'FT-ZOOM-SMS', 1, number.mrc_exp_chartfield])
+                with connections['pinnacle'].cursor() as cursor:
+                    cursor.callproc('pinn_custom.um_osc_util_k.um_add_generic_mrc_p', 
+                                    [number.subscriber_id, number.service_id, 'FT-ZOOM-SMS', 1, number.mrc_exp_chartfield])
+
+            Item.objects.create(description='Add SMS Text', chartcom_id=14388, created_by_id=request.user.id, internal_reference_id=76
+                                , data={'user_id': user_id, 'service_numbers': service_numbers})
 
             email = Email.objects.get(code='SMS_REQUEST')
-            email.to = [user_id + '@umich.edu', request.user.email]
+            email.to = user_id + '@umich.edu'
+            email.cc = request.user.email
             email.context = {"uniqname": user_id }
             email.send()
 

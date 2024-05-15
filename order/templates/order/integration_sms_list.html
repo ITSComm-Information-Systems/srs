@@ -1,0 +1,39 @@
+<style>
+    table, th, td {
+        border: 1px solid black;
+    }
+</style>
+
+<h1>SMS Orders</h1>
+
+<table>
+    <tr>
+        <th>SRS ID</th>
+        <th>Date</th>
+        <th>Submitted By</th>
+        <th>User ID</th>
+        <th>Phones</th>
+        <th>File</th>
+    </tr>
+    {% for item in item_list %}
+    <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.create_date }}</td>
+        <td>{{ item.created_by.username }}</td>
+        <td>{{ item.data.user_id }}</td>
+        <td>{% for num in item.data.service_numbers %}
+            {{ num }}<br>
+            {% endfor %}
+        </td>
+        <td>{% if item.external_reference_id != None %}
+            {{ item.external_reference_id }}
+            {% else %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="item" value="{{ item.id }}" class="btn-link">Cancel</button>
+            </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
