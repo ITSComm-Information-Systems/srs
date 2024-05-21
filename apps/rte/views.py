@@ -581,6 +581,7 @@ def view_time_display(request):
             date_end = today + timedelta(days=(6 - today.weekday() + 1) % 7)
             date_start = date_end - timedelta(weeks=5)
             weeks = [date_start + timedelta(weeks=i) for i in range(5)]
+            running_hours = 0
             
             multi_weekly_results = []
             for week_start in weeks:
@@ -593,22 +594,25 @@ def view_time_display(request):
                     ).aggregate(
                         total=Sum('actual_mins')  # Calculate the sum of the data for the week
                     )
-                total_hours = week_data['total'] if week_data['total'] else 0
+                total_hours_weekly = week_data['total'] if week_data['total'] else 0
+                running_hours += total_hours_weekly
                 multi_weekly_results.append({
                     'week_start': week_start,
                     'week_end': week_end,
-                    'total': format_time(total_hours)
+                    'total': format_time(total_hours_weekly)
                 })
             results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, assigned_date__gte=date_start,
                                                             assigned_date__lte=date_end).order_by('-assigned_date','work_order_display')
             search_criteria = (date_start - timedelta(days=1)).strftime('%b %d, %Y') + ' - ' + (date_end - timedelta(days=2)).strftime('%b %d, %Y')
+            total_hours = format_time(running_hours)
         else:
             results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, assigned_date__gte=date_start,
                                                             assigned_date__lte=date_end).order_by('-assigned_date','work_order_display')
             search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
+            total_hours = format_time(results.aggregate(Sum('actual_mins'))['actual_mins__sum'] or 0)
             
         search_topic = 'Date Range'
-        total_hours = format_time(results.aggregate(Sum('actual_mins'))['actual_mins__sum'] or 0)
+        
 
 
     context = {
