@@ -12,7 +12,15 @@
 	<div class='card-body'>
 		<strong>Tech ID:&nbsp;</strong>{{ techid }}<br>
 		<strong>{{ search_topic }}:&nbsp;</strong>{{ search_criteria }}<br>
-		<strong>Total Hours Worked:&nbsp;</strong>{{ total_hours }}
+		{% if multi_week_view %}
+			<hr/>
+			{% for result in multi_weekly_results %}
+				<em>{{ result.week_start|date:"M d" }} - {{ result.week_end|date:"M d" }}</em>: {{ result.total }}</td><br><hr/>
+			{% endfor %}
+			<strong>Total Hours Worked:&nbsp;</strong>{{ total_hours }}
+		{% else %}
+			<strong>Total Hours Worked:&nbsp;</strong>{{ total_hours }}
+		{% endif %}
 	</div>
 </div>
 
