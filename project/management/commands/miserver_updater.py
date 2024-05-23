@@ -13,6 +13,7 @@ class Command(BaseCommand):
         filename = options['filename']
         print(f'Process {filename}')
         print('open file')
+        not_found = []
 
         with open(f'{filename}') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
@@ -21,6 +22,13 @@ class Command(BaseCommand):
                 print("processing", server_name)
                 try:
                     server = Server.objects.get(name__iexact=server_name)
-                    print(server.production)
+                    if server.production == True:
+                        print('Old Production: ' + str(server.production))
+                        server.production = False
+                        print('New Production: ' + str(server.production))
+                        server.save()
                 except Server.DoesNotExist:
                     print(f"No server found with name: {server_name}")
+                    not_found.append(server_name)
+
+        print('Not found servers:', not_found)
