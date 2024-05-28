@@ -1347,9 +1347,10 @@ class BillingStorageForm(TabForm):
                 self.fields["billingAuthority"].initial = 'yes'
                 self.fields["serviceLvlAgreement"].initial = 'yes'
     
-                if hasattr(si, 'research_computing_package'):
-                    if si.research_computing_package == True:
-                        self.fields["research_comp_pkg"].initial = 'yes'
+                if self.action.service.name in ['turboResearch','dataDen']:
+                    if hasattr(si, 'research_computing_package'):
+                        if si.research_computing_package == True:
+                            self.fields["research_comp_pkg"].initial = 'yes'
 
         if self.action.service.name == 'miBackup':
             rate = StorageRate.objects.get(name=BackupDomain.RATE_NAME)
