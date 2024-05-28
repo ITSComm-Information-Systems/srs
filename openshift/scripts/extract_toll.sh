@@ -7,7 +7,7 @@ send_slack_message () {
 case $1 in
     Production)
         DIR='/media/toll'
-        CHANNEL='inf-information-systems_no-interns';;
+        CHANNEL='inf-information_systems_no-interns';;
     *)
         DIR='/media/test'
         CHANNEL='srs-testing';;
@@ -27,4 +27,4 @@ done
 
 send_slack_message "Toll Statements Complete"
 
-python3 manage.py send_email --mail TOLL_COMPLETE
+python3 manage.py send_email --email TOLL_COMPLETE

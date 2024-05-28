@@ -847,6 +847,11 @@ class ServerSupportForm(TabForm):
             os_id = None
             db = None
 
+        if self.request.POST.get('production') == 'False':
+            self.fields['on_call'].initial = '0'
+            self.fields['on_call'].disabled = True
+
+
         if self.request.POST.get('database', db):
             db = self.request.POST.get('database', db)
             if db == 'MSSQL':
@@ -1064,6 +1069,7 @@ class ServerSpecForm(TabForm):
             self.initial = self.instance.__dict__
             self.initial['backup'] = str(self.instance.backup)
             self.initial['replicated'] = str(self.instance.replicated)
+            self.initial['production'] = str(self.instance.production)
 
             if 'indows' in self.instance.os.label:  # Managed Linux can't edit disk
                 print('windos')
@@ -1079,6 +1085,10 @@ class ServerSpecForm(TabForm):
             else:
                 self.disk_formset = self.DiskDisplayFormSet(initial=self.disk_list)
             return
+        
+        if self.request.POST.get('misevregu') == 'True':
+            self.fields['backup'].initial = 'True'
+            self.fields['backup'].disabled = True
 
         instance_id = self.request.POST.get('instance_id')
 
@@ -1116,7 +1126,9 @@ class ServerSpecForm(TabForm):
 
         self.fields['managed'].initial = True
         self.fields['replicated'].initial = True
-        self.fields['backup'].initial = True
+
+        
+        self.fields['backup'].initial = 'True'
         self.fields['backup'].disabled = True
 
         self.fields['public_facing'].disabled = True
@@ -1247,6 +1259,8 @@ class ServerSpecForm(TabForm):
                     if os_name.startswith('Windows'):
                         self.add_error('cpu', 'Managed Windows requires at least two cpu.')
     
+        production = self.cleaned_data.get('production', None)
+
         super().clean()  # When regular clean isn't enough
 
 

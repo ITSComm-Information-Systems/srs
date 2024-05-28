@@ -5,12 +5,17 @@ from django.core.management import call_command
 from oscauth.utils import upsert_user
 from oscauth.models import LDAPGroup
 from django.contrib.auth.models import User
+from datetime import date
 
 class Command(BaseCommand):
     help = 'Daily operations'
 
     def handle(self, *args, **options):
         print('init')
+
+        if date.today().weekday() < 5:
+            print('weekday')
+            self.weekday_jobs()
 
         sql = '''delete from srs_auth_user_dept a
                 where group_id in (5,6) -- Orderer, Reporter
@@ -42,3 +47,7 @@ class Command(BaseCommand):
         call_command('mc_sync')
 
         print('end')
+
+    def weekday_jobs(self):
+        with connection.cursor() as cursor:
+            cursor.callproc('pinn_custom.um_softphone_files_k.create_sms_file_p')
