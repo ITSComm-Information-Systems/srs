@@ -1320,10 +1320,7 @@ class Item(models.Model):
                 attributes.append({'ID': 1957, 'Value': os.label}) 
 
             if self.data.get('volaction') != 'Delete':
-                if action.type == 'M':
-                    summ = text[2]['fields']
-                else:
-                    summ = text[1]['fields']
+                summ = text[2]['fields']
 
                 for field in summ:
                     if field['label'] == 'Disk Space':
