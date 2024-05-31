@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from project.models import Choice
-from services.models import Pool, Image, Network
+from services.models import Pool, Image, Network, ImageDisk
 from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database, ServerDisk
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from django.db import models
@@ -11,6 +11,13 @@ class ServerDiskSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServerDisk
         fields = ['name', 'size', 'controller', 'device']
+
+
+class ImageDiskSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ImageDisk
+        fields = ['name', 'size']
 
 class ChoiceSerializer(serializers.ModelSerializer):
 
@@ -28,6 +35,8 @@ def serializer_factory(model):
     }
     meta = type('Meta', (), meta_attrs)
     class_attrs = {'Meta': meta}
+    class_attrs['select_related'] = []
+    class_attrs['prefetch_related'] = []
 
     for fld in model._meta.get_fields():
         if type(fld) == models.fields.related.ForeignKey:
@@ -35,15 +44,19 @@ def serializer_factory(model):
                 class_attrs[fld.name] = ChoiceSerializer()
             else:
                 class_attrs[fld.name] = serializers.StringRelatedField()
+            class_attrs['select_related'].append(fld.name)
         elif type(fld) == models.fields.related.ManyToManyField:
             if fld.related_model == Choice:
                 class_attrs[fld.name] = ChoiceSerializer(many=True)
             else:
                 class_attrs[fld.name] = serializers.StringRelatedField(many=True)
+            class_attrs['prefetch_related'].append(fld.name)
+                
 
     if model == Server:   #TODO handle children
         class_attrs['disks'] = ServerDiskSerializer(many=True, read_only=True)
-
+    elif model == Image:
+        class_attrs['storage'] = ImageDiskSerializer(many=True, read_only=True)
 
     return type(f'{name}Serializer', (serializers.ModelSerializer,), class_attrs)
 
@@ -138,14 +151,6 @@ class ArcBillingSerializer(serializers.ModelSerializer):
         model = ArcBilling
         fields = ['id', 'arc_instance', 'size', 'shortcode']
 
-
-class PoolSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        exclude = ['id']
-        model = Pool
-
-
 class NetworkSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -163,13 +168,6 @@ class NetworkSerializer(serializers.ModelSerializer):
             i.save()
 
         return instance
-
-class ImageSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        exclude = ['id']
-        model = Image
-
 class LDAPGroupMemberSerializer(serializers.ModelSerializer):
     ldap_group = serializers.StringRelatedField()
 
