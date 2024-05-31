@@ -210,10 +210,14 @@ class DefaultViewSet(viewsets.ModelViewSet):
             queryset = Server.objects.all().select_related('os','admin_group','owner'
                 ,'patch_time','patch_day','reboot_time','reboot_day','backup_time','database_type').prefetch_related('regulated_data','non_regulated_data','disks').order_by('id')
         elif self.serializer_class.Meta.model.__name__ == 'ArcInstance':
-            print('arcinstance')
             queryset = ArcInstance.objects.all().select_related('owner','service').prefetch_related('rate','shortcodes','hosts').order_by('id')
         else:
             queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
+            if hasattr(self.serializer_class, 'prefetch_related'):
+                queryset = queryset.prefetch_related(*self.serializer_class.prefetch_related)
+
+            if hasattr(self.serializer_class, 'select_related'):
+                queryset = queryset.prefetch_related(*self.serializer_class.select_related)
 
         kwargs = {}
 
@@ -242,16 +246,19 @@ def viewset_factory(model, serializer_class=None):
 
 # Register URLs for API
 router = routers.DefaultRouter()
+
+# Use this method to add a new endpoint using only the model
+router.register('pool', viewset_factory(Pool))
+router.register('image', viewset_factory(Image))
+router.register('server', viewset_factory(Server))
+
+# Deprecated method requiring a custom serializer.
+router.register('network', viewset_factory(Network, serializers.NetworkSerializer))
 router.register('storageinstances', viewset_factory(StorageInstance, serializers.StorageInstanceSerializer))
 router.register('storagerates', viewset_factory(StorageRate, serializers.StorageRateSerializer))
 router.register('arcinstances', viewset_factory(ArcInstance, serializers.ArcInstanceSerializer))
 router.register('arcbilling', viewset_factory(ArcBilling, serializers.ArcBillingSerializer))
 router.register('backupdomains', viewset_factory(BackupDomain, serializers.BackupDomainSerializer))
-router.register('pool', viewset_factory(Pool, serializers.PoolSerializer))
-router.register('image', viewset_factory(Image, serializers.ImageSerializer))
-router.register('network', viewset_factory(Network, serializers.NetworkSerializer))
-#router.register('server', viewset_factory(Server, serializers.ServerSerializer))
-router.register('server', viewset_factory(Server))
 router.register('database', viewset_factory(Database, serializers.DatabaseSerializer))
 router.register('ldapgroups', LDAPGroupViewSet)
 router.register('ldapgroupmembers', LDAPGroupMemberViewSet)
