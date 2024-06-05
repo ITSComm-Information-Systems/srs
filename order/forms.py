@@ -959,7 +959,7 @@ class ServerSupportForm(TabForm):
             # Check if the values for reboot_day and patch_day match
             if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
                 # Check if patch_time is one of the specified values
-                if patch_time == 38 or 39 or 40 or 41:
+                if patch_time in [ '38', '39', '40', '41'] :
                     # Calculate the time difference between patch_time and reboot_time
                     time_difference = patch_time_map[patch_time] - reboot_time_map[reboot_time]
                     # Check if the time difference is within the desired range
