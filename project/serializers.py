@@ -152,7 +152,7 @@ class ArcBillingSerializer(serializers.ModelSerializer):
         fields = ['id', 'arc_instance', 'size', 'shortcode']
 
 class NetworkSerializer(serializers.ModelSerializer):
-
+    owner = serializers.StringRelatedField()
     class Meta:
         fields = ['id','status','name','created_date','size','vlan_id','owner']
         model = Network
