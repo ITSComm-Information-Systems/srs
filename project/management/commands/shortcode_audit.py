@@ -29,6 +29,8 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
+        self.group_audit()
+    
         print('Get Email')
 
         PATH = settings.SITE_URL + '/orders/wf/'
@@ -77,4 +79,40 @@ class Command(BaseCommand):
                 Slack('Shortcode Audit, no email found')
 
 
+    def group_audit(self, *args, **options):
+        print('Check for expired owner groups')
 
+        email = Email.objects.get(code='EXPIRED_GROUP')
+
+        sql = '''
+                    select service, service_id,
+                    '[' || listagg (JSON_OBJECT (
+                    KEY 'owner' IS owner,
+                    KEY 'name' IS name)
+                    --KEY 'shortcode' IS shortcode)
+                    ,',') within group (order by i.name) || ']' instances
+                    from SRS_SERVICES_INSTANCES_V i
+                    where service <> 'MiDatabase'
+                    and owner_active <> 1
+                    group by service, service_id
+                    order by service_id
+        '''
+
+        email_list = {}
+
+        for record in get_query_result(sql):    # Group by email
+            contact = self.REPLY_TO[record['service']]
+            record['instances'] = json.loads(record['instances'])
+
+            if contact in email_list:
+                email_list[contact].append(record)
+            else:
+                email_list[contact] = [record]
+
+        for key, value in email_list.items():  # Send one email to each owner group
+            email.context = {'service': value}
+            email.to = key
+            email.reply_to = self.REPLY_TO.get(record['service'])
+            email.cc = self.REPLY_TO.get(record['service'])
+            email.bcc = email.team_shared_email
+            email.send()
