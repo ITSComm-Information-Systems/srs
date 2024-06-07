@@ -23,7 +23,7 @@
 <h1>{{ title }}</h1>
 <div>
     <strong>Report Details</strong>
-    <form action="/reports/inventory/" method="POST" class="float-right" name="inventoryEdit">{% csrf_token %}
+    <form action="/reports/inventory/" method="POST" class="float-end" name="inventoryEdit">{% csrf_token %}
         <input name="edit_dept" type="hidden" value="{{ edit_dept }}">
         <input name="edit_date" type="hidden" value="{{ bill_period }}">
         <button class="link" type="submit"><i class="fas fa-edit"></i>Edit Your Selection</button>
@@ -132,12 +132,12 @@
         {% endif %}
     </div>
 
-    <div class="row float-right mt-2 mb-2">
+    <div class="row float-end mt-2 mb-2">
         {% if data_length %}
-        <input type='submit' id='filterapply' value='Apply Filters' class="btn btn-primary float-right">
-        <input type='submit' value='Remove Filters' class="btn btn-danger float-right" id='filterremove'>
+        <input type='submit' id='filterapply' value='Apply Filters' class="btn btn-primary float-end">
+        <input type='submit' value='Remove Filters' class="btn btn-danger float-end" id='filterremove'>
         {% endif %}
-        <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" id='download-link' class="btn btn-success float-right" aria-label="Downdload Report as CSV File">
+        <button onclick="exportTableToCSV('InventoryAndLocationReport.csv')" id='download-link' class="btn btn-success float-end" aria-label="Downdload Report as CSV File">
             Download CSV
         </button>
     </div><br>

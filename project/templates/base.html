@@ -55,12 +55,12 @@
 					<a class="logo" href="/">Service Request System</a>
 					{% endif %}
 				</div>
-				<button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target=".navbars"
+				<button class="navbar-toggler ms-auto" type="button" data-toggle="collapse" data-target=".navbars"
 					aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 					<i class="fas fa-bars text-light"></i>
 				</button>
 				<div class="collapse navbar-collapse navbars" aria-labelledby="aux-nav" role="navigation">
-					<ul class="navbar-nav ml-auto">
+					<ul class="navbar-nav ms-auto">
 						{% if user.is_authenticated %}
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle {% if title == 'Chartfield Change Request' or title == 'Manage User Access' or title == 'Department Look Up' or title == 'Manage Chartfields' or title == 'VoIP Location Change' %}active{% endif %}"

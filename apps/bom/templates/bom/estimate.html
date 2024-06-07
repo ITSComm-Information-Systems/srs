@@ -168,7 +168,7 @@
         <div>
           <p>
             {% if perms.bom.can_update_bom_ordered %}
-            <a class="float-right" href="/apps/bom/warehouse/{{ estimate.id }}" style="padding-right: 10px">Warehouse View</a><br>
+            <a class="float-end" href="/apps/bom/warehouse/{{ estimate.id }}" style="padding-right: 10px">Warehouse View</a><br>
             {% endif %}
             <strong>Created on</strong>&nbsp{{ estimate.create_date|date:"SHORT_DATETIME_FORMAT" }}<br>
             <strong>Created by</strong>&nbsp;{{ estimate.created_by }}<br><br>

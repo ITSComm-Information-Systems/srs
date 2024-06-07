@@ -14,7 +14,7 @@
 
 
 <form method="post">
-    <a class="float-right col-6" href="?file=CSV">Download CSV</a>
+    <a class="float-end col-6" href="?file=CSV">Download CSV</a>
     {% csrf_token %}
     {{ formset.management_form }}
     {% for form in formset %}
