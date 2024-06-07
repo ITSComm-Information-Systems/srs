@@ -50,7 +50,7 @@
                     {% endif %}
                     {{ diskform.size }}
                     {{ diskform.uom }}
-                    <span class="float-right disk-cost"></span>
+                    <span class="float-end disk-cost"></span>
                 </div>
 
                 {% for error in diskform.size.errors %}
@@ -68,7 +68,7 @@
                 {{ tab.form.disk_formset.empty_form.uom }}&nbsp;&nbsp;
                     <a onclick="deleteDisk(this);" href="javascript:void(0)"><i class="fas fa-minus-circle"></i></a>
 
-                <span class="float-right disk-cost"></span>
+                <span class="float-end disk-cost"></span>
                 </div>
             </div>
         </div>
@@ -95,7 +95,7 @@
             <small class="text-muted form-text" id="ram"> {{ tab.form.ram.field.description }}</small>
             <input style="display: inline;" type="number" name="ram" min="4" class="form-control form-inlin col-2"
                 max="64" required="" id="id_ram" value="{{ tab.form.ram.value }}">
-            <span id="ram_cost" data-rate="{{ tab.form.ram_rate }}" class="float-right">{{ tab.form.ram_cost }}</span>
+            <span id="ram_cost" data-rate="{{ tab.form.ram_rate }}" class="float-end">{{ tab.form.ram_cost }}</span>
             {% for error in field.errors %}
             <div role="alert" class="invalid-feedback"><i class="fas fa-exclamation-triangle"
                     aria-label="Icon signifying that user must enter a value"></i>{{error}}</div>
@@ -108,7 +108,7 @@
 <div class="row cost-driver">
     <div class="col-6">
 
-        <span id="backup_cost" class="float-right">$0.00</span>
+        <span id="backup_cost" class="float-end">$0.00</span>
         {% include field.field.template_name %}
     </div>
 </div>
@@ -124,7 +124,7 @@
 
 <div class="col-6">
     <hr>
-    <span id="total_cost" class="float-right">$</span>
+    <span id="total_cost" class="float-end">$</span>
     <strong class="float-center">Monthly Cost</strong>&nbsp;&nbsp;
 </div>
 <input type="hidden" name="total_cost" id="total_cost_field">
