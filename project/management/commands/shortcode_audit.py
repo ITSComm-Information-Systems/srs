@@ -112,7 +112,5 @@ class Command(BaseCommand):
         for key, value in email_list.items():  # Send one email to each owner group
             email.context = {'service': value}
             email.to = key
-            email.reply_to = self.REPLY_TO.get(record['service'])
-            email.cc = self.REPLY_TO.get(record['service'])
             email.bcc = email.team_shared_email
             email.send()
