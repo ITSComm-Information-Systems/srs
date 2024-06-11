@@ -59,6 +59,23 @@ def handle_custom_404(request, exception):
 def handle_custom_500(request):
 	return render(request, '404.html', status=500)
 
+@login_required
+def unity_login(request):
+	from project.models import Unity
+	from cryptography.fernet import Fernet
+
+	try:
+		temp_password = Unity.objects.get(username=request.user.username).temp_password
+		fernet = Fernet(settings.UNITY_KEY)
+		temp_pass = fernet.decrypt(temp_password.encode('ascii')).decode()
+		message = None
+	except:
+		temp_pass = ''
+		message = f'Password not found for user: { request.user.username }'
+
+	return render(request, 'unity.html', {'temp_pass': temp_pass, 'message': message })
+
+
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def chartchangeoptions(request):
 	template = loader.get_template('chartchangeoptions.html')
@@ -68,6 +85,7 @@ def chartchangeoptions(request):
 		'notice': notice,
 	}
 	return HttpResponse(template.render(context, request))
+
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def chartchange(request):
