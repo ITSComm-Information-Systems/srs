@@ -64,14 +64,14 @@ def unity_login(request):
 	from project.models import Unity
 	from cryptography.fernet import Fernet
 
-	try:
-		temp_password = Unity.objects.get(username=request.user.username).temp_password
-		fernet = Fernet(settings.UNITY_KEY)
-		temp_pass = fernet.decrypt(temp_password.encode('ascii')).decode()
-		message = None
-	except:
-		temp_pass = ''
-		message = f'Password not found for user: { request.user.username }'
+	#try:
+	temp_password = Unity.objects.get(username=request.user.username).temp_password
+	fernet = Fernet(settings.UNITY_KEY)
+	temp_pass = fernet.decrypt(temp_password.encode('ascii')).decode()
+	message = None
+	#except:
+	#	temp_pass = ''
+#		message = f'Password not found for user: { request.user.username }'
 
 	return render(request, 'unity.html', {'temp_pass': temp_pass, 'message': message })
 
