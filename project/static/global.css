@@ -1284,6 +1284,15 @@ table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sor
     content: " \25B4\25BE" 
 }
 
+/* Django form classes */
+.errorlist {
+	color: red;
+	list-style-type: square;
+}
+
+.helptext {
+	font-size: small;
+}
 
 /* Deprecated form-inline from Bootstrap 4 */
 .form-inline {
