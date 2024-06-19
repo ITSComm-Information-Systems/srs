@@ -46,7 +46,7 @@ class Command(BaseCommand):
             user_list = self.get_ua_list(cut_date, filter=" and migrate='YES_SET' and location_correct = 0 and new_building is null ")
         elif email.code in ['TUE_NO_LOGIN','WED_NO_LOGIN']:
             call_command('zoom_api', cut_date='next')  # Check for no logins
-            user_list = user_query.values_list('uniqname','updated_by').filter(zoom_login='N')
+            user_list = list(user_query.values_list('uniqname','updated_by').filter(zoom_login='N'))
             if email.code == 'WED_NO_LOGIN':
                 self.pause_users(cut_date)
         elif email.code == 'USER_MIGRATE':
