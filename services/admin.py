@@ -39,14 +39,17 @@ class ImageDiskInline(admin.TabularInline):
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
+    search_fields = ['name','owner__name']
     list_display = ['name', 'owner']
     inlines = (ImageDiskInline,)
 
 @admin.register(Network)
 class NetworkAdmin(admin.ModelAdmin):
+    search_fields = ['name','owner__name']
     list_display = ['name', 'owner']
 
 
 @admin.register(Pool)
 class PoolAdmin(admin.ModelAdmin):
+    search_fields = ['name','owner__name']
     list_display = ['name', 'owner', 'shortcode']
