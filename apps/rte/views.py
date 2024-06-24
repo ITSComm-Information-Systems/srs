@@ -555,6 +555,7 @@ def view_time_display(request):
     date_range = request.POST.get('dateRangeSelect')
     multi_week_view = False
     multi_weekly_results = None
+    total_hours = None
     if request.POST.get('viewLastButton'):
         date_range = request.POST.get('viewLastButton')
 
