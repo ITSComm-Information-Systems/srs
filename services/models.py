@@ -110,7 +110,7 @@ class Container(Cloud):
     SIZE_CHOICES = (
         ('sm_container', 'SMALL, up to 1GB RAM ($0.02/hr)'),
         ('med_container', 'Upgrade to MEDIUM, 1-4GB RAM ($0.04/hr)'),
-        ('lg_container', 'Upgrade to LARGE, 4-8GB RAM ($0.08/hr)'))
+        ('lg_container', 'Upgrade to LARGE, 4-8GB RAM ($0.09/hr)'))
 
     DATABASE_TYPE_CHOICES = (
         ('MARIADB', 'MariaDB'),
