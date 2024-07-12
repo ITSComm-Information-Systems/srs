@@ -20,6 +20,7 @@ from django.urls import resolve
 
 from ldap3 import Server, Connection, ALL
 
+from project.forms.base import SampleForm
 from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput, UmOscChartfieldV, UmOscAcctChangeRequest, UmOscNameChangeV
 from order.models import Chartcom
 from oscauth.models import AuthUserDept, AuthUserDeptV, DepartmentSecurityV
@@ -58,6 +59,20 @@ def handle_custom_404(request, exception):
 
 def handle_custom_500(request):
 	return render(request, '404.html', status=500)
+
+
+class SampleView(PermissionRequiredMixin, View):
+	permission_required = 'is_superuser'
+	template = 'baseform.html'
+
+	def post(self, request):
+		f = SampleForm(request.POST)
+		f.is_valid()
+		return render(request, 'sample_form.html', {'title': 'Base Form', 'form': f})
+
+	def get(self, request):
+		f = SampleForm()
+		return render(request, 'sample_form.html', {'title': 'Base Form', 'form': f})
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def chartchangeoptions(request):

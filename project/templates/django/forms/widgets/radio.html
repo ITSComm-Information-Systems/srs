@@ -1,7 +1,7 @@
 {{widget.optgroups.options}}
 {% for group, options, index in widget.optgroups %}
 {% for choice in options %}
-<div class="form-group form-check">
+<div class="form-check">
     <input class="form-check-input {{ widget.attrs.class }}" type="radio" value="{{ choice.value }}" name="{{ widget.name }}" id="{{ choice.name }}_{{ index }}" required
     {%if choice.selected %} checked {% endif %}
     {% include "django/forms/widgets/attrs.html" %}>

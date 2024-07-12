@@ -30,6 +30,7 @@ urlpatterns = [
     path('api/tollupload/', api.TollUploadView.as_view()),
     path('admin/', admin.site.urls),
     path('reports/',include('reports.urls')),
+    path('sample/', views.SampleView.as_view()),
     path('uniqname/', views.get_uniqname),
     path('chartchange/ajax/', views.change_dept_1),
     path('chartchangedept/ajax/', views.change_dept_3),
