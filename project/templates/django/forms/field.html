@@ -1,0 +1,14 @@
+<div class="mb-3" id="div_{{ field.auto_id }}">
+{% if field.use_fieldset %}
+  <fieldset{% if field.help_text and field.auto_id and "aria-describedby" not in field.field.widget.attrs %} aria-describedby="{{ field.auto_id }}_helptext"{% endif %}>
+  {% if field.label %}{{ field.legend_tag }}{% endif %}
+{% else %}
+  {% if field.label %}<strong>{{ field.label_tag }}</strong>{% endif %}
+{% endif %}
+{{ field }}{% if field.use_fieldset %}</fieldset>{% endif %}
+{% if field.help_text %}<div class="helptext"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}><small>{{ field.help_text|safe }}</small></div>{% endif %}
+<div role="”alert”" class="valid-feedback">OK.</div>
+{% for error in field.errors %}
+<div role="”alert”" class="invalid-feedback"><i class="fas fa-exclamation-triangle"></i>{{error}}</div>
+{% endfor %}
+</div>
