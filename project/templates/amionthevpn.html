@@ -1,6 +1,32 @@
 {% extends 'base.html' %}
-
 {% block content %}
-{{ hostname }}
-{{ IPAddr }}
+TEST
+
+
+
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Example API endpoint
+        const apiUrl = 'https://api.ipify.org?format=json';
+
+        // Use the fetch API to call the endpoint
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse the response body as JSON
+            })
+            .then(data => {
+                console.log(data); // Handle the data from the API
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    });
+</script>
+
 {% endblock %}
