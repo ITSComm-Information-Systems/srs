@@ -90,7 +90,7 @@ function addDisk(){
         input.id = "id_" + input.name;
 
         if (input.name.includes("cost")) {
-            input.value = "5.00";  // Set the initial cost value
+            input.value = "5.50";  // Set the initial cost value
         }
     });
             
@@ -121,35 +121,35 @@ const storage_cost = document.getElementById("{{ form.storage_cost.id_for_label 
 const gpu_cost = document.getElementById("{{ form.gpu_cost.id_for_label }}");
 const total_cost = document.getElementById("{{ form.total.id_for_label }}");
 const multi_disk = document.getElementById("{{ form.multi_disk.id_for_label }}");
-var storageTotal = document.getElementById("id_storage_cost");
+var storageTotal = document.getElementById("{{ form.storage_cost.initial }}");
 
 window.addEventListener("load", (event) => {
     //storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
     var page_loaded = false
-    gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
-    cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
-    memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
+    gpu_cost.value = gpu_choice.value == 'True' ? 6.73 : 0.00.toFixed(2)
+    cpu_cost.value = (cpu_choice.value * 1.28).toFixed(2)
+    memory_cost.value = (memory_choice.value * 0.53).toFixed(2)
     handleStorageData()
     calculateBaseImageCost()
 })
 
 cpu_choice.addEventListener("change", () => {
-    cpu_cost.value = (cpu_choice.value * 1.15).toFixed(2)
+    cpu_cost.value = (cpu_choice.value * 1.28).toFixed(2)
     calculateBaseImageCost()
 })
 
 memory_choice.addEventListener("change", () => {
-    memory_cost.value = (memory_choice.value * 0.48).toFixed(2)
+    memory_cost.value = (memory_choice.value * 0.53).toFixed(2)
     calculateBaseImageCost()
 })
 
 gpu_choice.addEventListener("change", () => {
-    gpu_cost.value = gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+    gpu_cost.value = gpu_choice.value == 'True' ? 6.73 : 0.00.toFixed(2)
     calculateBaseImageCost()
 })
 
 function calculateBaseImageCost(){
-    base_cost = 31.31
+    base_cost = 34.71
     cost = base_cost + parseFloat(cpu_cost.value) + parseFloat(memory_cost.value) + parseFloat(gpu_cost.value) + parseFloat(storageTotal.value)
     total_cost.value = cost.toFixed(2)
 }
@@ -163,7 +163,7 @@ function addEventListeners(){
 
     for (let index = 0; index < diskSizeSelectors.length; index++) {
         diskSizeSelectors[index].addEventListener("change", function(){
-            var diskTotal = parseInt(diskSizeSelectors[index].value) * 0.10
+            var diskTotal = parseInt(diskSizeSelectors[index].value) * 0.11
             diskCostFields[index].value=diskTotal.toFixed(2)
             handleMultiDisk()
             updateStorageTotal()
@@ -200,7 +200,7 @@ function refreshStorageData(){
         const disk_size = disk_array[index];
         costFieldID = "id_disk-" + index + "-cost"
         var costElement = document.getElementById(costFieldID)
-        disk_total = disk_size * 0.10
+        disk_total = disk_size * 0.11
         costElement.value = parseFloat(disk_total).toFixed(2)
     }
     

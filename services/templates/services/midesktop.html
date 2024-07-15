@@ -225,7 +225,7 @@
             input.id = "id_" + input.name;
 
             if (input.name.includes("cost")) {
-                input.value = "5.00";  // Set the initial cost value
+                input.value = "5.50";  // Set the initial cost value
             }
         });
             
@@ -282,9 +282,9 @@
         delimiters: ['[[', ']]'],
         data: {
             visible: false,
-            CPU_INITIAL:1.15,
-            MEMORY_INITIAL:0.96,
-            STORAGE_INITIAL:5.00,
+            CPU_INITIAL:1.28,
+            MEMORY_INITIAL:0.53,
+            STORAGE_INITIAL:5.50,
             GPU_INITIAL:0.00,
             BASE_COST:31.31,
             TOTAL_INITIAL:this.CPU_INITIAL + this.MEMORY_INITIAL + this.GPU_INITIAL + this.BASE_COST,
@@ -328,8 +328,8 @@
             },
             attachEventListeners() {
                 this.total_storage_cost = document.getElementById("{{ form.storage_cost.id_for_label }}");
-                this.total_storage_cost.value = 5.00.toFixed(2);
-                document.getElementById("id_disk-0-cost").value = 5.00.toFixed(2)
+                this.total_storage_cost.value = 5.50.toFixed(2);
+                document.getElementById("id_disk-0-cost").value = 5.50.toFixed(2)
                 document.getElementById("{{ form.cpu.id_for_label }}").addEventListener('change', this.handleCpuChange);
                 document.getElementById("{{ form.memory.id_for_label }}").addEventListener('change', this.handleMemoryChange);
                 document.getElementById("{{ form.gpu.id_for_label }}").addEventListener('change', this.handleGpuChange);
@@ -375,7 +375,7 @@
                         var storage_disk_cost = document.getElementById(storage_disk_cost_string)
                         var diskSize = (parseInt(diskSelector.value))
                         var storageTotal = document.getElementById("id_total")
-                        storage_disk_cost.value = (diskSize * 0.10).toFixed(2)
+                        storage_disk_cost.value = (diskSize * 0.11).toFixed(2)
                         eventBus.$emit('calculate-total-storage-cost', null);
                         
                     })
@@ -392,7 +392,7 @@
                 this.calculateBaseImageCost()
             },
             handleGpuChange(){
-                this.gpu_cost.value = this.gpu_choice.value == 'True' ? 6.07 : 0.00.toFixed(2)
+                this.gpu_cost.value = this.gpu_choice.value == 'True' ? 6.73 : 0.00.toFixed(2)
                 this.calculateBaseImageCost()
             },
         }
@@ -470,7 +470,7 @@
         methods: {
             handlePoolTypeSelected(poolType){
                 if (poolType == 'external'){
-                    this.baseImageTotalCost = 10
+                    this.baseImageTotalCost = 11.09
                 }
                 this.calculateTotal()
             },
