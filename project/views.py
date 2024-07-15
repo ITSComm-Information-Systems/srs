@@ -560,14 +560,28 @@ def get_uniqname(request):
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
 def amionthevpn(request):
-	api_url = "https://api.ipify.org?format=json"
-	response = requests.get(api_url)
-	if response.status_code == 200:
-		# Parse the JSON response
-		data = response.json()
+	# api_url = "https://api.ipify.org?format=json"
+	# response = requests.get(api_url)
+	# if response.status_code == 200:
+	# 	# Parse the JSON response
+	# 	data = response.json()
+	# else:
+    #     # Handle request errors or set data to None if the API call failed
+	# 	data = None
+
+	x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+	if x_forwarded_for:
+		ip = x_forwarded_for.split(',')[0]  # In case of multiple forwarded addresses, take the first one
 	else:
-        # Handle request errors or set data to None if the API call failed
-		data = None
+		ip = request.META.get('REMOTE_ADDR')  # Fallback to REMOTE_ADDR if no forwarded IP is available
+
+		data = {}  # Example: Initialize an empty dictionary or fetch your data as needed
+
+    # Add the client's IP address to the 'data' dictionary
+	data['ip'] = ip
+
+    # Now `ip` contains the IP address of the client
+	print(data)  # For demonstration purposes; remove or use logging in production
+
     
-	print(data)
 	return render(request, "amionthevpn.html", {'data': data})
