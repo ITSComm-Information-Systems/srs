@@ -570,6 +570,7 @@ def amionthevpn(request):
 	# 	data = None
 
 	x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+	ip = '0.0.0.0'
 	if x_forwarded_for:
 		ip = x_forwarded_for.split(',')[0]  # In case of multiple forwarded addresses, take the first one
 	else:
