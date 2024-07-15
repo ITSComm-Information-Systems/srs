@@ -47,6 +47,7 @@ urlpatterns = [
     path('', views.homepage),
     path('', include('pages.urls')),
     path('tools/',include('tools.urls')),
+    path('amionthevpn/', views.amionthevpn),
     #path('testtest/',views.raise404)
 
 ] 

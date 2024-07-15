@@ -1,4 +1,5 @@
 import warnings
+import requests
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.template import loader
@@ -556,3 +557,17 @@ def get_uniqname(request):
 		r = {'message': 'Uniqname not found.'}
 
 	return JsonResponse(r, safe=False)
+
+@permission_required(('oscauth.can_order'), raise_exception=True)
+def amionthevpn(request):
+	api_url = "https://api.ipify.org?format=json"
+	response = requests.get(api_url)
+	if response.status_code == 200:
+		# Parse the JSON response
+		data = response.json()
+	else:
+        # Handle request errors or set data to None if the API call failed
+		data = None
+    
+	print(data)
+	return render(request, "amionthevpn.html", {'data': data})
