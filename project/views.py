@@ -575,7 +575,7 @@ def amionthevpn(request):
 	else:
 		ip = request.META.get('REMOTE_ADDR')  # Fallback to REMOTE_ADDR if no forwarded IP is available
 
-		data = {}  # Example: Initialize an empty dictionary or fetch your data as needed
+	data = {}  # Example: Initialize an empty dictionary or fetch your data as needed
 
     # Add the client's IP address to the 'data' dictionary
 	data['ip'] = ip
