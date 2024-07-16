@@ -63,17 +63,33 @@ def handle_custom_500(request):
 def unity_login(request):
 	from project.models import Unity
 	from cryptography.fernet import Fernet
+	from pages.models import Page
+	from django.template import Template, RequestContext
 
 	try:
-		temp_password = Unity.objects.get(username=request.user.username).temp_password
+		unity = Unity.objects.get(username=request.user.username)
 		fernet = Fernet(settings.UNITY_KEY)
-		temp_pass = fernet.decrypt(temp_password.encode('ascii')).decode()
+		text_password = fernet.decrypt(unity.temp_password.encode('ascii')).decode()
 		message = None
 	except:
-		temp_pass = ''
+		text_password = ''
+		unity = ''
 		message = f'Password not found for user: { request.user.username }'
 
-	return render(request, 'unity.html', {'temp_pass': temp_pass, 'message': message })
+	page = Page.objects.get(permalink='unity')
+
+	template = Template(page.bodytext)
+	context = RequestContext(
+	    request,
+        {
+			'title': 'Unity Credentials',
+            'unity': unity,
+			'text_password': text_password,
+			'message': message,
+        },
+    )
+	return HttpResponse(template.render(context))
+
 
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
