@@ -25,7 +25,10 @@ class Command(BaseCommand):
                 else:
                     temp_pass = row[1]
                     pass_hash = fernet.encrypt(temp_pass.encode())
-                    Unity.objects.create(username=row[0], temp_password=pass_hash.decode())
+                    Unity.objects.create(username=row[0]
+                                         , temp_password=pass_hash.decode()
+                                         , temp_pin=row[2]
+                                         , phone_number=row[3])
                     line_count += 1
 
             print(f'Processed {line_count} lines.')
