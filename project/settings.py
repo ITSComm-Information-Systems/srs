@@ -120,7 +120,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 SRS_OUTAGE = os.getenv('SRS_OUTAGE', False)
-SERVICENOW_EMAIL = os.getenv('SERVICENOW_EMAIL', 'umichdev@service-now.com')
+UNITY_KEY = os.getenv('UNITY_KEY')
 
 TDX = {
     'URL': os.getenv('TDX_URL'),
