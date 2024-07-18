@@ -66,25 +66,28 @@ def unity_login(request):
 	from pages.models import Page
 	from django.template import Template, RequestContext
 
-	try:
-		unity = Unity.objects.get(username=request.user.username)
-		fernet = Fernet(settings.UNITY_KEY)
-		text_password = fernet.decrypt(unity.temp_password.encode('ascii')).decode()
-		message = None
-	except:
-		text_password = ''
-		unity = ''
+	#try:
+	phone_list = []
+	fernet = Fernet(settings.UNITY_KEY)
+	for rec in Unity.objects.filter(username=request.user.username):
+		text_password = fernet.decrypt(rec.temp_password.encode('ascii')).decode()
+		phone_list.append({'username': rec.username,
+				'temp_pin': rec.temp_pin,
+				'text_password': text_password,
+				'phone_number': rec.phone_number})
+
+	if len(phone_list) == 0:
 		message = f'Password not found for user: { request.user.username }'
+	else:
+		message = None
 
 	page = Page.objects.get(permalink='unity')
-
 	template = Template(page.bodytext)
 	context = RequestContext(
 	    request,
         {
 			'title': 'Unity Credentials',
-            'unity': unity,
-			'text_password': text_password,
+            'phone_list': phone_list,
 			'message': message,
         },
     )
