@@ -71,6 +71,12 @@ class ActionLog(models.Model):
      data = models.JSONField()
 
 
+class Unity(models.Model):
+     username = models.CharField(max_length=8)
+     temp_password = models.CharField(max_length=100)
+     temp_pin = models.CharField(max_length=10)
+     phone_number = models.CharField(max_length=20)
+
 class ChoiceManager(models.Manager):
 
      def get_choices(self, code):
