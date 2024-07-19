@@ -15,7 +15,7 @@ class Command(BaseCommand):
         fernet = Fernet(settings.UNITY_KEY)
         print('open file')
 
-        with open(f'/Users/djamison/Downloads/unity.csv') as csv_file:
+        with open(f'/Users/djamison/Downloads/UnityFinalImport.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             line_count = 0
             for row in csv_reader:
@@ -23,13 +23,24 @@ class Command(BaseCommand):
                     #print(f'Column names are {", ".join(row)}')
                     line_count += 1
                 else:
-                    temp_pass = row[1]
+                    # 0Alias,1Extension,2VoicemailAction,3RelayAddress,4Pin,5Password
+                    if row[0] != row[1]:
+                        print('warning alias', row[0], row[1])
+
+                    if row[2] != '3':
+                        print('warning', row[1], row[2])
+                    username = row[3].split('@')[0]
+                    if len(username) > 8:
+                        print('err', username)
+                        username = '-'
+                    temp_pass = row[5]
                     pass_hash = fernet.encrypt(temp_pass.encode())
-                    Unity.objects.create(username=row[0]
+                    Unity.objects.create(username=username
                                          , temp_password=pass_hash.decode()
-                                         , temp_pin=row[2]
-                                         , phone_number=row[3])
+                                         , temp_pin=row[4]
+                                         , phone_number=row[1])
                     line_count += 1
+                    
 
             print(f'Processed {line_count} lines.')
 
