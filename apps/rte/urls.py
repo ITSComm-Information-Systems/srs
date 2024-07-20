@@ -16,6 +16,9 @@ urlpatterns = [
     path('actionlog/', views.get_action_log),
     path('actionlog/<int:id>/', views.get_action_log_entry),
     path('confirmation/', views.get_confirmation),
+    path('estimate-history/', views.view_estimate_history),
+    path('tech-search/', views.tech_search, name='tech-search'),
+    path('show-workorders/', views.show_workorders, name='show-workorders'),
     path(r'', views.load_rte),
     
 ]

@@ -1,14 +1,16 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
-from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput
+from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput, UmOscPreorderApiAbstract
 from project.models import ActionLog
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
 from django.db import connections
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models.functions import ExtractWeek
+from django.core import serializers
+from ..bom.models import Workorder, Estimate, PreOrder, Labor
 
 # Base RTE view
 @permission_required('rte.add_umrteinput', raise_exception=True)
@@ -666,3 +668,113 @@ def format_time(total_hours):
         mins = '0' + str(mins)
     total_hours = str(hours) + ':' + str(mins)
     return total_hours
+
+
+@permission_required('rte.add_umrteinput', raise_exception=True)
+def view_estimate_history(request):
+    template = loader.get_template('rte/view/estimate-history.html')
+    # techid = 'lhehnlin'
+
+    # workorders = Labor.objects.filter(updated_by=techid).order_by('-update_date')[:5]
+    # print(workorders)
+
+
+    context = {
+        'title': 'View Estimate History',
+    }
+    return HttpResponse(template.render(context, request))
+
+@permission_required('rte.add_umrteinput', raise_exception=True)
+def tech_search(request):
+    techid = request.GET.get('techSearch')
+    template = loader.get_template('rte/view/tech-search-table.html')
+    potential_techs = UmRteTechnicianV.objects.filter(
+        (Q(labor_code__icontains=techid) | Q(labor_name_display2__icontains=techid)) & ~Q(labor_code=''))
+    context={}
+    context['techs'] = []
+    for tech in potential_techs:
+        context['techs'].append({
+            'labor_code': tech.labor_code.upper(),
+            'labor_name': tech.labor_name_display2
+        })
+    return HttpResponse(template.render(context, request))
+
+@permission_required('rte.add_umrteinput', raise_exception=True)
+def show_workorders(request):
+    techid = request.GET.get('techSearch')
+    template = loader.get_template('rte/view/tech-wo-estimate-table.html')
+    current_time = UmRteCurrentTimeAssignedV.objects.filter(
+                        labor_code=techid).order_by('-assigned_date')[:100]
+    # context={}
+    # context['workorders'] = []
+    # for wo in current_time:
+    #     actual_mins = 0
+    #     preorders = PreOrder.objects.filter(pre_order_number=wo.pre_order_number)
+    #     for preorder in preorders:
+    #         workorders = Workorder.objects.filter(pre_order_id=preorder.pre_order_id)
+    #         for workorder in workorders:
+    #             estimates = Estimate.objects.filter(woid=workorder.pre_order_id)
+    #             for estimate in estimates:
+    #                 labors = Labor.objects.filter(estimate_id=estimate)
+    #                 for labor_instance in labors:
+    #                     actual_mins = actual_mins + wo.actual_mins
+    #         context['workorders'].append({
+    #                         'project_name': wo.project_name,
+    #                         'work_order_display': wo.work_order_display,
+    #                         'pre_order_number': wo.pre_order_number,
+    #                         'status_name': wo.status_name,
+    #                         'work_status_name': wo.work_status_name,
+    #                         'assigned_labor_code': wo.assigned_labor_code,
+    #                         'labor_code': wo.labor_code,
+    #                         'labor_name_display': wo.labor_name_display,
+    #                         'labor_cost_name': wo.labor_cost_name,
+    #                         'rate_used': "{:.2f}".format(wo.rate_used),
+    #                         'estimated_mins': int(labor_instance.hours * 60),
+    #                         'actual_mins': actual_mins,
+    #                         'assn_wo_group_code': wo.assn_wo_group_code,    
+    #                         'assn_wo_group_name': wo.assn_wo_group_name,
+    #                     })
+
+    projects = {}
+    for wo in current_time:
+        actual_mins = 0
+        preorders = PreOrder.objects.filter(pre_order_number=wo.pre_order_number)
+        for preorder in preorders:
+            workorders = Workorder.objects.filter(pre_order_id=preorder.pre_order_id)
+            for workorder in workorders:
+                estimates = Estimate.objects.filter(woid=workorder.pre_order_id)
+                for estimate in estimates:
+                    labors = Labor.objects.filter(estimate_id=estimate)
+                    for labor_instance in labors:
+                        estimated_mins = int(labor_instance.hours * 60)
+        # Check if project is already in projects dict
+                        if wo.project_name not in projects:
+                            actual_mins = wo.actual_mins
+                            projects[wo.project_name] = {
+                                'project_name': wo.project_name,
+                                'work_order_display': wo.work_order_display,
+                                'pre_order_number': wo.pre_order_number,
+                                'status_name': wo.status_name,
+                                'work_status_name': wo.work_status_name,
+                                'assigned_labor_code': wo.assigned_labor_code,
+                                'labor_code': wo.labor_code,
+                                'labor_name_display': wo.labor_name_display,
+                                'labor_cost_name': wo.labor_cost_name,
+                                'rate_used': "{:.2f}".format(wo.rate_used),
+                                'estimated_mins': estimated_mins,
+                                'actual_mins': actual_mins,
+                                'assn_wo_group_code': wo.assn_wo_group_code,
+                                'assn_wo_group_name': wo.assn_wo_group_name,
+                            }
+                            
+                        else:
+                            # Aggregate actual_mins for the project
+                            projects[wo.project_name]['actual_mins'] += wo.actual_mins 
+
+    context = {'workorders': list(projects.values())}
+    
+        
+        # estimate = Estimate.objects.filter(pre_order_number=wo.pre_order_number)
+        # print(estimate)
+
+    return HttpResponse(template.render(context, request))

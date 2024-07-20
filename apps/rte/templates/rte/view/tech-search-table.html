@@ -1,0 +1,20 @@
+<table id="techTable" class="table table-hover" style="display: table;">
+    <tbody>
+        {% for tech in techs %}
+        <tr id="{{tech.labor_code}}"role="button" style="display: table-row;" onclick="handleRowClick('{{tech.labor_code}}')" hx-get="{% url 'show-workorders' %}" hx-trigger="click" hx-include="#techSearch" hx-target="#workorders">
+            <td> {{tech.labor_code}} </td>
+            <td> {{tech.labor_name}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% block js %}
+<script>
+    const handleRowClick = (laborCode) => {
+        document.getElementById('techSearch').value = laborCode;
+        document.getElementById('techTable').style.display = 'none';
+    }
+</script>
+
+{% endblock %}
