@@ -178,6 +178,7 @@ class Email(models.Model):
                subject = f'{settings.ENVIRONMENT} - {self.subject}'
 
           # Send Distribution List to Leads
-          msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc], reply_to=[self.reply_to])
+          msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc], reply_to=[self.reply_to],
+                                       headers = {'srs_code': self.code})
           msg.attach_alternative(body, "text/html")
           msg.send()

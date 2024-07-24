@@ -341,11 +341,11 @@ ACCESS_INTERNET_CHOICES = (('True','Yes, my desktop needs internet access (outsi
 MASK_CHOICES = [["16", "/28 (16 addresses)"], ["32", "/27 (32 addresses)"], ["64", "/26 (64 addresses)"], 
                     ["128", "/25 (128 addresses)"], ["256", "/24 (256 addresses)"]]
 
-CPU_INITIAL = 1.15
-MEMORY_INITIAL = 0.96
-STORAGE_INITIAL = 5.00
+CPU_INITIAL = 1.28
+MEMORY_INITIAL = 1.06
+STORAGE_INITIAL = 5.50
 GPU_INITIAL = 0.00
-BASE_COST = 31.31
+BASE_COST = 34.71
 TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
 
 class StorageForm(forms.Form):
