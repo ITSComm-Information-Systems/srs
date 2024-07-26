@@ -690,7 +690,7 @@ class Server(models.Model):
     domain = models.CharField(max_length=100)
     datacenter = models.CharField(max_length=100)
     firewall_requests = models.CharField(max_length=100)
-    legacy_data = models.TextField()
+    last_updated = models.DateTimeField(null=True)
 
     @cached_property
     def total_disk_size(self):
