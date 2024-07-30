@@ -251,10 +251,9 @@ class Pool(MiDesktop):
     quantity = models.IntegerField()
     images = models.ManyToManyField(Image)
     override = models.BooleanField(default=False)
-    cpu_override = models.IntegerField()
-    memory_override = models.IntegerField()
+    cpu_override = models.IntegerField(blank=True, null=True)
+    memory_override = models.IntegerField(blank=True, null=True)
 
-    @cached_property
     def total_cost(self):
         total_cost = 0
         if self.type == "external":
@@ -266,6 +265,10 @@ class Pool(MiDesktop):
             return round(0.00,2)
         
         return round(total_cost,2)
+
+    def override_total(self):
+        relevant_image = self.images.first()
+        return (relevant_image.total_cost_without_cpu_and_memory() + (self.cpu_override * relevant_image.cpu_rate()) + (self.memory_override * relevant_image.memory_rate())) * self.quantity
     
     def __str__(self):
         return self.name
