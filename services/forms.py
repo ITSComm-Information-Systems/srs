@@ -928,6 +928,7 @@ class InstantClonePoolChangeForm(forms.ModelForm):
         kwargs.pop('image', None)
 
         super(InstantClonePoolChangeForm, self).__init__(*args, **kwargs)
+        self.fields['total'].initial = self.total
         if self.user:
 
             image_list = Image.objects.filter(status='A',owner__in=[self.instance.owner.id]).order_by('name')
@@ -942,7 +943,7 @@ class InstantClonePoolChangeForm(forms.ModelForm):
                     self.fields[field].widget.attrs.update({'class': 'form-control'})
             else:
                 print('no widget for', field)
-        self.fields['total'].initial = self.total
+        
         self.fields['images'].initial = self.image.name
         
 
