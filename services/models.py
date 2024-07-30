@@ -198,6 +198,28 @@ class Image(MiDesktop):
                 total_cost = total_cost + rate.rate
 
         return total_cost
+    
+    def total_cost_without_cpu_and_memory(self):
+
+        for rate in StorageRate.objects.filter(service__name='midesktop').order_by('display_seq_no'):
+            if rate.label == 'Base':
+                total_cost_without_cpu_and_memory = rate.rate
+            if rate.label == 'Storage':
+                total_cost_without_cpu_and_memory = total_cost_without_cpu_and_memory + (rate.rate * self.total_storage_size)
+            if rate.label[:3] == 'GPU' and self.gpu == True:
+                total_cost_without_cpu_and_memory = total_cost_without_cpu_and_memory + rate.rate
+
+        return total_cost_without_cpu_and_memory
+    
+    def memory_rate(self):
+        for rate in StorageRate.objects.filter(service__name='midesktop').order_by('display_seq_no'):
+            if rate.label == 'Memory':
+                return rate.rate
+    
+    def cpu_rate(self):
+        for rate in StorageRate.objects.filter(service__name='midesktop').order_by('display_seq_no'):
+            if rate.label == 'CPU':
+                return rate.rate
 
     class Meta:
         verbose_name = 'MiDesktop Image'
