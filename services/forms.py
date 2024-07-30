@@ -913,9 +913,9 @@ class InstantClonePoolChangeForm(forms.ModelForm):
     quantity = forms.IntegerField(required=False,validators=[MinValueValidator(1), MaxValueValidator(200)])
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
     additional_details = forms.CharField(required=False,label="Additional Details")
-    override = forms.BooleanField()
-    cpu_override = forms.IntegerField()
-    memory_override = forms.IntegerField()
+    override = forms.BooleanField(required=False)
+    cpu_override = forms.IntegerField(required=False)
+    memory_override = forms.IntegerField(required=False)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user')
