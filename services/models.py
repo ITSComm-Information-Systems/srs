@@ -228,6 +228,9 @@ class Pool(MiDesktop):
     type = models.CharField(default='instant_clone',max_length=30,)
     quantity = models.IntegerField()
     images = models.ManyToManyField(Image)
+    override = models.BooleanField(default=False)
+    cpu_override = models.IntegerField()
+    memory_override = models.IntegerField()
 
     @cached_property
     def total_cost(self):
