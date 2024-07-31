@@ -847,6 +847,8 @@ class ServerSupportForm(TabForm):
             os_id = None
             db = None
 
+        
+
         if self.request.POST.get('production') == 'False':
             self.fields['on_call'].initial = '0'
             self.fields['on_call'].disabled = True
@@ -873,7 +875,15 @@ class ServerSupportForm(TabForm):
             else:
                 windows = False
 
-        if kwargs['request'].POST.get('managed', mang) == 'unmang' or not windows:
+        if windows:
+            # Remove specific choices from the patch_day field
+            patch_days_to_remove = ['Monday', 'Tuesday', 'Wednesday']
+            self.fields['patch_day'].choices = [
+                choice for choice in self.fields['patch_day'].choices
+                if choice[1] not in patch_days_to_remove
+            ]
+
+        if kwargs['request'].POST.get('managed', mang) == 'unmang':
             self.fields.pop('patch_day')
             self.fields.pop('patch_time')
             self.fields.pop('reboot_day')
@@ -892,6 +902,9 @@ class ServerSupportForm(TabForm):
         }
 
         patch_day_map = {
+            '363': 'MONDAY',
+            '362': 'TUESDAY',
+            '361': 'WEDNESDAY',
             '96': 'THURSDAY',
             '97': 'FRIDAY',
             '98': 'SATURDAY',
@@ -959,7 +972,7 @@ class ServerSupportForm(TabForm):
             # Check if the values for reboot_day and patch_day match
             if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
                 # Check if patch_time is one of the specified values
-                if patch_time in [ '38', '39', '40', '41'] :
+                if patch_time in ['38', '39', '40', '41']:
                     # Calculate the time difference between patch_time and reboot_time
                     time_difference = patch_time_map[patch_time] - reboot_time_map[reboot_time]
                     # Check if the time difference is within the desired range
