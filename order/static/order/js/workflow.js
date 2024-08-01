@@ -395,24 +395,16 @@ $(document).ready(function() {
     if (server) {
       $(document).on("change","#id_size", function() {size=$('#id_size').val();})
       $('#id_size').data('server', '');
-      type = $('#id_midatatype option:selected').text();
       size = Math.trunc(size)
-      if (type == 'Microsoft SQL Server'){
-        linktype = "MSSQL"
-      }
-      else{
-        linktype = type
-      }
-      link = "location.href='67?type=" + linktype + "&size=" + size +"';"; 
+      link = "location.href='67?type=" + database + "&size=" + size +"';"; 
       $('#go_button').attr('onclick', link)
       $("#order_server").modal('show');
     }
   });
 
   $(document).on("change", "#id_midatatype" , function() {
-    type = $('#id_midatatype option:selected').text();
+    type = get_db_type();
     size=$('#id_size').val();
-
     if(type == "Oracle" && size < 50){
       $('#id_size').val(50)
     }else if(type != "Oracle" && size != 30){
@@ -421,7 +413,7 @@ $(document).ready(function() {
   });
 
   $(document).on("change", "#id_size" , function() {
-    type = $('#id_midatatype option:selected').text();
+    type = get_db_type();
     size=$('#id_size').val();
 
     if(type == "Oracle" && size < 50){
@@ -467,15 +459,27 @@ $(document).ready(function() {
 
   }
 
+  function get_db_type() {
+    db_type = $('#id_midatatype option:selected').val();
 
+    if (db_type == "67") {
+      database = "MySQL";
+    } else if (db_type == "66") {
+      database = "MSSQL";
+    } else if (db_type == "68") {
+      database = "Oracle";
+    }
+    return database
+  }
   
   $(document).on("change", "#id_midatatype" , function() {
-    if ($('#id_midatatype option:selected').text()=="MSSQL") { // MSSQL
+    database = get_db_type();
+
+    if (database=="MSSQL") { // MSSQL
       $("#div_midatasql").show();
     } else {
       $("#div_midatasql").hide();
     }
-    database = $('#id_midatatype option:selected').text();
   });
 
 
