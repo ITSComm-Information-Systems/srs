@@ -403,7 +403,14 @@ def create_ticket_server_delete(instance, user, description):
     }
     
     if instance.database_type:
-        payload['Attributes'].append({"ID": "5319", "Value": instance.database_type.__str__()})
+        if instance.database_type.code == 'MSSQL':
+            db_label = 'Microsoft SQL Server'
+        elif instance.database_type.code == 'MYSQL':
+            db_label = 'MySQL'
+        elif instance.database_type.code == 'ORACLE':
+            db_label = 'Oracle'
+
+        payload['Attributes'].append({"ID": "5319", "Value": db_label})
 
     TDx().create_ticket(payload)
 
