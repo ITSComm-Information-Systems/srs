@@ -7,7 +7,7 @@ from django.forms.fields import DecimalField
 from ldap3.protocol.rfc4511 import Control
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
-from project.integrations import MCommunity, TDx
+from project.integrations import MCommunity, TDx, DB_TYPE
 from project.models import ShortCodeField, Choice
 from project.utils import get_query_result
 from softphone.models import Selection
@@ -1230,8 +1230,11 @@ class Item(models.Model):
             if self.data.get('volaction') == 'Delete':
                 payload['Title'] = 'Delete MiDatabase'
                 instance_id = self.data.get('instance_id')
-                db_type = Database.objects.get(id=instance_id).type.label
-                attributes.append({'ID': 1858, 'Value': db_type})
+                db_type = Database.objects.get(id=instance_id).type.code
+                attributes.append({'ID': 1858, 'Value': DB_TYPE.get(db_type)})
+            else:
+                db_type = Choice.objects.get(id=self.data.get('midatatype')).code
+                attributes.append({'ID': 1858, 'Value': DB_TYPE.get(db_type)})
 
         elif action.service.name == 'miServer':
             attributes.append({'ID': 1954, 'Value': self.data.get('shortcode')})
@@ -1280,8 +1283,8 @@ class Item(models.Model):
                     group_name = self.data.get('ad_group')
                     attributes.append({'ID': 1953, 'Value': MCommunity().get_group_email_and_name(group_name)})  # Admin Group
 
-                attributes.append({'ID': 5319, 'Value': db})
-                attributes.append({'ID': 1858, 'Value': db})
+                attributes.append({'ID': 5319, 'Value': DB_TYPE.get(db.type.code)})
+                attributes.append({'ID': 1858, 'Value': DB_TYPE.get(db.type.code)})
                 attributes.append({'ID': 1952, 'Value': 203}) # Managed
 
                 if db == 'MSSQL':
@@ -1298,7 +1301,7 @@ class Item(models.Model):
                 else:
                     if dedicated: # modifying a dedicated DB server
                         group_name = instance.admin_group.name
-                        attributes.append({'ID': 5319, 'Value': instance.database_type.code})
+                        attributes.append({'ID': 5319, 'Value': DB_TYPE.get(instance.database_type.code)})
                     else:
                         group_name = self.data.get('owner')
                         
