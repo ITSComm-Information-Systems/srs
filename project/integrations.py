@@ -359,6 +359,9 @@ class TDx():
         else:
             print(response, response.status_code, response.text)
 
+DB_TYPE = {'MSSQL': 'Microsoft SQL Server',
+           'MYSQL':  'MySQL',
+           'ORACLE':  'Oracle'}
 
 def create_ticket_server_delete(instance, user, description):
     
@@ -403,14 +406,7 @@ def create_ticket_server_delete(instance, user, description):
     }
     
     if instance.database_type:
-        if instance.database_type.code == 'MSSQL':
-            db_label = 'Microsoft SQL Server'
-        elif instance.database_type.code == 'MYSQL':
-            db_label = 'MySQL'
-        elif instance.database_type.code == 'ORACLE':
-            db_label = 'Oracle'
-
-        payload['Attributes'].append({"ID": "5319", "Value": db_label})
+        payload['Attributes'].append({"ID": "5319", "Value": DB_TYPE.get(instance.database_type.code)})
 
     TDx().create_ticket(payload)
 
@@ -912,7 +908,7 @@ def create_ticket_database_modify(instance, user, description):
             },
             {
                 "ID": "1858", # Type
-                "Value": instance.type.label
+                "Value": DB_TYPE.get(instance.type.code)
             },
             {
                 "ID": "1875",  # Shortcode
