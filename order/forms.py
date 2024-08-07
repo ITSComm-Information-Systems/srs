@@ -1556,7 +1556,6 @@ class DatabaseForm(ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(DatabaseForm, self).__init__(*args, **kwargs)
-        print('here')
         self.user = user
         group_list = MCommunity().get_groups(user.username)
 
