@@ -20,10 +20,17 @@
         <td>
             {% for image in rec.images.all %}
                 {{image.name}}&nbsp;
+                {% if rec.override %}
+                <span class="badge badge-info">OVERRIDE</span>
+                {% endif %}
             {% endfor %}
         </td>
         <td>{{ rec.owner }}</td>  
+        {% if rec.override %}
+        <td>{{rec.override_total|floatformat:2}}</td>
+        {% else %}
         <td>{{ rec.total_cost|floatformat:2}}</td>
+        {% endif %}
         <td>
             <a href="/services/midesktop/{{ rec.id }}/change/">
                 <i class="fas fa-edit"></i>
