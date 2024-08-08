@@ -1283,8 +1283,8 @@ class Item(models.Model):
                     group_name = self.data.get('ad_group')
                     attributes.append({'ID': 1953, 'Value': MCommunity().get_group_email_and_name(group_name)})  # Admin Group
 
-                attributes.append({'ID': 5319, 'Value': DB_TYPE.get(db.type.code)})
-                attributes.append({'ID': 1858, 'Value': DB_TYPE.get(db.type.code)})
+                attributes.append({'ID': 5319, 'Value': db})
+                attributes.append({'ID': 1858, 'Value': db})
                 attributes.append({'ID': 1952, 'Value': 203}) # Managed
 
                 if db == 'MSSQL':
