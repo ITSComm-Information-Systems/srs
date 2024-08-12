@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceProfileV, UmOscChartfieldV
+from project.models import Email
 from oscauth.models import AuthUserDept
 from pages.models import Page
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
@@ -54,6 +55,30 @@ def get_phone_location(request, phone_number):
         locations[0]['authorized'] = authorized
 
     return JsonResponse(locations, safe=False)
+
+
+
+@permission_required('oscauth.can_order')
+def get_phone_information(request, uniqname):
+    authorized_departments = AuthUserDept.get_order_departments(request.user)
+
+    service_list = list(UmOscServiceProfileV.objects.filter(
+            uniqname=uniqname, 
+            service_status_code="In Service", 
+            subscriber_status="Active", 
+            deptid__in=authorized_departments,
+        ).values())
+
+    record_list = []
+    for record in service_list:
+        parts = record["mrc_exp_chartfield"].split('-')
+        record["fund"] = parts[0]
+        record["program"] = parts[2]
+        record["chartcom_class"] = parts[3]
+
+        record_list.append(record)
+    
+    return JsonResponse(record_list, safe=False)
 
 
 def querydict_to_dict(query_dict):  # Kudos to QFXC on StackOverflow
@@ -498,6 +523,23 @@ def get_order_list(request):
     return HttpResponse(template.render(context, request))
 
 
+class SMS(PermissionRequiredMixin, View):
+    permission_required = 'oscauth.can_order'
+
+    def post(self, request):
+        item = Item.objects.get(id=request.POST.get('item'))
+        item.external_reference_id = 0
+        item.save()
+
+        return HttpResponseRedirect('/orders/integration/sms') 
+
+
+    def get(self, request):
+        item_list = Item.objects.filter(description='Add SMS Text').order_by('-create_date')
+
+        return render(request, 'order/integration_sms_list.html',  {'item_list': item_list,})
+
+
 class Integration(PermissionRequiredMixin, View):
     permission_required = 'oscauth.can_order'
 
@@ -790,7 +832,10 @@ class Services(UserPassesTestMixin, View):
             else:
                 service.actions = action_list.filter(service=service)
                 for action in service.actions:
-                    action.target = f'/orders/wf/{action.id}'
+                    if action.id == 76:   # ToDo add target to action.
+                        action.target = '/orders/sp/AddSMS'
+                    else:
+                        action.target = f'/orders/wf/{action.id}'
 
             if service.name == selected_service:
                 service.active = 'active show'
@@ -973,3 +1018,53 @@ class ServerView(UserPassesTestMixin, View):
         instance.save()
 
         return HttpResponseRedirect('/requestsent') 
+    
+
+class AddSMS(PermissionRequiredMixin, View):
+    title = 'Add SMS for Zoom Phone'
+    permission_required = 'oscauth.can_order'
+    form = AddSMSForm
+    template = 'order/add_sms.html'
+
+    def get(self, request):
+
+        return render(request, self.template, 
+                    {
+                        'title': self.title,
+                        'form': self.form(),
+                    })
+
+    
+    def post(self, request):
+
+        if request.POST.get('submit'):  # Already validated uniqname and retrieved associated phone numbers.
+            user_id = request.POST.get('user_id')
+            service_numbers = request.POST.getlist('service_number')
+
+            from project.pinnmodels import UmOscServiceProfileV as ServiceNumbers
+            for number in ServiceNumbers.objects.filter(service_number__in=service_numbers, service_status_code='In Service', uniqname=user_id):
+                print(number, number.mrc_exp_chartfield)
+
+                with connections['pinnacle'].cursor() as cursor:
+                    cursor.callproc('pinn_custom.um_osc_util_k.um_add_generic_mrc_p', 
+                                    [number.subscriber_id, number.service_id, 'FT-ZOOM-SMS', 1, number.mrc_exp_chartfield])
+
+            Item.objects.create(description='Add SMS Text', chartcom_id=14388, created_by_id=request.user.id, internal_reference_id=76
+                                , data={'user_id': user_id, 'service_numbers': service_numbers})
+
+            email = Email.objects.get(code='SMS_REQUEST')
+            email.to = user_id + '@umich.edu'
+            email.cc = request.user.email
+            email.context = {"uniqname": user_id }
+            email.send()
+
+            return HttpResponseRedirect('/requestsent')
+
+        form = self.form(request.POST, request=request)
+        form.is_valid()
+
+        return render(request, self.template, 
+                    {
+                        'title': self.title,
+                        'form': form,
+                    })

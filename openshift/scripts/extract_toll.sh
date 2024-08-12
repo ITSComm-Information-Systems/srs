@@ -4,25 +4,14 @@ send_slack_message () {
          https://slack.com/api/chat.postMessage > slack.log
 }
 
-
 case $1 in
     Production)
         DIR='/media/toll'
-        CHANNEL='inf-information-systems_no-interns';;
+        CHANNEL='inf-information_systems_no-interns';;
     *)
         DIR='/media/test'
         CHANNEL='srs-testing';;
 esac
-
-
-if [ $1 == 'Production' ]
-then
-    DIR='/media/toll'
-    CHANNEL='inf-information-systems_no-interns'
-else
-    DIR='/media/test'
-    CHANNEL='srs-testing'
-fi
 
 send_slack_message "Unzip Toll File $1" 
 
@@ -38,4 +27,4 @@ done
 
 send_slack_message "Toll Statements Complete"
 
-python3 manage.py send_email --mail TOLL_COMPLETE
+python3 manage.py send_email --email TOLL_COMPLETE

@@ -164,6 +164,7 @@ class UmOscChartfieldV(models.Model):
 class UmOscServiceProfileV(models.Model):
    deptid =  models.CharField(max_length=15, blank=True, null=True)
    service_number = models.CharField(max_length=60,primary_key=True)
+   service_id = models.CharField(max_length=15, blank=True, null=True)
    service_status_code = models.CharField(max_length=15, blank=True, null=True)
    service_type = models.CharField(max_length=20, blank=True, null=True)
    subscriber_id = models.CharField(max_length=7,null=True)

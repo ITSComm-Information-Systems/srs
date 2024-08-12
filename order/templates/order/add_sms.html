@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>{{ title }}</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <div>
+            <p>
+                Zoom Phone SMS can be requested for a number that has already transitioned to Zoom Phone. 
+                See <a href="https://documentation.its.umich.edu/node/4819" target="_blank">SMS FAQ</a><br>
+                <small>Note: If you are unable to find the uniqname you are looking for, please contact <a href="mailto:its-inf-csr@umich.edu">its-inf-csr@umich.edu</a></small>                
+            </p>
+        </div>
+        <div class="form-group col-6">
+            <label for="id_uniqname">
+                <strong>Enter uniqname associated with Zoom Phome.
+                </strong> </label>
+            <div class="row">
+                <div class="col">
+                    {{ form.uniqname }}
+                    {% for error in form.uniqname.errors %}
+                    <div role=”alert” class="invalid-feedback">
+                        <i class="fas fa-exclamation-triangle" aria-label="{{ error }}"></i>{{ error }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary findBtn" id="phoneLookup" name="find" value="find">Find</button>
+                </div>
+            </div>
+        </div>
+
+
+        {% if form.phone_numbers %}
+        <div id="subscriber">
+            <input name="user_id" type="hidden" value="{{ form.uniqname.value }}" />
+            SMS Texting will be added to the following softphone numbers:
+            <ul>
+                {% for number in form.phone_numbers %}
+                <input name="service_number" type="hidden" value="{{ number }}" />
+                <li>{{ number }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <input class="btn btn-primary" name="submit" type="submit" value="Submit Order">
+        {% endif %}
+
+    </form>
+
+{% endblock %}

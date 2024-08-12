@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Unity Temporary Password</h1>
+
+{% if message %}
+<p>{{ message }}</p>
+{% else %}
+<p>Your temporary password is: <br>
+<span id="temp_pass">{{ temp_pass }}</span>
+<button id="copy_btn" class="btn btn-primary" onclick="copyPass()">Copy</button>
+</p>
+
+<a href="/">How to change your password</a>
+{% endif %}
+{% endblock content %}
+
+{% block js %}
+
+    <script>
+        function copyPass() {
+        var copyText = document.getElementById("temp_pass");
+        navigator.clipboard.writeText(copyText.innerHTML);
+        var btn = document.getElementById("copy_btn");
+        btn.innerHTML = "Copied";
+        btn.disabled = true;
+        }
+    </script>
+
+{% endblock %}

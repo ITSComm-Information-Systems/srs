@@ -7,7 +7,7 @@ from django.forms.fields import DecimalField
 from ldap3.protocol.rfc4511 import Control
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
 from project.pinnmodels import UmOscPreorderApiV
-from project.integrations import MCommunity, TDx
+from project.integrations import MCommunity, TDx, DB_TYPE
 from project.models import ShortCodeField, Choice
 from project.utils import get_query_result
 from softphone.models import Selection
@@ -651,6 +651,7 @@ class Server(models.Model):
     created_date = models.DateTimeField(default=timezone.now, null=True)
     #shortcode = models.CharField(max_length=100) 
     public_facing = models.BooleanField(default=False)
+    production = models.BooleanField(default=True)
     managed = models.BooleanField(default=True)   #  <SRVmanaged></SRVmanaged>
 
     os = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={'parent__code__in': ['SERVER_UNMANAGED_OS','LINUX','WINDOWS']}
@@ -667,7 +668,7 @@ class Server(models.Model):
     in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
 
     firewall = models.CharField(max_length=100)
-    backup = models.BooleanField(default=False)
+    backup = models.BooleanField(default=True)
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
     backup_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_BACKUP_TIME"}
@@ -689,7 +690,7 @@ class Server(models.Model):
     domain = models.CharField(max_length=100)
     datacenter = models.CharField(max_length=100)
     firewall_requests = models.CharField(max_length=100)
-    legacy_data = models.TextField()
+    last_updated = models.DateTimeField(null=True)
 
     @cached_property
     def total_disk_size(self):
@@ -1229,8 +1230,11 @@ class Item(models.Model):
             if self.data.get('volaction') == 'Delete':
                 payload['Title'] = 'Delete MiDatabase'
                 instance_id = self.data.get('instance_id')
-                db_type = Database.objects.get(id=instance_id).type.label
-                attributes.append({'ID': 1858, 'Value': db_type})
+                db_type = Database.objects.get(id=instance_id).type.code
+                attributes.append({'ID': 1858, 'Value': DB_TYPE.get(db_type)})
+            else:
+                db_type = Choice.objects.get(id=self.data.get('midatatype')).code
+                attributes.append({'ID': 1858, 'Value': DB_TYPE.get(db_type)})
 
         elif action.service.name == 'miServer':
             attributes.append({'ID': 1954, 'Value': self.data.get('shortcode')})
@@ -1297,7 +1301,7 @@ class Item(models.Model):
                 else:
                     if dedicated: # modifying a dedicated DB server
                         group_name = instance.admin_group.name
-                        attributes.append({'ID': 5319, 'Value': instance.database_type.code})
+                        attributes.append({'ID': 5319, 'Value': DB_TYPE.get(instance.database_type.code)})
                     else:
                         group_name = self.data.get('owner')
                         
@@ -1319,10 +1323,7 @@ class Item(models.Model):
                 attributes.append({'ID': 1957, 'Value': os.label}) 
 
             if self.data.get('volaction') != 'Delete':
-                if action.type == 'M':
-                    summ = text[2]['fields']
-                else:
-                    summ = text[1]['fields']
+                summ = text[2]['fields']
 
                 for field in summ:
                     if field['label'] == 'Disk Space':
@@ -1379,7 +1380,7 @@ class Item(models.Model):
 
         MCommunity().add_entitlement(rec.admin_group.name)
 
-        for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing']:
+        for field in ['cpu','ram','name','support_email','support_phone','shortcode','backup','managed','replicated','public_facing','production']:
             value = self.data.get(field)
             if value:
                 setattr(rec, field, value)

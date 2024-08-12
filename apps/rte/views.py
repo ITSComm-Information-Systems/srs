@@ -8,6 +8,7 @@ from django.db import connections
 from django.db.models import Sum
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models.functions import ExtractWeek
 
 # Base RTE view
 @permission_required('rte.add_umrteinput', raise_exception=True)
@@ -552,6 +553,9 @@ def view_time_display(request):
     date_start = request.POST.get('calendarRangeStart')
     date_end = request.POST.get('calendarRangeEnd')
     date_range = request.POST.get('dateRangeSelect')
+    multi_week_view = False
+    multi_weekly_results = None
+    total_hours = 0
     if request.POST.get('viewLastButton'):
         date_range = request.POST.get('viewLastButton')
 
@@ -567,16 +571,50 @@ def view_time_display(request):
         # Search by date range
         if date_range:
             date_start, date_end = get_date_range(date_range)
+            if date_range == 'Last Month':
+                multi_week_view = True
         else:
             date_start = datetime.strptime(date_start, '%Y-%m-%d')
             date_end = datetime.strptime(date_end, '%Y-%m-%d')
 
-        results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, assigned_date__gte=date_start,
-                                                           assigned_date__lte=date_end).order_by('-assigned_date','work_order_display')
+        if date_range == 'Last Month':
+            today = datetime.now().date()
+            date_end = today + timedelta(days=(6 - today.weekday() + 1) % 7)
+            date_start = date_end - timedelta(weeks=5)
+            weeks = [date_start + timedelta(weeks=i) for i in range(5)]
+            running_hours = 0
+            
+            multi_weekly_results = []
+            for week_start in weeks:
+                week_start = week_start - timedelta(days=1)
+                week_end = week_start + timedelta(days=6)
+                week_data = UmRteCurrentTimeAssignedV.objects.filter(
+                        labor_code=techid, 
+                        assigned_date__gte=week_start,
+                        assigned_date__lt=week_end
+                    ).aggregate(
+                        total=Sum('actual_mins')  # Calculate the sum of the data for the week
+                    )
+                total_hours_weekly = week_data['total'] if week_data['total'] else 0
+                running_hours += total_hours_weekly
+                multi_weekly_results.append({
+                    'week_start': week_start,
+                    'week_end': week_end,
+                    'total': format_time(total_hours_weekly)
+                })
+            results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, assigned_date__gte=date_start,
+                                                            assigned_date__lte=date_end).order_by('-assigned_date','work_order_display')
+            search_criteria = (date_start - timedelta(days=1)).strftime('%b %d, %Y') + ' - ' + (date_end - timedelta(days=2)).strftime('%b %d, %Y')
+            total_hours = format_time(running_hours)
+        else:
+            results = UmRteCurrentTimeAssignedV.objects.filter(labor_code=techid, assigned_date__gte=date_start,
+                                                            assigned_date__lte=date_end).order_by('-assigned_date','work_order_display')
+            search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
+            total_hours = format_time(results.aggregate(Sum('actual_mins'))['actual_mins__sum'] or 0)
+            
         search_topic = 'Date Range'
-        search_criteria = date_start.strftime('%b %d, %Y') + ' - ' + date_end.strftime('%b %d, %Y')
+        
 
-    total_hours = format_time(results.aggregate(Sum('actual_mins'))['actual_mins__sum'] or 0)
 
     context = {
         'title': 'View Time',
@@ -584,7 +622,9 @@ def view_time_display(request):
         'search_topic': search_topic,
         'search_criteria': search_criteria,
         'entries': results,
-        'total_hours': total_hours
+        'total_hours': total_hours,
+        'multi_week_view': multi_week_view,
+        'multi_weekly_results': multi_weekly_results
     }
     return HttpResponse(template.render(context, request))
 
@@ -599,8 +639,8 @@ def get_date_range(date_range):
         date_start = today - timedelta(7+idx)
         date_end = today - timedelta(7+idx-6)
 
-    elif date_range == 'Last 3 Months':
-        date_start = date_end - timedelta(days=92)
+    elif date_range == 'Last Month':
+        date_start = date_end - timedelta(days=27)
 
     elif date_range == 'Last 6 Months':
         date_start = date_end - timedelta(days=183)

@@ -6,9 +6,9 @@ from django.forms import ModelForm, formset_factory
 from .models import *
 from softphone.models import Category
 from pages.models import Page
-from project.pinnmodels import UmOSCBuildingV
+from project.pinnmodels import UmOSCBuildingV, UmMpathDwCurrDepartment
 from oscauth.models import LDAPGroupMember
-from project.integrations import MCommunity, create_ticket_database_modify
+from project.integrations import MCommunity, create_ticket_database_modify, Zoom
 import math
 from project.models import Choice
 
@@ -847,6 +847,11 @@ class ServerSupportForm(TabForm):
             os_id = None
             db = None
 
+        if self.request.POST.get('production') == 'False':
+            self.fields['on_call'].initial = '0'
+            self.fields['on_call'].disabled = True
+
+
         if self.request.POST.get('database', db):
             db = self.request.POST.get('database', db)
             if db == 'MSSQL':
@@ -954,7 +959,7 @@ class ServerSupportForm(TabForm):
             # Check if the values for reboot_day and patch_day match
             if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
                 # Check if patch_time is one of the specified values
-                if patch_time == 38 or 39 or 40 or 41:
+                if patch_time in [ '38', '39', '40', '41'] :
                     # Calculate the time difference between patch_time and reboot_time
                     time_difference = patch_time_map[patch_time] - reboot_time_map[reboot_time]
                     # Check if the time difference is within the desired range
@@ -1064,6 +1069,7 @@ class ServerSpecForm(TabForm):
             self.initial = self.instance.__dict__
             self.initial['backup'] = str(self.instance.backup)
             self.initial['replicated'] = str(self.instance.replicated)
+            self.initial['production'] = str(self.instance.production)
 
             if 'indows' in self.instance.os.label:  # Managed Linux can't edit disk
                 print('windos')
@@ -1079,6 +1085,10 @@ class ServerSpecForm(TabForm):
             else:
                 self.disk_formset = self.DiskDisplayFormSet(initial=self.disk_list)
             return
+        
+        if self.request.POST.get('misevregu') == 'True':
+            self.fields['backup'].initial = 'True'
+            self.fields['backup'].disabled = True
 
         instance_id = self.request.POST.get('instance_id')
 
@@ -1116,7 +1126,9 @@ class ServerSpecForm(TabForm):
 
         self.fields['managed'].initial = True
         self.fields['replicated'].initial = True
-        self.fields['backup'].initial = True
+
+        
+        self.fields['backup'].initial = 'True'
         self.fields['backup'].disabled = True
 
         self.fields['public_facing'].disabled = True
@@ -1247,6 +1259,8 @@ class ServerSpecForm(TabForm):
                     if os_name.startswith('Windows'):
                         self.add_error('cpu', 'Managed Windows requires at least two cpu.')
     
+        production = self.cleaned_data.get('production', None)
+
         super().clean()  # When regular clean isn't enough
 
 
@@ -1347,9 +1361,10 @@ class BillingStorageForm(TabForm):
                 self.fields["billingAuthority"].initial = 'yes'
                 self.fields["serviceLvlAgreement"].initial = 'yes'
     
-                if hasattr(si, 'research_computing_package'):
-                    if si.research_computing_package == True:
-                        self.fields["research_comp_pkg"].initial = 'yes'
+                if self.action.service.name in ['turboResearch','dataDen']:
+                    if hasattr(si, 'research_computing_package'):
+                        if si.research_computing_package == True:
+                            self.fields["research_comp_pkg"].initial = 'yes'
 
         if self.action.service.name == 'miBackup':
             rate = StorageRate.objects.get(name=BackupDomain.RATE_NAME)
@@ -1550,7 +1565,6 @@ class DatabaseForm(ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(DatabaseForm, self).__init__(*args, **kwargs)
-        print('here')
         self.user = user
         group_list = MCommunity().get_groups(user.username)
 
@@ -1586,3 +1600,44 @@ class DatabaseForm(ModelForm):
             create_ticket_database_modify(self.instance, self.user, description)
 
         super().save(*args, **kwargs)  # Call the "real" save() method.
+
+
+class AddSMSForm(forms.Form):
+    uniqname = forms.CharField(label='Uniqname',
+                               widget=forms.TextInput(attrs={'class': 'form-control'}),
+                               help_text = 'Uniqname of zoom user.')
+
+    def clean(self):
+        zoom = Zoom().user_sms_elig(self.cleaned_data.get('uniqname'))
+        if 'phone_numbers' in zoom:
+            self.phone_numbers = [pn['number'][2:12] for pn in zoom.get('phone_numbers')]
+            loc = UmOscServiceProfileV.objects.filter(service_number__in=self.phone_numbers)
+            user_depts = AuthUserDept.get_order_departments(self.request.user.id).values_list('dept', flat=True)
+            for loc in UmOscServiceProfileV.objects.filter(service_number__in=self.phone_numbers, service_type='VoIP'
+                                                           , service_status_code='In Service'
+                                                           , subscriber_status='Active'):
+                if loc.deptid not in user_depts:
+                    self.add_error('uniqname', f'No order access for dept {loc.deptid}.') 
+                    self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
+                    self.phone_numbers = None
+                    break
+                else:
+                    dept = UmMpathDwCurrDepartment.objects.get(deptid=loc.deptid)
+                    print(dept.dept_grp_campus)
+                    if dept.dept_grp_campus == 'UM_FLINT':
+                        self.add_error('uniqname', f'Flint not rolling out SMS until fall 2024 (dept {loc.deptid}).') 
+                        self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
+                        self.phone_numbers = None
+                        break
+                
+        else:
+            self.add_error('uniqname', zoom.get('message')) 
+            self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
+
+        super().clean()
+
+    def __init__(self, *args, **kwargs):
+        if 'request' in kwargs:
+            self.request = kwargs['request']
+            self.kwargs = kwargs.pop('request', None)
+        super(AddSMSForm, self).__init__(*args, **kwargs)

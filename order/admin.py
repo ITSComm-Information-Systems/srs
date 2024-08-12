@@ -243,12 +243,12 @@ class ServerAdmin(ServiceInstanceAdmin):
     list_select_related = ['owner','os']
     inlines = [ServerDiskInline,]
 
-    readonly_fields = ('legacy_data','created_date','total_cost','total_disk_size')
+    readonly_fields = ('created_date','total_cost','total_disk_size')
 
     fieldsets = (
         (None, {
             'fields': (('name', 'in_service','created_date'), 'owner', ('admin_group','database_type'), 'shortcode', ('os','cpu','ram'),
-                        ('replicated','backup','backup_time','public_facing'),
+                        ('replicated','backup','backup_time','public_facing','production'),
                         ('on_call', 'support_email', 'support_phone'),
 
                         ('regulated_data','non_regulated_data'),
@@ -259,10 +259,6 @@ class ServerAdmin(ServiceInstanceAdmin):
             'classes': ('managed-section',),
             'fields': (('patch_day','patch_time'),
                     ('reboot_day', 'reboot_time'),),
-        }),
-        ('Legacy Data', {
-            'classes': ('collapse',),
-            'fields': ('legacy_data',),
         }),
         (None, {
             'fields': (('total_disk_size','total_cost'),),

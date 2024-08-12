@@ -71,6 +71,12 @@ class ActionLog(models.Model):
      data = models.JSONField()
 
 
+class Unity(models.Model):
+     username = models.CharField(max_length=8)
+     temp_password = models.CharField(max_length=100)
+     temp_pin = models.CharField(max_length=10)
+     phone_number = models.CharField(max_length=20)
+
 class ChoiceManager(models.Manager):
 
      def get_choices(self, code):
@@ -172,6 +178,7 @@ class Email(models.Model):
                subject = f'{settings.ENVIRONMENT} - {self.subject}'
 
           # Send Distribution List to Leads
-          msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc], reply_to=[self.reply_to])
+          msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc], reply_to=[self.reply_to],
+                                       headers = {'srs_code': self.code})
           msg.attach_alternative(body, "text/html")
           msg.send()
