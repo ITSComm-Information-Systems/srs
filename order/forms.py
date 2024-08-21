@@ -879,11 +879,8 @@ class ServerSupportForm(TabForm):
                 choice for choice in self.fields['patch_day'].choices
                 if choice[1] not in patch_days_to_remove
             ]
-        else:
-            self.fields.pop('reboot_day')
-            self.fields.pop('reboot_time')
 
-        if kwargs['request'].POST.get('managed', mang) == 'unmang' or kwargs['request'].POST.get('production') == 'False':
+        if kwargs['request'].POST.get('managed', mang) == 'unmang' or kwargs['request'].POST.get('managed') == 'False':
             if self.fields.get('patch_day'):
                 self.fields.pop('patch_day')
             if self.fields.get('patch_time'):
