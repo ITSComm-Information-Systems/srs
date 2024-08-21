@@ -883,6 +883,11 @@ class ServerSupportForm(TabForm):
             self.fields.pop('reboot_day')
             self.fields.pop('reboot_time')
 
+        if kwargs['request'].POST.get('managed', mang) == 'False':
+            print('false')
+            self.fields.pop('patch_day')
+            self.fields.pop('patch_time')
+
         if kwargs['request'].POST.get('managed', mang) == 'unmang':
             self.fields.pop('patch_day')
             self.fields.pop('patch_time')
