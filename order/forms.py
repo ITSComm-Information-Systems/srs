@@ -879,6 +879,11 @@ class ServerSupportForm(TabForm):
                 choice for choice in self.fields['patch_day'].choices
                 if choice[1] not in patch_days_to_remove
             ]
+        else:
+            if self.fields.get('reboot_day'):
+                self.fields.pop('reboot_day')
+            if self.fields.get('reboot_time'):
+                self.fields.pop('reboot_time')
 
         if kwargs['request'].POST.get('managed', mang) == 'unmang' or kwargs['request'].POST.get('managed') == 'False':
             if self.fields.get('patch_day'):
@@ -889,10 +894,6 @@ class ServerSupportForm(TabForm):
                 self.fields.pop('reboot_day')
             if self.fields.get('reboot_time'):
                 self.fields.pop('reboot_time')
-            # self.fields.pop('patch_day')
-            # self.fields.pop('patch_time')
-            # self.fields.pop('reboot_day')
-            # self.fields.pop('reboot_time')
 
         if kwargs['request'].POST.get('backup') == 'False':
             self.fields.pop('backup_time')
@@ -1071,11 +1072,9 @@ class ServerSpecForm(TabForm):
             self.initial['production'] = str(self.instance.production)
 
             if 'indows' in self.instance.os.label:  # Managed Linux can't edit disk
-                print('windos')
                 self.fields['size_edit'].initial = 1
             elif 'anaged' not in self.instance.os.label: 
                 self.fields['size_edit'].initial = 1
-                print('not managed')
 
         if self.request.POST.get('database'):
             self.set_database_defaults()
@@ -1564,7 +1563,6 @@ class DatabaseForm(ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(DatabaseForm, self).__init__(*args, **kwargs)
-        print('here')
         self.user = user
         group_list = MCommunity().get_groups(user.username)
 
