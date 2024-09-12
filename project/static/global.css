@@ -1295,6 +1295,9 @@ table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sor
 }
 
 /* Deprecated form-inline from Bootstrap 4 */
+.form-control[readonly]{background-color:#e9ecef;opacity:1}
+
+
 .form-inline {
 	display: -webkit-box;
 	display: -ms-flexbox;
