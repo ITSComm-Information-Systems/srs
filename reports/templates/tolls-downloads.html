@@ -22,7 +22,7 @@
 <h1>{{ title }}</h1>
 <div>
     <strong>Report selection</strong>
-    <form action="/reports/tolls/" method="POST" class="float-right" name="tollsEdit">{% csrf_token %}
+    <form action="/reports/tolls/" method="POST" class="float-end" name="tollsEdit">{% csrf_token %}
         <input name="edit_dept" type="hidden" value="{{ edit_dept }}">
         <input name="edit_date" type="hidden" value="{{ edit_date }}">
         <button class="link" type="submit"><i class="fas fa-edit"></i>Edit Your Selection</button>

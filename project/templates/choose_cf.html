@@ -12,7 +12,7 @@
                         Select Shortcode
                     </label>
                 </div>
-                <select class="custom-select" id="cf_shortcode_dr">
+                <select class="form-select" id="cf_shortcode_dr">
                     {% for cf in cf_info %}
                     {% if cf.short_code != ''%}
                     <option name="dept" value="{{ cf|jsonify }}">{{ cf.short_code }}</option>
@@ -29,7 +29,7 @@
                         Select Chartfield
                     </label>
                 </div>
-                <select name="chartcom" class="custom-select" id="cf_chartfield">
+                <select name="chartcom" class="form-select" id="cf_chartfield">
                     {% for cf in cf_info %}
                     <option name="dept" value="{{ cf|jsonify }}">{{ cf.account_number }}</option>
                     {% endfor %}

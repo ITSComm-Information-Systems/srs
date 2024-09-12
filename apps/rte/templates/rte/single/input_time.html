@@ -37,7 +37,7 @@
 		<label for="rateSelect" id="labelRateSelect">
 		    <strong>Rate Level </strong>
 		</label>
-		<select class='custom-select' id='rateSelect' disabled>
+		<select class='form-select' id='rateSelect' disabled>
 			{% for rate in rate_levels %}
 				<option value='{{ rate.labor_rate_level_name }}'>{{ rate.labor_rate_level_name }}</option>
 			{% endfor %}

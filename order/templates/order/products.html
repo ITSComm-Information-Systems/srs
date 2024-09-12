@@ -1,7 +1,7 @@
 
   <div id="equip{{list.id}}" data-phoneset="{{list.id}}">
       <label for="productCat">Select a Product Category</label>
-      <select class="col-3 custom-select order-status-dropdown" id="productCat" onchange="filterProducts(this)">
+      <select class="col-3 form-select order-status-dropdown" id="productCat" onchange="filterProducts(this)">
           <option value="0">Select a Category</option>
           {% for cat in tab.form.category_list %}
           <option value="{{ cat.id }}">{{ cat }}</option>

@@ -20,7 +20,7 @@
                             Switch Department
                         </label>
                     </div>
-                    <select class="custom-select order-status-dropdown" id="selectDept">
+                    <select class="form-select order-status-dropdown" id="selectDept">
                         <!--                         <option id="alldepts" name="dept" data-filter="dept" value="all_departments">
                             All Departments
                         </option> -->
@@ -69,7 +69,7 @@
                                 Submitted within
                             </label>
                         </div>
-                        <select class="custom-select" name="timeDiff" id="timeDiff">
+                        <select class="form-select" name="timeDiff" id="timeDiff">
                             <option value=''>--Select--</option>
                             {% for date in dates_list %}
                             <option data-dept="{{ date.1 }}" value="{{ date.0.1 }}"> {{ date.0.1 }}</option>
@@ -86,7 +86,7 @@
                                 Submitted By
                             </label>
                         </div>
-                        <select class="custom-select" name="submitter" id="submitter">
+                        <select class="form-select" name="submitter" id="submitter">
                             <option value=''>--Select--</option>
                             {% for people in people_list %}
                             <option data-dept="{{people.1}}" value="{{ people.0 }}">{{ people.0 }}</option>
@@ -103,7 +103,7 @@
                                 Status
                             </label>
                         </div>
-                        <select class="custom-select" name="orderStatus" id="orderStatus">
+                        <select class="form-select" name="orderStatus" id="orderStatus">
                             <option value=''>--Select--</option>
                             {% for status in status_list %}
                             <option data-dept='{{status.1}}' value="{{ status.0 }}">{{ status.0 }}</option>
@@ -186,9 +186,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="statusIndicatorModalLabel">Order Status Indicators</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
                         </div>
                         <div class="modal-body">
                             {% autoescape off %}
@@ -210,9 +208,7 @@
                         <form id="cancelOrderForm" method="POST" action="/orders/sendemail/">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="cancelOrder">Cancel Order</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
                             </div>
                             <div class="modal-body remove-chartfield-form-body">
                                 <strong class="remove-text">
