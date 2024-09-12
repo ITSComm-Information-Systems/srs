@@ -23,7 +23,7 @@
                                     Switch Department
                                 </label>
                             </div>
-                            <select class="custom-select order-status-dropdown" id="deptid" name="deptid">
+                            <select class="form-select order-status-dropdown" id="deptid" name="deptid">
                                 {% for dept in dept_list %}
                                 <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
                                 {% endfor %}

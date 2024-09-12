@@ -45,7 +45,7 @@
         <label for="agSelect" id="labelAGSelect" class='mt-2'>
             <strong>Assigned Group </strong>
         </label>
-        <select class='custom-select' id='agSelect'></select>
+        <select class='form-select' id='agSelect'></select>
     </div>
 </div>
 {% else %}
@@ -78,7 +78,7 @@
     <label for="agSelect" id="labelAGSelect" class='mt-2'>
         <strong>Assigned Group </strong>
     </label>
-    <select class='custom-select' id='agSelect'>
+    <select class='form-select' id='agSelect'>
         {% for group in assigned_groups %}
             <option>{{ group.wo_group_name }}</option>
         {% endfor %}
@@ -102,7 +102,7 @@
         <label for="agSelect" id="labelAGSelect" class='mt-2'>
             <strong>Assigned Group </strong>
         </label>
-        <select class='custom-select' id='agSelect'>
+        <select class='form-select' id='agSelect'>
             {% for group in assigned_groups %}
                 <option>{{ group.wo_group_name }}</option>
             {% endfor %}

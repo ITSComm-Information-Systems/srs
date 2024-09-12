@@ -26,7 +26,7 @@
 		<label for="assignedGroupSelectMultiple" id="labelAssignedGroupSelectMultiple">
 		    <strong>Assigned Group</strong>
 		</label>
-		<select class='custom-select' id='assignedGroupSelectMultiple' disabled>
+		<select class='form-select' id='assignedGroupSelectMultiple' disabled>
 		</select>
 	</div>
 
@@ -34,7 +34,7 @@
 		<label for="rateSelectMultiple" id="labelRateSelectMultiple">
 		    <strong>Rate Level </strong>
 		</label>
-		<select class='custom-select' id='rateSelectMultiple' disabled>
+		<select class='form-select' id='rateSelectMultiple' disabled>
 			{% for rate in rate_levels %}
 				<option>{{ rate.labor_rate_level_name }}</option>
 			{% endfor %}

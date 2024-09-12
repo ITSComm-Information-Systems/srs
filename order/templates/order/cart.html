@@ -21,7 +21,7 @@
                                 Switch Department
                             </label>
                         </div>
-                        <select name="deptid" class="custom-select order-status-dropdown" onchange="this.form.submit()"
+                        <select name="deptid" class="form-select order-status-dropdown" onchange="this.form.submit()"
                             id="department-dropdown">
                             {% for dept in dept_list %}
                                 {% if dept.active == 'A' %}

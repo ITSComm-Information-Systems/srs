@@ -63,7 +63,7 @@
                 <strong>Filter By:</strong>
             </div>
 
-            <div class="form-row">
+            <div class="row">
                 <div class="col-3" id="select_loc">
                     <div class="input-group col-auto">
                         <div class="input-group-prepend">
@@ -71,7 +71,7 @@
                                 Location
                             </label>
                         </div>
-                        <select class="custom-select" name="location" id="location">
+                        <select class="form-select" name="location" id="location">
                             <option value=''>--Select--</option>
                             {% for building in buildings %}
                                 <option value="{{ building }}">{{ building }}</option>
@@ -86,7 +86,7 @@
                             <label class="input-group-text" for="type">User ID Type</label>
                         </div>
 
-                        <select class="custom-select" name="type" id="type">
+                        <select class="form-select" name="type" id="type">
                             <option value=''>--Select--</option>
                             {% for type in user_types %}
                                 <option value="{{ type }}">{{ type }}</option>
@@ -101,7 +101,7 @@
                             <label class="input-group-text" for="cf">Chartfield</label>
                         </div>
 
-                        <select class="custom-select" name="cf" id="cf">
+                        <select class="form-select" name="cf" id="cf">
                             <option value=''>--Select--</option>
                             {% for chartfield in chartfields %}
                                 <option value="{{ chartfield }}">{{ chartfield }}</option>
@@ -117,7 +117,7 @@
                                 <label class="input-group-text" for="date">Last Call Date</label>
                             </div>
 
-                            <select class="custom-select" name="date" id="date">
+                            <select class="form-select" name="date" id="date">
                                 <option value=''>--Select--</option>
                                 <option id='lt6' value="lt6">Less than 6 months</option>
                                 <option id='6-12' value="6-12">Greater than 6 months and less than 12 months</option>
