@@ -478,9 +478,15 @@ class ServiceChangeView(UserPassesTestMixin, View):
             instance = get_object_or_404(Pool,pk=id, status=Status.ACTIVE)
             title = 'Modify ' + instance._meta.verbose_name.title()
             if instance.type == 'instant_clone':
-                
                 template = 'services/midesktop-instant-clone_change.html'
                 image = instance.images.all()[0]
+                if instance.override:
+                    cpu =instance.cpu_override
+                    memory = instance.memory_override
+                    cpu_rate = image.cpu_rate()
+                    memory_rate = image.memory_rate()
+                    total_cost_without_cpu_and_memory = image.total_cost_without_cpu_and_memory()
+                    image.total_cost = total_cost_without_cpu_and_memory + (cpu * cpu_rate) + (memory * memory_rate)
                 form = InstantClonePoolChangeForm(user=self.request.user, instance=instance,  image=image)
                 return render(request, template,
                         {'title': title,

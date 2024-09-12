@@ -198,6 +198,28 @@ class Image(MiDesktop):
                 total_cost = total_cost + rate.rate
 
         return total_cost
+    
+    def total_cost_without_cpu_and_memory(self):
+
+        for rate in StorageRate.objects.filter(service__name='midesktop').order_by('display_seq_no'):
+            if rate.label == 'Base':
+                total_cost_without_cpu_and_memory = rate.rate
+            if rate.label == 'Storage':
+                total_cost_without_cpu_and_memory = total_cost_without_cpu_and_memory + (rate.rate * self.total_storage_size)
+            if rate.label[:3] == 'GPU' and self.gpu == True:
+                total_cost_without_cpu_and_memory = total_cost_without_cpu_and_memory + rate.rate
+
+        return total_cost_without_cpu_and_memory
+    
+    def memory_rate(self):
+        for rate in StorageRate.objects.filter(service__name='midesktop').order_by('display_seq_no'):
+            if rate.label == 'Memory':
+                return rate.rate
+    
+    def cpu_rate(self):
+        for rate in StorageRate.objects.filter(service__name='midesktop').order_by('display_seq_no'):
+            if rate.label == 'CPU':
+                return rate.rate
 
     class Meta:
         verbose_name = 'MiDesktop Image'
@@ -228,8 +250,10 @@ class Pool(MiDesktop):
     type = models.CharField(default='instant_clone',max_length=30,)
     quantity = models.IntegerField()
     images = models.ManyToManyField(Image)
+    override = models.BooleanField(default=False)
+    cpu_override = models.IntegerField(blank=True, null=True)
+    memory_override = models.IntegerField(blank=True, null=True)
 
-    @cached_property
     def total_cost(self):
         total_cost = 0
         if self.type == "external":
@@ -241,6 +265,10 @@ class Pool(MiDesktop):
             return round(0.00,2)
         
         return round(total_cost,2)
+
+    def override_total(self):
+        relevant_image = self.images.first()
+        return (relevant_image.total_cost_without_cpu_and_memory() + (self.cpu_override * relevant_image.cpu_rate()) + (self.memory_override * relevant_image.memory_rate())) * self.quantity
     
     def __str__(self):
         return self.name

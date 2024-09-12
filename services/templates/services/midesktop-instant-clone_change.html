@@ -8,6 +8,11 @@
     <strong>Pool Name:</strong>&nbsp;{{ form.instance.name }}<br/>
     
     <strong>Image:</strong>&nbsp;<a href="/services/midesktop-image/{{ form.image.id }}/change/">{{ form.image.name }}</a><br/>
+    {% if form.instance.override %}
+    <div class="alert alert-info" role="alert">
+        This pool has an image override. <br/><strong>CPU: </strong> {{form.instance.cpu_override}} <br/><strong>Memory: </strong>{{form.instance.memory_override}} GB
+    </div>
+    {% endif %}
     <hr>
 
         <form method="POST">

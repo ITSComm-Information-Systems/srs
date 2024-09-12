@@ -913,15 +913,22 @@ class InstantClonePoolChangeForm(forms.ModelForm):
     quantity = forms.IntegerField(required=False,validators=[MinValueValidator(1), MaxValueValidator(200)])
     total = forms.DecimalField(required=False,initial=None, widget=forms.TextInput(attrs={'readonly':'true'}))
     additional_details = forms.CharField(required=False,label="Additional Details")
+    override = forms.BooleanField(required=False)
+    cpu_override = forms.IntegerField(required=False)
+    memory_override = forms.IntegerField(required=False)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user')
         self.image = kwargs.get('image')
         self.total = round(self.image.total_cost,2)
+        self.override = kwargs.get('override')
+        self.cpu_override = kwargs.get('cpu_override')
+        self.memory_override = kwargs.get('memory_override')
         kwargs.pop('user', None)
         kwargs.pop('image', None)
 
         super(InstantClonePoolChangeForm, self).__init__(*args, **kwargs)
+        self.fields['total'].initial = self.total
         if self.user:
 
             image_list = Image.objects.filter(status='A',owner__in=[self.instance.owner.id]).order_by('name')
@@ -936,7 +943,7 @@ class InstantClonePoolChangeForm(forms.ModelForm):
                     self.fields[field].widget.attrs.update({'class': 'form-control'})
             else:
                 print('no widget for', field)
-        self.fields['total'].initial = self.total
+        
         self.fields['images'].initial = self.image.name
         
 
