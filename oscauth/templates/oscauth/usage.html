@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>{{ title }}</h1>
+<form>
+    <div class="col-3">
+        <label for="phone_number" class="form-label">Phone Number</label>
+        <input name="phone_number" type="phone" class="form-control" id="id_phone_number" aria-describedby="phone_number">
+        <div id="phone_number_help" class="form-text">Enter the Phone Number.</div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+<div>
+    <p>{{ message }}</p>
+</div>
+
+{% if phone_number %}
+<div>
+    <b>Phone Number  {{ phone_number }}</b>
+    <table class="table">
+
+        {% for rec in totals %}
+
+            {% if forloop.first %}
+            <tr>
+                {% for heading in headings %}
+                    <th>{{ heading }}</th>
+                {% endfor %}
+            </tr>
+            {% endif %}
+
+            <tr>
+                {% for key, value in rec.items %}
+                <td>{{ value|default_if_none:"-" }}</td>
+                {% endfor %}
+
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}
