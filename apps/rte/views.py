@@ -705,78 +705,15 @@ def show_workorders(request):
     techid = request.GET.get('techSearch')
     template = loader.get_template('rte/view/tech-wo-estimate-table.html')
     print(techid)
-    current_time = SrsRteVsEstimate.objects.filter(labor_code=techid).values()
-    print(current_time)
-    # context={}
-    # context['workorders'] = []
-    # for wo in current_time:
-    #     actual_mins = 0
-    #     preorders = PreOrder.objects.filter(pre_order_number=wo.pre_order_number)
-    #     for preorder in preorders:
-    #         workorders = Workorder.objects.filter(pre_order_id=preorder.pre_order_id)
-    #         for workorder in workorders:
-    #             estimates = Estimate.objects.filter(woid=workorder.pre_order_id)
-    #             for estimate in estimates:
-    #                 labors = Labor.objects.filter(estimate_id=estimate)
-    #                 for labor_instance in labors:
-    #                     actual_mins = actual_mins + wo.actual_mins
-    #         context['workorders'].append({
-    #                         'project_name': wo.project_name,
-    #                         'work_order_display': wo.work_order_display,
-    #                         'pre_order_number': wo.pre_order_number,
-    #                         'status_name': wo.status_name,
-    #                         'work_status_name': wo.work_status_name,
-    #                         'assigned_labor_code': wo.assigned_labor_code,
-    #                         'labor_code': wo.labor_code,
-    #                         'labor_name_display': wo.labor_name_display,
-    #                         'labor_cost_name': wo.labor_cost_name,
-    #                         'rate_used': "{:.2f}".format(wo.rate_used),
-    #                         'estimated_mins': int(labor_instance.hours * 60),
-    #                         'actual_mins': actual_mins,
-    #                         'assn_wo_group_code': wo.assn_wo_group_code,    
-    #                         'assn_wo_group_name': wo.assn_wo_group_name,
-    #                     })
-
-    # projects = {}
-    # for wo in current_time:
-    #     actual_mins = 0
-    #     preorders = PreOrder.objects.filter(pre_order_number=wo.pre_order_number)
-    #     for preorder in preorders:
-    #         workorders = Workorder.objects.filter(pre_order_id=preorder.pre_order_id)
-    #         for workorder in workorders:
-    #             estimates = Estimate.objects.filter(woid=workorder.pre_order_id)
-    #             for estimate in estimates:
-    #                 labors = Labor.objects.filter(estimate_id=estimate)
-    #                 for labor_instance in labors:
-    #                     estimated_mins = int(labor_instance.hours * 60)
-    #     # Check if project is already in projects dict
-    #                     if wo.project_name not in projects:
-    #                         actual_mins = wo.actual_mins
-    #                         projects[wo.project_name] = {
-    #                             'project_name': wo.project_name,
-    #                             'work_order_display': wo.work_order_display,
-    #                             'pre_order_number': wo.pre_order_number,
-    #                             'status_name': wo.status_name,
-    #                             'work_status_name': wo.work_status_name,
-    #                             'assigned_labor_code': wo.assigned_labor_code,
-    #                             'labor_code': wo.labor_code,
-    #                             'labor_name_display': wo.labor_name_display,
-    #                             'labor_cost_name': wo.labor_cost_name,
-    #                             'rate_used': "{:.2f}".format(wo.rate_used),
-    #                             'estimated_mins': estimated_mins,
-    #                             'actual_mins': actual_mins,
-    #                             'assn_wo_group_code': wo.assn_wo_group_code,
-    #                             'assn_wo_group_name': wo.assn_wo_group_name,
-    #                         }
-                            
-    #                     else:
-    #                         # Aggregate actual_mins for the project
-    #                         projects[wo.project_name]['actual_mins'] += wo.actual_mins 
-
-    context = {'workorders': list(current_time.values())}
+    workorders = SrsRteVsEstimate.objects.filter(labor_code=techid)
+    for workorder in workorders:
+        if workorder.est_hours is None:
+            workorder.est_hours = 0
+        if workorder.reported_hours is None:
+            workorder.reported_hours = 0
+        workorder.difference = workorder.reported_hours - workorder.est_hours
     
-        
-        # estimate = Estimate.objects.filter(pre_order_number=wo.pre_order_number)
-        # print(estimate)
+    context = {'workorders': workorders}
+    
 
     return HttpResponse(template.render(context, request))

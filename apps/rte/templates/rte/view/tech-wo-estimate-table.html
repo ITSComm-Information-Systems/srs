@@ -2,39 +2,27 @@
     <thead>
         <tr>
             <th>Project Name</th>
-            <th>Work Order Display</th>
-            <th>Pre Order Number</th>
-            <th>Status Name</th>
-            <th>Work Status Name</th>
+            <th>Skill Code</th>
             <th>Assigned Labor Code</th>
             <th>Labor Code</th>
-            <th>Labor Name Display</th>
-            <th>Labor Cost Name</th>
-            <th>Rate Used</th>
-            <th>Estimated Mins</th>
-            <th>Actual Mins</th>
+            <th>Reported Hours</th>
+            <th>Estimated Hours</th>
+            <th>Difference</th>
             <th>Assn WO Group Code</th>
-            <th>Assn WO Group Name</th>
-    </tr>
-</thead>
-<tbody>
-    {% for wo in workorders %}
-    <tr>
-        <td>{{ wo.project_name }}</td>
-        <td>{{ wo.work_order_display }}</td>
-        <td>{{ wo.pre_order_number }}</td>
-        <td>{{ wo.status_name }}</td>
-        <td>{{ wo.work_status_name }}</td>
-        <td>{{ wo.assigned_labor_code }}</td>
-        <td>{{ wo.labor_code }}</td>
-        <td>{{ wo.labor_name_display }}</td>
-        <td>{{ wo.labor_cost_name }}</td>
-        <td>{{ wo.rate_used }}</td>
-        <td>{{ wo.estimated_mins }}</td>
-        <td>{{ wo.actual_mins }}</td>
-        <td>{{ wo.assn_wo_group_code }}</td>
-        <td>{{ wo.assn_wo_group_name }}</td>
-    </tr>
-    {% endfor %}
-</tbody>
+        </tr>
+    </thead>
+    <tbody>
+        {% for wo in workorders %}
+        <tr>
+            <td>{{ wo.project_name }}</td>
+            <td>{{ wo.skill_code }}</td>
+            <td>{{ wo.assigned_labor_code }}</td>
+            <td>{{ wo.labor_code }}</td>
+            <td>{{ wo.reported_hours|default_if_none:"0" }}</td>
+            <td>{{ wo.est_hours|default_if_none:"0"  }}</td>
+            <td>{{ wo.difference|default_if_none:"0"}}</td>
+            <td>{{ wo.assn_wo_group_code }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
