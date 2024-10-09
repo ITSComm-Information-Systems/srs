@@ -2,8 +2,10 @@ from django.shortcuts import render
 from datetime import datetime
 from project.pinnmodels import UmOscServiceProfileV
 from oscauth.models import AuthUserDept
+from django.contrib.auth.decorators import permission_required
 
 
+@permission_required('oscauth.can_report', raise_exception=True)
 def get_usage_report(request):
     context = {'title': 'Total Usage by Month'}
     phone_number = request.GET.get('phone_number')
