@@ -12,13 +12,12 @@ def get_usage_report(request):
 
     if phone_number:
         phone_number = phone_number.replace('-','').replace('(','').replace(')','').replace(' ', '')
-        locations = UmOscServiceProfileV.objects.filter(service_number=phone_number).values()
+        locations = UmOscServiceProfileV.objects.filter(service_number=phone_number).order_by('-start_date').values()
 
         if not locations:
             context['message'] = f'Phone Number not found: {phone_number}'
         else:
             phone_dept = locations[0]['deptid']
-
             if phone_dept in AuthUserDept.get_order_departments(request.user).values_list('dept', flat=True):
                 subscriber_id = locations[0]['subscriber_id']
                 context['phone_number'] = phone_number
