@@ -1,0 +1,28 @@
+<table id="woEstimateTable" class="table table-hover" style="display: table;">
+    <thead>
+        <tr>
+            <th>Project Name</th>
+            <th>Skill Code</th>
+            <th>Assigned Labor Code</th>
+            <th>Labor Code</th>
+            <th>Reported Hours</th>
+            <th>Estimated Hours</th>
+            <th>Difference</th>
+            <th>Assn WO Group Code</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for wo in workorders %}
+        <tr>
+            <td>{{ wo.project_name }}</td>
+            <td>{{ wo.skill_code }}</td>
+            <td>{{ wo.assigned_labor_code }}</td>
+            <td>{{ wo.labor_code }}</td>
+            <td>{{ wo.reported_hours|default_if_none:"0" }}</td>
+            <td>{{ wo.est_hours|default_if_none:"0"  }}</td>
+            <td>{{ wo.difference|default_if_none:"0"}}</td>
+            <td>{{ wo.assn_wo_group_code }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
