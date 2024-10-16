@@ -18,7 +18,7 @@ def get_usage_report(request):
             context['message'] = f'Phone Number not found: {phone_number}'
         else:
             phone_dept = locations[0]['deptid']
-            if phone_dept in AuthUserDept.get_order_departments(request.user).values_list('dept', flat=True):
+            if request.user.is_superuser or phone_dept in AuthUserDept.get_order_departments(request.user).values_list('dept', flat=True):
                 subscriber_id = locations[0]['subscriber_id']
                 context['phone_number'] = phone_number
                 context = {**context, **get_usage_totals(subscriber_id)}
