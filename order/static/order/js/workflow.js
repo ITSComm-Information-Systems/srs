@@ -407,7 +407,11 @@ $(document).ready(function() {
     size=$('#id_size').val();
     if(type == "Oracle" && size < 50){
       $('#id_size').val(50)
-    }else if(type != "Oracle" && size != 30){
+    }
+    else if(type == "MSSQL"){
+      $('#id_size').val(20)
+    }
+    else{
       $('#id_size').val(30)
     }
   });
@@ -415,10 +419,20 @@ $(document).ready(function() {
   $(document).on("change", "#id_size" , function() {
     type = get_db_type();
     size=$('#id_size').val();
+    console.log(type)
 
     if(type == "Oracle" && size < 50){
       $('#id_size').val(50)
     }
+
+    if(type == "MSSQL" && size < 20){
+      $('#id_size').val(20)
+    }
+
+    if(type == "MySQL" && size < 30){
+      $('#id_size').val(30)
+    }
+
   });
 
   $(document).on("click", "#not_dedicated" , function() {
