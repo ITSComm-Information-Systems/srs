@@ -1619,14 +1619,6 @@ class AddSMSForm(forms.Form):
                     self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
                     self.phone_numbers = None
                     break
-                else:
-                    dept = UmMpathDwCurrDepartment.objects.get(deptid=loc.deptid)
-                    print(dept.dept_grp_campus)
-                    if dept.dept_grp_campus == 'UM_FLINT':
-                        self.add_error('uniqname', f'Flint not rolling out SMS until fall 2024 (dept {loc.deptid}).') 
-                        self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
-                        self.phone_numbers = None
-                        break
                 
         else:
             self.add_error('uniqname', zoom.get('message')) 
