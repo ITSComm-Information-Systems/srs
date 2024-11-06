@@ -121,7 +121,7 @@ const storage_cost = document.getElementById("{{ form.storage_cost.id_for_label 
 const gpu_cost = document.getElementById("{{ form.gpu_cost.id_for_label }}");
 const total_cost = document.getElementById("{{ form.total.id_for_label }}");
 const multi_disk = document.getElementById("{{ form.multi_disk.id_for_label }}");
-var storageTotal = document.getElementById("{{ form.storage_cost.initial }}");
+const storageTotal = document.getElementById("{{ form.storage_cost.id_for_label }}");
 
 window.addEventListener("load", (event) => {
     //storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
@@ -163,7 +163,7 @@ function addEventListeners(){
 
     for (let index = 0; index < diskSizeSelectors.length; index++) {
         diskSizeSelectors[index].addEventListener("change", function(){
-            var diskTotal = parseInt(diskSizeSelectors[index].value) * 0.11
+            var diskTotal = parseFloat(diskSizeSelectors[index].value) * 0.11
             diskCostFields[index].value=diskTotal.toFixed(2)
             handleMultiDisk()
             updateStorageTotal()
@@ -210,7 +210,7 @@ function updateStorageTotal(){
     var diskCostFields = document.querySelectorAll('[id$="-cost"]');
     runningTotal = 0
     diskCostFields.forEach(disk => {
-        runningTotal = runningTotal + parseInt(disk.value)
+        runningTotal = runningTotal + parseFloat(disk.value)
     });
     storageTotal.value = runningTotal.toFixed(2)
     calculateBaseImageCost()
