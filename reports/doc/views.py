@@ -193,7 +193,7 @@ def generate_report(request):
 					if not any (cr['item_code'] == c.item_code for cr in credits):
 						credit = {
 							'item_code': c.item_code,
-							'credit': abs(c.charge_amount)
+							'credit': 0     # This gets added later
 						}
 						credits.append(credit)
 					# Item code already exists in table
