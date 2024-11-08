@@ -828,7 +828,9 @@ class Services(UserPassesTestMixin, View):
                                    {'label': 'View/Change Network','target': '/services/midesktop-network/'}]
             elif service.name == 'container':
                 service.actions = [{'label': 'Request Container Project', 'target': '/services/container/add/',
-                                    'description': 'The ITS Container Service hosts containerized applications. A Container Project is a development environment for creating or hosting a containerized app.'}]
+                                    'description': 'The ITS Container Service hosts containerized applications. A Container Project is a development environment for creating or hosting a containerized app.'},
+                                    {'label': 'Request On-Premise Container Project', 'target': '/services/onpremcontainer/add/',
+                                    'description': 'The ITS On-Premise Container Service hosts containerized applications on-premise. A Container Project is a development environment for creating or hosting a containerized app.'}]
             else:
                 service.actions = action_list.filter(service=service)
                 for action in service.actions:
