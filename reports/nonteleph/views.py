@@ -112,7 +112,7 @@ def generate_report(request):
     charge_types = []
     for cf in chartcoms:
         # Create tables for each user defined ID type
-        all_data = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf).order_by('unique_identifier', 'voucher_comment', 'item_description', 'invoice_date', 'user_defined_id')
+        all_data = UmOscAcctdetailMrcOccV.objects.filter(billing_date=date, account_number=cf).order_by('unique_identifier', 'voucher_comment', 'item_description', 'invoice_date', 'user_defined_id','charge_amount')
         prefixes = {}
         charges = {}
         total = 0
@@ -162,7 +162,7 @@ def generate_report(request):
                     if a.user_defined_id in retained:
                         retained[a.user_defined_id]['descr_jh'].append(a.item_description)
                         retained[a.user_defined_id]['quantity_vouchered_jh'].append(a.quantity_vouchered)
-                        retained[a.user_defined_id]['rate_jh'].append(rates[a.item_code])
+                        retained[a.user_defined_id]['rate_jh'].append(a.charge_amount / a.quantity_vouchered)
                         retained[a.user_defined_id]['total_charges_jh'].append(a.charge_amount)   
                     else:
                         retained[a.user_defined_id]={}
