@@ -234,11 +234,11 @@ def validate_project_name(value):
     if Openshift().get_project(value).ok:
         raise ValidationError(f'A project with this name already exists.  Please select a different name.')
     
-class OnpremcontainerNewForm(CloudForm):
-    title = 'Request an On-Premise Container Service Project'
+class OncampuscontainerNewForm(CloudForm):
+    title = 'Request an On-Campus Container Service Project'
     custom = ['course_info']
-    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','onprem_container_sensitive']
-    onprem_container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
+    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','oncampus_container_sensitive']
+    oncampus_container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
     course_yn = forms.BooleanField(widget=NoYes,
         label='Are you requesting this service for a course project?',
         help_text = "This service is available at no cost for faculty, staff, or students provided it's being used for a project or activity associated with a current U-M course. Faculty may request multiple application instances at one time (e.g., one per student). A valid course code is required.")
@@ -260,7 +260,7 @@ class OnpremcontainerNewForm(CloudForm):
 
     class Meta:
         model = Container
-        fields = ['onprem_container_sensitive','admin_group','course_yn','course_info','shortcode',
+        fields = ['oncampus_container_sensitive','admin_group','course_yn','course_info','shortcode',
                   'project_name', 'project_description', 'size','backup'] # Remaining follow form order
 
     def clean(self):
@@ -294,7 +294,7 @@ class OnpremcontainerNewForm(CloudForm):
         os = Openshift()
         os.create_project(self.instance, self.user.username)
 class ContainerNewForm(CloudForm):
-    title = 'Request a Container Service Project'
+    title = 'Request an AWS Container Project'
     custom = ['database_type', 'course_info']
     skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','container_sensitive']
     container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
