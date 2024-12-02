@@ -11,8 +11,8 @@
         {% include 'services/container_sensitive.html' %}
         {% endif %}
 
-        {% if 'onprem_container_sensitive' in form.fields %}
-        {% include 'services/onprem_container_sensitive.html' %}
+        {% if 'oncampus_container_sensitive' in form.fields %}
+        {% include 'services/oncampus_container_sensitive.html' %}
         {% endif %}
 
         <div id="div_formbody">
@@ -123,7 +123,7 @@
             }
         });
 
-        $("#id_onprem_container_sensitive").change(function () {
+        $("#id_oncampus_container_sensitive").change(function () {
             if (this.checked) {
                 $("#div_formbody").show();
                 $("#submit_btn").show();
@@ -159,7 +159,7 @@
         });
 
         $('#id_container_sensitive').trigger('change')
-        $('#id_onprem_container_sensitive').trigger('change')
+        $('#id_oncampus_container_sensitive').trigger('change')
         $('#id_migrate_existing').trigger('change')
         $('#id_sensitive_data_yn').trigger('change')
         $('#id_gcp_existing').trigger('change')
