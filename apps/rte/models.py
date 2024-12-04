@@ -7,8 +7,10 @@ class SrsRteVsEstimate(models.Model):
     assn_wo_group_code = models.CharField(max_length=32, blank=True, null=True)
     assigned_labor_code = models.CharField(max_length=9, blank=True, null=True)
     labor_code = models.CharField(max_length=9, blank=True, null=True)
+    pre_order_number = models.IntegerField()
     reported_hours = models.FloatField(blank=True, null=True)
     est_hours = models.FloatField(blank=True, null=True)
+    estimate_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False  # Created from a view. Don't remove.

@@ -3,6 +3,8 @@ from django.views.generic import TemplateView
 
 from . import views, reports
 
+app_name = 'bom'
+
 urlpatterns = [
     path('', TemplateView.as_view(template_name="bom/home.html")),
     path('favorites/', views.Favorites.as_view()),
