@@ -2,26 +2,24 @@
     <thead>
         <tr>
             <th>Project Name</th>
-            <th>Skill Code</th>
-            <th>Assigned Labor Code</th>
-            <th>Labor Code</th>
+            <th>Project Number</th>
             <th>Reported Hours</th>
             <th>Estimated Hours</th>
             <th>Difference</th>
-            <th>Assn WO Group Code</th>
         </tr>
     </thead>
     <tbody>
         {% for wo in workorders %}
         <tr>
+            {% if wo.estimate_id %}
+            <td><a href="{% url 'bom:estimate' wo.estimate_id %}">{{ wo.project_name }}</a></td>
+            {% else %}
             <td>{{ wo.project_name }}</td>
-            <td>{{ wo.skill_code }}</td>
-            <td>{{ wo.assigned_labor_code }}</td>
-            <td>{{ wo.labor_code }}</td>
+            {%endif%}
+            <td>{{wo.estimate_id}}</td>
             <td>{{ wo.reported_hours|default_if_none:"0" }}</td>
             <td>{{ wo.est_hours|default_if_none:"0"  }}</td>
             <td>{{ wo.difference|default_if_none:"0"}}</td>
-            <td>{{ wo.assn_wo_group_code }}</td>
         </tr>
         {% endfor %}
     </tbody>
