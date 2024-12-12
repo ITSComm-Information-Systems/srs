@@ -19,7 +19,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from ast import literal_eval
 import re
-import cx_Oracle
 import json
 from django.core.files.storage import FileSystemStorage
 from django.views.decorators.csrf import csrf_exempt

@@ -36,7 +36,6 @@ import os
 from django.db.models import indexes, Max
 from django.db import connections
 from django import db
-import cx_Oracle
 
 from django.core.mail import EmailMessage
 from django.conf import settings
