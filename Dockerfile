@@ -6,6 +6,8 @@ ENV GUNICORN_THREADS=4
 ENV PYTHONUNBUFFERED=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
+RUN apt-get -y update && apt-get install -y gcc
+
 WORKDIR /usr/src/app
 COPY requirements.txt requirements.txt
 
