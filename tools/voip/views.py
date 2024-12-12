@@ -20,7 +20,6 @@ from django.db import connections
 from django import db
 from project.pinnmodels import UmOscLocationsInUseV, UmOSCCampusBuildingV,  UmOscAvailableLocsV, UmOSCBuildingV, UmOscVoipLocChangeInput
 import os
-import cx_Oracle
 from datetime import date
 
 def get_voip(request):

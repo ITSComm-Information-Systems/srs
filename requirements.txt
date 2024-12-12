@@ -1,9 +1,9 @@
-Django~=5.0.0
+Django~=5.1.0
 whitenoise
 gunicorn
 mozilla-django-oidc
 pyyaml
-cx_Oracle
+oracledb
 django-debug-toolbar
 ldap3
 djangorestframework
