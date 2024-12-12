@@ -14,11 +14,11 @@ from softphone.models import Selection
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, date
 from django.utils import timezone
-from django.db import connections
+from django.db import connection
 from django.template.loader import render_to_string
 from ast import literal_eval
 import json, io, os, requests, time
-import cx_Oracle
+import oracledb
 from django.core.exceptions import ValidationError
 from oscauth.utils import get_mc_user, get_mc_group
 from decimal import Decimal
@@ -914,7 +914,7 @@ class Order(models.Model):
         primary_phone = str(u['telephoneNumber'])
         dept = self.chartcom.dept
 
-        with connections['pinnacle'].cursor() as cursor:
+        with connection.cursor() as cursor:
             cursor.callproc('pinn_custom.um_osc_util_k.um_add_new_contact_p', [uniqname, first_name, middle_name, last_name, primary_email, primary_phone, dept])
 
     def add_attachments(self):
@@ -930,19 +930,19 @@ class Order(models.Model):
                 #with connections['pinnacle'].cursor() as cursor:
                 #    cursor.callproc('pinn_custom.um_note_procedures_k.um_create_note_p', ['Work Order', None, pre_order_id, 'files', 'attachments', None, self.created_by.username] )
 
-                with connections['pinnacle'].cursor() as cursor:
-                    noteid = cursor.callfunc('pinn_custom.um_note_procedures_k.um_get_note_id_f', cx_Oracle.STRING , ['Work Order', pre_order_id, 'Order Detail'] )
+                with connection.cursor() as cursor:
+                    noteid = cursor.callfunc('pinn_custom.um_note_procedures_k.um_get_note_id_f', oracledb.STRING , ['Work Order', pre_order_id, 'Order Detail'] )
                     id = int(noteid)
 
                 for attachment in attachment_list:
                     filename = attachment.file.name[12:99]
                     fileData = attachment.file.read()
 
-                    conn = connections['pinnacle'].connection
-                    lob = conn.createlob(cx_Oracle.BLOB)  
+                    conn = connection.connection
+                    lob = conn.createlob(oracledb.BLOB)  
                     lob.write(fileData)
 
-                    with connections['pinnacle'].cursor() as cursor:
+                    with connection.cursor() as cursor:
                         noteid = cursor.callproc('pinn_custom.um_note_procedures_k.um_make_blob_an_attachment_p',  ['Note', id,'files', filename, lob] )
 
 
@@ -1029,13 +1029,13 @@ class Order(models.Model):
 
         LogItem().add_log_entry('JSON', self.id, json_data)
 
-        cursor = connections['pinnacle'].cursor()
+        cursor = connection.cursor()
 
         for attempt in range(1, tries+1):
 
             try:
                 cursor.callproc("dbms_output.enable")
-                ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', cx_Oracle.STRING , [json_data])
+                ponum = cursor.callfunc('um_osc_util_k.um_add_preorder_f', oracledb.STRING , [json_data])
 
                 self.order_reference = ponum
                 self.save()
@@ -1044,7 +1044,7 @@ class Order(models.Model):
                 print(self.id, 'Created', ponum)
                 break
 
-            except cx_Oracle.DatabaseError as e:
+            except oracledb.DatabaseError as e:
                 LogItem().add_log_entry('Error', self.id, e)
                 num = str(self.id)
                 url = settings.SITE_URL + '/orders/integration/'  + num
