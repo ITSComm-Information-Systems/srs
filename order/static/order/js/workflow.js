@@ -301,6 +301,20 @@ $(document).ready(function() {
     $('#div_ad_group').hide();
   });
 
+  // Zoom for Government
+  $(document).on("click", "#zgAccount_0" , function() {
+    $('#div_zgUniqname').hide().prop('required',false);
+    $('#div_zgOrderPhone').hide().prop('required',false);
+    $('#div_zgJack').show().prop('required',true);
+  });
+
+  $(document).on("click", "#zgAccount_1" , function() {
+    $('#div_zgUniqname').show().prop('required',true);
+    $('#div_zgOrderPhone').show().prop('required',true);
+    $('#div_zgJack').hide().prop('required',false);
+  });
+
+
   // midatabasic
   $('[data-tab="midatabasic"]').on('shown.bs.tab', function(event) {
 
