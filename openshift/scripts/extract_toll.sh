@@ -1,7 +1,8 @@
 send_slack_message () {
-    curl -s --header "Authorization: Bearer $SLACK_AUTH_TOKEN" \
-        --form  channel=$CHANNEL --form text="$1" \
-         https://slack.com/api/chat.postMessage > slack.log
+    python -c "import requests; \
+                requests.post('https://slack.com/api/chat.postMessage', \
+                headers={'Authorization': 'Bearer $SLACK_AUTH_TOKEN', 'accept': 'application/json'}, \
+                data={'channel': '$CHANNEL', 'text': '$1'})"
 }
 
 case $1 in
@@ -15,11 +16,9 @@ esac
 
 send_slack_message "Unzip Toll File $1" 
 
-tar -xzf /media/pload/toll.tar.gz -C "$DIR"
-rm /media/pload/toll.tar.gz
-
 if tar -xzf /media/pload/toll.tar.gz -C "$DIR"; then
     rm /media/pload/toll.tar.gz
+    python3 manage.py send_email --email TOLL_COMPLETE
 else
     send_slack_message "Error extracting toll file $1" 
     exit 1
@@ -34,4 +33,3 @@ done
 
 send_slack_message "Toll Statements Complete"
 
-python3 manage.py send_email --email TOLL_COMPLETE
