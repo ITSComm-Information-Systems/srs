@@ -15,8 +15,15 @@ esac
 
 send_slack_message "Unzip Toll File $1" 
 
-unzip -q /media/pload/toll.zip -d $DIR
-rm /media/pload/toll.zip
+tar -xzf /media/pload/toll.tar.gz -C "$DIR"
+rm /media/pload/toll.tar.gz
+
+if tar -xzf /media/pload/toll.tar.gz -C "$DIR"; then
+    rm /media/pload/toll.tar.gz
+else
+    send_slack_message "Error extracting toll file $1" 
+    exit 1
+fi
 
 send_slack_message "Unzip complete, delete folders older than 13 months."
 
