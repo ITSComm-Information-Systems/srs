@@ -27,7 +27,7 @@ class TollUploadView(APIView):
             return Response(status=401)
         
         fs = FileSystemStorage()
-        filename = fs.save('pload/toll.zip', request.FILES['toll.zip'])  
+        filename = fs.save('pload/toll.tar.gz', request.FILES['toll.tar.gz'])  
         print('created', filename)
 
         subprocess.Popen(['sh', 'openshift/scripts/extract_toll.sh', settings.ENVIRONMENT])  # Start extraction in background and continue.
