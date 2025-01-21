@@ -17,7 +17,7 @@ var update_total_cost = function() {
   $('#ram_cost').html('$' + ram_cost.toFixed(2));
 
   if ($('#id_cpu').data('server')){
-    disk_0 = $('.disk-size')[1];
+    disk_0 = $('.disk-size')[0];
 
     if (ram < 8) {
       paging_disk = 60;
