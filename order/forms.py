@@ -1146,8 +1146,8 @@ class ServerSpecForm(TabForm):
 
             base_size = float(database_size) / 10
             fifteen_percent = math.ceil(base_size * .15) * 10
-            thirty_percent = math.ceil(base_size * .3) * 10
-
+            thirty_percent = fifteen_percent * 2
+            ##thirty_percent = math.ceil(base_size * .3) * 10
             if ram < 8:
                 paging_disk = 60
             else:
