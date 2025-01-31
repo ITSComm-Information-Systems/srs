@@ -854,9 +854,15 @@ class ServerSupportForm(TabForm):
         if self.request.POST.get('database', db):
             db = self.request.POST.get('database', db)
             if db == 'MSSQL':
+                name = self.request.POST.get('name')
+                beginning_letter = name[3].lower()
+                if 'a'<= beginning_letter  <= 'l':
+                    self.fields['backup_time'].initial = Choice.objects.get(parent__code='SERVER_BACKUP_TIME', code='2200').id
+                else:
+                    self.fields['backup_time'].initial = Choice.objects.get(parent__code='SERVER_BACKUP_TIME', code='0000').id
                 windows = True
                 self.fields['backup_time'].disabled = True
-                self.fields['backup_time'].initial = Choice.objects.get(parent__code='SERVER_BACKUP_TIME', code='1800').id
+                self.fields['backup_time'].label = "OS Daily Backup Time"
                 self.fields['patch_day'].disabled = True
                 self.fields['patch_day'].initial = Choice.objects.get(parent__code='SERVER_PATCH_DATE', code='SAT').id
                 self.fields['patch_time'].disabled = True
@@ -1140,8 +1146,8 @@ class ServerSpecForm(TabForm):
 
             base_size = float(database_size) / 10
             fifteen_percent = math.ceil(base_size * .15) * 10
-            thirty_percent = math.ceil(base_size * .3) * 10
-
+            thirty_percent = fifteen_percent * 2
+            ##thirty_percent = math.ceil(base_size * .3) * 10
             if ram < 8:
                 paging_disk = 60
             else:
