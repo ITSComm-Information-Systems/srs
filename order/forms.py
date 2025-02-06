@@ -854,9 +854,15 @@ class ServerSupportForm(TabForm):
         if self.request.POST.get('database', db):
             db = self.request.POST.get('database', db)
             if db == 'MSSQL':
+                name = self.request.POST.get('name')
+                beginning_letter = name[3].lower()
+                if 'a'<= beginning_letter  <= 'l':
+                    self.fields['backup_time'].initial = Choice.objects.get(parent__code='SERVER_BACKUP_TIME', code='2200').id
+                else:
+                    self.fields['backup_time'].initial = Choice.objects.get(parent__code='SERVER_BACKUP_TIME', code='0000').id
                 windows = True
                 self.fields['backup_time'].disabled = True
-                self.fields['backup_time'].initial = Choice.objects.get(parent__code='SERVER_BACKUP_TIME', code='1800').id
+                self.fields['backup_time'].label = "OS Daily Backup Time"
                 self.fields['patch_day'].disabled = True
                 self.fields['patch_day'].initial = Choice.objects.get(parent__code='SERVER_PATCH_DATE', code='SAT').id
                 self.fields['patch_time'].disabled = True
@@ -1140,8 +1146,8 @@ class ServerSpecForm(TabForm):
 
             base_size = float(database_size) / 10
             fifteen_percent = math.ceil(base_size * .15) * 10
-            thirty_percent = math.ceil(base_size * .3) * 10
-
+            thirty_percent = fifteen_percent * 2
+            ##thirty_percent = math.ceil(base_size * .3) * 10
             if ram < 8:
                 paging_disk = 60
             else:
@@ -1158,7 +1164,7 @@ class ServerSpecForm(TabForm):
         else:
             self.fields['cpu'].widget.attrs.update({'data-server': 99, 'min': 2})
             self.fields['cpu'].initial = 2
-            self.fields['misevos'].initial = 8
+            self.fields['misevos'].initial = 341
             self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB', 'state': 'disabled'},
                                 {'name': 'disk1', 'size': database_size, 'uom': 'GB', 'state': 'disabled'},
                                 {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'}]
@@ -1215,20 +1221,10 @@ class ServerSpecForm(TabForm):
 
             if len(servername) > 0:
                 self.add_error('serverName', f'A server named {name.lower()} already exists. Please choose a different name.')
-                
-            #data sanitization
-            for i in range(len(name)):
-                #server names can only have one dash  
-                if name[i] == "-" and name[i+1] == '-':
-                    self.add_error('serverName', 'This server can only have one dash in the name.')
-                    break
-                
-                #server names cannot contain underscores
-                if name[i] == '_':
-                    self.add_error('serverName', 'Server names cannot contain underscores.')
-                    break
-            
-            
+
+            import re
+            if not re.match('^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$', name):
+                self.add_error('serverName', 'Name can contain letters, numbers, and single hypens.') 
 
             # managed windows name can't exceed 15 char:
             if len(name) > 15:
