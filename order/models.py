@@ -1294,7 +1294,7 @@ class Item(models.Model):
                     os = Choice.objects.get(code='Windows2022managed')
                 else:
                     attributes.append({'ID': 1994, 'Value': 216}) # Linux
-                    os = Choice.objects.get(code='RedHatEnterpriseLinux8')
+                    os = Choice.objects.get(code='RedHatEnterpriseLinux9')
                     
                 attributes.append({'ID': 1957, 'Value': os.label}) 
             else:
@@ -1411,7 +1411,7 @@ class Item(models.Model):
                 rec.patch_day_id = 98    # Saturday
                 rec.patch_time_id = 40   # 5:00 AM
             else:
-                rec.os = Choice.objects.get(code='RedHatEnterpriseLinux8')
+                rec.os = Choice.objects.get(code='RedHatEnterpriseLinux9')
 
         db_type = self.data.get('database')
         if db_type:

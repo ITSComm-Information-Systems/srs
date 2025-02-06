@@ -1164,7 +1164,7 @@ class ServerSpecForm(TabForm):
         else:
             self.fields['cpu'].widget.attrs.update({'data-server': 99, 'min': 2})
             self.fields['cpu'].initial = 2
-            self.fields['misevos'].initial = 8
+            self.fields['misevos'].initial = 341
             self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB', 'state': 'disabled'},
                                 {'name': 'disk1', 'size': database_size, 'uom': 'GB', 'state': 'disabled'},
                                 {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'}]
@@ -1221,20 +1221,10 @@ class ServerSpecForm(TabForm):
 
             if len(servername) > 0:
                 self.add_error('serverName', f'A server named {name.lower()} already exists. Please choose a different name.')
-                
-            #data sanitization
-            for i in range(len(name)):
-                #server names can only have one dash  
-                if name[i] == "-" and name[i+1] == '-':
-                    self.add_error('serverName', 'This server can only have one dash in the name.')
-                    break
-                
-                #server names cannot contain underscores
-                if name[i] == '_':
-                    self.add_error('serverName', 'Server names cannot contain underscores.')
-                    break
-            
-            
+
+            import re
+            if not re.match('^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$', name):
+                self.add_error('serverName', 'Name can contain letters, numbers, and single hypens.') 
 
             # managed windows name can't exceed 15 char:
             if len(name) > 15:
