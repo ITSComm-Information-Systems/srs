@@ -835,12 +835,7 @@ class ServerSupportForm(TabForm):
                 mang = 'unmang'
             else:
                 mang = 'mang'
-
-            try:
-                database = Database.objects.get(server=server)
-                db = database.type.code
-            except:
-                db = None
+                
         else:
             mang = None
             server = None
@@ -851,8 +846,8 @@ class ServerSupportForm(TabForm):
             self.fields['on_call'].initial = '0'
             self.fields['on_call'].disabled = True
 
-        if self.request.POST.get('database', db):
-            db = self.request.POST.get('database', db)
+        if self.request.POST.get('database'):
+            db = self.request.POST.get('database')
             if db == 'MSSQL':
                 name = self.request.POST.get('name')
                 beginning_letter = name[3].lower()
