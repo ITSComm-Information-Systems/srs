@@ -19,6 +19,7 @@ urlpatterns = [
     path('estimate-history/', views.view_estimate_history),
     path('tech-search/', views.tech_search, name='tech-search'),
     path('show-workorders/', views.show_workorders, name='show-workorders'),
+    path('estimate-mockup/', views.estimate_mockup, name='estimate-mockup'),
     path(r'', views.load_rte),
     
 ]

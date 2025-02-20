@@ -1,0 +1,66 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+<h2>{{ title }}</h2>
+
+<table class="table table-sm table-bordered">
+    <th>Project</th>
+    <th>Status</th>
+    <th>Facilites Eng</th>
+    <th>Network Eng</th>
+    <th>Video Eng</th>
+    {% for estimate in estimates %}
+        <tr>
+            <td>{{ estimate.wo_number_display }} Preorder: {{ estimate.pre_order_number }} {{estimate.label}}</td>
+            <td>{{ estimate.status }}</td>
+            <td>
+                {% for group, hours in estimate.group_hours.items %}
+                    {% if group.name == 'Facilities Eng.' %}
+                        /{{ hours|floatformat:0 }}
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for group, hours in estimate.group_hours.items %}
+                    {% if group.name == 'Network Eng' %}
+                        /{{ hours|floatformat:0 }}
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for group, hours in estimate.group_hours.items %}
+                    {% if group.name == 'Video Eng' %}
+                        /{{ hours|floatformat:0 }}
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+
+    <tr>
+        <td>IF-298-1    Preorder: 59570  Mult-1</td>
+        <td>Open</td>
+        <td data-bs-toggle="tooltip" data-bs-placement="top" title="John Smith: 8" class="table-success">8/16</td>
+        <td>0/0</td>
+        <td>0/0</td>
+    </tr>
+    <tr>
+        <td>IF-298-1    Preorder: 59570  Mult-2</td>
+        <td>Closed</td>
+        <td>0/0</td>
+        <td data-bs-toggle="tooltip" data-bs-placement="top" title="Pam Weaver: 8 | Tim Jones: 10" class="table-warning">18/20</td>
+        <td>0/0</td>
+    </tr>
+    <tr>
+        <td>IF-285-1    Preorder: 59575  Mult-1</td>
+        <td>Open</td>
+        <td data-bs-toggle="tooltip" data-bs-placement="top" title="John Smith: 24 | Tim Jones: 30 | Jimmy O'Neal: 10 | Leroy Salah: 6" class="table-danger">70/32</td>
+        <td>0/0</td>
+        <td data-bs-toggle="tooltip" data-bs-placement="top" title="Paige Gilmore: 10" class="table-success">10/25</td>
+        
+    </tr>
+
+</table>
+
+{% endblock %}
+
+

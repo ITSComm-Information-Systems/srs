@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models.functions import ExtractWeek
 from django.core import serializers
-from ..bom.models import Workorder, Estimate, PreOrder, Labor
+from ..bom.models import Workorder, Estimate, PreOrder, Labor, EstimateView
 from .models import SrsRteVsEstimate
 
 # Base RTE view
@@ -716,4 +716,36 @@ def show_workorders(request):
     context = {'workorders': workorders}
     
 
+    return HttpResponse(template.render(context, request))
+
+@permission_required('bom.can_access_bom')
+def estimate_mockup(request):
+    template = loader.get_template('rte/view/estimate-mockup.html')
+    username = request.user.username
+    unfiltered_estimates = EstimateView.objects.filter(
+        Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
+    ).exclude(status__in=['Rejected', 'Cancelled'])[:20]
+    estimates = []
+    for estimate in unfiltered_estimates:
+        estimates.append(estimate)
+
+    for estimate in estimates:
+        labor = Labor.objects.filter(estimate_id=estimate.id)
+        group_hours = {}
+        for l in labor:
+            if l.group not in group_hours:
+                group_hours[l.group] = 0
+            group_hours[l.group] += l.hours
+        estimate.group_hours = group_hours if group_hours else None
+
+# Print each group and total hours for debugging
+    # for estimate in estimates:
+    #     if estimate.group_hours:
+    #         for group, hours in estimate.group_hours.items():
+    #             print(f"Estimate ID: {estimate.id}, Group: {group}, Total Hours: {hours}")
+
+    context = {
+        'title': 'Estimate Mockup',
+        'estimates': estimates
+    }
     return HttpResponse(template.render(context, request))
