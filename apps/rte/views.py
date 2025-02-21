@@ -743,6 +743,10 @@ def estimate_mockup(request):
         network_group_submitted_hours = 0.00
         video_group_submitted_hours = 0.00
 
+        network_group_hover_string = ''
+        facilities_group_hover_string = ''
+        video_group_hover_string = ''
+
         
         for input_entry in input_entries:
             uniqname = input_entry.uniqname
@@ -755,7 +759,7 @@ def estimate_mockup(request):
                 network_group_submitted_hours += hours
             elif group == 'Facilities Eng':
                 facilities_group_submitted_hours += hours
-            elif group == 'Video Engineering':
+            elif group == 'Video Eng':
                 video_group_submitted_hours += hours
 
 
@@ -771,10 +775,16 @@ def estimate_mockup(request):
                 total_group_hours[group] = 0
             total_group_hours[group] += hours
         
-        # # Print each group and their total hours for debugging
-        # for group, uniqnames in group_uniqname_hours.items():
-        #     for uniqname, total_hours in uniqnames.items():
-        #         print(f"Estimate ID: {estimate.id}, Group: {group}, Uniqname: {uniqname}, Total Hours: {total_hours}")
+        # Print each group and their total hours for debugging
+        for group, uniqnames in group_uniqname_hours.items():
+            for uniqname, total_hours in uniqnames.items():
+                if group == 'Network Engineering':
+                    network_group_hover_string += f"{uniqname}: {total_hours} | "
+                elif group == 'Facilities Eng':
+                    facilities_group_hover_string += f"{uniqname}: {total_hours} | "
+                elif group == 'Video Eng':
+                    video_group_hover_string += f"{uniqname}: {total_hours} | "
+
         
         # # Print total submitted hours per group
         # for group, total_hours in total_group_hours.items():
@@ -786,6 +796,9 @@ def estimate_mockup(request):
         estimate.network_group_submitted_hours = network_group_submitted_hours
         estimate.facilities_group_submitted_hours = facilities_group_submitted_hours
         estimate.video_group_submitted_hours = video_group_submitted_hours
+        estimate.network_group_hover_string = network_group_hover_string
+        estimate.facilities_group_hover_string = facilities_group_hover_string
+        estimate.video_group_hover_string = video_group_hover_string
 
         # Calculate group hours from labor
         group_hours = {}

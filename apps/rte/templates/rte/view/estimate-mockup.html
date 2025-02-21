@@ -12,7 +12,7 @@
         <tr>
             <td>{{ estimate.wo_number_display }} Preorder: {{ estimate.pre_order_number }} {{estimate.label}}</td>
             <td>{{ estimate.status }}</td>
-            <td class="{{ estimate.facilities_class }}">
+            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{estimate.facilities_group_hover_string}}" class="{{ estimate.facilities_class }}">
                 {% for uniqname, hours in estimate.facilities_uniqname_hours.items %}
                     {{ hours|floatformat:2 }} <br>
                 {% endfor %}
@@ -24,7 +24,7 @@
                     {% endif %}
             {% endfor %}
             </td>
-            <td class="{{ estimate.network_class }}">
+            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{estimate.network_group_hover_string}}" class="{{ estimate.network_class }}">
                 {% for uniqname, hours in estimate.network_uniqname_hours.items %}
                     {{ hours|floatformat:2 }} <br>
                 {% endfor %}
@@ -37,7 +37,7 @@
             {% endfor %}
             </td>
             
-            <td class="{{ estimate.video_class }}">
+            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{estimate.video_group_hover_string}}" class="{{ estimate.video_class }}">
                 {% for uniqname, hours in estimate.video_uniqname_hours.items %}
                     {{ hours|floatformat:2 }} <br>
                 {% endfor %}
