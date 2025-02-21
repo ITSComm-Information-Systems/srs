@@ -725,24 +725,89 @@ def estimate_mockup(request):
     unfiltered_estimates = EstimateView.objects.filter(
         Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
     ).exclude(status__in=['Rejected', 'Cancelled'])[:20]
+    
     estimates = []
     for estimate in unfiltered_estimates:
         estimates.append(estimate)
 
     for estimate in estimates:
         labor = Labor.objects.filter(estimate_id=estimate.id)
+        service_order = UmRteServiceOrderV.objects.filter(pre_order_number=estimate.pre_order_number)
+        full_prord_wo_number = service_order[0].full_prord_wo_number if service_order else None
+        input_entries = UmRteInput.objects.filter(full_prord_wo_number=full_prord_wo_number)
+        
+        # Dictionary to accumulate hours for each group and uniqname
+        group_uniqname_hours = {}
+        total_group_hours = {}  # Dictionary to accumulate total hours per group
+        facilities_group_submitted_hours = 0.00
+        network_group_submitted_hours = 0.00
+        video_group_submitted_hours = 0.00
+
+        
+        for input_entry in input_entries:
+            uniqname = input_entry.uniqname
+            group = input_entry.wo_group_code
+            hh, mm = map(int, input_entry.actual_mins_display.split(':'))  # Split hh:mm and convert to int
+            hours = hh + mm / 60  # Convert to total hours
+
+            print('Group:', group)
+            if group == 'Network Engineering':
+                network_group_submitted_hours += hours
+            elif group == 'Facilities Eng':
+                facilities_group_submitted_hours += hours
+            elif group == 'Video Engineering':
+                video_group_submitted_hours += hours
+
+
+            if group not in group_uniqname_hours:
+                group_uniqname_hours[group] = {}
+            
+            if uniqname not in group_uniqname_hours[group]:
+                group_uniqname_hours[group][uniqname] = 0
+            
+            group_uniqname_hours[group][uniqname] += hours
+            
+            if group not in total_group_hours:
+                total_group_hours[group] = 0
+            total_group_hours[group] += hours
+        
+        # # Print each group and their total hours for debugging
+        # for group, uniqnames in group_uniqname_hours.items():
+        #     for uniqname, total_hours in uniqnames.items():
+        #         print(f"Estimate ID: {estimate.id}, Group: {group}, Uniqname: {uniqname}, Total Hours: {total_hours}")
+        
+        # # Print total submitted hours per group
+        # for group, total_hours in total_group_hours.items():
+        #     print("---")
+        #     print(f"Estimate ID: {estimate.id}, Group: {group}, Total Submitted Hours: {total_hours}")
+        
+        estimate.group_uniqname_hours = group_uniqname_hours
+        estimate.total_group_hours = total_group_hours
+        estimate.network_group_submitted_hours = network_group_submitted_hours
+        estimate.facilities_group_submitted_hours = facilities_group_submitted_hours
+        estimate.video_group_submitted_hours = video_group_submitted_hours
+
+        # Calculate group hours from labor
         group_hours = {}
         for l in labor:
             if l.group not in group_hours:
                 group_hours[l.group] = 0
-            group_hours[l.group] += l.hours
+            group_hours[l.group] += l.hours  # Keep in hours
         estimate.group_hours = group_hours if group_hours else None
 
-# Print each group and total hours for debugging
-    # for estimate in estimates:
-    #     if estimate.group_hours:
-    #         for group, hours in estimate.group_hours.items():
-    #             print(f"Estimate ID: {estimate.id}, Group: {group}, Total Hours: {hours}")
+        # Determine cell_class for each group
+        cell_class = {}
+        for group, submitted_hours in total_group_hours.items():
+            if group in group_hours:
+                if submitted_hours > group_hours[group]:
+                    cell_class[group] = 'table-danger'
+                elif submitted_hours > 0.8 * group_hours[group]:
+                    cell_class[group] = 'table-warning'
+                else:
+                    cell_class[group] = 'table-success'
+            else:
+                cell_class[group] = ''
+        estimate.cell_class = cell_class
 
     context = {
         'title': 'Estimate Mockup',
