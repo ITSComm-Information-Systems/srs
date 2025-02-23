@@ -719,13 +719,23 @@ def show_workorders(request):
     return HttpResponse(template.render(context, request))
 
 @permission_required('bom.can_access_bom')
-def estimate_mockup(request):
-    template = loader.get_template('rte/view/estimate-mockup.html')
+def actual_v_estimate(request):
     username = request.user.username
-    unfiltered_estimates = EstimateView.objects.filter(
-        Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
-    ).exclude(status__in=['Rejected', 'Cancelled'])[:20]
-    
+    url = request.path.strip('/').split('/')
+    slug = url[-1]
+    if slug == 'actual-vs-estimate-open':
+        template = loader.get_template('rte/view/actual-vs-estimate-open.html')
+        unfiltered_estimates = EstimateView.objects.filter(
+            Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
+        ).exclude(status__in=['Rejected', 'Cancelled', 'Completed'])
+    else:
+        template = loader.get_template('rte/view/actual-vs-estimate-completed.html')
+        unfiltered_estimates = EstimateView.objects.filter(
+            Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
+        ).filter(status__in=['Completed'])
+    # unfiltered_estimates = EstimateView.objects.filter(
+    #     Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
+    # ).exclude(status__in=['Rejected', 'Cancelled', 'Completed'])
     estimates = []
     for estimate in unfiltered_estimates:
         estimates.append(estimate)
@@ -862,7 +872,7 @@ def estimate_mockup(request):
         estimate.video_group_cell_class = video_group_cell_class
 
     context = {
-        'title': 'Estimate Mockup',
+        'title': 'Actual vs Estimated Hours',
         'estimates': estimates
     }
     return HttpResponse(template.render(context, request))

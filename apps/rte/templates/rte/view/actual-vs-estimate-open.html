@@ -1,6 +1,7 @@
 {% extends 'bom/base.html' %}
 {% block content %}
 <h2>{{ title }}</h2>
+<a href="{% url 'actual-vs-estimate-completed' %}">Show Completed</a><br/>
 
 <table class="table table-sm table-bordered">
     <th>Project</th>
@@ -24,29 +25,6 @@
             </td>
         </tr>
         {% endfor %}
-
-    <tr>
-        <td>IF-298-1    Preorder: 59570  Mult-1</td>
-        <td>Open</td>
-        <td data-bs-toggle="tooltip" data-bs-placement="top" title="John Smith: 8" class="table-success">8/16</td>
-        <td>0/0</td>
-        <td>0/0</td>
-    </tr>
-    <tr>
-        <td>IF-298-1    Preorder: 59570  Mult-2</td>
-        <td>Closed</td>
-        <td>0/0</td>
-        <td data-bs-toggle="tooltip" data-bs-placement="top" title="Pam Weaver: 8 | Tim Jones: 10" class="table-warning">18/20</td>
-        <td>0/0</td>
-    </tr>
-    <tr>
-        <td>IF-285-1    Preorder: 59575  Mult-1</td>
-        <td>Open</td>
-        <td data-bs-toggle="tooltip" data-bs-placement="top" title="John Smith: 24 | Tim Jones: 30 | Jimmy O'Neal: 10 | Leroy Salah: 6" class="table-danger">70/32</td>
-        <td>0/0</td>
-        <td data-bs-toggle="tooltip" data-bs-placement="top" title="Paige Gilmore: 10" class="table-success">10/25</td>
-        
-    </tr>
 
 </table>
 
