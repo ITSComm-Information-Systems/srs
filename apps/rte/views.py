@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models.functions import ExtractWeek
 from django.core import serializers
-from ..bom.models import Workorder, Estimate, PreOrder, Labor
+from ..bom.models import Workorder, Estimate, PreOrder, Labor, EstimateView
 from .models import SrsRteVsEstimate
 
 # Base RTE view
@@ -716,4 +716,163 @@ def show_workorders(request):
     context = {'workorders': workorders}
     
 
+    return HttpResponse(template.render(context, request))
+
+@permission_required('bom.can_access_bom')
+def actual_v_estimate(request):
+    username = request.user.username
+    url = request.path.strip('/').split('/')
+    slug = url[-1]
+    if slug == 'actual-vs-estimate-open':
+        template = loader.get_template('rte/view/actual-vs-estimate-open.html')
+        unfiltered_estimates = EstimateView.objects.filter(
+            Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
+        ).exclude(status__in=['Rejected', 'Cancelled', 'Completed'])
+    else:
+        template = loader.get_template('rte/view/actual-vs-estimate-completed.html')
+        unfiltered_estimates = EstimateView.objects.filter(
+            Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
+        ).filter(status__in=['Completed'])
+    # unfiltered_estimates = EstimateView.objects.filter(
+    #     Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
+    # ).exclude(status__in=['Rejected', 'Cancelled', 'Completed'])
+    estimates = []
+    for estimate in unfiltered_estimates:
+        estimates.append(estimate)
+
+    for estimate in estimates:
+        labor = Labor.objects.filter(estimate_id=estimate.id)
+        service_order = UmRteServiceOrderV.objects.filter(pre_order_number=estimate.pre_order_number)
+        full_prord_wo_number = service_order[0].full_prord_wo_number if service_order else None
+        input_entries = UmRteInput.objects.filter(full_prord_wo_number=full_prord_wo_number)
+        
+        # Dictionary to accumulate hours for each group and uniqname
+        group_uniqname_hours = {}
+        total_group_hours = {}  # Dictionary to accumulate total hours per group
+        facilities_group_submitted_hours = 0.00
+        network_group_submitted_hours = 0.00
+        video_group_submitted_hours = 0.00
+
+        network_group_hover_string = ''
+        facilities_group_hover_string = ''
+        video_group_hover_string = ''
+
+        
+        for input_entry in input_entries:
+            uniqname = input_entry.uniqname
+            group = input_entry.wo_group_code
+            hh, mm = map(int, input_entry.actual_mins_display.split(':'))  # Split hh:mm and convert to int
+            hours = hh + mm / 60  # Convert to total hours
+            if group == 'Network Engineering':
+                network_group_submitted_hours += hours
+            elif group == 'Facilities Eng':
+                facilities_group_submitted_hours += hours
+            elif group == 'Video Eng':
+                video_group_submitted_hours += hours
+
+
+            if group not in group_uniqname_hours:
+                group_uniqname_hours[group] = {}
+            
+            if uniqname not in group_uniqname_hours[group]:
+                group_uniqname_hours[group][uniqname] = 0
+            
+            group_uniqname_hours[group][uniqname] += hours
+            
+            if group not in total_group_hours:
+                total_group_hours[group] = 0
+            total_group_hours[group] += hours
+        
+        # Print each group and their total hours for debugging
+        for group, uniqnames in group_uniqname_hours.items():
+            for uniqname, total_hours in uniqnames.items():
+                if group == 'Network Engineering':
+                    network_group_hover_string += f"{uniqname}: {total_hours} | "
+                elif group == 'Facilities Eng':
+                    facilities_group_hover_string += f"{uniqname}: {total_hours} | "
+                elif group == 'Video Eng':
+                    video_group_hover_string += f"{uniqname}: {total_hours} | "
+
+        
+        estimate.group_uniqname_hours = group_uniqname_hours
+        estimate.total_group_hours = total_group_hours
+        estimate.network_group_submitted_hours = network_group_submitted_hours
+        estimate.facilities_group_submitted_hours = facilities_group_submitted_hours
+        estimate.video_group_submitted_hours = video_group_submitted_hours
+        estimate.network_group_hover_string = network_group_hover_string
+        estimate.facilities_group_hover_string = facilities_group_hover_string
+        estimate.video_group_hover_string = video_group_hover_string
+
+        # Calculate group hours from labor
+        group_hours = {}
+        facilities_estimated_hours = 0.00
+        network_estimated_hours = 0.00
+        video_estimated_hours = 0.00
+
+        for l in labor:
+            if l.group not in group_hours:
+                group_hours[l.group] = 0
+            group_hours[l.group] += l.hours  # Keep in hours
+        estimate.group_hours = group_hours if group_hours else None
+
+        for group in group_hours:
+            if group.name == 'Facilities Eng.':
+                facilities_estimated_hours = group_hours[group]
+            elif group.name == 'Network Eng':
+                network_estimated_hours = group_hours[group]
+            elif group.name == 'Video Eng':
+                video_estimated_hours = group_hours[group]
+
+        estimate.facilities_group_estimated_hours = facilities_estimated_hours
+        estimate.network_group_estimated_hours = network_estimated_hours
+        estimate.video_group_estimated_hours = video_estimated_hours
+        # Determine cell_class for each group
+        facilities_group_cell_class = ''
+        network_group_cell_class = ''
+        video_group_cell_class = ''
+
+        #convert to float
+        facilities_group_submitted_hours = float(facilities_group_submitted_hours)
+        network_group_submitted_hours = float(network_group_submitted_hours)
+        video_group_submitted_hours = float(video_group_submitted_hours)
+        facilities_estimated_hours = float(facilities_estimated_hours)
+        network_estimated_hours = float(network_estimated_hours)
+        video_estimated_hours = float(video_estimated_hours)
+
+
+        if facilities_group_submitted_hours > facilities_estimated_hours:
+            facilities_group_cell_class = 'table-danger'
+            pass
+        elif facilities_group_submitted_hours > facilities_estimated_hours * 0.8:
+            facilities_group_cell_class = 'table-warning'
+            pass
+        elif facilities_group_submitted_hours < facilities_estimated_hours:
+            facilities_group_cell_class = 'table-success'
+
+        if network_group_submitted_hours > network_estimated_hours:
+            network_group_cell_class = 'table-danger'
+            pass
+        elif network_group_submitted_hours > network_estimated_hours * 0.8:
+            network_group_cell_class = 'table-warning'
+            pass
+        elif network_group_submitted_hours < network_estimated_hours:
+            network_group_cell_class = 'table-success'
+
+        if video_group_submitted_hours > video_estimated_hours:
+            video_group_cell_class = 'table-danger'
+            pass
+        elif video_group_submitted_hours > video_estimated_hours * 0.8:
+            video_group_cell_class = 'table-warning'
+            pass
+        elif video_group_submitted_hours < video_estimated_hours:
+            video_group_cell_class = 'table-success'
+
+        estimate.facilities_group_cell_class = facilities_group_cell_class
+        estimate.network_group_cell_class = network_group_cell_class
+        estimate.video_group_cell_class = video_group_cell_class
+
+    context = {
+        'title': 'Actual vs Estimated Hours',
+        'estimates': estimates
+    }
     return HttpResponse(template.render(context, request))

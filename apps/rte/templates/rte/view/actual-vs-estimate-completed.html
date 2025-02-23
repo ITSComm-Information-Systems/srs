@@ -1,0 +1,33 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+<h2>{{ title }}</h2>
+<a href="{% url 'actual-vs-estimate-open' %}">Show Open</a><br/>
+
+<table class="table table-sm table-bordered">
+    <th>Project</th>
+    <th>Status</th>
+    <th>Facilites Eng</th>
+    <th>Network Eng</th>
+    <th>Video Eng</th>
+    {% for estimate in estimates %} 
+        <tr>
+            <td>{{ estimate.wo_number_display }} Preorder: {{ estimate.pre_order_number }} {{estimate.label}}</td>
+            <td>{{ estimate.status }}</td>
+            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{estimate.facilities_group_hover_string}}" class="{{ estimate.facilities_group_cell_class }}">
+                {{ estimate.facilities_group_submitted_hours|floatformat:2 }} / {{estimate.facilities_group_estimated_hours|floatformat:2}}
+            </td>
+            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{estimate.network_group_hover_string}}" class="{{ estimate.network_group_cell_class }}">
+                {{ estimate.network_group_submitted_hours|floatformat:2 }} / {{estimate.network_group_estimated_hours|floatformat:2}}
+            </td>
+            
+            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{estimate.video_group_hover_string}}" class="{{ estimate.video_group_cell_class }}">
+                {{ estimate.video_group_submitted_hours|floatformat:2 }} / {{estimate.video_group_estimated_hours|floatformat:2}}
+            </td>
+        </tr>
+        {% endfor %}
+
+</table>
+
+{% endblock %}
+
+
