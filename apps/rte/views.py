@@ -812,29 +812,54 @@ def estimate_mockup(request):
                 network_estimated_hours = group_hours[group]
             elif group.name == 'Video Eng':
                 video_estimated_hours = group_hours[group]
-                
-
-        print('Facilities Eng:', facilities_group_submitted_hours,facilities_estimated_hours)
-        print('Network Engineering:', network_group_submitted_hours,network_estimated_hours)
-        print('Video Eng:', video_group_submitted_hours,video_estimated_hours)
 
         estimate.facilities_group_estimated_hours = facilities_estimated_hours
         estimate.network_group_estimated_hours = network_estimated_hours
         estimate.video_group_estimated_hours = video_estimated_hours
         # Determine cell_class for each group
-        cell_class = {}
-        for group, submitted_hours in total_group_hours.items():
-            if group in group_hours:
-                if submitted_hours > group_hours[group]:
-                    cell_class[group] = 'table-danger'
-                elif submitted_hours > 0.8 * group_hours[group]:
-                    cell_class[group] = 'table-warning'
-                else:
-                    cell_class[group] = 'table-success'
-            else:
-                cell_class[group] = ''
-        estimate.cell_class = cell_class
+        facilities_group_cell_class = ''
+        network_group_cell_class = ''
+        video_group_cell_class = ''
 
+        #convert to float
+        facilities_group_submitted_hours = float(facilities_group_submitted_hours)
+        network_group_submitted_hours = float(network_group_submitted_hours)
+        video_group_submitted_hours = float(video_group_submitted_hours)
+        facilities_estimated_hours = float(facilities_estimated_hours)
+        network_estimated_hours = float(network_estimated_hours)
+        video_estimated_hours = float(video_estimated_hours)
+
+
+        if facilities_group_submitted_hours > facilities_estimated_hours:
+            facilities_group_cell_class = 'table-danger'
+            pass
+        elif facilities_group_submitted_hours > facilities_estimated_hours * 0.8:
+            facilities_group_cell_class = 'table-warning'
+            pass
+        elif facilities_group_submitted_hours < facilities_estimated_hours:
+            facilities_group_cell_class = 'table-success'
+
+        if network_group_submitted_hours > network_estimated_hours:
+            network_group_cell_class = 'table-danger'
+            pass
+        elif network_group_submitted_hours > network_estimated_hours * 0.8:
+            network_group_cell_class = 'table-warning'
+            pass
+        elif network_group_submitted_hours < network_estimated_hours:
+            network_group_cell_class = 'table-success'
+
+        if video_group_submitted_hours > video_estimated_hours:
+            video_group_cell_class = 'table-danger'
+            pass
+        elif video_group_submitted_hours > video_estimated_hours * 0.8:
+            video_group_cell_class = 'table-warning'
+            pass
+        elif video_group_submitted_hours < video_estimated_hours:
+            video_group_cell_class = 'table-success'
+
+        estimate.facilities_group_cell_class = facilities_group_cell_class
+        estimate.network_group_cell_class = network_group_cell_class
+        estimate.video_group_cell_class = video_group_cell_class
 
     context = {
         'title': 'Estimate Mockup',
