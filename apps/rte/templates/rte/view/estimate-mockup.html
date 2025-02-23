@@ -13,41 +13,14 @@
             <td>{{ estimate.wo_number_display }} Preorder: {{ estimate.pre_order_number }} {{estimate.label}}</td>
             <td>{{ estimate.status }}</td>
             <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{estimate.facilities_group_hover_string}}" class="{{ estimate.facilities_class }}">
-                {% for uniqname, hours in estimate.facilities_uniqname_hours.items %}
-                    {{ hours|floatformat:2 }} <br>
-                {% endfor %}
-                {{ estimate.facilities_group_submitted_hours|floatformat:2 }} 
-                {% for group, hours in estimate.group_hours.items %}
-                    {% if group.name == 'Facilities Eng.' %}
-                        
-                        / {{ hours|floatformat:2 }}
-                    {% endif %}
-            {% endfor %}
+                {{ estimate.facilities_group_submitted_hours|floatformat:2 }} / {{estimate.facilities_group_estimated_hours|floatformat:2}}
             </td>
             <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{estimate.network_group_hover_string}}" class="{{ estimate.network_class }}">
-                {% for uniqname, hours in estimate.network_uniqname_hours.items %}
-                    {{ hours|floatformat:2 }} <br>
-                {% endfor %}
-                {{ estimate.network_group_submitted_hours|floatformat:2 }} 
-                {% for group, hours in estimate.group_hours.items %}
-                    {% if group.name == 'Network Eng' %}
-                        
-                        / {{ hours|floatformat:2 }}
-                    {% endif %}
-            {% endfor %}
+                {{ estimate.network_group_submitted_hours|floatformat:2 }} / {{estimate.network_group_estimated_hours|floatformat:2}}
             </td>
             
             <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{estimate.video_group_hover_string}}" class="{{ estimate.video_class }}">
-                {% for uniqname, hours in estimate.video_uniqname_hours.items %}
-                    {{ hours|floatformat:2 }} <br>
-                {% endfor %}
-                {{ estimate.video_group_submitted_hours|floatformat:2 }} 
-                {% for group, hours in estimate.group_hours.items %}
-                    {% if group.name == 'Video Eng' %}
-                        
-                        / {{ hours|floatformat:2 }}
-                    {% endif %}
-            {% endfor %}
+                {{ estimate.video_group_submitted_hours|floatformat:2 }} / {{estimate.video_group_estimated_hours|floatformat:2}}
             </td>
         </tr>
         {% endfor %}

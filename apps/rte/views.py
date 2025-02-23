@@ -753,8 +753,6 @@ def estimate_mockup(request):
             group = input_entry.wo_group_code
             hh, mm = map(int, input_entry.actual_mins_display.split(':'))  # Split hh:mm and convert to int
             hours = hh + mm / 60  # Convert to total hours
-
-            print('Group:', group)
             if group == 'Network Engineering':
                 network_group_submitted_hours += hours
             elif group == 'Facilities Eng':
@@ -786,11 +784,6 @@ def estimate_mockup(request):
                     video_group_hover_string += f"{uniqname}: {total_hours} | "
 
         
-        # # Print total submitted hours per group
-        # for group, total_hours in total_group_hours.items():
-        #     print("---")
-        #     print(f"Estimate ID: {estimate.id}, Group: {group}, Total Submitted Hours: {total_hours}")
-        
         estimate.group_uniqname_hours = group_uniqname_hours
         estimate.total_group_hours = total_group_hours
         estimate.network_group_submitted_hours = network_group_submitted_hours
@@ -802,12 +795,32 @@ def estimate_mockup(request):
 
         # Calculate group hours from labor
         group_hours = {}
+        facilities_estimated_hours = 0.00
+        network_estimated_hours = 0.00
+        video_estimated_hours = 0.00
+
         for l in labor:
             if l.group not in group_hours:
                 group_hours[l.group] = 0
             group_hours[l.group] += l.hours  # Keep in hours
         estimate.group_hours = group_hours if group_hours else None
 
+        for group in group_hours:
+            if group.name == 'Facilities Eng.':
+                facilities_estimated_hours = group_hours[group]
+            elif group.name == 'Network Eng':
+                network_estimated_hours = group_hours[group]
+            elif group.name == 'Video Eng':
+                video_estimated_hours = group_hours[group]
+                
+
+        print('Facilities Eng:', facilities_group_submitted_hours,facilities_estimated_hours)
+        print('Network Engineering:', network_group_submitted_hours,network_estimated_hours)
+        print('Video Eng:', video_group_submitted_hours,video_estimated_hours)
+
+        estimate.facilities_group_estimated_hours = facilities_estimated_hours
+        estimate.network_group_estimated_hours = network_estimated_hours
+        estimate.video_group_estimated_hours = video_estimated_hours
         # Determine cell_class for each group
         cell_class = {}
         for group, submitted_hours in total_group_hours.items():
@@ -821,6 +834,7 @@ def estimate_mockup(request):
             else:
                 cell_class[group] = ''
         estimate.cell_class = cell_class
+
 
     context = {
         'title': 'Estimate Mockup',
