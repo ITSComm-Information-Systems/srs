@@ -3,6 +3,7 @@ from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path, re_path
 from django.conf.urls.static import static, serve
+from django.views.generic.base import RedirectView
 from . import views
 from . import api
 
@@ -14,6 +15,10 @@ handler500 = views.handle_custom_500
 
 urlpatterns = [
 
+    path('apps/', include('apps.urls')),
+    path('', views.homepage),
+    re_path(r'^.*$', RedirectView.as_view(url='/', permanent=False)),  # Catch-all redirect
+
     re_path(r'^media/(?P<path>.*)$', serve, {
             'document_root': settings.MEDIA_ROOT,
             }),
@@ -22,7 +27,7 @@ urlpatterns = [
     path('orders/', include('order.urls')),
     path('pages/', include('pages.urls')),
     path('auth/', include('oscauth.urls')),
-    path('apps/', include('apps.urls')),
+
     path('unitylogin', views.unity_login),
     path('unitylogin/', views.unity_login),
     path('softphone/', include('softphone.urls')),
@@ -46,7 +51,7 @@ urlpatterns = [
     path('managerapprovalinit/', views.managerapprovalinit), # AJAX
     path('managerapproval/submit/', views.managerapprovalsubmit), # AJAX
     #path('namechange/', views.NameChange.as_view()),
-    path('', views.homepage),
+
     path('', include('pages.urls')),
     path('tools/',include('tools.urls')),
     #path('testtest/',views.raise404)
