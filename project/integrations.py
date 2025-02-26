@@ -189,7 +189,12 @@ class Openshift():
         url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
 
         for users in instance.cleaned_names:
-            role = users[:-1]
+
+            if users == 'all':
+                role = 'cluster-logging-application-view'
+            else:
+                role = users[:-1]   # admins becomes admin, etc.
+
             uniqnames = instance.cleaned_names[users]
             if len(uniqnames) > 0:
 
@@ -301,8 +306,22 @@ class TDx():
         url = f'{self.BASE_URL}/tickets/{id}'
         return requests.get( url, headers=self.headers )
 
+    def get_account(self, username):
+        url = f'{self.BASE_URL}/people/search'
+
+        try:
+            resp = requests.post(url, headers=self.headers, json={"AlternateID": username, "MaxResults": 1})
+            admin_id = resp.json()[0].get('DefaultAccountID')
+        except:
+            print('error geting admin_id')
+            admin_id = 0
+
+        return admin_id
+
     def create_ticket(self, payload):
         payload['SourceID'] = 8         # System
+        username = payload.get('RequestorEmail').split('@')[0]
+        payload['AccountID'] = self.get_account(username)
 
         resp = requests.post( f'{self.BASE_URL}/31/tickets/'
                             , headers=self.headers
