@@ -670,53 +670,6 @@ def format_time(total_hours):
     return total_hours
 
 
-@permission_required('rte.add_umrteinput', raise_exception=True)
-def view_estimate_history(request):
-    template = loader.get_template('rte/view/estimate-history.html')
-    # techid = 'lhehnlin'
-
-    # workorders = Labor.objects.filter(updated_by=techid).order_by('-update_date')[:5]
-    # print(workorders)
-
-
-    context = {
-        'title': 'View Estimate History',
-    }
-    return HttpResponse(template.render(context, request))
-
-@permission_required('rte.add_umrteinput', raise_exception=True)
-def tech_search(request):
-    techid = request.GET.get('techSearch')
-    template = loader.get_template('rte/view/tech-search-table.html')
-    potential_techs = UmRteTechnicianV.objects.filter(
-        (Q(labor_code__icontains=techid) | Q(labor_name_display2__icontains=techid)) & ~Q(labor_code=''))
-    context={}
-    context['techs'] = []
-    for tech in potential_techs:
-        context['techs'].append({
-            'labor_code': tech.labor_code.upper(),
-            'labor_name': tech.labor_name_display2
-        })
-    return HttpResponse(template.render(context, request))
-
-@permission_required('rte.add_umrteinput', raise_exception=True)
-def show_workorders(request):
-    techid = request.GET.get('techSearch')
-    template = loader.get_template('rte/view/tech-wo-estimate-table.html')
-    print(techid)
-    workorders = SrsRteVsEstimate.objects.filter(labor_code=techid)
-    for workorder in workorders:
-        if workorder.est_hours is None:
-            workorder.est_hours = 0
-        if workorder.reported_hours is None:
-            workorder.reported_hours = 0
-        workorder.difference = workorder.reported_hours - workorder.est_hours
-    
-    context = {'workorders': workorders}
-    
-
-    return HttpResponse(template.render(context, request))
-
 @permission_required('bom.can_access_bom')
 def actual_v_estimate(request):
     username = request.user.username
