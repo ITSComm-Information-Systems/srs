@@ -11,7 +11,6 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models.functions import ExtractWeek
 from django.core import serializers
 from ..bom.models import Workorder, Estimate, PreOrder, Labor, EstimateView
-from .models import SrsRteVsEstimate
 
 # Base RTE view
 @permission_required('rte.add_umrteinput', raise_exception=True)
@@ -744,7 +743,10 @@ def actual_v_estimate(request):
         labor = Labor.objects.filter(estimate_id=estimate.id)
         service_order = UmRteServiceOrderV.objects.filter(pre_order_number=estimate.pre_order_number)
         full_prord_wo_number = service_order[0].full_prord_wo_number if service_order else None
-        input_entries = UmRteInput.objects.filter(full_prord_wo_number=full_prord_wo_number)
+        if full_prord_wo_number:
+            input_entries = UmRteInput.objects.filter(full_prord_wo_number=full_prord_wo_number)
+        else:
+            input_entries = []
         
         # Dictionary to accumulate hours for each group and uniqname
         group_uniqname_hours = {}
