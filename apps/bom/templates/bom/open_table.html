@@ -1,12 +1,12 @@
 <table id="workorder_table" class="table table-hover table-striped sortable" aria-live="polite">
     <thead>
         <tr>
-            <th>Workorder</th>
-            <th>Preorder</th>
-            <th>Project</th>
-            <th>Comment</th>
-            <th>Building</th>
-            <th>Estimates</th>
+            <th onclick="sortTable(0)">Workorder</th>
+            <th onclick="sortTable(1)">Preorder</th>
+            <th onclick="sortTable(2)">Project</th>
+            <th onclick="sortTable(3)">Comment</th>
+            <th onclick="sortTable(4)">Building</th>
+            <th onclick="sortTable(5)">Estimates</th>
         </tr>
     </thead>
     <tbody id="workOrderTableBody">
@@ -24,26 +24,59 @@
 </table>
 
 {% block js %}
-    <script>
-        document.addEventListener("htmx:afterSettle", function(event) {
-            var tableRows = document.querySelectorAll("#workOrderTableBody tr");
-            tableRows.forEach(function (row) {
-                row.addEventListener("click", function () {
-                    var estimate_id = this.getAttribute('data-estimate_id');
-                    if (estimate_id !== 'None') {
-                        window.location.replace("/apps/bom/estimate/" + estimate_id + "/");
-                    } else {
-                        var pre_order_id = this.getAttribute('data-pre_order_id');
-                        console.log(pre_order_id, 'pid');
-                        document.getElementById("pre_order_id").value = pre_order_id;
-                        $('#addEstimate').modal();
-                    }
-                });
+<script>
+    document.addEventListener("htmx:afterSettle", function(event) {
+        var tableRows = document.querySelectorAll("#workOrderTableBody tr");
+        tableRows.forEach(function (row) {
+            row.addEventListener("click", function () {
+                var estimate_id = this.getAttribute('data-estimate_id');
+                if (estimate_id !== 'None') {
+                    window.location.replace("/apps/bom/estimate/" + estimate_id + "/");
+                } else {
+                    var pre_order_id = this.getAttribute('data-pre_order_id');
+                    console.log(pre_order_id, 'pid');
+                    document.getElementById("pre_order_id").value = pre_order_id;
+                    $('#addEstimate').modal();
+                }
             });
-            
-
-            // Reinitialize the SortTable functionality
-            sorttable.init();
         });
-    </script>
-    {% endblock js %}
+    });
+
+    var sortDirections = {}; // Object to keep track of sorting directions for each column
+
+    function sortTable(n) {
+        var table, rows, switching, i, x, y, shouldSwitch, switchcount = 0;
+        table = document.getElementById("workorder_table");
+        switching = true;
+        var rowsArray = Array.from(table.rows).slice(1); // Convert rows to array and exclude the header row
+
+        // Determine the sorting direction for the column
+        if (!sortDirections[n]) {
+            sortDirections[n] = "asc";
+        } else {
+            sortDirections[n] = sortDirections[n] === "asc" ? "desc" : "asc";
+        }
+
+        var dir = sortDirections[n];
+
+        rowsArray.sort(function(a, b) {
+            x = a.getElementsByTagName("TD")[n].innerHTML.toLowerCase();
+            y = b.getElementsByTagName("TD")[n].innerHTML.toLowerCase();
+            if (dir == "asc") {
+                if (x > y) return 1;
+                if (x < y) return -1;
+                return 0;
+            } else if (dir == "desc") {
+                if (x < y) return 1;
+                if (x > y) return -1;
+                return 0;
+            }
+        });
+
+        // Append sorted rows back to the table
+        for (i = 0; i < rowsArray.length; i++) {
+            table.tBodies[0].appendChild(rowsArray[i]);
+        }
+    }
+</script>
+{% endblock js %}

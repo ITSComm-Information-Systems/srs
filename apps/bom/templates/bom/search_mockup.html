@@ -7,7 +7,7 @@
         name="search" placeholder="Begin Typing To Search Preorders..."
         hx-post="{% url 'open_preorder_endpoint' %}"
         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-        hx-trigger="input changed delay:500ms, keyup[key=='Enter'], load"
+        hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
         hx-target="#search-results"
         hx-indicator=".htmx-indicator">
 
