@@ -3,17 +3,37 @@
 <head>
     <!-- Include Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .sort-table th {
+            cursor: pointer;
+        }
+        .sort-table th .fa-sort-up,
+        .sort-table th .fa-sort-down {
+            display: none;
+        }
+        .sort-table th .fa-sort {
+            display: inline;
+        }
+        .sort-table th.sorted-asc .fa-sort-up,
+        .sort-table th.sorted-desc .fa-sort-down {
+            display: none;
+        }
+        .sort-table th.sorted-asc .fa-sort,
+        .sort-table th.sorted-desc .fa-sort {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <table id="workorder_table" class="table table-hover table-striped" aria-live="polite">
+    <table id="workorder_table" class="table table-hover table-striped sort-table" aria-live="polite">
         <thead>
             <tr>
-                <th onclick="sortTable(0)">Workorder <i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-                <th onclick="sortTable(1)">Preorder <i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-                <th onclick="sortTable(2)">Project <i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-                <th onclick="sortTable(3)">Comment <i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-                <th onclick="sortTable(4)">Building <i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-                <th onclick="sortTable(5)">Estimates <i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+                <th style="min-width: 150px;" onclick="sortTable(0)">Workorder <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none; "></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+                <th style="min-width: 150px;" onclick="sortTable(1)">Preorder <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+                <th onclick="sortTable(2)">Project <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+                <th onclick="sortTable(3)">Comment <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+                <th onclick="sortTable(4)">Building <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+                <th style="min-width: 150px;" onclick="sortTable(5)">Estimates <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
             </tr>
         </thead>
         <tbody id="workOrderTableBody">
@@ -69,14 +89,29 @@
             rowsArray.sort(function(a, b) {
                 x = a.getElementsByTagName("TD")[n].innerHTML.toLowerCase();
                 y = b.getElementsByTagName("TD")[n].innerHTML.toLowerCase();
-                if (dir == "asc") {
-                    if (x > y) return 1;
-                    if (x < y) return -1;
-                    return 0;
-                } else if (dir == "desc") {
-                    if (x < y) return 1;
-                    if (x > y) return -1;
-                    return 0;
+
+                // Check if x and y are numeric
+                var xNum = parseFloat(x);
+                var yNum = parseFloat(y);
+
+                if (!isNaN(xNum) && !isNaN(yNum)) {
+                    // Sort numerically
+                    if (dir == "asc") {
+                        return xNum - yNum;
+                    } else {
+                        return yNum - xNum;
+                    }
+                } else {
+                    // Sort alphabetically
+                    if (dir == "asc") {
+                        if (x > y) return 1;
+                        if (x < y) return -1;
+                        return 0;
+                    } else if (dir == "desc") {
+                        if (x < y) return 1;
+                        if (x > y) return -1;
+                        return 0;
+                    }
                 }
             });
 
@@ -88,9 +123,11 @@
             // Update the sorting icons
             var headers = table.getElementsByTagName("th");
             for (i = 0; i < headers.length; i++) {
+                var sortIcon = headers[i].querySelector(".fa-sort");
                 var upIcon = headers[i].querySelector(".fa-sort-up");
                 var downIcon = headers[i].querySelector(".fa-sort-down");
                 if (i === n) {
+                    sortIcon.style.display = "none";
                     if (dir === "asc") {
                         upIcon.style.display = "inline";
                         downIcon.style.display = "none";
@@ -99,6 +136,7 @@
                         downIcon.style.display = "inline";
                     }
                 } else {
+                    sortIcon.style.display = "inline";
                     upIcon.style.display = "none";
                     downIcon.style.display = "none";
                 }
