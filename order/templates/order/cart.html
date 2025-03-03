@@ -21,7 +21,7 @@
                                 Switch Department
                             </label>
                         </div>
-                        <select name="deptid" class="custom-select order-status-dropdown" onchange="this.form.submit()"
+                        <select name="deptid" class="form-select order-status-dropdown" onchange="this.form.submit()"
                             id="department-dropdown">
                             {% for dept in dept_list %}
                                 {% if dept.active == 'A' %}
@@ -138,9 +138,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteCartItem">Delete Cart Item</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
                 </div>
                 <div class="modal-body">
                     <strong class="remove-text">

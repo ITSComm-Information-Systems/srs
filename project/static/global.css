@@ -1025,10 +1025,25 @@ h3.alert-heading {
 .text-muted {
 	color:#655a52 !important;
 }
+
+.form-group {
+	margin-bottom: 1rem;
+  }
+  
+.form-text {
+	display: block;
+	margin-top: 0.25rem;
+  }
+  
 .form-row {
-    margin-right:auto;
-    margin-left:auto;
-}
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	margin-right: -5px;
+	margin-left: -5px;
+  }
+
 .form-control {
 /*    margin:0.2rem;*/
 	border:1px solid #cecbc9;
@@ -1046,15 +1061,17 @@ h3.alert-heading {
 .input-group>.custom-select.order-status-dropdown {
     border-top-right-radius:.25rem;
     border-bottom-right-radius:.25rem;
+
 }
 .input-group-text {
 	border:1px solid #cecbc9;
 	background-color:#f4f3f2;
 	color:#333333;
 }
-.input-group>.custom-select:not(:last-child), .input-group>.form-control:not(:last-child) {
+.foo.input-group>.custom-select:not(:last-child), .input-group>.form-control:not(:last-child) {
 	border-top-right-radius:reset;
 	border-bottom-right-radius:reset;
+
 }
 .select2-container {
     width:100% !important;
@@ -1266,3 +1283,108 @@ pre {
 table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
     content: " \25B4\25BE" 
 }
+
+/* Django form classes */
+.errorlist {
+	color: red;
+	list-style-type: square;
+}
+
+.helptext {
+	font-size: small;
+}
+
+/* Deprecated form-inline from Bootstrap 4 */
+.form-control[readonly]{background-color:#e9ecef;opacity:1}
+
+
+.form-inline {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-ms-flex-flow: row wrap;
+	flex-flow: row wrap;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+  }
+  
+  .form-inline .form-check {
+	width: 100%;
+  }
+
+
+
+  @media (min-width: 576px) {
+	.form-inline label {
+	  display: -webkit-box;
+	  display: -ms-flexbox;
+	  display: flex;
+	  -webkit-box-align: center;
+	  -ms-flex-align: center;
+	  align-items: center;
+	  -webkit-box-pack: center;
+	  -ms-flex-pack: center;
+	  justify-content: center;
+	  margin-bottom: 0;
+	}
+	.form-inline .form-group {
+	  display: -webkit-box;
+	  display: -ms-flexbox;
+	  display: flex;
+	  -webkit-box-flex: 0;
+	  -ms-flex: 0 0 auto;
+	  flex: 0 0 auto;
+	  -webkit-box-orient: horizontal;
+	  -webkit-box-direction: normal;
+	  -ms-flex-flow: row wrap;
+	  flex-flow: row wrap;
+	  -webkit-box-align: center;
+	  -ms-flex-align: center;
+	  align-items: center;
+	  margin-bottom: 0;
+	}
+	.form-inline .form-control {
+	  display: inline-block;
+	  width: auto;
+	  vertical-align: middle;
+	}
+	.form-inline .form-control-plaintext {
+	  display: inline-block;
+	}
+	.form-inline .input-group {
+	  width: auto;
+	}
+	.form-inline .form-check {
+	  display: -webkit-box;
+	  display: -ms-flexbox;
+	  display: flex;
+	  -webkit-box-align: center;
+	  -ms-flex-align: center;
+	  align-items: center;
+	  -webkit-box-pack: center;
+	  -ms-flex-pack: center;
+	  justify-content: center;
+	  width: auto;
+	  padding-left: 0;
+	}
+	.form-inline .form-check-input {
+	  position: relative;
+	  margin-top: 0;
+	  margin-right: 0.25rem;
+	  margin-left: 0;
+	}
+	.form-inline .custom-control {
+	  -webkit-box-align: center;
+	  -ms-flex-align: center;
+	  align-items: center;
+	  -webkit-box-pack: center;
+	  -ms-flex-pack: center;
+	  justify-content: center;
+	}
+	.form-inline .custom-control-label {
+	  margin-bottom: 0;
+	}
+  }

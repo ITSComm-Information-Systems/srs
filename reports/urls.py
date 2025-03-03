@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views
 
 from django.conf.urls import include
 
@@ -8,6 +9,7 @@ urlpatterns = [
     path('doc/', include('reports.doc.urls')),
     path('soc/', include('reports.soc.urls')),
     path('metrics/', include('reports.metrics.urls')),
-    path('nonteleph/', include('reports.nonteleph.urls'))
-
+    path('nonteleph/', include('reports.nonteleph.urls')),
+    path('usage/', include('reports.usage.urls')),
+    path('log_click/', views.log_click, name='log_click'),
 ]

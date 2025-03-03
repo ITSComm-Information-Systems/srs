@@ -53,3 +53,4 @@ class NetworkAdmin(admin.ModelAdmin):
 class PoolAdmin(admin.ModelAdmin):
     search_fields = ['name','owner__name']
     list_display = ['name', 'owner', 'shortcode']
+    fields = ('status','owner','shortcode','name','type','quantity','images',('override','cpu_override', 'memory_override'))

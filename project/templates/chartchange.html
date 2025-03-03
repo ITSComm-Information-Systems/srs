@@ -43,7 +43,7 @@
           Switch Department
         </label>
       </div>
-      <select name="deptids" class="custom-select" id="chart_deptids">
+      <select name="deptids" class="form-select" id="chart_deptids">
         {% for dept in deptids %}
         <option value="{{ dept.deptid }} - {{ dept.dept_descr }}?{{ dept.dept_mgr }}">
           {{ dept.deptid }} - {{ dept.dept_descr }}</option>

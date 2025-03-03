@@ -6,7 +6,7 @@
       <h2 class="mb-0">
         {{ workorder.wo_number_display }} &nbsp&nbsp Preorder: {{ workorder.pre_order_number }} &nbsp&nbsp Status:
         {{ workorder.status_name }}
-        <button id="addEstimateBtn" type="button" class="btn btn-primary float-right" <a class="delete" href="#" data-toggle="modal"
+        <button id="addEstimateBtn" type="button" class="btn btn-primary float-end" <a class="delete" href="#" data-toggle="modal"
           data-target="#addEstimate">Add Estimate</button>
         <br>
         <button class="btn btn-link always-enabled" type="button" data-toggle="collapse" data-target="#collapse-1" aria-expanded="true"
@@ -138,9 +138,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">UMNet Project Information</h5>
-        <button type="button" class="close always-enabled" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close always-enabled" data-dismiss="modal" aria-label="Close">
       </div>
 
       <form method="POST" action="/apps/bom/edit_project/">

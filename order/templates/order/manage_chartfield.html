@@ -23,7 +23,7 @@
                                     Switch Department
                                 </label>
                             </div>
-                            <select class="custom-select order-status-dropdown" id="deptid" name="deptid">
+                            <select class="form-select order-status-dropdown" id="deptid" name="deptid">
                                 {% for dept in dept_list %}
                                 <option name="dept" value="{{dept.dept}}">{{dept.dept}} - {{dept.name}}</option>
                                 {% endfor %}
@@ -128,9 +128,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="addChartfieldToShortlist">Add Chartfield to List</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
                     </div>
                     <div class="modal-body">
                         <form id="addChartfieldForm" method="POST" action="/orders/chartcom/">{% csrf_token %}
@@ -198,9 +196,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editChartfield">Edit Chartfield</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
                     </div>
                     <div class="modal-body">
                         <form id="editChartfieldForm" method="POST" action="/orders/chartcom/">{% csrf_token %}
@@ -251,9 +247,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="deleteChartfield">Remove Chartfield</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
                     </div>
                     <div class="modal-body remove-chartfield-form-body">
                         <strong class="remove-text">

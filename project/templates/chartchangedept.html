@@ -67,7 +67,7 @@
 </h1>
 
 <p hidden id="dept_mgr"></p>
-{% if deptids|length > 1 %}
+
 <form id="choose_dept" method="POST">{% csrf_token %}
   <div class="row align-items-start mb-4 justify-content-center mt-5" id="select_dept">
     <div class="input-group col-md-6">
@@ -76,7 +76,7 @@
           Switch Department
         </label>
       </div>
-      <select name="deptids" class="custom-select" id="chart_deptids">
+      <select name="deptids" class="form-select" id="chart_deptids">
         {% for dept in deptids %}
         <option value="{{ dept.dept }} - {{ dept.dept_name }}?{{ dept.dept_mgr }}?{{dept.dept_mgr_uniqname}}">
           {{ dept.dept }} - {{ dept.dept_name }}</option>
@@ -87,7 +87,6 @@
       data-content="Select your current department."></i>
   </div>
 </form>
-{% endif %}
 
 <ul class="nav justify-content-center nav-pills" id="chartchange_nav" role="tablist">
   <li class="nav-item">

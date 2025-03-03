@@ -23,6 +23,8 @@ urlpatterns = [
     path('pages/', include('pages.urls')),
     path('auth/', include('oscauth.urls')),
     path('apps/', include('apps.urls')),
+    path('unitylogin', views.unity_login),
+    path('unitylogin/', views.unity_login),
     path('softphone/', include('softphone.urls')),
     path('services/', include('services.urls')),
     path('api/', include(api.router.urls)),

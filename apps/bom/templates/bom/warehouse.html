@@ -31,10 +31,10 @@
 
 
         {% if estimate.folder %}
-        <a class='ml-auto mr-3' href="{{ estimate.folder }}" target="_blank" ><i class="fas fa-link"></i>&nbsp; Drive Folder</a>
+        <a class='ms-auto mr-3' href="{{ estimate.folder }}" target="_blank" ><i class="fas fa-link"></i>&nbsp; Drive Folder</a>
         {% endif %}
 
-        <a class='ml-auto mr-3' style="align-content: flex-end" href='/apps/bom/estimate/{{ estimate.id }}'>Return to
+        <a class='ms-auto mr-3' style="align-content: flex-end" href='/apps/bom/estimate/{{ estimate.id }}'>Return to
             Main</a>
         <div style="border: 1px solid black; margin: 1%;">
             <table style="margin: 1%;">
@@ -139,7 +139,7 @@
 
         $('[data-toggle="popover"]').popover();
         // Class form up with bootstrap
-        $("select").addClass("form-control custom-select");
+        $("select").addClass("form-control form-select");
         $('input:not(:checkbox)').addClass("form-control");
 
         $('#addEstimateBtn').hide();

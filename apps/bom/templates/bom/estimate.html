@@ -168,7 +168,7 @@
         <div>
           <p>
             {% if perms.bom.can_update_bom_ordered %}
-            <a class="float-right" href="/apps/bom/warehouse/{{ estimate.id }}" style="padding-right: 10px">Warehouse View</a><br>
+            <a class="float-end" href="/apps/bom/warehouse/{{ estimate.id }}" style="padding-right: 10px">Warehouse View</a><br>
             {% endif %}
             <strong>Created on</strong>&nbsp{{ estimate.create_date|date:"SHORT_DATETIME_FORMAT" }}<br>
             <strong>Created by</strong>&nbsp;{{ estimate.created_by }}<br><br>
@@ -235,9 +235,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Pinnacle Note</h5>
-        <button type="button" class="close always-enabled" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close always-enabled" data-dismiss="modal" aria-label="Close">
       </div>
 
       <form method="POST" action="/apps/bom/add_pinnacle_note/" enctype="multipart/form-data">
@@ -310,7 +308,7 @@
     });
 
     // Class form up with bootstrap
-    $("select").addClass("form-control custom-select");
+    $("select").addClass("form-control form-select");
     $('input:not(:checkbox)').addClass("form-control");
 
     status = $("#id_status").val()

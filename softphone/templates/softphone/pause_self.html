@@ -14,7 +14,7 @@
 
 
 <form method="post">
-    <a class="float-right col-6" href="?file=CSV">Download CSV</a>
+    <a class="float-end col-6" href="?file=CSV">Download CSV</a>
     {% csrf_token %}
     {{ formset.management_form }}
     {% for form in formset %}
@@ -39,7 +39,7 @@
             <div class="form-group col-sm upgrade_to_softphone" id="div_id_form-0-migrate" data-location="ARBOR LAKES 3">
                 <label>Pause Transition?</label>
                 <div>
-                    <select name="{{ form.prefix }}-pause_until" class="form-control custom-select pause_until" id="id_{{ form.prefix }}-pause_until">
+                    <select name="{{ form.prefix }}-pause_until" class="form-control form-select pause_until" id="id_{{ form.prefix }}-pause_until">
                         {% for option in date_list %}
                             <option value="{{ option|first }}">{{ option|last }}</option>
                         {% endfor %}

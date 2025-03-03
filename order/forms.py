@@ -835,12 +835,7 @@ class ServerSupportForm(TabForm):
                 mang = 'unmang'
             else:
                 mang = 'mang'
-
-            try:
-                database = Database.objects.get(server=server)
-                db = database.type.code
-            except:
-                db = None
+                
         else:
             mang = None
             server = None
@@ -851,13 +846,18 @@ class ServerSupportForm(TabForm):
             self.fields['on_call'].initial = '0'
             self.fields['on_call'].disabled = True
 
-
-        if self.request.POST.get('database', db):
-            db = self.request.POST.get('database', db)
+        if self.request.POST.get('database'):
+            db = self.request.POST.get('database')
             if db == 'MSSQL':
+                name = self.request.POST.get('name')
+                beginning_letter = name[3].lower()
+                if 'a'<= beginning_letter  <= 'l':
+                    self.fields['backup_time'].initial = Choice.objects.get(parent__code='SERVER_BACKUP_TIME', code='2200').id
+                else:
+                    self.fields['backup_time'].initial = Choice.objects.get(parent__code='SERVER_BACKUP_TIME', code='0000').id
                 windows = True
                 self.fields['backup_time'].disabled = True
-                self.fields['backup_time'].initial = Choice.objects.get(parent__code='SERVER_BACKUP_TIME', code='1800').id
+                self.fields['backup_time'].label = "OS Daily Backup Time"
                 self.fields['patch_day'].disabled = True
                 self.fields['patch_day'].initial = Choice.objects.get(parent__code='SERVER_PATCH_DATE', code='SAT').id
                 self.fields['patch_time'].disabled = True
@@ -873,11 +873,28 @@ class ServerSupportForm(TabForm):
             else:
                 windows = False
 
-        if kwargs['request'].POST.get('managed', mang) == 'unmang' or not windows:
-            self.fields.pop('patch_day')
-            self.fields.pop('patch_time')
-            self.fields.pop('reboot_day')
-            self.fields.pop('reboot_time')
+        if windows:
+            # Remove specific choices from the patch_day field
+            patch_days_to_remove = ['Monday', 'Tuesday', 'Wednesday']
+            self.fields['patch_day'].choices = [
+                choice for choice in self.fields['patch_day'].choices
+                if choice[1] not in patch_days_to_remove
+            ]
+        else:
+            if self.fields.get('reboot_day'):
+                self.fields.pop('reboot_day')
+            if self.fields.get('reboot_time'):
+                self.fields.pop('reboot_time')
+
+        if kwargs['request'].POST.get('managed', mang) == 'unmang' or kwargs['request'].POST.get('managed') == 'False':
+            if self.fields.get('patch_day'):
+                self.fields.pop('patch_day')
+            if self.fields.get('patch_time'):
+                self.fields.pop('patch_time')
+            if self.fields.get('reboot_day'):
+                self.fields.pop('reboot_day')
+            if self.fields.get('reboot_time'):
+                self.fields.pop('reboot_time')
 
         if kwargs['request'].POST.get('backup') == 'False':
             self.fields.pop('backup_time')
@@ -892,6 +909,9 @@ class ServerSupportForm(TabForm):
         }
 
         patch_day_map = {
+            '363': 'MONDAY',
+            '362': 'TUESDAY',
+            '361': 'WEDNESDAY',
             '96': 'THURSDAY',
             '97': 'FRIDAY',
             '98': 'SATURDAY',
@@ -934,17 +954,6 @@ class ServerSupportForm(TabForm):
         patch_day = self.cleaned_data.get('patch_day')
         patch_time = self.cleaned_data.get('patch_time')
 
-        # if patch_time == '49':
-        #     if reboot_time == '51' or reboot_time == '52' or reboot_time == '53':
-        #         if patch_day == '96' and reboot_day == '108':
-        #             error = True
-        #         if patch_day == '97' and reboot_day == '109':
-        #             error = True
-        #         if patch_day == '98' and reboot_day == '103':
-        #             error = True
-        #         if patch_day == '99' and reboot_day == '104':
-        #             error = True
-
         #This checks that a reboot isnt scheduled early morning the following day if patch time is at 11pm
         # Check if patch_time is '49'(11pm) and reboot_time is one of '51', '52', or '53'(12:00am, 12:30am, 1:00am the following day)
         if patch_time == '49' and reboot_time in ['51', '52', '53']:
@@ -953,13 +962,12 @@ class ServerSupportForm(TabForm):
                 # Set the error flag to True if the conditions are met
                 error = True
 
-
         # Check if the corresponding values exist in both the reboot_day_map and patch_day_map
         if reboot_day_map.get(reboot_day) and patch_day_map.get(patch_day):
             # Check if the values for reboot_day and patch_day match
             if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
                 # Check if patch_time is one of the specified values
-                if patch_time in [ '38', '39', '40', '41'] :
+                if patch_time in ['38', '39', '40', '41']:
                     # Calculate the time difference between patch_time and reboot_time
                     time_difference = patch_time_map[patch_time] - reboot_time_map[reboot_time]
                     # Check if the time difference is within the desired range
@@ -967,18 +975,11 @@ class ServerSupportForm(TabForm):
                         # Set the error flag to True if all conditions are satisfied
                         error = True
 
-
-        # if reboot_day_map[reboot_day] and patch_day_map[patch_day]:
-        #     if reboot_day_map[reboot_day] == patch_day_map[patch_day]:
-        #         if patch_time == 38 or 39 or 40 or 41:
-        #             if patch_time_map[patch_time] - reboot_time_map[reboot_time] >= -2 and patch_time_map[patch_time] - reboot_time_map[reboot_time] <= 0:
-        #                 error = True
-
         if error:
             raise ValidationError("Reboot time cannot be within 2 hours of patch time.")
         super().clean()
 
-
+        return reboot_time
 
 class ServerDataForm(TabForm):
     template = 'order/server_data.html'
@@ -1072,11 +1073,9 @@ class ServerSpecForm(TabForm):
             self.initial['production'] = str(self.instance.production)
 
             if 'indows' in self.instance.os.label:  # Managed Linux can't edit disk
-                print('windos')
                 self.fields['size_edit'].initial = 1
             elif 'anaged' not in self.instance.os.label: 
                 self.fields['size_edit'].initial = 1
-                print('not managed')
 
         if self.request.POST.get('database'):
             self.set_database_defaults()
@@ -1142,8 +1141,8 @@ class ServerSpecForm(TabForm):
 
             base_size = float(database_size) / 10
             fifteen_percent = math.ceil(base_size * .15) * 10
-            thirty_percent = math.ceil(base_size * .3) * 10
-
+            thirty_percent = fifteen_percent * 2
+            ##thirty_percent = math.ceil(base_size * .3) * 10
             if ram < 8:
                 paging_disk = 60
             else:
@@ -1160,7 +1159,7 @@ class ServerSpecForm(TabForm):
         else:
             self.fields['cpu'].widget.attrs.update({'data-server': 99, 'min': 2})
             self.fields['cpu'].initial = 2
-            self.fields['misevos'].initial = 8
+            self.fields['misevos'].initial = 341
             self.disk_list =[{'name': 'disk0', 'size': '50', 'uom': 'GB', 'state': 'disabled'},
                                 {'name': 'disk1', 'size': database_size, 'uom': 'GB', 'state': 'disabled'},
                                 {'name': 'disk2', 'size': database_size, 'uom': 'GB', 'state': 'disabled'}]
@@ -1217,20 +1216,10 @@ class ServerSpecForm(TabForm):
 
             if len(servername) > 0:
                 self.add_error('serverName', f'A server named {name.lower()} already exists. Please choose a different name.')
-                
-            #data sanitization
-            for i in range(len(name)):
-                #server names can only have one dash  
-                if name[i] == "-" and name[i+1] == '-':
-                    self.add_error('serverName', 'This server can only have one dash in the name.')
-                    break
-                
-                #server names cannot contain underscores
-                if name[i] == '_':
-                    self.add_error('serverName', 'Server names cannot contain underscores.')
-                    break
-            
-            
+
+            import re
+            if not re.match('^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$', name):
+                self.add_error('serverName', 'Name can contain letters, numbers, and single hypens.') 
 
             # managed windows name can't exceed 15 char:
             if len(name) > 15:
@@ -1565,7 +1554,6 @@ class DatabaseForm(ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(DatabaseForm, self).__init__(*args, **kwargs)
-        print('here')
         self.user = user
         group_list = MCommunity().get_groups(user.username)
 
@@ -1622,14 +1610,6 @@ class AddSMSForm(forms.Form):
                     self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
                     self.phone_numbers = None
                     break
-                else:
-                    dept = UmMpathDwCurrDepartment.objects.get(deptid=loc.deptid)
-                    print(dept.dept_grp_campus)
-                    if dept.dept_grp_campus == 'UM_FLINT':
-                        self.add_error('uniqname', f'Flint not rolling out SMS until fall 2024 (dept {loc.deptid}).') 
-                        self.fields['uniqname'].widget.attrs.update({'class': ' is-invalid form-control'})
-                        self.phone_numbers = None
-                        break
                 
         else:
             self.add_error('uniqname', zoom.get('message')) 

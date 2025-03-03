@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>{{ title }}</h1>
+<form>
+    <div class="col-3">
+        <b><label for="phone_number" class="form-label">Enter Phone Number to Search:</label></b>
+        <input name="phone_number" placeholder="e.g. 7347642700" type="phone" class="form-control" id="id_phone_number" aria-describedby="phone_number">
+        <button type="submit" class="btn btn-primary">Generate Report</button>
+    </div>
+</form>
+
+<div>
+    <p>{{ message }}</p>
+</div>
+
+{% if phone_number %}
+<div>
+    <b>Phone Number  {{ phone_number }}</b>
+    {% if not totals %}
+    <p>No call data found.</p>
+    {% endif %}
+    <table class="table">
+
+        {% for rec in totals %}
+
+            {% if forloop.first %}
+            <tr>
+                {% for heading in headings %}
+                    <th>{{ heading }}</th>
+                {% endfor %}
+            </tr>
+            {% endif %}
+
+            <tr>
+                {% for key, value in rec.items %}
+                <td>{{ value|default_if_none:"-" }}</td>
+                {% endfor %}
+
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}
