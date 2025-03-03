@@ -16,6 +16,12 @@ urlpatterns = [
     path('actionlog/', views.get_action_log),
     path('actionlog/<int:id>/', views.get_action_log_entry),
     path('confirmation/', views.get_confirmation),
+    path('estimate-history/', views.view_estimate_history),
+    path('tech-search/', views.tech_search, name='tech-search'),
+    path('show-workorders/', views.show_workorders, name='show-workorders'),
+    path('actual-vs-estimate-open/', views.actual_v_estimate, name='actual-vs-estimate-open'),
+    path('actual-vs-estimate-completed/', views.actual_v_estimate, name='actual-vs-estimate-completed'),
+    #path('estimate-mockup/', views.estimate_mockup, name='estimate-mockup'),
     path(r'', views.load_rte),
     
 ]

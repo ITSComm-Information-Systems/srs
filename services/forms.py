@@ -267,6 +267,7 @@ class ContainerNewForm(CloudForm):
     def clean(self):
         # Check all uniqnames in a single call for efficiency porpoises
         uniqnames = []
+        all_users = []
         cleaned_names = {}
         for users in ['admins', 'editors', 'viewers']:
             cleaned_names[users] = []
@@ -274,6 +275,9 @@ class ContainerNewForm(CloudForm):
                 user = user.strip('\r, ')
                 uniqnames.append(user)
                 cleaned_names[users].append(user)
+                all_users.append(user)
+
+        cleaned_names['all'] = list(set(all_users))
 
         valid_uniqnames = MCommunity().check_user_list(uniqnames)
 

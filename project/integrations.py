@@ -189,7 +189,12 @@ class Openshift():
         url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
 
         for users in instance.cleaned_names:
-            role = users[:-1]
+
+            if users == 'all':
+                role = 'cluster-logging-application-view'
+            else:
+                role = users[:-1]   # admins becomes admin, etc.
+
             uniqnames = instance.cleaned_names[users]
             if len(uniqnames) > 0:
 
