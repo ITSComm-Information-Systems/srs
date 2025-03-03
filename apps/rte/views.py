@@ -749,10 +749,15 @@ def actual_v_estimate(request):
         # Dictionary to accumulate hours for each group and uniqname
         group_uniqname_hours = {}
         total_group_hours = {}  # Dictionary to accumulate total hours per group
+
+        drafting_group_submitted_hours = 0.00
         facilities_group_submitted_hours = 0.00
         network_group_submitted_hours = 0.00
         video_group_submitted_hours = 0.00
+        project_manager_group_submitted_hours = 0.00
 
+        project_manager_group_hover_string = ''
+        drafting_group_hover_string = ''
         network_group_hover_string = ''
         facilities_group_hover_string = ''
         video_group_hover_string = ''
@@ -765,10 +770,14 @@ def actual_v_estimate(request):
             hours = hh + mm / 60  # Convert to total hours
             if group == 'Network Engineering':
                 network_group_submitted_hours += hours
+            elif group == 'Drafting':
+                drafting_group_submitted_hours += hours
             elif group == 'Facilities Eng':
                 facilities_group_submitted_hours += hours
             elif group == 'Video Eng':
                 video_group_submitted_hours += hours
+            elif group == 'Proj Mgr':
+                project_manager_group_submitted_hours += hours
 
 
             if group not in group_uniqname_hours:
@@ -788,26 +797,39 @@ def actual_v_estimate(request):
             for uniqname, total_hours in uniqnames.items():
                 if group == 'Network Engineering':
                     network_group_hover_string += f"{uniqname}: {total_hours} | "
+                elif group == 'Drafting':
+                    drafting_group_hover_string += f"{uniqname}: {total_hours} | "
                 elif group == 'Facilities Eng':
                     facilities_group_hover_string += f"{uniqname}: {total_hours} | "
                 elif group == 'Video Eng':
                     video_group_hover_string += f"{uniqname}: {total_hours} | "
+                elif group == 'Proj Mgr':
+                    project_manager_group_hover_string += f"{uniqname}: {total_hours} | "
 
         
         estimate.group_uniqname_hours = group_uniqname_hours
         estimate.total_group_hours = total_group_hours
+
+        estimate.drafting_group_submitted_hours = drafting_group_submitted_hours
         estimate.network_group_submitted_hours = network_group_submitted_hours
         estimate.facilities_group_submitted_hours = facilities_group_submitted_hours
         estimate.video_group_submitted_hours = video_group_submitted_hours
+        estimate.project_manager_group_submitted_hours = project_manager_group_submitted_hours
+
+        estimate.project_manager_group_hover_string = project_manager_group_hover_string
+        estimate.drafting_group_hover_string = drafting_group_hover_string
         estimate.network_group_hover_string = network_group_hover_string
         estimate.facilities_group_hover_string = facilities_group_hover_string
         estimate.video_group_hover_string = video_group_hover_string
 
         # Calculate group hours from labor
         group_hours = {}
+
+        drafting_estimated_hours = 0.00
         facilities_estimated_hours = 0.00
         network_estimated_hours = 0.00
         video_estimated_hours = 0.00
+        project_manager_estimated_hours = 0.00
 
         for l in labor:
             if l.group not in group_hours:
@@ -818,26 +840,40 @@ def actual_v_estimate(request):
         for group in group_hours:
             if group.name == 'Facilities Eng.':
                 facilities_estimated_hours = group_hours[group]
+            elif group.name == 'Drafting':
+                drafting_estimated_hours = group_hours[group]
             elif group.name == 'Network Eng':
                 network_estimated_hours = group_hours[group]
             elif group.name == 'Video Eng':
                 video_estimated_hours = group_hours[group]
+            elif group.name == 'Project Mgt':
+                project_manager_estimated_hours = group_hours[group]
 
+        estimate.drafting_group_estimated_hours = drafting_estimated_hours
         estimate.facilities_group_estimated_hours = facilities_estimated_hours
         estimate.network_group_estimated_hours = network_estimated_hours
         estimate.video_group_estimated_hours = video_estimated_hours
+        estimate.project_manager_group_estimated_hours = project_manager_estimated_hours
         # Determine cell_class for each group
+        drafting_group_cell_class = ''
         facilities_group_cell_class = ''
         network_group_cell_class = ''
         video_group_cell_class = ''
+        project_manager_group_cell_class = ''
 
         #convert to float
         facilities_group_submitted_hours = float(facilities_group_submitted_hours)
         network_group_submitted_hours = float(network_group_submitted_hours)
         video_group_submitted_hours = float(video_group_submitted_hours)
+        drafting_group_submitted_hours = float(drafting_group_submitted_hours)
+        project_manager_group_submitted_hours = float(project_manager_group_submitted_hours)
+
+
+        drafting_estimated_hours = float(drafting_estimated_hours)
         facilities_estimated_hours = float(facilities_estimated_hours)
         network_estimated_hours = float(network_estimated_hours)
         video_estimated_hours = float(video_estimated_hours)
+        project_manager_estimated_hours = float(project_manager_estimated_hours)
 
 
         if facilities_group_submitted_hours > facilities_estimated_hours:
@@ -867,9 +903,29 @@ def actual_v_estimate(request):
         elif video_group_submitted_hours < video_estimated_hours:
             video_group_cell_class = 'table-success'
 
+        if drafting_group_submitted_hours > drafting_estimated_hours:
+            drafting_group_cell_class = 'table-danger'
+            pass
+        elif drafting_group_submitted_hours > drafting_estimated_hours * 0.8:
+            drafting_group_cell_class = 'table-warning'
+            pass
+        elif drafting_group_submitted_hours < drafting_estimated_hours:
+            drafting_group_cell_class = 'table-success'
+
+        if project_manager_group_submitted_hours > project_manager_estimated_hours:
+            project_manager_group_cell_class = 'table-danger'
+            pass
+        elif project_manager_group_submitted_hours > project_manager_estimated_hours * 0.8:
+            project_manager_group_cell_class = 'table-warning'
+            pass
+        elif project_manager_group_submitted_hours < project_manager_estimated_hours:
+            project_manager_group_cell_class = 'table-success'
+
+        estimate.drafting_group_cell_class = drafting_group_cell_class
         estimate.facilities_group_cell_class = facilities_group_cell_class
         estimate.network_group_cell_class = network_group_cell_class
         estimate.video_group_cell_class = video_group_cell_class
+        estimate.project_manager_group_cell_class = project_manager_group_cell_class
 
     context = {
         'title': 'Actual vs Estimated Hours',
