@@ -680,21 +680,27 @@ def calculate_hours_and_classes(input_entries, labor):
         'Drafting': 0.00,
         'Facilities Eng': 0.00,
         'Video Eng': 0.00,
-        'Proj Mgr': 0.00
+        'Proj Mgr': 0.00,
+        'Network Operation': 0.00,
+        'OSP Tech': 0.00
     }
     group_hover_strings = {
         'Network Engineering': '',
         'Drafting': '',
         'Facilities Eng': '',
         'Video Eng': '',
-        'Proj Mgr': ''
+        'Proj Mgr': '',
+        'Network Operation': '',
+        'OSP Tech': ''
     }
     group_cell_classes = {
         'Network Engineering': '',
         'Drafting': '',
         'Facilities Eng': '',
         'Video Eng': '',
-        'Proj Mgr': ''
+        'Proj Mgr': '',
+        'Network Operation': '',
+        'OSP Tech': ''
     }
 
     #um_bom_labor_group_v - NAME
@@ -703,7 +709,10 @@ def calculate_hours_and_classes(input_entries, labor):
         'Drafting': 0.00,
         'Facilities Eng.': 0.00,
         'Video Eng': 0.00,
-        'Project Mgt': 0.00
+        'Project Mgt': 0.00,
+        'Network Ops': 0.00,
+        'FSU - OSP': 0.00,
+        'FSU - ISP': 0.00
     }
     
 
@@ -789,26 +798,44 @@ def actual_v_estimate(request):
 
         estimate.group_uniqname_hours = hours_and_classes['group_uniqname_hours']
         estimate.total_group_hours = hours_and_classes['total_group_hours']
+
         estimate.drafting_group_submitted_hours = hours_and_classes['group_submitted_hours']['Drafting']
         estimate.network_group_submitted_hours = hours_and_classes['group_submitted_hours']['Network Engineering']
         estimate.facilities_group_submitted_hours = hours_and_classes['group_submitted_hours']['Facilities Eng']
         estimate.video_group_submitted_hours = hours_and_classes['group_submitted_hours']['Video Eng']
         estimate.project_manager_group_submitted_hours = hours_and_classes['group_submitted_hours']['Proj Mgr']
+        estimate.network_ops_group_submitted_hours = hours_and_classes['group_submitted_hours']['Network Operation']
+        estimate.osp_tech_group_submitted_hours = hours_and_classes['group_submitted_hours']['OSP Tech']
+
+
         estimate.project_manager_group_hover_string = hours_and_classes['group_hover_strings']['Proj Mgr']
         estimate.drafting_group_hover_string = hours_and_classes['group_hover_strings']['Drafting']
         estimate.network_group_hover_string = hours_and_classes['group_hover_strings']['Network Engineering']
         estimate.facilities_group_hover_string = hours_and_classes['group_hover_strings']['Facilities Eng']
         estimate.video_group_hover_string = hours_and_classes['group_hover_strings']['Video Eng']
-        estimate.drafting_group_estimated_hours = hours_and_classes['group_estimated_hours']['Drafting']
-        estimate.facilities_group_estimated_hours = hours_and_classes['group_estimated_hours']['Facilities Eng.']
-        estimate.network_group_estimated_hours = hours_and_classes['group_estimated_hours']['Network Eng']
-        estimate.video_group_estimated_hours = hours_and_classes['group_estimated_hours']['Video Eng']
-        estimate.project_manager_group_estimated_hours = hours_and_classes['group_estimated_hours']['Project Mgt']
+        estimate.network_ops_group_hover_string = hours_and_classes['group_hover_strings']['Network Operation']
+        estimate.osp_tech_group_hover_string = hours_and_classes['group_hover_strings']['OSP Tech']
+
+        
         estimate.drafting_group_cell_class = hours_and_classes['group_cell_classes']['Drafting']
         estimate.facilities_group_cell_class = hours_and_classes['group_cell_classes']['Facilities Eng']
         estimate.network_group_cell_class = hours_and_classes['group_cell_classes']['Network Engineering']
         estimate.video_group_cell_class = hours_and_classes['group_cell_classes']['Video Eng']
         estimate.project_manager_group_cell_class = hours_and_classes['group_cell_classes']['Proj Mgr']
+        estimate.network_ops_group_cell_class = hours_and_classes['group_cell_classes']['Network Operation']
+        estimate.osp_tech_group_cell_class = hours_and_classes['group_cell_classes']['OSP Tech']
+
+
+        estimate.drafting_group_estimated_hours = hours_and_classes['group_estimated_hours']['Drafting']
+        estimate.facilities_group_estimated_hours = hours_and_classes['group_estimated_hours']['Facilities Eng.']
+        estimate.network_group_estimated_hours = hours_and_classes['group_estimated_hours']['Network Eng']
+        estimate.video_group_estimated_hours = hours_and_classes['group_estimated_hours']['Video Eng']
+        estimate.project_manager_group_estimated_hours = hours_and_classes['group_estimated_hours']['Project Mgt']
+        estimate.network_ops_group_estimated_hours = hours_and_classes['group_estimated_hours']['Network Ops']
+        estimate.osp_tech_group_estimated_hours = hours_and_classes['group_estimated_hours']['FSU - OSP']
+
+
+        
 
     context = {
         'title': 'Actual vs Estimated Hours',
