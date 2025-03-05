@@ -143,7 +143,7 @@ def edit_project(request):
         project = Project.objects.get(id=project_id)
         engineer = project.netops_engineer
     else:
-        project = Project()
+        project, created = Project.objects.get_or_create(woid=woid)
         project.woid = woid
         engineer = ''
 

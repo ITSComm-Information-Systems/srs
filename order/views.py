@@ -329,7 +329,7 @@ class ManageChartcom(PermissionRequiredMixin, View):
             chartcom.save()
 
         if action == 'delete':
-            x = Chartcom.objects.get(id=id).delete()
+            x = Chartcom.objects.filter(id=id).update(active=False)
 
         return HttpResponseRedirect('/orders/chartcom/' + deptid)
 
@@ -351,7 +351,7 @@ class ManageChartcom(PermissionRequiredMixin, View):
                 department = ''
                 deptid = 0
 
-        chartcoms = Chartcom.objects.filter(dept=deptid)
+        chartcoms = Chartcom.objects.filter(dept=deptid, active=True)
         add_chartcoms = UmOscChartfieldV.objects.filter(deptid=deptid)
 
         short_code_list = {}
@@ -644,7 +644,7 @@ class Workflow(UserPassesTestMixin, View):
                 f.charge_types = ChargeType.objects.filter(action__id=action_id).order_by('display_seq_no')
                 f.dept_list = Chartcom.get_user_chartcom_depts(request.user.id) #['12','34','56']
                 #f.chartcom_list = Chartcom.get_user_chartcoms(request.user.id)
-                f.chartcom_list = UserChartcomV.objects.filter(user=request.user).order_by('name')
+                f.chartcom_list = UserChartcomV.objects.filter(user=request.user, active=True).order_by('name')
                 tab.form = f
 
             elif tab.custom_form == 'StaticForm':
@@ -826,8 +826,10 @@ class Services(UserPassesTestMixin, View):
                                    {'label': 'Create Network','target': '/services/midesktop-network/add'},
                                    {'label': 'View/Change Network','target': '/services/midesktop-network/'}]
             elif service.name == 'container':
-                service.actions = [{'label': 'Request Container Project', 'target': '/services/container/add/',
-                                    'description': 'The ITS Container Service hosts containerized applications. A Container Project is a development environment for creating or hosting a containerized app.'}]
+                service.actions = [{'label': 'Request AWS Container Project', 'target': '/services/container/add/',
+                                    'description': 'The ITS Container Service hosts containerized applications. A Container Project is a development environment for creating or hosting a containerized app.'},
+                                    {'label': 'Request On-Campus Container Project', 'target': '/services/oncampuscontainer/add/',
+                                    'description': 'The ITS On-Campus Container Service hosts containerized applications on-campus. A Container Project is a development environment for creating or hosting a containerized app.'}]
             else:
                 service.actions = action_list.filter(service=service)
                 for action in service.actions:

@@ -22,6 +22,19 @@
         <div class="tab-pane fade {{ service.active }}" id="{{ service.name }}" role="tabpanel" aria-labelledby="v-pills-profile-tab">
             <div class="row service" id="{{service.name}}" name="serviceCards">
                 <h3 class="lead">{{ service }}</h3>
+                
+                {% if service.name == 'container' %}
+                    <div class="row">
+                        <div class="alert alert-warning ms-2" >
+                            
+                            <p>The Container Service hosts applications in the AWS US East (Ohio) region and in on-campus data centers. The AWS multi-Availability Zone model generally provides 
+                                the highest uptime. As such, most applications will benefit from running in AWS. If your application requires low latency access to an existing on-campus database, 
+                                the Data Warehouse, or an existing on-campus MiStorage share, then the on-campus hosting option would likely be the best option. If you would like to consult with Container 
+                                Service staff prior to making a decision, email <a href="its-container-service-support@umich.edu">its-container-service-support@umich.edu</a></p>
+                        </div>
+                    </div>
+                {% endif %}
+                
                 <div class="col-md-12 card-deck">
                     {% for action in service.actions %}
                     <div class="card col-12">
