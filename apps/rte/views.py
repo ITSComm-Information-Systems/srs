@@ -669,7 +669,6 @@ def format_time(total_hours):
     total_hours = str(hours) + ':' + str(mins)
     return total_hours
 
-
 def calculate_hours_and_classes(input_entries, labor):
     group_uniqname_hours = {}
     total_group_hours = {}
@@ -768,6 +767,7 @@ def calculate_hours_and_classes(input_entries, labor):
         'group_cell_classes': group_cell_classes
     }
 
+
 @permission_required('bom.can_access_bom')
 def actual_v_estimate(request):
     username = request.user.username
@@ -783,7 +783,6 @@ def actual_v_estimate(request):
         unfiltered_estimates = EstimateView.objects.filter(
             Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
         ).filter(status__in=['Completed'])
-
     estimates = []
     for estimate in unfiltered_estimates:
         estimates.append(estimate)
@@ -833,10 +832,6 @@ def actual_v_estimate(request):
         estimate.project_manager_group_estimated_hours = hours_and_classes['group_estimated_hours']['Project Mgt']
         estimate.network_ops_group_estimated_hours = hours_and_classes['group_estimated_hours']['Network Ops']
         estimate.osp_tech_group_estimated_hours = hours_and_classes['group_estimated_hours']['FSU - OSP']
-
-
-        
-
     context = {
         'title': 'Actual vs Estimated Hours',
         'estimates': estimates

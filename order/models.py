@@ -235,6 +235,7 @@ class Constant(models.Model):
 
 
 class Chartcom(models.Model):
+    active = models.BooleanField(default=True)
     fund = models.CharField(max_length=30)
     dept = models.CharField(max_length=30)
     program = models.CharField(max_length=30)
@@ -254,7 +255,7 @@ class Chartcom(models.Model):
         return account_number
 
     def get_user_chartcoms(self):
-        chartcom_list = UserChartcomV.objects.filter(user=self).order_by('name')
+        chartcom_list = UserChartcomV.objects.filter(user=self, active=True).order_by('name')
         #user_chartcoms = []
         
         #for chartcom in chartcom_list:
@@ -263,7 +264,7 @@ class Chartcom(models.Model):
         return chartcom_list
 
     def get_user_chartcom_depts(self):
-        dept_list = UserChartcomV.objects.filter(user=self).order_by('dept').values('dept').distinct()
+        dept_list = UserChartcomV.objects.filter(user=self, active=True).order_by('dept').values('dept').distinct()
         user_chartcom_depts = []
         
 
@@ -276,7 +277,7 @@ class Chartcom(models.Model):
     def get_user_chartcoms_for_dept(self, dept):
 
         if self.has_perm('can_order_all'):
-            chartcom_list = Chartcom.objects.filter(dept=dept)
+            chartcom_list = Chartcom.objects.filter(dept=dept, active=True)
             cc_list = []
             for cc in chartcom_list:
                 item = vars(cc)
@@ -287,7 +288,7 @@ class Chartcom(models.Model):
             chartcom_list = cc_list
             
         else:
-            chartcom_list = list(UserChartcomV.objects.filter(user=self, dept=dept).order_by('name').values())
+            chartcom_list = list(UserChartcomV.objects.filter(user=self, dept=dept, active=True).order_by('name').values())
 
         return chartcom_list
 
@@ -295,6 +296,7 @@ class Chartcom(models.Model):
 class UserChartcomV(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     chartcom = models.ForeignKey(Chartcom, on_delete=models.DO_NOTHING)
+    active = models.BooleanField(default=True)
     name = models.CharField(max_length=20, blank=True, primary_key=True)
     dept = models.CharField(max_length=30)
     account_number = models.CharField(max_length=30)
