@@ -1,14 +1,16 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
-from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput
+from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput, UmOscPreorderApiAbstract
 from project.models import ActionLog
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
 from django.db import connections
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models.functions import ExtractWeek
+from django.core import serializers
+from ..bom.models import Workorder, Estimate, PreOrder, Labor, EstimateView
 
 # Base RTE view
 @permission_required('rte.add_umrteinput', raise_exception=True)
@@ -666,3 +668,177 @@ def format_time(total_hours):
         mins = '0' + str(mins)
     total_hours = str(hours) + ':' + str(mins)
     return total_hours
+
+
+def calculate_hours_and_classes(input_entries, labor):
+    group_uniqname_hours = {}
+    total_group_hours = {}
+
+    #UM_RTE_LABOR_GROUP_V - WO_GROUP_CODE
+    group_submitted_hours = {
+        'Network Engineering': 0.00,
+        'Drafting': 0.00,
+        'Facilities Eng': 0.00,
+        'Video Eng': 0.00,
+        'Proj Mgr': 0.00,
+        'Network Operation': 0.00,
+        'OSP Tech': 0.00
+    }
+    group_hover_strings = {
+        'Network Engineering': '',
+        'Drafting': '',
+        'Facilities Eng': '',
+        'Video Eng': '',
+        'Proj Mgr': '',
+        'Network Operation': '',
+        'OSP Tech': ''
+    }
+    group_cell_classes = {
+        'Network Engineering': '',
+        'Drafting': '',
+        'Facilities Eng': '',
+        'Video Eng': '',
+        'Proj Mgr': '',
+        'Network Operation': '',
+        'OSP Tech': ''
+    }
+
+    #um_bom_labor_group_v - NAME
+    group_estimated_hours = {
+        'Network Eng': 0.00,
+        'Drafting': 0.00,
+        'Facilities Eng.': 0.00,
+        'Video Eng': 0.00,
+        'Project Mgt': 0.00,
+        'Network Ops': 0.00,
+        'FSU - OSP': 0.00,
+        'FSU - ISP': 0.00
+    }
+    
+
+    for input_entry in input_entries:
+        if input_entry.wo_group_code in group_submitted_hours:
+            uniqname = input_entry.uniqname
+            group = input_entry.wo_group_code
+            hh, mm = map(int, input_entry.actual_mins_display.split(':'))
+            hours = hh + mm / 60
+            group_submitted_hours[group] += hours
+
+            if group not in group_uniqname_hours:
+                group_uniqname_hours[group] = {}
+            if uniqname not in group_uniqname_hours[group]:
+                group_uniqname_hours[group][uniqname] = 0
+            group_uniqname_hours[group][uniqname] += hours
+
+            if group not in total_group_hours:
+                total_group_hours[group] = 0
+            total_group_hours[group] += hours
+
+    for group, uniqnames in group_uniqname_hours.items():
+        uniqname_strings = [f"{uniqname}: {total_hours}" for uniqname, total_hours in uniqnames.items()]
+        group_hover_strings[group] = " | ".join(uniqname_strings)
+            
+    for l in labor:
+        if l.group.name in group_estimated_hours.keys():
+            group_estimated_hours[l.group.name] += float(l.hours)
+
+    group_submitted_hours_list = list(group_submitted_hours.items())
+    group_estimated_hours_list = list(group_estimated_hours.items())
+
+    for counter in range(len(group_hover_strings)):
+        group = group_submitted_hours_list[counter][0]
+        submitted_hours = group_submitted_hours_list[counter][1]
+        estimated_hours = group_estimated_hours_list[counter][1]
+
+        if estimated_hours == 0 and submitted_hours == 0:
+            group_cell_classes[group] = ''
+        elif submitted_hours > estimated_hours:
+            group_cell_classes[group] = 'table-danger'
+        elif submitted_hours > estimated_hours * 0.8:
+            group_cell_classes[group] = 'table-warning'
+        else:
+            group_cell_classes[group] = 'table-success'
+
+    return {
+        'group_uniqname_hours': group_uniqname_hours,
+        'total_group_hours': total_group_hours,
+        'group_submitted_hours': group_submitted_hours,
+        'group_hover_strings': group_hover_strings,
+        'group_estimated_hours': group_estimated_hours,
+        'group_cell_classes': group_cell_classes
+    }
+
+@permission_required('bom.can_access_bom')
+def actual_v_estimate(request):
+    username = request.user.username
+    url = request.path.strip('/').split('/')
+    slug = url[-1]
+    if slug == 'actual-vs-estimate-open':
+        template = loader.get_template('rte/view/actual-vs-estimate-open.html')
+        unfiltered_estimates = EstimateView.objects.filter(
+            Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
+        ).exclude(status__in=['Rejected', 'Cancelled', 'Completed'])
+    else:
+        template = loader.get_template('rte/view/actual-vs-estimate-completed.html')
+        unfiltered_estimates = EstimateView.objects.filter(
+            Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
+        ).filter(status__in=['Completed'])
+
+    estimates = []
+    for estimate in unfiltered_estimates:
+        estimates.append(estimate)
+
+    for estimate in estimates:
+        labor = Labor.objects.filter(estimate_id=estimate.id)
+        service_order = UmRteServiceOrderV.objects.filter(pre_order_number=estimate.pre_order_number)
+        full_prord_wo_number = service_order[0].full_prord_wo_number if service_order else None
+        input_entries = UmRteInput.objects.filter(full_prord_wo_number=full_prord_wo_number) if full_prord_wo_number else []
+
+        hours_and_classes = calculate_hours_and_classes(input_entries, labor)
+
+        estimate.group_uniqname_hours = hours_and_classes['group_uniqname_hours']
+        estimate.total_group_hours = hours_and_classes['total_group_hours']
+
+        estimate.drafting_group_submitted_hours = hours_and_classes['group_submitted_hours']['Drafting']
+        estimate.network_group_submitted_hours = hours_and_classes['group_submitted_hours']['Network Engineering']
+        estimate.facilities_group_submitted_hours = hours_and_classes['group_submitted_hours']['Facilities Eng']
+        estimate.video_group_submitted_hours = hours_and_classes['group_submitted_hours']['Video Eng']
+        estimate.project_manager_group_submitted_hours = hours_and_classes['group_submitted_hours']['Proj Mgr']
+        estimate.network_ops_group_submitted_hours = hours_and_classes['group_submitted_hours']['Network Operation']
+        estimate.osp_tech_group_submitted_hours = hours_and_classes['group_submitted_hours']['OSP Tech']
+
+
+        estimate.project_manager_group_hover_string = hours_and_classes['group_hover_strings']['Proj Mgr']
+        estimate.drafting_group_hover_string = hours_and_classes['group_hover_strings']['Drafting']
+        estimate.network_group_hover_string = hours_and_classes['group_hover_strings']['Network Engineering']
+        estimate.facilities_group_hover_string = hours_and_classes['group_hover_strings']['Facilities Eng']
+        estimate.video_group_hover_string = hours_and_classes['group_hover_strings']['Video Eng']
+        estimate.network_ops_group_hover_string = hours_and_classes['group_hover_strings']['Network Operation']
+        estimate.osp_tech_group_hover_string = hours_and_classes['group_hover_strings']['OSP Tech']
+
+        
+        estimate.drafting_group_cell_class = hours_and_classes['group_cell_classes']['Drafting']
+        estimate.facilities_group_cell_class = hours_and_classes['group_cell_classes']['Facilities Eng']
+        estimate.network_group_cell_class = hours_and_classes['group_cell_classes']['Network Engineering']
+        estimate.video_group_cell_class = hours_and_classes['group_cell_classes']['Video Eng']
+        estimate.project_manager_group_cell_class = hours_and_classes['group_cell_classes']['Proj Mgr']
+        estimate.network_ops_group_cell_class = hours_and_classes['group_cell_classes']['Network Operation']
+        estimate.osp_tech_group_cell_class = hours_and_classes['group_cell_classes']['OSP Tech']
+
+
+        estimate.drafting_group_estimated_hours = hours_and_classes['group_estimated_hours']['Drafting']
+        estimate.facilities_group_estimated_hours = hours_and_classes['group_estimated_hours']['Facilities Eng.']
+        estimate.network_group_estimated_hours = hours_and_classes['group_estimated_hours']['Network Eng']
+        estimate.video_group_estimated_hours = hours_and_classes['group_estimated_hours']['Video Eng']
+        estimate.project_manager_group_estimated_hours = hours_and_classes['group_estimated_hours']['Project Mgt']
+        estimate.network_ops_group_estimated_hours = hours_and_classes['group_estimated_hours']['Network Ops']
+        estimate.osp_tech_group_estimated_hours = hours_and_classes['group_estimated_hours']['FSU - OSP']
+
+
+        
+
+    context = {
+        'title': 'Actual vs Estimated Hours',
+        'estimates': estimates
+    }
+    return HttpResponse(template.render(context, request))
