@@ -15,7 +15,7 @@ handler500 = views.handle_custom_500
 
 urlpatterns = [
 
-    path('apps/', include('apps.urls')),
+    #path('apps/', include('apps.urls')),
     path('', views.homepage),
     re_path(r'^.*$', RedirectView.as_view(url='/', permanent=False)),  # Catch-all redirect
 
