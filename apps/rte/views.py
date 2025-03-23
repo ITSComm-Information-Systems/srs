@@ -567,6 +567,7 @@ def view_time_display(request):
             work_order).order_by('-assigned_date','work_order_display')
         search_topic = 'Work Order'
         search_criteria = work_order
+        total_hours = format_time(results.aggregate(Sum('actual_mins'))['actual_mins__sum'] or 0)
 
     # Search dates
     else:
