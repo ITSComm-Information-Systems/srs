@@ -2,14 +2,11 @@
 {% block content %}
 <h2>{{ title }}</h2>
 
+{% include 'bom/partials/estimate_search_menu.html' %}
 
-<input class="form-control" type="search"
-        name="search" placeholder="Begin Typing To Search Preorders..."
-        hx-post="{% url 'estimate_search_endpoint' %}"
-        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-        hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
-        hx-target="#search-results"
-        hx-indicator=".htmx-indicator">
+
+
+
 
 <span class="htmx-indicator">
     <h5 style="margin-left: 10px;">Searching...</h5>
