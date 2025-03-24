@@ -25,6 +25,6 @@ urlpatterns = [
     path('summary-report/<int:estimate_id>', reports.summary_report),
     path('netops/', views.NetOpsSearch.as_view()),
     path('engineering/', views.EngineeringSearch.as_view()),
-    path('search_mockup/', views.search_mockup, name='search_mockup'),
+    path('open_preorder_search/', views.open_preorder_search, name='open_preorder_search'),
     path('open_preorder_endpoint/', views.open_preorder_endpoint, name='open_preorder_endpoint'),
 ]

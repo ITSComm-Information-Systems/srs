@@ -100,20 +100,20 @@ class Search(PermissionRequiredMixin, View):
                 if 'Project Managers' in assigned_groups:
                     template = 'bom/search_estimates_projectmanagers.html'
 
-        else:  # open_workorder
-            title = 'Search Open Preorders/Workorders'
-            search_list = Workorder.objects.filter(status_name='Open').defer('status_name')
+        # else:  # open_workorder
+        #     title = 'Search Open Preorders/Workorders'
+        #     search_list = Workorder.objects.filter(status_name='Open').defer('status_name')
 
-            for workorder in search_list:
-                if workorder.building_number:
-                    workorder.building = str(workorder.building_number) + ' - ' + workorder.building_name
+        #     for workorder in search_list:
+        #         if workorder.building_number:
+        #             workorder.building = str(workorder.building_number) + ' - ' + workorder.building_name
                 
-                if len(workorder.comment_text) > 80:
-                    workorder.comment = workorder.comment_text[0:80] + '...'
-                else:
-                    workorder.comment = workorder.comment_text
+        #         if len(workorder.comment_text) > 80:
+        #             workorder.comment = workorder.comment_text[0:80] + '...'
+        #         else:
+        #             workorder.comment = workorder.comment_text
 
-            template = 'bom/basic_search.html'
+        #     template = 'bom/basic_search.html'
 
         return render(request, template,
                       {'title': title,
@@ -572,11 +572,11 @@ class EngineeringSearch(PermissionRequiredMixin, View):
                     'search_list': search_list})
 
 @permission_required('bom.can_access_bom')
-def search_mockup(request):
-    template = 'bom/search_mockup.html'
+def open_preorder_search(request):
+    template = 'bom/open_preorder_search.html'
 
     return render(request, template,
-                {'title': 'Search Mockup',
+                {'title': 'Search Open Preorders/Workorders',
                 })
 
 @permission_required('bom.can_access_bom')
