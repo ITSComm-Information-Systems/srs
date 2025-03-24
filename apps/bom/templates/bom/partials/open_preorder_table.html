@@ -1,24 +1,6 @@
 {% load static %}
-<style>
-    .sort-table th {
-        cursor: pointer;
-    }
-    .sort-table th .fa-sort-up,
-    .sort-table th .fa-sort-down {
-        display: none;
-    }
-    .sort-table th .fa-sort {
-        display: inline;
-    }
-    .sort-table th.sorted-asc .fa-sort-up,
-    .sort-table th.sorted-desc .fa-sort-down {
-        display: none;
-    }
-    .sort-table th.sorted-asc .fa-sort,
-    .sort-table th.sorted-desc .fa-sort {
-        display: none;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/common_sort.css' %}">
+
 
 <table id="workorder_table" class="table table-hover table-striped sort-table" aria-live="polite">
     <thead>
