@@ -100,20 +100,20 @@ class Search(PermissionRequiredMixin, View):
                 if 'Project Managers' in assigned_groups:
                     template = 'bom/search_estimates_projectmanagers.html'
 
-        else:  # open_workorder
-            title = 'Search Open Preorders/Workorders'
-            search_list = Workorder.objects.filter(status_name='Open').defer('status_name')
+        # else:  # open_workorder
+        #     title = 'Search Open Preorders/Workorders'
+        #     search_list = Workorder.objects.filter(status_name='Open').defer('status_name')
 
-            for workorder in search_list:
-                if workorder.building_number:
-                    workorder.building = str(workorder.building_number) + ' - ' + workorder.building_name
+        #     for workorder in search_list:
+        #         if workorder.building_number:
+        #             workorder.building = str(workorder.building_number) + ' - ' + workorder.building_name
                 
-                if len(workorder.comment_text) > 80:
-                    workorder.comment = workorder.comment_text[0:80] + '...'
-                else:
-                    workorder.comment = workorder.comment_text
+        #         if len(workorder.comment_text) > 80:
+        #             workorder.comment = workorder.comment_text[0:80] + '...'
+        #         else:
+        #             workorder.comment = workorder.comment_text
 
-            template = 'bom/basic_search.html'
+        #     template = 'bom/basic_search.html'
 
         return render(request, template,
                       {'title': title,
@@ -570,3 +570,45 @@ class EngineeringSearch(PermissionRequiredMixin, View):
         return render(request, template,
                     {'title': 'Engineering Projects',
                     'search_list': search_list})
+
+@permission_required('bom.can_access_bom')
+def open_preorder_search(request):
+    template = 'bom/open_preorder_search.html'
+
+    return render(request, template,
+                {'title': 'Search Open Preorders/Workorders',
+                })
+
+@permission_required('bom.can_access_bom')
+def open_preorder_endpoint(request):
+    if request.method == 'POST':
+        search_query = request.POST.get('search', '')
+        search_list = Workorder.objects.filter(
+            Q(status_name='Open') & (
+                Q(wo_number_display__icontains=search_query) |
+                Q(pre_order_number__icontains=search_query) |
+                Q(status_name__icontains=search_query) |
+                Q(project_display__icontains=search_query) |
+                Q(building_number__icontains=search_query) |
+                Q(building_name__icontains=search_query) |
+                Q(comment_text__icontains=search_query) 
+            )
+        ).defer('status_name')
+
+        for workorder in search_list:
+                if workorder.building_number:
+                    workorder.building = str(workorder.building_number) + ' - ' + workorder.building_name
+                
+                if len(workorder.comment_text) > 80:
+                    workorder.comment = workorder.comment_text[0:80] + '...'
+                else:
+                    workorder.comment = workorder.comment_text
+
+
+    search_list_size = len(search_list)
+    if search_list_size == 0:
+        template = 'bom/no_results.html'
+    else:
+        template = 'bom/open_table.html'
+    return render(request, template,
+                {'search_list': search_list})
