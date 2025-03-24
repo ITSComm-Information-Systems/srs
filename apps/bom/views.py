@@ -570,6 +570,44 @@ class EngineeringSearch(PermissionRequiredMixin, View):
         return render(request, template,
                     {'title': 'Engineering Projects',
                     'search_list': search_list})
+    
+@permission_required('bom.can_access_bom')
+def estimate_search(request):
+    template = 'bom/estimate_search.html'
+    return render(request, template, {'title': 'All Preorders/Workorder w/Estimates'})
+
+def estimate_search_endpoint(request):
+    # Get the search query and selected statuses
+    search_query = request.POST.get('search', '').strip()
+    selected_statuses = request.POST.getlist('status')  # Get the list of selected checkboxes
+
+    print("Search Query:", search_query)  # Debugging
+    print("Selected Statuses:", selected_statuses)  # Debugging
+
+    # Build the queryset based on the search query and selected statuses
+    search_list = EstimateView.objects.all()
+
+    if search_query:
+        search_list = search_list.filter(
+            Q(wo_number_display__icontains=search_query) |
+            Q(pre_order_number__icontains=search_query) |
+            Q(project_display__icontains=search_query) |
+            Q(label__icontains=search_query) |
+            Q(status__icontains=search_query) |
+            Q(project_manager__icontains=search_query) |
+            Q(assigned_engineer__icontains=search_query) |
+            Q(assigned_netops__icontains=search_query) |
+            Q(estimated_start_date__icontains=search_query) |
+            Q(estimated_completion_date__icontains=search_query)
+        )
+
+    if selected_statuses:
+        search_list = search_list.filter(status__in=selected_statuses)
+
+    # Render the partial template with the filtered results
+    template = 'bom/partials/estimate_search_table.html'
+    return render(request, template, {'search_list': search_list})
+=======
 
 @permission_required('bom.can_access_bom')
 def open_preorder_search(request):
