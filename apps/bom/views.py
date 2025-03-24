@@ -615,6 +615,7 @@ def open_preorder_search(request):
 
     return render(request, template,
                 {'title': 'Search Open Preorders/Workorders',
+                })
 @permission_required('bom.can_access_bom')
 def search_mockup(request):
     template = 'bom/search_mockup.html'
