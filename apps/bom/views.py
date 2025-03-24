@@ -581,9 +581,6 @@ def estimate_search_endpoint(request):
     search_query = request.POST.get('search', '').strip()
     selected_statuses = request.POST.getlist('status')  # Get the list of selected checkboxes
 
-    print("Search Query:", search_query)  # Debugging
-    print("Selected Statuses:", selected_statuses)  # Debugging
-
     # Build the queryset based on the search query and selected statuses
     search_list = EstimateView.objects.all()
 
@@ -605,9 +602,12 @@ def estimate_search_endpoint(request):
         search_list = search_list.filter(status__in=selected_statuses)
 
     # Render the partial template with the filtered results
-    template = 'bom/partials/estimate_search_table.html'
+    search_list_size = len(search_list)
+    if search_list_size == 0:
+        template = 'bom/partials/no_results.html'
+    else:
+        template = 'bom/partials/estimate_search_table.html'
     return render(request, template, {'search_list': search_list})
-=======
 
 @permission_required('bom.can_access_bom')
 def open_preorder_search(request):
@@ -645,8 +645,8 @@ def open_preorder_endpoint(request):
 
     search_list_size = len(search_list)
     if search_list_size == 0:
-        template = 'bom/no_results.html'
+        template = 'bom/partials/no_results.html'
     else:
-        template = 'bom/open_table.html'
+        template = 'bom/partials/open_preorder_table.html'
     return render(request, template,
                 {'search_list': search_list})
