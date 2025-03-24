@@ -570,3 +570,14 @@ class EngineeringSearch(PermissionRequiredMixin, View):
         return render(request, template,
                     {'title': 'Engineering Projects',
                     'search_list': search_list})
+    
+@permission_required('bom.can_access_bom')
+def estimate_search(request):
+    template = 'bom/estimate_search.html'
+    return render(request, template, {'title': 'All Preorders/Workorder w/Estimates'})
+
+@permission_required('bom.can_access_bom')
+def estimate_search_endpoint(request):
+    template = 'bom/partials/estimate_search_table.html'
+    search_list = EstimateView.objects.all()
+    return render(request, template,{'search_list': search_list})
