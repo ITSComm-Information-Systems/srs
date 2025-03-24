@@ -570,3 +570,45 @@ class EngineeringSearch(PermissionRequiredMixin, View):
         return render(request, template,
                     {'title': 'Engineering Projects',
                     'search_list': search_list})
+
+@permission_required('bom.can_access_bom')
+def search_mockup(request):
+    template = 'bom/search_mockup.html'
+
+    return render(request, template,
+                {'title': 'Search Mockup',
+                })
+
+@permission_required('bom.can_access_bom')
+def open_preorder_endpoint(request):
+    if request.method == 'POST':
+        search_query = request.POST.get('search', '')
+        search_list = Workorder.objects.filter(
+            Q(status_name='Open') & (
+                Q(wo_number_display__icontains=search_query) |
+                Q(pre_order_number__icontains=search_query) |
+                Q(status_name__icontains=search_query) |
+                Q(project_display__icontains=search_query) |
+                Q(building_number__icontains=search_query) |
+                Q(building_name__icontains=search_query) |
+                Q(comment_text__icontains=search_query) 
+            )
+        ).defer('status_name')
+
+        for workorder in search_list:
+                if workorder.building_number:
+                    workorder.building = str(workorder.building_number) + ' - ' + workorder.building_name
+                
+                if len(workorder.comment_text) > 80:
+                    workorder.comment = workorder.comment_text[0:80] + '...'
+                else:
+                    workorder.comment = workorder.comment_text
+
+
+    search_list_size = len(search_list)
+    if search_list_size == 0:
+        template = 'bom/no_results.html'
+    else:
+        template = 'bom/open_table.html'
+    return render(request, template,
+                {'search_list': search_list})
