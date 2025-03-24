@@ -3,8 +3,6 @@ from django.views.generic import TemplateView
 
 from . import views, reports
 
-app_name = 'bom'
-
 urlpatterns = [
     path('', TemplateView.as_view(template_name="bom/home.html")),
     path('favorites/', views.Favorites.as_view()),
@@ -27,6 +25,8 @@ urlpatterns = [
     path('summary-report/<int:estimate_id>', reports.summary_report),
     path('netops/', views.NetOpsSearch.as_view()),
     path('engineering/', views.EngineeringSearch.as_view()),
-    path('search_mockup/', views.search_mockup, name='search_mockup'),
+    path('estimate_search/', views.estimate_search, name='estimate_search'),
+    path('estimate_search_endpoint/', views.estimate_search_endpoint, name='estimate_search_endpoint'),
+    path('open_preorder_search/', views.open_preorder_search, name='open_preorder_search'),
     path('open_preorder_endpoint/', views.open_preorder_endpoint, name='open_preorder_endpoint'),
 ]

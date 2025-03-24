@@ -567,6 +567,7 @@ def view_time_display(request):
             work_order).order_by('-assigned_date','work_order_display')
         search_topic = 'Work Order'
         search_criteria = work_order
+        total_hours = format_time(results.aggregate(Sum('actual_mins'))['actual_mins__sum'] or 0)
 
     # Search dates
     else:
@@ -734,8 +735,8 @@ def calculate_hours_and_classes(input_entries, labor):
             total_group_hours[group] += hours
 
     for group, uniqnames in group_uniqname_hours.items():
-        for uniqname, total_hours in uniqnames.items():
-            group_hover_strings[group] += f"{uniqname}: {total_hours} | "
+        uniqname_strings = [f"{uniqname}: {total_hours}" for uniqname, total_hours in uniqnames.items()]
+        group_hover_strings[group] = " | ".join(uniqname_strings)
             
     for l in labor:
         if l.group.name in group_estimated_hours.keys():
