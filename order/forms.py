@@ -400,7 +400,7 @@ class BillingForm(TabForm):
         action_id = self.request.POST['action_id']
         self.charge_types = ChargeType.objects.filter(action__id=action_id).order_by('display_seq_no')
         self.dept_list = Chartcom.get_user_chartcom_depts(self.request.user.id) 
-        self.chartcom_list = UserChartcomV.objects.filter(user=self.request.user).order_by('name')
+        self.chartcom_list = UserChartcomV.objects.filter(user=self.request.user, active=True).order_by('name')
 
 
 class FeaturesForm(TabForm):
