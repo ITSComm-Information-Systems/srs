@@ -1,3 +1,4 @@
+{% load static %}
 <style>
     .sort-table th {
         cursor: pointer;
@@ -22,16 +23,16 @@
 <table id="workorder_table" class="table table-hover table-striped sort-table" aria-live="polite">
     <thead>
         <tr>
-            <th style="min-width: 150px;" onclick="sortTable(0)">Workorder <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-            <th style="min-width: 150px;" onclick="sortTable(1)">Preorder <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-            <th onclick="sortTable(2)">Project <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-            <th onclick="sortTable(3)">Label <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-            <th onclick="sortTable(4)">Status <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-            <th onclick="sortTable(5)">PM <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-            <th style="min-width: 150px;" onclick="sortTable(6)">Engineer <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-            <th onclick="sortTable(7)">UMNet <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-            <th style="min-width: 150px;" onclick="sortTable(8)">Start Date <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
-            <th style="min-width: 150px;" onclick="sortTable(9)">Eng. Due Date <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 150px;" onclick="sortTable('workorder_table', 0)">Workorder <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 150px;" onclick="sortTable('workorder_table', 1)">Preorder <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th onclick="sortTable('workorder_table', 2)">Project <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th onclick="sortTable('workorder_table', 3)">Label <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th onclick="sortTable('workorder_table', 4)">Status <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th onclick="sortTable('workorder_table', 5)">PM <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 150px;" onclick="sortTable('workorder_table', 6)">Engineer <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th onclick="sortTable('workorder_table', 7)">UMNet <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 150px;" onclick="sortTable('workorder_table', 8)">Start Date <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 150px;" onclick="sortTable('workorder_table', 9)">Eng. Due Date <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
         </tr>
     </thead>
     <tbody id="workOrderTableBody">
@@ -53,97 +54,5 @@
 </table>
 
 {% block js %}
-<script>
-    var sortDirections = {}; // Object to keep track of sorting directions for each column
-
-    function sortTable(n) {
-        var table, rows, switching, i, x, y, shouldSwitch, switchcount = 0;
-        table = document.getElementById("workorder_table");
-        switching = true;
-        var rowsArray = Array.from(table.rows).slice(1); // Convert rows to array and exclude the header row
-
-        // Determine the sorting direction for the column
-        if (!sortDirections[n]) {
-            sortDirections[n] = "asc";
-        } else {
-            sortDirections[n] = sortDirections[n] === "asc" ? "desc" : "asc";
-        }
-
-        var dir = sortDirections[n];
-
-        rowsArray.sort(function(a, b) {
-            x = a.getElementsByTagName("TD")[n].innerHTML.trim();
-            y = b.getElementsByTagName("TD")[n].innerHTML.trim();
-
-            // Check if the column contains dates
-            if (isValidDate(x) && isValidDate(y)) {
-                var xDate = new Date(x);
-                var yDate = new Date(y);
-
-                if (dir === "asc") {
-                    return xDate - yDate;
-                } else {
-                    return yDate - xDate;
-                }
-            }
-
-            // Check if x and y are numeric
-            var xNum = parseFloat(x);
-            var yNum = parseFloat(y);
-
-            if (!isNaN(xNum) && !isNaN(yNum)) {
-                // Sort numerically
-                if (dir === "asc") {
-                    return xNum - yNum;
-                } else {
-                    return yNum - xNum;
-                }
-            } else {
-                // Sort alphabetically
-                if (dir === "asc") {
-                    if (x > y) return 1;
-                    if (x < y) return -1;
-                    return 0;
-                } else if (dir === "desc") {
-                    if (x < y) return 1;
-                    if (x > y) return -1;
-                    return 0;
-                }
-            }
-        });
-
-        // Append sorted rows back to the table
-        for (i = 0; i < rowsArray.length; i++) {
-            table.tBodies[0].appendChild(rowsArray[i]);
-        }
-
-        // Update the sorting icons
-        var headers = table.getElementsByTagName("th");
-        for (i = 0; i < headers.length; i++) {
-            var sortIcon = headers[i].querySelector(".fa-sort");
-            var upIcon = headers[i].querySelector(".fa-sort-up");
-            var downIcon = headers[i].querySelector(".fa-sort-down");
-            if (i === n) {
-                sortIcon.style.display = "none";
-                if (dir === "asc") {
-                    upIcon.style.display = "inline";
-                    downIcon.style.display = "none";
-                } else {
-                    upIcon.style.display = "none";
-                    downIcon.style.display = "inline";
-                }
-            } else {
-                sortIcon.style.display = "inline";
-                upIcon.style.display = "none";
-                downIcon.style.display = "none";
-            }
-        }
-    }
-
-    // Helper function to check if a string is a valid date
-    function isValidDate(dateString) {
-        var date = Date.parse(dateString);
-        return !isNaN(date);
-    }
-</script>
+<script src="{% static 'js/common_sort.js' %}"></script>
 {% endblock js %}
