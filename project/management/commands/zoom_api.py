@@ -1,9 +1,15 @@
 from django.core.management.base import BaseCommand
-
-from softphone.models import Zoom, Selection, SelectionV, SubscriberCharges, next_cut_date, ZoomToken
-import os, requests
+from django.utils import timezone
+from softphone.models import Zoom, Selection, SelectionV, SubscriberCharges, next_cut_date, ZoomToken, ZoomAPI
+import os, requests, time
 
 import datetime, csv
+
+FLINT = 'iWZlFMvWREiQ2Jblp6k1LQ'
+AA = 'KTy52PDyS9CzCCb29Qf5tg'
+DEARBORN =  'gIcx3ptyTT6Xdnac0azKBg'
+DEFAULT_ADDRESS = [FLINT, AA, DEARBORN]
+ZOOM_URL = 'https://api.zoom.us/v2/phone/users'
 
 class Command(BaseCommand):
     help = 'Call Zoom API to get User Data'
@@ -17,6 +23,7 @@ class Command(BaseCommand):
         parser.add_argument('--file')      # Run for everyone in a file
         parser.add_argument('--cut_date')  # Run for everyone in a file
         parser.add_argument('--report')    # Report of all active zoom phones
+        parser.add_argument('--e911')      # Update e911 Data
 
     def handle(self, *args, **options):
         self.zoom_token = os.getenv('ZOOM_TOKEN')
@@ -26,6 +33,9 @@ class Command(BaseCommand):
 
         if options['report']:
             self.get_zoom_report()
+            return
+        elif options['e911']:
+            self.update_e911(options['e911'])
             return
         elif options['uniqname']:
             r = self.process_user(options['uniqname'])
@@ -107,17 +117,18 @@ class Command(BaseCommand):
 
 
     def get_zoom_report(self):
-            url = 'https://api.zoom.us/v2/phone/users'
             params = {'page_size': 300}
+            all_users = []
 
             while True:
-                r = requests.get( url, headers={'Authorization': f'Bearer {self.zoom_token}'}, params=params)
+                r = requests.get( ZOOM_URL, headers={'Authorization': f'Bearer {self.zoom_token}'}, params=params)
                 data = r.json()
                 if not r.ok:
                     print(r.status_code, r.text)
                     return
 
                 for user in data['users']:
+                    all_users.append(user['id'])
                     print(user['extension_number'], user['status'], user['email'])
 
                 next_page_token = data.get('next_page_token')
@@ -127,3 +138,41 @@ class Command(BaseCommand):
                     break
 
             print('total_records', data['total_records'])
+            return all_users
+
+
+    def update_e911(self, parameter):
+        x = 0
+
+        if parameter == 'new':  # New Users
+            all_users = self.get_zoom_report()
+            imported_users = list(ZoomAPI.objects.values_list('id', flat=True))
+            user_list = list(set(all_users) - set(imported_users))
+        elif parameter == 'missing':   # Check All Users Missing Emergency Addresses
+            user_list = list(ZoomAPI.objects.values_list('id', flat=True).filter(address_updated=False))
+        else:  # All Active Users
+            user_list = self.get_zoom_report()
+
+        for user in user_list:
+            x +=1
+
+            r = requests.get(f'{ZOOM_URL}/{user}', headers={'Authorization': f'Bearer {self.zoom_token}'})
+            data = r.json()
+            if not r.ok:
+                print(r.status_code, r.text)
+                if r.status_code == 401 and r.text == '{"code":124,"message":"Access token has expired."}':
+                    time.sleep(10)
+                    self.zoom_token = ZoomToken.objects.all()[0].token
+                    continue
+
+            print(x, data['extension_number'], data['status'], data['email'])
+
+            zoom = ZoomAPI()
+            zoom.id = user
+            zoom.phone_number = data['extension_number']
+            zoom.username = data['email'].split('@')[0]
+            zoom.default_address = data['emergency_address']['id'] in DEFAULT_ADDRESS  # Flag if address has been changed from the default
+            zoom.last_updated = timezone.now()
+            zoom.save()
+
+        print('end process', timezone.now())
