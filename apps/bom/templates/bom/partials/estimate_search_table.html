@@ -1,0 +1,39 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/common_sort.css' %}">
+
+<table id="workorder_table" class="table table-hover table-striped sort-table" aria-live="polite">
+    <thead>
+        <tr>
+            <th style="min-width: 150px;" onclick="sortTable('workorder_table', 0)">Workorder <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 150px;" onclick="sortTable('workorder_table', 1)">Preorder <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th onclick="sortTable('workorder_table', 2)">Project <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th onclick="sortTable('workorder_table', 3)">Label <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th onclick="sortTable('workorder_table', 4)">Status <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th onclick="sortTable('workorder_table', 5)">PM <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 150px;" onclick="sortTable('workorder_table', 6)">Engineer <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th onclick="sortTable('workorder_table', 7)">UMNet <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 150px;" onclick="sortTable('workorder_table', 8)">Start Date <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 150px;" onclick="sortTable('workorder_table', 9)">Eng. Due Date <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+        </tr>
+    </thead>
+    <tbody id="workOrderTableBody">
+        {% for record in search_list %}
+        <tr data-estimate_id="{{ record.id }}" data-pre_order_id="{{ record.pre_order_id }}">
+            <td>{{ record.wo_number_display }}</td>
+            <td>{{ record.pre_order_number }}</td>
+            <td>{{ record.project_display }}</td>
+            <td>{{ record.label }}</td>
+            <td>{{ record.status }}</td>
+            <td>{{ record.project_manager }}</td>
+            <td>{{ record.assigned_engineer }}</td>
+            <td>{{ record.assigned_netops }}</td>
+            <td>{{ record.estimated_start_date|date:"Y-m-d" }}</td>
+            <td>{{ record.estimated_completion_date|date:"Y-m-d" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% block js %}
+<script src="{% static 'js/common_sort.js' %}"></script>
+{% endblock js %}
