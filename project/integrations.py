@@ -820,12 +820,6 @@ class PoolPayload(MiDesktopPayload):
         self.attributes = []
         self.context = {}
         self.tasks = []
-        if action == 'Modify':
-            self.service_id = 64  # Modify Pool
-            self.form_id = 111      
-        elif action == 'Delete':
-            self.service_id = 65  # Delete Pool
-            self.form_id = 112
 
         self.add_attribute(self.midesktop_pool_type.id, getattr(self.midesktop_pool_type, instance.type))
         self.add_attribute(self.pool_name.id, instance.name)
@@ -846,8 +840,6 @@ class ImagePayload(MiDesktopPayload):
         self.context = {}
         self.tasks = []
         if action == 'Modify':
-            self.service_id = 61
-            self.form_id = 109
 
             if 'new_disks' in kwargs:
                 changed_disks = []
