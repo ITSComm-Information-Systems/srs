@@ -1,18 +1,30 @@
 {% extends 'bom/base.html' %}
 {% block content %}
-<h2>{{ title }}</h2>
+<h2 style="margin-top:30px;">{{ title }}</h2>
 
-
-<input class="form-control" type="search"
-        name="search" placeholder="Begin Typing To Search Preorders..."
-        hx-post="{% url 'open_preorder_endpoint' %}"
+<form hx-post="{% url 'open_preorder_endpoint' %}" 
         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-        hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
+        hx-trigger="input change delay:500ms, keyup[key=='Enter']"
         hx-target="#search-results"
-        hx-indicator=".htmx-indicator">
+        hx-indicator=".htmx-indicator"
+        style="display: flex; align-items: flex-start; gap: 15px; flex-wrap: wrap;">
 
-<span class="htmx-indicator">
-    <h5 style="margin-left: 10px;">Searching...</h5>
-</span>
+        <input class="form-control border border-primary" type="search"
+                name="search" placeholder="Begin Typing To Search Preorders..."
+                style="flex: 1; min-width: 200px;">
+</form>
+
+
+
+
+{% include 'bom/partials/searching_indicator.html' %}
 <div id="search-results"></div>
+
+<style>
+        .form-control::placeholder { 
+                color: rgba(64, 101, 143, 0.6);
+                opacity: 1; 
+}
+</style>
+
 {% endblock content %}

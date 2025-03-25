@@ -1,14 +1,14 @@
 <form hx-post="{% url 'estimate_search_endpoint' %}" 
-      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-      hx-trigger="input change delay:500ms, keyup[key=='Enter']"
-      hx-target="#search-results"
-      hx-indicator=".htmx-indicator"
-      style="display: flex; align-items: flex-start; gap: 15px; flex-wrap: wrap;">
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-trigger="input change delay:500ms, keyup[key=='Enter']"
+        hx-target="#search-results"
+        hx-indicator=".htmx-indicator"
+        style="display: flex; align-items: flex-start; gap: 15px; flex-wrap: wrap;">
     
     <!-- Search Input -->
-    <input class="form-control" type="search"
-           name="search" placeholder="Begin Typing To Search..."
-           style="flex: 1; min-width: 200px;">
+    <input class="form-control border border-primary" type="search"
+            name="search" placeholder="Begin Typing To Search..."
+            style="flex: 1; min-width: 200px;">
 
     <!-- Checkboxes as Toggle Buttons -->
     <div class="status-filters" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: -23px;">
@@ -43,9 +43,9 @@
 
     /* Checked state styling */
     .btn-check:checked + .btn {
-        background-color: #0d6efd; /* Bootstrap primary color */
+        background-color: rgb(64, 101, 143); 
         color: white;
-        border-color: #0d6efd;
+        border-color: rgb(64, 101, 143);
     }
 
     /* Grid container for buttons */
@@ -54,4 +54,9 @@
         grid-template-columns: repeat(4, 1fr); /* 4 columns */
         gap: 10px; /* Spacing between buttons */
     }
+
+    .form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+            color: rgba(64, 101, 143, 0.6);
+            opacity: 1; /* Firefox */
+}
 </style>
