@@ -23,9 +23,6 @@
 						{% if request.user|in_group:'Network Engineering' %}
 						<a class="dropdown-item" href="/apps/bom/engineering/">Engineering Projects</a>
 						{% endif %}
-						{% if perms.bom.can_update_bom_ordered %}
-						<a class="dropdown-item" href="/apps/bom/search?filter=warehouse">Warehouse</a>
-						{% endif %}
 					</div>
 
 				</li>
