@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('username', models.CharField(max_length=20)),
                 ('phone_number', models.CharField(max_length=50)),
                 ('dept_id', models.CharField(max_length=10, null=True)),
-                ('address_updated', models.BooleanField()),
+                ('default_address', models.BooleanField()),
                 ('last_updated', models.DateTimeField()),
             ],
         ),
