@@ -604,6 +604,28 @@ def estimate_search_endpoint(request):
     # Limit the results to the most recent 50 based on estimated_start_date
     search_list = search_list.order_by('-estimated_start_date')[:50]
 
+    # If fewer than 50 results, pad with entries that have no estimated_start_date
+    if len(search_list) < 50:
+        padding_needed = 50 - len(search_list)
+        padding_results = EstimateView.objects.filter(estimated_start_date__isnull=True)
+        if search_query:
+            padding_results = padding_results.filter(
+                Q(wo_number_display__icontains=search_query) |
+                Q(pre_order_number__icontains=search_query) |
+                Q(project_display__icontains=search_query) |
+                Q(label__icontains=search_query) |
+                Q(status__icontains=search_query) |
+                Q(project_manager__icontains=search_query) |
+                Q(assigned_engineer__icontains=search_query) |
+                Q(assigned_netops__icontains=search_query) |
+                Q(estimated_completion_date__icontains=search_query)
+            )
+        if selected_statuses:
+            padding_results = padding_results.filter(status__in=selected_statuses)
+
+        # Add padding results to the search list
+        search_list = list(search_list) + list(padding_results[:padding_needed])
+
     # Render the partial template with the filtered results
     search_list_size = len(search_list)
     if search_list_size == 0:
