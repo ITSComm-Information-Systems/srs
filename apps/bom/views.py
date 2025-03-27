@@ -582,7 +582,7 @@ def estimate_search_endpoint(request):
     selected_statuses = request.POST.getlist('status')  # Get the list of selected checkboxes
 
     # Build the queryset based on the search query and selected statuses
-    search_list = EstimateView.objects.all()
+    search_list = EstimateView.objects.exclude(estimated_start_date__isnull=True)
 
     if search_query:
         search_list = search_list.filter(
@@ -600,6 +600,9 @@ def estimate_search_endpoint(request):
 
     if selected_statuses:
         search_list = search_list.filter(status__in=selected_statuses)
+
+    # Limit the results to the most recent 50 based on estimated_start_date
+    search_list = search_list.order_by('-estimated_start_date')[:50]
 
     # Render the partial template with the filtered results
     search_list_size = len(search_list)
