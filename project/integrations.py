@@ -709,6 +709,7 @@ class MiDesktopPayload(Payload):
     image_type = ChoiceAttribute(2346, Existing=899, New=900, Clone=901)
     image_name = TextAttribute(2347)    # midesktop_Base Image Name textbox
     pool_name = TextAttribute(2348)     # midesktop_Pool Display Name textbox
+    midesktop_request_type = ChoiceAttribute(14923, DeleteImage=76372, ModifyImage=76371, DeletePool=76370, ModifyPool=76369)  
 
     def __init__(self, action, instance, request, **kwargs):
         self.request = request
@@ -820,6 +821,10 @@ class PoolPayload(MiDesktopPayload):
         self.attributes = []
         self.context = {}
         self.tasks = []
+        if action == 'Modify':
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.ModifyPool) 
+        elif action == 'Delete':
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.DeletePool)
 
         self.add_attribute(self.midesktop_pool_type.id, getattr(self.midesktop_pool_type, instance.type))
         self.add_attribute(self.pool_name.id, instance.name)
@@ -840,7 +845,7 @@ class ImagePayload(MiDesktopPayload):
         self.context = {}
         self.tasks = []
         if action == 'Modify':
-            
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.ModifyImage)
             if 'new_disks' in kwargs:
                 changed_disks = []
                 old_disks = kwargs.get('old_disks')
@@ -859,8 +864,7 @@ class ImagePayload(MiDesktopPayload):
                 self.context['changed_disks'] = changed_disks
 
         if action == 'Delete':
-            self.service_id = 63
-            self.form_id = 110 
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.DeleteImage)
         self.add_attribute(self.image_name.id, instance.name)
         self.context['image'] = instance
         super().__init__(action, instance, request, **kwargs)
