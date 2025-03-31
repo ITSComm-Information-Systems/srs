@@ -21,11 +21,6 @@
 
             {% if record.multi_count  %}
                 onclick="window.location= '{% url 'estimate' record.estimate_id %}'"
-                hx-get="{% url 'estimate' record.estimate_id %}"
-                hx-target="body"
-                hx-trigger="click"
-                hx-push-url="true"
-                hx-redirect="true"
             {% endif %}
         >
             <td>{{ record.wo_number_display }}</td>
