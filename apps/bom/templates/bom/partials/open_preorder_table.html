@@ -20,11 +20,7 @@
             data-pre_order_id="{{ record.pre_order_id }}"
 
             {% if record.multi_count  %}
-                hx-get="{% url 'estimate' record.estimate_id %}"
-                hx-target="body"
-                hx-trigger="click"
-                hx-push-url="true"
-                hx-redirect="true"
+                onclick="window.location= '{% url 'estimate' record.estimate_id %}'"
             {% endif %}
         >
             <td>{{ record.wo_number_display }}</td>
