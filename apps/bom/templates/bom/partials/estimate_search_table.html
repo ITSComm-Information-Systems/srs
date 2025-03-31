@@ -21,11 +21,8 @@
         <tr 
             data-estimate_id="{{ record.id }}" 
             data-pre_order_id="{{ record.pre_order_id }}"
-            hx-get="{% url 'estimate' record.id %}"
-            hx-target="body"
-            hx-trigger="click"
-            hx-push-url="true"
-            hx-redirect="true"
+            onclick="window.location= '{% url 'estimate' record.id %}'"
+            
         >
             <td>{{ record.wo_number_display }}</td>
             <td>{{ record.pre_order_number }}</td>
