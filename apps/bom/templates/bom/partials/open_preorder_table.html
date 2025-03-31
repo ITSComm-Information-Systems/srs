@@ -15,7 +15,15 @@
     </thead>
     <tbody id="workOrderTableBody">
         {% for record in search_list %}
-        <tr data-estimate_id="{{ record.estimate_id }}" data-pre_order_id="{{ record.pre_order_id }}">
+        <tr 
+            data-estimate_id="{{ record.estimate_id }}" 
+            data-pre_order_id="{{ record.pre_order_id }}"
+            hx-get="{% url 'estimate' record.estimate_id %}"
+            hx-target="body"
+            hx-trigger="click"
+            hx-push-url="true"
+            hx-redirect="true"
+        >
             <td>{{ record.wo_number_display }}</td>
             <td>{{ record.pre_order_number }}</td>
             <td>{{ record.project_display }}</td>
