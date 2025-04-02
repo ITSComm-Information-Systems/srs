@@ -520,7 +520,7 @@ class ArcInstance(Volume):
     def get_shortcodes(self):
         return ArcBilling.objects.filter(arc_instance=self)
 
-    def get_user_volumes(self, user, vol_type):
+    def get_user_volumes(self, user, vol_type, service_id):
 
         sql = '''
             select arc.id, arc.name, grp.name as owner, arc."SIZE",
@@ -539,12 +539,12 @@ class ArcInstance(Volume):
                                    from srs_oscauth_ldapgroupmember mbr
                                    where mbr.username = %s)
 
-            and arc.service_id = 9
+            and arc.service_id = %s
             and type = %s
             order by arc.name
         '''
 
-        queryset = get_query_result(sql, (user.username,vol_type), json_fields=['shortcode_list'])
+        queryset = get_query_result(sql, (user.username,service_id, vol_type), json_fields=['shortcode_list'])
 
         return queryset
 
