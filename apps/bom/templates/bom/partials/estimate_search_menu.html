@@ -1,0 +1,62 @@
+<form hx-post="{% url 'estimate_search_endpoint' %}" 
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-trigger="input change delay:500ms, keyup[key=='Enter']"
+        hx-target="#search-results"
+        hx-indicator=".htmx-indicator"
+        style="display: flex; align-items: flex-start; gap: 15px; flex-wrap: wrap;">
+    
+    <!-- Search Input -->
+    <input class="form-control border border-primary" type="search"
+            name="search" placeholder="Begin Typing To Search..."
+            style="flex: 1; min-width: 200px;">
+
+    <!-- Checkboxes as Toggle Buttons -->
+    <div class="status-filters" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: -23px;">
+        <input type="checkbox" name="status" value="Rejected" class="btn-check" id="status-rejected">
+        <label for="status-rejected" class="btn btn-outline-primary">Rejected</label>
+
+        <input type="checkbox" name="status" value="Estimate" class="btn-check" id="status-estimate">
+        <label for="status-estimate" class="btn btn-outline-primary">Estimate</label>
+
+        <input type="checkbox" name="status" value="Approve" class="btn-check" id="status-approve">
+        <label for="status-approve" class="btn btn-outline-primary">Approve</label>
+
+        <input type="checkbox" name="status" value="Warehouse" class="btn-check" id="status-warehouse">
+        <label for="status-warehouse" class="btn btn-outline-primary">Warehouse</label>
+
+        <input type="checkbox" name="status" value="Ordered" class="btn-check" id="status-ordered">
+        <label for="status-ordered" class="btn btn-outline-primary">Ordered</label>
+
+        <input type="checkbox" name="status" value="Completed" class="btn-check" id="status-completed">
+        <label for="status-completed" class="btn btn-outline-primary">Completed</label>
+
+        <input type="checkbox" name="status" value="Cancelled" class="btn-check" id="status-cancelled">
+        <label for="status-cancelled" class="btn btn-outline-primary">Cancelled</label>
+    </div>
+</form>
+
+<style>
+    /* Hide the default checkbox */
+    .btn-check {
+        display: none;
+    }
+
+    /* Checked state styling */
+    .btn-check:checked + .btn {
+        background-color: rgb(64, 101, 143); 
+        color: white;
+        border-color: rgb(64, 101, 143);
+    }
+
+    /* Grid container for buttons */
+    .status-filters {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* 4 columns */
+        gap: 10px; /* Spacing between buttons */
+    }
+
+    .form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+            color: rgba(64, 101, 143, 0.6);
+            opacity: 1; /* Firefox */
+}
+</style>

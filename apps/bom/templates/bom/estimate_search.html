@@ -1,0 +1,11 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+
+<h2 style="margin-top:30px;">{{ title }}</h2>
+
+{% include 'bom/partials/estimate_search_menu.html' %}
+{% include 'bom/partials/searching_indicator.html' %}
+
+<div id="search-results">
+</div>
+{% endblock content %}
