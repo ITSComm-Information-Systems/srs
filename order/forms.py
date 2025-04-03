@@ -579,10 +579,14 @@ class VolumeSelectionForm(TabForm):
                 for volume in self.volume_list:
                     self.total_cost = self.total_cost + volume.total_cost
                 return
-
+            elif service.id == 11:
+                self.volume_list = ArcInstance().get_user_volumes(self.request.user, 'NFS', service.id)     
+                self.template = 'order/volume_review.html'
+                for volume in self.volume_list:
+                   self.total_cost = self.total_cost + volume['total_cost']
+                return
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
-                    
                 self.template = 'order/volume_review.html'
 
             for volume in self.volume_list:
