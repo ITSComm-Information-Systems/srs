@@ -528,7 +528,9 @@ class ArcInstance(Volume):
             (select JSON_ARRAYAGG(json_object('shortcode': shortcode, 'size': "SIZE")  )
                 from srs_order_arcbilling where arc_instance_id = arc.id) as shortcode_list,
 
-            (select label from srs_order_storagerate where id = arc.rate_id) as rate
+            (select label from srs_order_storagerate where id = arc.rate_id) as rate,
+
+            (select rate from srs_order_storagerate where id = arc.rate_id) * arc."SIZE" as total_cost
 
             from srs_order_arcinstance arc
 
