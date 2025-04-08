@@ -1,6 +1,7 @@
 {% extends 'bom/base.html' %}
 {% block content %}
 {% load humanize %}
+{% load static %}
 
 
 <h2>{{ title }}</h2>
@@ -17,16 +18,16 @@
 
 {% include 'bom/partials/searching_indicator.html' %}
 
-<table id="item_table" class="table table-hover table-striped" aria-live="polite">
+<table id="item_table" class="table table-hover table-striped sort-table" aria-live="polite">
     <thead>
         <tr>
-            <th>Code</th>
-            <th>Description</th>
-            <th>Type</th>
-            <th>Subclass</th>
-            <th>Manufacturer</th>
-            <th>Manufacturer#</th>
-            <th class="text-right">Price</th>
+            <th style="min-width:100px;" onclick="sortTable('item_table', 0)">Code <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:107px;" onclick="sortTable('item_table', 1)">Description <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:81px;" onclick="sortTable('item_table', 2)">Type <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:105px;" onclick="sortTable('item_table', 3)">Subclass <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:144px;" onclick="sortTable('item_table', 4)">Manufacturer <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:155px;" onclick="sortTable('item_table', 5)">Manufacturer# <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:100px;" onclick="sortTable('item_table', 6)" class="text-right">Price <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
         </tr>
     </thead>
     <tbody id="itemTableBody">
@@ -34,5 +35,9 @@
     </tbody>
 </table>
 
+<div class="htmx-indicator" style="display: none;">Loading...</div>
 
+{% block js %}
+<script src="{% static 'js/common_sort.js' %}"></script>
+{% endblock js %}
 {% endblock %}
