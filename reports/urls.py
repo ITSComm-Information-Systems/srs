@@ -11,4 +11,6 @@ urlpatterns = [
     path('metrics/', include('reports.metrics.urls')),
     path('nonteleph/', include('reports.nonteleph.urls')),
     path('usage/', include('reports.usage.urls')),
+    #path('log_click/', views.log_click, name='log_click'),
+    path('e911/', include('reports.e911.urls')),
 ]
