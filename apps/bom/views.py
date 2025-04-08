@@ -176,6 +176,21 @@ def item_lookup(request):
                     'item_list': item_list})
 
 @permission_required('bom.can_access_bom')
+def item_lookup_endpoint(request):
+    search_query = request.POST.get('item_code', '').strip().lower()
+    item_list = Item.objects.get_active()
+
+    if search_query:
+        item_list = item_list.filter(
+            Q(code__icontains=search_query) |
+            Q(name__icontains=search_query) |
+            Q(manufacturer__icontains=search_query) |
+            Q(manufacturer_part_number__icontains=search_query)
+        )
+
+    return render(request, 'bom/partials/item_table_rows.html', {'item_list': item_list})
+
+@permission_required('bom.can_access_bom')
 def item_details(request, item_pk):
     # Get the item object for the given pk
     item = get_object_or_404(Item, pk=item_pk)
