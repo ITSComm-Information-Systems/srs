@@ -15,6 +15,7 @@ urlpatterns = [
     path('upload_csv/', views.upload_csv),
     path('item_lookup/', views.item_lookup),
     path('item-lookup-endpoint/', views.item_lookup_endpoint, name='item_lookup_endpoint'),
+    path('items/<int:item_pk>/usage-count/', views.item_usage_count, name='item_usage_count'),
     path('item/<int:item_pk>/details/', views.item_details, name='item_details'),
     path('notify_warehouse/', views.notify_warehouse),
     path('add_pinnacle_note/', views.add_pinnacle_note),
