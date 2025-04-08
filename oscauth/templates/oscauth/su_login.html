@@ -1,20 +1,69 @@
 {% extends 'base.html' %}
-{% load i18n %}
 
 {% block content %}
+<h1>{{ title }}</h1>
 
-<h1>{{title}}</h1>
-<form action="." method="POST">{% csrf_token %}
- 
-    {{ form.as_p }}
-    <div class="submit-row">
-      <input type="submit" name="submit" class="btn btn-primary" value="{% trans "Change Login" %}"/>
+<!-- Search Box -->
+<form 
+      hx-post="{% url 'search_users_endpoint' %}" 
+      hx-trigger="input delay:300ms" 
+      hx-target="#dropdown-results" 
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      onsubmit="return false;"
+      style="position: relative;">
+    <input type="text" name="search" placeholder="Search users..." class="form-control" autocomplete="off">
+    
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" style="display: none; margin-top: 5px; font-size: 14px; color: gray;">
+        Searching...
     </div>
+    
+    <!-- Dropdown Results -->
+    <div id="dropdown-results" class="dropdown-menu" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; z-index: 1000;">
+        <!-- Results will be dynamically loaded here -->
+    </div>
+</form>
 
-  </form>
-
-{% endblock %}
+{% endblock content %}
 
 {% block js %}
-<script type="text/javascript" src="/static/select.js"></script>
+<script>
+    document.addEventListener('htmx:beforeRequest', () => {
+        // Show the loading indicator before the request starts
+        const loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'block';
+        }
+
+        // Hide the dropdown while searching
+        const dropdown = document.getElementById('dropdown-results');
+        if (dropdown) {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('htmx:afterSwap', (event) => {
+        // Hide the loading indicator after the request completes
+        const loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+
+        // Show the dropdown if results are loaded
+        const dropdown = document.getElementById('dropdown-results');
+        if (dropdown && dropdown.innerHTML.trim() !== '') {
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        // Hide the dropdown if clicked outside
+        const dropdown = document.getElementById('dropdown-results');
+        if (dropdown && !dropdown.contains(event.target) && !event.target.matches('input[name="search"]')) {
+            dropdown.style.display = 'none';
+        }
+    });
+</script>
 {% endblock %}
