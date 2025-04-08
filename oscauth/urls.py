@@ -8,9 +8,10 @@ urlpatterns = [
 
     # Switch User
     path('su/', views.su_logout, name="su_logout"),
+    path('search_users_endpoint/', views.search_users_endpoint, name="search_users_endpoint"),
     path('su_login/', views.su_login, name="su_login"),
     path('logout/', views.logout_view),
-    path('?P<user_id>', views.login_as_user, name="login_as_user"),
+    path('login_as_user/<str:user_id>', views.login_as_user, name="login_as_user"),
     path('adduser/', views.get_name),
     #path('ldap/user/', views.get_name),
     path('mypriv/', views.mypriv),
