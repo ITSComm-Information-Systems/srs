@@ -504,7 +504,6 @@ def modpriv(request):
 #@user_passes_test(su_login_callback)
 @permission_required('oscauth.can_impersonate')
 def login_as_user(request, user_id):
-    print("User ID:", user_id)
     userobj = authenticate(request=request, su=True, user_id=user_id)
     if not userobj:
         raise Http404("User not found")
