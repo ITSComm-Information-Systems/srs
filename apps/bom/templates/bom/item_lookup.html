@@ -7,6 +7,7 @@
 <h2>{{ title }}</h2>
 
 <form hx-post="{% url 'item_lookup_endpoint' %}" 
+        onsubmit="return false;"
         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
         hx-trigger="input delay:500ms, keyup[key=='Enter']"
         hx-target="#itemTableBody"
