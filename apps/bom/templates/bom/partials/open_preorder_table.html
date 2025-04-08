@@ -1,6 +1,6 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/common_sort.css' %}">
-
+{% include 'bom/modal_add_estimate.html' %}
 
 <table id="workorder_table" class="table table-hover table-striped sort-table" aria-live="polite">
     <thead>
@@ -17,12 +17,7 @@
         {% for record in search_list %}
         <tr 
             data-estimate_id="{{ record.estimate_id }}" 
-            data-pre_order_id="{{ record.pre_order_id }}"
-
-            {% if record.multi_count  %}
-                onclick="window.location= '{% url 'estimate' record.estimate_id %}'"
-            {% endif %}
-        >
+            data-pre_order_id="{{ record.pre_order_id }}">
             <td>{{ record.wo_number_display }}</td>
             <td>{{ record.pre_order_number }}</td>
             <td>{{ record.project_display }}</td>
@@ -36,4 +31,30 @@
 
 {% block js %}
 <script src="{% static 'js/common_sort.js' %}"></script>
+<script>
+    function attachRowClickHandlers() {
+        var tableRows = document.querySelectorAll("#workOrderTableBody tr");
+        tableRows.forEach(function (row) {
+            row.addEventListener("click", function () {
+                var estimate_id = this.getAttribute('data-estimate_id');
+                if (estimate_id !== 'None') {
+                    window.location.replace("/apps/bom/estimate/" + estimate_id + "/");
+                } else {
+                    var pre_order_id = this.getAttribute('data-pre_order_id');
+                    console.log(pre_order_id, 'pid');
+                    document.getElementById("pre_order_id").value = pre_order_id;
+                    $('#addEstimate').modal();
+                }
+            });
+        });
+    }
+
+    // Attach handlers initially
+    attachRowClickHandlers();
+
+    // Reattach handlers after HTMX updates
+    document.body.addEventListener("htmx:afterSettle", function () {
+        attachRowClickHandlers();
+    });
+</script>
 {% endblock js %}
