@@ -504,28 +504,29 @@ def modpriv(request):
 #@user_passes_test(su_login_callback)
 @permission_required('oscauth.can_impersonate')
 def login_as_user(request, user_id):
-    userobj = authenticate(request=request, su=True, user_id=user_id)
-    if not userobj:
-        raise Http404("User not found")
+    print("User ID:", user_id)
+    # userobj = authenticate(request=request, su=True, user_id=user_id)
+    # if not userobj:
+    #     raise Http404("User not found")
 
-    exit_users_pk = request.session.get("exit_users_pk", default=[])
-    exit_users_pk.append(
-        (request.session[SESSION_KEY], request.session[BACKEND_SESSION_KEY]))
+    # exit_users_pk = request.session.get("exit_users_pk", default=[])
+    # exit_users_pk.append(
+    #     (request.session[SESSION_KEY], request.session[BACKEND_SESSION_KEY]))
 
-    maintain_last_login = hasattr(userobj, 'last_login')
-    if maintain_last_login:
-        last_login = userobj.last_login
+    # maintain_last_login = hasattr(userobj, 'last_login')
+    # if maintain_last_login:
+    #     last_login = userobj.last_login
 
-    try:
-        if not custom_login_action(request, userobj):
-            login(request, userobj)
-        request.session["exit_users_pk"] = exit_users_pk
-    finally:
-        if maintain_last_login:
-            userobj.last_login = last_login
-            userobj.save(update_fields=['last_login'])
+    # try:
+    #     if not custom_login_action(request, userobj):
+    #         login(request, userobj)
+    #     request.session["exit_users_pk"] = exit_users_pk
+    # finally:
+    #     if maintain_last_login:
+    #         userobj.last_login = last_login
+    #         userobj.save(update_fields=['last_login'])
 
-    add_custom_permissions(user_id)
+    # add_custom_permissions(user_id)
 
     return HttpResponseRedirect('/')
 
@@ -551,18 +552,25 @@ def add_custom_permissions(user_id):
 @require_http_methods(['POST', 'GET'])
 #@user_passes_test(su_login_callback)
 @permission_required('oscauth.can_impersonate')
-def su_login(request, form_class=UserSuForm, template_name='oscauth/su_login.html'):
-    form = form_class(request.POST or None)
+def su_login(request, template_name='oscauth/su__login.html'):
     user_list = User.objects.order_by('username')
-    if form.is_valid():
-        return login_as_user(request, form.get_user().pk)
 
     return render(request, template_name, {
         'title': 'Impersonate User',
-        'form': form,
         'user_list': user_list,
     })
 
+def search_users_endpoint(request):
+    if request.method == "POST":
+        query = request.POST.get("search", "").strip()
+        users = User.objects.filter(username__icontains=query)[:10]  # Adjust the filter as needed
+        template = 'oscauth/partials/impersonate_user_return.html'
+
+        print("Query:", query)
+        print("Users:", users)
+
+    return render(request, template, {
+        'users': users})
 
 def su_logout(request):
     exit_users_pk = request.session.get("exit_users_pk", default=[])
