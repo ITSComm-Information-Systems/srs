@@ -1,0 +1,14 @@
+<form hx-post="{% url 'assigned_to_me_endpoint' %}" 
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-trigger="load, input change delay:500ms, keyup[key=='Enter']"
+        hx-target="#search-results"
+        hx-indicator=".htmx-indicator"
+        onsubmit="return false;"
+        style="display: flex; align-items: flex-start; gap: 15px; flex-wrap: wrap;">
+    
+    <!-- Search Input -->
+    <input class="form-control border border-primary" type="search"
+            name="search" placeholder="Begin Typing To Search..."
+            style="flex: 1; min-width: 200px;">
+
+</form>

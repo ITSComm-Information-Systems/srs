@@ -702,3 +702,47 @@ def open_preorder_endpoint(request):
         template = 'bom/partials/open_preorder_table.html'
     return render(request, template,
                 {'search_list': search_list})
+
+@permission_required('bom.can_access_bom')
+def assigned_to_me(request):
+    template ='bom/assigned_to_me.html'
+    search_list = EstimateView.objects.assigned_to(request.user.username)
+
+    return render(request, template,
+                {'title': 'Assigned to Me',
+                'search_list': search_list
+                })
+
+@permission_required('bom.can_access_bom')
+def assigned_to_me_endpoint(request):
+    # Get the search query and selected statuses
+    search_query = request.POST.get('search', '').strip()
+    # Build the queryset based on the search query and selected statuses
+    search_list = list(EstimateView.objects.assigned_to(request.user.username))
+
+    if search_query:
+        search_list = [
+            item for item in search_list if (
+                search_query.lower() in str(item.wo_number_display).lower() or
+                search_query.lower() in str(item.pre_order_number).lower() or
+                search_query.lower() in str(item.project_display).lower() or
+                search_query.lower() in str(item.label).lower() or
+                search_query.lower() in str(item.status).lower() or
+                search_query.lower() in str(item.project_manager).lower() or
+                search_query.lower() in str(item.assigned_engineer).lower() or
+                search_query.lower() in str(item.assigned_netops).lower() or
+                search_query.lower() in str(item.estimated_start_date).lower() or
+                search_query.lower() in str(item.estimated_completion_date).lower()
+            )
+        ]
+
+
+    # Render the partial template with the filtered results
+    search_list_size = len(search_list)
+    if search_list_size == 0:
+        template = 'bom/partials/no_results.html'
+    else:
+        template = 'bom/partials/assigned_to_me_table.html'
+    
+    return render(request, template,
+                {'search_list': search_list})

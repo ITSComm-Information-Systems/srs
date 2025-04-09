@@ -31,4 +31,6 @@ urlpatterns = [
     path('estimate_search_endpoint/', views.estimate_search_endpoint, name='estimate_search_endpoint'),
     path('open_preorder_search/', views.open_preorder_search, name='open_preorder_search'),
     path('open_preorder_endpoint/', views.open_preorder_endpoint, name='open_preorder_endpoint'),
+    path('assigned_to_me/', views.assigned_to_me, name='assigned_to_me'),
+    path('assigned_to_me_endpoint/', views.assigned_to_me_endpoint, name='assigned_to_me_endpoint'),
 ]
