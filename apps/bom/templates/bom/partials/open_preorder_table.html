@@ -1,0 +1,60 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/common_sort.css' %}">
+{% include 'bom/modal_add_estimate.html' %}
+
+<table id="workorder_table" class="table table-hover table-striped sort-table" aria-live="polite">
+    <thead>
+        <tr>
+            <th style="min-width: 122px;" onclick="sortTable('workorder_table', 0)">Workorder <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 109px;" onclick="sortTable('workorder_table', 1)">Preorder <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 98px;" onclick="sortTable('workorder_table', 2)">Project <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 117px;" onclick="sortTable('workorder_table', 3)">Comment <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 105px;" onclick="sortTable('workorder_table', 4)">Building <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width: 118px;" onclick="sortTable('workorder_table', 5)">Estimates <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+        </tr>
+    </thead>
+    <tbody id="workOrderTableBody">
+        {% for record in search_list %}
+        <tr 
+            data-estimate_id="{{ record.estimate_id }}" 
+            data-pre_order_id="{{ record.pre_order_id }}">
+            <td>{{ record.wo_number_display }}</td>
+            <td>{{ record.pre_order_number }}</td>
+            <td>{{ record.project_display }}</td>
+            <td>{{ record.comment }}</td>
+            <td>{{ record.building }}</td>
+            <td>{{ record.multi_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% block js %}
+<script src="{% static 'js/common_sort.js' %}"></script>
+<script>
+    function attachRowClickHandlers() {
+        var tableRows = document.querySelectorAll("#workOrderTableBody tr");
+        tableRows.forEach(function (row) {
+            row.addEventListener("click", function () {
+                var estimate_id = this.getAttribute('data-estimate_id');
+                if (estimate_id !== 'None') {
+                    window.location.replace("/apps/bom/estimate/" + estimate_id + "/");
+                } else {
+                    var pre_order_id = this.getAttribute('data-pre_order_id');
+                    console.log(pre_order_id, 'pid');
+                    document.getElementById("pre_order_id").value = pre_order_id;
+                    $('#addEstimate').modal();
+                }
+            });
+        });
+    }
+
+    // Attach handlers initially
+    attachRowClickHandlers();
+
+    // Reattach handlers after HTMX updates
+    document.body.addEventListener("htmx:afterSettle", function () {
+        attachRowClickHandlers();
+    });
+</script>
+{% endblock js %}

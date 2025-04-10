@@ -549,9 +549,9 @@ class VolumeSelectionForm(TabForm):
                 vol_type = action.override['storage_type']
                 if service.id == 7:
                     self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service')
-                elif service.id == 9:
+                elif service.id in [9,10,11]:
                     self.template = 'order/turbo_volume_selection.html'
-                    self.volume_list = ArcInstance().get_user_volumes(self.request.user, vol_type)
+                    self.volume_list = ArcInstance().get_user_volumes(self.request.user, vol_type, service.id)
                 else:  #Prefetch shortcodes
                     self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service').prefetch_related('shortcodes')
                 return
@@ -579,10 +579,14 @@ class VolumeSelectionForm(TabForm):
                 for volume in self.volume_list:
                     self.total_cost = self.total_cost + volume.total_cost
                 return
-
+            elif service.id == 11:
+                self.volume_list = ArcInstance().get_user_volumes(self.request.user, 'NFS', service.id)     
+                self.template = 'order/volume_review.html'
+                for volume in self.volume_list:
+                   self.total_cost = self.total_cost + volume['total_cost']
+                return
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
-                    
                 self.template = 'order/volume_review.html'
 
             for volume in self.volume_list:
