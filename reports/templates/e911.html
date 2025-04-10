@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title }}</h1>
+<p>The phones below do not have an emergency address associatd with them in Zoom.  
+    Please have the user update their emergency address using the <a target="_blank" href="https://documentation.its.umich.edu/node/3191#address">zoom web interface</a>.
+</p>
+<div>
+    <a class="float-end" href="?file=CSV">Download CSV</a>
+    <table class="table table-hover table-striped">
+        <tr>
+            <th>Department</th>
+            <th>Service Number</th>
+            <th>Uniqname</th>
+          </tr>
+    {% for phone in phone_numbers %}
+        <tr>
+            <td>{{ phone.dept_id }}</td>
+            <td>{{ phone.phone_number }}</td>
+            <td>{{ phone.username }}</td>
+        </tr>
+
+    {% endfor %}
+    </table>
+
+</div>
+
+{% endblock %}
