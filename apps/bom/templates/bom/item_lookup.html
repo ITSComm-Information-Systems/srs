@@ -1,55 +1,44 @@
 {% extends 'bom/base.html' %}
 {% block content %}
 {% load humanize %}
+{% load static %}
+
+
 <h2>{{ title }}</h2>
 
+<form hx-post="{% url 'item_lookup_endpoint' %}" 
+        onsubmit="return false;"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-trigger="input delay:500ms, keyup[key=='Enter']"
+        hx-target="#itemTableBody"
+        hx-indicator=".htmx-indicator">
+    <div class="form-group">
+        <input type="text" class="form-control border border-primary" id="item_code" name="item_code" placeholder="Search items...">
+    </div>
+</form>
 
-<div class="form-group col-md-3">
-    <label for="formGroupExampleInput">Filter</label>
-    <input type="text" class="form-control" id="item_code" name="item_code">
-</div>
+{% include 'bom/partials/searching_indicator.html' %}
 
-
-<table id="item_table" class="table table-hover table-striped" aria-live=”polite”>
+<table id="item_table" class="table table-hover table-striped sort-table" aria-live="polite">
     <thead>
         <tr>
-            <th>Code</th>
-            <th>Description</th>
-            <th>Type</th>
-            <th>Subclass</th>
-            <th>Manufacturer</th>
-            <th>Manufacturer#</th>
-            <th class="text-right">Price</th>
+            <th style="min-width:100px;" onclick="sortTable('item_table', 0)">Code <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:107px;" onclick="sortTable('item_table', 1)">Description <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:81px;" onclick="sortTable('item_table', 2)">Type <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:105px;" onclick="sortTable('item_table', 3)">Subclass <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:144px;" onclick="sortTable('item_table', 4)">Manufacturer <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:155px;" onclick="sortTable('item_table', 5)">Manufacturer# <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:100px;" onclick="sortTable('item_table', 6)" class="text-right">Price <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
         </tr>
     </thead>
     <tbody id="itemTableBody">
-        {% for item in item_list %}
-        <tr data-item_id="{{ item.id }}" data-item_code="{{ item.code }}">
-            <td><a href="{% url 'item_details' item_pk=item.id %}">{{ item.code }}</a></td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.class_code }}</td>
-            <td>{{ item.subclass_name }}</td>
-            <td>{{ item.manufacturer }}</td>
-            <td>{{ item.manufacturer_part_number }}</td>
-            <td class="text-right">{{ item.price|intcomma }}</td>
-        </tr>
-        {% endfor %}
+        {% include 'bom/partials/item_table_rows.html' %}
     </tbody>
 </table>
 
-{% endblock %}
-
+<div class="htmx-indicator" style="display: none;">Loading...</div>
 
 {% block js %}
-<script>
-
-    $("#item_code").on("keyup", function () {
-        $("#item_table").show();
-        var value = $(this).val().toLowerCase();
-        $("#itemTableBody tr").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
-
-</script>
+<script src="{% static 'js/common_sort.js' %}"></script>
 {% endblock js %}
+{% endblock %}
