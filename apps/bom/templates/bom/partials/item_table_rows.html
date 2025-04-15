@@ -1,0 +1,69 @@
+{% for item in item_list %}
+{% load humanize %}
+<tr 
+    data-item_id="{{ item.id }}" 
+    data-item_code="{{ item.code }}" 
+    data-bs-toggle="tooltip" 
+    data-placement="left" 
+    title="Loading..." 
+    hx-get="{% url 'item_usage_count' item_pk=item.id %}" 
+    hx-trigger="mouseover delay:500ms" 
+    hx-swap="none" 
+    hx-on::after-request="handleTooltipUpdate(event, this)" 
+    hx-on::mouseleave="$(this).tooltip('dispose')">
+    <td>{{ item.code }}</td>
+    <td>{{ item.name }}</td>
+    <td>{{ item.class_code }}</td>
+    <td>{{ item.subclass_name }}</td>
+    <td>{{ item.manufacturer }}</td>
+    <td>{{ item.manufacturer_part_number }}</td>
+    <td class="text-right">{{ item.price|intcomma }}</td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="7" class="text-center">No items found.</td>
+</tr>
+{% endfor %}
+
+<script>
+    // Initialize Bootstrap 4 tooltips
+    document.addEventListener('DOMContentLoaded', function () {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            $(tooltipTriggerEl).tooltip({
+                trigger: 'hover',
+                animation: true,
+                delay: { show: 500, hide: 100 }
+            });
+        });
+    });
+
+    // Handle tooltip update after htmx request
+    function handleTooltipUpdate(event, element) {
+        if (event.detail.successful) {
+            const newCount = event.detail.xhr.responseText;
+
+            // Destroy all other tooltips
+            const allTooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            allTooltips.forEach(function (tooltipEl) {
+                if (tooltipEl !== element) {
+                    $(tooltipEl).tooltip('dispose'); // Dispose of other tooltips
+                }
+            });
+
+            // Update tooltip attributes for the current element
+            element.setAttribute('title', 'In estimates: ' + newCount);
+            element.setAttribute('data-original-title', 'In estimates: ' + newCount);
+
+            // Reinitialize the tooltip for the current element
+            $(element).tooltip('dispose'); // Destroy the old tooltip
+            $(element).tooltip({ title: 'In estimates: ' + newCount }).tooltip('show'); // Show the updated tooltip
+        }
+    }
+</script>
+
+<style>
+    .tooltip {
+        margin-right: 10px;
+    }
+</style>

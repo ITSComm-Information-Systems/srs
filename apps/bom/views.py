@@ -176,6 +176,32 @@ def item_lookup(request):
                     'item_list': item_list})
 
 @permission_required('bom.can_access_bom')
+def item_lookup_endpoint(request):
+    search_query = request.POST.get('item_code', '').strip().lower()
+    item_list = Item.objects.get_active()
+
+
+    if search_query:
+        item_list = item_list.filter(
+            Q(code__icontains=search_query) |
+            Q(name__icontains=search_query) |
+            Q(manufacturer__icontains=search_query) |
+            Q(manufacturer_part_number__icontains=search_query)
+        )
+
+    return render(request, 'bom/partials/item_table_rows.html', {'item_list': item_list})
+
+@permission_required('bom.can_access_bom')
+def item_usage_count(request, item_pk):
+    # Get the item object for the given pk
+    item = get_object_or_404(Item, pk=item_pk)
+    total_quantity = Material.objects.filter(item=item, material_location__estimate__status__in=[Estimate.WAREHOUSE, Estimate.ORDERED]).aggregate(Sum('quantity'))['quantity__sum']
+    if total_quantity is None:
+        total_quantity = 0
+
+    return HttpResponse(str(total_quantity))
+
+@permission_required('bom.can_access_bom')
 def item_details(request, item_pk):
     # Get the item object for the given pk
     item = get_object_or_404(Item, pk=item_pk)
