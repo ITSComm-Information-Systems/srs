@@ -20,22 +20,26 @@
         rowsArray.sort(function (a, b) {
             var x = a.getElementsByTagName("TD")[n].innerHTML.trim();
             var y = b.getElementsByTagName("TD")[n].innerHTML.trim();
-
+        
+            // Remove commas from the values
+            var xClean = x.replace(/,/g, "");
+            var yClean = y.replace(/,/g, "");
+        
             // Check if the column contains dates
-            if (isValidDate(x) && isValidDate(y)) {
-                var xDate = new Date(x);
-                var yDate = new Date(y);
+            if (isValidDate(xClean) && isValidDate(yClean)) {
+                var xDate = new Date(xClean);
+                var yDate = new Date(yClean);
                 return dir === "asc" ? xDate - yDate : yDate - xDate;
             }
-
+        
             // Check if x and y are numeric
-            var xNum = parseFloat(x);
-            var yNum = parseFloat(y);
-
+            var xNum = parseFloat(xClean);
+            var yNum = parseFloat(yClean);
+        
             if (!isNaN(xNum) && !isNaN(yNum)) {
                 return dir === "asc" ? xNum - yNum : yNum - xNum;
             }
-
+        
             // Sort alphabetically
             if (dir === "asc") {
                 return x.localeCompare(y);

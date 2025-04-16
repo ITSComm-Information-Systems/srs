@@ -9,7 +9,7 @@
 <form hx-post="{% url 'item_lookup_endpoint' %}" 
         onsubmit="return false;"
         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-        hx-trigger="input delay:500ms, keyup[key=='Enter']"
+        hx-trigger="load, input delay:500ms, keyup[key=='Enter']"
         hx-target="#itemTableBody"
         hx-indicator=".htmx-indicator">
     <div class="form-group">
@@ -22,7 +22,7 @@
 <table id="item_table" class="table table-hover table-striped sort-table" aria-live="polite">
     <thead>
         <tr>
-            <th style="min-width:100px;" onclick="sortTable('item_table', 0)">Code <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:126px;" onclick="sortTable('item_table', 0)">Code <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
             <th style="min-width:107px;" onclick="sortTable('item_table', 1)">Description <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
             <th style="min-width:81px;" onclick="sortTable('item_table', 2)">Type <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
             <th style="min-width:105px;" onclick="sortTable('item_table', 3)">Subclass <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
