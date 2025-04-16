@@ -1,6 +1,7 @@
 {% for item in item_list %}
 {% load humanize %}
-<tr 
+<tr>
+    <td
     data-item_id="{{ item.id }}" 
     data-item_code="{{ item.code }}" 
     data-bs-toggle="tooltip" 
@@ -10,14 +11,13 @@
     hx-trigger="mouseover delay:500ms" 
     hx-swap="none" 
     hx-on::after-request="handleTooltipUpdate(event, this)" 
-    hx-on::mouseleave="$(this).tooltip('dispose')">
-    <td>{{ item.code }}</td>
+    hx-on::mouseleave="$(this).tooltip('dispose')">{{ item.code }}</td>
     <td>{{ item.name }}</td>
     <td>{{ item.class_code }}</td>
     <td>{{ item.subclass_name }}</td>
     <td>{{ item.manufacturer }}</td>
     <td>{{ item.manufacturer_part_number }}</td>
-    <td class="text-right">{{ item.price|intcomma }}</td>
+    <td class="text-right">{{ item.price|floatformat:2|intcomma }}</td>
 </tr>
 {% empty %}
 <tr>

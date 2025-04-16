@@ -169,11 +169,9 @@ def project_list(request):
 
 @permission_required('bom.can_access_bom')
 def item_lookup(request):
-    item_list = Item.objects.get_active()
 
     return render(request, 'bom/item_lookup.html',
-                    {'title': 'Item Lookup',
-                    'item_list': item_list})
+                    {'title': 'Item Lookup'})
 
 @permission_required('bom.can_access_bom')
 def item_lookup_endpoint(request):
