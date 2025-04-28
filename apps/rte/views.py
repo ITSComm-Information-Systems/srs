@@ -778,15 +778,15 @@ def actual_v_estimate(request):
         template = loader.get_template('rte/view/actual-vs-estimate-open.html')
         unfiltered_estimates = EstimateView.objects.filter(
             Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
-        ).exclude(status__in=['Rejected', 'Cancelled', 'Completed'])
+        ).exclude(status__in=['Rejected', 'Cancelled', 'Completed']).exclude(estimated_start_date__isnull=True).order_by('-estimated_start_date')[:250]
     else:
         template = loader.get_template('rte/view/actual-vs-estimate-completed.html')
         unfiltered_estimates = EstimateView.objects.filter(
             Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
-        ).filter(status__in=['Completed'])
+        ).filter(status__in=['Completed']).exclude(estimated_start_date__isnull=True).order_by('-estimated_start_date')[:250]
 
     estimates = []
-    for estimate in unfiltered_estimates:
+    for estimate in unfiltered_estimates: 
         estimates.append(estimate)
 
     for estimate in estimates:
@@ -834,9 +834,6 @@ def actual_v_estimate(request):
         estimate.project_manager_group_estimated_hours = hours_and_classes['group_estimated_hours']['Project Mgt']
         estimate.network_ops_group_estimated_hours = hours_and_classes['group_estimated_hours']['Network Ops']
         estimate.osp_tech_group_estimated_hours = hours_and_classes['group_estimated_hours']['FSU - OSP']
-
-
-        
 
     context = {
         'title': 'Actual vs Estimated Hours',
