@@ -296,7 +296,7 @@ class Chartcom(models.Model):
 class UserChartcomV(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     chartcom = models.ForeignKey(Chartcom, on_delete=models.DO_NOTHING)
-    active = models.BooleanField(default=True)
+    #active = models.BooleanField(default=True)
     name = models.CharField(max_length=20, blank=True, primary_key=True)
     dept = models.CharField(max_length=30)
     account_number = models.CharField(max_length=30)
