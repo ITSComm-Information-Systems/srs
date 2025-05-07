@@ -188,12 +188,18 @@ class Openshift():
     def create_role_bindings(self, instance):
         url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
 
+        role_map = {
+            'admins': 'admin',
+            'editors': 'edit',
+            'viewers': 'view'
+        }
+
         for users in instance.cleaned_names:
 
             if users == 'all':
                 role = 'cluster-logging-application-view'
             else:
-                role = users[:-1]   # admins becomes admin, etc.
+                role = role_map[users]   # admins becomes admin, etc.
 
             uniqnames = instance.cleaned_names[users]
             if len(uniqnames) > 0:
