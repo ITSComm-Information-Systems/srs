@@ -331,9 +331,10 @@ class ContainerNewForm(CloudForm):
             cleaned_names[users] = []
             for user in self.cleaned_data.get(users).split('\n'):
                 user = user.strip('\r, ')
-                uniqnames.append(user)
-                cleaned_names[users].append(user)
-                all_users.append(user)
+                if user != '':
+                    uniqnames.append(user)
+                    cleaned_names[users].append(user)
+                    all_users.append(user)
 
         cleaned_names['all'] = list(set(all_users))
 
