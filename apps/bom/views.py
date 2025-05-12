@@ -706,3 +706,6 @@ def open_preorder_endpoint(request):
         template = 'bom/partials/open_preorder_table.html'
     return render(request, template,
                 {'search_list': search_list})
+
+def test(request):
+    pass
