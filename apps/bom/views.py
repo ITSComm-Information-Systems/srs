@@ -174,6 +174,8 @@ def item_lookup(request):
     return render(request, 'bom/item_lookup.html',
                     {'title': 'Item Lookup',
                     'item_list': item_list})
+def test(request):
+    pass
 
 @permission_required('bom.can_access_bom')
 def item_details(request, item_pk):
