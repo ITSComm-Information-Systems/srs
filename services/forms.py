@@ -234,9 +234,67 @@ def validate_project_name(value):
     if Openshift().get_project(value).ok:
         raise ValidationError(f'A project with this name already exists.  Please select a different name.')
     
+class OncampuscontainerNewForm(CloudForm):
+    title = 'Request an On-Campus Container Service Project'
+    custom = ['course_info']
+    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','oncampus_container_sensitive']
+    oncampus_container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
+    course_yn = forms.BooleanField(widget=NoYes,
+        label='Are you requesting this service for a course project?',
+        help_text = "This service is available at no cost for faculty, staff, or students provided it's being used for a project or activity associated with a current U-M course. Faculty may request multiple application instances at one time (e.g., one per student). A valid course code is required.")
+    course_info = forms.CharField(required=False)
+    shortcode = forms.CharField(validators=[validate_shortcode], required=False)
+    admin_group = forms.ChoiceField(label='Contact Group', help_text='The MCommunity group is used to identify a point of contact should the primary point of contact for this account change. Must be public and contain at least 2 members. The MCommunity group will not be used to define or maintain access to your project. Please omit @umich.edu from your group name in this field.')
+    project_name = forms.CharField(help_text='A project is a logical grouping of resources that can be managed together. A project can contain multiple applications, services, and other resources. Projects are used to organize and manage resources in a way that makes sense for your team. The project name must be unique on the hosting cluster. It must be lowercase, contain no special characters, and contain no spaces. Hyphens are permitted.',
+                                   validators=[validators.RegexValidator(
+                                        regex='^[a-z0-9][0-9a-z\-]*[a-z0-9]$',  # lowercase and hypens, also start and end with a lowercase letter
+                                        message="Label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character.",
+                                        code='invalid_name'), validate_project_name]
+                                   )
 
+    project_description = forms.CharField(required=False, help_text='Used to describe any charges associated with this project on billing invoices.', validators=[validate_project_description])
+    backup = forms.CharField(widget=NoYes, help_text='Selecting "Yes" here will automatically create a backup of the artifacts and persistent volumes associated with your application.')
+    admins = forms.CharField(widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should be "Admins" for this project.  Enter one uniqname per line.')
+    editors = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "Edit" access to this project.  Enter one uniqname per line.')
+    viewers = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":2}), help_text='List uniqnames of users who should have "View" access to this project.  Enter one uniqname per line.')
+
+    class Meta:
+        model = Container
+        fields = ['oncampus_container_sensitive','admin_group','course_yn','course_info','shortcode',
+                  'project_name', 'project_description', 'size','backup'] # Remaining follow form order
+
+    def clean(self):
+        # Check all uniqnames in a single call for efficiency porpoises
+        uniqnames = []
+        cleaned_names = {}
+        for users in ['admins', 'editors', 'viewers']:
+            cleaned_names[users] = []
+            for user in self.cleaned_data.get(users).split('\n'):
+                user = user.strip('\r, ')
+                uniqnames.append(user)
+                cleaned_names[users].append(user)
+
+        valid_uniqnames = MCommunity().check_user_list(uniqnames)
+
+        for users in ['admins', 'editors', 'viewers']:
+            error = ''
+            for user in cleaned_names[users]:
+                if user and user not in valid_uniqnames:
+                    error = error + user + ' '
+            
+            if error:
+                self.add_error(users, error + 'not found.')        
+
+        self.instance.cleaned_names = cleaned_names  # Hang on to this for later.
+
+        return super().clean()
+
+    def save(self):
+        # Create project in openshift, don't save to SRS.
+        os = Openshift()
+        os.create_project(self.instance, self.user.username)
 class ContainerNewForm(CloudForm):
-    title = 'Request a Container Service Project'
+    title = 'Request an AWS Container Project'
     custom = ['database_type', 'course_info']
     skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','container_sensitive']
     container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
@@ -273,9 +331,10 @@ class ContainerNewForm(CloudForm):
             cleaned_names[users] = []
             for user in self.cleaned_data.get(users).split('\n'):
                 user = user.strip('\r, ')
-                uniqnames.append(user)
-                cleaned_names[users].append(user)
-                all_users.append(user)
+                if user != '':
+                    uniqnames.append(user)
+                    cleaned_names[users].append(user)
+                    all_users.append(user)
 
         cleaned_names['all'] = list(set(all_users))
 

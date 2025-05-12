@@ -1,0 +1,26 @@
+<table id="woEstimateTable" class="table table-hover" style="display: table;">
+    <thead>
+        <tr>
+            <th>Project Name</th>
+            <th>Project Number</th>
+            <th>Reported Hours</th>
+            <th>Estimated Hours</th>
+            <th>Difference</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for wo in workorders %}
+        <tr>
+            {% if wo.estimate_id %}
+            <td><a href="{% url 'bom:estimate' wo.estimate_id %}">{{ wo.project_name }}</a></td>
+            {% else %}
+            <td>{{ wo.project_name }}</td>
+            {%endif%}
+            <td>{{wo.estimate_id}}</td>
+            <td>{{ wo.reported_hours|default_if_none:"0" }}</td>
+            <td>{{ wo.est_hours|default_if_none:"0"  }}</td>
+            <td>{{ wo.difference|default_if_none:"0"}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

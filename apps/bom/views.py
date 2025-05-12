@@ -143,7 +143,7 @@ def edit_project(request):
         project = Project.objects.get(id=project_id)
         engineer = project.netops_engineer
     else:
-        project = Project()
+        project, created = Project.objects.get_or_create(woid=woid)
         project.woid = woid
         engineer = ''
 
@@ -169,13 +169,35 @@ def project_list(request):
 
 @permission_required('bom.can_access_bom')
 def item_lookup(request):
-    item_list = Item.objects.get_active()
 
     return render(request, 'bom/item_lookup.html',
-                    {'title': 'Item Lookup',
-                    'item_list': item_list})
-def test(request):
-    pass
+                    {'title': 'Item Lookup'})
+
+@permission_required('bom.can_access_bom')
+def item_lookup_endpoint(request):
+    search_query = request.POST.get('item_code', '').strip().lower()
+    item_list = Item.objects.get_active()
+
+
+    if search_query:
+        item_list = item_list.filter(
+            Q(code__icontains=search_query) |
+            Q(name__icontains=search_query) |
+            Q(manufacturer__icontains=search_query) |
+            Q(manufacturer_part_number__icontains=search_query)
+        )
+
+    return render(request, 'bom/partials/item_table_rows.html', {'item_list': item_list})
+
+@permission_required('bom.can_access_bom')
+def item_usage_count(request, item_pk):
+    # Get the item object for the given pk
+    item = get_object_or_404(Item, pk=item_pk)
+    total_quantity = Material.objects.filter(item=item, material_location__estimate__status__in=[Estimate.WAREHOUSE, Estimate.ORDERED]).aggregate(Sum('quantity'))['quantity__sum']
+    if total_quantity is None:
+        total_quantity = 0
+
+    return HttpResponse(str(total_quantity))
 
 @permission_required('bom.can_access_bom')
 def item_details(request, item_pk):
@@ -572,7 +594,7 @@ class EngineeringSearch(PermissionRequiredMixin, View):
         return render(request, template,
                     {'title': 'Engineering Projects',
                     'search_list': search_list})
-    
+   
 @permission_required('bom.can_access_bom')
 def estimate_search(request):
     template = 'bom/estimate_search.html'
@@ -642,6 +664,13 @@ def open_preorder_search(request):
 
     return render(request, template,
                 {'title': 'Search Open Preorders/Workorders',
+                })
+@permission_required('bom.can_access_bom')
+def search_mockup(request):
+    template = 'bom/search_mockup.html'
+
+    return render(request, template,
+                {'title': 'Search Mockup',
                 })
 
 @permission_required('bom.can_access_bom')

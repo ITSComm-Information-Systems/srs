@@ -301,6 +301,20 @@ $(document).ready(function() {
     $('#div_ad_group').hide();
   });
 
+  // Zoom for Government
+  $(document).on("click", "#zgAccount_0" , function() {
+    $('#div_zgUniqname').hide().prop('required',false);
+    $('#div_zgOrderPhone').hide().prop('required',false);
+    $('#div_zgJack').show().prop('required',true);
+  });
+
+  $(document).on("click", "#zgAccount_1" , function() {
+    $('#div_zgUniqname').show().prop('required',true);
+    $('#div_zgOrderPhone').show().prop('required',true);
+    $('#div_zgJack').hide().prop('required',false);
+  });
+
+
   // midatabasic
   $('[data-tab="midatabasic"]').on('shown.bs.tab', function(event) {
 
@@ -561,8 +575,12 @@ $(document).ready(function() {
   });
 
   function set_server_name() {
-    
     server_name = $("#id_serverName").val();
+
+    if ($("#regulated_data_4").prop("checked")) { // Check for PCI Datum
+      server_name = 'p-' + server_name;
+      pci = true;
+    }
 
     if (database) {
       if (database == "MSSQL") {
@@ -572,7 +590,7 @@ $(document).ready(function() {
       } else {
         server_name = server_name + '-' + database.toLowerCase();
       }
-    } else if (managed_windows) {
+    } else if (managed_windows && !pci) {
       if ($('#misevprefix_0').prop("checked")) {
         server_name = $("#id_misevregpre").val() + '-' + server_name;
       } else {
