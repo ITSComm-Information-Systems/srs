@@ -1,6 +1,6 @@
 {% for item in item_list %}
 {% load humanize %}
-<tr>
+<tr data-item-id="{{ item.commodity_code }}">
     <td>
         <button class="btn btn-link" onclick="handlePlusClick(this)"
                 hx-post="{% url 'add_selected_barcode_item' %}" 
@@ -28,34 +28,54 @@
 {% endfor %}
 
 <script>
-    function handlePlusClick(button) {
-        // Get the container for selected items
-        const selectedItemsContainer = document.querySelector("#selectedItemsContainer");
+    // Object to store the button states
+    const buttonStates = {};
 
-        // Count the number of selected items
-        const selectedCount = selectedItemsContainer.querySelectorAll(".card").length;
+    function handlePlusClick(button) {
+        // Get the unique identifier for the row (e.g., commodity code)
+        //rowID is the commodity code also known as a Z code
+        const rowId = button.closest("tr").dataset.itemId;
 
         // Find the icon element inside the button
         const icon = button.querySelector('i');
-
-        // Allow removal even if the limit is reached
-        if (icon.classList.contains('fa-minus')) {
-            // Remove the item (you may need to implement additional logic here)
-            icon.classList.remove('fa-minus', 'text-danger'); // Remove 'text-danger' when switching back
-            icon.classList.add('fa-plus');
-            return; // Exit the function
-        }
-
-        // Check if the limit of 16 is reached
-        if (selectedCount >= 16) {
-            alert("You can only select up to 16 barcodes.");
-            return; // Prevent further execution
-        }
 
         // Toggle between plus and minus icons
         if (icon.classList.contains('fa-plus')) {
             icon.classList.remove('fa-plus');
             icon.classList.add('fa-minus', 'text-danger'); // Add 'text-danger' for red color
+            buttonStates[rowId] = 'minus'; // Update the state
+        } else {
+            icon.classList.remove('fa-minus', 'text-danger');
+            icon.classList.add('fa-plus');
+            buttonStates[rowId] = 'plus'; // Update the state
         }
     }
+
+    // Function to restore button states after a search
+    function restoreButtonStates() {
+        const rows = document.querySelectorAll("#itemTableBody tr");
+        rows.forEach(row => {
+            const rowId = row.dataset.itemId;
+
+            // Only update rows that exist in the buttonStates object
+            if (buttonStates[rowId]) {
+                const button = row.querySelector("button");
+                const icon = button.querySelector('i');
+
+                // Check the state and update the button accordingly
+                if (buttonStates[rowId] === 'minus') {
+                    icon.classList.remove('fa-plus');
+                    icon.classList.add('fa-minus', 'text-danger');
+                } else {
+                    icon.classList.remove('fa-minus', 'text-danger');
+                    icon.classList.add('fa-plus');
+                }
+            }
+        });
+    }
+
+    // Call restoreButtonStates after the table is updated (e.g., after a search)
+    document.addEventListener("htmx:afterSwap", function () {
+        restoreButtonStates();
+    });
 </script>
