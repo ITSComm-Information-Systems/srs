@@ -21,9 +21,9 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.platypus import (
-    Paragraph, FrameBreak,
+    Paragraph, FrameBreak, Flowable,
     Frame, PageTemplate, BaseDocTemplate,
-    KeepInFrame, PageBreak)
+    KeepInFrame, Spacer)
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfgen.canvas import Canvas
 from io import BytesIO
@@ -834,16 +834,65 @@ def create_label(item):
     # Return the frame and the drawing function
     return frame, draw_rounded_rect
 
+class RoundedLabel(Flowable):
+    def __init__(self, item):
+        super().__init__()
+        self.item = item
+        self.width = 4 * inch  # Label width
+        self.height = 1.15 * inch  # Label height
+        self.radius = 8  # Rounded corner radius
+
+    def draw(self):
+        # Draw the rounded rectangle
+        self.canv.roundRect(0, 0, self.width, self.height, self.radius, stroke=1, fill=0)
+
+        # Add the label content inside the rectangle
+        styles = getSampleStyleSheet()
+        code_style = ParagraphStyle(
+            'CodeStyle',
+            parent=styles['Normal'],
+            fontName='Helvetica-Bold',
+            fontSize=12,
+            spaceAfter=4
+        )
+        desc_style = ParagraphStyle(
+            'DescStyle',
+            parent=styles['Normal'],
+            fontSize=10,
+            leading=12,
+            spaceAfter=2
+        )
+        min_lvl_style = ParagraphStyle(
+            'MinLvlStyle',
+            parent=styles['Normal'],
+            fontSize=9,
+            textColor=colors.darkgrey
+        )
+
+        # Draw the content
+        self.canv.setFont('Helvetica-Bold', 12)
+        self.canv.drawString(10, self.height - 20, self.item['code'])
+
+        y = self.height - 40
+        for line in self.item['description']:
+            self.canv.setFont('Helvetica', 10)
+            self.canv.drawString(10, y, line)
+            y -= 12
+
+        self.canv.setFont('Helvetica', 9)
+        self.canv.setFillColor(colors.darkgrey)
+        self.canv.drawString(10, y - 10, f"Min. Lvl: {self.item['min_lvl']}")
+
 @permission_required('bom.can_access_bom')
 def create_barcode_pdf(request):
     buffer = BytesIO()
     doc = BaseDocTemplate(
         buffer,
         pagesize=letter,
-        leftMargin=0.5 * inch,
-        rightMargin=0.5 * inch,
-        topMargin=0.5 * inch,
-        bottomMargin=0.5 * inch
+        leftMargin=0.0125 * inch,
+        rightMargin=0.125 * inch,
+        topMargin=0.125 * inch,
+        bottomMargin=0.125 * inch
     )
 
     # Define frames for two columns
@@ -875,22 +924,11 @@ def create_barcode_pdf(request):
     ] * 16
     story = []
     items_per_column = 8  # 8 items per column (16 total per page)
-    
-    # Split data into left and right columns
-    for i in range(0, len(data), items_per_column * 2):
-        left_data = data[i:i + items_per_column]
-        right_data = data[i + items_per_column:i + items_per_column * 2]
-        
-        # Build left column content
-        left_story = [create_label(item)[0] for item in left_data]
-        # Build right column content
-        right_story = [create_label(item)[0] for item in right_data]
-        
-        # Use KeepInFrame to ensure content fits
-        story.append(KeepInFrame(col_width, doc.height, left_story))
-        story.append(FrameBreak())  # Switch to next frame (col2)
-        story.append(KeepInFrame(col_width, doc.height, right_story))
-        story.append(PageBreak())
+
+    # Add labels to the story
+    for item in data:
+        story.append(RoundedLabel(item))
+        story.append(Spacer(0, 0.1 * inch))  # Add spacing between labels
 
     doc.build(story)
     buffer.seek(0)
