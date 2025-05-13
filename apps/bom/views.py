@@ -13,7 +13,7 @@ from datetime import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
 
-from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, ProjectView, EstimateView, UmOscNoteProfileV, NotificationManager, Notification, Technician
+from .models import *
 from .forms import FavoriteForm, EstimateForm, ProjectForm, MaterialForm, MaterialLocationForm, LaborForm
 
 
@@ -699,3 +699,13 @@ def open_preorder_endpoint(request):
         template = 'bom/partials/open_preorder_table.html'
     return render(request, template,
                 {'search_list': search_list})
+
+@permission_required('bom.can_access_bom')
+def item_barcodes(request):
+    template = 'bom/item_barcodes.html'
+    items = ItemBarcode.objects.all()
+    #print num of items
+    print(f'num of items: {items.count()}')
+    return render(request, template,
+                {   'title': 'Item Barcodes',
+                    'items': items,})

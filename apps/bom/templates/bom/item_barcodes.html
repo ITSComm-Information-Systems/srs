@@ -1,0 +1,33 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+{% load humanize %}
+{% load static %}
+
+
+<h2>{{ title }}</h2>
+
+{% for item in items %}
+    <div class="item-barcode">
+        {{ item.commodity_code }} -
+        {{ item.commodity_name }} -
+        {{ item.manufacturer_part_number }} -
+        {{ item.min_reorder_lvl }} -
+        {{ item.warehouse_code }} -
+        {{ item.warehouse_name }}
+    </div>
+{% endfor %}
+<!-- <form hx-post="{% url 'item_lookup_endpoint' %}"
+        onsubmit="return false;"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-trigger="load, input delay:500ms, keyup[key=='Enter']"
+        hx-target="#itemTableBody"
+        hx-indicator=".htmx-indicator">
+    <div class="form-group">
+        <input type="text" class="form-control border border-primary" id="item_code" name="item_code" placeholder="Search items...">
+    </div>
+</form>
+
+{% include 'bom/partials/searching_indicator.html' %} -->
+
+
+{% endblock %}
