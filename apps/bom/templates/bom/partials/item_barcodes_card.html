@@ -1,0 +1,19 @@
+<div class="container">
+    {% for item in selected_items %}
+        {% if forloop.counter0|divisibleby:2 %} <!-- Start a new row every two items -->
+            <div class="row">
+        {% endif %}
+            
+        <div class="col-md-6">
+            <div style="margin-bottom: 20px;" class="card">
+                <div class="card-body">
+                    <span style="margin-top:-1px;" class="card-title"><b>{{ item.commodity_code }}</b> - {{ item.commodity_name }}</span>
+                </div>
+            </div>
+        </div>
+    
+        {% if forloop.counter|divisibleby:2 or forloop.last %} <!-- Close the row after two items or if last item -->
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>

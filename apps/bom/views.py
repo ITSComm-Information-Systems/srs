@@ -702,6 +702,8 @@ def open_preorder_endpoint(request):
 
 @permission_required('bom.can_access_bom')
 def item_barcodes(request):
+    if "selected_items" in request.session:
+        del request.session["selected_items"]
     template = 'bom/item_barcodes.html'
 
     return render(request, template,
@@ -756,7 +758,8 @@ def add_selected_barcode_item(request):
 
         # Add the new item to the list if it's not already selected
         if new_item not in selected_items:
-            selected_items.append(new_item)
+            if len(selected_items) < 16:
+                selected_items.append(new_item)
 
         #remove the item from the list if it is already selected
         else:
@@ -765,9 +768,6 @@ def add_selected_barcode_item(request):
         # Save the updated list back to the session
         request.session["selected_items"] = selected_items
 
-        # Print all selected items
-        for item in selected_items:
-            print(item)
-
-        # Return a response
-        return JsonResponse({"message": "Item added successfully!"})
+        #pass selected items to the template
+        return render(request, 'bom/partials/item_barcodes_card.html',
+                     {'selected_items': selected_items})

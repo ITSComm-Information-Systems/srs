@@ -7,7 +7,6 @@
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                 hx-trigger="click"
                 hx-target="#selectedItemsContainer"
-                hx-indicator=".htmx-indicator"
                 hx-vals='{
                     "item_commodity_code": "{{ item.commodity_code }}",
                     "item_commodity_name": "{{ item.commodity_name }}",
@@ -30,16 +29,33 @@
 
 <script>
     function handlePlusClick(button) {
+        // Get the container for selected items
+        const selectedItemsContainer = document.querySelector("#selectedItemsContainer");
+
+        // Count the number of selected items
+        const selectedCount = selectedItemsContainer.querySelectorAll(".card").length;
+
         // Find the icon element inside the button
         const icon = button.querySelector('i');
-    
+
+        // Allow removal even if the limit is reached
+        if (icon.classList.contains('fa-minus')) {
+            // Remove the item (you may need to implement additional logic here)
+            icon.classList.remove('fa-minus', 'text-danger'); // Remove 'text-danger' when switching back
+            icon.classList.add('fa-plus');
+            return; // Exit the function
+        }
+
+        // Check if the limit of 16 is reached
+        if (selectedCount >= 16) {
+            alert("You can only select up to 16 barcodes.");
+            return; // Prevent further execution
+        }
+
         // Toggle between plus and minus icons
         if (icon.classList.contains('fa-plus')) {
             icon.classList.remove('fa-plus');
             icon.classList.add('fa-minus', 'text-danger'); // Add 'text-danger' for red color
-        } else {
-            icon.classList.remove('fa-minus', 'text-danger'); // Remove 'text-danger' when switching back
-            icon.classList.add('fa-plus');
         }
     }
-    </script>
+</script>

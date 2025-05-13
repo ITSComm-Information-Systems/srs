@@ -6,6 +6,12 @@
 
 <h2>{{ title }}</h2>
 
+{% include 'bom/partials/searching_indicator.html' %}
+
+<div id="selectedItemsContainer">
+    <!-- Selected items cards will be dynamically inserted here -->
+</div>
+
 <form hx-post="{% url 'item_barcodes_endpoint' %}" 
         onsubmit="return false;"
         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
@@ -16,44 +22,6 @@
         <input type="text" class="form-control border border-primary" id="item_code" name="item_code" placeholder="Search items...">
     </div>
 </form>
-
-{% include 'bom/partials/searching_indicator.html' %}
-
-<div id="selectedItemsContainer" class="container">
-    <!-- Selected items cards will be dynamically inserted here -->
-</div>
-
-<!-- <div class="container">
-    <div class="row">
-        <div class="col-md">
-            <div style="margin-bottom: 20px; margin-left:20px;" class="card">
-                <div class="card-body">
-                    <h5 style="margin-top:-1px;" class="card-title">Row One Barcodes</h5>
-                    <p class="card-text">The barcode will be here</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md">
-            <div style="margin-bottom: 20px; margin-right:20px;" class="card">
-                <div class="card-body">
-                    <h5 style="margin-top:-1px;" class="card-title">Row two Barcodes</h5>
-                    <p class="card-text">The barcode will be here</p>
-                </div>
-            </div>
-            <div style="margin-bottom: 20px; margin-right:20px;" class="card">
-                <div class="card-body">
-                    <h5 style="margin-top:-1px;" class="card-title">Row two Barcodes</h5>
-                    <p class="card-text">The barcode will be here</p>
-                </div>
-            </div>
-            <div style="margin-bottom: 20px; margin-right:20px;" class="card">
-                <div class="card-body">
-                    <h5 style="margin-top:-1px;" class="card-title">Row two Barcodes</h5>
-                    <p class="card-text">The barcode will be here</p>
-                </div>
-            </div>
-        </div>
-</div> -->
 
 <table id="item_table" class="table table-hover table-striped sort-table" aria-live="polite">
     <thead>
