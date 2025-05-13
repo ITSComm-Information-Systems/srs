@@ -1,0 +1,45 @@
+{% for item in item_list %}
+{% load humanize %}
+<tr>
+    <td>
+        <button class="btn btn-link" onclick="handlePlusClick(this)"
+                hx-post="{% url 'add_selected_barcode_item' %}" 
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-trigger="click"
+                hx-target="#selectedItemsContainer"
+                hx-indicator=".htmx-indicator"
+                hx-vals='{
+                    "item_commodity_code": "{{ item.commodity_code }}",
+                    "item_commodity_name": "{{ item.commodity_name }}",
+                    "item_manufacturer_part_nbr": "{{ item.manufacturer_part_nbr }}",
+                    "item_warehouse_code": "{{ item.warehouse_code }}",
+                    "item_warehouse_name": "{{ item.warehouse_name }}",
+                    "item_min_reorder_lvl": "{{ item.min_reorder_lvl }}"
+                }'>
+            <i class="fa fa-plus"></i> <!-- Font Awesome Plus Icon -->
+        </button>
+        {{ item.commodity_code }}</td>
+    <td>{{ item.commodity_name }}</td>
+    <td>{{ item.manufacturer_part_nbr }}</td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="7" class="text-center">No items found.</td>
+</tr>
+{% endfor %}
+
+<script>
+    function handlePlusClick(button) {
+        // Find the icon element inside the button
+        const icon = button.querySelector('i');
+    
+        // Toggle between plus and minus icons
+        if (icon.classList.contains('fa-plus')) {
+            icon.classList.remove('fa-plus');
+            icon.classList.add('fa-minus', 'text-danger'); // Add 'text-danger' for red color
+        } else {
+            icon.classList.remove('fa-minus', 'text-danger'); // Remove 'text-danger' when switching back
+            icon.classList.add('fa-plus');
+        }
+    }
+    </script>

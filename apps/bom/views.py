@@ -8,9 +8,9 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.forms import modelform_factory, modelformset_factory, inlineformset_factory
 from project.pinnmodels import UmOscPreorderApiV,UmRteTechnicianV, UmRteLaborGroupV
-from django.db.models import Q,F, Sum
+from django.db.models import Q,F, Sum, IntegerField
 from datetime import datetime
-
+from django.db.models.functions import Cast, Substr
 from django.contrib.auth.decorators import login_required, permission_required
 
 from .models import *
@@ -703,9 +703,71 @@ def open_preorder_endpoint(request):
 @permission_required('bom.can_access_bom')
 def item_barcodes(request):
     template = 'bom/item_barcodes.html'
-    items = ItemBarcode.objects.all()
-    #print num of items
-    print(f'num of items: {items.count()}')
+
     return render(request, template,
-                {   'title': 'Item Barcodes',
-                    'items': items,})
+                {   'title': 'Item Barcodes',})
+
+@permission_required('bom.can_access_bom')
+def item_barcodes_endpoint(request):
+    template = 'bom/partials/item_barcodes_rows.html'
+    search_query = request.POST.get('item_code', '').strip().lower()
+
+    item_list = ItemBarcode.objects.all()
+    if search_query:
+        item_list = item_list.filter(
+            Q(commodity_code__icontains=search_query) |
+            Q(commodity_name__icontains=search_query) |
+            Q(manufacturer_part_nbr__icontains=search_query) |
+            Q(warehouse_code__icontains=search_query) |
+            Q(warehouse_name__icontains=search_query) )
+
+    item_list = item_list.order_by('commodity_code')[:1000]
+    
+    return render(request, template,
+                {'item_list': item_list})
+
+@permission_required('bom.can_access_bom')
+def add_selected_barcode_item(request):
+    # Initialize the session variable if it doesn't exist
+    if "selected_items" not in request.session:
+        request.session["selected_items"] = []
+
+    if request.method == "POST":
+        # Retrieve the selected items from the session
+        selected_items = request.session["selected_items"]
+
+        # Get the item details from the POST request
+        commodity_code = request.POST.get("item_commodity_code")
+        commodity_name = request.POST.get("item_commodity_name")
+        manufacturer_part_nbr = request.POST.get("item_manufacturer_part_nbr")
+        warehouse_code = request.POST.get("item_warehouse_code")
+        warehouse_name = request.POST.get("item_warehouse_name")
+        min_reorder_lvl = request.POST.get("item_min_reorder_lvl")
+
+        # Create a dictionary for the new item
+        new_item = {
+            "commodity_code": commodity_code,
+            "commodity_name": commodity_name,
+            "manufacturer_part_nbr": manufacturer_part_nbr,
+            "warehouse_code": warehouse_code,
+            "warehouse_name": warehouse_name,
+            "min_reorder_lvl": min_reorder_lvl,
+        }
+
+        # Add the new item to the list if it's not already selected
+        if new_item not in selected_items:
+            selected_items.append(new_item)
+
+        #remove the item from the list if it is already selected
+        else:
+            selected_items.remove(new_item)
+
+        # Save the updated list back to the session
+        request.session["selected_items"] = selected_items
+
+        # Print all selected items
+        for item in selected_items:
+            print(item)
+
+        # Return a response
+        return JsonResponse({"message": "Item added successfully!"})

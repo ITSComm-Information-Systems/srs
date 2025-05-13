@@ -31,4 +31,6 @@ urlpatterns = [
     path('open_preorder_search/', views.open_preorder_search, name='open_preorder_search'),
     path('open_preorder_endpoint/', views.open_preorder_endpoint, name='open_preorder_endpoint'),
     path('item_barcodes/', views.item_barcodes, name='item_barcodes'),
+    path('item_barcodes_endpoint/', views.item_barcodes_endpoint, name='item_barcodes_endpoint'),
+    path('add_selected_barcode_item/', views.add_selected_barcode_item, name='add_selected_barcode_item'),
 ]

@@ -6,17 +6,7 @@
 
 <h2>{{ title }}</h2>
 
-{% for item in items %}
-    <div class="item-barcode">
-        {{ item.commodity_code }} -
-        {{ item.commodity_name }} -
-        {{ item.manufacturer_part_number }} -
-        {{ item.min_reorder_lvl }} -
-        {{ item.warehouse_code }} -
-        {{ item.warehouse_name }}
-    </div>
-{% endfor %}
-<!-- <form hx-post="{% url 'item_lookup_endpoint' %}"
+<form hx-post="{% url 'item_barcodes_endpoint' %}" 
         onsubmit="return false;"
         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
         hx-trigger="load, input delay:500ms, keyup[key=='Enter']"
@@ -27,7 +17,60 @@
     </div>
 </form>
 
-{% include 'bom/partials/searching_indicator.html' %} -->
+{% include 'bom/partials/searching_indicator.html' %}
 
+<div id="selectedItemsContainer" class="container">
+    <!-- Selected items cards will be dynamically inserted here -->
+</div>
 
+<!-- <div class="container">
+    <div class="row">
+        <div class="col-md">
+            <div style="margin-bottom: 20px; margin-left:20px;" class="card">
+                <div class="card-body">
+                    <h5 style="margin-top:-1px;" class="card-title">Row One Barcodes</h5>
+                    <p class="card-text">The barcode will be here</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div style="margin-bottom: 20px; margin-right:20px;" class="card">
+                <div class="card-body">
+                    <h5 style="margin-top:-1px;" class="card-title">Row two Barcodes</h5>
+                    <p class="card-text">The barcode will be here</p>
+                </div>
+            </div>
+            <div style="margin-bottom: 20px; margin-right:20px;" class="card">
+                <div class="card-body">
+                    <h5 style="margin-top:-1px;" class="card-title">Row two Barcodes</h5>
+                    <p class="card-text">The barcode will be here</p>
+                </div>
+            </div>
+            <div style="margin-bottom: 20px; margin-right:20px;" class="card">
+                <div class="card-body">
+                    <h5 style="margin-top:-1px;" class="card-title">Row two Barcodes</h5>
+                    <p class="card-text">The barcode will be here</p>
+                </div>
+            </div>
+        </div>
+</div> -->
+
+<table id="item_table" class="table table-hover table-striped sort-table" aria-live="polite">
+    <thead>
+        <tr>
+            <th style="min-width:136px;" onclick="sortTable('item_table', 0)">Code <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:107px;" onclick="sortTable('item_table', 1)">Name <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:81px;" onclick="sortTable('item_table', 2)">Mfr. Part Number <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+        </tr>
+    </thead>
+    <tbody id="itemTableBody">
+        {% include 'bom/partials/item_barcodes_rows.html' %}
+    </tbody>
+</table>
+
+<div class="htmx-indicator" style="display: none;">Loading...</div>
+
+{% block js %}
+<script src="{% static 'js/common_sort.js' %}"></script>
+{% endblock js %}
 {% endblock %}
