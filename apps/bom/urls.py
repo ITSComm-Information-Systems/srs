@@ -33,4 +33,5 @@ urlpatterns = [
     path('item_barcodes/', views.item_barcodes, name='item_barcodes'),
     path('item_barcodes_endpoint/', views.item_barcodes_endpoint, name='item_barcodes_endpoint'),
     path('add_selected_barcode_item/', views.add_selected_barcode_item, name='add_selected_barcode_item'),
+    path('create_barcode_pdf/', views.create_barcode_pdf, name='create_barcode_pdf'),
 ]

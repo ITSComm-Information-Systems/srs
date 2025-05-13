@@ -16,6 +16,18 @@ from django.contrib.auth.decorators import login_required, permission_required
 from .models import *
 from .forms import FavoriteForm, EstimateForm, ProjectForm, MaterialForm, MaterialLocationForm, LaborForm
 
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from reportlab.lib import colors
+from reportlab.platypus import (
+    Paragraph, FrameBreak,
+    Frame, PageTemplate, BaseDocTemplate,
+    KeepInFrame, PageBreak)
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.pdfgen.canvas import Canvas
+from io import BytesIO
+import math
 
 class WorkorderListView(ListView):
     #filterset_class = None
@@ -771,3 +783,115 @@ def add_selected_barcode_item(request):
         #pass selected items to the template
         return render(request, 'bom/partials/item_barcodes_card.html',
                      {'selected_items': selected_items})
+
+# -- Rounded Label Template --
+def create_label(item):
+    styles = getSampleStyleSheet()
+    
+    # Custom styles
+    code_style = ParagraphStyle(
+        'CodeStyle', 
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=12,
+        spaceAfter=4
+    )
+    
+    desc_style = ParagraphStyle(
+        'DescStyle',
+        parent=styles['Normal'],
+        fontSize=10,
+        leading=12,
+        spaceAfter=2
+    )
+    
+    min_lvl_style = ParagraphStyle(
+        'MinLvlStyle',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=colors.darkgrey
+    )
+
+    # Build label content
+    elements = [
+        Paragraph(item['code'], code_style),
+        *[Paragraph(line, desc_style) for line in item['description']],
+        Paragraph(f"Min. Lvl: {item['min_lvl']}", min_lvl_style)
+    ]
+
+    # Create rounded rectangle frame
+    frame = KeepInFrame(
+        2.8 * inch,  # Label width
+        1.5 * inch,  # Label height
+        elements,
+        hAlign='LEFT'
+    )
+
+    # Custom drawing function for the rounded rectangle
+    def draw_rounded_rect(canvas, x, y, width, height, radius=8):
+        canvas.roundRect(x, y, width, height, radius, stroke=1, fill=0)
+
+    # Return the frame and the drawing function
+    return frame, draw_rounded_rect
+
+@permission_required('bom.can_access_bom')
+def create_barcode_pdf(request):
+    buffer = BytesIO()
+    doc = BaseDocTemplate(
+        buffer,
+        pagesize=letter,
+        leftMargin=0.5 * inch,
+        rightMargin=0.5 * inch,
+        topMargin=0.5 * inch,
+        bottomMargin=0.5 * inch
+    )
+
+    # Define frames for two columns
+    col_width = (doc.width - 0.25 * inch) / 2  # Account for 0.25" gap between columns
+    frame1 = Frame(
+        doc.leftMargin,
+        doc.bottomMargin,
+        col_width,
+        doc.height,
+        id='col1'
+    )
+    frame2 = Frame(
+        doc.leftMargin + col_width + 0.25 * inch,  # Add gap between columns
+        doc.bottomMargin,
+        col_width,
+        doc.height,
+        id='col2'
+    )
+
+    two_col_template = PageTemplate(id='TwoCol', frames=[frame1, frame2])
+    doc.addPageTemplates([two_col_template])
+
+    data = [
+        {
+            'code': 'Z-000008',
+            'min_lvl': 0,
+            'description': ['75 OHM Coax DC Block', '15-1259']
+        },
+    ] * 16
+    story = []
+    items_per_column = 8  # 8 items per column (16 total per page)
+    
+    # Split data into left and right columns
+    for i in range(0, len(data), items_per_column * 2):
+        left_data = data[i:i + items_per_column]
+        right_data = data[i + items_per_column:i + items_per_column * 2]
+        
+        # Build left column content
+        left_story = [create_label(item)[0] for item in left_data]
+        # Build right column content
+        right_story = [create_label(item)[0] for item in right_data]
+        
+        # Use KeepInFrame to ensure content fits
+        story.append(KeepInFrame(col_width, doc.height, left_story))
+        story.append(FrameBreak())  # Switch to next frame (col2)
+        story.append(KeepInFrame(col_width, doc.height, right_story))
+        story.append(PageBreak())
+
+    doc.build(story)
+    buffer.seek(0)
+    return HttpResponse(buffer, content_type='application/pdf')
