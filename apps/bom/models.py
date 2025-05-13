@@ -711,3 +711,17 @@ class Favorite(models.Model):
 
     class Meta: 
         db_table = 'um_bom_favorites'
+
+class ItemBarcode(models.Model):
+    commodity_code = models.CharField(max_length=32)
+    commodity_name = models.CharField(max_length=200)
+    manufacturer_part_nbr = models.CharField(max_length=50)
+    min_reorder_lvl = models.IntegerField()
+    warehouse_code = models.CharField(max_length=32)
+    warehouse_name = models.CharField(max_length=200)
+
+    def __str__(self): 
+        return self.commodity_code
+
+    class Meta: 
+        db_table = 'srs_bar_code_labels_v'
