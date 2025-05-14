@@ -155,7 +155,7 @@ def edit_project(request):
         project = Project.objects.get(id=project_id)
         engineer = project.netops_engineer
     else:
-        project = Project()
+        project, created = Project.objects.get_or_create(woid=woid)
         project.woid = woid
         engineer = ''
 
@@ -606,7 +606,7 @@ class EngineeringSearch(PermissionRequiredMixin, View):
         return render(request, template,
                     {'title': 'Engineering Projects',
                     'search_list': search_list})
-    
+   
 @permission_required('bom.can_access_bom')
 def estimate_search(request):
     template = 'bom/estimate_search.html'
@@ -676,6 +676,13 @@ def open_preorder_search(request):
 
     return render(request, template,
                 {'title': 'Search Open Preorders/Workorders',
+                })
+@permission_required('bom.can_access_bom')
+def search_mockup(request):
+    template = 'bom/search_mockup.html'
+
+    return render(request, template,
+                {'title': 'Search Mockup',
                 })
 
 @permission_required('bom.can_access_bom')

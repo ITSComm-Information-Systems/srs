@@ -219,6 +219,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
 
             return render(request, 'services/midesktop-image.html',context)
         try:
+            print(service.capitalize() + 'NewForm')
             form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)
         except KeyError:
             return HttpResponseNotFound('<h1>Page not found</h1>')
