@@ -27,7 +27,7 @@ from reportlab.platypus import (
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from io import BytesIO
-import math
+import os
 
 class WorkorderListView(ListView):
     #filterset_class = None
@@ -783,8 +783,8 @@ def add_selected_barcode_item(request):
         #pass selected items to the template
         return render(request, 'bom/partials/item_barcodes_card.html',
                      {'selected_items': selected_items})
-
-pdfmetrics.registerFont(TTFont('Code39Azalea', 'project/static/Code39AzaleaRegular2.ttf'))
+font_path = os.path.join(settings.BASE_DIR, 'project','static', 'code39azalearegular2.ttf')
+pdfmetrics.registerFont(TTFont('Code39Azalea', font_path))
 class RoundedLabel(Flowable):
     def __init__(self, item):
         super().__init__()
