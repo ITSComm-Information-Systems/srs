@@ -25,6 +25,7 @@ from reportlab.platypus import (
     Frame, PageTemplate, BaseDocTemplate,
     KeepInFrame, Spacer)
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from io import BytesIO
 import math
 
@@ -783,6 +784,7 @@ def add_selected_barcode_item(request):
         return render(request, 'bom/partials/item_barcodes_card.html',
                      {'selected_items': selected_items})
 
+pdfmetrics.registerFont(TTFont('Code39Azalea', 'project/static/Code39AzaleaRegular2.ttf'))
 class RoundedLabel(Flowable):
     def __init__(self, item):
         super().__init__()
@@ -822,6 +824,11 @@ class RoundedLabel(Flowable):
         x_position = (self.width / 2) - (text_width / 2)  # Center the text
         self.canv.drawString(x_position, self.height - 48, self.item['manufacturer_part_nbr'])
 
+
+        text_width = pdfmetrics.stringWidth(self.item['manufacturer_part_nbr'], 'Code39Azalea', 24)
+        x_position = (self.width / 2) - (text_width / 2)
+        self.canv.setFont('Code39Azalea', 24)
+        self.canv.drawString(x_position, self.height -73, self.item['commodity_code'])
 
 @permission_required('bom.can_access_bom')
 def create_barcode_pdf(request):
@@ -863,7 +870,7 @@ def create_barcode_pdf(request):
             'manufacturer_part_nbr': '15-1259',
             
         },
-    ] * 50
+    ] * 16
     story = []
     items_per_column = 8  # 8 items per column (16 total per page)
 
