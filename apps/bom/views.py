@@ -24,8 +24,7 @@ from reportlab.platypus import (
     Paragraph, FrameBreak, Flowable,
     Frame, PageTemplate, BaseDocTemplate,
     KeepInFrame, Spacer)
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.pdfgen.canvas import Canvas
+from reportlab.pdfbase import pdfmetrics
 from io import BytesIO
 import math
 
@@ -784,56 +783,6 @@ def add_selected_barcode_item(request):
         return render(request, 'bom/partials/item_barcodes_card.html',
                      {'selected_items': selected_items})
 
-# -- Rounded Label Template --
-def create_label(item):
-    styles = getSampleStyleSheet()
-    
-    # Custom styles
-    code_style = ParagraphStyle(
-        'CodeStyle', 
-        parent=styles['Normal'],
-        fontName='Helvetica-Bold',
-        fontSize=12,
-        spaceAfter=4
-    )
-    
-    desc_style = ParagraphStyle(
-        'DescStyle',
-        parent=styles['Normal'],
-        fontSize=10,
-        leading=12,
-        spaceAfter=2
-    )
-    
-    min_lvl_style = ParagraphStyle(
-        'MinLvlStyle',
-        parent=styles['Normal'],
-        fontSize=9,
-        textColor=colors.darkgrey
-    )
-
-    # Build label content
-    elements = [
-        Paragraph(item['code'], code_style),
-        *[Paragraph(line, desc_style) for line in item['description']],
-        Paragraph(f"Min. Lvl: {item['min_lvl']}", min_lvl_style)
-    ]
-
-    # Create rounded rectangle frame
-    frame = KeepInFrame(
-        2.8 * inch,  # Label width
-        1.5 * inch,  # Label height
-        elements,
-        hAlign='LEFT'
-    )
-
-    # Custom drawing function for the rounded rectangle
-    def draw_rounded_rect(canvas, x, y, width, height, radius=8):
-        canvas.roundRect(x, y, width, height, radius, stroke=1, fill=0)
-
-    # Return the frame and the drawing function
-    return frame, draw_rounded_rect
-
 class RoundedLabel(Flowable):
     def __init__(self, item):
         super().__init__()
@@ -846,42 +795,33 @@ class RoundedLabel(Flowable):
         # Draw the rounded rectangle
         self.canv.roundRect(0, 0, self.width, self.height, self.radius, stroke=1, fill=0)
 
-        # Add the label content inside the rectangle
-        styles = getSampleStyleSheet()
-        code_style = ParagraphStyle(
-            'CodeStyle',
-            parent=styles['Normal'],
-            fontName='Helvetica-Bold',
-            fontSize=12,
-            spaceAfter=4
-        )
-        desc_style = ParagraphStyle(
-            'DescStyle',
-            parent=styles['Normal'],
-            fontSize=10,
-            leading=12,
-            spaceAfter=2
-        )
-        min_lvl_style = ParagraphStyle(
-            'MinLvlStyle',
-            parent=styles['Normal'],
-            fontSize=9,
-            textColor=colors.darkgrey
-        )
-
-        # Draw the content
+        # Draw the commodity_code
         self.canv.setFont('Helvetica-Bold', 12)
-        self.canv.drawString(10, self.height - 20, self.item['code'])
+        self.canv.setFillColor(colors.red)
+        self.canv.drawString(10, self.height - 13, self.item['commodity_code'])
 
-        y = self.height - 40
-        for line in self.item['description']:
-            self.canv.setFont('Helvetica', 10)
-            self.canv.drawString(10, y, line)
-            y -= 12
-
+        
+        # Draw the "Min. Lvl:" text in regular font
         self.canv.setFont('Helvetica', 9)
-        self.canv.setFillColor(colors.darkgrey)
-        self.canv.drawString(10, y - 10, f"Min. Lvl: {self.item['min_lvl']}")
+        self.canv.setFillColor(colors.black)
+        self.canv.drawString(170, self.height - 13, "Min. Lvl:")
+
+        # Draw the variable part in bold and larger font
+        self.canv.setFont('Helvetica-Bold', 12)  # Bold and larger font
+        self.canv.drawString(225, self.height - 13, str(self.item['min_reorder_lvl']))
+
+        # Center the commodity_name
+        self.canv.setFont('Helvetica-Bold', 8)
+        text_width = pdfmetrics.stringWidth(self.item['commodity_name'], 'Helvetica-Bold', 8)
+        x_position = (self.width / 2) - (text_width / 2)  # Center the text
+        self.canv.drawString(x_position, self.height - 33, self.item['commodity_name'])
+
+        # Draw the manufacturer_part_nbr
+        self.canv.setFont('Helvetica-Bold', 11)
+        text_width = pdfmetrics.stringWidth(self.item['manufacturer_part_nbr'], 'Helvetica-Bold', 11)
+        x_position = (self.width / 2) - (text_width / 2)  # Center the text
+        self.canv.drawString(x_position, self.height - 48, self.item['manufacturer_part_nbr'])
+
 
 @permission_required('bom.can_access_bom')
 def create_barcode_pdf(request):
@@ -917,11 +857,13 @@ def create_barcode_pdf(request):
 
     data = [
         {
-            'code': 'Z-000008',
-            'min_lvl': 0,
-            'description': ['75 OHM Coax DC Block', '15-1259']
+            'commodity_code': 'Z-000008',
+            'min_reorder_lvl': 0,
+            'commodity_name': '75 OHM Coax DC Block', 
+            'manufacturer_part_nbr': '15-1259',
+            
         },
-    ] * 16
+    ] * 50
     story = []
     items_per_column = 8  # 8 items per column (16 total per page)
 
