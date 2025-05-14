@@ -905,7 +905,7 @@ def create_barcode_pdf(request):
         id='col1'
     )
     frame2 = Frame(
-        doc.leftMargin + col_width + 0.25 * inch,  # Add gap between columns
+        doc.leftMargin + col_width + 0.125 * inch,  # Add gap between columns
         doc.bottomMargin,
         col_width,
         doc.height,
