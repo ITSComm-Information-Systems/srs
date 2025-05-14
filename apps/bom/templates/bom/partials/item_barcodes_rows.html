@@ -32,6 +32,14 @@
     const buttonStates = {};
 
     function handlePlusClick(button) {
+        // Count the number of rows in the "minus" state
+        const selectedCount = Object.values(buttonStates).filter(state => state === 'minus').length;
+
+        // If there are already 16 selected, show an alert and prevent further selection
+        if (selectedCount >= 16) {
+            alert("16 is the maximum number of items you can select.");
+            return; // Prevent further execution
+        }
         // Get the unique identifier for the row (e.g., commodity code)
         //rowID is the commodity code also known as a Z code
         const rowId = button.closest("tr").dataset.itemId;

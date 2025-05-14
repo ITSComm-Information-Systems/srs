@@ -790,6 +790,7 @@ def add_selected_barcode_item(request):
         #pass selected items to the template
         return render(request, 'bom/partials/item_barcodes_card.html',
                      {'selected_items': selected_items})
+    
 font_path = os.path.join(settings.BASE_DIR, 'project','static', 'code39azalearegular2.ttf')
 pdfmetrics.registerFont(TTFont('Code39Azalea', font_path))
 class RoundedLabel(Flowable):
