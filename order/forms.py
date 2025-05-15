@@ -1094,8 +1094,10 @@ class ServerSpecForm(TabForm):
             self.fields['backup'].disabled = True
 
             if '78' in self.request.POST.get('regulated_data', []): # Check for PCI Data (78)
+                self.fields['replicated'].disabled = True
+                self.fields['replicated'].initial = 'True'
                 self.fields['managed'].disabled = True
-                self.fields['managed'].initial = True
+                self.fields['managed'].initial = 'True'
                 self.fields.pop('misevprefix')
 
         instance_id = self.request.POST.get('instance_id')
