@@ -838,7 +838,7 @@ class RoundedLabel(Flowable):
         self.canv.drawString(x_position, self.height - 48, self.item['manufacturer_part_nbr'])
 
         # Draw the barcode
-        text_width = pdfmetrics.stringWidth(self.item['manufacturer_part_nbr'], 'Code39Azalea', 24)
+        text_width = pdfmetrics.stringWidth(self.item['commodity_code'], 'Code39Azalea', 24)
         x_position = (self.width / 2) - (text_width / 2)
         self.canv.setFont('Code39Azalea', 24)
         self.canv.drawString(x_position, self.height -73, self.item['commodity_code'])
