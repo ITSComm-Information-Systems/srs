@@ -32,27 +32,29 @@
     const buttonStates = {};
 
     function handlePlusClick(button) {
-        // Count the number of rows in the "minus" state
-        const selectedCount = Object.values(buttonStates).filter(state => state === 'minus').length;
-
-        // If there are already 16 selected, show an alert and prevent further selection
-        if (selectedCount >= 16) {
-            alert("16 is the maximum number of items you can select.");
-            return; // Prevent further execution
-        }
         // Get the unique identifier for the row (e.g., commodity code)
-        //rowID is the commodity code also known as a Z code
         const rowId = button.closest("tr").dataset.itemId;
 
         // Find the icon element inside the button
         const icon = button.querySelector('i');
 
-        // Toggle between plus and minus icons
+        // Check if the button is currently in the "plus" state
         if (icon.classList.contains('fa-plus')) {
+            // Count the number of rows in the "minus" state
+            const selectedCount = Object.values(buttonStates).filter(state => state === 'minus').length;
+
+            // If there are already 16 selected, show an alert and prevent further selection
+            if (selectedCount >= 16) {
+                alert("16 is the maximum number of items you can select.");
+                return; // Prevent further execution
+            }
+
+            // Change the button to the "minus" state
             icon.classList.remove('fa-plus');
             icon.classList.add('fa-minus', 'text-danger'); // Add 'text-danger' for red color
             buttonStates[rowId] = 'minus'; // Update the state
         } else {
+            // Change the button back to the "plus" state
             icon.classList.remove('fa-minus', 'text-danger');
             icon.classList.add('fa-plus');
             buttonStates[rowId] = 'plus'; // Update the state
