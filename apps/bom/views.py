@@ -794,99 +794,107 @@ def add_selected_barcode_item(request):
 font_path = os.path.join(settings.BASE_DIR, 'project','static', 'code39azalearegular2.ttf')
 pdfmetrics.registerFont(TTFont('Code39Azalea', font_path))
 class RoundedLabel(Flowable):
-    def __init__(self, item):
+    def __init__(self, item, bg_color=None):  # Add bg_color parameter with default None
         super().__init__()
         self.item = item
+        self.bg_color = bg_color  # Store the background color
         self.width = 4 * inch  # Label width
         self.height = 1.15 * inch  # Label height
         self.radius = 8  # Rounded corner radius
 
     def draw(self):
-        # Draw the rounded rectangle
-        self.canv.roundRect(0, 0, self.width, self.height, self.radius, stroke=1, fill=0)
+        # Draw the rounded rectangle with background if bg_color is set
+        if self.bg_color:
+            self.canv.setFillColor(colors.yellow)  # Use yellow color
+            self.canv.roundRect(0, 0, self.width, self.height, self.radius, stroke=1, fill=1)
+        else:
+            # Draw just the border if no background color
+            self.canv.roundRect(0, 0, self.width, self.height, self.radius, stroke=1, fill=0)
 
-        # Draw the commodity_code
+        # Rest of your drawing code remains the same
         self.canv.setFont('Helvetica-Bold', 12)
         self.canv.setFillColor(colors.red)
         self.canv.drawString(10, self.height - 13, self.item['commodity_code'])
 
-        
         # Draw the "Min. Lvl:" text in regular font
         self.canv.setFont('Helvetica', 9)
         self.canv.setFillColor(colors.black)
         self.canv.drawString(170, self.height - 13, "Min. Lvl:")
 
         # Draw the variable part in bold and larger font
-        self.canv.setFont('Helvetica-Bold', 12)  # Bold and larger font
+        self.canv.setFont('Helvetica-Bold', 12)
         self.canv.drawString(225, self.height - 13, str(self.item['min_reorder_lvl']))
 
         # Center the commodity_name
         self.canv.setFont('Helvetica-Bold', 8)
         text_width = pdfmetrics.stringWidth(self.item['commodity_name'], 'Helvetica-Bold', 8)
-        x_position = (self.width / 2) - (text_width / 2)  # Center the text
+        x_position = (self.width / 2) - (text_width / 2)
         self.canv.drawString(x_position, self.height - 33, self.item['commodity_name'])
 
         # Draw the manufacturer_part_nbr
         self.canv.setFont('Helvetica-Bold', 11)
         text_width = pdfmetrics.stringWidth(self.item['manufacturer_part_nbr'], 'Helvetica-Bold', 11)
-        x_position = (self.width / 2) - (text_width / 2)  # Center the text
+        x_position = (self.width / 2) - (text_width / 2)
         self.canv.drawString(x_position, self.height - 48, self.item['manufacturer_part_nbr'])
 
-
+        # Draw the barcode
         text_width = pdfmetrics.stringWidth(self.item['manufacturer_part_nbr'], 'Code39Azalea', 24)
         x_position = (self.width / 2) - (text_width / 2)
         self.canv.setFont('Code39Azalea', 24)
         self.canv.drawString(x_position, self.height -73, self.item['commodity_code'])
 
+import json
 @permission_required('bom.can_access_bom')
 def create_barcode_pdf(request):
-    buffer = BytesIO()
-    doc = BaseDocTemplate(
-        buffer,
-        pagesize=letter,
-        leftMargin=0.0125 * inch,
-        rightMargin=0.125 * inch,
-        topMargin=0.125 * inch,
-        bottomMargin=0.125 * inch
-    )
+    if request.method == 'POST':
+        selected_items = request.session["selected_items"]
+        data = json.loads(request.body)
+        yellow_items = data.get('yellow_items', [])
+        yellow_items = [item[5:] for item in yellow_items]
 
-    # Define frames for two columns
-    col_width = (doc.width - 0.25 * inch) / 2  # Account for 0.25" gap between columns
-    frame1 = Frame(
-        doc.leftMargin,
-        doc.bottomMargin,
-        col_width,
-        doc.height,
-        id='col1'
-    )
-    frame2 = Frame(
-        doc.leftMargin + col_width + 0.125 * inch,  # Add gap between columns
-        doc.bottomMargin,
-        col_width,
-        doc.height,
-        id='col2'
-    )
+        buffer = BytesIO()
+        doc = BaseDocTemplate(
+            buffer,
+            pagesize=letter,
+            leftMargin=0.0125 * inch,
+            rightMargin=0.125 * inch,
+            topMargin=0.125 * inch,
+            bottomMargin=0.125 * inch
+        )
 
-    two_col_template = PageTemplate(id='TwoCol', frames=[frame1, frame2])
-    doc.addPageTemplates([two_col_template])
+        # Define frames for two columns
+        col_width = (doc.width - 0.25 * inch) / 2  # Account for 0.25" gap between columns
+        frame1 = Frame(
+            doc.leftMargin,
+            doc.bottomMargin,
+            col_width,
+            doc.height,
+            id='col1'
+        )
+        frame2 = Frame(
+            doc.leftMargin + col_width + 0.125 * inch,  # Add gap between columns
+            doc.bottomMargin,
+            col_width,
+            doc.height,
+            id='col2'
+        )
 
-    data = [
-        {
-            'commodity_code': 'Z-000008',
-            'min_reorder_lvl': 0,
-            'commodity_name': '75 OHM Coax DC Block', 
-            'manufacturer_part_nbr': '15-1259',
+        two_col_template = PageTemplate(id='TwoCol', frames=[frame1, frame2])
+        doc.addPageTemplates([two_col_template])
+
+        story = []
+        items_per_column = 8  # 8 items per column (16 total per page)
+
+        # Add labels to the story
+        for item in selected_items:
+            # Check if current item should have yellow background
+            bg_color = 'yellow' if item['commodity_code'] in yellow_items else None
             
-        },
-    ] * 16
-    story = []
-    items_per_column = 8  # 8 items per column (16 total per page)
+            story.append(RoundedLabel(item, bg_color=bg_color))  # Pass bg_color to RoundedLabel
+            story.append(Spacer(0, 0.1 * inch))  # Add spacing between labels
 
-    # Add labels to the story
-    for item in data:
-        story.append(RoundedLabel(item))
-        story.append(Spacer(0, 0.1 * inch))  # Add spacing between labels
+        doc.build(story)
+        buffer.seek(0)
+        return HttpResponse(buffer, content_type='application/pdf')
 
-    doc.build(story)
-    buffer.seek(0)
-    return HttpResponse(buffer, content_type='application/pdf')
+    return HttpResponse("Invalid request method", status=405)

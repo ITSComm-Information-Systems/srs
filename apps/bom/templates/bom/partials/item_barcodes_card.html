@@ -95,36 +95,50 @@
     // Generate barcodes
     function generateCodes() {
         console.log("Generating barcodes...");
-        const selectedItems = JSON.parse(localStorage.getItem('selected_items')) || [];
+        yellowItems = [];
+        let selectedItems = {{ selected_items|safe }};
+        let cardStates = localStorage.getItem('cardStates');
+        cardStates = JSON.parse(cardStates);
+
+        cardStates = Object.keys(cardStates).map(key => {
+            return {
+                commodity_code: key,
+                color: cardStates[key]
+            };
+        });
+
+
+        cardStates.forEach(item => {
+            if (item.color === 'yellow') {
+                yellowItems.push(item.commodity_code);
+            }
+        });
+        
+        yellowItems.forEach(item => {
+            console.log(item);
+        });
+        
         fetch("{% url 'create_barcode_pdf' %}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': "{{ csrf_token }}" // Ensure CSRF token is included
+                'X-CSRFToken': "{{ csrf_token }}"
             },
             body: JSON.stringify({
                 selected_items: selectedItems,
+                yellow_items: yellowItems 
             })
         })
-        .then(response => response.blob())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.blob();
+        })
         .then(blob => {
-        // Create object URL for the PDF blob
-        const pdfUrl = URL.createObjectURL(blob);
-        
-        // Open the PDF in a new tab or the same tab
-        window.open(pdfUrl, '_blank');
-    })
-    .catch(error => console.error('Error:', error));
+            const pdfUrl = URL.createObjectURL(blob);
+            window.open(pdfUrl, '_blank');
+        })
+        .catch(error => console.error('Error:', error));
     }
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        if (!isInitialLoad) {
-            restoreCardColors();
-        }
-    });
-
-    // HTMX event handlers
-    document.body.addEventListener('htmx:afterSwap', restoreCardColors);
-    document.body.addEventListener('htmx:afterSettle', restoreCardColors);
 </script>
