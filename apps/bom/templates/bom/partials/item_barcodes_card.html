@@ -1,19 +1,98 @@
 <div class="container">
+    <!-- Toggle All Button -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <button id="toggleAllBtn" class="btn btn-secondary" onclick="toggleAllCards()">
+                Toggle All Card Colors
+            </button>
+        </div>
+    </div>
+
+    <!-- Cards Container -->
     {% for item in selected_items %}
-        {% if forloop.counter0|divisibleby:2 %} <!-- Start a new row every two items -->
+        {% if forloop.counter0|divisibleby:2 %}
             <div class="row">
         {% endif %}
             
         <div class="col-md-6">
-            <div style="margin-bottom: 20px;" class="card">
+            <div style="margin-bottom: 20px;" class="card" id="card-{{item.commodity_code}}" 
+                 onclick="toggleCardColor(this)"
+                 hx-preserve="true">
                 <div class="card-body">
                     <span style="margin-top:-1px;" class="card-title"><b>{{ item.commodity_code }}</b> - {{ item.commodity_name }}</span>
                 </div>
             </div>
         </div>
     
-        {% if forloop.counter|divisibleby:2 or forloop.last %} <!-- Close the row after two items or if last item -->
+        {% if forloop.counter|divisibleby:2 or forloop.last %}
             </div>
         {% endif %}
     {% endfor %}
 </div>
+
+<script>
+    // Track if we're in a "toggle all" operation
+    let isTogglingAll = false;
+
+    // Detect initial load
+    const isInitialLoad = !window.performance.getEntriesByType("navigation")[0].type || 
+                        window.performance.getEntriesByType("navigation")[0].type === 'reload';
+
+    // Clear storage on fresh load
+    if (isInitialLoad) {
+        localStorage.removeItem('cardStates');
+    }
+
+    // Store card states
+    function saveCardStates() {
+        const states = {};
+        document.querySelectorAll('.card').forEach(card => {
+            states[card.id] = card.style.backgroundColor;
+        });
+        localStorage.setItem('cardStates', JSON.stringify(states));
+        
+        // Only update button text if we're toggling all cards
+        if (isTogglingAll) {
+            updateToggleAllButtonText();
+            isTogglingAll = false;
+        }
+    }
+
+    // Restore card states
+    function restoreCardColors() {
+        const savedStates = JSON.parse(localStorage.getItem('cardStates') || '{}');
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.backgroundColor = savedStates[card.id] || '';
+        });
+    }
+
+    // Toggle single card
+    function toggleCardColor(card) {
+        card.style.backgroundColor = card.style.backgroundColor === 'yellow' ? '' : 'yellow';
+        saveCardStates();
+    }
+
+    // Toggle all cards
+    function toggleAllCards() {
+        isTogglingAll = true;
+        const cards = document.querySelectorAll('.card');
+        const allYellow = cards.length > 0 && 
+                         Array.from(cards).every(card => card.style.backgroundColor === 'yellow');
+        
+        cards.forEach(card => {
+            card.style.backgroundColor = allYellow ? '' : 'yellow';
+        });
+        saveCardStates();
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!isInitialLoad) {
+            restoreCardColors();
+        }
+    });
+
+    // HTMX event handlers
+    document.body.addEventListener('htmx:afterSwap', restoreCardColors);
+    document.body.addEventListener('htmx:afterSettle', restoreCardColors);
+</script>
