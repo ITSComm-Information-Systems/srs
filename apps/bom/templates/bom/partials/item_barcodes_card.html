@@ -6,6 +6,13 @@
                 Toggle All Card Colors
             </button>
         </div>
+
+        <div class="col-12">
+            <button id="toggleAllBtn" class="btn btn-secondary" onclick="generateCodes()">
+                Generate Barcodes
+            </button>
+        </div>
+
     </div>
 
     <!-- Cards Container -->
@@ -83,6 +90,31 @@
             card.style.backgroundColor = allYellow ? '' : 'yellow';
         });
         saveCardStates();
+    }
+
+    // Generate barcodes
+    function generateCodes() {
+        console.log("Generating barcodes...");
+        const selectedItems = JSON.parse(localStorage.getItem('selected_items')) || [];
+        fetch("{% url 'create_barcode_pdf' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': "{{ csrf_token }}" // Ensure CSRF token is included
+            },
+            body: JSON.stringify({
+                selected_items: selectedItems,
+            })
+        })
+        .then(response => response.blob())
+        .then(blob => {
+        // Create object URL for the PDF blob
+        const pdfUrl = URL.createObjectURL(blob);
+        
+        // Open the PDF in a new tab or the same tab
+        window.open(pdfUrl, '_blank');
+    })
+    .catch(error => console.error('Error:', error));
     }
 
     // Initialize
