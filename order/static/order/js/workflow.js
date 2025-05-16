@@ -255,6 +255,38 @@ $(document).ready(function() {
     $('[data-tab="LocationNew"]').show();
   });
 
+  // Zoom Government
+
+
+  $("#div_zgAccount").click(function() {
+    $('#div_zgUniqname').hide();
+    $('#div_zgJack').hide();
+    $('#div_zgConduit').hide();
+  });
+
+
+  $("#zgOrderPhone_0").click(function() {
+    $('#div_zgUniqname').hide();
+    $('#div_zgJack').hide();
+  });
+
+  $("#zgOrderPhone_1").click(function() {
+    if ($('input[name="zgAccount"]:checked').val() == 'user') {
+      $('#div_zgUniqname').show();
+    }
+    $('#div_zgJack').show();
+  });
+
+  $("#zgJack_0").click(function() {
+    $('#div_zgConduit').show();
+  });
+
+// zgAccount_1
+
+  $("#zgJack_1").click(function() {
+    $('#div_zgConduit').hide();
+  });
+
   $("#activePhone_yesactivephone").click(function() {
     $('[data-tab="PhoneLocation"]').show();
     $('[data-tab="LocationNew"]').hide();
