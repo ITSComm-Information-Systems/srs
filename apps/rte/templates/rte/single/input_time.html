@@ -51,16 +51,16 @@
 
 	<div class='form-group col-2'>
 		<label for="duration"><strong>Duration</strong></label>
-		<div class='form-inline' id='duration'>
-			<input class='form-control col-6' type="text" name="duration-hours" id="duration-hours" placeholder='HH' readonly>
-			<input class='form-control col-6' type="text" name="duration-mins" id="duration-mins" placeholder='MM' readonly>
+		<div class='d-flex' id='duration'>
+			<input style="width:89px; margin-right:3px;" class='form-control col-6' type="text" name="duration-hours" id="duration-hours" placeholder='HH' readonly> <span style="margin-top: 5px;">:</span> 
+			<input style="width:89px; margin-left:3px;" class='form-control col-6' type="text" name="duration-mins" id="duration-mins" placeholder='MM' readonly>
 		</div>
 	</div>
 
 	<div class='form-group col-3'>
 		<label for="notes"><strong>Notes</strong></label>
 		<div class='form-inline'>
-		    <input type="text" class="form-control" id="notes" name='notes' readonly>
+		    <input style="margin-top:-5px;" type="text" class="form-control" id="notes" name='notes' readonly>
 		    <button class='btn btn-primary' id='single-add'>Add</button>
 		</div>
 	</div>
