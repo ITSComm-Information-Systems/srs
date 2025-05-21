@@ -1,0 +1,27 @@
+{% extends 'baseapps.html' %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<div class="form-group" id="searchTech">
+    <form>
+        <label for="techSearch" id="labelTechSearch">
+            <strong>Search for a Tech Name or Tech ID</strong>
+        </label>
+        <small id="buildingTechBlock" class="form-text text-muted">
+            Select the technician whose estimates you would like to view.
+        </small>
+        <input name='techSearch' autocomplete='off' id="techSearch" class="form-control col-4" type="text" aria-describedby="buildingTechBlock"
+            placeholder="Search..." hx-get="{% url 'tech-search' %}" hx-trigger="keyup changed delay:500ms" hx-target="#search-results">
+    </form>
+    </div>
+
+<div class="col-6">
+    <div id="search-results"></div>
+</div>
+
+<div id="workorders"></div>
+
+
+{% endblock %}

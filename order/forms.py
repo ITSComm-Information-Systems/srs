@@ -1093,6 +1093,13 @@ class ServerSpecForm(TabForm):
             self.fields['backup'].initial = 'True'
             self.fields['backup'].disabled = True
 
+            if '78' in self.request.POST.get('regulated_data', []): # Check for PCI Data (78)
+                self.fields['replicated'].disabled = True
+                self.fields['replicated'].initial = 'True'
+                self.fields['managed'].disabled = True
+                self.fields['managed'].initial = 'True'
+                self.fields.pop('misevprefix')
+
         instance_id = self.request.POST.get('instance_id')
 
         if self.is_bound:
@@ -1522,12 +1529,21 @@ class NewLocationForm(TabForm):
 
 
 class EquipmentForm(TabForm):
-    cat = ['Basic','VOIP']
-    cat[0] = Product.objects.all().filter(active=True, category=1).order_by('display_seq_no')
-    cat[0].id = 'basic'
-    cat[1] = Product.objects.all().filter(active=True, category__in=[2, 4]).order_by('display_seq_no') # Voip and Conference
-    cat[1].id = 'voip'
     template = 'order/equipment.html'
+
+    def __init__(self, *args, **kwargs):
+        super(EquipmentForm, self).__init__(*args, **kwargs)
+
+        if self.action.id == 77: # Zoom for Government
+            self.cat = ['VOIP']
+            self.cat[0] = Product.objects.all().filter(active=True, category=41).order_by('display_seq_no') # Zoom for Govt
+            self.cat[0].id = 'voip'
+        else:
+            self.cat = ['Basic','VOIP']
+            self.cat[0] = Product.objects.all().filter(active=True, category=1).order_by('display_seq_no')
+            self.cat[0].id = 'basic'
+            self.cat[1] = Product.objects.all().filter(active=True, category__in=[2, 4]).order_by('display_seq_no') # Voip and Conference
+            self.cat[1].id = 'voip'
 
 
 class ProductForm(TabForm):
