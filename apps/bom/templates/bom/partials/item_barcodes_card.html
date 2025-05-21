@@ -39,10 +39,10 @@
 
 <script>
     // Track if we're in a "toggle all" operation
-    let isTogglingAll = false;
+    var isTogglingAll = false;
 
     // Detect initial load
-    const isInitialLoad = !window.performance.getEntriesByType("navigation")[0].type || 
+    var isInitialLoad = !window.performance.getEntriesByType("navigation")[0].type || 
                         window.performance.getEntriesByType("navigation")[0].type === 'reload';
 
     // Clear storage on fresh load
