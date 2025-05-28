@@ -711,3 +711,19 @@ class Favorite(models.Model):
 
     class Meta: 
         db_table = 'um_bom_favorites'
+
+class ItemBarcode(models.Model):
+    commodity_code = models.CharField(max_length=12, db_column='COMMODITY_CODE', primary_key=True)
+    commodity_name = models.CharField(max_length=50, db_column='COMMODITY_NAME')
+    manufacturer_part_nbr = models.CharField(max_length=128, db_column='MANUFACTURER_PART_NBR')
+    min_reorder_lvl = models.IntegerField(db_column='MIN_REORDER_LVL')
+    warehouse_code = models.CharField(max_length=10, db_column='WAREHOUSE_CODE')
+    warehouse_name = models.CharField(max_length=25, db_column='WAREHOUSE_NAME')
+
+    def __str__(self): 
+        return self.commodity_code
+
+    class Meta: 
+        db_table = 'PINN_CUSTOM\".\"srs_bar_code_labels_v'
+        managed = False
+        verbose_name = 'Item Barcode'

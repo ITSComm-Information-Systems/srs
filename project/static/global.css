@@ -1388,3 +1388,9 @@ table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sor
 	  margin-bottom: 0;
 	}
   }
+.sticky-header {
+    position: sticky;
+    top: 0; /* Sticks to the top of the viewport */
+    background-color: white; /* Ensures the header has a solid background */
+    z-index: 1; /* Keeps the header above other content */
+}
