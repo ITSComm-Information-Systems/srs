@@ -4,14 +4,14 @@
 <a href="{% url 'actual-vs-estimate-completed' %}">Show Completed</a><br/>
 
 <table class="table table-sm table-bordered">
-    <th>Project</th>
-    <th>Status</th>
-    <th>Drafting</th>
-    <th>Facilites</th>
-    <th>Network Eng</th>
-    <th>Project Mgt</th>
-    <th>Net Ops</th>
-    <th>FSU - OSP</th>
+    <th class="sticky-header">Project</th>
+    <th class="sticky-header">Status</th>
+    <th class="sticky-header">Drafting</th>
+    <th class="sticky-header">Facilities</th>
+    <th class="sticky-header">Network Eng</th>
+    <th class="sticky-header">Project Mgt</th>
+    <th class="sticky-header">Net Ops</th>
+    <th class="sticky-header">FSU - OSP</th>
     {% for estimate in estimates %} 
         <tr>
             <td>{{ estimate.wo_number_display }} Preorder: {{ estimate.pre_order_number }} {{estimate.label}}</td>
