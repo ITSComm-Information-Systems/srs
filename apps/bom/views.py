@@ -726,7 +726,7 @@ def item_barcodes(request):
     template = 'bom/item_barcodes.html'
 
     return render(request, template,
-                {   'title': 'Item Barcodes',})
+                {   'title': 'Commodity Labels',})
 
 @permission_required('bom.can_access_bom')
 def item_barcodes_endpoint(request):
