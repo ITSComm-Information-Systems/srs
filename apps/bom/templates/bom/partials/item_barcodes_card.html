@@ -6,9 +6,8 @@
                 Toggle All Card Colors
             </button>
             <button id="toggleAllBtn" class="btn btn-success" onclick="generateCodes()">
-                Generate Labels
+                Generate Barcodes
             </button>
-
         </div>
 
     </div>
@@ -24,7 +23,7 @@
                  onclick="toggleCardColor(this)"
                  hx-preserve="true">
                 <div class="card-body">
-                    <span style="margin-top:-1px;" class="card-title"><b>{{ item.commodity_code }}</b> - {{ item.commodity_name }}</span>
+                    <span style="margin-top:-1px;" class="card-title"><b>{{ item.commodity_code }}</b> - {{ item.commodity_name|slice:":40" }}{% if item.commodity_name|length > 40 %}...{% endif %}</span>
                 </div>
             </div>
         </div>
@@ -43,11 +42,9 @@
     var isInitialLoad = !window.performance.getEntriesByType("navigation")[0].type || 
                         window.performance.getEntriesByType("navigation")[0].type === 'reload';
 
-    // Check if this is the first time the page is loaded
-    if (!localStorage.getItem('isInitialLoad')) {
-        // Clear cardStates only on the first load
+    // Clear storage on fresh load
+    if (isInitialLoad) {
         localStorage.removeItem('cardStates');
-        localStorage.setItem('isInitialLoad', 'true'); // Set the flag to indicate the page has been loaded
     }
 
     // Store card states
@@ -58,7 +55,6 @@
         });
         localStorage.setItem('cardStates', JSON.stringify(states));
         
-        // Only update button text if we're toggling all cards
         if (isTogglingAll) {
             isTogglingAll = false;
         }
