@@ -5,10 +5,12 @@
             <button id="toggleAllBtn" class="btn btn-secondary" onclick="toggleAllCards()">
                 Toggle All Card Colors
             </button>
-            <button id="toggleAllBtn" class="btn btn-success" onclick="generateCodes()">
-                Generate Labels
+            <!-- <button id="toggleAllBtn" class="btn btn-secondary" onclick="generateCodes()">
+                Generate Barcodes
+            </button> -->
+            <button id="toggleAllBtn" class="btn btn-success">
+                Generate Barcodes
             </button>
-
         </div>
 
     </div>
@@ -37,17 +39,15 @@
 
 <script>
     // Track if we're in a "toggle all" operation
-    var isTogglingAll = false;
+    let isTogglingAll = false;
 
     // Detect initial load
-    var isInitialLoad = !window.performance.getEntriesByType("navigation")[0].type || 
+    const isInitialLoad = !window.performance.getEntriesByType("navigation")[0].type || 
                         window.performance.getEntriesByType("navigation")[0].type === 'reload';
 
-    // Check if this is the first time the page is loaded
-    if (!localStorage.getItem('isInitialLoad')) {
-        // Clear cardStates only on the first load
+    // Clear storage on fresh load
+    if (isInitialLoad) {
         localStorage.removeItem('cardStates');
-        localStorage.setItem('isInitialLoad', 'true'); // Set the flag to indicate the page has been loaded
     }
 
     // Store card states
@@ -60,6 +60,7 @@
         
         // Only update button text if we're toggling all cards
         if (isTogglingAll) {
+            updateToggleAllButtonText();
             isTogglingAll = false;
         }
     }
@@ -93,9 +94,11 @@
 
     // Generate barcodes
     function generateCodes() {
+        console.log("Generating barcodes...");
         yellowItems = [];
         let selectedItems = {{ selected_items|safe }};
-        let cardStates = JSON.parse(localStorage.getItem('cardStates') || '{}');
+        let cardStates = localStorage.getItem('cardStates');
+        cardStates = JSON.parse(cardStates);
 
         cardStates = Object.keys(cardStates).map(key => {
             return {
@@ -109,6 +112,10 @@
             if (item.color === 'yellow') {
                 yellowItems.push(item.commodity_code);
             }
+        });
+        
+        yellowItems.forEach(item => {
+            console.log(item);
         });
         
         fetch("{% url 'create_barcode_pdf' %}", {
