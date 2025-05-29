@@ -560,32 +560,37 @@ $(document).ready(function() {
     set_server_name();
   });
 
-  function set_server_name() {
-    server_name = $("#id_serverName").val();
+function set_server_name() {
+  let server_name = $("#id_serverName").val();
+  let prefix = '';
+  let suffix = '';
+  let pci = false;
 
-    if ($("#regulated_data_4").prop("checked")) { // Check for PCI Datum
-      server_name = 'p-' + server_name;
-      pci = true;
-    }
-
-    if (database) {
-      if (database == "MSSQL") {
-        server_name = 'db-' + server_name
-      } else if (database == "Oracle") {
-        server_name = server_name + '-ora'
-      } else {
-        server_name = server_name + '-' + database.toLowerCase();
-      }
-    } else if (managed_windows && !pci) {
-      if ($('#misevprefix_0').prop("checked")) {
-        server_name = $("#id_misevregpre").val() + '-' + server_name;
-      } else {
-        server_name = 'MIS-' + server_name;
-      }
-    }
-
-    $("#id_name").val(server_name);
+  if ($("#regulated_data_4").prop("checked")) { // Check for PCI Datum
+    pci = true;
+    prefix += 'p-';
   }
+
+  if (database) {
+    if (database === "MSSQL") {
+      prefix += 'db-';
+    } else if (database === "Oracle") {
+      suffix = '-ora';
+    } else {
+      suffix = '-' + database.toLowerCase();
+    }
+  } else if (managed_windows && !pci) {
+    if ($('#misevprefix_0').prop("checked")) {
+      prefix += $("#id_misevregpre").val() + '-';
+    } else {
+      prefix += 'MIS-';
+    }
+  }
+
+  server_name = prefix + server_name + suffix;
+  $("#id_name").val(server_name);
+}
+
 
   $(document).on("change", ".cost-driver" , function() {
     update_total_cost();

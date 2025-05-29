@@ -1080,14 +1080,6 @@ class ServerSpecForm(TabForm):
                 self.fields['size_edit'].initial = 1
             elif 'anaged' not in self.instance.os.label: 
                 self.fields['size_edit'].initial = 1
-
-        if self.request.POST.get('database'):
-            self.set_database_defaults()
-            if self.is_bound:
-                self.disk_formset = self.DiskDisplayFormSet(self.request.POST)            
-            else:
-                self.disk_formset = self.DiskDisplayFormSet(initial=self.disk_list)
-            return
         
         if self.request.POST.get('misevregu') == 'True':
             self.fields['backup'].initial = 'True'
@@ -1099,6 +1091,14 @@ class ServerSpecForm(TabForm):
                 self.fields['managed'].disabled = True
                 self.fields['managed'].initial = 'True'
                 self.fields.pop('misevprefix')
+
+        if self.request.POST.get('database'):
+            self.set_database_defaults()
+            if self.is_bound:
+                self.disk_formset = self.DiskDisplayFormSet(self.request.POST)            
+            else:
+                self.disk_formset = self.DiskDisplayFormSet(initial=self.disk_list)
+            return
 
         instance_id = self.request.POST.get('instance_id')
 
