@@ -29,7 +29,9 @@
 
 <script>
     // Object to store the button states
-    const buttonStates = {};
+    if (typeof buttonStates === 'undefined') {
+        var buttonStates = {};
+    }
 
     function handlePlusClick(button) {
         // Get the unique identifier for the row (e.g., commodity code)
