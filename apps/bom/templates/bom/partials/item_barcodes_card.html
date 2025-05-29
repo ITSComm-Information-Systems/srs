@@ -55,9 +55,7 @@
         });
         localStorage.setItem('cardStates', JSON.stringify(states));
         
-        // Only update button text if we're toggling all cards
         if (isTogglingAll) {
-            updateToggleAllButtonText();
             isTogglingAll = false;
         }
     }
