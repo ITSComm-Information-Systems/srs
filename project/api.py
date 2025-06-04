@@ -6,7 +6,7 @@ from rest_framework import routers, viewsets
 from . import serializers
 from django.conf import settings
 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAdminUser, IsAuthenticated, SAFE_METHODS
 from rest_framework.views import APIView
 from django.core.mail import EmailMessage
 from apps.bom.models import Item, EstimateView, Material, MaterialLocation
@@ -16,6 +16,14 @@ from django.core.files.storage import FileSystemStorage
 
 from .models import Webhooks
 import threading, time, subprocess
+
+
+class IsAdminOrReadOnly(BasePermission):    # Allows full access to admins, read-only to others.
+
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:  # SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
+            return True
+        return request.user and request.user.is_staff
 
 
 class TollUploadView(APIView):
@@ -210,7 +218,11 @@ class DefaultViewSet(viewsets.ModelViewSet):
             queryset = Server.objects.all().select_related('os','admin_group','owner'
                 ,'patch_time','patch_day','reboot_time','reboot_day','backup_time','database_type').prefetch_related('regulated_data','non_regulated_data','disks').order_by('id')
         elif self.serializer_class.Meta.model.__name__ == 'ArcInstance':
-            queryset = ArcInstance.objects.all().select_related('owner','service').prefetch_related('rate','shortcodes','hosts').order_by('id')
+            if self.request.user.is_staff:
+                queryset = ArcInstance.objects.all().select_related('owner','service').prefetch_related('rate','shortcodes','hosts').order_by('id')
+            else:
+                owner_list = LDAPGroup.objects.filter(ldapgroupmember__username=self.request.user.username).distinct()
+                queryset = ArcInstance.objects.filter(owner_id__in=owner_list).select_related('owner','service').prefetch_related('rate','shortcodes','hosts').order_by('id')
         else:
             queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
             if hasattr(self.serializer_class, 'prefetch_related'):
@@ -230,6 +242,12 @@ class DefaultViewSet(viewsets.ModelViewSet):
         queryset = queryset.filter(**kwargs)
         
         return queryset
+
+
+class ArcInstanceViewSet(DefaultViewSet):
+    permission_classes = [IsAdminOrReadOnly]
+    serializer_class = serializers.ArcInstanceSerializer
+
 
 def viewset_factory(model, serializer_class=None):
     name = model.__name__
@@ -256,7 +274,7 @@ router.register('server', viewset_factory(Server))
 router.register('network', viewset_factory(Network, serializers.NetworkSerializer))
 router.register('storageinstances', viewset_factory(StorageInstance, serializers.StorageInstanceSerializer))
 router.register('storagerates', viewset_factory(StorageRate, serializers.StorageRateSerializer))
-router.register('arcinstances', viewset_factory(ArcInstance, serializers.ArcInstanceSerializer))
+router.register('arcinstances', ArcInstanceViewSet, serializers.ArcInstanceSerializer)
 router.register('arcbilling', viewset_factory(ArcBilling, serializers.ArcBillingSerializer))
 router.register('backupdomains', viewset_factory(BackupDomain, serializers.BackupDomainSerializer))
 router.register('database', viewset_factory(Database, serializers.DatabaseSerializer))
