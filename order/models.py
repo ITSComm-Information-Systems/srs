@@ -491,6 +491,7 @@ class ArcInstance(Volume):
     thunder_x = models.BooleanField(default=False)
     research_computing_package = models.BooleanField(default=False)
     amount_used = models.DecimalField(max_digits=12, decimal_places=2, default=0, null=True, blank=True)
+    college = models.CharField(max_length=20, null=True, blank=True, default=None)
 
     class meta:
         verbose_name = 'ARC Storage Instance'   
