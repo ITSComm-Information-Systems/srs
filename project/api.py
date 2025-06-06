@@ -210,28 +210,24 @@ class LDAPGroupMemberViewSet(LDAPViewSet):
     serializer_class = serializers.LDAPGroupMemberSerializer
 
 class DefaultViewSet(viewsets.ModelViewSet):
-    queryset = StorageRate.objects.all()
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
-        if self.serializer_class.Meta.model.__name__ == 'Server':
-            print('server')
-            queryset = Server.objects.all().select_related('os','admin_group','owner'
-                ,'patch_time','patch_day','reboot_time','reboot_day','backup_time','database_type').prefetch_related('regulated_data','non_regulated_data','disks').order_by('id')
-        elif self.serializer_class.Meta.model.__name__ == 'ArcInstance':
-            if self.request.user.is_staff:
-                queryset = ArcInstance.objects.all().select_related('owner','service').prefetch_related('rate','shortcodes','hosts').order_by('id')
-            else:
-                owner_list = LDAPGroup.objects.filter(ldapgroupmember__username=self.request.user.username).distinct()
-                queryset = ArcInstance.objects.filter(owner_id__in=owner_list).select_related('owner','service').prefetch_related('rate','shortcodes','hosts').order_by('id')
-        else:
-            queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
-            if hasattr(self.serializer_class, 'prefetch_related'):
-                queryset = queryset.prefetch_related(*self.serializer_class.prefetch_related)
+        queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
+        if hasattr(self.serializer_class, 'prefetch_related'):
+            queryset = queryset.prefetch_related(*self.serializer_class.prefetch_related)
 
-            if hasattr(self.serializer_class, 'select_related'):
-                queryset = queryset.prefetch_related(*self.serializer_class.select_related)
+        if hasattr(self.serializer_class, 'select_related'):
+            queryset = queryset.prefetch_related(*self.serializer_class.select_related)
 
         kwargs = {}
+
+        if not self.request.user.is_staff: # Non Admins are limited by group membership.
+            if 'owner' in [f.name for f in self.serializer_class.Meta.model._meta.get_fields()]:
+                owner_list = LDAPGroup.objects.filter(ldapgroupmember__username=self.request.user.username).distinct()
+                queryset = queryset.filter(owner_id__in=owner_list)
+            else:
+                return [] 
 
         for parm, val in self.request.GET.items():
             field = parm.split('__')[0]
@@ -242,11 +238,6 @@ class DefaultViewSet(viewsets.ModelViewSet):
         queryset = queryset.filter(**kwargs)
         
         return queryset
-
-
-class ArcInstanceViewSet(DefaultViewSet):
-    permission_classes = [IsAdminOrReadOnly]
-    serializer_class = serializers.ArcInstanceSerializer
 
 
 def viewset_factory(model, serializer_class=None):
@@ -274,7 +265,7 @@ router.register('server', viewset_factory(Server))
 router.register('network', viewset_factory(Network, serializers.NetworkSerializer))
 router.register('storageinstances', viewset_factory(StorageInstance, serializers.StorageInstanceSerializer))
 router.register('storagerates', viewset_factory(StorageRate, serializers.StorageRateSerializer))
-router.register('arcinstances', ArcInstanceViewSet, serializers.ArcInstanceSerializer)
+router.register('arcinstances', viewset_factory(ArcInstance, serializers.ArcInstanceSerializer))
 router.register('arcbilling', viewset_factory(ArcBilling, serializers.ArcBillingSerializer))
 router.register('backupdomains', viewset_factory(BackupDomain, serializers.BackupDomainSerializer))
 router.register('database', viewset_factory(Database, serializers.DatabaseSerializer))
