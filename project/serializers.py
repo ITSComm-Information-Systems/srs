@@ -55,6 +55,7 @@ def serializer_factory(model):
 
     if model == Server:   #TODO handle children
         class_attrs['disks'] = ServerDiskSerializer(many=True, read_only=True)
+        class_attrs['prefetch_related'].append('disks')
     elif model == Image:
         class_attrs['storage'] = ImageDiskSerializer(many=True, read_only=True)
 
@@ -139,6 +140,8 @@ class ArcBillingForInstanceSerializer(serializers.ModelSerializer):
 class ArcInstanceSerializer(VolumeInstanceSerializer):
     hosts = serializers.StringRelatedField(many=True)
     shortcodes = ArcBillingForInstanceSerializer(many=True, read_only=True)
+    prefetch_related = ['rate','shortcodes','hosts']
+    select_related = ['owner','service']
 
     class Meta:
         model = ArcInstance
