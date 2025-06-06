@@ -1311,6 +1311,10 @@ class Item(models.Model):
                     attributes.append({'ID': 1953, 'Value': MCommunity().get_group_email_and_name(group_name)})  # Admin Group
 
                 managed = self.data.get('managed', mod_man)
+
+                if '78' in self.data.get('regulated_data', []):
+                    managed = 'True'
+
                 if managed == 'True' or db:
                     os = Choice.objects.get(id=self.data.get('misevos', os_id))
                     attributes.append({'ID': 1952, 'Value': 203}) # Managed
