@@ -255,6 +255,37 @@ $(document).ready(function() {
     $('[data-tab="LocationNew"]').show();
   });
 
+  // Zoom Government
+  $("#zgAccount_0").click(function() {  // Provide Deskset not associated with uniqname.
+    $('#div_zgUniqname').hide();  
+    $('#div_zgJack').show();
+    $('#div_zgConduit').hide();
+    $('#div_zgOrderPhone').hide();
+  });
+
+  $("#zgAccount_1").click(function() {  //  Create an account associated with a uniqname.
+    $('#div_zgUniqname').show();
+    $('#div_zgJack').hide();
+    $('#div_zgConduit').hide();
+    $('#div_zgOrderPhone').show();
+  });
+
+  $("#zgOrderPhone_0").click(function() {
+    $('#div_zgJack').hide();
+  });
+
+  $("#zgOrderPhone_1").click(function() {
+    $('#div_zgJack').show();
+  });
+
+  $("#zgJack_0").click(function() {
+    $('#div_zgConduit').show();
+  });
+
+  $("#zgJack_1").click(function() {
+    $('#div_zgConduit').hide();
+  });
+
   $("#activePhone_yesactivephone").click(function() {
     $('[data-tab="PhoneLocation"]').show();
     $('[data-tab="LocationNew"]').hide();
