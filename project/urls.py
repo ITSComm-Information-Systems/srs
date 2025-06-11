@@ -28,6 +28,7 @@ urlpatterns = [
     path('softphone/', include('softphone.urls')),
     path('services/', include('services.urls')),
     path('api/', include(api.router.urls)),
+    path('api/token/', views.TokenView.as_view()),
     path('api/bommaterial/', api.BomMaterialView.as_view()),
     path('api/tollupload/', api.TollUploadView.as_view()),
     path('admin/', admin.site.urls),
