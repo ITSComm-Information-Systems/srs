@@ -681,7 +681,8 @@ GROUP_CONFIG = {
         'Video Eng': {'field': 'video'},
         'Proj Mgr': {'field': 'project_manager'},
         'Network Operation': {'field': 'network_ops'},
-        'OSP Tech': {'field': 'osp_tech'}
+        'OSP Tech': {'field': 'osp_tech'},
+        'FSU': {'field': 'fsu'},
     },
     
     # Estimated hours groups (um_bom_labor_group_v - NAME)
@@ -693,7 +694,7 @@ GROUP_CONFIG = {
         'Project Mgt': {'field': 'project_manager', 'submitted_group': 'Proj Mgr'},
         'Network Ops': {'field': 'network_ops', 'submitted_group': 'Network Operation'},
         'FSU - OSP': {'field': 'osp_tech', 'submitted_group': 'OSP Tech'},
-        'FSU - ISP': {'field': None}  # Not used in submitted hours
+        'FSU - ISP': {'field': 'fsu', 'submitted_group':'FSU'}  # Not used in submitted hours
     }
 }
 

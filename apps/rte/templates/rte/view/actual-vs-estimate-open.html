@@ -1,17 +1,30 @@
 {% extends 'bom/base.html' %}
 {% block content %}
+<style>
+    .table th, .table td {
+        padding: 4px 2px; /* Adjust these values as needed */
+        vertical-align: middle;
+    }
+    .table td:first-child, .table th:first-child {
+        padding-left: 5px;
+    }
+    .table td:not(:first-child), .table th:not(:first-child) {
+        text-align: center;
+    }
+</style>
 <h2>{{ title }}</h2>
 <a href="{% url 'actual-vs-estimate-completed' %}">Show Completed</a><br/>
 
-<table class="table table-sm table-bordered">
+<table class="table table-sm table-bordered table-striped">
     <th class="sticky-header">Project</th>
-    <th class="sticky-header">Status</th>
-    <th class="sticky-header">Drafting</th>
-    <th class="sticky-header">Facilities</th>
-    <th class="sticky-header">Network Eng</th>
-    <th class="sticky-header">Project Mgt</th>
-    <th class="sticky-header">Net Ops</th>
-    <th class="sticky-header">FSU - OSP</th>
+    <th style="width:100px;" class="sticky-header">Status</th>
+    <th style="width:100px;" class="sticky-header">Drafting</th>
+    <th style="width:100px;" class="sticky-header">Facilities</th>
+    <th style="width:100px;" class="sticky-header">Network Eng</th>
+    <th style="width:100px;" class="sticky-header">Project Mgt</th>
+    <th style="width:100px;" class="sticky-header">Net Ops</th>
+    <th style="width:100px;" class="sticky-header">FSU - OSP</th>
+    <th style="width:100px;" class="sticky-header">FSU - ISP</th>
     {% for estimate in estimates %} 
         <tr>
             <td>{{ estimate.wo_number_display }} Preorder: {{ estimate.pre_order_number }} {{estimate.label}}</td>
@@ -38,6 +51,9 @@
 
             <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{estimate.osp_tech_group_hover_string}}" class="{{ estimate.osp_tech_group_cell_class }}">
                 {{ estimate.osp_tech_group_submitted_hours|floatformat:2 }} / {{estimate.osp_tech_group_estimated_hours|floatformat:2}}
+            </td>
+            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{estimate.fsu_group_hover_string}}" class="{{ estimate.fsu_group_cell_class }}">
+                {{ estimate.fsu_group_submitted_hours|floatformat:2 }} / {{estimate.fsu_group_estimated_hours|floatformat:2}}
             </td>
 
         </tr>
