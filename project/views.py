@@ -578,16 +578,19 @@ class TokenView(LoginRequiredMixin, View):
 		Token.objects.filter(user=self.request.user).delete()
 		token = Token.objects.create(user=self.request.user)
 		token.expires = token.created + timedelta(days=90)
-		helppage = Page.objects.get(permalink='/apihelp')
+		help_page = Page.objects.get(permalink='/apihelp')
 	
-		return render(request, 'api_token.html',  {'token': token, 'helppage': helppage})
+		return render(request, 'api_token.html',  {'token': token, 'helppage': help_page})
 
 	def get(self, request):
 		token = Token.objects.filter(user=self.request.user).first()
-		token.expires = token.created + timedelta(days=90)
-		helppage = Page.objects.get(permalink='/apihelp')
 
-		return render(request, 'api_token.html',  {'token': token, 'helppage': helppage})
+		if token:
+			token.expires = token.created + timedelta(days=90)
+
+		help_page = Page.objects.get(permalink='/apihelp')
+
+		return render(request, 'api_token.html',  {'token': token, 'helppage': help_page})
 
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
