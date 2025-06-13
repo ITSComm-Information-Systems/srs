@@ -748,6 +748,22 @@ class Server(models.Model):
 
         super().save(*args, **kwargs)  # Call the "real" save() method.
 
+    def get_tickets(self):
+        tickets = Ticket.objects.filter(instance_id = self.id).order_by('create_date')
+         
+        ticket_list = []
+
+        for ticket in tickets: 
+            ticket_list.append({'id': ticket.ticket_id
+                              , 'url': f'{TDX_URL}{ticket.ticket_id}'
+                              , 'create_date': ticket.create_date
+                              , 'fulfill': ticket.data.get('misevfirewall')
+                              , 'note': render_to_string('order/pinnacle_note.html',
+                                        {'text': ticket.data.get('reviewSummary')
+                                        ,'description': 'Review Summary'})
+                              })
+        return ticket_list
+
 
 class ServerDisk(models.Model):
     CONTROLLER_LIST = [(0,0),(1,1),(2,2),(3,3),]
@@ -1571,6 +1587,8 @@ class Ticket(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
     instance = models.ForeignKey(ArcInstance, null=True, on_delete=models.DO_NOTHING)
+    description = models.CharField(max_length=100)
+    create_date = models.DateTimeField()
     ticket_id = models.PositiveIntegerField()
     status = models.CharField(max_length=10)
     data = models.JSONField()
