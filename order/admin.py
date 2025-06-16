@@ -271,6 +271,17 @@ class ServerAdmin(ServiceInstanceAdmin):
     #def has_change_permission(self, request, obj=None):
     #    return user_has_permission(request, obj)
 
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+
+        instance = self.model.objects.get(id=object_id)
+ 
+        extra_context = {
+            'ticket_list': instance.get_tickets() 
+        }
+        return super().change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
+
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
