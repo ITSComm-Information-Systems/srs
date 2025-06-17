@@ -491,6 +491,7 @@ class ArcInstance(Volume):
     thunder_x = models.BooleanField(default=False)
     research_computing_package = models.BooleanField(default=False)
     amount_used = models.DecimalField(max_digits=12, decimal_places=2, default=0, null=True, blank=True)
+    college = models.CharField(max_length=20, null=True, blank=True, default=None)
 
     class meta:
         verbose_name = 'ARC Storage Instance'   
@@ -1310,6 +1311,10 @@ class Item(models.Model):
                     attributes.append({'ID': 1953, 'Value': MCommunity().get_group_email_and_name(group_name)})  # Admin Group
 
                 managed = self.data.get('managed', mod_man)
+
+                if '78' in self.data.get('regulated_data', []):
+                    managed = 'True'
+
                 if managed == 'True' or db:
                     os = Choice.objects.get(id=self.data.get('misevos', os_id))
                     attributes.append({'ID': 1952, 'Value': 203}) # Managed
