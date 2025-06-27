@@ -9,7 +9,7 @@ from django.shortcuts import render
 from django.urls import path
 from project.models import Choice
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database, LDAPGroupMember
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -306,6 +306,33 @@ class TicketAdmin(admin.ModelAdmin):
 @admin.register(LDAPGroup)
 class LDAPGroupAdmin(admin.ModelAdmin):
     search_fields = ['name']
+    readonly_fields = ['name']
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                '<path:object_id>/refresh_groupn/',
+                self.admin_site.admin_view(self.refresh_group),
+                name='refresh_group',
+            ),
+        ]
+        return custom_urls + urls
+
+    def refresh_group(self, request, object_id):
+        # Your custom logic here
+        group = LDAPGroup.objects.get(id=object_id)
+        group.update_membership()
+
+        self.message_user(request, "Group Refreshed!")
+        return HttpResponseRedirect(f"../")
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        user_list = LDAPGroupMember.objects.filter(ldap_group_id=object_id).order_by('username')
+
+        return super().change_view(
+            request, object_id, form_url, extra_context={'user_list': user_list},
+        )
 
 
 class VolumeAdmin(ServiceInstanceAdmin):
