@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from project.models import Choice
 from services.models import Pool, Image, Network, ImageDisk
-from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database, ServerDisk
+from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database, ServerDisk, Ticket
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from django.db import models
 
@@ -24,6 +24,24 @@ class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
         exclude = ['sequence']
+
+
+class DefaultSerializer(serializers.ModelSerializer):
+
+    def get_tickets(self, obj):
+        request = self.context.get('request')
+        if request and request.query_params.get('include_tickets') != 'true':
+            return None
+        
+        ticket_list = []
+
+        for ticket in Ticket.objects.filter(instance_id = obj.id).order_by('create_date'):
+            ticket_list.append(
+                {'ticket_id': ticket.id,
+                'instructions': ticket.data.get('misevfirewall')}
+            )
+
+        return ticket_list
 
 
 def serializer_factory(model):
@@ -56,10 +74,11 @@ def serializer_factory(model):
     if model == Server:   #TODO handle children
         class_attrs['disks'] = ServerDiskSerializer(many=True, read_only=True)
         class_attrs['prefetch_related'].append('disks')
+        class_attrs['tickets'] = serializers.SerializerMethodField()
     elif model == Image:
         class_attrs['storage'] = ImageDiskSerializer(many=True, read_only=True)
 
-    return type(f'{name}Serializer', (serializers.ModelSerializer,), class_attrs)
+    return type(f'{name}Serializer', (DefaultSerializer,), class_attrs)
 
 class DatabaseSerializer(serializers.ModelSerializer):
 
