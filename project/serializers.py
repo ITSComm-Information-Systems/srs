@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from project.models import Choice
 from services.models import Pool, Image, Network, ImageDisk
-from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database, ServerDisk, Ticket
+from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database, ServerDisk, Ticket, ServerTicket
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from django.db import models
 
@@ -11,6 +11,13 @@ class ServerDiskSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServerDisk
         fields = ['name', 'size', 'controller', 'device']
+
+
+class ServerTicketSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ServerTicket
+        fields = ['ticket_id', 'comments']
 
 
 class ImageDiskSerializer(serializers.ModelSerializer):
@@ -75,6 +82,8 @@ def serializer_factory(model):
         class_attrs['disks'] = ServerDiskSerializer(many=True, read_only=True)
         class_attrs['prefetch_related'].append('disks')
         class_attrs['tickets'] = serializers.SerializerMethodField()
+        class_attrs['tickets'] = ServerTicketSerializer(many=True, read_only=True)
+        class_attrs['prefetch_related'].append('tickets')
     elif model == Image:
         class_attrs['storage'] = ImageDiskSerializer(many=True, read_only=True)
 
