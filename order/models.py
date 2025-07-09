@@ -765,6 +765,16 @@ class Server(models.Model):
         return ticket_list
 
 
+class ServerTicket(models.Model):   # View with tickets for API
+    server = models.ForeignKey(Server, related_name='tickets', on_delete=models.DO_NOTHING)
+    ticket_id = models.PositiveIntegerField(primary_key=True)
+    comments = models.CharField(max_length=100)
+    
+    class Meta:
+        db_table = 'order_server_ticket_v'
+        managed = False
+
+
 class ServerDisk(models.Model):
     CONTROLLER_LIST = [(0,0),(1,1),(2,2),(3,3),]
     DEVICE_LIST = []
