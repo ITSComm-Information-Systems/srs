@@ -749,7 +749,7 @@ class Server(models.Model):
         super().save(*args, **kwargs)  # Call the "real" save() method.
 
     def get_tickets(self):
-        tickets = Ticket.objects.filter(instance_id = self.id).order_by('create_date')
+        tickets = ServerTicket.objects.filter(server_id = self.id).order_by('create_date')
          
         ticket_list = []
 
@@ -757,9 +757,9 @@ class Server(models.Model):
             ticket_list.append({'id': ticket.ticket_id
                               , 'url': f'{TDX_URL}{ticket.ticket_id}'
                               , 'create_date': ticket.create_date
-                              , 'fulfill': ticket.data.get('misevfirewall')
+                              , 'fulfill': ticket.comments
                               , 'note': render_to_string('order/pinnacle_note.html',
-                                        {'text': ticket.data.get('reviewSummary')
+                                        {'text': json.loads(ticket.summary)
                                         ,'description': 'Review Summary'})
                               })
         return ticket_list
@@ -768,6 +768,8 @@ class Server(models.Model):
 class ServerTicket(models.Model):   # View with tickets for API
     server = models.ForeignKey(Server, related_name='tickets', on_delete=models.DO_NOTHING)
     ticket_id = models.PositiveIntegerField(primary_key=True)
+    create_date = models.DateTimeField()
+    summary = models.TextField()
     comments = models.CharField(max_length=100)
     
     class Meta:
