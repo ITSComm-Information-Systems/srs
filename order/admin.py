@@ -250,6 +250,7 @@ class ServerAdmin(ServiceInstanceAdmin):
             'fields': (('name', 'in_service','created_date'), 'owner', ('admin_group','database_type'), 'shortcode', ('os','cpu','ram'),
                         ('replicated','backup','backup_time','public_facing','production'),
                         ('on_call', 'support_email', 'support_phone'),
+                        ('cname',),
 
                         ('regulated_data','non_regulated_data'),
                         'managed'
