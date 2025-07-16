@@ -33,6 +33,24 @@ class ChoiceSerializer(serializers.ModelSerializer):
         exclude = ['sequence']
 
 
+class DefaultSerializer(serializers.ModelSerializer):
+
+    def get_tickets(self, obj):
+        request = self.context.get('request')
+        if request and request.query_params.get('include_tickets') != 'true':
+            return None
+        
+        ticket_list = []
+
+        for ticket in Ticket.objects.filter(instance_id = obj.id).order_by('create_date'):
+            ticket_list.append(
+                {'ticket_id': ticket.id,
+                'instructions': ticket.data.get('misevfirewall')}
+            )
+
+        return ticket_list
+
+
 def serializer_factory(model):
     name = model.__name__
 
@@ -68,7 +86,7 @@ def serializer_factory(model):
     elif model == Image:
         class_attrs['storage'] = ImageDiskSerializer(many=True, read_only=True)
 
-    return type(f'{name}Serializer', (serializers.ModelSerializer,), class_attrs)
+    return type(f'{name}Serializer', (DefaultSerializer,), class_attrs)
 
 class DatabaseSerializer(serializers.ModelSerializer):
 
