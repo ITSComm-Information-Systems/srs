@@ -690,6 +690,7 @@ class Server(models.Model):
     reboot_day = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_REBOOT_DATE"}
                                     , related_name='reboot_day'
                                     , on_delete=models.CASCADE,)
+    cname = models.CharField(max_length=100, null=True, blank=True)
     domain = models.CharField(max_length=100)
     datacenter = models.CharField(max_length=100)
     firewall_requests = models.CharField(max_length=100)
