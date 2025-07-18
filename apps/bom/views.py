@@ -398,7 +398,6 @@ class Estimates(PermissionRequiredMixin, View):
 
         if estimate.project:
             project_form = ProjectForm(instance=estimate.project)
-            print('foo', estimate.project, project_form.is_bound)
         else:
             project_form = ProjectForm()
 
