@@ -394,13 +394,14 @@ class Project(BOM):
     ]
 
     woid = models.IntegerField()
-    netops_engineer = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True, verbose_name='NetOps')
+    engineer1 = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True, db_constraint=False
+                                   , verbose_name='UMNET Engineer 1', related_name='engineer1')
+    engineer2 = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True, db_constraint=False
+                                   , verbose_name='UMNET Engineer 2', related_name='engineer2') 
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, null=True)
     assigned_date = models.DateTimeField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     completed_date = models.DateTimeField(null=True, blank=True)
-    activity = models.TextField(default='')
-    legacy_parent_id = models.CharField(max_length=32, default=0)
 
     class Meta: 
         db_table = 'um_bom_project'
@@ -408,9 +409,12 @@ class Project(BOM):
     def notify_engineer(self, estimate_id):
         estimate = Estimate.objects.get(id=estimate_id)
         estimate.get_workorder()
-        addr = f'{self.netops_engineer.user_name}@umich.edu'
+        addr = [f'{self.engineer1.user_name}@umich.edu']
+        if self.engineer2:
+            addr.append(f'{self.engineer2.user_name}@umich.edu')
+
         print(f'send to: {addr}')
-        NotificationManager().send_email('Project assigned to you', estimate, [addr])
+        NotificationManager().send_email('Project assigned to you', estimate, addr)
 
 
 class ProjectView(BOM):
@@ -436,9 +440,8 @@ class ProjectView(BOM):
     assigned_date = models.DateTimeField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     completed_date = models.DateTimeField(null=True, blank=True)
-    #activity = models.TextField(default='')
-    legacy_parent_id = models.CharField(max_length=32, default=0)
-    netops_engineer = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True, verbose_name='NetOps')
+    engineer1 = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True, verbose_name='NetOps1', related_name='tech1')
+    engineer2 = models.ForeignKey(Technician,on_delete=models.CASCADE,blank=True,null=True, verbose_name='NetOps2', related_name='tech2')
     estimate_id = models.IntegerField()
     status_name = models.CharField(max_length=60)
     project_display = models.CharField(max_length = 255, null=True)
