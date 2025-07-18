@@ -113,7 +113,8 @@
           <div class="col-sm">
             <p class="h4" id="tabTitle">UMNet&nbsp<a href="$" i class="fas fa-edit" aria-hidden="true"
                 data-toggle="modal" data-target="#modalUMNET"></a></p>
-            <strong>UMNet Engineer:</strong><br>{{ estimate.project.netops_engineer }}<br>
+            <strong>UMNet Engineer1:</strong><br>{{ estimate.project.engineer1 }}<br>
+            <strong>UMNet Engineer2:</strong><br>{{ estimate.project.engineer2 }}<br>
             <strong>Assigned Date:</strong>{{ estimate.project.assigned_date|date:"SHORT_DATE_FORMAT" }}<br>
             <strong>Due Date:</strong>{{ estimate.project.due_date|date:"SHORT_DATE_FORMAT" }}<br>
             <strong>Completed Date:</strong>{{ estimate.project.completed_date|date:"SHORT_DATE_FORMAT" }}<br>
@@ -147,7 +148,7 @@
           <input type="hidden" name="estimate_id" value="{{ estimate.id }}">
           <input type="hidden" name="woid" value="{{ estimate.woid }}">
           <input type="hidden" name="project_id" value="{{ estimate.project.id }}">
-
+          bar
           {{ project_form.as_p }}
 
         </div>
