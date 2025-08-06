@@ -1,6 +1,9 @@
 import csv, json
 
 from django.utils.html import format_html
+from django import forms
+from django.core.exceptions import ValidationError
+from project.integrations import MCommunity
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.contrib import admin
@@ -304,10 +307,33 @@ class TicketAdmin(admin.ModelAdmin):
         instance_id = item.data['instance_id']
         return HttpResponseRedirect(f'/admin/order/arcinstance/{instance_id}/change/')
 
+
+class LDAPGroupForm(forms.ModelForm):
+    class Meta:
+        model = LDAPGroup
+        fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+
+        mc = MCommunity()
+        mc.get_group(name)
+
+        if mc.conn.entries is None:
+            raise ValidationError(f"LDAP group '{name}' not found.")
+
+        # Set the primary key to gidNumber from LDAP
+        gid = int(mc.conn.entries[0]['gidnumber'].value)
+        self.instance.id = gid
+
+        return cleaned_data
+
+
 @admin.register(LDAPGroup)
 class LDAPGroupAdmin(admin.ModelAdmin):
     search_fields = ['name']
-    readonly_fields = ['name']
+    form = LDAPGroupForm
 
     def get_urls(self):
         urls = super().get_urls()

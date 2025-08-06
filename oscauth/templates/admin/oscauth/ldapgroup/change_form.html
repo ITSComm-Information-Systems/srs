@@ -3,7 +3,10 @@
 {% block after_field_sets %}
     <div class="custom-info-box">
         <h5>Members
-                    <a class="button" href="{% url 'admin:refresh_group' original.pk %}">
+        {% if original and original.pk %}
+            <a class="button" href="{% url 'admin:refresh_group' original.pk %}">Refresh Group</a>
+
+
             Refresh Group
         </a>
         </h5>
@@ -12,7 +15,7 @@
             <li>{{ user }}</li>
             {% endfor %}
         </ul>
-
+        {% endif %}
 
     </div>
 {% endblock %}
