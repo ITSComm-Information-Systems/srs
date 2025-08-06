@@ -633,6 +633,8 @@ class NotificationManager(models.Manager):
                 addr = f'{estimate.workorder.add_info_list_value_code_2}@umich.edu'
                 print(f'send to: {addr}')
                 email_list.append(addr)
+            elif notification.recipient == 'engineer':
+                email_list.append(f'{estimate.assigned_engineer.user_name}@umich.edu')
             else:
                 email_list.append(notification.recipient)
 
@@ -690,6 +692,7 @@ class Notification(models.Model):
         (Estimate.COMPLETED, 'BOM Completed'),
         (Estimate.CANCELLED, 'BOM Cancelled'),
         (Estimate.REJECTED, 'BOM Rejected'),
+        (Estimate.APPROVED, 'BOM Approved'),
         (11, 'NetOps Created'),
         (12, ROUTE_PM)
     ]

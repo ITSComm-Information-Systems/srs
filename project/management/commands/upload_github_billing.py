@@ -85,13 +85,34 @@ class Command(BaseCommand):
 
     def shortcode_audit(self, data):
         print('Run shortcode Audit')
+        body = ''
+
         for key, value in data['github']['shortcodes'].items():  # Loop thorugh all instances
 
             try:
                 acct = UmOscAllActiveAcctNbrsV.objects.get(short_code=value['shortcode'])
             except ObjectDoesNotExist:
                 print('Project:', key, 'shortcode not found:', value['shortcode'])
-            
+                body += f'Project: {key} shortcode not found: {value['shortcode']} \n'
+
+        if settings.ENVIRONMENT == 'Production':
+            subject = f'GitHub Shortcode Audit'
+            to = ['itscomm.information.systems@umich.edu', 'srs-github-billing@umich.edu']
+        else:
+            subject = f'GitHub Shortcode Audit - {settings.ENVIRONMENT}'
+            to = ['itscomm.information.systems@umich.edu', 'djamison@umich.edu']
+
+        if body:
+            email = EmailMessage(
+                subject,
+                body,
+                'srs-otto@umich.edu',
+                to,
+                []
+            )
+
+            email.send()
+
 
     def send_email(self, csvfile, body):
 
