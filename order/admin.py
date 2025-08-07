@@ -1,6 +1,9 @@
 import csv, json
 
 from django.utils.html import format_html
+from django import forms
+from django.core.exceptions import ValidationError
+from project.integrations import MCommunity
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.contrib import admin
@@ -304,10 +307,10 @@ class TicketAdmin(admin.ModelAdmin):
         instance_id = item.data['instance_id']
         return HttpResponseRedirect(f'/admin/order/arcinstance/{instance_id}/change/')
 
+
 @admin.register(LDAPGroup)
 class LDAPGroupAdmin(admin.ModelAdmin):
     search_fields = ['name']
-    readonly_fields = ['name']
 
     def get_urls(self):
         urls = super().get_urls()

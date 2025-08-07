@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User, Group
 from project.pinnmodels import UmCurrentDeptManagersV, UmOscDeptProfileV
 from oscauth.utils import McGroup
+from django.core.exceptions import ValidationError
 
 
 class Role(models.Model):  
@@ -142,6 +143,20 @@ class LDAPGroup(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def clean(self):
+        mc = McGroup(self.name)  # Check name vs MCommunity
+
+        if not hasattr(mc, 'dn'):
+            raise ValidationError({'name': 'Group not found.'})
+        else:
+            self.id = mc.gidnumber
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.full_clean()  # Make sure the record exists in MCommunity
+
+        super().save(*args, **kwargs)
 
     def lookup(self, name):
         mc = McGroup(name)  # Check name vs MCommunity
