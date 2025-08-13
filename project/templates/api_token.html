@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>      
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta name="robots" content="NONE,NOARCHIVE" />
+      <title>Api Root – Django REST framework</title>
+          <link rel="stylesheet" type="text/css" href="/static/rest_framework/css/bootstrap.min.css"/>
+          <link rel="stylesheet" type="text/css" href="/static/rest_framework/css/bootstrap-tweaks.css"/>
+        
+        <link rel="stylesheet" type="text/css" href="/static/rest_framework/css/prettify.css"/>
+        <link rel="stylesheet" type="text/css" href="/static/rest_framework/css/default.css"/>
+
+  </head>
+
+
+  <body class="">
+
+    <div class="wrapper">
+      
+        <div class="navbar navbar-static-top navbar-inverse"
+             role="navigation" aria-label="navbar">
+          <div class="container">
+            <span>
+              
+                <a class='navbar-brand' rel="nofollow" href='https://www.django-rest-framework.org/'>
+                    Django REST framework
+                </a>
+              
+            </span>
+            <ul class="nav navbar-nav pull-right">
+              
+                
+                  <li class="navbar-text">{{ request.user.username }}</li>
+                
+              
+            </ul>
+          </div>
+        </div>
+      
+
+        <div class="container">
+        
+        <ul class="breadcrumb">
+            
+              
+                <li class="active"><a href="/api/">Api Root</a></li>
+              
+            
+        </ul><br>
+        </div>
+
+        <div class="container">
+        
+            <h4>Use this page to request a token.</h4>
+
+            Notes about API tokens:
+            <ul>
+                <li>The token will be linked to your user ID.</li>
+                <li>The token expires 90 days after creation but can be regenerated at any time.</li>
+                <li>If you are not an admin, you will have read-only access to the same instances (servers, volumes, etc.) that you can access in SRS.</li>
+            </ul>
+
+
+            {% if token %}
+                <table border="1" cellpadding="8" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Created</th>
+                            <th>Expires</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <td>
+                                <span style="display: none;" id="token-text">{{ token.key }}</span>
+                                <span>{{ token.key|slice:":4" }}****</span>
+                                <button onclick="copyToClipboard()">Copy</button>
+                            </td>
+                            <td>{{ token.created|date:"m-d-Y" }}</td>
+                            <td>{{ token.expires|date:"m-d-Y" }}</td>
+                    </tbody>
+                </table>
+
+            {% else %}
+                <b>No token found.</b>
+            {% endif %}
+
+            <p><br>
+                Click below to replace token with a new one.
+            </p>
+
+            <form method="POST">{% csrf_token %}
+                <input type="hidden" value="token">
+                <button class="btn btn-primary js-tooltip" title="" data-original-title="Make a POST request on the Pool List resource">Request Token</button>
+            </form>
+        <hr>
+                {% autoescape off %} {{ helppage.bodytext }} {% endautoescape %} 
+        </div>
+
+
+    </div>
+
+    <script>
+    function copyToClipboard() {
+        const tokenText = document.getElementById("token-text").innerText;
+        navigator.clipboard.writeText(tokenText).then(function() {
+            alert("Token copied to clipboard");
+        }, function(err) {
+            alert("Failed to copy: " + err);
+        });
+    }
+    </script>
+
+</body>
+
+</html>

@@ -1,6 +1,9 @@
 import csv, json
 
 from django.utils.html import format_html
+from django import forms
+from django.core.exceptions import ValidationError
+from project.integrations import MCommunity
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.contrib import admin
@@ -9,7 +12,7 @@ from django.shortcuts import render
 from django.urls import path
 from project.models import Choice
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database, LDAPGroupMember
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -250,6 +253,7 @@ class ServerAdmin(ServiceInstanceAdmin):
             'fields': (('name', 'in_service','created_date'), 'owner', ('admin_group','database_type'), 'shortcode', ('os','cpu','ram'),
                         ('replicated','backup','backup_time','public_facing','production'),
                         ('on_call', 'support_email', 'support_phone'),
+                        ('cname',),
 
                         ('regulated_data','non_regulated_data'),
                         'managed'
@@ -270,6 +274,17 @@ class ServerAdmin(ServiceInstanceAdmin):
 
     #def has_change_permission(self, request, obj=None):
     #    return user_has_permission(request, obj)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+
+        instance = self.model.objects.get(id=object_id)
+ 
+        extra_context = {
+            'ticket_list': instance.get_tickets() 
+        }
+        return super().change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
 
 
 @admin.register(Ticket)
@@ -292,9 +307,36 @@ class TicketAdmin(admin.ModelAdmin):
         instance_id = item.data['instance_id']
         return HttpResponseRedirect(f'/admin/order/arcinstance/{instance_id}/change/')
 
+
 @admin.register(LDAPGroup)
 class LDAPGroupAdmin(admin.ModelAdmin):
     search_fields = ['name']
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                '<path:object_id>/refresh_groupn/',
+                self.admin_site.admin_view(self.refresh_group),
+                name='refresh_group',
+            ),
+        ]
+        return custom_urls + urls
+
+    def refresh_group(self, request, object_id):
+        # Your custom logic here
+        group = LDAPGroup.objects.get(id=object_id)
+        group.update_membership()
+
+        self.message_user(request, "Group Refreshed!")
+        return HttpResponseRedirect(f"../")
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        user_list = LDAPGroupMember.objects.filter(ldap_group_id=object_id).order_by('username')
+
+        return super().change_view(
+            request, object_id, form_url, extra_context={'user_list': user_list},
+        )
 
 
 class VolumeAdmin(ServiceInstanceAdmin):

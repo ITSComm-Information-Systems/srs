@@ -690,6 +690,7 @@ class Server(models.Model):
     reboot_day = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_REBOOT_DATE"}
                                     , related_name='reboot_day'
                                     , on_delete=models.CASCADE,)
+    cname = models.CharField(max_length=100, null=True, blank=True)
     domain = models.CharField(max_length=100)
     datacenter = models.CharField(max_length=100)
     firewall_requests = models.CharField(max_length=100)
@@ -747,6 +748,34 @@ class Server(models.Model):
         self.shortcode = self.shortcode.strip()
 
         super().save(*args, **kwargs)  # Call the "real" save() method.
+
+    def get_tickets(self):
+        tickets = ServerTicket.objects.filter(server_id = self.id).order_by('create_date')
+         
+        ticket_list = []
+
+        for ticket in tickets: 
+            ticket_list.append({'id': ticket.ticket_id
+                              , 'url': f'{TDX_URL}{ticket.ticket_id}'
+                              , 'create_date': ticket.create_date
+                              , 'fulfill': ticket.comments
+                              , 'note': render_to_string('order/pinnacle_note.html',
+                                        {'text': json.loads(ticket.summary)
+                                        ,'description': 'Review Summary'})
+                              })
+        return ticket_list
+
+
+class ServerTicket(models.Model):   # View with tickets for API
+    server = models.ForeignKey(Server, related_name='tickets', on_delete=models.DO_NOTHING)
+    ticket_id = models.PositiveIntegerField(primary_key=True)
+    create_date = models.DateTimeField()
+    summary = models.TextField()
+    comments = models.CharField(max_length=100)
+    
+    class Meta:
+        db_table = 'order_server_ticket_v'
+        managed = False
 
 
 class ServerDisk(models.Model):
@@ -1571,6 +1600,8 @@ class Ticket(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
     instance = models.ForeignKey(ArcInstance, null=True, on_delete=models.DO_NOTHING)
+    description = models.CharField(max_length=100)
+    create_date = models.DateTimeField()
     ticket_id = models.PositiveIntegerField()
     status = models.CharField(max_length=10)
     data = models.JSONField()

@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.views.decorators.http import require_http_methods
 from django.views.generic import View
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth import get_user_model
 from django import forms
@@ -20,11 +20,13 @@ from django.urls import resolve
 
 from ldap3 import Server, Connection, ALL
 
+from rest_framework.authtoken.models import Token
+
 from project.pinnmodels import UmOscAcctsInUseV, UmOscAcctSubscribersV, UmOscDeptProfileV, UmOscAllActiveAcctNbrsV, UmOscAcctChangeInput, UmOscChartfieldV, UmOscAcctChangeRequest, UmOscNameChangeV
 from order.models import Chartcom
 from oscauth.models import AuthUserDept, AuthUserDeptV, DepartmentSecurityV
 from oscauth.utils import get_mc_user
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import F
 from pages.models import Page
@@ -568,6 +570,27 @@ class NameChange(PermissionRequiredMixin, View):
             {'title': 'Name Change',
 			 'helptext': helptext,
 			 'phone_list': phone_list,})
+
+
+class TokenView(LoginRequiredMixin, View):
+
+	def post(self, request):
+		Token.objects.filter(user=self.request.user).delete()
+		token = Token.objects.create(user=self.request.user)
+		token.expires = token.created + timedelta(days=90)
+		help_page = Page.objects.get(permalink='/apihelp')
+	
+		return render(request, 'api_token.html',  {'token': token, 'helppage': help_page})
+
+	def get(self, request):
+		token = Token.objects.filter(user=self.request.user).first()
+
+		if token:
+			token.expires = token.created + timedelta(days=90)
+
+		help_page = Page.objects.get(permalink='/apihelp')
+
+		return render(request, 'api_token.html',  {'token': token, 'helppage': help_page})
 
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
