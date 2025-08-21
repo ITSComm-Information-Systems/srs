@@ -14,7 +14,8 @@
                 <th>Workorder</th>
                 <th>Preorder</th>
                 <th>Description</th>
-                <th>UMNet Engineer</th>
+                <th>UMNet Engineer1</th>
+                <th>UMNet Engineer2</th>
                 <th>UMNet Status</th>
                 <th>Pinnacle Status</th>
                 <th>Assigned Date</th>
@@ -28,7 +29,8 @@
                 <td style="white-space: nowrap;">{{ record.wo_number_display }}</td>
                 <td>{{ record.pre_order_number }}</td>
                 <td>{{ record.project_display |default:"None"}}</td>
-                <td>{{ record.netops_engineer }}</td>
+                <td>{{ record.engineer1 }}</td>
+                <td>{{ record.engineer2 }}</td>
                 <td>{{ record.get_status_display }}</td>
                 <td>{{ record.status_name }}</td>
                 <td sorttable_customkey={{ record.assigned_date|date:"Ymd" }}>{{ record.assigned_date|date:"N j, Y"|default:"None" }}</td>

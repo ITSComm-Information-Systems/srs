@@ -260,6 +260,7 @@ $(document).ready(function() {
     $('#div_zgUniqname').hide();  
     $('#div_zgJack').show();
     $('#div_zgConduit').hide();
+    $('#div_zgJackNumber').hide();
     $('#div_zgOrderPhone').hide();
   });
 
@@ -267,6 +268,7 @@ $(document).ready(function() {
     $('#div_zgUniqname').show();
     $('#div_zgJack').hide();
     $('#div_zgConduit').hide();
+    $('#div_zgJackNumber').hide();
     $('#div_zgOrderPhone').show();
   });
 
@@ -280,10 +282,12 @@ $(document).ready(function() {
 
   $("#zgJack_0").click(function() {
     $('#div_zgConduit').show();
+    $('#div_zgJackNumber').hide();
   });
 
   $("#zgJack_1").click(function() {
     $('#div_zgConduit').hide();
+    $('#div_zgJackNumber').show();
   });
 
   $("#activePhone_yesactivephone").click(function() {

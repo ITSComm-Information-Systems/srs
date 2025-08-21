@@ -141,18 +141,20 @@ def edit_project(request):
 
     if project_id:
         project = Project.objects.get(id=project_id)
-        engineer = project.netops_engineer
+        engineer1 = project.engineer1
+        engineer2 = project.engineer2
     else:
         project = Project()
         project.woid = woid
-        engineer = ''
+        engineer1 = ''
+        engineer2 = ''
 
     project.set_create_audit_fields(request.user.username)
     form = ProjectForm(request.POST, instance=project)
     if form.is_valid():
         project.save()
     
-    if project.netops_engineer != engineer:
+    if project.engineer1 != engineer1 or project.engineer2 != engineer1:
         project.notify_engineer(estimate_id)
 
     return HttpResponseRedirect(f'/apps/bom/estimate/{estimate_id}')
