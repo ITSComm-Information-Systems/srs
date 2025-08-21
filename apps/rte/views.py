@@ -811,8 +811,10 @@ def apply_hours_to_estimate(estimate, hours_and_classes):
 
 import time
 from collections import defaultdict
+from django.views.decorators.cache import cache_page
 
 @permission_required('bom.can_access_bom')
+@cache_page(60 * 2)
 def actual_v_estimate(request):
     """Main view function for actual vs estimate comparison"""
 
