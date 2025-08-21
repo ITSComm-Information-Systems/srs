@@ -11,6 +11,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models.functions import ExtractWeek
 from django.core import serializers
 from ..bom.models import Workorder, Estimate, PreOrder, Labor, EstimateView
+from collections import defaultdict
+from django.views.decorators.cache import cache_page
 
 # Base RTE view
 @permission_required('rte.add_umrteinput', raise_exception=True)
@@ -809,16 +811,10 @@ def apply_hours_to_estimate(estimate, hours_and_classes):
             setattr(estimate, f"{config['field']}_group_estimated_hours", 
                     hours_and_classes['group_estimated_hours'].get(group, 0))
 
-import time
-from collections import defaultdict
-from django.views.decorators.cache import cache_page
-
 @permission_required('bom.can_access_bom')
 @cache_page(60 * 2)
 def actual_v_estimate(request):
     """Main view function for actual vs estimate comparison"""
-
-    start_time=time.time()
     username = request.user.username
     url = request.path.strip('/').split('/')
     slug = url[-1]
@@ -868,6 +864,4 @@ def actual_v_estimate(request):
         'title': 'Actual vs Estimated Hours',
         'estimates': estimates
     }
-    elapsed = time.time() - start_time
-    print(f"[actual_v_estimate] Page load time: {elapsed:.2f} seconds")
     return HttpResponse(template.render(context, request))
