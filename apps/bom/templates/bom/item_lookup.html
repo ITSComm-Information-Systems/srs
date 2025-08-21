@@ -32,7 +32,9 @@
         </tr>
     </thead>
     <tbody id="itemTableBody">
+    {% if item_list %}
         {% include 'bom/partials/item_table_rows.html' %}
+    {% endif %}
     </tbody>
 </table>
 
