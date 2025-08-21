@@ -712,9 +712,9 @@ def initialize_group_data():
 def process_input_entries(input_entries, data):
     """Process input entries to calculate submitted hours"""
     for input_entry in input_entries:
-        if input_entry.wo_group_code in data['group_submitted_hours']:
-            uniqname = input_entry.uniqname
-            group = input_entry.wo_group_code
+        if input_entry.assn_wo_group_code in data['group_submitted_hours']:
+            uniqname = input_entry.labor_code
+            group = input_entry.assn_wo_group_code
             
             # Convert HH:MM to hours
             hh, mm = map(int, input_entry.actual_mins_display.split(':'))
@@ -837,7 +837,7 @@ def actual_v_estimate(request):
         labor = Labor.objects.filter(estimate_id=estimate.id)
         service_order = UmRteServiceOrderV.objects.filter(pre_order_number=estimate.pre_order_number)
         full_prord_wo_number = service_order[0].full_prord_wo_number if service_order else None
-        input_entries = UmRteInput.objects.filter(full_prord_wo_number=full_prord_wo_number) if full_prord_wo_number else []
+        input_entries = UmRteCurrentTimeAssignedV.objects.filter(work_order_display=full_prord_wo_number) if full_prord_wo_number else []
         
         hours_and_classes = calculate_hours_and_classes(input_entries, labor)
         apply_hours_to_estimate(estimate, hours_and_classes)
