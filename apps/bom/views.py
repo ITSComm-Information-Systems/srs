@@ -600,64 +600,6 @@ def estimate_search(request):
     template = 'bom/estimate_search.html'
     return render(request, template, {'title': 'All Preorders/Workorder w/Estimates'})
 
-def estimate_search_endpoint(request):
-    # Get the search query and selected statuses
-    search_query = request.POST.get('search', '').strip()
-    selected_statuses = request.POST.getlist('status')  # Get the list of selected checkboxes
-
-    # Build the queryset based on the search query and selected statuses
-    search_list = EstimateView.objects.exclude(estimated_start_date__isnull=True)
-
-    if search_query:
-        search_list = search_list.filter(
-            Q(wo_number_display__icontains=search_query) |
-            Q(pre_order_number__icontains=search_query) |
-            Q(project_display__icontains=search_query) |
-            Q(label__icontains=search_query) |
-            Q(status__icontains=search_query) |
-            Q(project_manager__icontains=search_query) |
-            Q(assigned_engineer__icontains=search_query) |
-            Q(assigned_netops__icontains=search_query) |
-            Q(estimated_start_date__icontains=search_query) |
-            Q(estimated_completion_date__icontains=search_query)
-        )
-
-    if selected_statuses:
-        search_list = search_list.filter(status__in=selected_statuses)
-
-    # Limit the results to the most recent 50 based on estimated_start_date
-    search_list = search_list.order_by('-estimated_start_date')[:50]
-
-    # If fewer than 50 results, pad with entries that have no estimated_start_date
-    if len(search_list) < 50:
-        padding_needed = 50 - len(search_list)
-        padding_results = EstimateView.objects.filter(estimated_start_date__isnull=True)
-        if search_query:
-            padding_results = padding_results.filter(
-                Q(wo_number_display__icontains=search_query) |
-                Q(pre_order_number__icontains=search_query) |
-                Q(project_display__icontains=search_query) |
-                Q(label__icontains=search_query) |
-                Q(status__icontains=search_query) |
-                Q(project_manager__icontains=search_query) |
-                Q(assigned_engineer__icontains=search_query) |
-                Q(assigned_netops__icontains=search_query) |
-                Q(estimated_completion_date__icontains=search_query)
-            )
-        if selected_statuses:
-            padding_results = padding_results.filter(status__in=selected_statuses)
-
-        # Add padding results to the search list
-        search_list = list(search_list) + list(padding_results[:padding_needed])
-
-    # Render the partial template with the filtered results
-    search_list_size = len(search_list)
-    if search_list_size == 0:
-        template = 'bom/partials/no_results.html'
-    else:
-        template = 'bom/partials/estimate_search_table.html'
-    return render(request, template, {'search_list': search_list})
-
 @permission_required('bom.can_access_bom')
 def open_preorder_search(request):
     template = 'bom/open_preorder_search.html'
@@ -666,36 +608,139 @@ def open_preorder_search(request):
                 {'title': 'Search Open Preorders/Workorders',
                 })
 
+# ...existing code...
+
+def build_search_q(search_query, fields):
+    """
+    Returns a Q object for the given fields based on the query logic:
+    - If quoted, does exact phrase search.
+    - Otherwise, splits and ORs each word.
+    """
+    if search_query.startswith('"') and search_query.endswith('"'):
+        phrase = search_query.strip('"')
+        q = Q()
+        for field in fields:
+            q |= Q(**{f"{field}__icontains": phrase})
+        return q
+    else:
+        words = search_query.split()
+        q_obj = Q()
+        for word in words:
+            q_word = Q()
+            for field in fields:
+                q_word |= Q(**{f"{field}__icontains": word})
+            q_obj |= q_word
+        return q_obj
+
+def get_search_results(
+    model,
+    search_query,
+    search_fields,
+    filter_kwargs=None,
+    status_field=None,
+    selected_statuses=None,
+    order_by=None,
+    limit=50,
+    pad_filter_kwargs=None,
+    pad_order_by=None,
+    post_process=None,
+    pk_field='pk'
+):
+    queryset = model.objects.all()
+    if filter_kwargs:
+        queryset = queryset.filter(**filter_kwargs)
+    if search_query:
+        queryset = queryset.filter(build_search_q(search_query, search_fields))
+    if status_field and selected_statuses:
+        queryset = queryset.filter(**{f"{status_field}__in": selected_statuses})
+    if order_by:
+        queryset = queryset.order_by(*order_by)
+    # Limit fields for Workorder
+    if model.__name__ == "Workorder":
+        queryset = queryset.only(
+            'wo_number_display', 'pre_order_number', 'status_name', 'project_display',
+            'building_number', 'building_name', 'comment_text'
+        )
+    queryset = queryset[:limit]
+    results = list(queryset)
+    if len(results) < limit and pad_filter_kwargs:
+        padding_needed = limit - len(results)
+        padding_qs = model.objects.filter(**pad_filter_kwargs)
+        if pad_order_by:
+            padding_qs = padding_qs.order_by(*pad_order_by)
+        if results:
+            exclude_ids = [getattr(obj, pk_field) for obj in results]
+            padding_qs = padding_qs.exclude(**{f"{pk_field}__in": exclude_ids})
+        # Limit fields for Workorder padding as well
+        if model.__name__ == "Workorder":
+            padding_qs = padding_qs.only(
+                'wo_number_display', 'pre_order_number', 'status_name', 'project_display',
+                'building_number', 'building_name', 'comment_text'
+            )
+        results += list(padding_qs[:padding_needed])
+    if post_process:
+        for obj in results:
+            post_process(obj)
+    return results
+
+import time
+
+@permission_required('bom.can_access_bom')
+def estimate_search_endpoint(request):
+    search_query = request.POST.get('search', '').strip()
+    selected_statuses = request.POST.getlist('status')
+    search_fields = [
+        'wo_number_display', 'pre_order_number', 'project_display', 'label',
+        'status', 'project_manager', 'assigned_engineer', 'assigned_netops',
+        'estimated_start_date', 'estimated_completion_date'
+    ]
+    results = get_search_results(
+        model=EstimateView,
+        search_query=search_query,
+        search_fields=search_fields,
+        filter_kwargs={'estimated_start_date__isnull': False},
+        status_field='status',
+        selected_statuses=selected_statuses,
+        order_by=['-estimated_start_date'],
+        limit=50,
+        pad_filter_kwargs={'estimated_start_date__isnull': True},
+        pad_order_by=['-estimated_start_date']
+    )
+    template = 'bom/partials/no_results.html' if not results else 'bom/partials/estimate_search_table.html'
+    print(len(results))
+    return render(request, template, {'search_list': results})
+
+
 @permission_required('bom.can_access_bom')
 def open_preorder_endpoint(request):
-    if request.method == 'POST':
-        search_query = request.POST.get('search', '')
-        search_list = Workorder.objects.filter(
-            Q(status_name='Open') & (
-                Q(wo_number_display__icontains=search_query) |
-                Q(pre_order_number__icontains=search_query) |
-                Q(status_name__icontains=search_query) |
-                Q(project_display__icontains=search_query) |
-                Q(building_number__icontains=search_query) |
-                Q(building_name__icontains=search_query) |
-                Q(comment_text__icontains=search_query) 
-            )
-        ).defer('status_name')
-
-        for workorder in search_list:
-                if workorder.building_number:
-                    workorder.building = str(workorder.building_number) + ' - ' + workorder.building_name
-                
-                if len(workorder.comment_text) > 80:
-                    workorder.comment = workorder.comment_text[0:80] + '...'
-                else:
-                    workorder.comment = workorder.comment_text
-
-
-    search_list_size = len(search_list)
-    if search_list_size == 0:
-        template = 'bom/partials/no_results.html'
-    else:
-        template = 'bom/partials/open_preorder_table.html'
-    return render(request, template,
-                {'search_list': search_list})
+    start = time.time()
+    search_query = request.POST.get('search', '').strip()
+    search_fields = [
+        'wo_number_display', 'pre_order_number', 'status_name', 'project_display',
+        'building_number', 'building_name', 'comment_text'
+    ]
+    def post_process(workorder):
+        if hasattr(workorder, 'building_number') and workorder.building_number:
+            workorder.building = f"{workorder.building_number} - {workorder.building_name}"
+        if hasattr(workorder, 'comment_text'):
+            if len(workorder.comment_text) > 80:
+                workorder.comment = workorder.comment_text[0:80] + '...'
+            else:
+                workorder.comment = workorder.comment_text
+    results = get_search_results(
+        model=Workorder,
+        search_query=search_query,
+        search_fields=search_fields,
+        filter_kwargs={'status_name': 'Open'},
+        order_by=['-wo_number_display'],
+        limit=50,
+        pad_filter_kwargs={'status_name': 'Open'},
+        pad_order_by=['-wo_number_display'],
+        post_process=post_process,
+        pk_field='wo_number_display' 
+    )
+    end = time.time() - start
+    print(f"[actual_v_estimate] Page load time: {end:.2f} seconds")
+    print(len(results))
+    template = 'bom/partials/no_results.html' if not results else 'bom/partials/open_preorder_table.html'
+    return render(request, template, {'search_list': results})
