@@ -830,7 +830,7 @@ def actual_v_estimate(request):
         template_name = 'rte/view/actual-vs-estimate-completed.html'
         estimates = list(EstimateView.objects.filter(
             Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
-        ).filter(status__in=['Completed']))
+        ).filter(status__in=['Completed'])[:550])
 
     # Batch fetch related Labor and ServiceOrder objects
     estimate_ids = [e.id for e in estimates]
