@@ -75,10 +75,7 @@ class ProjectForm(ModelForm):
     
     class Meta:
         model = Project
-        fields = ['netops_engineer','assigned_date','due_date','completed_date','status']
-        labels = {
-        "netops_engineer":  "UMNet Engineer",
-        }
+        fields = ['engineer1','engineer2','assigned_date','due_date','completed_date','status']
         widgets = {
             'assigned_date': forms.DateInput(attrs={'type': 'date'}),
             'due_date': forms.DateInput(attrs={'type': 'date'}),
@@ -89,4 +86,5 @@ class ProjectForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
         if self.instance:
-            self.fields['netops_engineer'].queryset = Technician.objects.filter(active=Technician.ACTIVE, wo_group_code = 'Network Operation').order_by('labor_name_display')
+            self.fields['engineer1'].queryset = Technician.objects.filter(active=Technician.ACTIVE, wo_group_code = 'Network Operation').order_by('labor_name_display')
+            self.fields['engineer2'].queryset = Technician.objects.filter(active=Technician.ACTIVE, wo_group_code = 'Network Operation').order_by('labor_name_display')

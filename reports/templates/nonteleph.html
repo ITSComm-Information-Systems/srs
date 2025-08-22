@@ -60,7 +60,11 @@
 			</div>
 			<div class="card-body">
 				{% for key, value in c.charge_tables.items %}
+				{% if key == 'Wolverine Web Services' %}
+				<strong>Pantheon</strong>
+				{% else %}
 				<strong>{{ key }}</strong>
+				{% endif %}
 				<table class="table-responsive table table-sm table-striped mt-2" id='charge_table' style="display: table;">
 					<thead>
 						<tr class="thead-dark">
@@ -118,6 +122,13 @@
 							<th scope='col'>Shortcode</th>
 							<th scope="col">Quantity</th>
 							<th scope='col' class='total-col'>Total Charge</th>
+							{% elif key == 'Wolverine Web Services' %}
+							<th scope='col' class="first-col">Billing ID</th>
+							<th scope="col">Description</th>
+							<th scope="col">Transaction Type</th>
+							<th scope="col"></th>
+							<th scope="col"></th>
+							<th scope="col" class='total-col'>Total Charge</th>
 							{% else %}
 							<th scope='col' class="first-col">Billing ID</th>
 							<th scope="col">Description</th>
@@ -159,7 +170,7 @@
 							</td>
 
 							<td>{% for server in v.rate_jh %}
-								{{server}}<br>
+								{{server|floatformat:4 }}<br>
 								{% endfor %}
 							</td>
 
@@ -189,6 +200,13 @@
 							<td>{{ v.shortcode }}</td>
 							<td>{{ v.quantity_vouchered }}</td>
 
+							<td class='total-col'>{{ v.total_charges }}</td>
+							{% elif key == 'Wolverine Web Services' %}
+							<td class='first-col'>{{ v.user_defined_id }}</td>
+							<td>{{ v.descr }}</td>
+							<td>{{ v.type }}</td>
+							<td></td>
+							<td></td>
 							<td class='total-col'>{{ v.total_charges }}</td>
 							{% else %}
 							{% if key == 'Container Services' %}
@@ -226,6 +244,7 @@
 							<td class='total-col'>{{ v.total_charges }}</td>
 							{% endif %}
 							{% endif %}
+							
 						</tr>
 						{% endfor %}
 						<tr class='table-total bg-warning'>

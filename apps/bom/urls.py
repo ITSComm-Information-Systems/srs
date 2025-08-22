@@ -14,7 +14,8 @@ urlpatterns = [
     path('edit_project/', views.edit_project),
     path('upload_csv/', views.upload_csv),
     path('item_lookup/', views.item_lookup),
-    path('item/<int:item_pk>/details/', views.item_details, name='item_details'),
+    path('item-lookup-endpoint/', views.item_lookup_endpoint, name='item_lookup_endpoint'),
+    path('items/<int:item_pk>/usage-count/', views.item_usage_count, name='item_usage_count'),
     path('notify_warehouse/', views.notify_warehouse),
     path('add_pinnacle_note/', views.add_pinnacle_note),
     path('add_item/<int:estimate_id>/', views.AddItem.as_view()),
@@ -25,4 +26,8 @@ urlpatterns = [
     path('summary-report/<int:estimate_id>', reports.summary_report),
     path('netops/', views.NetOpsSearch.as_view()),
     path('engineering/', views.EngineeringSearch.as_view()),
+    path('estimate_search/', views.estimate_search, name='estimate_search'),
+    path('estimate_search_endpoint/', views.estimate_search_endpoint, name='estimate_search_endpoint'),
+    path('open_preorder_search/', views.open_preorder_search, name='open_preorder_search'),
+    path('open_preorder_endpoint/', views.open_preorder_endpoint, name='open_preorder_endpoint'),
 ]

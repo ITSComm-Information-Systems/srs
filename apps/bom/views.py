@@ -100,20 +100,20 @@ class Search(PermissionRequiredMixin, View):
                 if 'Project Managers' in assigned_groups:
                     template = 'bom/search_estimates_projectmanagers.html'
 
-        else:  # open_workorder
-            title = 'Search Open Preorders/Workorders'
-            search_list = Workorder.objects.filter(status_name='Open').defer('status_name')
+        # else:  # open_workorder
+        #     title = 'Search Open Preorders/Workorders'
+        #     search_list = Workorder.objects.filter(status_name='Open').defer('status_name')
 
-            for workorder in search_list:
-                if workorder.building_number:
-                    workorder.building = str(workorder.building_number) + ' - ' + workorder.building_name
+        #     for workorder in search_list:
+        #         if workorder.building_number:
+        #             workorder.building = str(workorder.building_number) + ' - ' + workorder.building_name
                 
-                if len(workorder.comment_text) > 80:
-                    workorder.comment = workorder.comment_text[0:80] + '...'
-                else:
-                    workorder.comment = workorder.comment_text
+        #         if len(workorder.comment_text) > 80:
+        #             workorder.comment = workorder.comment_text[0:80] + '...'
+        #         else:
+        #             workorder.comment = workorder.comment_text
 
-            template = 'bom/basic_search.html'
+        #     template = 'bom/basic_search.html'
 
         return render(request, template,
                       {'title': title,
@@ -141,18 +141,20 @@ def edit_project(request):
 
     if project_id:
         project = Project.objects.get(id=project_id)
-        engineer = project.netops_engineer
+        engineer1 = project.engineer1
+        engineer2 = project.engineer2
     else:
         project = Project()
         project.woid = woid
-        engineer = ''
+        engineer1 = ''
+        engineer2 = ''
 
     project.set_create_audit_fields(request.user.username)
     form = ProjectForm(request.POST, instance=project)
     if form.is_valid():
         project.save()
     
-    if project.netops_engineer != engineer:
+    if project.engineer1 != engineer1 or project.engineer2 != engineer1:
         project.notify_engineer(estimate_id)
 
     return HttpResponseRedirect(f'/apps/bom/estimate/{estimate_id}')
@@ -169,11 +171,35 @@ def project_list(request):
 
 @permission_required('bom.can_access_bom')
 def item_lookup(request):
-    item_list = Item.objects.get_active()
 
     return render(request, 'bom/item_lookup.html',
-                    {'title': 'Item Lookup',
-                    'item_list': item_list})
+                    {'title': 'Item Lookup'})
+
+@permission_required('bom.can_access_bom')
+def item_lookup_endpoint(request):
+    search_query = request.POST.get('item_code', '').strip().lower()
+    item_list = Item.objects.get_active()
+
+
+    if search_query:
+        item_list = item_list.filter(
+            Q(code__icontains=search_query) |
+            Q(name__icontains=search_query) |
+            Q(manufacturer__icontains=search_query) |
+            Q(manufacturer_part_number__icontains=search_query)
+        )
+
+    return render(request, 'bom/partials/item_table_rows.html', {'item_list': item_list})
+
+@permission_required('bom.can_access_bom')
+def item_usage_count(request, item_pk):
+    # Get the item object for the given pk
+    item = get_object_or_404(Item, pk=item_pk)
+    total_quantity = Material.objects.filter(item=item, material_location__estimate__status__in=[Estimate.WAREHOUSE, Estimate.ORDERED]).aggregate(Sum('quantity'))['quantity__sum']
+    if total_quantity is None:
+        total_quantity = 0
+
+    return HttpResponse(str(total_quantity))
 
 @permission_required('bom.can_access_bom')
 def item_details(request, item_pk):
@@ -570,3 +596,108 @@ class EngineeringSearch(PermissionRequiredMixin, View):
         return render(request, template,
                     {'title': 'Engineering Projects',
                     'search_list': search_list})
+    
+@permission_required('bom.can_access_bom')
+def estimate_search(request):
+    template = 'bom/estimate_search.html'
+    return render(request, template, {'title': 'All Preorders/Workorder w/Estimates'})
+
+def estimate_search_endpoint(request):
+    # Get the search query and selected statuses
+    search_query = request.POST.get('search', '').strip()
+    selected_statuses = request.POST.getlist('status')  # Get the list of selected checkboxes
+
+    # Build the queryset based on the search query and selected statuses
+    search_list = EstimateView.objects.exclude(estimated_start_date__isnull=True)
+
+    if search_query:
+        search_list = search_list.filter(
+            Q(wo_number_display__icontains=search_query) |
+            Q(pre_order_number__icontains=search_query) |
+            Q(project_display__icontains=search_query) |
+            Q(label__icontains=search_query) |
+            Q(status__icontains=search_query) |
+            Q(project_manager__icontains=search_query) |
+            Q(assigned_engineer__icontains=search_query) |
+            Q(assigned_netops__icontains=search_query) |
+            Q(estimated_start_date__icontains=search_query) |
+            Q(estimated_completion_date__icontains=search_query)
+        )
+
+    if selected_statuses:
+        search_list = search_list.filter(status__in=selected_statuses)
+
+    # Limit the results to the most recent 50 based on estimated_start_date
+    search_list = search_list.order_by('-estimated_start_date')[:50]
+
+    # If fewer than 50 results, pad with entries that have no estimated_start_date
+    if len(search_list) < 50:
+        padding_needed = 50 - len(search_list)
+        padding_results = EstimateView.objects.filter(estimated_start_date__isnull=True)
+        if search_query:
+            padding_results = padding_results.filter(
+                Q(wo_number_display__icontains=search_query) |
+                Q(pre_order_number__icontains=search_query) |
+                Q(project_display__icontains=search_query) |
+                Q(label__icontains=search_query) |
+                Q(status__icontains=search_query) |
+                Q(project_manager__icontains=search_query) |
+                Q(assigned_engineer__icontains=search_query) |
+                Q(assigned_netops__icontains=search_query) |
+                Q(estimated_completion_date__icontains=search_query)
+            )
+        if selected_statuses:
+            padding_results = padding_results.filter(status__in=selected_statuses)
+
+        # Add padding results to the search list
+        search_list = list(search_list) + list(padding_results[:padding_needed])
+
+    # Render the partial template with the filtered results
+    search_list_size = len(search_list)
+    if search_list_size == 0:
+        template = 'bom/partials/no_results.html'
+    else:
+        template = 'bom/partials/estimate_search_table.html'
+    return render(request, template, {'search_list': search_list})
+
+@permission_required('bom.can_access_bom')
+def open_preorder_search(request):
+    template = 'bom/open_preorder_search.html'
+
+    return render(request, template,
+                {'title': 'Search Open Preorders/Workorders',
+                })
+
+@permission_required('bom.can_access_bom')
+def open_preorder_endpoint(request):
+    if request.method == 'POST':
+        search_query = request.POST.get('search', '')
+        search_list = Workorder.objects.filter(
+            Q(status_name='Open') & (
+                Q(wo_number_display__icontains=search_query) |
+                Q(pre_order_number__icontains=search_query) |
+                Q(status_name__icontains=search_query) |
+                Q(project_display__icontains=search_query) |
+                Q(building_number__icontains=search_query) |
+                Q(building_name__icontains=search_query) |
+                Q(comment_text__icontains=search_query) 
+            )
+        ).defer('status_name')
+
+        for workorder in search_list:
+                if workorder.building_number:
+                    workorder.building = str(workorder.building_number) + ' - ' + workorder.building_name
+                
+                if len(workorder.comment_text) > 80:
+                    workorder.comment = workorder.comment_text[0:80] + '...'
+                else:
+                    workorder.comment = workorder.comment_text
+
+
+    search_list_size = len(search_list)
+    if search_list_size == 0:
+        template = 'bom/partials/no_results.html'
+    else:
+        template = 'bom/partials/open_preorder_table.html'
+    return render(request, template,
+                {'search_list': search_list})

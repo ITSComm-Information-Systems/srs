@@ -1,0 +1,16 @@
+<ul class="list-group">
+    {% for user in users %}
+        <li 
+            class="list-group-item dropdown-item"
+            hx-post="{% url 'login_as_user' user.id %}" 
+            hx-target="body" 
+            hx-swap="innerHTML"
+            hx-trigger="click"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            style="cursor: pointer;">
+            {{ user.username }}
+        </li>
+    {% empty %}
+        <li class="list-group-item dropdown-item">No results found</li>
+    {% endfor %}
+</ul>

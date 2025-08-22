@@ -255,6 +255,41 @@ $(document).ready(function() {
     $('[data-tab="LocationNew"]').show();
   });
 
+  // Zoom Government
+  $("#zgAccount_0").click(function() {  // Provide Deskset not associated with uniqname.
+    $('#div_zgUniqname').hide();  
+    $('#div_zgJack').show();
+    $('#div_zgConduit').hide();
+    $('#div_zgJackNumber').hide();
+    $('#div_zgOrderPhone').hide();
+  });
+
+  $("#zgAccount_1").click(function() {  //  Create an account associated with a uniqname.
+    $('#div_zgUniqname').show();
+    $('#div_zgJack').hide();
+    $('#div_zgConduit').hide();
+    $('#div_zgJackNumber').hide();
+    $('#div_zgOrderPhone').show();
+  });
+
+  $("#zgOrderPhone_0").click(function() {
+    $('#div_zgJack').hide();
+  });
+
+  $("#zgOrderPhone_1").click(function() {
+    $('#div_zgJack').show();
+  });
+
+  $("#zgJack_0").click(function() {
+    $('#div_zgConduit').show();
+    $('#div_zgJackNumber').hide();
+  });
+
+  $("#zgJack_1").click(function() {
+    $('#div_zgConduit').hide();
+    $('#div_zgJackNumber').show();
+  });
+
   $("#activePhone_yesactivephone").click(function() {
     $('[data-tab="PhoneLocation"]').show();
     $('[data-tab="LocationNew"]').hide();
@@ -560,28 +595,37 @@ $(document).ready(function() {
     set_server_name();
   });
 
-  function set_server_name() {
-    
-    server_name = $("#id_serverName").val();
+function set_server_name() {
+  let server_name = $("#id_serverName").val();
+  let prefix = '';
+  let suffix = '';
+  let pci = false;
 
-    if (database) {
-      if (database == "MSSQL") {
-        server_name = 'db-' + server_name
-      } else if (database == "Oracle") {
-        server_name = server_name + '-ora'
-      } else {
-        server_name = server_name + '-' + database.toLowerCase();
-      }
-    } else if (managed_windows) {
-      if ($('#misevprefix_0').prop("checked")) {
-        server_name = $("#id_misevregpre").val() + '-' + server_name;
-      } else {
-        server_name = 'MIS-' + server_name;
-      }
-    }
-
-    $("#id_name").val(server_name);
+  if ($("#regulated_data_4").prop("checked")) { // Check for PCI Datum
+    pci = true;
+    prefix += 'p-';
   }
+
+  if (database) {
+    if (database === "MSSQL") {
+      prefix += 'db-';
+    } else if (database === "Oracle") {
+      suffix = '-ora';
+    } else {
+      suffix = '-' + database.toLowerCase();
+    }
+  } else if (managed_windows && !pci) {
+    if ($('#misevprefix_0').prop("checked")) {
+      prefix += $("#id_misevregpre").val() + '-';
+    } else {
+      prefix += 'MIS-';
+    }
+  }
+
+  server_name = prefix + server_name + suffix;
+  $("#id_name").val(server_name);
+}
+
 
   $(document).on("change", ".cost-driver" , function() {
     update_total_cost();

@@ -551,18 +551,20 @@ def add_custom_permissions(user_id):
 @require_http_methods(['POST', 'GET'])
 #@user_passes_test(su_login_callback)
 @permission_required('oscauth.can_impersonate')
-def su_login(request, form_class=UserSuForm, template_name='oscauth/su_login.html'):
-    form = form_class(request.POST or None)
-    user_list = User.objects.order_by('username')
-    if form.is_valid():
-        return login_as_user(request, form.get_user().pk)
+def su_login(request, template_name='oscauth/su_login.html'):
 
     return render(request, template_name, {
         'title': 'Impersonate User',
-        'form': form,
-        'user_list': user_list,
     })
 
+def search_users_endpoint(request):
+    if request.method == "POST":
+        query = request.POST.get("search", "").strip()
+        users = User.objects.filter(username__icontains=query)[:10]  # Adjust the filter as needed
+        template = 'oscauth/partials/impersonate_user_return.html'
+
+    return render(request, template, {
+        'users': users})
 
 def su_logout(request):
     exit_users_pk = request.session.get("exit_users_pk", default=[])

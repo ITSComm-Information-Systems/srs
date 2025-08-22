@@ -1,12 +1,12 @@
 #from django.contrib.auth.models import User
-from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database
+from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database, ArcHost
 from services.models import Pool, Image, Network
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from rest_framework import routers, viewsets
 from . import serializers
 from django.conf import settings
 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAdminUser, IsAuthenticated, SAFE_METHODS
 from rest_framework.views import APIView
 from django.core.mail import EmailMessage
 from apps.bom.models import Item, EstimateView, Material, MaterialLocation
@@ -16,6 +16,18 @@ from django.core.files.storage import FileSystemStorage
 
 from .models import Webhooks
 import threading, time, subprocess
+
+
+class IsAdminOrReadOnly(BasePermission):    # Allows full access to admins, read-only to others.
+
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False  # Deny access if not logged in
+
+        if request.method in SAFE_METHODS:  # SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
+            return True
+        
+        return request.user and request.user.is_staff
 
 
 class TollUploadView(APIView):
@@ -202,24 +214,24 @@ class LDAPGroupMemberViewSet(LDAPViewSet):
     serializer_class = serializers.LDAPGroupMemberSerializer
 
 class DefaultViewSet(viewsets.ModelViewSet):
-    queryset = StorageRate.objects.all()
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
-        if self.serializer_class.Meta.model.__name__ == 'Server':
-            print('server')
-            queryset = Server.objects.all().select_related('os','admin_group','owner'
-                ,'patch_time','patch_day','reboot_time','reboot_day','backup_time','database_type').prefetch_related('regulated_data','non_regulated_data','disks').order_by('id')
-        elif self.serializer_class.Meta.model.__name__ == 'ArcInstance':
-            queryset = ArcInstance.objects.all().select_related('owner','service').prefetch_related('rate','shortcodes','hosts').order_by('id')
-        else:
-            queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
-            if hasattr(self.serializer_class, 'prefetch_related'):
-                queryset = queryset.prefetch_related(*self.serializer_class.prefetch_related)
+        queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
+        if hasattr(self.serializer_class, 'prefetch_related'):
+            queryset = queryset.prefetch_related(*self.serializer_class.prefetch_related)
 
-            if hasattr(self.serializer_class, 'select_related'):
-                queryset = queryset.prefetch_related(*self.serializer_class.select_related)
+        if hasattr(self.serializer_class, 'select_related'):
+            queryset = queryset.prefetch_related(*self.serializer_class.select_related)
 
         kwargs = {}
+
+        if not self.request.user.is_staff: # Non Admins are limited by group membership.
+            if 'owner' in [f.name for f in self.serializer_class.Meta.model._meta.get_fields()]:
+                owner_list = LDAPGroup.objects.filter(ldapgroupmember__username=self.request.user.username).distinct()
+                queryset = queryset.filter(owner_id__in=owner_list)
+            else:
+                return [] 
 
         for parm, val in self.request.GET.items():
             field = parm.split('__')[0]
@@ -230,6 +242,7 @@ class DefaultViewSet(viewsets.ModelViewSet):
         queryset = queryset.filter(**kwargs)
         
         return queryset
+
 
 def viewset_factory(model, serializer_class=None):
     name = model.__name__
@@ -251,6 +264,7 @@ router = routers.DefaultRouter()
 router.register('pool', viewset_factory(Pool))
 router.register('image', viewset_factory(Image))
 router.register('server', viewset_factory(Server))
+router.register('archost', viewset_factory(ArcHost))
 
 # Deprecated method requiring a custom serializer.
 router.register('network', viewset_factory(Network, serializers.NetworkSerializer))

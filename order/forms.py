@@ -549,9 +549,9 @@ class VolumeSelectionForm(TabForm):
                 vol_type = action.override['storage_type']
                 if service.id == 7:
                     self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service')
-                elif service.id == 9:
+                elif service.id in [9,10,11]:
                     self.template = 'order/turbo_volume_selection.html'
-                    self.volume_list = ArcInstance().get_user_volumes(self.request.user, vol_type)
+                    self.volume_list = ArcInstance().get_user_volumes(self.request.user, vol_type, service.id)
                 else:  #Prefetch shortcodes
                     self.volume_list = self.vol.objects.filter(service=service, type=vol_type, owner__in=groups).order_by('name').select_related('rate','owner','service').prefetch_related('shortcodes')
                 return
@@ -579,10 +579,14 @@ class VolumeSelectionForm(TabForm):
                 for volume in self.volume_list:
                     self.total_cost = self.total_cost + volume.total_cost
                 return
-
+            elif service.id == 11:
+                self.volume_list = ArcInstance().get_user_volumes(self.request.user, 'NFS', service.id)     
+                self.template = 'order/volume_review.html'
+                for volume in self.volume_list:
+                   self.total_cost = self.total_cost + volume['total_cost']
+                return
             else:
                 self.volume_list = self.vol.objects.filter(service=service, owner__in=groups).order_by('name')
-                    
                 self.template = 'order/volume_review.html'
 
             for volume in self.volume_list:
@@ -1076,6 +1080,17 @@ class ServerSpecForm(TabForm):
                 self.fields['size_edit'].initial = 1
             elif 'anaged' not in self.instance.os.label: 
                 self.fields['size_edit'].initial = 1
+        
+        if self.request.POST.get('misevregu') == 'True':
+            self.fields['backup'].initial = 'True'
+            self.fields['backup'].disabled = True
+
+            if '78' in self.request.POST.getlist('regulated_data', []): # Check for PCI Data (78)
+                self.fields['replicated'].disabled = True
+                self.fields['replicated'].initial = 'True'
+                self.fields['managed'].disabled = True
+                self.fields['managed'].initial = 'True'
+                self.fields.pop('misevprefix')
 
         if self.request.POST.get('database'):
             self.set_database_defaults()
@@ -1084,10 +1099,6 @@ class ServerSpecForm(TabForm):
             else:
                 self.disk_formset = self.DiskDisplayFormSet(initial=self.disk_list)
             return
-        
-        if self.request.POST.get('misevregu') == 'True':
-            self.fields['backup'].initial = 'True'
-            self.fields['backup'].disabled = True
 
         instance_id = self.request.POST.get('instance_id')
 
@@ -1141,8 +1152,8 @@ class ServerSpecForm(TabForm):
 
             base_size = float(database_size) / 10
             fifteen_percent = math.ceil(base_size * .15) * 10
-            thirty_percent = fifteen_percent * 2
-            ##thirty_percent = math.ceil(base_size * .3) * 10
+            ##thirty_percent = fifteen_percent * 2
+            thirty_percent = math.ceil(base_size * .3) * 10
             if ram < 8:
                 paging_disk = 60
             else:
@@ -1518,12 +1529,21 @@ class NewLocationForm(TabForm):
 
 
 class EquipmentForm(TabForm):
-    cat = ['Basic','VOIP']
-    cat[0] = Product.objects.all().filter(active=True, category=1).order_by('display_seq_no')
-    cat[0].id = 'basic'
-    cat[1] = Product.objects.all().filter(active=True, category__in=[2, 4]).order_by('display_seq_no') # Voip and Conference
-    cat[1].id = 'voip'
     template = 'order/equipment.html'
+
+    def __init__(self, *args, **kwargs):
+        super(EquipmentForm, self).__init__(*args, **kwargs)
+
+        if self.action.id == 77: # Zoom for Government
+            self.cat = ['VOIP']
+            self.cat[0] = Product.objects.all().filter(active=True, category=41).order_by('display_seq_no') # Zoom for Govt
+            self.cat[0].id = 'voip'
+        else:
+            self.cat = ['Basic','VOIP']
+            self.cat[0] = Product.objects.all().filter(active=True, category=1).order_by('display_seq_no')
+            self.cat[0].id = 'basic'
+            self.cat[1] = Product.objects.all().filter(active=True, category__in=[2, 4]).order_by('display_seq_no') # Voip and Conference
+            self.cat[1].id = 'voip'
 
 
 class ProductForm(TabForm):

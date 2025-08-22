@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from project.models import Choice
 from services.models import Pool, Image, Network, ImageDisk
-from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database, ServerDisk
+from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database, ServerDisk, Ticket, ServerTicket
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from django.db import models
 
@@ -11,6 +11,13 @@ class ServerDiskSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServerDisk
         fields = ['name', 'size', 'controller', 'device']
+
+
+class ServerTicketSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ServerTicket
+        fields = ['ticket_id', 'comments']
 
 
 class ImageDiskSerializer(serializers.ModelSerializer):
@@ -24,6 +31,24 @@ class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
         exclude = ['sequence']
+
+
+class DefaultSerializer(serializers.ModelSerializer):
+
+    def get_tickets(self, obj):
+        request = self.context.get('request')
+        if request and request.query_params.get('include_tickets') != 'true':
+            return None
+        
+        ticket_list = []
+
+        for ticket in Ticket.objects.filter(instance_id = obj.id).order_by('create_date'):
+            ticket_list.append(
+                {'ticket_id': ticket.id,
+                'instructions': ticket.data.get('misevfirewall')}
+            )
+
+        return ticket_list
 
 
 def serializer_factory(model):
@@ -55,10 +80,13 @@ def serializer_factory(model):
 
     if model == Server:   #TODO handle children
         class_attrs['disks'] = ServerDiskSerializer(many=True, read_only=True)
+        class_attrs['prefetch_related'].append('disks')
+        class_attrs['tickets'] = ServerTicketSerializer(many=True, read_only=True)
+        class_attrs['prefetch_related'].append('tickets')
     elif model == Image:
         class_attrs['storage'] = ImageDiskSerializer(many=True, read_only=True)
 
-    return type(f'{name}Serializer', (serializers.ModelSerializer,), class_attrs)
+    return type(f'{name}Serializer', (DefaultSerializer,), class_attrs)
 
 class DatabaseSerializer(serializers.ModelSerializer):
 
@@ -139,11 +167,13 @@ class ArcBillingForInstanceSerializer(serializers.ModelSerializer):
 class ArcInstanceSerializer(VolumeInstanceSerializer):
     hosts = serializers.StringRelatedField(many=True)
     shortcodes = ArcBillingForInstanceSerializer(many=True, read_only=True)
+    prefetch_related = ['rate','shortcodes','hosts']
+    select_related = ['owner','service']
 
     class Meta:
         model = ArcInstance
         fields = ['id','name','owner','size','service','type','rate','shortcodes', 'created_date','uid','ad_group','total_cost','hosts'
-        ,'nfs_group_id','multi_protocol','sensitive_regulated','great_lakes','armis','lighthouse','globus','globus_phi','thunder_x','research_computing_package','amount_used']
+        ,'nfs_group_id','multi_protocol','sensitive_regulated','great_lakes','armis','lighthouse','globus','globus_phi','thunder_x','research_computing_package','college','amount_used']
 
 
 class ArcBillingSerializer(serializers.ModelSerializer):
