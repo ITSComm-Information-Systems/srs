@@ -20,9 +20,21 @@
                     <tr>
                         <td class="align-middle px-2 py-1">{{ worker.labor_name_display2 }}</td>
                         {% for week in week_starts %}
-                            <td class="align-middle px-2 py-1">
-                                {{ worker_hours|dict_key:group.wo_group_name|dict_key:worker.labor_code|dict_key:week|default:"0"|floatformat:2 }}
-                            </td>
+                            {% with hours=worker_hours|dict_key:group.wo_group_name|dict_key:worker.labor_code|dict_key:week|default:"0"|floatval %}
+                                {% if forloop.last %}
+                                    <td class="align-middle px-2 py-1">
+                                        {{ hours|floatformat:2 }}
+                                    </td>
+                                {% else %}
+                                    <td class="align-middle px-2 py-1
+                                        {% if hours < 39.5 %}
+                                            table-danger
+                                        {% endif %}
+                                    ">
+                                        {{ hours|floatformat:2 }}
+                                    </td>
+                                {% endif %}
+                            {% endwith %}
                         {% endfor %}
                     </tr>
                 {% endfor %}

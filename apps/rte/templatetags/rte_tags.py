@@ -11,3 +11,10 @@ def dict_key(d, key):
     if isinstance(d, dict):
         return d.get(key, {})
     return {}
+
+@register.filter
+def floatval(value):
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return 0
