@@ -866,51 +866,66 @@ def actual_v_estimate(request):
     }
     return HttpResponse(template.render(context, request))
 
+import time
+
 @permission_required('bom.can_access_bom')
 @cache_page(60 * 2)
 def employee_time_report(request):
-    # 1. Get all groups and their members (unique groups only)
-    groups_qs = UmRteLaborGroupV.objects.all()
-    seen = set()
-    groups = []
-    for g in groups_qs:
-        if g.wo_group_name not in seen:
-            groups.append(g)
-            seen.add(g.wo_group_name)
+    # 1. Get all unique groups (by name)
+    group_names = (
+        UmRteLaborGroupV.objects
+        .values_list('wo_group_name', flat=True)
+        .distinct()
+    )
+    groups = [
+        UmRteLaborGroupV.objects.filter(wo_group_name=name).first()
+        for name in group_names
+    ]
+    groups.sort(key=lambda g: g.wo_group_name if g else "")
 
+    # 2. Build group_workers mapping efficiently
+    # Get all group memberships at once
+    group_memberships = UmRteLaborGroupV.objects.values('wo_group_name', 'wo_group_labor_code')
+    techs = {t.labor_code: t for t in UmRteTechnicianV.objects.all()}
     group_workers = defaultdict(list)
-    for tech in UmRteTechnicianV.objects.all():
-        for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech.labor_code):
-            group_workers[group.wo_group_name].append(tech)
+    for gm in group_memberships:
+        tech = techs.get(gm['wo_group_labor_code'])
+        if tech:
+            group_workers[gm['wo_group_name']].append(tech)
 
-    # 2. Define week range (e.g., last 6 weeks)
+    # 3. Define week range (e.g., last 5 weeks)
     today = datetime.today().date()
     number_of_weeks_to_display = 5
-    week_starts = [(today - timedelta(days=today.weekday())) - timedelta(weeks=i) for i in range(number_of_weeks_to_display)][::-1]
+    week_starts = [
+        (today - timedelta(days=today.weekday())) - timedelta(weeks=i)
+        for i in range(number_of_weeks_to_display)
+    ][::-1]
 
-    # 3. Gather hours per worker per week
+    # 4. Gather hours per worker per week
     worker_hours = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))
-    # Structure: worker_hours[group][worker][week_start] = hours
-
-    # Query all relevant time entries in one go
     min_date = week_starts[0]
     max_date = week_starts[-1] + timedelta(days=6)
     entries = UmRteCurrentTimeAssignedV.objects.filter(
         assigned_date__gte=min_date,
         assigned_date__lte=max_date
+    ).values(
+        'assn_wo_group_name', 'labor_code', 'assigned_date', 'actual_mins_display'
     )
 
+    week_start_cache = {}
     for entry in entries:
-        group = entry.assn_wo_group_name
-        worker = entry.labor_code
-        # Find the week start for this entry
-        week_start = entry.assigned_date - timedelta(days=entry.assigned_date.weekday())
+        group = entry['assn_wo_group_name']
+        worker = entry['labor_code']
+        adate = entry['assigned_date']
+        if adate not in week_start_cache:
+            week_start_cache[adate] = adate - timedelta(days=adate.weekday())
+        week_start = week_start_cache[adate]
         # Convert HH:MM to float hours
-        hh, mm = map(int, entry.actual_mins_display.split(':'))
+        hh, mm = map(int, entry['actual_mins_display'].split(':'))
         hours = hh + mm / 60
         worker_hours[group][worker][week_start] += hours
 
-    # 4. Prepare context for template
+    # 5. Prepare context for template
     context = {
         'groups': groups,
         'group_workers': group_workers,
