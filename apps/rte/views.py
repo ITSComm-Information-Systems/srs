@@ -867,6 +867,7 @@ def actual_v_estimate(request):
     return HttpResponse(template.render(context, request))
 
 @permission_required('bom.can_access_bom')
+@cache_page(60 * 2)
 def employee_time_report(request):
     # 1. Get all groups and their members (unique groups only)
     groups_qs = UmRteLaborGroupV.objects.all()
@@ -884,7 +885,8 @@ def employee_time_report(request):
 
     # 2. Define week range (e.g., last 6 weeks)
     today = datetime.today().date()
-    week_starts = [(today - timedelta(days=today.weekday())) - timedelta(weeks=i) for i in range(6)][::-1]
+    number_of_weeks_to_display = 5
+    week_starts = [(today - timedelta(days=today.weekday())) - timedelta(weeks=i) for i in range(number_of_weeks_to_display)][::-1]
 
     # 3. Gather hours per worker per week
     worker_hours = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))

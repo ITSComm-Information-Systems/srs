@@ -2,14 +2,15 @@
 {% load rte_tags %}
 
 {% block content %}
+<h2>{{ title }}</h2>
 
 {% for group in groups %}
-    <h3 class="mt-4">{{ group.wo_group_name }}</h3>
+    <h4 class="mt-4">{{ group.wo_group_name }}</h4>
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover table-sm text-nowrap align-middle" style="width:auto; margin-bottom:1rem;">
             <thead class="thead-dark">
                 <tr>
-                    <th class="align-middle px-2 py-1">Worker</th>
+                    <th class="align-middle px-2 py-1"></th>
                     {% for week in week_starts %}
                         <th class="align-middle px-2 py-1">{{ week|date:"M d" }}</th>
                     {% endfor %}
