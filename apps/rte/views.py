@@ -865,3 +865,56 @@ def actual_v_estimate(request):
         'estimates': estimates
     }
     return HttpResponse(template.render(context, request))
+
+@permission_required('bom.can_access_bom')
+def employee_time_report(request):
+    # 1. Get all groups and their members (unique groups only)
+    groups_qs = UmRteLaborGroupV.objects.all()
+    seen = set()
+    groups = []
+    for g in groups_qs:
+        if g.wo_group_name not in seen:
+            groups.append(g)
+            seen.add(g.wo_group_name)
+
+    group_workers = defaultdict(list)
+    for tech in UmRteTechnicianV.objects.all():
+        for group in UmRteLaborGroupV.objects.filter(wo_group_labor_code=tech.labor_code):
+            group_workers[group.wo_group_name].append(tech)
+
+    # 2. Define week range (e.g., last 6 weeks)
+    today = datetime.today().date()
+    week_starts = [(today - timedelta(days=today.weekday())) - timedelta(weeks=i) for i in range(6)][::-1]
+
+    # 3. Gather hours per worker per week
+    worker_hours = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))
+    # Structure: worker_hours[group][worker][week_start] = hours
+
+    # Query all relevant time entries in one go
+    min_date = week_starts[0]
+    max_date = week_starts[-1] + timedelta(days=6)
+    entries = UmRteCurrentTimeAssignedV.objects.filter(
+        assigned_date__gte=min_date,
+        assigned_date__lte=max_date
+    )
+
+    for entry in entries:
+        group = entry.assn_wo_group_name
+        worker = entry.labor_code
+        # Find the week start for this entry
+        week_start = entry.assigned_date - timedelta(days=entry.assigned_date.weekday())
+        # Convert HH:MM to float hours
+        hh, mm = map(int, entry.actual_mins_display.split(':'))
+        hours = hh + mm / 60
+        worker_hours[group][worker][week_start] += hours
+
+    # 4. Prepare context for template
+    context = {
+        'groups': groups,
+        'group_workers': group_workers,
+        'week_starts': week_starts,
+        'worker_hours': worker_hours,
+        'title': 'Weekly Worker Hours by Group',
+    }
+    template = loader.get_template('rte/view/employee-time-report.html')
+    return HttpResponse(template.render(context, request))
