@@ -1,0 +1,46 @@
+{% extends 'bom/base.html' %}
+{% load rte_tags %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+
+{% for group in groups %}
+    <h4 class="mt-4">{{ group.wo_group_name }}</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover table-sm text-nowrap align-middle" style="width:auto; margin-bottom:1rem;">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="align-middle px-2 py-1"></th>
+                    {% for week in week_starts %}
+                        <th class="align-middle px-2 py-1">{{ week|date:"M d" }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for worker in group_workers|dict_key:group.wo_group_name %}
+                    <tr>
+                        <td class="align-middle px-2 py-1">{{ worker.labor_name_display2 }}</td>
+                        {% for week in week_starts %}
+                            {% with hours=worker_hours|dict_key:group.wo_group_name|dict_key:worker.labor_code|dict_key:week|default:"0"|floatval %}
+                                {% if forloop.last %}
+                                    <td class="align-middle px-2 py-1">
+                                        {{ hours|floatformat:2 }}
+                                    </td>
+                                {% else %}
+                                    <td class="align-middle px-2 py-1
+                                        {% if hours < 39.5 %}
+                                            table-danger
+                                        {% endif %}
+                                    ">
+                                        {{ hours|floatformat:2 }}
+                                    </td>
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endfor %}
+{% endblock %}

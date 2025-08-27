@@ -18,6 +18,7 @@ urlpatterns = [
     path('confirmation/', views.get_confirmation),
     path('actual-vs-estimate-open/', views.actual_v_estimate, name='actual-vs-estimate-open'),
     path('actual-vs-estimate-completed/', views.actual_v_estimate, name='actual-vs-estimate-completed'),
+    path('employee-time-report/', views.employee_time_report, name='employee-time-report'),
     #path('estimate-mockup/', views.estimate_mockup, name='estimate-mockup'),
     path(r'', views.load_rte),
     
