@@ -671,8 +671,6 @@ def format_time(total_hours):
         mins = '0' + str(mins)
     total_hours = str(hours) + ':' + str(mins)
     return total_hours
-
-
 GROUP_CONFIG = {
     # Submitted hours groups (UM_RTE_LABOR_GROUP_V - WO_GROUP_CODE)
     #This prefix is used to match the group codes in the input entries
@@ -818,7 +816,6 @@ def actual_v_estimate(request):
     username = request.user.username
     url = request.path.strip('/').split('/')
     slug = url[-1]
-
     if slug == 'actual-vs-estimate-open':
         template_name = 'rte/view/actual-vs-estimate-open.html'
         estimates = list(EstimateView.objects.filter(
@@ -858,7 +855,6 @@ def actual_v_estimate(request):
 
         hours_and_classes = calculate_hours_and_classes(input_entries, labor)
         apply_hours_to_estimate(estimate, hours_and_classes)
-
     template = loader.get_template(template_name)
     context = {
         'title': 'Actual vs Estimated Hours',

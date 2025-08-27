@@ -1,8 +1,18 @@
-import json, yaml, requests
+import json, yaml, requests, re
 from django.conf import settings
 from ldap3 import Server, Connection, ALL, MODIFY_ADD
 from django.template.loader import render_to_string
 from django.core.mail import mail_admins
+
+TDX_FIELD_TO_ID = {
+    "CPU": "1963",
+    "RAM": "1964",
+    "Disk Replication": "1966",
+    "Patch Day": "1971",
+    "Patch Time": "1970",
+    "Additional requirements, such as Firewall rules": "1977",
+}
+
 class MCommunity:
 
     def __init__(self):
@@ -188,18 +198,12 @@ class Openshift():
     def create_role_bindings(self, instance):
         url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
 
-        role_map = {
-            'admins': 'admin',
-            'editors': 'edit',
-            'viewers': 'view'
-        }
-
         for users in instance.cleaned_names:
 
             if users == 'all':
                 role = 'cluster-logging-application-view'
             else:
-                role = role_map[users]   # admins becomes admin, etc.
+                role = users[:-1]   # admins becomes admin, etc.
 
             uniqnames = instance.cleaned_names[users]
             if len(uniqnames) > 0:
@@ -328,6 +332,8 @@ class TDx():
         payload['SourceID'] = 8         # System
         username = payload.get('RequestorEmail').split('@')[0]
         payload['AccountID'] = self.get_account(username)
+        if payload['ServiceID'] == 10:
+            payload = self.mark_changed_fields(payload)
 
         resp = requests.post( f'{self.BASE_URL}/31/tickets/'
                             , headers=self.headers
@@ -346,6 +352,25 @@ class TDx():
                 task_id = json.loads(task_response.text).get('ID')
 
         return resp
+
+    def mark_changed_fields(self, payload):
+        fields = {}
+        for line in payload['Description'].splitlines():
+            match = re.match(r'^\*(.+?):\s*(.+)$', line.strip())
+            if match:
+                key = match.group(1).strip()
+                value = match.group(2).strip()
+                pk = TDX_FIELD_TO_ID.get(key)
+                if pk:
+                    fields[pk] = value
+
+        for attribute in payload['Attributes']:
+
+            id = fields.get(attribute['ID'])
+            if id:
+                attribute['Value'] = '*' + attribute['Value']
+
+        return payload
 
     def create_task(self, payload, ticket):
         payload['SourceID'] = 8         # System
@@ -706,7 +731,7 @@ class MiDesktopPayload(Payload):
     form_id = 555	             # ITS-MiDesktop - Form
     priority_id = 19 # Medium
 
-    midesktop_request_type = ChoiceAttribute(14923, Pool=56252, Image=56253, Network=56254)  
+    midesktop_request_type = ChoiceAttribute(14923, Pool=56252, Image=56253, Network=56254, DeleteImage=82314, ModifyImage=82316, DeletePool=82315, ModifyPool=82317)  
     midesktop_pool_type = ChoiceAttribute(14924, external=56255, instant_clone=56256, persistent=56257)  
     new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
     owner = TextAttribute(2343)         # midesktop_MComm group textbox
@@ -827,11 +852,9 @@ class PoolPayload(MiDesktopPayload):
         self.context = {}
         self.tasks = []
         if action == 'Modify':
-            self.service_id = 64  # Modify Pool
-            self.form_id = 111      
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.ModifyPool) 
         elif action == 'Delete':
-            self.service_id = 65  # Delete Pool
-            self.form_id = 112
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.DeletePool)
 
         self.add_attribute(self.midesktop_pool_type.id, getattr(self.midesktop_pool_type, instance.type))
         self.add_attribute(self.pool_name.id, instance.name)
@@ -852,9 +875,7 @@ class ImagePayload(MiDesktopPayload):
         self.context = {}
         self.tasks = []
         if action == 'Modify':
-            self.service_id = 61
-            self.form_id = 109
-
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.ModifyImage)
             if 'new_disks' in kwargs:
                 changed_disks = []
                 old_disks = kwargs.get('old_disks')
@@ -873,8 +894,7 @@ class ImagePayload(MiDesktopPayload):
                 self.context['changed_disks'] = changed_disks
 
         if action == 'Delete':
-            self.service_id = 63
-            self.form_id = 110 
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.DeleteImage)
         self.add_attribute(self.image_name.id, instance.name)
         self.context['image'] = instance
         super().__init__(action, instance, request, **kwargs)
