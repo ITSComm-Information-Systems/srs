@@ -931,7 +931,7 @@ def employee_time_report(request):
         'group_workers': group_workers,
         'week_starts': week_starts,
         'worker_hours': worker_hours,
-        'title': 'Weekly Worker Hours by Group',
+        'title': 'Weekly Hours by Group',
     }
     template = loader.get_template('rte/view/employee-time-report.html')
     return HttpResponse(template.render(context, request))
