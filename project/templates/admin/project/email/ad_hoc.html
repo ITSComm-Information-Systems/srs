@@ -58,8 +58,8 @@ djamison,jwalfish,rhoffer
 {% autoescape off %}
 
 <b>From: </b>{{ email.sender }} <br><br>
-<b>Subject: </b>{{ email.render_subject }} <br>
-{{ email.render_body }}
+<b>Subject: </b>{{ email.subject }} <br>
+{{ email.body }}
 
 {% endautoescape %}
 
