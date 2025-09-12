@@ -1074,6 +1074,12 @@ class Order(models.Model):
                 
                 self.add_attachments()
                 print(self.id, 'Created', ponum)
+
+                if equipment_only:
+                    if settings.ENVIRONMENT == 'Production':
+                        send_mail('Equipment Only Preorder ' + ponum + ' submitted', ponum, 'itscomm.information.systems@umich.edu', ['its-infrastructure-bom@umich.edu'])
+                    else:
+                        send_mail('Equipment Only Preorder ' + ponum + ' submitted', ponum, 'itscomm.information.systems@umich.edu', ['djamison@umich.edu'])   
                 break
 
             except oracledb.DatabaseError as e:
