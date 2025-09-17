@@ -10,7 +10,16 @@ TDX_FIELD_TO_ID = {
     "Disk Replication": "1966",
     "Patch Day": "1971",
     "Patch Time": "1970",
+    "Reboot Day": "1981",
+    "Daily Backup Time": "1968",
+    "Reboot Time": "1969",
     "Additional requirements, such as Firewall rules": "1977",
+    "Enter a Billing Shortcode for costs to be billed to": "1954",
+    "Additional requirements, such as Firewall rules": "1977",
+    "Enter phone number for the support group": "19223",
+    "Enter email address for the support group": "1975",
+    "MCommunity Admin Group": "1953",
+    "If a problem with your server is detected by our monitoring system, when can we contact you or your group?": "1974"
 }
 
 class MCommunity:
