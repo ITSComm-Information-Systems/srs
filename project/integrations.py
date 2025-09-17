@@ -10,7 +10,16 @@ TDX_FIELD_TO_ID = {
     "Disk Replication": "1966",
     "Patch Day": "1971",
     "Patch Time": "1970",
+    "Reboot Day": "1981",
+    "Daily Backup Time": "1968",
+    "Reboot Time": "1969",
     "Additional requirements, such as Firewall rules": "1977",
+    "Enter a Billing Shortcode for costs to be billed to": "1954",
+    "Additional requirements, such as Firewall rules": "1977",
+    "Enter phone number for the support group": "19223",
+    "Enter email address for the support group": "1975",
+    "MCommunity Admin Group": "1953",
+    "If a problem with your server is detected by our monitoring system, when can we contact you or your group?": "1974"
 }
 
 class MCommunity:
@@ -198,18 +207,12 @@ class Openshift():
     def create_role_bindings(self, instance):
         url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
 
-        role_map = {
-            'admins': 'admin',
-            'editors': 'edit',
-            'viewers': 'view'
-        }
-
         for users in instance.cleaned_names:
 
             if users == 'all':
                 role = 'cluster-logging-application-view'
             else:
-                role = role_map[users]   # admins becomes admin, etc.
+                role = users[:-1]   # admins becomes admin, etc.
 
             uniqnames = instance.cleaned_names[users]
             if len(uniqnames) > 0:
@@ -737,7 +740,7 @@ class MiDesktopPayload(Payload):
     form_id = 555	             # ITS-MiDesktop - Form
     priority_id = 19 # Medium
 
-    midesktop_request_type = ChoiceAttribute(14923, Pool=56252, Image=56253, Network=56254)  
+    midesktop_request_type = ChoiceAttribute(14923, Pool=56252, Image=56253, Network=56254, DeleteImage=82314, ModifyImage=82316, DeletePool=82315, ModifyPool=82317)  
     midesktop_pool_type = ChoiceAttribute(14924, external=56255, instant_clone=56256, persistent=56257)  
     new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
     owner = TextAttribute(2343)         # midesktop_MComm group textbox
@@ -857,6 +860,10 @@ class PoolPayload(MiDesktopPayload):
         self.attributes = []
         self.context = {}
         self.tasks = []
+        if action == 'Modify':
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.ModifyPool) 
+        elif action == 'Delete':
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.DeletePool)
 
         self.add_attribute(self.midesktop_pool_type.id, getattr(self.midesktop_pool_type, instance.type))
         self.add_attribute(self.pool_name.id, instance.name)
@@ -877,7 +884,7 @@ class ImagePayload(MiDesktopPayload):
         self.context = {}
         self.tasks = []
         if action == 'Modify':
-
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.ModifyImage)
             if 'new_disks' in kwargs:
                 changed_disks = []
                 old_disks = kwargs.get('old_disks')
@@ -896,8 +903,7 @@ class ImagePayload(MiDesktopPayload):
                 self.context['changed_disks'] = changed_disks
 
         if action == 'Delete':
-            self.service_id = 63
-            self.form_id = 110 
+            self.add_attribute(self.midesktop_request_type.id, self.midesktop_request_type.DeleteImage)
         self.add_attribute(self.image_name.id, instance.name)
         self.context['image'] = instance
         super().__init__(action, instance, request, **kwargs)
