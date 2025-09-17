@@ -11,6 +11,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models.functions import ExtractWeek
 from django.core import serializers
 from ..bom.models import Workorder, Estimate, PreOrder, Labor, EstimateView
+from collections import defaultdict
+from django.views.decorators.cache import cache_page
 
 # Base RTE view
 @permission_required('rte.add_umrteinput', raise_exception=True)
@@ -670,6 +672,7 @@ def format_time(total_hours):
     total_hours = str(hours) + ':' + str(mins)
     return total_hours
 
+
 GROUP_CONFIG = {
     # Submitted hours groups (UM_RTE_LABOR_GROUP_V - WO_GROUP_CODE)
     #This prefix is used to match the group codes in the input entries
@@ -809,43 +812,126 @@ def apply_hours_to_estimate(estimate, hours_and_classes):
                     hours_and_classes['group_estimated_hours'].get(group, 0))
 
 @permission_required('bom.can_access_bom')
+@cache_page(60 * 2)
 def actual_v_estimate(request):
     """Main view function for actual vs estimate comparison"""
     username = request.user.username
     url = request.path.strip('/').split('/')
     slug = url[-1]
-    
-    # Determine which template and query to use
+
     if slug == 'actual-vs-estimate-open':
         template_name = 'rte/view/actual-vs-estimate-open.html'
-        estimates = EstimateView.objects.filter(
+        estimates = list(EstimateView.objects.filter(
             Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
         ).exclude(status__in=['Rejected', 'Cancelled', 'Completed']
         ).exclude(estimated_start_date__isnull=True
-        ).order_by('-estimated_start_date')[:250]
+        ).order_by('-estimated_start_date')[:250])
     else:
         template_name = 'rte/view/actual-vs-estimate-completed.html'
-        estimates = EstimateView.objects.filter(
+        estimates = list(EstimateView.objects.filter(
             Q(project_manager=username) | Q(assigned_engineer=username) | Q(assigned_netops=username)
-        ).filter(status__in=['Completed'])
-    
-    # Convert to list (if not already)
-    estimates = list(estimates)
-    
+        ).filter(status__in=['Completed'])[:550])
+
+    # Batch fetch related Labor and ServiceOrder objects
+    estimate_ids = [e.id for e in estimates]
+    pre_order_numbers = [e.pre_order_number for e in estimates]
+
+    labor_map = defaultdict(list)
+    for l in Labor.objects.filter(estimate_id__in=estimate_ids):
+        labor_map[l.estimate_id].append(l)
+
+    service_order_map = {so.pre_order_number: so for so in UmRteServiceOrderV.objects.filter(pre_order_number__in=pre_order_numbers)}
+
+    # Batch fetch all relevant UmRteCurrentTimeAssignedV entries
+    full_prord_wo_numbers = [service_order_map.get(e.pre_order_number).full_prord_wo_number
+                                for e in estimates if e.pre_order_number in service_order_map]
+    input_entries_map = defaultdict(list)
+    for entry in UmRteCurrentTimeAssignedV.objects.filter(work_order_display__in=full_prord_wo_numbers):
+        input_entries_map[entry.work_order_display].append(entry)
+
     # Process each estimate
     for estimate in estimates:
-        labor = Labor.objects.filter(estimate_id=estimate.id)
-        service_order = UmRteServiceOrderV.objects.filter(pre_order_number=estimate.pre_order_number)
-        full_prord_wo_number = service_order[0].full_prord_wo_number if service_order else None
-        input_entries = UmRteCurrentTimeAssignedV.objects.filter(work_order_display=full_prord_wo_number) if full_prord_wo_number else []
-        
+        labor = labor_map.get(estimate.id, [])
+        service_order = service_order_map.get(estimate.pre_order_number)
+        full_prord_wo_number = service_order.full_prord_wo_number if service_order else None
+        input_entries = input_entries_map.get(full_prord_wo_number, []) if full_prord_wo_number else []
+
         hours_and_classes = calculate_hours_and_classes(input_entries, labor)
         apply_hours_to_estimate(estimate, hours_and_classes)
-    
-    # Render template
+
     template = loader.get_template(template_name)
     context = {
         'title': 'Actual vs Estimated Hours',
         'estimates': estimates
     }
+    return HttpResponse(template.render(context, request))
+
+import time
+
+@permission_required('bom.can_access_bom')
+@cache_page(60 * 2)
+def employee_time_report(request):
+    # 1. Get all unique groups (by name)
+    group_names = (
+        UmRteLaborGroupV.objects
+        .values_list('wo_group_name', flat=True)
+        .distinct()
+    )
+    groups = [
+        UmRteLaborGroupV.objects.filter(wo_group_name=name).first()
+        for name in group_names
+    ]
+    groups.sort(key=lambda g: g.wo_group_name if g else "")
+
+    # 2. Build group_workers mapping efficiently
+    # Get all group memberships at once
+    group_memberships = UmRteLaborGroupV.objects.values('wo_group_name', 'wo_group_labor_code')
+    techs = {t.labor_code: t for t in UmRteTechnicianV.objects.all()}
+    group_workers = defaultdict(list)
+    for gm in group_memberships:
+        tech = techs.get(gm['wo_group_labor_code'])
+        if tech:
+            group_workers[gm['wo_group_name']].append(tech)
+
+    # 3. Define week range (e.g., last 5 weeks)
+    today = datetime.today().date()
+    number_of_weeks_to_display = 5
+    week_starts = [
+        (today - timedelta(days=today.weekday())) - timedelta(weeks=i)
+        for i in range(number_of_weeks_to_display)
+    ][::-1]
+
+    # 4. Gather hours per worker per week
+    worker_hours = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))
+    min_date = week_starts[0]
+    max_date = week_starts[-1] + timedelta(days=6)
+    entries = UmRteCurrentTimeAssignedV.objects.filter(
+        assigned_date__gte=min_date,
+        assigned_date__lte=max_date
+    ).values(
+        'assn_wo_group_name', 'labor_code', 'assigned_date', 'actual_mins_display'
+    )
+
+    week_start_cache = {}
+    for entry in entries:
+        group = entry['assn_wo_group_name']
+        worker = entry['labor_code']
+        adate = entry['assigned_date']
+        if adate not in week_start_cache:
+            week_start_cache[adate] = adate - timedelta(days=adate.weekday())
+        week_start = week_start_cache[adate]
+        # Convert HH:MM to float hours
+        hh, mm = map(int, entry['actual_mins_display'].split(':'))
+        hours = hh + mm / 60
+        worker_hours[group][worker][week_start] += hours
+
+    # 5. Prepare context for template
+    context = {
+        'groups': groups,
+        'group_workers': group_workers,
+        'week_starts': week_starts,
+        'worker_hours': worker_hours,
+        'title': 'Weekly Hours by Group',
+    }
+    template = loader.get_template('rte/view/employee-time-report.html')
     return HttpResponse(template.render(context, request))
