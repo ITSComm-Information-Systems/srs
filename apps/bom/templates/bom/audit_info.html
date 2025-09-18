@@ -1,6 +1,6 @@
 <a class="popover-icon" data-toggle="popover" tabindex="0" role="button" data-container="body"
-data-trigger="hover" data-placement="right" title="{{feature.label}}" 
-data-content="Added {{ record.create_date|date:"SHORT_DATETIME_FORMAT" }} by {{ record.created_by }} Modified {{ record.update_date|date:"SHORT_DATETIME_FORMAT"}} by {{ record.updated_by }}">
+data-trigger="hover" data-placement="right" title="{{feature.label}}" data-html="true"
+data-content="Added {{ record.create_date|date:"SHORT_DATETIME_FORMAT" }} by {{ record.created_by }}<br>Modified {{ record.update_date|date:"SHORT_DATETIME_FORMAT"}} by {{ record.updated_by }}">
 <i class="fas fa-info-circle" aria-label="More informaiton about {{feature.label}}"></i>
 </a>
 
