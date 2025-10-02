@@ -706,7 +706,7 @@ class MiDesktopPayload(Payload):
     form_id = 555	             # ITS-MiDesktop - Form
     priority_id = 19 # Medium
 
-    midesktop_request_type = ChoiceAttribute(14923, Pool=56252, Image=56253, Network=56254, DeleteImage=82314, ModifyImage=82316, DeletePool=82315, ModifyPool=82317)  
+    midesktop_request_type = ChoiceAttribute(14923, Pool=56252, Image=56253, Network=56254, DeleteImage=89575, ModifyImage=89577, DeletePool=89576, ModifyPool=89578)  
     midesktop_pool_type = ChoiceAttribute(14924, external=56255, instant_clone=56256, persistent=56257)  
     new_customer = ChoiceAttribute(2342, Yes=893, No=894)  # midesktop_New Existing dropdown
     owner = TextAttribute(2343)         # midesktop_MComm group textbox
