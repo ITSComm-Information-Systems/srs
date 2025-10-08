@@ -1335,10 +1335,10 @@ class Item(models.Model):
                 attributes.append({'ID': 1952, 'Value': 203}) # Managed
 
                 if db == 'MSSQL':
-                    attributes.append({'ID': 1994, 'Value': 215}) # Windows
+                    attributes.append({'ID': 19327, 'Value': 'Windows'}) # Windows
                     os = Choice.objects.get(code='Windows2022managed')
                 else:
-                    attributes.append({'ID': 1994, 'Value': 216}) # Linux
+                    attributes.append({'ID': 19327, 'Value': 'Linux'}) # Linux
                     os = Choice.objects.get(code='RedHatEnterpriseLinux9')
                     
                 attributes.append({'ID': 1957, 'Value': os.label}) 
@@ -1363,13 +1363,13 @@ class Item(models.Model):
                     os = Choice.objects.get(id=self.data.get('misevos', os_id))
                     attributes.append({'ID': 1952, 'Value': 203}) # Managed
                     if os.code.startswith('Windows'):
-                        attributes.append({'ID': 1994, 'Value': 215}) # Windows
+                        attributes.append({'ID': 19327, 'Value': 'Windows'}) # Windows
                     else:
-                        attributes.append({'ID': 1994, 'Value': 216}) # Linux
+                        attributes.append({'ID': 19327, 'Value': 'Linux'}) # Linux
                 else:
                     os = Choice.objects.get(id=self.data.get('misernonmang', os_id))
                     attributes.append({'ID': 1952, 'Value': 207}) # Non-Managed
-                    attributes.append({'ID': 1994, 'Value': 214}) # IAAS
+                    attributes.append({'ID': 19327, 'Value': 'IAAS'}) # IAAS
                 
                 attributes.append({'ID': 1957, 'Value': os.label}) 
 
