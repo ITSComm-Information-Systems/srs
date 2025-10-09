@@ -53,7 +53,6 @@ class EmailAdmin(admin.ModelAdmin):
                             row[key] = value.split(',')
 
                     email = Email.objects.get(id=object_id)
-                    email.update_body(row)
 
                     if request.POST.get('submit') == 'Upload CSV':  # Preview only
                         break
