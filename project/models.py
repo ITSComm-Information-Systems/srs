@@ -148,21 +148,10 @@ class Email(models.Model):
           return self.code
 
      def render_subject(self):
-          cut_date = next_cut_date()
-          week_of = cut_date - timedelta(days = 3)
-
-          context = {'cut_date': cut_date, 'week_of': week_of}
-          return Template(self.subject).render(Context(context))
+          return Template(self.subject).render(Context(self.context))
 
      def render_body(self):
-          cut_date = next_cut_date()
-          week_of = cut_date - timedelta(days = 3)
-
-          context = {'cut_date': cut_date, 'week_of': week_of}
-          return Template(self.body).render(Context(context))
-     
-     def update_body(self, context):
-          self.body = Template(self.body).render(Context(context))
+          return Template(self.body).render(Context(self.context))
 
      def send(self):
           text_message = self.subject
