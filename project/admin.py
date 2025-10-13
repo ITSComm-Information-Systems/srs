@@ -31,9 +31,7 @@ class EmailAdmin(admin.ModelAdmin):
 
     def send_test(self, request, object_id):
         email = Email.objects.get(id=object_id)
-
-        call_command('softphone_email', email=email.code, audit=1)
-
+        email.send()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     def send_to_user(self, request, object_id):

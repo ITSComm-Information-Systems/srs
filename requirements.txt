@@ -3,7 +3,7 @@ whitenoise
 gunicorn
 mozilla-django-oidc
 pyyaml
-oracledb
+oracledb==3.3
 django-debug-toolbar
 ldap3
 djangorestframework
