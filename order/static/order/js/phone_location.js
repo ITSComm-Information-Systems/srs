@@ -30,9 +30,33 @@ $(document).ready(function() {
     
           success: function (data) {
             locations = data;
+
+            $("#cardDeck .generated-card").remove();
+            if (data.length < 1) { // Validation
+                $("#id_phone_number").addClass('is-invalid').removeClass('is-valid');
+                $("#id_phone_number").siblings(".invalid-feedback").html(
+                    '<i class="fas fa-exclamation-triangle"></i>Number not found.'
+                );
+              document.getElementById("id_phone_number").setCustomValidity("Not found");
+              $("#workflowForm").addClass('was-validated');
+            } else if (data[0]['authorized'] === false) {
+                $("#id_phone_number").addClass('is-invalid').removeClass('is-valid');
+                $("#id_phone_number").siblings(".invalid-feedback").html(
+                    '<i class="fas fa-exclamation-triangle"></i> Not Authorized for number.'
+                );
+                document.getElementById("id_phone_number").setCustomValidity("Not authorized");
+                //$("#workflowForm").addClass('was-validated');
+                //$('#phoneLookup').html('Find').removeClass(' disabled');
+
+            } else {
+              document.getElementById("id_phone_number").setCustomValidity("");
+              document.getElementById("id_phone_number").checkValidity();
+              $("#id_phone_number").removeClass('is-invalid');
+              $("#workflowForm").removeClass('was-validated');
+
             for (loc = 0; loc < data.length; loc++) {
                 var newCard = $("#mainCard").clone();
-                $(newCard).attr('id',loc);
+                $(newCard).attr('id',loc).addClass("generated-card");
                 $(newCard).show();
                 $(newCard).find("#name").text(data[loc]['building_name']);
                 $(newCard).find("#code").text(data[loc]['building_code']);
@@ -44,14 +68,6 @@ $(document).ready(function() {
                 $("#foundPhone").text(phone_number);
                 $("#phLocationFields").show();
             }
-            if (data.length < 1) { // Validation
-              document.getElementById("id_phone_number").setCustomValidity("Not authorized");
-              $("#workflowForm").addClass('was-validated');
-            } else {
-              document.getElementById("id_phone_number").setCustomValidity("");
-              document.getElementById("id_phone_number").checkValidity();
-              $("#id_phone_number").removeClass('is-invalid');
-              $("#workflowForm").removeClass('was-validated');
             }
           },
     
