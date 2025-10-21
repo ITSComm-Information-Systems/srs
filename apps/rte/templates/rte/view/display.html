@@ -35,10 +35,11 @@
 			<th>Rate Level</th>
 			<th>Status</th>
 			<th>Billed</th>
+			<th>Notes</th>
 		</thead>
 		<tbody>
 			{% for entry in entries %}
-				<tr>
+				<tr data-notes='{{ entry.notes|escapejs }}'>
 					<td>{{ entry.work_order_display }}</td>
 					<td>{{ entry.comment_text|truncatechars:200}}</td>
 					<td>{{ entry.assigned_date }}</td>
@@ -47,8 +48,15 @@
 					<td>{{ entry.rate_number.labor_rate_level_name }}</td>
 					<td>{{ entry.status_name }}</td>
 					<td>{% if entry.billed == 'Yes' %}<i class="fas fa-check"></i>{% endif %}</td>
+					<td>
+						<a href="#" onclick="notesClicked({{ forloop.counter0 }}, event)">
+							{% if entry.notes|length > 0 %}
+								{{ entry.notes|length }}
+							{% endif %}
+						</a>
+					</td>
 				</tr>
-			{% endfor%}
+			{% endfor %}
 		</tbody>
 	</table>
 
@@ -60,19 +68,90 @@
 	  </ul>
 	</nav>
 {% else %}
-
-
 	<div class='alert alert-danger col-4'>
 		No time entries for the selected criteria.
 	</div>
 	<button type="button" class="btn btn-primary"> 
 	  <a href="/apps/rte/view-time/" style="color:inherit">Search Again</a>
 	</button>
-
 {% endif %}
 
 {% endblock %}
 
 {% block js %}
 <script src="/static/js/rte/view_times.js"></script>
+<script>
+    function notesClicked(idx, event){
+        event.preventDefault();
+        
+        const tr = event.target.closest('tr');
+        const table = document.getElementById('view-time-table');
+        const colCount = tr.children.length;
+
+        // Remove any existing notes row
+        const nextRow = tr.nextElementSibling;
+        if (nextRow && nextRow.classList.contains('notes-row')) {
+            nextRow.remove();
+            return;
+        }
+
+        // Get notes from data attribute
+        const notesData = tr.getAttribute('data-notes');
+        let notes = [];
+        
+        if (notesData) {
+            // Clean up the data and parse as Python literal (this works reliably)
+            let cleanData = notesData
+                .replace(/\\u0022/g, '"')
+                .replace(/\\u0027/g, "'")
+                .replace(/\\u002D/g, "-")
+                .replace(/\\u005C/g, "\\")
+                .replace(/\\u005Cr/g, "\r")
+                .replace(/\\u005Cn/g, "\n");
+            
+            // Safe eval for this specific use case
+            notes = eval(cleanData);
+        }
+
+        // Create a new row after the current row
+        const newRow = table.insertRow(tr.rowIndex + 1);
+        newRow.className = 'notes-row';
+
+        // Create a cell that spans all columns
+        const cell = newRow.insertCell(0);
+        cell.colSpan = colCount;
+        cell.style.backgroundColor = '#f8f9fa';
+        cell.style.padding = '30px';
+
+        // Build notes content
+        let notesContent = '';
+        if (Array.isArray(notes) && notes.length > 0) {
+            notes.forEach((note, noteIndex) => {
+                const noteText = note.note_body_stripped || 'No note content';
+                const author = note.note_author || 'Unknown author';
+                const date = note.note_creation_date || 'Unknown date';
+                
+                notesContent += `
+                    <div class="note-item mb-2 p-2 border-bottom">
+                        <div class="note-text"><strong>Note ${noteIndex + 1}:</strong> ${noteText}</div>
+                        <div class="note-meta small text-muted">
+                            By: ${author} | Date: ${date}
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            notesContent = '<div class="text-muted">No notes available</div>';
+        }
+
+        cell.innerHTML = `
+            <div class="notes-container">
+                <h6 class="notes-header">Notes (${notes.length})</h6>
+                <div class="notes-content">
+                    ${notesContent}
+                </div>
+            </div>
+        `;
+    }
+</script>
 {% endblock %}

@@ -1359,3 +1359,29 @@ class UmOscNameChangeV(models.Model):
     class Meta:
         managed = False  # Created from a view. Don't remove.
         db_table = 'PINN_CUSTOM\".\"um_osc_name_change_v'
+
+class Note(models.Model):
+    note_id = models.IntegerField(primary_key=True)
+    note_type_id = models.IntegerField()
+    note_type_code = models.CharField(max_length=120, blank=True, null=True)
+    note_type_subcode = models.CharField(max_length=120, blank=True, null=True)
+    note_types_id = models.IntegerField()
+    note_types_code = models.CharField(max_length=200, blank=True, null=True)
+    note_types_name = models.CharField(max_length=400, blank=True, null=True)
+    accessibility = models.BooleanField()
+    accessibility_name = models.CharField(max_length=240, blank=True, null=True)
+    note_keyid_value = models.IntegerField(blank=True, null=True)
+    note_keyid_value2 = models.IntegerField(blank=True, null=True)
+    note_subject = models.CharField(max_length=1020, blank=True, null=True)
+    note_body = models.TextField(blank=True, null=True)
+    note_body_stripped = models.CharField(max_length=4000, blank=True, null=True)
+    primary_note = models.BooleanField()
+    tenant_code = models.CharField(max_length=120, blank=True, null=True)
+    note_author = models.CharField(max_length=400, blank=True, null=True)
+    note_creation_date = models.DateField(blank=True, null=True)
+    last_update_user = models.CharField(max_length=400, blank=True, null=True)
+    last_update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'PS_SYSTEM\".\"NOTE_API_V'
