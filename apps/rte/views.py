@@ -649,7 +649,7 @@ def view_time_display(request):
             'billed': result.billed or '',
             'notes': result.notes  # This should already be a list of dicts
         }
-    entries_data.append(entry_data)
+        entries_data.append(entry_data)
 
     context = {
         'title': 'View Time',
