@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
-from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput, UmOscPreorderApiAbstract
+from project.pinnmodels import Note, UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput, UmOscPreorderApiAbstract
 from project.models import ActionLog
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
@@ -13,6 +13,7 @@ from django.core import serializers
 from ..bom.models import Workorder, Estimate, PreOrder, Labor, EstimateView
 from collections import defaultdict
 from django.views.decorators.cache import cache_page
+import json
 
 # Base RTE view
 @permission_required('rte.add_umrteinput', raise_exception=True)
@@ -618,8 +619,37 @@ def view_time_display(request):
             total_hours = format_time(results.aggregate(Sum('actual_mins'))['actual_mins__sum'] or 0)
             
         search_topic = 'Date Range'
-        
 
+    # Create a JSON-serializable structure for all entries with their notes
+    entries_data = []
+    
+    for result in results:
+        wo_number = result.wo_number
+        labor_code = result.labor_code
+        notes_qs = Note.objects.filter(note_keyid_value=wo_number, note_author = labor_code)
+        result.notes = [
+            {
+                'note_body_stripped': n.note_body_stripped or '',
+                'note_author': n.note_author or '',
+                'note_creation_date': n.note_creation_date.strftime('%Y-%m-%d') if n.note_creation_date else ''
+            }
+            for n in notes_qs
+        ]
+    
+    entries_data = []
+    for result in results:
+        entry_data = {
+            'work_order_display': result.work_order_display,
+            'comment_text': result.comment_text or '',
+            'assigned_date': str(result.assigned_date) if result.assigned_date else '',
+            'actual_mins_display': result.actual_mins_display,
+            'assn_wo_group_name': result.assn_wo_group_name or '',
+            'rate_level_name': getattr(result.rate_number, 'labor_rate_level_name', '') if hasattr(result, 'rate_number') else '',
+            'status_name': result.status_name or '',
+            'billed': result.billed or '',
+            'notes': result.notes  # This should already be a list of dicts
+        }
+    entries_data.append(entry_data)
 
     context = {
         'title': 'View Time',
@@ -629,8 +659,10 @@ def view_time_display(request):
         'entries': results,
         'total_hours': total_hours,
         'multi_week_view': multi_week_view,
-        'multi_weekly_results': multi_weekly_results
+        'multi_weekly_results': multi_weekly_results,
+        'entries_data_json': json.dumps(entries_data)
     }
+    
     return HttpResponse(template.render(context, request))
 
 
