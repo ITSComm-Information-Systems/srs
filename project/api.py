@@ -21,8 +21,12 @@ import threading, time, subprocess
 class IsAdminOrReadOnly(BasePermission):    # Allows full access to admins, read-only to others.
 
     def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False  # Deny access if not logged in
+
         if request.method in SAFE_METHODS:  # SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
             return True
+        
         return request.user and request.user.is_staff
 
 

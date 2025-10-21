@@ -1,0 +1,46 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+{% load humanize %}
+{% load static %}
+
+
+<h2>{{ title }}</h2>
+
+
+
+<div id="selectedItemsContainer">
+    <!-- Selected items cards will be dynamically inserted here -->
+</div>
+
+<form hx-post="{% url 'item_barcodes_endpoint' %}" 
+        onsubmit="return false;"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-trigger="input delay:500ms, keyup[key=='Enter']"
+        hx-target="#itemTableBody"
+        hx-indicator=".htmx-indicator">
+    <div class="form-group">
+        <input type="text" class="form-control border border-primary" id="item_code" name="item_code" placeholder="Search items...">
+    </div>
+</form>
+
+{% include 'bom/partials/searching_indicator.html' %}
+
+<table id="item_table" class="table table-hover table-striped sort-table" aria-live="polite">
+    <thead>
+        <tr>
+            <th style="min-width:136px;" onclick="sortTable('item_table', 0)">Code <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:107px;" onclick="sortTable('item_table', 1)">Name <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+            <th style="min-width:81px;" onclick="sortTable('item_table', 2)">Mfr. Part Number <i class="fas fa-sort"></i><i class="fas fa-sort-up" style="display:none;"></i><i class="fas fa-sort-down" style="display:none;"></i></th>
+        </tr>
+    </thead>
+    <tbody id="itemTableBody">
+        {% include 'bom/partials/item_barcodes_rows.html' %}
+    </tbody>
+</table>
+
+<div class="htmx-indicator" style="display: none;">Loading...</div>
+
+{% block js %}
+<script src="{% static 'js/common_sort.js' %}"></script>
+{% endblock js %}
+{% endblock %}

@@ -240,7 +240,7 @@ class ContainerNewForm(CloudForm):
     custom = ['database_type', 'course_info']
     skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','container_sensitive']
     container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
-    course_yn = forms.BooleanField(widget=NoYes,
+    course_yn = forms.CharField(widget=NoYes,
         label='Are you requesting this service for a course project?',
         help_text = "This service is available at no cost for faculty, staff, or students provided it's being used for a project or activity associated with a current U-M course. Faculty may request multiple application instances at one time (e.g., one per student). A valid course code is required.")
     course_info = forms.CharField(required=False)
@@ -265,6 +265,11 @@ class ContainerNewForm(CloudForm):
                   'project_name', 'project_description', 'size','database','database_type','backup'] # Remaining follow form order
 
     def clean(self):
+        course_yn = self.cleaned_data.get('course_yn')
+        shortcode = self.cleaned_data.get('shortcode')
+        if course_yn == 'No' and not shortcode:
+            self.add_error('shortcode', 'Shortcode required.')
+
         # Check all uniqnames in a single call for efficiency porpoises
         uniqnames = []
         all_users = []
