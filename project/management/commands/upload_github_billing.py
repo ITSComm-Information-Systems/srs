@@ -5,12 +5,20 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.mail import EmailMessage
 from project.pinnmodels import UmBillInputApiV, UmOscAllActiveAcctNbrsV
-from django.db import connections, connection
+from django.db import connections, connection, models
 
 
 from datetime import datetime, timedelta
 
 TODAY = int(datetime.now().strftime('%m%d%Y'))
+class UmMPathAccts(models.Model):
+     legacy_account = models.CharField(primary_key=True, max_length=10)
+     legacy_account_status = models.CharField(max_length=30)
+
+     class Meta:
+          managed = False
+          db_table = 'PINN_CUSTOM\".\"um_mpath_accts'
+
 
 class Command(BaseCommand):
     help = 'Upload Github Billing data for Mi-services to Pinnacle'
@@ -90,7 +98,7 @@ class Command(BaseCommand):
         for key, value in data['github']['shortcodes'].items():  # Loop thorugh all instances
 
             try:
-                acct = UmOscAllActiveAcctNbrsV.objects.get(short_code=value['shortcode'])
+                acct = UmMPathAccts.objects.get(legacy_account=value['shortcode'])
             except ObjectDoesNotExist:
                 print('Project:', key, 'shortcode not found:', value['shortcode'])
                 body += f'Project: {key} shortcode not found: {value['shortcode']} \n'
