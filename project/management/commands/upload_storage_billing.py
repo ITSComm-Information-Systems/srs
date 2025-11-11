@@ -20,13 +20,13 @@ class Command(BaseCommand):
 
         self.service = options['service']
 
-        arc_ts_query = 'select b.shortcode, b.\"SIZE\" as total_size, a.name, a.created_date, c.name as rate_name, round(c.rate * b.\"SIZE\",2) as total_cost, d.name as owner ' \
+        arc_ts_query = 'select b.shortcode, b.\"SIZE\" as total_size, a.name, a.created_date, c.name as rate_name, round(c.rate * b.\"SIZE\",2) as total_cost, d.name as owner, a.college ' \
                     'from srs_order_arcinstance a, srs_order_arcbilling b, srs_order_storagerate c, srs_oscauth_ldapgroup d ' \
                     'where b.arc_instance_id = a.id ' \
                     '  and a.rate_id = c.id ' \
                     '  and a.owner_id = d.id ' 
 
-        dataden_query = "select b.shortcode, b.\"SIZE\" as total_size, a.amount_used, a.name, a.created_date, c.name as rate_name, " \
+        dataden_query = "select b.shortcode, b.\"SIZE\" as total_size, a.amount_used, a.name, a.created_date, c.name as rate_name, a.college, " \
                     " case    " \
                     "  when a.research_computing_package = 1 and b.shortcode = '123758' and (select count(*) from srs_order_arcbilling where arc_instance_id = a.id) = 1 Then " \
                     "    case when (a.amount_used < 1 or a.amount_used is null) then    " \
@@ -45,7 +45,7 @@ class Command(BaseCommand):
                     "  and a.owner_id = d.id " \
                     "  and a.service_id = 11 order by a.name, a.created_date "
 
-        turbo_query = "select b.shortcode, b.\"SIZE\" as total_size, a.amount_used, a.name, a.created_date, c.name as rate_name, " \
+        turbo_query = "select b.shortcode, b.\"SIZE\" as total_size, a.amount_used, a.name, a.created_date, c.name as rate_name, a.college, " \
                     " case    " \
                     "  when a.research_computing_package = 1 and b.shortcode = '123150' and (select count(*) from srs_order_arcbilling where arc_instance_id = a.id) = 1 Then " \
                     "    case when (a.amount_used < 1 or a.amount_used is null) then    " \
@@ -123,8 +123,8 @@ class Command(BaseCommand):
         csvwriter = csv.writer(csvfile)
         if self.service == 'MiServer':
             csvwriter.writerow(['id','cpu','created_date','os_id','os_code','managed','ad_group','shortcode','size','name','rate_name','total_cost','owner'])
-        elif self.service == 'Turbo' or self.service == 'Data-Den':
-            csvwriter.writerow(['shortcode','size','amount_used', 'name','date_created','rate_name','total_cost','owner'])
+        elif self.service in ['Turbo','Data-Den','Locker-Storage']:
+            csvwriter.writerow(['shortcode','size','amount_used', 'name','date_created','rate_name','total_cost','owner','college'])
         else:
             csvwriter.writerow(['shortcode','size','name','date_created','rate_name','total_cost','owner'])
 
