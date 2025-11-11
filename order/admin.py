@@ -146,6 +146,7 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
         return download_url + urls
 
     def download_csv(self, request):
+
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="full_list.csv"'
@@ -161,9 +162,12 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
                 choice_related.append(field.name)
 
         writer.writerow(row)
+        instances = self.model.objects.all().select_related(*choice_related)
+        if not request.GET.get('admin', '') or not request.user.is_staff:   # When called from order page just show user's data.
+            groups = list(LDAPGroupMember.objects.filter(username= request.user).values_list('ldap_group_id'))
+            instances = instances.filter(owner__in=groups, in_service=True).order_by('name').select_related('owner')
 
-        instance_list = list(self.model.objects.all().select_related(*choice_related))
-        for instance in instance_list:
+        for instance in list(instances):
             row = []
             for field in fields:
                 if self.model == ArcInstance and field.name == 'shortcode':
