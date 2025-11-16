@@ -121,12 +121,7 @@ class Command(BaseCommand):
 
         csvfile = io.StringIO()
         csvwriter = csv.writer(csvfile)
-        if self.service == 'MiServer':
-            csvwriter.writerow(['id','cpu','created_date','os_id','os_code','managed','ad_group','shortcode','size','name','rate_name','total_cost','owner'])
-        elif self.service in ['Turbo','Data-Den','Locker-Storage']:
-            csvwriter.writerow(['shortcode','size','amount_used', 'name','date_created','rate_name','total_cost','owner','college'])
-        else:
-            csvwriter.writerow(['shortcode','size','name','date_created','rate_name','total_cost','owner'])
+        csvwriter.writerow(instances[0].keys()) # Write Header Row
 
         for instance in instances:
             csvwriter.writerow(instance.values())
