@@ -12,6 +12,7 @@
         {% endif %}
 
         <div id="div_formbody">
+        <hr>
         {% for field in form %}
             {% if field.name in form.skip %}
             {% elif field.name in form.custom %}
@@ -109,17 +110,24 @@
             }
         });
 
-        $("#id_container_sensitive").change(function () {
-            if (this.checked) {
+        // Run whenever either radio button changes
+        $("#container_sensitive_0, #container_sensitive_1").change(function () {
+            if ($("#container_sensitive_0").is(":checked") || $("#container_sensitive_1").is(":checked")) {
                 $("#div_formbody").show();
                 $("#submit_btn").show();
             } else {
                 $("#div_formbody").hide();
                 $("#submit_btn").hide();
             }
+            if ($("#container_sensitive_0").is(":checked")) {
+                $("#div_database").show();
+            } else {
+                $("#div_database").hide();
+            }
+
         });
 
-        
+
 
         $("#id_nih_yn").change(function () {
             if (this.value == "Yes") {
@@ -144,7 +152,8 @@
             }
         });
 
-        $('#id_container_sensitive').trigger('change')
+        $('#container_sensitive_0').trigger('change')
+        $('#container_sensitive_1').trigger('change')
         $('#id_migrate_existing').trigger('change')
         $('#id_sensitive_data_yn').trigger('change')
         $('#id_gcp_existing').trigger('change')
