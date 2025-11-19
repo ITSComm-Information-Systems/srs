@@ -234,11 +234,14 @@ def validate_project_name(value):
 
 
 class ContainerNewForm(CloudForm):
+    CLOUD_CAMPUS_CHOICES = (('cloud', 'I have read the above information. My site/app does not use any sensitive data classified as Restricted or has specific compliance requirements such as HIPAA/PHI, CUI and ITAR.')
+                            ,('campus', 'Due to sensitive data requirements or other factors, I am requesting an on-campus project.'),)
+
     title = 'Request a Container Service Project'
     custom = ['database_type', 'course_info']
     skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','container_sensitive']
     #container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}), required=False)    
-    container_sensitive = forms.ChoiceField(choices=(('cloud', 'Cloud'),('campus', 'Campus'),))
+    container_sensitive = forms.ChoiceField(choices=CLOUD_CAMPUS_CHOICES,widget=forms.RadioSelect(attrs={'class': 'form-check-input'}))
     course_yn = forms.BooleanField(widget=NoYes,
         label='Are you requesting this service for a course project?',
         help_text = "This service is available at no cost for faculty, staff, or students provided it's being used for a project or activity associated with a current U-M course. Faculty may request multiple application instances at one time (e.g., one per student). A valid course code is required.")
