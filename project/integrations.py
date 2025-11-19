@@ -161,14 +161,19 @@ class ShortCodesAPI(UmAPI):
         return requests.get(url, headers=self.headers)
 
 class Openshift():
-    SERVER = settings.OPENSHIFT['SERVER']    
-    USER = settings.OPENSHIFT['USER']
-    HEADERS = {'Authorization': 'Bearer ' + settings.OPENSHIFT['TOKEN']}
-    API_ENDPOINT = f'https://api.{SERVER}:6443'
-    PROJECT_URL = f'https://console-openshift-console.apps.{SERVER}/k8s/cluster/projects'
+
+    def __init__(self, cluster="cloud"):
+        cfg = settings.OPENSHIFT[cluster]
+
+        self.server = cfg["SERVER"]
+        self.headers = {'Authorization': f"Bearer {cfg['TOKEN']}"}
+        self.api_endpoint = f"https://api.{self.server}:6443"
+        self.project_url = (
+            f"https://console-openshift-console.apps.{self.server}/k8s/cluster/projects"
+        )
 
     def get_project(self, name):
-        return requests.get(f'{self.API_ENDPOINT}/apis/project.openshift.io/v1/projects/{name}', headers=self.HEADERS)
+        return requests.get(f'{self.api_endpoint}/apis/project.openshift.io/v1/projects/{name}', headers=self.headers)
 
     def create_project(self, instance, requester):
         payload = {"metadata": {
@@ -196,7 +201,7 @@ class Openshift():
             except:
                 print('error getting shortcode')
 
-        r = requests.post(f'{self.API_ENDPOINT}/apis/project.openshift.io/v1/projects', headers=self.HEADERS, json=payload)     
+        r = requests.post(f'{self.api_endpoint}/apis/project.openshift.io/v1/projects', headers=self.headers, json=payload)     
         if r.ok:
             self.create_role_bindings(instance)
             self.add_limits(instance)
@@ -209,7 +214,7 @@ class Openshift():
             raise RuntimeError(r.status_code, r.text)
 
     def create_role_bindings(self, instance):
-        url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
+        url = self.api_endpoint + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
 
         role_map = {
             'admins': 'admin',
@@ -233,14 +238,14 @@ class Openshift():
                     'roleRef': {'name': role}, 'userNames': uniqnames
                 }
                 
-                r = requests.post(url, headers=self.HEADERS, json=body)
+                r = requests.post(url, headers=self.headers, json=body)
                 if not r.ok:
                     mail_admins('Error Openshift.create_role_bindings()', r.text, fail_silently=True)
 
     def add_limits(self, instance):
         limits = self.get_yaml(instance.size)
-        r = requests.post(f'{self.API_ENDPOINT}/api/v1/namespaces/{instance.project_name}/limitranges'
-                             , headers=self.HEADERS, json=limits)
+        r = requests.post(f'{self.api_endpoint}/api/v1/namespaces/{instance.project_name}/limitranges'
+                             , headers=self.headers, json=limits)
         if not r.ok:
             mail_admins('Error Openshift.add_limits()', r.text, fail_silently=True)
         return r
@@ -250,8 +255,8 @@ class Openshift():
         payload['metadata']['name'] = f'backup-schedule-{instance.project_name}'
         payload['spec']['template']['includedNamespaces'][0] = instance.project_name
 
-        r = requests.post(f'{self.API_ENDPOINT}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
-                             , headers=self.HEADERS)
+        r = requests.post(f'{self.api_endpoint}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
+                             , headers=self.headers)
         if not r.ok:
             mail_admins('Error Openshift.add_backup()', r.text, fail_silently=True)
         return r
@@ -261,8 +266,8 @@ class Openshift():
         for item in payload['items']:
             item['metadata']['namespace'] = instance.project_name
 
-            r = requests.post(f'{self.API_ENDPOINT}/apis/networking.k8s.io/v1/namespaces/{instance.project_name}/networkpolicies'
-                                , headers=self.HEADERS, json=item)
+            r = requests.post(f'{self.api_endpoint}/apis/networking.k8s.io/v1/namespaces/{instance.project_name}/networkpolicies'
+                                , headers=self.headers, json=item)
 
             if not r.ok:
                 mail_admins('Error Openshift.add_network_policy()', r.text, fail_silently=True)
