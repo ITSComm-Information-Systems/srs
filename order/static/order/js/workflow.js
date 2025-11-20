@@ -533,6 +533,12 @@ $(document).ready(function() {
 
 
   //MiServer Specification
+  $(function () {
+    if ($('[data-tab="miSevBasic"]').hasClass('active')) {
+      $('#ssl_modal').modal('show');
+    }
+  });
+
   $('[data-tab="miSeverSpec"]').on('show.bs.tab', function(event) {
     size_edit = $('#id_size_edit').val();
 
