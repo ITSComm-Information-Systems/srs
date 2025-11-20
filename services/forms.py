@@ -230,10 +230,8 @@ def validate_project_description(value):
 
 def validate_project_name(value):
     if len(value) > 40:
-        raise ValidationError(f'A project name must be 40 characters or less. Please select a shorter name.')
-    if Openshift().get_project(value).ok:
-        raise ValidationError(f'A project with this name already exists.  Please select a different name.')
-    
+        raise ValidationError(f'A project name must be 40 characters or less. Please select a shorter name.')    
+
 
 class ContainerNewForm(CloudForm):
     title = 'Request a Container Service Project'
@@ -264,11 +262,20 @@ class ContainerNewForm(CloudForm):
         fields = ['container_sensitive','admin_group','course_yn','course_info','shortcode',
                   'project_name', 'project_description', 'size','database','database_type','backup'] # Remaining follow form order
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cluster = 'cloud'
+
     def clean(self):
         course_yn = self.cleaned_data.get('course_yn')
         shortcode = self.cleaned_data.get('shortcode')
         if course_yn == 'No' and not shortcode:
             self.add_error('shortcode', 'Shortcode required.')
+
+        project_name = self.cleaned_data.get('project_name')
+
+        if Openshift(cluster=self.cluster).get_project(project_name).ok:
+            self.add_error('project_name', 'A project with this name already exists.  Please select a different name.')        
 
         # Check all uniqnames in a single call for efficiency porpoises
         uniqnames = []
@@ -302,9 +309,23 @@ class ContainerNewForm(CloudForm):
 
     def save(self):
         # Create project in openshift, don't save to SRS.
-        os = Openshift()
+        os = Openshift(cluster=self.cluster)
         os.create_project(self.instance, self.user.username)
+        self.instance.project_url = f'{os.project_url}/{self.instance.project_name}'
 
+
+class CampuscontainerNewForm(ContainerNewForm):
+
+    class Meta:
+        model = Container
+        fields = ['container_sensitive','admin_group','course_yn','course_info','shortcode',
+                  'project_name', 'project_description', 'size','backup'] # Remaining follow form order
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cluster = 'campus'
+
+        
 class MiDesktopForm(forms.Form):
     admin_group = forms.ChoiceField(label='MCommunity Admin Group')
 
