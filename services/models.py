@@ -146,6 +146,7 @@ class Service():
     azure = Azure
     gcpaccount = GCPAccount
     container = Container
+    campuscontainer = Container
 
 class MiDesktop(models.Model):
     instance_label = 'Instance'

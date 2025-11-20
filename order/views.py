@@ -826,8 +826,10 @@ class Services(UserPassesTestMixin, View):
                                    {'label': 'Create Network','target': '/services/midesktop-network/add'},
                                    {'label': 'View/Change Network','target': '/services/midesktop-network/'}]
             elif service.name == 'container':
-                service.actions = [{'label': 'Request Container Project', 'target': '/services/container/add/',
-                                    'description': 'The ITS Container Service hosts containerized applications. A Container Project is a development environment for creating or hosting a containerized app.'}]
+                service.actions = [{'label': 'Request Container Project - ROSA', 'target': '/services/container/add/',
+                                    'description': 'The ITS Container Service hosts containerized applications. A Container Project is a development environment for creating or hosting a containerized app.'},
+                                    {'label': 'Request Container Project - Campus', 'target': '/services/campuscontainer/add/',
+                                    'description': 'Request a project in the on-premise OpenShift cluster. Choose this option when your project requires low-latency access to campus-hosted datastores.'}]
             else:
                 service.actions = action_list.filter(service=service)
                 for action in service.actions:
