@@ -234,14 +234,10 @@ def validate_project_name(value):
 
 
 class ContainerNewForm(CloudForm):
-    CLOUD_CAMPUS_CHOICES = (('cloud', 'I have read the above information. My site/app does not use any sensitive data classified as Restricted or has specific compliance requirements such as HIPAA/PHI, CUI and ITAR.')
-                            ,('campus', 'Due to sensitive data requirements or other factors, I am requesting an on-campus project.'),)
-
     title = 'Request a Container Service Project'
     custom = ['database_type', 'course_info']
     skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','container_sensitive']
-    #container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}), required=False)    
-    container_sensitive = forms.ChoiceField(choices=CLOUD_CAMPUS_CHOICES,widget=forms.RadioSelect(attrs={'class': 'form-check-input'}))
+    container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
     course_yn = forms.BooleanField(widget=NoYes,
         label='Are you requesting this service for a course project?',
         help_text = "This service is available at no cost for faculty, staff, or students provided it's being used for a project or activity associated with a current U-M course. Faculty may request multiple application instances at one time (e.g., one per student). A valid course code is required.")
@@ -266,11 +262,14 @@ class ContainerNewForm(CloudForm):
         fields = ['container_sensitive','admin_group','course_yn','course_info','shortcode',
                   'project_name', 'project_description', 'size','database','database_type','backup'] # Remaining follow form order
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cluster = 'cloud'
+
     def clean(self):
-        cluster = self.cleaned_data.get('container_sensitive')
         project_name = self.cleaned_data.get('project_name')
 
-        if Openshift(cluster=cluster).get_project(project_name).ok:
+        if Openshift(cluster=self.cluster).get_project(project_name).ok:
             self.add_error('project_name', 'A project with this name already exists.  Please select a different name.')        
 
         # Check all uniqnames in a single call for efficiency porpoises
@@ -305,11 +304,23 @@ class ContainerNewForm(CloudForm):
 
     def save(self):
         # Create project in openshift, don't save to SRS.
-        os = Openshift(cluster=self.cleaned_data.get('container_sensitive'))
+        os = Openshift(cluster=self.cluster)
         os.create_project(self.instance, self.user.username)
         self.instance.project_url = f'{os.project_url}/{self.instance.project_name}'
 
 
+class CampuscontainerNewForm(ContainerNewForm):
+
+    class Meta:
+        model = Container
+        fields = ['container_sensitive','admin_group','course_yn','course_info','shortcode',
+                  'project_name', 'project_description', 'size','backup'] # Remaining follow form order
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cluster = 'campus'
+
+        
 class MiDesktopForm(forms.Form):
     admin_group = forms.ChoiceField(label='MCommunity Admin Group')
 
