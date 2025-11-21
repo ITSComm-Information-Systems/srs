@@ -5,7 +5,8 @@ WORKDIR /usr/src/app
 COPY . .
 
 # Fix OpenShift permissions
-RUN chmod -R g+rw /usr/src/app
+RUN mkdir -p /usr/src/app/staticfiles
+RUN chmod -R g+rw /usr/src/app/staticfiles
 RUN chmod g+x /usr/src/app/docker-entrypoint.sh
 
 EXPOSE 8000
