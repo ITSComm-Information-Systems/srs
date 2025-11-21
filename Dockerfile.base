@@ -1,4 +1,4 @@
-# ---- Custom Python Base Image Without GCC (Python 3.13) ----
+# ---- Base Image: Python + Dependencies ----
 FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -7,11 +7,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR $APP_HOME
 
-# Copy dependencies
+# Copy dependency list
 COPY requirements.txt .
 
-# Install dependencies (all wheels)
+# Install dependencies (all wheels, no gcc needed)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# OpenShift-friendly group-write permissions
+# OpenShift-friendly permissions
 RUN chgrp -R 0 $APP_HOME && chmod -R g+rwX $APP_HOME

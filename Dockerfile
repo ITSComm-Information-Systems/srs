@@ -1,19 +1,21 @@
-FROM python:3.13-slim
+# ---- Final Application Image ----
+FROM image-registry.openshift-image-registry.svc:5000/djamison-sandbox/base:latest
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    APP_HOME=/opt/base
-
+ENV APP_HOME=/opt/app-root/src
 WORKDIR $APP_HOME
 
-# Copy only the dependency list
-COPY requirements.txt .
+# Copy your Django project
+COPY . $APP_HOME
 
-# Install base dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# OpenShift requires group-writable directories
+RUN mkdir -p $APP_HOME/staticfiles && \
+    mkdir -p $APP_HOME/media && \
+    chgrp -R 0 $APP_HOME && chmod -R g+rwX $APP_HOME
 
-# OpenShift-safe permissions
-RUN chgrp -R 0 $APP_HOME && chmod -R g+rwX $APP_HOME
+EXPOSE 8080
 
-# Put installed libs on Python path
-ENV PYTHONPATH="$APP_HOME:${PYTHONPATH}"
+# Optional: bake static into the image
+RUN python manage.py collectstatic --noinput || true
+
+# Start Gunicorn
+CMD ["gunicorn", "project.wsgi:application", "--bind", "0.0.0.0:8080"]
