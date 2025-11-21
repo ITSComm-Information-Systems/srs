@@ -1278,13 +1278,13 @@ class Item(models.Model):
             attributes.append({'ID': 1954, 'Value': self.data.get('shortcode')})
 
             if self.data.get('production') == 'True':
-                attributes.append({'ID': 19324, 'Value': 'Production'}) # Production
+                attributes.append({'ID': 20571, 'Value': 'Production'}) # Production
             if self.data.get('production') == 'False':
-                attributes.append({'ID': 19324, 'Value': 'Non-Production'}) # non-production
+                attributes.append({'ID': 20571, 'Value': 'Non-Production'}) # non-production
             if self.data.get('backup') == 'True':
-                attributes.append({'ID': 19325, 'Value': 'Yes'}) # Yes
+                attributes.append({'ID': 20570, 'Value': 'Yes'}) # Yes
             if self.data.get('backup') == 'False':
-                attributes.append({'ID': 19325, 'Value': 'No'}) # No
+                attributes.append({'ID': 20570, 'Value': 'No'}) # No
 
             if self.data.get('michmed_flag') == 'Yes':
                 michmed = 21619  # Yes
