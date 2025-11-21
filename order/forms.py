@@ -1100,6 +1100,11 @@ class ServerSpecForm(TabForm):
                 self.disk_formset = self.DiskDisplayFormSet(initial=self.disk_list)
             return
 
+            if '78' in self.request.POST.get('regulated_data', []): # Check for PCI Data (78)
+                self.fields['managed'].disabled = True
+                self.fields['managed'].initial = True
+                self.fields.pop('misevprefix')
+
         instance_id = self.request.POST.get('instance_id')
 
         if self.is_bound:

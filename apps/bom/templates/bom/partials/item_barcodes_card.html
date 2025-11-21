@@ -1,0 +1,133 @@
+<div class="container">
+    <!-- Toggle All Button -->
+    <div class="row mb-3">
+        <div class="col d-flex justify-content-between">
+            <button id="toggleAllBtn" class="btn btn-secondary" onclick="toggleAllCards()">
+                Toggle All Card Colors
+            </button>
+            <button id="toggleAllBtn" class="btn btn-success" onclick="generateCodes()">
+                Generate Labels
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Cards Container -->
+    {% for item in selected_items %}
+        {% if forloop.counter0|divisibleby:2 %}
+            <div class="row">
+        {% endif %}
+            
+        <div class="col-md-6">
+            <div style="margin-bottom: 20px;" class="card" id="card-{{item.commodity_code}}" 
+                 onclick="toggleCardColor(this)"
+                 hx-preserve="true">
+                <div class="card-body">
+                    <span style="margin-top:-1px;" class="card-title"><b>{{ item.commodity_code }}</b> - {{ item.commodity_name|slice:":40" }}{% if item.commodity_name|length > 40 %}...{% endif %}</span>
+                </div>
+            </div>
+        </div>
+    
+        {% if forloop.counter|divisibleby:2 or forloop.last %}
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+    // Track if we're in a "toggle all" operation
+    var isTogglingAll = false;
+
+    // Detect initial load
+    var isInitialLoad = !window.performance.getEntriesByType("navigation")[0].type || 
+                        window.performance.getEntriesByType("navigation")[0].type === 'reload';
+
+    // Clear storage on fresh load
+    if (isInitialLoad) {
+        localStorage.removeItem('cardStates');
+    }
+
+    // Store card states
+    function saveCardStates() {
+        const states = {};
+        document.querySelectorAll('.card').forEach(card => {
+            states[card.id] = card.style.backgroundColor;
+        });
+        localStorage.setItem('cardStates', JSON.stringify(states));
+        
+        if (isTogglingAll) {
+            isTogglingAll = false;
+        }
+    }
+
+    // Restore card states
+    function restoreCardColors() {
+        const savedStates = JSON.parse(localStorage.getItem('cardStates') || '{}');
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.backgroundColor = savedStates[card.id] || '';
+        });
+    }
+
+    // Toggle single card
+    function toggleCardColor(card) {
+        card.style.backgroundColor = card.style.backgroundColor === 'yellow' ? '' : 'yellow';
+        saveCardStates();
+    }
+
+    // Toggle all cards
+    function toggleAllCards() {
+        isTogglingAll = true;
+        const cards = document.querySelectorAll('.card');
+        const allYellow = cards.length > 0 && 
+                         Array.from(cards).every(card => card.style.backgroundColor === 'yellow');
+        
+        cards.forEach(card => {
+            card.style.backgroundColor = allYellow ? '' : 'yellow';
+        });
+        saveCardStates();
+    }
+
+    // Generate barcodes
+    function generateCodes() {
+        yellowItems = [];
+        let selectedItems = {{ selected_items|safe }};
+        let cardStates = JSON.parse(localStorage.getItem('cardStates') || '{}');
+
+        cardStates = Object.keys(cardStates).map(key => {
+            return {
+                commodity_code: key,
+                color: cardStates[key]
+            };
+        });
+
+
+        cardStates.forEach(item => {
+            if (item.color === 'yellow') {
+                yellowItems.push(item.commodity_code);
+            }
+        });
+        
+        fetch("{% url 'create_barcode_pdf' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                selected_items: selectedItems,
+                yellow_items: yellowItems 
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const pdfUrl = URL.createObjectURL(blob);
+            window.open(pdfUrl, '_blank');
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>

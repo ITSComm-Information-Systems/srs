@@ -671,6 +671,8 @@ def format_time(total_hours):
         mins = '0' + str(mins)
     total_hours = str(hours) + ':' + str(mins)
     return total_hours
+
+
 GROUP_CONFIG = {
     # Submitted hours groups (UM_RTE_LABOR_GROUP_V - WO_GROUP_CODE)
     #This prefix is used to match the group codes in the input entries
