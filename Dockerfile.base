@@ -1,3 +1,4 @@
+# ---- Custom Python Base Image Without GCC (Python 3.13) ----
 FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -6,14 +7,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR $APP_HOME
 
-# Copy only the dependency list
+# Copy dependencies
 COPY requirements.txt .
 
-# Install base dependencies
+# Install dependencies (all wheels)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# OpenShift-safe permissions
+# OpenShift-friendly group-write permissions
 RUN chgrp -R 0 $APP_HOME && chmod -R g+rwX $APP_HOME
-
-# Put installed libs on Python path
-ENV PYTHONPATH="$APP_HOME:${PYTHONPATH}"
