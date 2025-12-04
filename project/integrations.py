@@ -21,7 +21,7 @@ TDX_FIELD_TO_ID = {
     "MCommunity Admin Group": "1953",
     "Will this server be used in Production?": "20571",
     "Backup": "20570",
-    "Please let us know what hours you'd like us to monitor and respond to issues with your server.": "1974",
+    "Please let us know what hours you would like us to monitor and respond to issues with your server.": "1974",
     "miserver_Server Environment": "19324",
     "miserver_Server": "19325"
 }
