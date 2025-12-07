@@ -454,7 +454,7 @@ class StorageInstance(Volume):
     flux = models.BooleanField(default=False)
 
     def get_shortcodes(self):
-        return [{"shortcode": self.shortcode, "size": self.size}]
+        return StorageBilling.objects.filter(storage_instance=self)
 
     def get_hosts(self):
         return StorageHost.objects.filter(storage_instance=self)
@@ -561,6 +561,15 @@ class ArcHost(VolumeHost):
 
 class ArcBilling(models.Model):
     arc_instance = models.ForeignKey(ArcInstance, related_name='shortcodes', on_delete=models.CASCADE)
+    size = models.IntegerField()
+    shortcode = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.shortcode
+
+
+class StorageBilling(models.Model):
+    storage_instance = models.ForeignKey(StorageInstance, related_name='shortcodes', on_delete=models.CASCADE)
     size = models.IntegerField()
     shortcode = models.CharField(max_length=100)
 
@@ -1590,6 +1599,21 @@ class Item(models.Model):
 
         if self.data.get('flux') == 'yes':
             rec.flux = True
+
+        rec.save()
+        self.internal_reference_id = rec.id
+        self.save() # Save the instance ID on the item 
+        bill_size_list = self.data.get('terabytes')
+
+        StorageBilling.objects.filter(storage_instance=rec).delete()
+
+        for num, shortcode in enumerate(self.data.get('shortcode')):
+            if shortcode:
+                sc = StorageBilling()
+                sc.storage_instance = rec
+                sc.size = bill_size_list[num]
+                sc.shortcode = shortcode
+                sc.save()
 
     def update_softphone(self):
         try:
