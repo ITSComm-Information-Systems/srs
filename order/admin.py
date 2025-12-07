@@ -12,7 +12,7 @@ from django.shortcuts import render
 from django.urls import path
 from project.models import Choice
 
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database, LDAPGroupMember
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database, LDAPGroupMember, StorageBilling
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -469,13 +469,19 @@ class ArcInstanceAdmin(VolumeAdmin):
             return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+class StorageBillingInline(admin.TabularInline):
+    model = StorageBilling
+    extra = 0
+
+
 @admin.register(StorageInstance)
 class StorageInstanceAdmin(VolumeAdmin):
     child_record = StorageHost
     child_key = 'storage_instance_id'
     service_list = [7]
     list_select_related = ['owner','rate']
-    exclude = ['owner_name', 'owner_bak']
+    exclude = ['owner_name', 'owner_bak', 'shortcode']
+    inlines = [StorageBillingInline]
 
 
 @admin.register(ArcBilling)
