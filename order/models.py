@@ -678,6 +678,7 @@ class Server(models.Model):
 
     on_call = models.PositiveSmallIntegerField(null=True, choices=ON_CALL_CHOICES)   #<monitoringsystem>businesshours</monitoringsystem>
     in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
+    billable = models.BooleanField(default=True, help_text='Turning this off will pause monthly billing.')
 
     firewall = models.CharField(max_length=100)
     backup = models.BooleanField(default=True)
