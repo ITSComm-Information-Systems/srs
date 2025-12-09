@@ -262,6 +262,23 @@ class PdfCreator:
 		# Add header to report
 		flowables = flowables + self.build_header(normal)
 
+		# Return report if no materials.
+		if not self.estimate.material_list:
+			flowables.append(Paragraph('No materials for this estimate.', normal))
+
+			# You probably still want the summaries:
+			flowables.append(Paragraph('Item Summary', self.subheader))
+			flowables = flowables + self.build_item_summary(normal)
+
+			flowables.append(Paragraph('Labor Summary', self.subheader))
+			flowables = flowables + self.build_labor_summary(normal)
+
+			flowables.append(Paragraph('Totals', self.subheader))
+			flowables = flowables + self.build_totals(normal)
+
+			return flowables
+
+
 		# Add first location to table
 		prev_loc = self.estimate.material_list[0].material_location
 		table_heading = [Paragraph('<b>Item Code</b>', normal), Paragraph('<b>Material Detail</b>', normal),

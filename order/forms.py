@@ -1327,7 +1327,7 @@ class BillingStorageForm(TabForm):
 
         self.fields['shortcode'].validators=[validate_shortcode]
 
-        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':
+        if self.action.service.name in ('lockerStorage', 'turboResearch', 'dataDen','miStorage'):
             self.template = 'order/billing_storage.html'
             self.shortcode_list = []
 
@@ -1356,7 +1356,7 @@ class BillingStorageForm(TabForm):
                 si = self.vol.objects.get(id=instance_id)
                 #else: # miBackup
                 #    si = self.vol.objects.get(id=instance_id)
-                if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':
+                if self.action.service.name in ('lockerStorage', 'turboResearch', 'dataDen','miStorage'):
                     if not self.is_bound:
                         self.shortcode_list = si.get_shortcodes()
 
@@ -1400,7 +1400,7 @@ class BillingStorageForm(TabForm):
     def clean(self):
         super().clean()
         
-        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':
+        if self.action.service.name in ('lockerStorage', 'turboResearch', 'dataDen', 'miStorage'):
             if int(self.total_size) != self.new_total_size:
                 self.shortcode_error = f'Sizes must total {self.total_size}'
                 self.add_error('totalCost', 'block') 
@@ -1432,7 +1432,7 @@ class BillingStorageForm(TabForm):
 
             summary.append({'label': 'Total Monthly Cost', 'value': str(total_cost)})
 
-        if self.action.service.name=='lockerStorage' or self.action.service.name=='turboResearch' or self.action.service.name=='dataDen':
+        if self.action.service.name in ('lockerStorage', 'turboResearch', 'dataDen','miStorage'):
             shortcode_list = self.data.getlist('shortcode')
             size_list = self.data.getlist('terabytes')
             label = ''
