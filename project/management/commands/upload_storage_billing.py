@@ -64,11 +64,13 @@ class Command(BaseCommand):
                     "  and a.owner_id = d.id " \
                     "  and a.service_id = 9 order by a.name, a.created_date "
 
-        mistorage_query = 'select a.shortcode, a."SIZE" as total_size, a.name, a.created_date, c.name as rate_name, round(c.rate * a."SIZE",2) as total_cost, d.name as owner ' \
-                'from srs_order_storageinstance a, srs_order_storagerate c, srs_oscauth_ldapgroup d ' \
-                'where  a.rate_id = c.id ' \
-                '  and a.owner_id = d.id order by a.name, a.created_date ' \
-
+        mistorage_query = """select b.shortcode, b."SIZE" as total_size, a.name, a.created_date, c.name as rate_name, round(c.rate * b."SIZE",2) as total_cost, d.name as owner 
+                from srs_order_storageinstance a, srs_order_storagerate c, srs_oscauth_ldapgroup d, srs_order_storagebilling b 
+                where  a.rate_id = c.id 
+                  and a.owner_id = d.id 
+                  AND b.storage_instance_id = a.id
+                  order by a.name, a.created_date"""
+                
         mibackup_query = "select a.shortcode, ceil(a.\"SIZE\") as total_size, a.name, to_date('20200701','YYYYMMDD') as created_date, c.name as rate_name, round(c.rate * a.\"SIZE\",2) as total_cost, d.name as owner " \
                 "from srs_order_backupdomain a, srs_oscauth_ldapgroup d, srs_order_storagerate c " \
                 "where  c.name = 'MB-MCOMM' " \
