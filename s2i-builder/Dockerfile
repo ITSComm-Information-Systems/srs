@@ -13,7 +13,7 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
 COPY requirements.txt /opt/app-root/requirements.txt
 
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r /opt/app-root/requirements.txt --user
+    pip install --no-cache-dir -r /opt/app-root/requirements.txt
 
 # ——— 3) Install S2I scripts ———
 COPY .s2i/bin/ /usr/libexec/s2i/
