@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+echo "This is the Python 3.14 S2I Builder image"

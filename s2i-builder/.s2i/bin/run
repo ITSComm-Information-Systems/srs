@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+APP_DIR=$HOME
+
+cd $APP_DIR
+
+GUNICORN_CMD=${GUNICORN_CMD:-"gunicorn project.wsgi"}
+PORT=${PORT:-8080}
+
+echo "---> Starting Gunicorn"
+exec $GUNICORN_CMD --bind=0.0.0.0:$PORT --workers=3
