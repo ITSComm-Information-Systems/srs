@@ -21,7 +21,9 @@ class RoleAdmin(admin.ModelAdmin):
 
 
 class BulkUpdateForm(forms.Form):
-    vp_groups = UmMpathDwCurrDepartment.objects.exclude(dept_grp=' ').values_list('dept_grp', 'dept_grp_descr').distinct().order_by('dept_grp_descr')
+    # TODO django6
+    #vp_groups = UmMpathDwCurrDepartment.objects.exclude(dept_grp=' ').values_list('dept_grp', 'dept_grp_descr').distinct().order_by('dept_grp_descr')
+    vp_groups = []
     department_group = forms.MultipleChoiceField(choices=vp_groups)
     uniqname = Uniqname(max_length=8)
     role = forms.ChoiceField(choices=[('','----'),('4','Proxy'),('5','Orderer'),('6','Reporter')])
