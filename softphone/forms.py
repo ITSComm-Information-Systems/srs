@@ -6,8 +6,8 @@ from project.models import Choice
 
 unselected = (None,'---',)
 # TODO django6
-#migrate_choices = list(Choice.objects.filter(parent__code='SOFTPHONE_MIGRATE').values_list('code','label').order_by('sequence'))
-migrate_choices = []
+migrate_choices = list(Choice.objects.filter(parent__code='SOFTPHONE_MIGRATE').values_list('code','label').order_by('sequence'))
+#migrate_choices = []
 migrate_choices.insert(0, unselected)
 yn_choices = [unselected ,(True,'Yes',), (False, 'No',)]
 
