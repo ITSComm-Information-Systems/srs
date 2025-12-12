@@ -696,6 +696,19 @@ class Server(models.Model):
     firewall_requests = models.CharField(max_length=100)
     last_updated = models.DateTimeField(null=True)
 
+    def __init__(self, *args, **kwargs):
+        super(Server, self).__init__(*args, **kwargs)
+        for rate in StorageRate.objects.filter(name__startswith='SV-'):
+            if rate.name == 'SV-RAM':
+                self.ram_rate = rate.rate
+            elif rate.name == 'SV-DI-REP':
+                self.disk_replicated = rate.rate
+            elif rate.name == 'SV-DI-NONREP':
+                self.disk_no_replication = rate.rate
+            elif rate.name == 'SV-DI-BACKUP':
+                self.disk_backup = rate.rate
+
+
     @staticmethod
     def get_storage_rates():
         return list(StorageRate.objects.filter(name__startswith='SV-'))
