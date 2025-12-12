@@ -66,7 +66,7 @@ def serializer_factory(model):
     for fld in model._meta.get_fields():
         if type(fld) == models.fields.related.ForeignKey:
             if fld.related_model == Choice:
-                class_attrs[fld.name] = ChoiceSerializer()
+                class_attrs[fld.name] = ChoiceSerializer(required=False, allow_null=True)
             else:
                 class_attrs[fld.name] = serializers.StringRelatedField()
             class_attrs['select_related'].append(fld.name)
