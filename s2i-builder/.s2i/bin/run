@@ -2,7 +2,7 @@
 set -e
 
 APP_ROOT=/opt/app-root/src
-PORT=${PORT:-8080}
+PORT=${PORT:-8000}
 
 cd "$APP_ROOT"
 
