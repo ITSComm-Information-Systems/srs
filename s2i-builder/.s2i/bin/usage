@@ -1,2 +1,8 @@
-#!/usr/bin/env bash
-echo "This is the Python 3.14 S2I Builder image"
+#!/bin/bash
+cat <<EOF
+This is a Python+Django S2I builder image.
+
+To use:
+  oc new-build <builder>~<repo-url>
+  oc start-build <build-name> --from-dir .
+EOF

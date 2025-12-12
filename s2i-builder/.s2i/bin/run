@@ -1,9 +1,16 @@
 #!/bin/bash
 set -e
 
+APP_ROOT=/opt/app-root/src
+PORT=${PORT:-8080}
+
+cd "$APP_ROOT"
+
+echo "---> Starting Gunicorn on port $PORT"
+
 exec gunicorn project.wsgi:application \
-    --bind=0.0.0.0:8080 \
+    --bind=0.0.0.0:$PORT \
     --workers=2 \
     --threads=4 \
-    --pythonpath=/opt/app-root/src \
-    --chdir=/opt/app-root/src
+    --pythonpath="$APP_ROOT" \
+    --log-file=-

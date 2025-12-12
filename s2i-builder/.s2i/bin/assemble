@@ -1,23 +1,15 @@
 #!/bin/bash
 set -e
 
-echo "---> S2I assemble starting"
-
-# S2I runs as arbitrary UID; make sure HOME is set to a writable dir
-export HOME=/opt/app-root
-APP_DIR=$HOME/app
-SRC_DIR=/tmp/src
-
-mkdir -p $HOME/.local
-mkdir -p $APP_DIR
-
-echo "Skipping pip install — dependencies already included in builder image"
-#pip install --user -r $SRC_DIR/requirements.txt
+echo "---> Installing Python dependencies"
+pip install --no-cache-dir -r requirements.txt
 
 echo "---> Copying application source"
-cp -R $SRC_DIR/* $APP_DIR/
+# S2I already copies your repo into /tmp/src
+cp -a /tmp/src/. /opt/app-root/src/
 
-echo "---> Running collectstatic"
-python $APP_DIR/manage.py collectstatic --noinput || true
+echo "---> Collecting static files"
+cd /opt/app-root/src
+python3 manage.py collectstatic --noinput
 
-echo "---> Assemble complete"
+echo "---> Build completed"
