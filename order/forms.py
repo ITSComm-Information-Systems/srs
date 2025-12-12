@@ -805,7 +805,7 @@ class ServerSupportForm(TabForm):
         super(ServerSupportForm, self).__init__(*args, **kwargs)
 
         self.fields['support_phone'].validators = [validators.RegexValidator(
-                regex='^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$',
+                regex=r'^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$',
                 message='Please provide a 10 digit phone number.',
                 code='invalid_username')]
 
