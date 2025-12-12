@@ -1,10 +1,9 @@
 #!/bin/bash
 set -e
 
-cd /opt/app-root/src
-
-exec gunicorn \
+exec gunicorn project.wsgi:application \
+    --bind=0.0.0.0:8080 \
     --workers=2 \
     --threads=4 \
-    --bind=0.0.0.0:8080 \
-    project.wsgi:application
+    --pythonpath=/opt/app-root/src \
+    --chdir=/opt/app-root/src
