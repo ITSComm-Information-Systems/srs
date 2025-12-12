@@ -414,14 +414,15 @@ class FeaturesForm(TabForm):
     types = FeatureType.objects.all()
     features = Feature.objects.all().order_by('display_seq_no')
 
-    for cat in categories:
-        cat.types = []
-        for type in types:
-            q = features.filter(type=type).filter(category=cat).order_by('display_seq_no')
-            if q:
-                cat.types.append(q)
-                cat.types[-1].label = type.label
-                cat.types[-1].description = type.description
+    # TODO django6
+    #for cat in categories:
+    #    cat.types = []
+    #    for type in types:
+    #        q = features.filter(type=type).filter(category=cat).order_by('display_seq_no')
+    #        if q:
+    #            cat.types.append(q)
+    #            cat.types[-1].label = type.label
+    #            cat.types[-1].description = type.description
 
     template = 'order/features.html'
 
