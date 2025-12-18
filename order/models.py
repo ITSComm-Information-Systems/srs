@@ -644,17 +644,7 @@ class Server(models.Model):
     ]
 
     MANAGED_FIELDS = ['patch_time', 'patch_day', 'reboot_time', 'reboot_day']
-
-    for rate in StorageRate.objects.filter(name__startswith='SV-'):
-        if rate.name == 'SV-RAM':
-            ram_rate = rate.rate
-        elif rate.name == 'SV-DI-REP':
-            disk_replicated = rate.rate
-        elif rate.name == 'SV-DI-NONREP':
-            disk_no_replication = rate.rate
-        elif rate.name == 'SV-DI-BACKUP':
-            disk_backup = rate.rate
-
+    #TODO Django6
     name = models.CharField(max_length=100)  #  <name>PS-VD-DIRECTORY-1</name>
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     admin_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
@@ -705,6 +695,23 @@ class Server(models.Model):
     datacenter = models.CharField(max_length=100)
     firewall_requests = models.CharField(max_length=100)
     last_updated = models.DateTimeField(null=True)
+
+    def __init__(self, *args, **kwargs):
+        super(Server, self).__init__(*args, **kwargs)
+        for rate in StorageRate.objects.filter(name__startswith='SV-'):
+            if rate.name == 'SV-RAM':
+                self.ram_rate = rate.rate
+            elif rate.name == 'SV-DI-REP':
+                self.disk_replicated = rate.rate
+            elif rate.name == 'SV-DI-NONREP':
+                self.disk_no_replication = rate.rate
+            elif rate.name == 'SV-DI-BACKUP':
+                self.disk_backup = rate.rate
+
+
+    @staticmethod
+    def get_storage_rates():
+        return list(StorageRate.objects.filter(name__startswith='SV-'))
 
     @cached_property
     def total_disk_size(self):

@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+echo "---> Installing Python dependencies"
+pip install --no-cache-dir -r requirements.txt
+
+echo "---> Copying application source"
+# S2I already copies your repo into /tmp/src
+cp -a /tmp/src/. /opt/app-root/src/
+
+echo "---> Collecting static files"
+cd /opt/app-root/src
+python3 manage.py collectstatic --noinput
+
+echo "---> Build completed"

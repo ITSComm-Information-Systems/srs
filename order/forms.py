@@ -409,22 +409,38 @@ class FeaturesForm(TabForm):
         queryset=Feature.objects.all(), 
         widget=forms.CheckboxSelectMultiple(),
     )
-    
-    categories = FeatureCategory.objects.all()
-    types = FeatureType.objects.all()
-    features = Feature.objects.all().order_by('display_seq_no')
-
-    for cat in categories:
-        cat.types = []
-        for type in types:
-            q = features.filter(type=type).filter(category=cat).order_by('display_seq_no')
-            if q:
-                cat.types.append(q)
-                cat.types[-1].label = type.label
-                cat.types[-1].description = type.description
 
     template = 'order/features.html'
 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        categories = FeatureCategory.objects.all()
+        types = FeatureType.objects.all()
+        features = Feature.objects.all().order_by('display_seq_no')
+
+        for cat in categories:
+            cat.types = []
+            for type in types:
+                q = (
+                    features
+                    .filter(type=type)
+                    .filter(category=cat)
+                    .order_by('display_seq_no')
+                )
+                if q:
+                    # REQUIRED by template
+                    q.label = type.label
+                    q.description = type.description
+
+                    # Used here: {% if feature.id == type.last %}
+                    q.last = q.last().id if q.exists() else None
+
+                    cat.types.append(q)
+
+        # REQUIRED: {% for category in tab.form.categories %}
+        self.categories = categories
     class Meta:
         model = Feature
         fields = ('name', 'description',) 
@@ -804,7 +820,7 @@ class ServerSupportForm(TabForm):
         super(ServerSupportForm, self).__init__(*args, **kwargs)
 
         self.fields['support_phone'].validators = [validators.RegexValidator(
-                regex='^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$',
+                regex=r'^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$',
                 message='Please provide a 10 digit phone number.',
                 code='invalid_username')]
 
