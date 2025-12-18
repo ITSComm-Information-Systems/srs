@@ -414,14 +414,15 @@ class FeaturesForm(TabForm):
     types = FeatureType.objects.all()
     features = Feature.objects.all().order_by('display_seq_no')
 
-    for cat in categories:
-        cat.types = []
-        for type in types:
-            q = features.filter(type=type).filter(category=cat).order_by('display_seq_no')
-            if q:
-                cat.types.append(q)
-                cat.types[-1].label = type.label
-                cat.types[-1].description = type.description
+    # TODO django6
+    #for cat in categories:
+    #    cat.types = []
+    #    for type in types:
+    #        q = features.filter(type=type).filter(category=cat).order_by('display_seq_no')
+    #        if q:
+    #            cat.types.append(q)
+    #            cat.types[-1].label = type.label
+    #            cat.types[-1].description = type.description
 
     template = 'order/features.html'
 
@@ -804,7 +805,7 @@ class ServerSupportForm(TabForm):
         super(ServerSupportForm, self).__init__(*args, **kwargs)
 
         self.fields['support_phone'].validators = [validators.RegexValidator(
-                regex='^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$',
+                regex=r'^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$',
                 message='Please provide a 10 digit phone number.',
                 code='invalid_username')]
 

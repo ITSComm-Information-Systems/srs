@@ -16,8 +16,8 @@ from softphone.models import next_cut_date
 
 def validate_shortcode(value):
 
-     if not re.search("\d{6}", value):
-          raise ValidationError(f'Please enter a six digit shortcode.')
+     if not re.fullmatch(r"\d{6}", value):
+          raise ValidationError('Please enter a six digit shortcode.')
      else:
           try:
                api = ShortCodesAPI()

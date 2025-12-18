@@ -1,0 +1,8 @@
+#!/bin/bash
+cat <<EOF
+This is a Python+Django S2I builder image.
+
+To use:
+  oc new-build <builder>~<repo-url>
+  oc start-build <build-name> --from-dir .
+EOF
