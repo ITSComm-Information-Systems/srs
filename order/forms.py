@@ -1449,12 +1449,13 @@ class BillingStorageForm(TabForm):
             summary.append({'label': 'Total Monthly Cost', 'value': str(total_cost)})
 
         if self.action.service.name in ('lockerStorage', 'turboResearch', 'dataDen','miStorage'):
+            unit = 'GB' if self.action.service.name in ['miStorage'] else 'TB'
             shortcode_list = self.data.getlist('shortcode')
             size_list = self.data.getlist('terabytes')
             label = ''
             for num, shortcode in enumerate(shortcode_list):
                 if shortcode:
-                    label = f'{label}   \n {size_list[num]}TB to {shortcode},'
+                    label = f'{label}   \n {size_list[num]}{unit} to {shortcode},'
 
             summary[0]['value'] = label 
 
