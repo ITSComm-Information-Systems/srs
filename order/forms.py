@@ -409,23 +409,38 @@ class FeaturesForm(TabForm):
         queryset=Feature.objects.all(), 
         widget=forms.CheckboxSelectMultiple(),
     )
-    
-    categories = FeatureCategory.objects.all()
-    types = FeatureType.objects.all()
-    features = Feature.objects.all().order_by('display_seq_no')
-
-    # TODO django6
-    #for cat in categories:
-    #    cat.types = []
-    #    for type in types:
-    #        q = features.filter(type=type).filter(category=cat).order_by('display_seq_no')
-    #        if q:
-    #            cat.types.append(q)
-    #            cat.types[-1].label = type.label
-    #            cat.types[-1].description = type.description
 
     template = 'order/features.html'
 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        categories = FeatureCategory.objects.all()
+        types = FeatureType.objects.all()
+        features = Feature.objects.all().order_by('display_seq_no')
+
+        for cat in categories:
+            cat.types = []
+            for type in types:
+                q = (
+                    features
+                    .filter(type=type)
+                    .filter(category=cat)
+                    .order_by('display_seq_no')
+                )
+                if q:
+                    # REQUIRED by template
+                    q.label = type.label
+                    q.description = type.description
+
+                    # Used here: {% if feature.id == type.last %}
+                    q.last = q.last().id if q.exists() else None
+
+                    cat.types.append(q)
+
+        # REQUIRED: {% for category in tab.form.categories %}
+        self.categories = categories
     class Meta:
         model = Feature
         fields = ('name', 'description',) 
@@ -1434,12 +1449,13 @@ class BillingStorageForm(TabForm):
             summary.append({'label': 'Total Monthly Cost', 'value': str(total_cost)})
 
         if self.action.service.name in ('lockerStorage', 'turboResearch', 'dataDen','miStorage'):
+            unit = 'GB' if self.action.service.name in ['miStorage'] else 'TB'
             shortcode_list = self.data.getlist('shortcode')
             size_list = self.data.getlist('terabytes')
             label = ''
             for num, shortcode in enumerate(shortcode_list):
                 if shortcode:
-                    label = f'{label}   \n {size_list[num]}TB to {shortcode},'
+                    label = f'{label}   \n {size_list[num]}{unit} to {shortcode},'
 
             summary[0]['value'] = label 
 
