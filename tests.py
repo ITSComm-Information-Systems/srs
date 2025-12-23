@@ -4,6 +4,7 @@ from django.test import SimpleTestCase
 from django.urls import reverse
 from django.test import Client
 
+# Test
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
 django.setup()
 
