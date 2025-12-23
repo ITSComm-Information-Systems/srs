@@ -1,0 +1,15 @@
+# .github/workflows/rosa-dev-rebuild.yml
+name: Trigger ROSA QA Build
+
+on:
+  push:
+    branches: [ qa ]
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call OpenShift build webhook
+        run: |
+          curl -X POST "${{ secrets.OPENSHIFT_BUILD_QA }}"
+
