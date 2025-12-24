@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
         call_command('deptmgrupdt')
 
-        call_command('user_deactivation', update=True)
+        call_command('user_deactivation', update='True')
 
         print('Start Group Sync')
         call_command('mc_sync')
