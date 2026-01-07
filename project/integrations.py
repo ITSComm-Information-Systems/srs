@@ -16,13 +16,13 @@ TDX_FIELD_TO_ID = {
     "Additional requirements, such as Firewall rules": "1977",
     "Enter a Billing Shortcode for costs to be billed to": "1954",
     "Additional requirements, such as Firewall rules": "1977",
-    "Enter phone number for the support group": "20426",
+    "Enter phone number for the support group": "20147",
     "Enter email address for the support group": "1975",
     "MCommunity Admin Group": "1953",
     "Will this server be used in Production?": "20571",
-    "Backup": "20570",
+    "Backup": "20972",
     "Please let us know what hours you would like us to monitor and respond to issues with your server.": "1974",
-    "miserver_Server Environment": "19324",
+    "miserver_Server Environment": "20365",
     "miserver_Server": "19325"
 }
 
