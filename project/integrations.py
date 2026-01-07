@@ -1,8 +1,31 @@
-import json, yaml, requests
+import json, yaml, requests, re
 from django.conf import settings
 from ldap3 import Server, Connection, ALL, MODIFY_ADD
 from django.template.loader import render_to_string
 from django.core.mail import mail_admins
+
+TDX_FIELD_TO_ID = {
+    "CPU": "1963",
+    "RAM": "1964",
+    "Disk Replication": "1966",
+    "Patch Day": "1971",
+    "Patch Time": "1970",
+    "Reboot Day": "1981",
+    "Daily Backup Time": "1968",
+    "Reboot Time": "1969",
+    "Additional requirements, such as Firewall rules": "1977",
+    "Enter a Billing Shortcode for costs to be billed to": "1954",
+    "Additional requirements, such as Firewall rules": "1977",
+    "Enter phone number for the support group": "20147",
+    "Enter email address for the support group": "1975",
+    "MCommunity Admin Group": "1953",
+    "Will this server be used in Production?": "20571",
+    "Backup": "20972",
+    "Please let us know what hours you would like us to monitor and respond to issues with your server.": "1974",
+    "miserver_Server Environment": "20365",
+    "miserver_Server": "19325"
+}
+
 class MCommunity:
 
     def __init__(self):
@@ -328,6 +351,8 @@ class TDx():
         payload['SourceID'] = 8         # System
         username = payload.get('RequestorEmail').split('@')[0]
         payload['AccountID'] = self.get_account(username)
+        if payload['ServiceID'] == 10:
+            payload = self.mark_changed_fields(payload)
 
         resp = requests.post( f'{self.BASE_URL}/31/tickets/'
                             , headers=self.headers
@@ -346,6 +371,25 @@ class TDx():
                 task_id = json.loads(task_response.text).get('ID')
 
         return resp
+
+    def mark_changed_fields(self, payload):
+        fields = {}
+        for line in payload['Description'].splitlines():
+            match = re.match(r'^\*(.+?):\s*(.+)$', line.strip())
+            if match:
+                key = match.group(1).strip()
+                value = match.group(2).strip()
+                pk = TDX_FIELD_TO_ID.get(key)
+                if pk:
+                    fields[pk] = value
+
+        for attribute in payload['Attributes']:
+
+            id = fields.get(attribute['ID'])
+            if id:
+                attribute['Value'] = '*' + attribute['Value']
+
+        return payload
 
     def create_task(self, payload, ticket):
         payload['SourceID'] = 8         # System
