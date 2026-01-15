@@ -972,30 +972,75 @@ class DatabaseView(UserPassesTestMixin, View):
         }
         return HttpResponse(template.render(context, request))
 
+NAME_RE = re.compile(r'^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$')
 
+def server_name_check(request):
+    """
+    HTMX endpoint to validate a proposed server name.
+    Returns an HTML fragment for inline feedback.
+    """
+    # Because the input name is serverName[]
+    name = request.GET.get("serverName[]", "").strip().lower()
+
+    if not name:
+        return HttpResponse("")
+
+    # length check (DNS-safe)
+    if len(name) > 63:
+        return HttpResponse(
+            '<div class="invalid-feedback d-block">'
+            'Name must be 63 characters or fewer.'
+            '</div>'
+        )
+
+    # format check
+    if not NAME_RE.match(name):
+        return HttpResponse(
+            '<div class="invalid-feedback d-block">'
+            'Name can contain letters, numbers, and single hyphens, '
+            'must start with a letter, and cannot end with a hyphen.'
+            '</div>'
+        )
+
+    # availability check (case-insensitive)
+    if Server.objects.filter(name__iexact=name).exists():
+        return HttpResponse(
+            '<div class="invalid-feedback d-block">'
+            'That name is already in use.'
+            '</div>'
+        )
+
+    # success
+    return HttpResponse(
+        '<div class="valid-feedback d-block">'
+        'Name is available.'
+        '</div>'
+    )
 class ServerView(UserPassesTestMixin, View):
+
+    def dispatch(self, request, *args, **kwargs):
+        self.server = get_object_or_404(Server, pk=kwargs["instance_id"])
+        return super().dispatch(request, *args, **kwargs)
 
     def test_func(self):
         username = self.request.user.username
-        instance_id = self.kwargs['instance_id']
-        #owner = Server.objects.get(id=instance_id).owner.name
-        instance = get_object_or_404(Server, pk=instance_id)
 
-        mc = MCommunity() 
-        mc.get_group(instance.owner.name)
+        mc = MCommunity()
+        mc.get_group(self.server.owner.name)
 
-        if username in mc.members:
-            return True
-        else:
-            return False
+        return username in mc.members
     
     def get(self, request, instance_id, action):
-        if action != 'delete':
-            raise Http404
 
         server = get_object_or_404(Server, pk=instance_id)
 
-        template = loader.get_template('order/server_delete.html')
+        if action == 'delete':
+            template = loader.get_template('order/server_delete.html')
+        elif action == 'clone':
+            template = loader.get_template('order/server_clone.html')
+        else:
+            raise Http404
+
         context = {
             'title': 'Delete Server',
             'server': server

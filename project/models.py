@@ -99,11 +99,25 @@ class ChoiceManager(models.Manager):
           return group_list
 
 
+class ChoiceSet(models.Model):
+    """
+    The domain/category, e.g. SERVER_OS, BACKUP_TIME, STORAGE_TIER.
+    """
+    code = models.CharField(max_length=80, unique=True)   # SERVER_OS
+    label = models.CharField(max_length=120)              # "Server Operating System"
+    description = models.TextField(blank=True, default="")
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.code
+
+
 class Choice(models.Model):
      active = models.BooleanField(default=True)
      code = models.CharField(max_length=80)
      sequence = models.PositiveSmallIntegerField()
      parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
+     set = models.ForeignKey(ChoiceSet, on_delete=models.CASCADE)
      label = models.CharField(max_length=100)
      objects = ChoiceManager()
      

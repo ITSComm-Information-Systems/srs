@@ -31,7 +31,27 @@
                     
                             {% endfor %}
                         </td>
-                        <td class="action"><a href="#" onclick="modifyVolume(0, {{ volume.id }})">Edit</a><a href="/orders/server/{{ volume.id }}/delete/" class="delete">Delete</a></td>
+
+                        <td class="action">
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Actions">
+                                <button type="button"
+                                        class="btn btn-outline-primary"
+                                        onclick="modifyVolume(0, {{ volume.id }})">
+                                    Edit
+                                </button>
+
+                                <a href="/orders/server/{{ volume.id }}/delete/"
+                                class="btn btn-outline-danger">
+                                    Delete
+                                </a>
+
+                                <a href="/orders/server/{{ volume.id }}/clone/"
+                                class="btn btn-outline-secondary">
+                                    Clone
+                                </a>
+                            </div>
+                        </td>
+
                     </tr>
                 {% endfor %}
             </tbody>
