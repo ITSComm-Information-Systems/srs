@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Clone Server</h1>
+
+<div class="mb-3">
+  <strong>Name:</strong> {{ server.name }}<br>
+  {{ server.os }}<br>
+  CPU: {{ server.cpu }}<br>
+  RAM: {{ server.ram }}<br>
+  Shortcode: {{ server.shortcode }}<br>
+  Owner: {{ server.owner.name }}<br>
+</div>
+
+<hr>
+
+<form method="post">
+  {% csrf_token %}
+
+  <div id="clone-names">
+    <div class="row g-2 mb-2 clone-row">
+      <div class="col-md-6">
+        <input
+          type="text"
+          name="serverName[]"
+          class="form-control"
+          placeholder="New server name"
+          hx-get="{% url 'server_name_check' %}"
+          hx-trigger="blur changed delay:400ms"
+          hx-target="next .validation"
+          hx-include="this"
+          autocomplete="off"
+          required
+        >
+        <div class="validation"></div>
+      </div>
+
+      <div class="col-auto">
+        <button type="button"
+                class="btn btn-outline-danger"
+                onclick="removeRow(this)">
+          Remove
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button type="button"
+          class="btn btn-outline-secondary mb-3"
+          onclick="addRow()">
+    + Add another server
+  </button>
+
+  <div>
+    <button type="submit" class="btn btn-primary" id="submit-btn">
+    Next
+    </button>
+
+    <a href=".." class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+
+<script>
+function addRow() {
+  const container = document.getElementById('clone-names');
+  const templateRow = container.querySelector('.clone-row');
+  const newRow = templateRow.cloneNode(true);
+
+  // Clear value + validation message in the cloned row
+  const input = newRow.querySelector('input[name="serverName[]"]');
+  input.value = "";
+  const validation = newRow.querySelector('.validation');
+  if (validation) validation.innerHTML = "";
+
+  container.appendChild(newRow);
+
+  // Bind HTMX attributes on the new row
+  if (window.htmx) htmx.process(newRow);
+
+  input.focus();
+}
+
+function removeRow(btn) {
+  const container = document.getElementById('clone-names');
+  const rows = container.querySelectorAll('.clone-row');
+
+  // Keep at least one row
+  if (rows.length <= 1) {
+    const input = rows[0].querySelector('input[name="serverName[]"]');
+    input.value = "";
+    const validation = rows[0].querySelector('.validation');
+    if (validation) validation.innerHTML = "";
+    input.focus();
+    return;
+  }
+
+  btn.closest('.clone-row').remove();
+}
+
+
+function updateSubmitState() {
+  const hasErrors = document.querySelector('.invalid-feedback');
+  const inputs = document.querySelectorAll('input[name="serverName[]"]');
+
+  // require at least one non-empty name
+  const hasAtLeastOneName = Array.from(inputs).some(i => i.value.trim() !== "");
+
+  const submitBtn = document.getElementById('submit-btn');
+  submitBtn.disabled = !!hasErrors || !hasAtLeastOneName;
+}
+
+// Watch typing
+document.addEventListener('input', e => {
+  if (e.target.name === 'serverName[]') {
+    updateSubmitState();
+  }
+});
+
+// Watch HTMX validation responses
+document.body.addEventListener('htmx:afterSwap', updateSubmitState);
+
+// Initial state
+updateSubmitState();
+
+</script>
+
+{% endblock %}
