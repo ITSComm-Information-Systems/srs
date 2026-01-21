@@ -261,6 +261,7 @@ $(document).ready(function() {
     $('#div_zgJack').show();
     $('#div_zgConduit').hide();
     $('#div_zgOrderPhone').hide();
+    $('#div_JackNumber').hide();
   });
 
   $("#zgAccount_1").click(function() {  //  Create an account associated with a uniqname.
@@ -268,6 +269,7 @@ $(document).ready(function() {
     $('#div_zgJack').hide();
     $('#div_zgConduit').hide();
     $('#div_zgOrderPhone').show();
+    $('#div_JackNumber').hide();
   });
 
   $("#zgOrderPhone_0").click(function() {
@@ -280,10 +282,12 @@ $(document).ready(function() {
 
   $("#zgJack_0").click(function() {
     $('#div_zgConduit').show();
+    $('#div_JackNumber').hide();
   });
 
   $("#zgJack_1").click(function() {
     $('#div_zgConduit').hide();
+    $('#div_JackNumber').show();
   });
 
   $("#activePhone_yesactivephone").click(function() {
