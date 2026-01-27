@@ -457,7 +457,7 @@ class ArcInstanceAdmin(VolumeAdmin):
         ('No Regulated/Sensitive', {'fields':(('lighthouse','globus','thunder_x','great_lakes'),)
         })
     )
-
+    csv_query = 'select * from srs_order_arcinstance_api_v'
     class Media:
         js = ('order/js/admin_arc.js',)
 
