@@ -11,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.urls import path
 from project.models import Choice
+from project.utils import download_csv_from_queryset, get_query_result
 
 from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database, LDAPGroupMember, StorageBilling
 
@@ -146,6 +147,10 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
         return download_url + urls
 
     def download_csv(self, request):
+
+        if hasattr(self, 'csv_query') and request.path.startswith('/admin/'):
+            recs = get_query_result(self.csv_query)
+            return download_csv_from_queryset(recs, file_name=self.model.__name__)
 
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(content_type='text/csv')
@@ -452,7 +457,7 @@ class ArcInstanceAdmin(VolumeAdmin):
         ('No Regulated/Sensitive', {'fields':(('lighthouse','globus','thunder_x','great_lakes'),)
         })
     )
-
+    csv_query = 'select * from srs_order_arcinstance_api_v'
     class Media:
         js = ('order/js/admin_arc.js',)
 
@@ -482,6 +487,7 @@ class StorageInstanceAdmin(VolumeAdmin):
     list_select_related = ['owner','rate']
     exclude = ['owner_name', 'owner_bak', 'shortcode']
     inlines = [StorageBillingInline]
+    csv_query = 'select * from srs_order_storageinstance_api_v'
 
 
 @admin.register(ArcBilling)
