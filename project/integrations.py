@@ -16,11 +16,13 @@ TDX_FIELD_TO_ID = {
     "Additional requirements, such as Firewall rules": "1977",
     "Enter a Billing Shortcode for costs to be billed to": "1954",
     "Additional requirements, such as Firewall rules": "1977",
-    "Enter phone number for the support group": "19223",
+    "Enter phone number for the support group": "20147",
     "Enter email address for the support group": "1975",
     "MCommunity Admin Group": "1953",
-    "If a problem with your server is detected by our monitoring system, when can we contact you or your group?": "1974",
-    "miserver_Server Environment": "19324",
+    "Will this server be used in Production?": "20571",
+    "Backup": "20972",
+    "Please let us know what hours you would like us to monitor and respond to issues with your server.": "1974",
+    "miserver_Server Environment": "20365",
     "miserver_Server": "19325"
 }
 
@@ -56,6 +58,21 @@ class MCommunity:
                 {"id": id, "name": name}
             )
         return sorted(groups_json, key=lambda k: k['name'])
+
+    def get_group_email_set(self, uniqname) -> set[str]:
+        self.conn.search(
+            'ou=Groups,dc=umich,dc=edu',
+            f'(&(umichDirectMember=uid={uniqname},ou=People,dc=umich,dc=edu)(joinable=False))',
+            attributes=["umichGroupEmail"],
+        )
+
+        emails = set()
+        for entry in self.conn.entries:
+            vals = entry.entry_attributes_as_dict.get("umichGroupEmail", [])
+            if vals:
+                emails.add(vals[0].strip().lower())
+
+        return emails
 
     def get_group(self, name):
         self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member","gidnumber"])

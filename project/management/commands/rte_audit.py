@@ -15,7 +15,7 @@ class Command(BaseCommand):
         email = Email.objects.get(code='RTE_40_HOURS')
         subject = email.subject
 
-        sql = '''
+        sql = """
                 SELECT * FROM
                 (SELECT g.WO_GROUP_LABOR_CODE AS uniqname , g.WO_GROUP_NAME AS grp
                 ,(SELECT sum(ACTUAL_MINS)
@@ -44,8 +44,9 @@ class Command(BaseCommand):
                 )
                 WHERE is_supervisor = 0
                 AND (tot_min IS NULL or tot_min < 2400)
+                AND UNIQNAME NOT LIKE 'GROUP%%'
                 ORDER BY grp, uniqname
-        '''
+        """
 
         for record in get_query_result(sql):
             uniqname = record['uniqname'].lower()
