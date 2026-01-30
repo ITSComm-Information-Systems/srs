@@ -59,6 +59,21 @@ class MCommunity:
             )
         return sorted(groups_json, key=lambda k: k['name'])
 
+    def get_group_email_set(self, uniqname) -> set[str]:
+        self.conn.search(
+            'ou=Groups,dc=umich,dc=edu',
+            f'(&(umichDirectMember=uid={uniqname},ou=People,dc=umich,dc=edu)(joinable=False))',
+            attributes=["umichGroupEmail"],
+        )
+
+        emails = set()
+        for entry in self.conn.entries:
+            vals = entry.entry_attributes_as_dict.get("umichGroupEmail", [])
+            if vals:
+                emails.add(vals[0].strip().lower())
+
+        return emails
+
     def get_group(self, name):
         self.conn.search('ou=Groups,dc=umich,dc=edu', '(cn=' + name + ')', attributes=["member","gidnumber"])
 

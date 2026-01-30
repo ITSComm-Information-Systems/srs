@@ -56,28 +56,28 @@
             Notes about API tokens:
             <ul>
                 <li>The token will be linked to your user ID.</li>
-                <li>The token expires 90 days after creation but can be regenerated at any time.</li>
+                <li>The token can be regenerated at any time.</li>
                 <li>If you are not an admin, you will have read-only access to the same instances (servers, volumes, etc.) that you can access in SRS.</li>
             </ul>
 
-
+            <h4>Personal token.</h4>
             {% if token %}
                 <table border="1" cellpadding="8" cellspacing="0">
                     <thead>
                         <tr>
+                            <th>Username</th>
                             <th>Token</th>
                             <th>Created</th>
-                            <th>Expires</th>
                         </tr>
                     </thead>
                     <tbody>
+                            <td>djamison{{ request.username }}</td>
                             <td>
-                                <span style="display: none;" id="token-text">{{ token.key }}</span>
+                                <span style="display:none" id="token-text-personal">{{ token.key }}</span>
                                 <span>{{ token.key|slice:":4" }}****</span>
-                                <button onclick="copyToClipboard()">Copy</button>
+                                <button type="button" onclick="copyToClipboard('token-text-personal')">Copy</button>
                             </td>
                             <td>{{ token.created|date:"m-d-Y" }}</td>
-                            <td>{{ token.expires|date:"m-d-Y" }}</td>
                     </tbody>
                 </table>
 
@@ -93,6 +93,55 @@
                 <input type="hidden" value="token">
                 <button class="btn btn-primary js-tooltip" title="" data-original-title="Make a POST request on the Pool List resource">Request Token</button>
             </form>
+            
+            <h4>Group Token.</h4>
+            {% if service_accounts %}
+                <table border="1" cellpadding="8" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>MCommunity Group</th>
+                            <th>Token</th>
+                            <th>Created</th>
+                            <th>Renew Token</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for service_account in service_accounts %}
+                            <tr>
+                                <td>{{ service_account.username }}</td>
+                                <td>{{ service_account.email }}</td>
+                                {% if service_account.auth_token.key %}
+                                <td>
+                                    <span style="display:none" id="token-text-{{ service_account.id }}">{{ service_account.auth_token.key }}</span>
+                                    <span>{{ service_account.auth_token.key|slice:":4" }}****</span>
+                                    <button type="button" onclick="copyToClipboard('token-text-{{ service_account.id }}')">Copy</button>
+                                </td>
+                                <td>{{ service_account.auth_token.created|date:"m-d-Y" }}</td>
+                                <td>
+                                    <form method="POST">{% csrf_token %}
+                                        <input type="hidden" id="groupID" name="groupID" value="{{ service_account.id }}">
+                                        <button class="btn btn-primary js-tooltip" title="" data-original-title="Make a POST request on the Pool List resource">Renew Token</button></button>
+                                    </form>
+                                </td>
+                                {% else %}
+                                <td></td><td></td>
+                                <td>
+                                    <form method="POST">{% csrf_token %}
+                                        <input type="hidden" id="groupID" name="groupID" value="{{ service_account.id }}">
+                                        <button class="btn btn-primary js-tooltip" title="" data-original-title="Make a POST request on the Pool List resource">Create Token</button>
+                                    </form>
+                                </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            {% else %}
+                <b>No token found.</b>
+            {% endif %}            
+
         <hr>
                 {% autoescape off %} {{ helppage.bodytext }} {% endautoescape %} 
         </div>
@@ -101,13 +150,19 @@
     </div>
 
     <script>
-    function copyToClipboard() {
-        const tokenText = document.getElementById("token-text").innerText;
-        navigator.clipboard.writeText(tokenText).then(function() {
-            alert("Token copied to clipboard");
-        }, function(err) {
-            alert("Failed to copy: " + err);
-        });
+    function copyToClipboard(elementId) {
+    const el = document.getElementById(elementId);
+    const tokenText = (el?.innerText || el?.textContent || "").trim();
+
+    if (!tokenText) {
+        alert("No token found to copy");
+        return;
+    }
+
+    navigator.clipboard.writeText(tokenText).then(
+        () => alert("Token copied to clipboard"),
+        (err) => alert("Failed to copy: " + err)
+    );
     }
     </script>
 
