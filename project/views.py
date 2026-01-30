@@ -12,7 +12,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import View
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import get_user_model
 from django import forms
 from .forms.fields import Phone, Uniqname
@@ -30,6 +30,7 @@ from datetime import datetime, date, timedelta
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import F
 from pages.models import Page
+from project.integrations import MCommunity
 
 import json
 from django.http import JsonResponse
@@ -575,22 +576,38 @@ class NameChange(PermissionRequiredMixin, View):
 class TokenView(LoginRequiredMixin, View):
 
 	def post(self, request):
-		Token.objects.filter(user=self.request.user).delete()
-		token = Token.objects.create(user=self.request.user)
-		token.expires = token.created + timedelta(days=90)
-		help_page = Page.objects.get(permalink='/apihelp')
-	
-		return render(request, 'api_token.html',  {'token': token, 'helppage': help_page})
+
+		group_id = request.POST.get('groupID')
+		if group_id:
+			user_id = int(group_id)
+		else:
+			user_id = self.request.user.id
+
+		Token.objects.filter(user_id=user_id).delete()
+		token = Token.objects.create(user_id=user_id)
+		return redirect("/api/token")  
 
 	def get(self, request):
+
+		def email_local_part(email: str) -> str:
+			return (email or "").split("@", 1)[0].strip().lower()
+		
 		token = Token.objects.filter(user=self.request.user).first()
-
-		if token:
-			token.expires = token.created + timedelta(days=90)
-
 		help_page = Page.objects.get(permalink='/apihelp')
+		group_list = MCommunity().get_group_email_set(self.request.user.username)
 
-		return render(request, 'api_token.html',  {'token': token, 'helppage': help_page})
+		service_accounts = (
+			User.objects
+			.filter(username__startswith='rest.')
+			.select_related('auth_token')  # pulls token if present, None if not
+		)
+
+		allowed_accounts = [
+		u for u in service_accounts
+		if email_local_part(u.email) in group_list
+		]
+
+		return render(request, 'api_token.html',  {'token': token, 'service_accounts': allowed_accounts, 'helppage': help_page})
 
 
 @permission_required(('oscauth.can_order'), raise_exception=True)
