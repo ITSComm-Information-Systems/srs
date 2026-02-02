@@ -194,6 +194,19 @@ class MiServer(ServiceBilling):
     sql = 'select a.*, a."SIZE" as total_size from srs_order_miserver_billing_v a order by name'
 
 
+class Container(ServiceBilling):
+    sql = 'select 1 from dual;'   # TODO create procs when we get the test file.
+
+    def get_records(self):
+        print('foo')
+
+    def run_pinnacle_job(self):
+        print('bar')
+
+    def send_email(self):
+        print('baz')
+
+
 class Command(BaseCommand):
     help = 'Upload Billing data for Mi-services to Pinnacle'
 
