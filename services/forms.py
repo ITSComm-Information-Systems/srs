@@ -421,7 +421,7 @@ class NetworkForm(forms.Form):
 class ImageForm(forms.Form):
     name = forms.CharField(required=False)
     initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
-    operating_system = forms.ChoiceField(required=False,choices=(('Windows11 64bit','Windows11 64bit'),('Ubuntu 22.04','Ubuntu 22.04'),('Ubuntu 24.04','Ubuntu 24.04')('Debian 12.7','Debian 12.7'),('RHEL 9.4','RHEL 9.4'),('RHEL 9.5','RHEL 9.5')))
+    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),('Windows11 64bit','Windows11 64bit')))
 
     template_name = 'services/image.html'
 
@@ -444,6 +444,7 @@ class MiDesktopNewForm(MiDesktopForm):
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
     pool_type = forms.ChoiceField(label='Pool Type', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent"),("external","External")))
     pool_name = forms.CharField(required=True)
+    pool_accessibility = forms.ChoiceField(choices=(('No Restriction','No Restriction'),('Publicly Available','Publicly Available'),('From UMNet Only','From UMNet Only')),required=True)
     auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('1min','1 Minute'),('5min','5 Minutes'),('15min','15 Minutes'),('30min','30 Minutes'),
                                                                 ('1hr','1 Hour'),('2hr','2 Hours'),('4hr','4 Hours'),('8hr','8 Hours'),('12hr','12 Hours'),
                                                                 ('16hr','16 Hours'),('20hr','20 Hours'),('24hr','24 Hours')))
@@ -454,7 +455,7 @@ class MiDesktopNewForm(MiDesktopForm):
 
     image_name = forms.CharField(required=False)
     initial_image = forms.ChoiceField(required=False, choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
-    operating_system = forms.ChoiceField(required=False,choices=(('Windows11 64bit','Windows11 64bit'),('Ubuntu 22.04','Ubuntu 22.04'),('Ubuntu 24.04','Ubuntu 24.04')('Debian 12.7','Debian 12.7'),('RHEL 9.4','RHEL 9.4'),('RHEL 9.5','RHEL 9.5')))
+    operating_system = forms.ChoiceField(required=False,choices=(('Windows10 64bit','Windows10 64bit'),('Windows11 64bit','Windows11 64bit')))
 
     cpu = forms.ChoiceField(required=False,choices=CPU_CHOICES, label="CPU")
     cpu_cost = forms.DecimalField(required=False,initial=CPU_INITIAL, label="CPU Cost", widget=forms.TextInput(attrs={'readonly':'true'}))
@@ -732,7 +733,7 @@ class DiskForm(forms.ModelForm):
 class MiDesktopNewImageForm(MiDesktopForm):
     name = forms.CharField()
     initial_image = forms.ChoiceField(choices=(('Blank','Blank Image'),('Standard','MiDesktop Standard Image')))
-    operating_system = forms.ChoiceField(required=False,choices=(('Windows11 64bit','Windows11 64bit'),('Ubuntu 22.04','Ubuntu 22.04'),('Ubuntu 24.04','Ubuntu 24.04')('Debian 12.7','Debian 12.7'),('RHEL 9.4','RHEL 9.4'),('RHEL 9.5','RHEL 9.5')))
+    operating_system = forms.ChoiceField(choices=(('Windows10 64bit','Windows10 64bit'),('Windows 11 64bit','Windows 11 64bit')))
 
     calculator_form = CalculatorForm(prefix="calculator")
     network_type = forms.ChoiceField(label='Will you be using a shared network or a dedicated network?', choices = (("private","Shared Network (Private)"),("web-access","Shared Network (Web-Access)"),("dedicated","Dedicated Network")))
