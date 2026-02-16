@@ -71,7 +71,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                            <td>djamison{{ request.username }}</td>
+                            <td>{{ token.user.username }}</td>
                             <td>
                                 <span style="display:none" id="token-text-personal">{{ token.key }}</span>
                                 <span>{{ token.key|slice:":4" }}****</span>
