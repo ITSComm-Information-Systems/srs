@@ -16,13 +16,58 @@
 
 <form method="post">
   {% csrf_token %}
+  {{ formset.management_form }}
+
+  {% if formset.non_form_errors %}
+    <div class="alert alert-danger">
+      {% for err in formset.non_form_errors %}
+        <div>{{ err }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
   <div id="clone-names">
+    {% for form in formset %}
+      <div class="row g-2 mb-2 clone-row">
+        <div class="col-md-6">
+          <input
+            type="text"
+            name="{{ form.name.html_name }}"
+            id="{{ form.name.id_for_label }}"
+            value="{{ form.name.value|default_if_none:'' }}"
+            class="form-control{% if form.name.errors %} is-invalid{% endif %}"
+            placeholder="New server name"
+            hx-get="{% url 'server_name_check' %}"
+            hx-trigger="blur changed delay:400ms"
+            hx-target="next .validation"
+            hx-include="this"
+            autocomplete="off"
+            required
+          >
+          {% for err in form.name.errors %}
+            <div class="invalid-feedback d-block">{{ err }}</div>
+          {% endfor %}
+          <div class="validation"></div>
+        </div>
+
+        <div class="col-auto">
+          <button type="button"
+                  class="btn btn-outline-danger"
+                  onclick="removeRow(this)">
+            Remove
+          </button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <template id="empty-clone-row-template">
     <div class="row g-2 mb-2 clone-row">
       <div class="col-md-6">
         <input
           type="text"
-          name="serverName[]"
+          name="{{ formset.empty_form.name.html_name }}"
+          id="{{ formset.empty_form.name.id_for_label }}"
           class="form-control"
           placeholder="New server name"
           hx-get="{% url 'server_name_check' %}"
@@ -43,7 +88,7 @@
         </button>
       </div>
     </div>
-  </div>
+  </template>
 
   <button type="button"
           class="btn btn-outline-secondary mb-3"
@@ -53,7 +98,7 @@
 
   <div>
     <button type="submit" class="btn btn-primary" id="submit-btn">
-    Next
+    Submit
     </button>
 
     <a href=".." class="btn btn-outline-secondary">Cancel</a>
@@ -61,22 +106,37 @@
 </form>
 
 <script>
+function syncFormIndexes() {
+  const container = document.getElementById('clone-names');
+  const rows = container.querySelectorAll('.clone-row');
+  const totalForms = document.getElementById('id_clone-TOTAL_FORMS');
+
+  rows.forEach((row, index) => {
+    const input = row.querySelector('input[type="text"]');
+    if (!input) return;
+    input.name = `clone-${index}-name`;
+    input.id = `id_clone-${index}-name`;
+  });
+
+  totalForms.value = rows.length;
+}
+
 function addRow() {
   const container = document.getElementById('clone-names');
-  const templateRow = container.querySelector('.clone-row');
-  const newRow = templateRow.cloneNode(true);
+  const template = document.getElementById('empty-clone-row-template');
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = template.innerHTML.trim();
+  const newRow = wrapper.firstElementChild;
 
-  // Clear value + validation message in the cloned row
-  const input = newRow.querySelector('input[name="serverName[]"]');
-  input.value = "";
+  const input = newRow.querySelector('input[type="text"]');
+  input.value = '';
   const validation = newRow.querySelector('.validation');
-  if (validation) validation.innerHTML = "";
+  if (validation) validation.innerHTML = '';
 
   container.appendChild(newRow);
+  syncFormIndexes();
 
-  // Bind HTMX attributes on the new row
   if (window.htmx) htmx.process(newRow);
-
   input.focus();
 }
 
@@ -86,7 +146,7 @@ function removeRow(btn) {
 
   // Keep at least one row
   if (rows.length <= 1) {
-    const input = rows[0].querySelector('input[name="serverName[]"]');
+    const input = rows[0].querySelector('input[type="text"]');
     input.value = "";
     const validation = rows[0].querySelector('.validation');
     if (validation) validation.innerHTML = "";
@@ -95,12 +155,14 @@ function removeRow(btn) {
   }
 
   btn.closest('.clone-row').remove();
+  syncFormIndexes();
+  updateSubmitState();
 }
 
 
 function updateSubmitState() {
   const hasErrors = document.querySelector('.invalid-feedback');
-  const inputs = document.querySelectorAll('input[name="serverName[]"]');
+  const inputs = document.querySelectorAll('#clone-names input[type="text"]');
 
   // require at least one non-empty name
   const hasAtLeastOneName = Array.from(inputs).some(i => i.value.trim() !== "");
@@ -111,7 +173,7 @@ function updateSubmitState() {
 
 // Watch typing
 document.addEventListener('input', e => {
-  if (e.target.name === 'serverName[]') {
+  if (e.target.closest('#clone-names')) {
     updateSubmitState();
   }
 });
@@ -120,6 +182,7 @@ document.addEventListener('input', e => {
 document.body.addEventListener('htmx:afterSwap', updateSubmitState);
 
 // Initial state
+syncFormIndexes();
 updateSubmitState();
 
 </script>
