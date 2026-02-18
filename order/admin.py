@@ -247,7 +247,7 @@ class DatabaseAdmin(ServiceInstanceAdmin):
 
 @admin.register(Server)
 class ServerAdmin(ServiceInstanceAdmin):
-    list_display = ['name', 'owner', 'os']
+    list_display = ['name', 'owner', 'os', 'transformation']
     list_filter = ('in_service','managed', 'database_type')
     ordering = ('name',)
     search_fields = ['name','owner__name']
@@ -263,9 +263,9 @@ class ServerAdmin(ServiceInstanceAdmin):
                         ('replicated','backup','backup_time','public_facing','production'),
                         ('on_call', 'support_email', 'support_phone'),
                         ('cname',),
-
                         ('regulated_data','non_regulated_data'),
-                        'managed'
+                        'managed',
+                        'transformation',
                         ),
         }),
         ('Managed', {
@@ -285,7 +285,6 @@ class ServerAdmin(ServiceInstanceAdmin):
     #    return user_has_permission(request, obj)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
-
         instance = self.model.objects.get(id=object_id)
  
         extra_context = {
