@@ -972,15 +972,27 @@ class DatabaseView(UserPassesTestMixin, View):
         }
         return HttpResponse(template.render(context, request))
 
-NAME_RE = re.compile(r'^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$')
+def _extract_server_name(params):
+    name = params.get("serverName[]", "").strip().lower()
+    if name:
+        return name
+
+    name = params.get("name", "").strip().lower()
+    if name:
+        return name
+
+    for key, value in params.items():
+        if key.endswith('-name'):
+            return value.strip().lower()
+
+    return ""
 
 def server_name_check(request):
     """
     HTMX endpoint to validate a proposed server name.
     Returns an HTML fragment for inline feedback.
     """
-    # Because the input name is serverName[]
-    name = request.GET.get("serverName[]", "").strip().lower()
+    name = _extract_server_name(request.GET)
 
     if not name:
         return HttpResponse("")
@@ -994,7 +1006,7 @@ def server_name_check(request):
         )
 
     # format check
-    if not NAME_RE.match(name):
+    if not CLONE_NAME_RE.match(name):
         return HttpResponse(
             '<div class="invalid-feedback d-block">'
             'Name can contain letters, numbers, and single hyphens, '
@@ -1033,35 +1045,58 @@ class ServerView(UserPassesTestMixin, View):
     def get(self, request, instance_id, action):
 
         server = get_object_or_404(Server, pk=instance_id)
+        formset = None
 
         if action == 'delete':
             template = loader.get_template('order/server_delete.html')
+            title = 'Delete Server'
         elif action == 'clone':
             template = loader.get_template('order/server_clone.html')
+            formset = CloneServerNameFormSet(prefix='clone')
+            title = 'Clone Server'
         else:
             raise Http404
 
         context = {
-            'title': 'Delete Server',
-            'server': server
+            'title': title,
+            'server': server,
+            'formset': formset,
         }
         return HttpResponse(template.render(context, request))
 
 
     def post(self, request, instance_id, action):
         instance = get_object_or_404(Server, pk=instance_id)
-        create_ticket_server_delete(instance, request.user, f'End Service for {instance.name}')
+        if action == 'delete':
+            create_ticket_server_delete(instance, request.user, f'End Service for {instance.name}')
 
-        current_time = datetime.datetime.now()
-        formatted_date = current_time.strftime('%Y%m%d')
-        suffix = "-Ended-" + formatted_date
-        instance.name = instance.name + suffix
+            current_time = datetime.datetime.now()
+            formatted_date = current_time.strftime('%Y%m%d')
+            suffix = "-Ended-" + formatted_date
+            instance.name = instance.name + suffix
 
+            instance.in_service = False
+            instance.save()
 
-        instance.in_service = False
-        instance.save()
+            return HttpResponseRedirect('/requestsent')
 
-        return HttpResponseRedirect('/requestsent') 
+        if action == 'clone':
+            formset = CloneServerNameFormSet(request.POST, prefix='clone')
+            if formset.is_valid():
+                for clone in formset.cleaned_data:
+                    new_server = instance.clone(clone['name'])
+
+                return HttpResponseRedirect('/requestsent')
+
+            template = loader.get_template('order/server_clone.html')
+            context = {
+                'title': 'Clone Server',
+                'server': instance,
+                'formset': formset,
+            }
+            return HttpResponse(template.render(context, request))
+
+        raise Http404
     
 
 class AddSMS(PermissionRequiredMixin, View):

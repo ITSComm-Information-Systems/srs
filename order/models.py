@@ -1,8 +1,9 @@
 from typing import Sequence
 from django.conf import settings
+from copy import copy
 from django.core.mail import send_mail
 from django.contrib.admin.models import LogEntry, ADDITION
-from django.db import models
+from django.db import models, transaction
 from django.forms.fields import DecimalField
 from ldap3.protocol.rfc4511 import Control
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
@@ -707,6 +708,35 @@ class Server(models.Model):
                 self.disk_no_replication = rate.rate
             elif rate.name == 'SV-DI-BACKUP':
                 self.disk_backup = rate.rate
+
+    def clone(self, name):
+        with transaction.atomic():
+            original = self  # just for readability
+
+            new = copy(original)
+            new.pk = None
+            new.name = name
+            new.created_date = timezone.now() 
+            new.save()
+
+            # Clone child disks (assuming Disk has FK: server = ForeignKey(Server))
+            for disk in original.disks.all():  # adjust related_name
+                disk_new = copy(disk)
+                disk_new.pk = None
+                disk_new.name = disk.name
+                disk_new.controller = disk.controller
+                disk_new.device = disk.device
+                disk_new.size = disk.size
+                disk_new.server = new
+                disk_new.save()
+
+            # Clone ManyToMany
+            for field in self._meta.many_to_many:
+                getattr(new, field.name).set(
+                    getattr(original, field.name).all()
+                )
+
+            return new
 
 
     @staticmethod

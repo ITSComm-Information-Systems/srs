@@ -2,6 +2,7 @@ from django import forms
 from django.core import validators
 #from django.db.models.fields import IntegerField
 from django.forms import ModelForm, formset_factory
+import re
 #from .models import Product, Service, Action, Feature, FeatureCategory, FeatureType, Restriction, ProductCategory, Element, StorageInstance, Step, StorageMember, StorageHost, StorageRate
 from .models import *
 from softphone.models import Category
@@ -15,6 +16,65 @@ from project.models import Choice
 from project.forms.fields import *
 
 get_choices = Choice.objects.get_choices
+
+CLONE_NAME_RE = re.compile(r'^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$')
+
+
+class CloneServerNameForm(forms.Form):
+    name = forms.CharField(label='New server name', max_length=63)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'New server name',
+            'autocomplete': 'off',
+            'required': True,
+        })
+
+    def clean_name(self):
+        name = self.cleaned_data['name'].strip().lower()
+
+        if len(name) > 63:
+            raise forms.ValidationError('Name must be 63 characters or fewer.')
+
+        if not CLONE_NAME_RE.match(name):
+            raise forms.ValidationError(
+                'Name can contain letters, numbers, and single hyphens, must start with a letter, and cannot end with a hyphen.'
+            )
+
+        if Server.objects.filter(name__iexact=name).exists():
+            raise forms.ValidationError('That name is already in use.')
+
+        return name
+
+
+class BaseCloneServerNameFormSet(forms.BaseFormSet):
+    def clean(self):
+        if any(self.errors):
+            return
+
+        seen = set()
+        for form in self.forms:
+            name = form.cleaned_data.get('name', '').strip().lower()
+            if not name:
+                continue
+
+            if name in seen:
+                raise forms.ValidationError(f'Duplicate server name in request: {name}')
+            seen.add(name)
+
+        if not seen:
+            raise forms.ValidationError('Enter at least one server name.')
+
+
+CloneServerNameFormSet = formset_factory(
+    CloneServerNameForm,
+    formset=BaseCloneServerNameFormSet,
+    extra=0,
+    min_num=1,
+    validate_min=True,
+)
 
 def get_storage_options(action):
     opt_list = []
