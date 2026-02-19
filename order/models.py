@@ -677,6 +677,7 @@ class Server(models.Model):
     backup_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_BACKUP_TIME"}
                                     , related_name='backup_time'
                                     , on_delete=models.CASCADE,)
+    transformation = models.BooleanField(null=True, blank=True, help_text='Indicates whether the server was brought in as part of the IT transformation effort.')
     patch_time = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "SERVER_PATCH_TIME"}
                                     , related_name='patch_time'
                                     , on_delete=models.CASCADE,)
