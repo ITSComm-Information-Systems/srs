@@ -847,7 +847,8 @@ class MiDesktopPayload(Payload):
 
             self.context['netlabs'] = netlabs
 
-        self.add_attribute(self.owner.id, instance.owner.name)
+        email = MCommunity().get_group_email(instance.owner.name)
+        self.add_attribute(self.owner.id, instance.owner.name + ' | ' + email )
         if self.description == '':
             self.description = render_to_string(self.template, self.context)
 
@@ -870,7 +871,7 @@ class MiDesktopPayload(Payload):
             "ResponsibleGroupID": self.responsible_group_id,
             "Title": self.title,
             "RequestorEmail": self.request.user.email,
-            "Description": self.description,
+            "Description": f'Additional Details\n{self.description}',
             "IsRichHtml": True,
             "Attributes": getattr(self, 'attributes', []),
             "Tasks": getattr(self, 'tasks', []),
