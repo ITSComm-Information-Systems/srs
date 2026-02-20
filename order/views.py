@@ -14,7 +14,7 @@ from pages.models import Page
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from pages.models import Page
 from django.http import JsonResponse
-from project.integrations import create_ticket_server_delete
+from project.integrations import create_ticket_server_delete, create_ticket
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from ast import literal_eval
@@ -1085,6 +1085,7 @@ class ServerView(UserPassesTestMixin, View):
             if formset.is_valid():
                 for clone in formset.cleaned_data:
                     new_server = instance.clone(clone['name'])
+                    create_ticket('New', new_server, request)
 
                 return HttpResponseRedirect('/requestsent')
 
