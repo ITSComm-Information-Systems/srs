@@ -774,6 +774,8 @@ class MiDesktopPayload(Payload):
     image_type = ChoiceAttribute(2346, Existing=899, New=900, Clone=901)
     image_name = TextAttribute(2347)    # midesktop_Base Image Name textbox
     pool_name = TextAttribute(2348)     # midesktop_Pool Display Name textbox
+    group_email = TextAttribute(21315)
+    additional_details = TextAttribute(21317)
 
     def __init__(self, action, instance, request, **kwargs):
         self.request = request
@@ -848,7 +850,9 @@ class MiDesktopPayload(Payload):
             self.context['netlabs'] = netlabs
 
         email = MCommunity().get_group_email(instance.owner.name)
-        self.add_attribute(self.owner.id, instance.owner.name + ' | ' + email )
+        self.add_attribute(self.owner.id, instance.owner.name)
+        self.add_attribute(self.group_email.id, email)
+        self.add_attribute(self.additional_details.id, self.form.cleaned_data.get('additional_details'))
         if self.description == '':
             self.description = render_to_string(self.template, self.context)
 
@@ -871,7 +875,7 @@ class MiDesktopPayload(Payload):
             "ResponsibleGroupID": self.responsible_group_id,
             "Title": self.title,
             "RequestorEmail": self.request.user.email,
-            "Description": f'Additional Details\n{self.description}',
+            "Description": self.description,
             "IsRichHtml": True,
             "Attributes": getattr(self, 'attributes', []),
             "Tasks": getattr(self, 'tasks', []),
