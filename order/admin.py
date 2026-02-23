@@ -278,6 +278,8 @@ class ServerAdmin(ServiceInstanceAdmin):
         }),
     )
 
+    csv_query = 'select * from srs_order_server_api_v'
+
     class Media:
         js = ('order/js/admin_server.js',)
 
