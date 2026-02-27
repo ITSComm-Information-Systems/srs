@@ -507,6 +507,8 @@ function calculate_duration() {
     }
     hours = hours + Math.floor(mins / 60);
     mins = mins % 60;
-    return format_duration(hours.toString(), mins.toString());
+
+    return format_duration(hours.toString(), mins.toString()); 
 }
+
 
