@@ -104,9 +104,13 @@ $(document).ready(function() {
 
     // Submit entries
     $('.single-submit').on('click', function() {
-        var form_html = '<input name="num_entries" type="text" value="' + total_entries_single + '" hidden>';
-        $('#single-input-form').append(form_html);
-        $('#single-input-form').submit();
+        // Always rebuild hidden inputs from entries array before submit
+        rebuild_table_and_inputs();
+        // Remove any previous num_entries input to avoid duplicates
+           $('#single-input-form input[name="num_entries"]').remove();
+           var form_html = '<input name="num_entries" type="text" value="' + total_entries_single + '" hidden>';
+           $('#single-input-form').append(form_html);
+           $('#single-input-form').submit();
     })
 
     // Add new row to input table
