@@ -327,4 +327,3 @@ function calculate_duration() {
 
     return format_duration(hours.toString(), mins.toString()); 
 }
-
