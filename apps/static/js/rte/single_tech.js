@@ -1,15 +1,3 @@
-// Split duration into hours and mins
-function split_duration(duration, part) {
-    var split = duration.split(':');
-    if (part === 'hours') {
-        return split[0] ? split[0] : '0';
-    } else {
-        return split[1] ? split[1] : '0';
-    }
-}
-// Central source of truth for all entries (global scope)
-var entries = [];
-
 $(document).ready(function() {
     // Table pop up on search
     $("#techTable").hide();
@@ -49,51 +37,6 @@ $(document).ready(function() {
         // Transition to work order input
         if (current_tab == 2) {
             techid_to_wo();
-            // Clear and rebuild the input table and hidden inputs from current visible rows
-            var rows = [];
-            $('#single-input-table > tbody').empty();
-            // Gather all current hidden input values (non-deleted)
-            var entry = 1;
-            while (true) {
-                var wo = $("input[name='" + entry + "_work_order']").val();
-                var rate = $("input[name='" + entry + "_rate']").val();
-                var date = $("input[name='" + entry + "_assigned_date']").val();
-                var duration = $("input[name='" + entry + "_duration']").val();
-                var notes = $("input[name='" + entry + "_notes']").val();
-                if (typeof wo === 'undefined') break;
-                if (wo !== 'Deleted') {
-                    rows.push({wo: wo, rate: rate, date: date, duration: duration, notes: notes});
-                }
-                entry++;
-            }
-            // Remove all old hidden inputs
-            $('#single-input-form input[type="text"][name$="_work_order"], #single-input-form input[type="text"][name$="_rate"], #single-input-form input[type="date"][name$="_assigned_date"], #single-input-form input[type="text"][name$="_duration"], #single-input-form input[type="text"][name$="_notes"]').remove();
-            // Rebuild table and hidden inputs from rows
-            for (var i = 0; i < rows.length; i++) {
-                var idx = i + 1;
-                var html = '<tr id="row-' + idx + '">' +
-                    '<td>' + rows[i].wo + '</td>' +
-                    '<td>' + (rows[i].rate || '') + '</td>' +
-                    '<td>' + (rows[i].date || '') + '</td>' +
-                    '<td id="row-' + idx + '-date">' + (rows[i].duration || '') + '</td>' +
-                    '<td id="row-' + idx + '-notes">' + (rows[i].notes || '') + '</td>' +
-                    '<td style="padding-right: 0px;" class="delete-col"><div style="float:right;">'+
-                    '<button style="float: left;" class="btn btn-success" id="single-copy" onClick="copier(' + idx + ')" >Copy</button>' +
-                    '<button style="float: right;" class="btn btn-danger delete_row" id="' + idx + '">Delete</button></div></td>' +
-                    '</tr>';
-                $('#single-input-table > tbody:last-child').append(html);
-                // Add hidden inputs
-                var form_html = '<input type="text" name="' + idx + '_work_order" value="' + rows[i].wo + '" hidden>' +
-                    '<input type="text" name="' + idx + '_rate" value="' + (rows[i].rate || '') + '" hidden>' +
-                    '<input type="date" name="' + idx + '_assigned_date" value="' + (rows[i].date || '') + '" hidden>' +
-                    '<input type="text" name="' + idx + '_duration" value="' + (rows[i].duration || '') + '" hidden>' +
-                    '<input type="text" name="' + idx + '_notes" value="' + (rows[i].notes || '') + '" hidden>';
-                $('#single-input-form').append(form_html);
-            }
-            // Reset num_entries and total_entries_single to match the rebuilt rows
-            num_entries = rows.length;
-            total_entries_single = rows.length;
-            $('#total-hours').text(calculate_duration());
         }
         // Transition to review/submit tab
         if (current_tab == 3) {
@@ -101,6 +44,9 @@ $(document).ready(function() {
         }
     });
 
+    // Keep track of number of rows in table
+    num_entries = 0;
+    total_entries_single = 0;
 
     // Submit entries
     $('.single-submit').on('click', function() {
@@ -112,19 +58,9 @@ $(document).ready(function() {
     // Add new row to input table
     $('#single-add').on('click', function() {
         if (validate_add()) {
-            if (entries.length < 15) {
-                entries.push({
-                    wo: $('#workOrderSearch').val(),
-                    rate: $('#rateSelect').val(),
-                    date: $('#assigned_date').val(),
-                    duration: format_duration($('#duration-hours').val(), $('#duration-mins').val()),
-                    notes: $('#notes').val()
-                });
-                rebuild_table_and_inputs();
-                $('#add-error').addClass('hidden');
-            } else {
-                $('#max-entries').removeClass('hidden');
-            }
+            num_entries = add_to_table(num_entries);
+            total_entries_single = total_entries_single + 1;
+            $('#add-error').addClass('hidden');
         }
     });
 
@@ -132,74 +68,16 @@ $(document).ready(function() {
         var key = e.which;
         if (key === 13) {
             if (validate_add()) {
-                if (entries.length < 15) {
-                    entries.push({
-                        wo: $('#workOrderSearch').val(),
-                        rate: $('#rateSelect').val(),
-                        date: $('#assigned_date').val(),
-                        duration: format_duration($('#duration-hours').val(), $('#duration-mins').val()),
-                        notes: $('#notes').val()
-                    });
-                    rebuild_table_and_inputs();
-                    $('#add-error').addClass('hidden');
-                } else {
-                    $('#max-entries').removeClass('hidden');
-                }
+                num_entries = add_to_table(num_entries);
+                total_entries_single = total_entries_single + 1;
+                $('#add-error').addClass('hidden');
             }
         }
-    });
+      });
 
     $('#single-input-table').on('click', '.delete_row', function() {
-        var idx = parseInt($(this).attr('id')) - 1;
-        if (idx >= 0 && idx < entries.length) {
-            entries.splice(idx, 1);
-            rebuild_table_and_inputs();
-        }
+        num_entries = delete_row($(this).attr('id'), num_entries);
     });
-// Helper to rebuild table and hidden inputs from entries array
-function rebuild_table_and_inputs() {
-    $('#single-input-table > tbody').empty();
-    $('#single-input-form input[type="text"][name$="_work_order"], #single-input-form input[type="text"][name$="_rate"], #single-input-form input[type="date"][name$="_assigned_date"], #single-input-form input[type="text"][name$="_duration"], #single-input-form input[type="text"][name$="_notes"]').remove();
-    for (var i = 0; i < entries.length; i++) {
-        var idx = i + 1;
-        var html = '<tr id="row-' + idx + '">' +
-            '<td>' + entries[i].wo + '</td>' +
-            '<td>' + (entries[i].rate || '') + '</td>' +
-            '<td>' + (entries[i].date || '') + '</td>' +
-            '<td id="row-' + idx + '-date">' + (entries[i].duration || '') + '</td>' +
-            '<td id="row-' + idx + '-notes">' + (entries[i].notes || '') + '</td>' +
-            '<td style="padding-right: 0px;" class="delete-col"><div style="float:right;">'+
-            '<button style="float: left;" class="btn btn-success" id="single-copy" onClick="copier(' + idx + ')" >Copy</button>' +
-            '<button style="float: right;" class="btn btn-danger delete_row" id="' + idx + '">Delete</button></div></td>' +
-            '</tr>';
-        $('#single-input-table > tbody:last-child').append(html);
-        var form_html = '<input type="text" name="' + idx + '_work_order" value="' + entries[i].wo + '" hidden>' +
-            '<input type="text" name="' + idx + '_rate" value="' + (entries[i].rate || '') + '" hidden>' +
-            '<input type="date" name="' + idx + '_assigned_date" value="' + (entries[i].date || '') + '" hidden>' +
-            '<input type="text" name="' + idx + '_duration" value="' + (entries[i].duration || '') + '" hidden>' +
-            '<input type="text" name="' + idx + '_notes" value="' + (entries[i].notes || '') + '" hidden>';
-        $('#single-input-form').append(form_html);
-    }
-    if (entries.length > 0) {
-        $("#single-input").show();
-    } else {
-        $("#single-input").hide();
-    }
-    $('#total-hours').text(calculate_duration());
-    // Reset all input values
-    $("#workOrderSearch").val(null).trigger('change');
-    $('#rateSelect').val('Regular');
-    $('#assigned_date').val('');
-    $('#duration-hours').val('');
-    $('#duration-mins').val('');
-    $('#notes').val('');
-    // Reset grayed out input fields
-    $('#rateSelect').attr('disabled', 'disabled');
-    $('#assigned_date').attr('readonly', 'readonly');
-    $('#duration-hours').attr('readonly', 'readonly');
-    $('#duration-mins').attr('readonly', 'readonly');
-    $('#notes').attr('readonly', 'readonly');
-}
 
     $('#techSelect').on('change', function(){
         full_selection = $(this).val().split('(');
@@ -231,12 +109,8 @@ function techid_to_wo() {
 
 // Transition from work order select to review/submit
 function wo_to_review() {
-    // Clear review tables to prevent duplication
-    $('#single-review').empty();
-    $('#tech-info-review').empty();
-    // Remove any previously appended hidden inputs to prevent duplication
-    $('#single-input-form input[type="text"][name$="_work_order"], #single-input-form input[type="text"][name$="_rate"], #single-input-form input[type="date"][name$="_assigned_date"], #single-input-form input[type="text"][name$="_duration"], #single-input-form input[type="text"][name$="_notes"]').remove();
-    // Re-append the current table and info
+    $('#single-review').html('');
+    $('#tech-info-review').html('');
     $('#single-review').append($("#single-input").html());
     $('#single-review tr').find('.delete-col').remove();
     $('#tech-info-review').append($("#tech-info-input").html());
@@ -252,75 +126,48 @@ function copier(num){
 
 // Add row to input table
 function add_to_table(num_entries) {
-    // Gather all current entries from hidden inputs
-    var rows = [];
-    var entry = 1;
-    while (true) {
-        var wo = $("input[name='" + entry + "_work_order']").val();
-        var rate = $("input[name='" + entry + "_rate']").val();
-        var date = $("input[name='" + entry + "_assigned_date']").val();
-        var duration = $("input[name='" + entry + "_duration']").val();
-        var notes = $("input[name='" + entry + "_notes']").val();
-        if (typeof wo === 'undefined') break;
-        if (wo !== 'Deleted') {
-            rows.push({wo: wo, rate: rate, date: date, duration: duration, notes: notes});
-        }
-        entry++;
-    }
-    // Add the new entry
-    if (rows.length < 15) {
-        rows.push({
-            wo: $('#workOrderSearch').val(),
-            rate: $('#rateSelect').val(),
-            date: $('#assigned_date').val(),
-            duration: format_duration($('#duration-hours').val(), $('#duration-mins').val()),
-            notes: $('#notes').val()
-        });
-    } else {
-        $('#max-entries').removeClass('hidden');
-        return rows.length;
-    }
-    // Rebuild table and hidden inputs
-    $('#single-input-table > tbody').empty();
-    $('#single-input-form input[type="text"][name$="_work_order"], #single-input-form input[type="text"][name$="_rate"], #single-input-form input[type="date"][name$="_assigned_date"], #single-input-form input[type="text"][name$="_duration"], #single-input-form input[type="text"][name$="_notes"]').remove();
-    for (var i = 0; i < rows.length; i++) {
-        var idx = i + 1;
-        var html = '<tr id="row-' + idx + '">' +
-            '<td>' + rows[i].wo + '</td>' +
-            '<td>' + (rows[i].rate || '') + '</td>' +
-            '<td>' + (rows[i].date || '') + '</td>' +
-            '<td id="row-' + idx + '-date">' + (rows[i].duration || '') + '</td>' +
-            '<td id="row-' + idx + '-notes">' + (rows[i].notes || '') + '</td>' +
-            '<td style="padding-right: 0px;" class="delete-col"><div style="float:right;">'+
-            '<button style="float: left;" class="btn btn-success" id="single-copy" onClick="copier(' + idx + ')" >Copy</button>' +
-            '<button style="float: right;" class="btn btn-danger delete_row" id="' + idx + '">Delete</button></div></td>' +
-            '</tr>';
-        $('#single-input-table > tbody:last-child').append(html);
-        var form_html = '<input type="text" name="' + idx + '_work_order" value="' + rows[i].wo + '" hidden>' +
-            '<input type="text" name="' + idx + '_rate" value="' + (rows[i].rate || '') + '" hidden>' +
-            '<input type="date" name="' + idx + '_assigned_date" value="' + (rows[i].date || '') + '" hidden>' +
-            '<input type="text" name="' + idx + '_duration" value="' + (rows[i].duration || '') + '" hidden>' +
-            '<input type="text" name="' + idx + '_notes" value="' + (rows[i].notes || '') + '" hidden>';
+    if (num_entries < 15) {
+        num_entries = num_entries + 1; 
+        var html = '<tr id="row-' + num_entries + '">' + 
+                        '<td>' + $('#workOrderSearch').val() + '</td>' +
+                        '<td>' + $('#rateSelect').val() + '</td>' +
+                        '<td>' + $('#assigned_date').val() + '</td>' +
+                        '<td id="row-' + num_entries + '-date" hour="' + $('#duration-hours').val() + 'minute="'+$('#duration-minute').val()+'">' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '</td>' +
+                        '<td id="row-' + num_entries + '-notes">' + $('#notes').val() + '</td>' +
+                        '<td style="padding-right: 0px;" class="delete-col"><div style="float:right;">'+
+                        '<button style="float: left;" class="btn btn-success" id="single-copy" onClick="copier('+num_entries+')" >Copy</button>' +
+                        '<button style="float: right;" class="btn btn-danger delete_row" id="' + num_entries + '">Delete</button></div></td>' +
+                    '</tr>';
+        var form_html = '<input type="text" name="' + num_entries + '_work_order" value="' + $('#workOrderSearch').val() + '" hidden>' +
+                        '<input type="text" name="' + num_entries + '_rate" value="' + $('#rateSelect').val() + '" hidden>' +
+                        '<input type="date" name="' + num_entries + '_assigned_date" value="' + $('#assigned_date').val() + '" hidden>' +
+                        '<input type="text" name="' + num_entries + '_duration" value="' + format_duration($('#duration-hours').val(), $('#duration-mins').val()) + '" hidden>' +
+                        '<input type="text" name="' + num_entries + '_notes" value="' + $('#notes').val() + '" hidden>';
         $('#single-input-form').append(form_html);
+        $('#single-input-table > tbody:last-child').append(html);
+        $("#single-input").show();
+
+        $('#total-hours').text(calculate_duration());
+
+        // Reset all input values
+        $("#workOrderSearch").val(null).trigger('change');
+        $('#rateSelect').val('Regular');
+        $('#assigned_date').val('');
+        $('#duration-hours').val('');
+        $('#duration-mins').val('');
+        $('#notes').val('');
+
+        // Reset grayed out input fields
+        $('#rateSelect').attr('disabled', 'disabled');
+        $('#assigned_date').attr('readonly', 'readonly');
+        $('#duration-hours').attr('readonly', 'readonly');
+        $('#duration-mins').attr('readonly', 'readonly');
+        $('#notes').attr('readonly', 'readonly');
     }
-    $("#single-input").show();
-    $('#total-hours').text(calculate_duration());
-    // Reset all input values
-    $("#workOrderSearch").val(null).trigger('change');
-    $('#rateSelect').val('Regular');
-    $('#assigned_date').val('');
-    $('#duration-hours').val('');
-    $('#duration-mins').val('');
-    $('#notes').val('');
-    // Reset grayed out input fields
-    $('#rateSelect').attr('disabled', 'disabled');
-    $('#assigned_date').attr('readonly', 'readonly');
-    $('#duration-hours').attr('readonly', 'readonly');
-    $('#duration-mins').attr('readonly', 'readonly');
-    $('#notes').attr('readonly', 'readonly');
-    num_entries = rows.length;
-    total_entries_single = rows.length;
-    return num_entries;
+    else {
+        $('#max-entries').removeClass('hidden');
+    }
+    return(num_entries);
 }
 
 // Format input date to HH:MM
@@ -342,51 +189,17 @@ function format_duration(hours, mins) {
 
 // Delete row in table
 function delete_row(row_num, num_entries) {
-    // Remove the row from the table and hidden inputs, then rebuild both
-    var rows = [];
-    var entry = 1;
-    while (true) {
-        var wo = $("input[name='" + entry + "_work_order']").val();
-        var rate = $("input[name='" + entry + "_rate']").val();
-        var date = $("input[name='" + entry + "_assigned_date']").val();
-        var duration = $("input[name='" + entry + "_duration']").val();
-        var notes = $("input[name='" + entry + "_notes']").val();
-        if (typeof wo === 'undefined') break;
-        if (entry != row_num && wo !== 'Deleted') {
-            rows.push({wo: wo, rate: rate, date: date, duration: duration, notes: notes});
-        }
-        entry++;
-    }
-    $('#single-input-table > tbody').empty();
-    $('#single-input-form input[type="text"][name$="_work_order"], #single-input-form input[type="text"][name$="_rate"], #single-input-form input[type="date"][name$="_assigned_date"], #single-input-form input[type="text"][name$="_duration"], #single-input-form input[type="text"][name$="_notes"]').remove();
-    for (var i = 0; i < rows.length; i++) {
-        var idx = i + 1;
-        var html = '<tr id="row-' + idx + '">' +
-            '<td>' + rows[i].wo + '</td>' +
-            '<td>' + (rows[i].rate || '') + '</td>' +
-            '<td>' + (rows[i].date || '') + '</td>' +
-            '<td id="row-' + idx + '-date">' + (rows[i].duration || '') + '</td>' +
-            '<td id="row-' + idx + '-notes">' + (rows[i].notes || '') + '</td>' +
-            '<td style="padding-right: 0px;" class="delete-col"><div style="float:right;">'+
-            '<button style="float: left;" class="btn btn-success" id="single-copy" onClick="copier(' + idx + ')" >Copy</button>' +
-            '<button style="float: right;" class="btn btn-danger delete_row" id="' + idx + '">Delete</button></div></td>' +
-            '</tr>';
-        $('#single-input-table > tbody:last-child').append(html);
-        var form_html = '<input type="text" name="' + idx + '_work_order" value="' + rows[i].wo + '" hidden>' +
-            '<input type="text" name="' + idx + '_rate" value="' + (rows[i].rate || '') + '" hidden>' +
-            '<input type="date" name="' + idx + '_assigned_date" value="' + (rows[i].date || '') + '" hidden>' +
-            '<input type="text" name="' + idx + '_duration" value="' + (rows[i].duration || '') + '" hidden>' +
-            '<input type="text" name="' + idx + '_notes" value="' + (rows[i].notes || '') + '" hidden>';
-        $('#single-input-form').append(form_html);
-    }
-    if (rows.length == 0) {
+    $('#row-' + row_num).remove();
+    //num_entries = num_entries - 1;
+    $('#max-entries').addClass('hidden');
+
+    $('[name="' + row_num + '_work_order"]').val('Deleted');
+
+    if (num_entries == 0) {
         $('#single-input').hide();
     }
-    $('#max-entries').addClass('hidden');
     $('#total-hours').text(calculate_duration());
-    num_entries = rows.length;
-    total_entries_single = rows.length;
-    return num_entries;
+    return(num_entries);
 }
 
 // Make sure user enters tech ID
@@ -498,17 +311,19 @@ function get_assigned_groups(techid) {
 function calculate_duration() {
     var hours = 0;
     var mins = 0;
-    for (var i = 0; i < entries.length; i++) {
-        var duration = entries[i].duration || '00:00';
-        var row_hours = split_duration(duration, 'hours');
-        var row_mins = split_duration(duration, 'mins');
-        hours += parseInt(row_hours);
-        mins += parseInt(row_mins);
-    }
+
+    $('#single-input-table tbody tr').each(function() {
+        var row = $(this);
+        var duration = row.find('td:nth-child(4)').text();
+        row_hours = split_duration(duration, 'hours');
+        row_mins = split_duration(duration, 'mins');
+
+        hours = hours + parseInt(row_hours);
+        mins = mins + parseInt(row_mins);
+    })
+
     hours = hours + Math.floor(mins / 60);
     mins = mins % 60;
 
     return format_duration(hours.toString(), mins.toString()); 
 }
-
-
