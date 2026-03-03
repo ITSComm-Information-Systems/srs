@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Clone Server</h1>
+
+<div class="mb-3">
+  <strong>Name:</strong> {{ server.name }}<br>
+  {{ server.os }}<br>
+  CPU: {{ server.cpu }}<br>
+  RAM: {{ server.ram }}<br>
+  Shortcode: {{ server.shortcode }}<br>
+  Owner: {{ server.owner.name }}<br>
+</div>
+
+<hr>
+
+<form method="post">
+  {% csrf_token %}
+  {{ formset.management_form }}
+
+  {% if formset.non_form_errors %}
+    <div class="alert alert-danger">
+      {% for err in formset.non_form_errors %}
+        <div>{{ err }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div id="clone-names">
+    {% for form in formset %}
+      <div class="row g-2 mb-2 clone-row">
+        <div class="col-md-6">
+          <input
+            type="text"
+            value="{{ prefix }}"
+            name="{{ form.name.html_name }}"
+            id="{{ form.name.id_for_label }}"
+            class="form-control{% if form.name.errors %} is-invalid{% endif %}"
+            placeholder="New server name"
+            hx-get="{% url 'server_name_check' %}"
+            hx-trigger="blur changed delay:400ms"
+            hx-target="next .validation"
+            hx-include="this"
+            autocomplete="off"
+            required
+          >
+          {% for err in form.name.errors %}
+            <div class="invalid-feedback d-block">{{ err }}</div>
+          {% endfor %}
+          <div class="validation"></div>
+        </div>
+
+        <div class="col-auto">
+          <button type="button"
+                  class="btn btn-outline-danger"
+                  onclick="removeRow(this)">
+            Remove
+          </button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <template id="empty-clone-row-template">
+    <div class="row g-2 mb-2 clone-row">
+      <div class="col-md-6">
+        <input
+          type="text"
+          value="{{ prefix }}"
+          name="{{ formset.empty_form.name.html_name }}"
+          id="{{ formset.empty_form.name.id_for_label }}"
+          class="form-control"
+          placeholder="New server name"
+          hx-get="{% url 'server_name_check' %}"
+          hx-trigger="blur changed delay:400ms"
+          hx-target="next .validation"
+          hx-include="this"
+          autocomplete="off"
+          required
+        >
+        <div class="validation"></div>
+      </div>
+
+      <div class="col-auto">
+        <button type="button"
+                class="btn btn-outline-danger"
+                onclick="removeRow(this)">
+          Remove
+        </button>
+      </div>
+    </div>
+  </template>
+
+  <button type="button"
+          class="btn btn-outline-secondary mb-3"
+          onclick="addRow()">
+    + Add another server
+  </button>
+
+  <div>
+    <button type="submit" class="btn btn-primary" id="submit-btn">
+    Submit
+    </button>
+
+    <a href=".." class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+
+<script>
+function syncFormIndexes() {
+  const container = document.getElementById('clone-names');
+  const rows = container.querySelectorAll('.clone-row');
+  const totalForms = document.getElementById('id_clone-TOTAL_FORMS');
+
+  rows.forEach((row, index) => {
+    const input = row.querySelector('input[type="text"]');
+    if (!input) return;
+    input.name = `clone-${index}-name`;
+    input.id = `id_clone-${index}-name`;
+  });
+
+  totalForms.value = rows.length;
+}
+
+function addRow() {
+  const container = document.getElementById('clone-names');
+  const template = document.getElementById('empty-clone-row-template');
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = template.innerHTML.trim();
+  const newRow = wrapper.firstElementChild;
+
+  const input = newRow.querySelector('input[type="text"]');
+  const validation = newRow.querySelector('.validation');
+  if (validation) validation.innerHTML = '';
+
+  container.appendChild(newRow);
+  syncFormIndexes();
+
+  if (window.htmx) htmx.process(newRow);
+  input.focus();
+}
+
+const prefix = "{{ prefix }}";
+
+document.addEventListener('input', function(e) {
+  if (!e.target.matches('#clone-names input[type="text"]')) return;
+
+  let val = e.target.value;
+
+  // If prefix missing or edited, restore it
+  if (!val.startsWith(prefix)) {
+    const suffix = val.replace(prefix, '').replace(/^-*/, '');
+    e.target.value = prefix + suffix;
+  }
+});
+
+function removeRow(btn) {
+  const container = document.getElementById('clone-names');
+  const rows = container.querySelectorAll('.clone-row');
+
+  // Keep at least one row
+  if (rows.length <= 1) {
+    const input = rows[0].querySelector('input[type="text"]');
+    input.value = "";
+    const validation = rows[0].querySelector('.validation');
+    if (validation) validation.innerHTML = "";
+    input.focus();
+    return;
+  }
+
+  btn.closest('.clone-row').remove();
+  syncFormIndexes();
+  updateSubmitState();
+}
+
+
+function updateSubmitState() {
+  const hasErrors = document.querySelector('.invalid-feedback');
+  const inputs = document.querySelectorAll('#clone-names input[type="text"]');
+
+  // require at least one non-empty name
+  const hasAtLeastOneName = Array.from(inputs).some(i => i.value.trim() !== "");
+
+  const submitBtn = document.getElementById('submit-btn');
+  submitBtn.disabled = !!hasErrors || !hasAtLeastOneName;
+}
+
+// Watch typing
+document.addEventListener('input', e => {
+  if (e.target.closest('#clone-names')) {
+    updateSubmitState();
+  }
+});
+
+// Watch HTMX validation responses
+document.body.addEventListener('htmx:afterSwap', updateSubmitState);
+
+// Initial state
+syncFormIndexes();
+updateSubmitState();
+
+</script>
+
+{% endblock %}

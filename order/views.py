@@ -14,7 +14,7 @@ from pages.models import Page
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from pages.models import Page
 from django.http import JsonResponse
-from project.integrations import create_ticket_server_delete
+from project.integrations import create_ticket_server_delete, create_ticket
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from ast import literal_eval
@@ -974,51 +974,138 @@ class DatabaseView(UserPassesTestMixin, View):
         }
         return HttpResponse(template.render(context, request))
 
+def _extract_server_name(params):
+    name = params.get("serverName[]", "").strip().lower()
+    if name:
+        return name
 
+    name = params.get("name", "").strip().lower()
+    if name:
+        return name
+
+    for key, value in params.items():
+        if key.endswith('-name'):
+            return value.strip().lower()
+
+    return ""
+
+def server_name_check(request):
+    """
+    HTMX endpoint to validate a proposed server name.
+    Returns an HTML fragment for inline feedback.
+    """
+    name = _extract_server_name(request.GET)
+
+    if not name:
+        return HttpResponse("")
+
+    # length check (DNS-safe)
+    if len(name) > 63:
+        return HttpResponse(
+            '<div class="invalid-feedback d-block">'
+            'Name must be 63 characters or fewer.'
+            '</div>'
+        )
+
+    # format check
+    if not CLONE_NAME_RE.match(name):
+        return HttpResponse(
+            '<div class="invalid-feedback d-block">'
+            'Name can contain letters, numbers, and single hyphens, '
+            'must start with a letter, and cannot end with a hyphen.'
+            '</div>'
+        )
+
+    # availability check (case-insensitive)
+    if Server.objects.filter(name__iexact=name).exists():
+        return HttpResponse(
+            '<div class="invalid-feedback d-block">'
+            'That name is already in use.'
+            '</div>'
+        )
+
+    # success
+    return HttpResponse(
+        '<div class="valid-feedback d-block">'
+        'Name is available.'
+        '</div>'
+    )
 class ServerView(UserPassesTestMixin, View):
+
+    def dispatch(self, request, *args, **kwargs):
+        self.server = get_object_or_404(Server, pk=kwargs["instance_id"])
+        return super().dispatch(request, *args, **kwargs)
 
     def test_func(self):
         username = self.request.user.username
-        instance_id = self.kwargs['instance_id']
-        #owner = Server.objects.get(id=instance_id).owner.name
-        instance = get_object_or_404(Server, pk=instance_id)
 
-        mc = MCommunity() 
-        mc.get_group(instance.owner.name)
+        mc = MCommunity()
+        mc.get_group(self.server.owner.name)
 
-        if username in mc.members:
-            return True
-        else:
-            return False
+        return username in mc.members
     
     def get(self, request, instance_id, action):
-        if action != 'delete':
-            raise Http404
 
         server = get_object_or_404(Server, pk=instance_id)
+        if server.name.startswith('db-'):
+            prefix = 'db-'
+        elif server.name.startswith('MIS-'):
+            prefix = 'MIS-'
+    
+        formset = None
 
-        template = loader.get_template('order/server_delete.html')
+        if action == 'delete':
+            template = loader.get_template('order/server_delete.html')
+            title = 'Delete Server'
+        elif action == 'clone':
+            template = loader.get_template('order/server_clone.html')
+            formset = CloneServerNameFormSet(prefix='clone')
+            title = 'Clone Server'
+        else:
+            raise Http404
+
         context = {
-            'title': 'Delete Server',
-            'server': server
+            'title': title,
+            'server': server,
+            'formset': formset,
+            'prefix': prefix,
         }
         return HttpResponse(template.render(context, request))
 
 
     def post(self, request, instance_id, action):
         instance = get_object_or_404(Server, pk=instance_id)
-        create_ticket_server_delete(instance, request.user, f'End Service for {instance.name}')
+        if action == 'delete':
+            create_ticket_server_delete(instance, request.user, f'End Service for {instance.name}')
 
-        current_time = datetime.datetime.now()
-        formatted_date = current_time.strftime('%Y%m%d')
-        suffix = "-Ended-" + formatted_date
-        instance.name = instance.name + suffix
+            current_time = datetime.datetime.now()
+            formatted_date = current_time.strftime('%Y%m%d')
+            suffix = "-Ended-" + formatted_date
+            instance.name = instance.name + suffix
 
+            instance.in_service = False
+            instance.save()
 
-        instance.in_service = False
-        instance.save()
+            return HttpResponseRedirect('/requestsent')
 
-        return HttpResponseRedirect('/requestsent') 
+        if action == 'clone':
+            formset = CloneServerNameFormSet(request.POST, prefix='clone')
+            if formset.is_valid():
+                for clone in formset.cleaned_data:
+                    new_server = instance.clone(clone['name'])
+                    create_ticket('New', new_server, request)
+
+                return HttpResponseRedirect('/requestsent')
+
+            template = loader.get_template('order/server_clone.html')
+            context = {
+                'title': 'Clone Server',
+                'server': instance,
+                'formset': formset,
+            }
+            return HttpResponse(template.render(context, request))
+
+        raise Http404
     
 
 class AddSMS(PermissionRequiredMixin, View):
