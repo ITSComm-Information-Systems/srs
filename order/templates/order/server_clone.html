@@ -32,9 +32,9 @@
         <div class="col-md-6">
           <input
             type="text"
+            value="{{ prefix }}"
             name="{{ form.name.html_name }}"
             id="{{ form.name.id_for_label }}"
-            value="{{ form.name.value|default_if_none:'' }}"
             class="form-control{% if form.name.errors %} is-invalid{% endif %}"
             placeholder="New server name"
             hx-get="{% url 'server_name_check' %}"
@@ -66,6 +66,7 @@
       <div class="col-md-6">
         <input
           type="text"
+          value="{{ prefix }}"
           name="{{ formset.empty_form.name.html_name }}"
           id="{{ formset.empty_form.name.id_for_label }}"
           class="form-control"
@@ -129,7 +130,6 @@ function addRow() {
   const newRow = wrapper.firstElementChild;
 
   const input = newRow.querySelector('input[type="text"]');
-  input.value = '';
   const validation = newRow.querySelector('.validation');
   if (validation) validation.innerHTML = '';
 
@@ -139,6 +139,20 @@ function addRow() {
   if (window.htmx) htmx.process(newRow);
   input.focus();
 }
+
+const prefix = "{{ prefix }}";
+
+document.addEventListener('input', function(e) {
+  if (!e.target.matches('#clone-names input[type="text"]')) return;
+
+  let val = e.target.value;
+
+  // If prefix missing or edited, restore it
+  if (!val.startsWith(prefix)) {
+    const suffix = val.replace(prefix, '').replace(/^-*/, '');
+    e.target.value = prefix + suffix;
+  }
+});
 
 function removeRow(btn) {
   const container = document.getElementById('clone-names');
