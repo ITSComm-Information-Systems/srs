@@ -852,7 +852,8 @@ class MiDesktopPayload(Payload):
         email = MCommunity().get_group_email(instance.owner.name)
         self.add_attribute(self.owner.id, instance.owner.name)
         self.add_attribute(self.group_email.id, email)
-        self.add_attribute(self.additional_details.id, self.form.cleaned_data.get('additional_details'))
+        if hasattr(self, 'form'):
+            self.add_attribute(self.additional_details.id, self.form.cleaned_data.get('additional_details'))
         if self.description == '':
             self.description = render_to_string(self.template, self.context)
 
