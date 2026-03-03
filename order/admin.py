@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from django import forms
 from django.core.exceptions import ValidationError
 from project.integrations import MCommunity
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.template import loader
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
@@ -147,10 +147,13 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
         return download_url + urls
 
     def download_csv(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponseForbidden("Authentication required")
 
-        if hasattr(self, 'csv_query') and request.path.startswith('/admin/'):
-            recs = get_query_result(self.csv_query)
-            return download_csv_from_queryset(recs, file_name=self.model.__name__)
+        if hasattr(self, 'csv_query'):
+            if request.user.has_perm(f"{self.model._meta.app_label}.view_{self.model._meta.model_name}"):
+                recs = get_query_result(self.csv_query)
+                return download_csv_from_queryset(recs, file_name=self.model.__name__)
 
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(content_type='text/csv')
