@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/token/', views.TokenView.as_view()),
     path('api/bommaterial/', api.BomMaterialView.as_view()),
     path('api/tollupload/', api.TollUploadView.as_view()),
+    path('api/csupload/', api.ContainerServicesBillingUploadView.as_view()),
     path('admin/', admin.site.urls),
     path('reports/',include('reports.urls')),
     path('uniqname/', views.get_uniqname),
