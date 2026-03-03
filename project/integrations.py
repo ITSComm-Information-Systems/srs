@@ -835,6 +835,12 @@ class ServerPayload(Payload):
                     value = value.label
 
                 self.add_attribute(attr.id, value)
+        
+        disk_descr = "\n".join(
+            f"{disk.name} - {disk.size} GB"
+            for disk in instance.disks.all())
+        
+        self.add_attribute(self.disk.id, disk_descr)
 
 
 class MiDesktopPayload(Payload):
