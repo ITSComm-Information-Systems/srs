@@ -1022,6 +1022,11 @@ class ServerView(UserPassesTestMixin, View):
     def get(self, request, instance_id, action):
 
         server = get_object_or_404(Server, pk=instance_id)
+        if server.name.startswith('db-'):
+            prefix = 'db-'
+        elif server.name.startswith('MIS-'):
+            prefix = 'MIS-'
+    
         formset = None
 
         if action == 'delete':
@@ -1038,6 +1043,7 @@ class ServerView(UserPassesTestMixin, View):
             'title': title,
             'server': server,
             'formset': formset,
+            'prefix': prefix,
         }
         return HttpResponse(template.render(context, request))
 
