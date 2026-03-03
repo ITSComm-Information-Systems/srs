@@ -1049,6 +1049,8 @@ class ServerView(UserPassesTestMixin, View):
             prefix = 'db-'
         elif server.name.startswith('MIS-'):
             prefix = 'MIS-'
+        else:
+            prefix = ''
     
         formset = None
 
