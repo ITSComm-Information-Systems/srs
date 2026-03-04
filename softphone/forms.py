@@ -1,6 +1,6 @@
 import datetime
 from django import forms
-from .models import Category, Selection
+from .models import Category, Selection, WolfResponse
 from project.forms.fields import Uniqname
 from project.models import Choice
 
@@ -126,3 +126,16 @@ class LocationForm(forms.Form):
         selection.new_jack = self.cleaned_data.get('jack')
         selection.location_correct = 0
         selection.save()
+
+
+class WolfSelectionForm(forms.ModelForm):  
+
+    REQUIRED = 'This field is required.'
+
+
+
+    class Meta:
+        model = WolfResponse
+        #fields = ['subscriber', 'category', 'other_category', 'uniqname', 'uniqname_correct', 'migrate', 'notes', 'location_correct']
+        exclude = ['id','update_date','updated_by']
+        

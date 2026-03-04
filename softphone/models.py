@@ -365,3 +365,159 @@ class ZoomToken(models.Model):
     class Meta:
         db_table = 'PINN_CUSTOM\".\"um_zoom_token'
         managed = False
+
+
+class WolfLocation(models.Model):
+    svc_sub_loc_id = models.FloatField()
+    assign_start_date = models.DateField()
+    assign_end_date = models.DateField(blank=True, null=True)
+    rating_start_date = models.DateField(blank=True, null=True)
+    rating_end_date = models.DateField(blank=True, null=True)
+    service_id = models.FloatField()
+    directory_listing = models.BooleanField()
+    service_number = models.CharField(max_length=60)
+    private_number = models.CharField(max_length=60)
+    service_status_code = models.CharField(max_length=15)
+    service_status_id = models.IntegerField(blank=True, null=True)
+    service_type_id = models.IntegerField()
+    service_type_code = models.CharField(max_length=20)
+    service_category_name = models.CharField(max_length=20, blank=True, null=True)
+    svc_chars_format_id = models.BooleanField()
+    wo_number_display = models.CharField(max_length=98, blank=True, null=True)
+    alert_id = models.FloatField(blank=True, null=True)
+    alert_name = models.CharField(max_length=50, blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    switch_status = models.CharField(max_length=15, blank=True, null=True)
+    switch_id = models.FloatField(blank=True, null=True)
+    switch_name = models.CharField(max_length=30, blank=True, null=True)
+    switch_type_id = models.IntegerField(blank=True, null=True)
+    switch_type_code = models.CharField(max_length=20, blank=True, null=True)
+    service_class_code = models.CharField(max_length=5, blank=True, null=True)
+    switch_address = models.CharField(max_length=40, blank=True, null=True)
+    multi_single_code = models.CharField(max_length=1, blank=True, null=True)
+    multi_single_name = models.CharField(max_length=60, blank=True, null=True)
+    prim_secn_mdn_code = models.CharField(max_length=1, blank=True, null=True)
+    prim_secn_mdn_name = models.CharField(max_length=60, blank=True, null=True)
+    analog_digital_code = models.CharField(max_length=1, blank=True, null=True)
+    analog_digital_name = models.CharField(max_length=60, blank=True, null=True)
+    e911_class_of_svc_code = models.CharField(max_length=1, blank=True, null=True)
+    e911_class_of_svc_name = models.CharField(max_length=60, blank=True, null=True)
+    e911_type_of_svc_code = models.CharField(max_length=1, blank=True, null=True)
+    e911_type_of_svc_name = models.CharField(max_length=60, blank=True, null=True)
+    location_id = models.FloatField()
+    address_line_1 = models.CharField(max_length=255, blank=True, null=True)
+    address_line_2 = models.CharField(max_length=255, blank=True, null=True)
+    address_line_3 = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=50, blank=True, null=True)
+    state = models.CharField(max_length=2, blank=True, null=True)
+    zip_code = models.CharField(max_length=5, blank=True, null=True)
+    country_id = models.FloatField(blank=True, null=True)
+    country_code = models.CharField(max_length=20, blank=True, null=True)
+    country_name = models.CharField(max_length=50, blank=True, null=True)
+    building_id = models.IntegerField(blank=True, null=True)
+    building_code = models.CharField(max_length=10, blank=True, null=True)
+    building_name = models.CharField(max_length=25, blank=True, null=True)
+    floor_name = models.CharField(max_length=18, blank=True, null=True)
+    room_name = models.CharField(max_length=18, blank=True, null=True)
+    jack_name = models.CharField(max_length=30, blank=True, null=True)
+    demarcation = models.CharField(max_length=250, blank=True, null=True)
+    circuit_primary = models.BooleanField(blank=True, null=True)
+    cable_path_id = models.FloatField(blank=True, null=True)
+    primary_loc_flag = models.BooleanField(blank=True, null=True)
+    location_display = models.CharField(max_length=114, blank=True, null=True)
+    list_display_name = models.CharField(max_length=104, blank=True, null=True)
+    form_display_name = models.CharField(max_length=103, blank=True, null=True)
+    subscriber_id = models.CharField(max_length=7)
+    first_name = models.CharField(max_length=50, blank=True, null=True)
+    mi = models.CharField(max_length=1, blank=True, null=True)
+    last_name = models.CharField(max_length=50, blank=True, null=True)
+    email_address = models.CharField(max_length=320, blank=True, null=True)
+    subscriber_status_id = models.FloatField(blank=True, null=True)
+    subscriber_status_code = models.CharField(max_length=20, blank=True, null=True)
+    subscriber_group_id = models.FloatField(blank=True, null=True)
+    subscriber_group_name = models.CharField(max_length=20)
+    directory_area_code = models.CharField(max_length=3, blank=True, null=True)
+    directory_exchange = models.CharField(max_length=3, blank=True, null=True)
+    directory_extension = models.CharField(max_length=4, blank=True, null=True)
+    subscriber_title = models.CharField(max_length=100, blank=True, null=True)
+    billing_cycle_id = models.FloatField(blank=True, null=True)
+    billing_cycle_code = models.CharField(max_length=2)
+    billing_cycle_name = models.CharField(max_length=25, blank=True, null=True)
+    department_id = models.IntegerField(blank=True, null=True)
+    department_number = models.CharField(max_length=15, blank=True, null=True)
+    department_name = models.CharField(max_length=50, blank=True, null=True)
+    user_defined_id = models.CharField(max_length=20, blank=True, null=True)
+    active = models.BooleanField(blank=True, null=True)
+    hierarchy_level_id = models.IntegerField(blank=True, null=True)
+    hierarchy_level_code = models.CharField(max_length=50, blank=True, null=True)
+    hierarchy_level_name = models.CharField(max_length=100, blank=True, null=True)
+    hierarchy_path = models.CharField(max_length=4000, blank=True, null=True)
+    hierarchy_level_label_1 = models.CharField(max_length=4000, blank=True, null=True)
+    hierarchy_level1_id = models.FloatField(blank=True, null=True)
+    hierarchy_level1_code = models.CharField(max_length=50, blank=True, null=True)
+    hierarchy_level1_name = models.CharField(max_length=100, blank=True, null=True)
+    hierarchy_level_label_2 = models.CharField(max_length=4000, blank=True, null=True)
+    hierarchy_level2_id = models.FloatField(blank=True, null=True)
+    hierarchy_level2_code = models.CharField(max_length=50, blank=True, null=True)
+    hierarchy_level2_name = models.CharField(max_length=100, blank=True, null=True)
+    hierarchy_level_label_3 = models.CharField(max_length=4000, blank=True, null=True)
+    hierarchy_level3_id = models.FloatField(blank=True, null=True)
+    hierarchy_level3_code = models.CharField(max_length=50, blank=True, null=True)
+    hierarchy_level3_name = models.CharField(max_length=100, blank=True, null=True)
+    hierarchy_level_label_4 = models.CharField(max_length=4000, blank=True, null=True)
+    hierarchy_level4_id = models.FloatField(blank=True, null=True)
+    hierarchy_level4_code = models.CharField(max_length=50, blank=True, null=True)
+    hierarchy_level4_name = models.CharField(max_length=100, blank=True, null=True)
+    hierarchy_level_label_5 = models.CharField(max_length=4000, blank=True, null=True)
+    hierarchy_level5_id = models.FloatField(blank=True, null=True)
+    hierarchy_level5_code = models.CharField(max_length=50, blank=True, null=True)
+    hierarchy_level5_name = models.CharField(max_length=100, blank=True, null=True)
+    service_subscrib_id = models.FloatField()
+    add_info_row_defn_id = models.IntegerField()
+    add_info_values_id = models.IntegerField()
+    link_all_subscribers = models.BooleanField(blank=True, null=True)
+    special_action_code = models.CharField(max_length=100, blank=True, null=True)
+    last_update_date = models.DateField(blank=True, null=True)
+    move_feat_items = models.BooleanField(blank=True, null=True)
+    move_inventory = models.BooleanField(blank=True, null=True)
+    move_svc_chars = models.BooleanField(blank=True, null=True)
+    e911_prim_loc_id = models.FloatField(blank=True, null=True)
+    select_first_location = models.BooleanField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'softphone_wolf_snapshot'
+
+
+
+class WolfResponse(models.Model):
+
+    class Action(models.TextChoices):
+        DISCONNECT = "DISCONNECT", "Disconnect"
+        SOFTPHONE_USER = "SOFTPHONE_USER", "Softphone with User"
+        DESKPHONE_USER = "DESKPHONE_USER", "Deskphone with User"
+        DESKPHONE_COMMON = "DESKPHONE_COMMON", "Deskphone Common Area"
+        KEEP_ANALOG = "KEEP_ANALOG", "Keep line analog (Alarm, fax, modem)"
+
+    uniqname = models.CharField(max_length=30)
+
+    category = models.ForeignKey(
+        Category,
+        null=True,
+        limit_choices_to={'sequence__isnull': False},
+        on_delete=models.CASCADE
+    )
+
+    location = models.OneToOneField(
+        WolfLocation,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+
+    action = models.CharField(
+        max_length=25,
+        choices=Action.choices,
+        null=True,
+        blank=True,
+    )
