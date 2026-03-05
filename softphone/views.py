@@ -1,5 +1,6 @@
 from django.http import HttpResponseRedirect 
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View
@@ -12,7 +13,7 @@ from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
 from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV, UmOscAvailableLocsV
 from project.models import Choice
-from project.utils import download_csv_from_queryset
+from project.utils import download_csv_from_queryset, get_query_result
 from pages.models import Page
 from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date, WolfResponse
 from .forms import SelectionForm, OptOutForm, LocationForm, WolfSelectionForm
@@ -432,11 +433,37 @@ def download_csv(request, dept_id):
 
 
 # Wolf
+def wolf_redirect(request):
+    dept_list = get_wolf_dept_list(request.user)
+    dept = max(dept_list, key=lambda x: x['phone_lines'])
+    dept_id = dept['department_number']
+
+    return redirect(reverse("wolf", kwargs={"dept_id": dept_id}))
+
+
+
+def get_wolf_dept_list(user):
+
+    sql = '''
+            SELECT count(*) as phone_lines, snap.DEPARTMENT_NUMBER , snap.DEPARTMENT_NAME
+            FROM SRS_SOFTPHONE_WOLFRESPONSE resp
+            LEFT JOIN SRS_SOFTPHONE_WOLF_SNAPSHOT snap
+            ON snap.id = resp.LOCATION_ID 
+            LEFT JOIN srs_department_security_v sec
+            ON sec.deptid = snap.DEPARTMENT_NUMBER 
+            WHERE sec.USERNAME = %s
+              AND resp.action IS NULL
+            GROUP BY snap.DEPARTMENT_NUMBER, snap.DEPARTMENT_NAME
+            ORDER BY snap.DEPARTMENT_NUMBER
+    '''
+
+    queryset = get_query_result(sql, (user.username,))
+
+    return queryset
 
 class WolfSubscribers(LoginRequiredMixin, View):
 
     def post(self, request, dept_id):
-        print(request.POST)
         target_page = request.POST.get('target_page')
         target_card = request.POST.get('target_card','')
 
@@ -456,16 +483,29 @@ class WolfSubscribers(LoginRequiredMixin, View):
             return HttpResponseRedirect('details/')
 
     def get(self, request, dept_id):
+
+        dept_list = get_wolf_dept_list(request.user)
+
+        if not dept_list:
+            return render(request, 'softphone/wolf_subscribers.html',
+                {'title': 'Softphone',
+                'dept_id': dept_id})
+
+        if not any(d['department_number'] == dept_id for d in dept_list):
+            dept = max(dept_list, key=lambda x: x['phone_lines'])
+            dept_id = dept['department_number']
+
         if not request.GET.get('page'):
             request.session['softphone_selection'] = {}
 
         page_number = request.GET.get('page', 1)
-        full_list = WolfResponse.objects.filter(location__department_number='450000')
+        full_list = WolfResponse.objects.filter(location__department_number=dept_id, action__isnull=True).order_by('service_number')
 
         paginator = Paginator(full_list, 50)
         phone_list = paginator.page(page_number)
 
-        dept_list = get_department_list(dept_id, request.user)
+        #dept_list = get_department_list(dept_id, request.user)
+        print(dept_list)
         if hasattr(dept_list, 'access_error'):
             if not request.user.is_superuser:
                 return render(request, 'softphone/step_subscribers.html',
@@ -541,10 +581,10 @@ class WolfDetails(View):
 
 
         page = request.session.get('softphone_page')
-        location_ids = [
-            value for key, value in request.POST.items() if key.endswith('-location')
+        service_numbers = [
+            value for key, value in request.POST.items() if key.endswith('-service_number')
         ]
-        phone_list = WolfResponse.objects.filter(location_id__in=location_ids)
+        phone_list = WolfResponse.objects.filter(service_number__in=service_numbers)
 
         SelectionFormSet = modelformset_factory(
             WolfResponse,

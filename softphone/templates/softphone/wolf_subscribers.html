@@ -8,8 +8,11 @@
 
     <div class='container'>
 
-        <h1>Telephone Upgrade Request Form</h1>
-
+        <h1>WOLF - Telephone List</h1>
+        <div class="text-muted small">
+            Data as of March 4, 2026
+        </div>
+        <br>
         <div>
             <div class="d-inline">
                 <label for="deptf">
@@ -22,18 +25,14 @@
                     {% endif %}
 
                     {% for dept in dept_list %}
-                    <option {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.dept_id }} - {{ dept.dept_name }}</option>
+                    <option {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.department_number }} - {{ dept.department_name }}</option>
+                    {% empty %}
+                    <option>No Departements Found</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="d-inline">Status:</div>
             <div class="d-inline-block align-middle">
-                {% if selections_made == 0 %}
-                0 Telephone Lines Submitted
-                {% else %}
-                <a href="/softphone/wolf/{{ dept_id }}/selections/"> {{ selections_made }} Telephone Lines Submitted</a>
-                {% endif %}
-                <br>
                 {{ phone_list.paginator.count }} Telephone Lines Remaining
             </div>
 
@@ -253,6 +252,7 @@
         });
 
         $("#deptf").change(function () {
+            console.log('redirect' + this.value)
             window.location.href = "/softphone/wolf/" + this.value + "/";
         });
 

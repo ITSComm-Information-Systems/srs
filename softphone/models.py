@@ -492,7 +492,6 @@ class WolfLocation(models.Model):
 
 
 class WolfResponse(models.Model):
-
     class Action(models.TextChoices):
         DISCONNECT = "DISCONNECT", "Disconnect"
         SOFTPHONE_USER = "SOFTPHONE_USER", "Softphone with User"
@@ -500,19 +499,14 @@ class WolfResponse(models.Model):
         DESKPHONE_COMMON = "DESKPHONE_COMMON", "Deskphone Common Area"
         KEEP_ANALOG = "KEEP_ANALOG", "Keep line analog (Alarm, fax, modem)"
 
-    uniqname = models.CharField(max_length=30)
-
-    category = models.ForeignKey(
-        Category,
-        null=True,
-        limit_choices_to={'sequence__isnull': False},
-        on_delete=models.CASCADE
-    )
+    service_number = models.CharField(max_length=10, primary_key=True)
 
     location = models.OneToOneField(
         WolfLocation,
         on_delete=models.CASCADE,
-        primary_key=True,
+        null=True,
+        blank=True,
+        related_name="response"
     )
 
     action = models.CharField(
@@ -520,4 +514,14 @@ class WolfResponse(models.Model):
         choices=Action.choices,
         null=True,
         blank=True,
+    )
+
+    uniqname = models.CharField(max_length=30)
+
+    category = models.ForeignKey(
+        Category,
+        null=True,
+        blank=True,
+        limit_choices_to={'sequence__isnull': False},
+        on_delete=models.CASCADE
     )
