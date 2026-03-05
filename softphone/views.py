@@ -1,21 +1,22 @@
 from django.http import HttpResponseRedirect 
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.forms import formset_factory
+from django.forms import formset_factory, modelformset_factory
 
 import datetime
 from django.forms import formset_factory
 from oscauth.models import AuthUserDept, AuthUserDeptV
 from project.pinnmodels import UmMpathDwCurrDepartment, UmOSCBuildingV, UmOscAvailableLocsV
 from project.models import Choice
-from project.utils import download_csv_from_queryset
+from project.utils import download_csv_from_queryset, get_query_result
 from pages.models import Page
-from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date
-from .forms import SelectionForm, OptOutForm, LocationForm
+from .models import SubscriberCharges, Selection, SelectionV, DeptV, Ambassador, CutDate, next_cut_date, WolfResponse
+from .forms import SelectionForm, OptOutForm, LocationForm, WolfSelectionForm
 from django.contrib.auth.decorators import login_required, permission_required
 
 
@@ -430,3 +431,185 @@ def download_csv(request, dept_id):
     qs = SelectionV.objects.filter(dept_id=dept_id).order_by('-update_date','service_number')
     return download_csv_from_queryset(qs, file_name=f'dept_{dept_id}')
 
+
+# Wolf
+def wolf_redirect(request):
+    dept_list = get_wolf_dept_list(request.user)
+    dept = max(dept_list, key=lambda x: x['phone_lines'])
+    dept_id = dept['department_number']
+
+    return redirect(reverse("wolf", kwargs={"dept_id": dept_id}))
+
+
+
+def get_wolf_dept_list(user):
+
+    sql = '''
+            SELECT count(*) as phone_lines, snap.DEPARTMENT_NUMBER , snap.DEPARTMENT_NAME
+            FROM SRS_SOFTPHONE_WOLFRESPONSE resp
+            LEFT JOIN SRS_SOFTPHONE_WOLF_SNAPSHOT snap
+            ON snap.id = resp.LOCATION_ID 
+            LEFT JOIN srs_department_security_v sec
+            ON sec.deptid = snap.DEPARTMENT_NUMBER 
+            WHERE sec.USERNAME = %s
+              AND resp.action IS NULL
+            GROUP BY snap.DEPARTMENT_NUMBER, snap.DEPARTMENT_NAME
+            ORDER BY snap.DEPARTMENT_NUMBER
+    '''
+
+    queryset = get_query_result(sql, (user.username,))
+
+    return queryset
+
+class WolfSubscribers(LoginRequiredMixin, View):
+
+    def post(self, request, dept_id):
+        target_page = request.POST.get('target_page')
+        target_card = request.POST.get('target_card','')
+
+        subscribers = self.request.POST.getlist('id')
+        page = request.GET.get('page', 1)
+
+        selections = request.session.get('softphone_selection')
+        if not selections:
+            request.session['softphone_selection'] = {}
+
+        request.session['softphone_selection'].update({page: subscribers})
+        request.session['softphone_page'] = request.GET.get('page', 1)
+
+        if target_page:
+            return HttpResponseRedirect(f'?page={ target_page }{target_card}')   
+        else:
+            return HttpResponseRedirect('details/')
+
+    def get(self, request, dept_id):
+
+        dept_list = get_wolf_dept_list(request.user)
+
+        if not dept_list:
+            return render(request, 'softphone/wolf_subscribers.html',
+                {'title': 'Softphone',
+                'dept_id': dept_id})
+
+        if not any(d['department_number'] == dept_id for d in dept_list):
+            dept = max(dept_list, key=lambda x: x['phone_lines'])
+            dept_id = dept['department_number']
+
+        if not request.GET.get('page'):
+            request.session['softphone_selection'] = {}
+
+        page_number = request.GET.get('page', 1)
+        full_list = WolfResponse.objects.filter(location__department_number=dept_id, action__isnull=True).order_by('service_number')
+
+        paginator = Paginator(full_list, 50)
+        phone_list = paginator.page(page_number)
+
+        #dept_list = get_department_list(dept_id, request.user)
+        print(dept_list)
+        if hasattr(dept_list, 'access_error'):
+            if not request.user.is_superuser:
+                return render(request, 'softphone/step_subscribers.html',
+                        {'title': 'Softphone',
+                        'dept_list': dept_list,
+                        'dept_id': dept_id})
+
+        cards_selected = 0
+        selections = request.session.get('softphone_selection')
+        if selections:
+            for key, value in selections.items():
+                if key == page_number:   # Mark selections for current page
+                    for phone in phone_list:
+                        if phone['subscriber'] in value:
+                            phone['checked'] ='checked'
+                else:
+                    cards_selected = cards_selected + len(value)
+
+        return render(request, 'softphone/wolf_subscribers.html',
+                      {'title': 'Softphone',
+                       'selections_made': Selection.objects.selections_made(dept_id=dept_id),
+                       'cards_selected': cards_selected,
+                       'phone_list': phone_list,
+                       'full_list': full_list,
+                       'dept_list': dept_list,
+                       'dept_id': dept_id})
+
+
+class WolfDetails(View):
+
+    def get(self, request, dept_id):
+
+        phones_selected = set()
+        for page in request.session['softphone_selection'].values():
+            phones_selected.update(page)
+
+        print(phones_selected)
+
+        page = request.session['softphone_page']
+        phone_list = WolfResponse.objects.filter(location_id__in=phones_selected)
+
+        SelectionFormSet = modelformset_factory(
+            WolfResponse,
+            form=WolfSelectionForm,
+            extra=0
+        )
+        selection_formset = SelectionFormSet(queryset=phone_list)
+
+        return render(request, 'softphone/wolf_details.html',
+                      {'title': 'Softphone',
+                       'selection_formset': selection_formset,
+                       'selections_made': Selection.objects.selections_made(dept_id=dept_id),
+                       'phone_list': phone_list,
+                       'page': page,
+                       'dept_id': dept_id})
+
+    def post(self, request, dept_id):
+
+        phones_selected = []
+        for key, value in self.request.POST.items():  # Deal with deleted forms
+            if key.endswith('subscriber'):
+                phones_selected.append(value)
+
+        target_page = self.request.POST.get('target_page')
+        if target_page:  # Back Button - clear removed selections
+            for page, subs in request.session['softphone_selection'].items():
+                for subscriber in subs:
+                    if subscriber not in phones_selected:
+                        request.session['softphone_selection'][page].remove(subscriber)
+                        request.session.modified = True       
+
+            return HttpResponseRedirect(target_page)
+
+
+        page = request.session.get('softphone_page')
+        service_numbers = [
+            value for key, value in request.POST.items() if key.endswith('-service_number')
+        ]
+        phone_list = WolfResponse.objects.filter(service_number__in=service_numbers)
+
+        SelectionFormSet = modelformset_factory(
+            WolfResponse,
+            form=WolfSelectionForm,
+            extra=0,
+        )
+        selection_formset = SelectionFormSet(request.POST, queryset=phone_list)
+
+        selections_errored = 0
+        selections_saved = 0
+
+        if selection_formset.is_valid():
+            selection_formset.save()
+
+            request.session['softphone_selection'] = {}
+            return HttpResponseRedirect(f'/softphone/dept/{dept_id}/confirmation/')
+        else:
+            print('invalid', selection_formset.errors)
+
+        return render(request, 'softphone/wolf_details.html',
+                    {'title': 'Softphone',
+                    'selection_formset': selection_formset,
+                    'selections_made': Selection.objects.selections_made(dept_id=dept_id),
+                    'selections_saved': selections_saved,
+                    'selections_errored': selections_errored,
+                    'phone_list': phone_list,
+                    'page': page,
+                    'dept_id': dept_id})

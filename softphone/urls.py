@@ -3,6 +3,9 @@ from . import views
 
 urlpatterns = [
     path('help', views.get_help),
+    path('wolf/<int:dept_id>/', views.WolfSubscribers.as_view(), name='wolf'),
+    path('wolf/<int:dept_id>/details/', views.WolfDetails.as_view(), name='details'),
+    re_path(r'^wolf.*$', views.wolf_redirect),
     path('pause/<str:uniqname>', views.PauseUser.as_view(), name='pause_user'),
     path('pause', views.PauseUser.as_view(), name='pause_user'),
     path('location', views.LocationChange.as_view(), name='location'),
