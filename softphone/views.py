@@ -486,7 +486,6 @@ class WolfSubscribers(LoginRequiredMixin, View):
             return HttpResponseRedirect('details/')
 
     def get(self, request, dept_id):
-
         dept_list = get_wolf_dept_list(request.user)
 
         if not dept_list:
@@ -507,8 +506,6 @@ class WolfSubscribers(LoginRequiredMixin, View):
         paginator = Paginator(full_list, 50)
         phone_list = paginator.page(page_number)
 
-        #dept_list = get_department_list(dept_id, request.user)
-        print(dept_list)
         if hasattr(dept_list, 'access_error'):
             if not request.user.is_superuser:
                 return render(request, 'softphone/step_subscribers.html',
