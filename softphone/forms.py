@@ -1,6 +1,6 @@
 import datetime
 from django import forms
-from .models import Category, Selection
+from .models import Category, Selection, WolfResponse
 from project.forms.fields import Uniqname
 from project.models import Choice
 
@@ -126,3 +126,32 @@ class LocationForm(forms.Form):
         selection.new_jack = self.cleaned_data.get('jack')
         selection.location_correct = 0
         selection.save()
+
+
+class WolfSelectionForm(forms.ModelForm):
+
+    class Meta:
+        model = WolfResponse
+        exclude = ['id','update_date','updated_by']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].required = False
+        self.fields['uniqname'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        action = cleaned_data.get("action")
+        uniqname = cleaned_data.get("uniqname")
+        category = cleaned_data.get("category")
+
+        if action != "DISCONNECT":
+            if not category:
+                self.add_error("category", "This field is required.")
+
+        if action in ('SOFTPHONE_USER', 'DESKPHONE_USER'):
+            if not uniqname:
+                self.add_error("uniqname", "This field is required.")
+
+        return cleaned_data
