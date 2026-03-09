@@ -435,8 +435,11 @@ def download_csv(request, dept_id):
 # Wolf
 def wolf_redirect(request):
     dept_list = get_wolf_dept_list(request.user)
-    dept = max(dept_list, key=lambda x: x['phone_lines'])
-    dept_id = dept['department_number']
+    dept_id = 0
+
+    if dept_list:
+        dept = max(dept_list, key=lambda x: x['phone_lines'])
+        dept_id = dept['department_number']
 
     return redirect(reverse("wolf", kwargs={"dept_id": dept_id}))
 
