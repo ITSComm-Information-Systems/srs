@@ -486,7 +486,6 @@ class WolfSubscribers(LoginRequiredMixin, View):
             return HttpResponseRedirect('details/')
 
     def get(self, request, dept_id):
-
         dept_list = get_wolf_dept_list(request.user)
 
         if not dept_list:
@@ -507,8 +506,6 @@ class WolfSubscribers(LoginRequiredMixin, View):
         paginator = Paginator(full_list, 50)
         phone_list = paginator.page(page_number)
 
-        #dept_list = get_department_list(dept_id, request.user)
-        print(dept_list)
         if hasattr(dept_list, 'access_error'):
             if not request.user.is_superuser:
                 return render(request, 'softphone/step_subscribers.html',
@@ -529,7 +526,7 @@ class WolfSubscribers(LoginRequiredMixin, View):
 
         return render(request, 'softphone/wolf_subscribers.html',
                       {'title': 'Softphone',
-                       'selections_made': Selection.objects.selections_made(dept_id=dept_id),
+                       'selections_made': WolfResponse.objects.filter(location__department_number=dept_id, action__isnull=False).order_by('service_number').count(),
                        'cards_selected': cards_selected,
                        'phone_list': phone_list,
                        'full_list': full_list,
@@ -600,7 +597,8 @@ class WolfDetails(View):
         selections_saved = 0
 
         if selection_formset.is_valid():
-            selection_formset.save()
+            for form in selection_formset:
+                form.save(request.user.username)
 
             request.session['softphone_selection'] = {}
             return HttpResponseRedirect(f'/softphone/dept/{dept_id}/confirmation/')

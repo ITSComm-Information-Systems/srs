@@ -155,3 +155,13 @@ class WolfSelectionForm(forms.ModelForm):
                 self.add_error("uniqname", "This field is required.")
 
         return cleaned_data
+
+    def save(self, username, commit=True):
+        obj = super().save(commit=False)
+        obj.submitted_by = username
+        obj.submitted_at = datetime.datetime.now()
+
+        if commit:
+            obj.save()
+
+        return obj

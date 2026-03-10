@@ -50,7 +50,13 @@
     </ul>
 </div>
 
-
+        <div class="alert alert-warning text-center mb-4 container" role="alert">
+            <strong>Action Required:</strong>
+            Complete all lines by <strong>Wednesday, March 25, 2026</strong>. 
+            Any unused or low-volume telephone lines that are not identified to be disconnected or migrated 
+            will be automatically disabled and moved into a <strong>maintenance hold</strong>. 
+            Lines in a maintenance hold cannot receive calls but will still be billed for.
+        </div>
 
 <form id="card-deck" method="post">
     <div class='container-fluid'>
@@ -74,7 +80,7 @@
                     <div class="col-sm">
                         <strong>Phone</strong><br>
                         {{ phone.service_number}}<br>
-                        Uniqname: {{ phone.user }}<br>
+                        Subscriber: {{ phone.form_display_name }}<br>
                         {{ phone.name}}
                     </div>
                     <div class="col-sm">
@@ -152,25 +158,21 @@
     </div>
 
     <div id="footered" class="container-fluid fixed-bottom bg-light border border-top-primary">
-
-        <div class="container">
+        <div class="container d-flex justify-content-between">
             <input type="hidden" name="calling_page" value="{{ page }}">
-            <a id="id_previous" class="btn btn-primary text-white" href="/softphone/wolf/{{ dept_id }}/" role="button">Previous</a>
 
-            <div class="float-end">
-                <button id="id_next" type="submit" class="btn btn-primary">Submit</button>
-            </div>
+            <a id="id_previous" class="btn btn-primary text-white"
+            href="/softphone/wolf/{{ dept_id }}/" role="button">
+            Previous
+            </a>
+
+            <button id="id_next" type="submit" class="btn btn-primary">
+                Submit
+            </button>
         </div>
-
     </div>
 
-        <div class="alert alert-warning text-center mb-4" role="alert">
-            <strong>Action Required:</strong>
-            Complete all lines by <strong>Wednesday, March 25, 2026</strong>. 
-            Any unused or low-volume telephone lines that are not identified to be disconnected or migrated 
-            will be automatically disabled and moved into a <strong>maintenance hold</strong>. 
-            Lines in a maintenance hold cannot receive calls but will still be billed for.
-        </div>
+
 
 
 </form>
