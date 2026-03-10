@@ -526,7 +526,7 @@ class WolfSubscribers(LoginRequiredMixin, View):
 
         return render(request, 'softphone/wolf_subscribers.html',
                       {'title': 'Softphone',
-                       'selections_made': Selection.objects.selections_made(dept_id=dept_id),
+                       'selections_made': WolfResponse.objects.filter(location__department_number=dept_id, action__isnull=False).order_by('service_number').count(),
                        'cards_selected': cards_selected,
                        'phone_list': phone_list,
                        'full_list': full_list,
