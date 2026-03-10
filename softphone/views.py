@@ -597,7 +597,8 @@ class WolfDetails(View):
         selections_saved = 0
 
         if selection_formset.is_valid():
-            selection_formset.save()
+            for form in selection_formset:
+                form.save(request.user.username)
 
             request.session['softphone_selection'] = {}
             return HttpResponseRedirect(f'/softphone/dept/{dept_id}/confirmation/')
