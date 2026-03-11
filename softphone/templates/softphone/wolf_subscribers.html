@@ -32,7 +32,10 @@
                     {% endif %}
 
                     {% for dept in dept_list %}
-                    <option {{ dept.selected }} value={{ dept.dept_id }}>{{ dept.department_number }} - {{ dept.department_name }}</option>
+                        <option value="{{ dept.department_number }}"
+                            {% if dept.department_number == dept_id %}selected{% endif %}>
+                            {{ dept.department_number }} - {{ dept.department_name }}
+                        </option>
                     {% empty %}
                     <option>No Departements Found</option>
                     {% endfor %}
@@ -40,7 +43,8 @@
             </div>
             <div class="d-inline">Status:</div>
             <div class="d-inline-block align-middle">
-                {{ phone_list.paginator.count }} Telephone Lines Remaining
+                {{ phone_list.paginator.count }} Telephone Lines Remaining <br>
+                {{ selections_made }} Telephone Lines Submitted
             </div>
 
 
@@ -55,7 +59,7 @@
                         <select id="id_phone_search" class="col-sm" placeholder="Search for Number">
                             <option></option>
                             {% for line in full_list %}
-                            <option href="/" value="{{ forloop.counter }}">{{ line.number }} - {{ line.name }}</option>
+                            <option href="/" value="{{ forloop.counter }}">{{ line.service_number }} - {{ line.location.form_display_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -151,7 +155,8 @@
                         Phone: <strong>{{ phone.location.service_number }}</strong>
                     </div>
                     <div class="col-sm-4">
-                        Uniqname: <strong>{{ phone.location.user }}</strong>
+                        Subscriber: <strong>{{ phone.location.form_display_name }}</strong><br>
+                        {{ phone.location.email_address }}
                     </div>
                 </div>
 

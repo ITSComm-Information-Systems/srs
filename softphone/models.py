@@ -525,3 +525,6 @@ class WolfResponse(models.Model):
         limit_choices_to={'sequence__isnull': False},
         on_delete=models.CASCADE
     )
+
+    submitted_by = models.CharField(max_length=10, null=True, blank=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
