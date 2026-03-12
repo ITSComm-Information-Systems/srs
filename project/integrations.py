@@ -774,8 +774,8 @@ class MiDesktopPayload(Payload):
     image_type = ChoiceAttribute(2346, Existing=899, New=900, Clone=901)
     image_name = TextAttribute(2347)    # midesktop_Base Image Name textbox
     pool_name = TextAttribute(2348)     # midesktop_Pool Display Name textbox
-    group_email = TextAttribute(21315)
-    additional_details = TextAttribute(21317)
+    group_email = TextAttribute(21766)
+    additional_details = TextAttribute(21767)
 
     def __init__(self, action, instance, request, **kwargs):
         self.request = request
