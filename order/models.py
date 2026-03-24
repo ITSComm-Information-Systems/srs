@@ -23,6 +23,7 @@ from django.core.exceptions import ValidationError
 from oscauth.utils import get_mc_user, get_mc_group
 from decimal import Decimal
 from django.utils.functional import cached_property
+from simple_history.models import HistoricalRecords
 
 
 if settings.ENVIRONMENT == 'Production':
@@ -635,6 +636,8 @@ class DayOfWeek(models.IntegerChoices):
 
 
 class Server(models.Model):
+    history = HistoricalRecords()
+
     BUSINESS_HOURS = 0
     ALL_HOURS = 1
 
@@ -850,6 +853,7 @@ class ServerData(models.Model):
 
 
 class Database(models.Model):
+    history = HistoricalRecords()
     MDB_ADMIN_GROUP = 2349226
 
     MYSQL = 0

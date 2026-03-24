@@ -3,6 +3,8 @@ from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path, re_path
 from django.conf.urls.static import static, serve
+from django.contrib.auth.decorators import login_not_required
+from mozilla_django_oidc import views as oidc_views
 from . import views
 from . import api
 
@@ -18,6 +20,8 @@ urlpatterns = [
             'document_root': settings.MEDIA_ROOT,
             }),
 
+    path("oidc/authenticate/", login_not_required(oidc_views.OIDCAuthenticationRequestView.as_view())),
+    path("oidc/callback/", login_not_required(oidc_views.OIDCAuthenticationCallbackView.as_view())),
     path('oidc/', include('mozilla_django_oidc.urls')),
     path('orders/', include('order.urls')),
     path('pages/', include('pages.urls')),

@@ -12,6 +12,7 @@ from django.shortcuts import render
 from django.urls import path
 from project.models import Choice
 from project.utils import download_csv_from_queryset, get_query_result
+from simple_history.admin import SimpleHistoryAdmin
 
 from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database, LDAPGroupMember, StorageBilling
 
@@ -249,7 +250,7 @@ class DatabaseAdmin(ServiceInstanceAdmin):
         )
 
 @admin.register(Server)
-class ServerAdmin(ServiceInstanceAdmin):
+class ServerAdmin(ServiceInstanceAdmin, SimpleHistoryAdmin):   #ServiceInstanceAdmin
     list_display = ['name', 'owner', 'os', 'transformation']
     list_filter = ('in_service','managed', 'database_type')
     ordering = ('name',)
