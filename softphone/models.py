@@ -494,10 +494,10 @@ class WolfLocation(models.Model):
 class WolfResponse(models.Model):
     class Action(models.TextChoices):
         DISCONNECT = "DISCONNECT", "Disconnect"
-        SOFTPHONE_USER = "SOFTPHONE_USER", "Softphone with User"
-        DESKPHONE_USER = "DESKPHONE_USER", "Deskphone with User"
-        DESKPHONE_COMMON = "DESKPHONE_COMMON", "Deskphone Common Area"
-        KEEP_ANALOG = "KEEP_ANALOG", "Keep line analog (Alarm, fax, modem)"
+        SOFTPHONE_USER = "SOFTPHONE_USER", "Upgrade to Zoom Softphone"
+        DESKPHONE_USER = "DESKPHONE_USER", "Upgrade to Zoom Deskphone"
+        DESKPHONE_COMMON = "DESKPHONE_COMMON", "Upgrade to Zoom Common Area Deskphone"
+        KEEP_ANALOG = "KEEP_ANALOG", "Keep analog (for compliance, alarms, fax, modem, emergency)"
 
     service_number = models.CharField(max_length=10, primary_key=True)
 
