@@ -10,3 +10,4 @@ djangorestframework
 reportlab
 django-extensions
 openpyxl
+django-simple-history
