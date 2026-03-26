@@ -200,7 +200,15 @@ class WolfResponseAdmin(admin.ModelAdmin):
         'category',
         'submitted_by',
         'submitted_at',
+        'location__department_number'
     ]
     search_fields = ['service_number', 'uniqname', 'submitted_by']
     list_filter = ['action', 'category', 'submitted_by']
     ordering = ['-submitted_at', 'service_number']
+    readonly_fields = ['submitted_at', 'submitted_by']
+    exclude = ['location','service_number']
+    actions = ['download_csv']
+
+    @admin.action(description='Download CSV')
+    def download_csv(self, request, queryset):
+        return download_csv_from_queryset(queryset, file_name='wolfresponse')

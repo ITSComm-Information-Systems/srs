@@ -489,7 +489,8 @@ class WolfLocation(models.Model):
         managed = False
         db_table = 'softphone_wolf_snapshot'
 
-
+    def __str__(self):
+        return self.form_display_name
 
 class WolfResponse(models.Model):
     class Action(models.TextChoices):
@@ -528,3 +529,6 @@ class WolfResponse(models.Model):
 
     submitted_by = models.CharField(max_length=10, null=True, blank=True)
     submitted_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return self.service_number
