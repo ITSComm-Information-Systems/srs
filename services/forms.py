@@ -342,7 +342,7 @@ class MiDesktopForm(forms.Form):
 
         return cleaned_data
 
-ACCESS_INTERNET_CHOICES = (('True','Yes, my desktop needs internet access (outside of U of M sites)'),('False','No, my desktop do not need internet access to any network outside of U of M'))
+ACCESS_INTERNET_CHOICES = (('True','Yes, my desktop needs internet access (outside of U of M sites)'),('False','No, my desktop does not need internet access to any network outside of U of M'))
 MASK_CHOICES = [["16", "/28 (16 addresses)"], ["32", "/27 (32 addresses)"], ["64", "/26 (64 addresses)"], 
                     ["128", "/25 (128 addresses)"], ["256", "/24 (256 addresses)"]]
 
