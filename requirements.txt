@@ -4,7 +4,7 @@ gunicorn
 mozilla-django-oidc
 pyyaml
 oracledb
-django-debug-toolbar
+#django-debug-toolbar
 ldap3
 djangorestframework
 reportlab
