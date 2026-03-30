@@ -139,7 +139,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
         elif service == 'cluster':
             template = None
             print(request.POST)
-            return render(request, self.template,{})
+            return HttpResponseRedirect('/requestsent')
         else:
             model = getattr(Service, service)
             form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)
