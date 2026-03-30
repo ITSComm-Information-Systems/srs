@@ -136,6 +136,10 @@ class ServiceRequestView(UserPassesTestMixin, View):
                     'multi_disk': '50,'
                 })
                 return render(request, 'services/midesktop-image.html',context)
+        elif service == 'cluster':
+            template = None
+            print(request.POST)
+            return render(request, self.template,{})
         else:
             model = getattr(Service, service)
             form = globals()[service.capitalize() + 'NewForm'](request.POST, user=self.request.user)
@@ -218,6 +222,10 @@ class ServiceRequestView(UserPassesTestMixin, View):
             })
 
             return render(request, 'services/midesktop-image.html',context)
+        if service == 'cluster':
+            context = {}
+            return render(request, 'services/cluster.html',context)
+
         try:
             form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)
         except KeyError:
@@ -589,3 +597,10 @@ def get_service_list(request, service):
                 'service_list': service_list,
                 'groups': groups,
                 })
+
+class ClusterSubmitView(UserPassesTestMixin, View):
+    def test_func(self):
+        return True
+        
+    def post(self, request, service, id):
+        print(request)
