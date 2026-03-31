@@ -224,7 +224,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
             return render(request, 'services/midesktop-image.html',context)
         if service == 'cluster':
             context = {}
-            disks = [{'name': 'disk0', 'size': '90', 'uom': 'GB', 'state': 'enabled'},
+            disks = [{'name': 'disk0', 'size': '60', 'uom': 'GB', 'state': 'disabled'},
                                 {'name': 'disk1', 'size': '30', 'uom': 'GB', 'state': 'disabled'},
                                 {'name': 'disk2', 'size': '100', 'uom': 'GB', 'state': 'enabled'},
                                 {'name': 'disk3', 'size': '15', 'uom': 'GB', 'state': 'disabled'},

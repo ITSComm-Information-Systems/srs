@@ -110,7 +110,7 @@
         var host1Input = document.getElementById('host1_name');
         var host2Input = document.getElementById('host2_name');
         var ramInput = document.getElementById('id_ram');
-        var disk0SizeInput = document.getElementById('id_disk-0-size');
+        var disk0SizeInput = document.querySelector('input[name="disks-0-size"]');
 
         if (serverNameInput && host1Input && host2Input) {
             serverNameInput.addEventListener('input', function() {
@@ -132,12 +132,11 @@
                 var ram = parseFloat(ramInput.value);
                 var minSize = getMinDisk0Size(ram);
                 disk0SizeInput.min = minSize;
-                if (!disk0SizeInput.value || parseInt(disk0SizeInput.value) < minSize) {
-                    disk0SizeInput.value = minSize;
-                }
+                disk0SizeInput.value = minSize;
             }
 
             ramInput.addEventListener('input', updateDisk0Size);
+            ramInput.addEventListener('change', updateDisk0Size);
             disk0SizeInput.addEventListener('input', function() {
                 var ram = parseFloat(ramInput.value);
                 var minSize = getMinDisk0Size(ram);
@@ -162,7 +161,7 @@
         <select class="form-control">
             <option value="GB" selected>GB</option>
         </select>
-        &nbsp;<button type="button" class="btn btn-danger btn-sm ml-2 delete-disk-btn" title="Delete Disk">Delete</button>
+        <button type="button" class="btn btn-danger btn-sm ml-2 delete-disk-btn" title="Delete Disk">Delete</button>
     `;
     container.appendChild(newDiskDiv);
 
