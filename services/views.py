@@ -224,7 +224,12 @@ class ServiceRequestView(UserPassesTestMixin, View):
             return render(request, 'services/midesktop-image.html',context)
         if service == 'cluster':
             context = {}
-            return render(request, 'services/cluster.html',context)
+            disks = [{'name': 'disk0', 'size': '90', 'uom': 'GB', 'state': 'enabled'},
+                                {'name': 'disk1', 'size': '30', 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk2', 'size': '100', 'uom': 'GB', 'state': 'enabled'},
+                                {'name': 'disk3', 'size': '15', 'uom': 'GB', 'state': 'disabled'},
+                                {'name': 'disk4', 'size': '15', 'uom': 'GB', 'state': 'disabled'}]
+            return render(request, 'services/cluster.html',{'disks':disks})
 
         try:
             form = globals()[service.capitalize() + 'NewForm'](user=self.request.user)

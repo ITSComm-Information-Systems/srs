@@ -84,15 +84,18 @@
 
                 <small class="text-muted form-text" id="hostsText">Disk 0 is your base Operating System Disk.The other disks are for your database and supporting requirements, such as backups, logs and temp space.</small>
             </div>
-            <div class="form-inline disk-div" style="display: block;">
-                    <input type="text" name="disk-0-name" value="disk0" class="form-control col-2" readonly="">
-                    <input type="text" value="SCSI-0:0" class="form-control col-2" readonly="" id="id_disk-0-scsi">
-                    <input type="number" name="disk-0-size" value="60" min="60" class="form-control disk-size" id="id_disk-0-size">
-                    <select class="form-control">
-                        <option value="GB" selected="">GB</option>
+            <div class="disk-div" id="disk-container" style="display: block;">
+            {% for disk in disks %}
+                <div class="form-inline mb-2">
+                    <input type="text" name="disks-{{ forloop.counter0 }}-name" value="{{ disk.name }}" class="form-control col-2" readonly>
+                    <input type="number" name="disks-{{ forloop.counter0 }}-size" value="{{ disk.size }}" class="form-control disk-size" {% if disk.state == 'disabled' %}readonly{% endif %}>
+                    <select class="form-control" disabled>
+                        <option value="{{ disk.uom }}" selected>{{ disk.uom }}</option>
                     </select>
-                    <span class="float-end disk-cost">$5.87</span>
+                </div>
+            {% endfor %}
             </div>
+<button type="button" id="add-disk-btn" class="btn btn-secondary mt-2">Add Disk</button>
             <hr>
         </div>
     </div>
@@ -146,6 +149,28 @@
             updateDisk0Size();
         }
     });
+
+    document.getElementById('add-disk-btn').addEventListener('click', function() {
+    var container = document.getElementById('disk-container');
+    var diskCount = container.querySelectorAll('input[name$="-name"]').length;
+    var newDiskDiv = document.createElement('div');
+    newDiskDiv.className = 'form-inline mt-2 new-disk';
+
+    newDiskDiv.innerHTML = `
+        <input type="text" name="disks-${diskCount}-name" value="disk${diskCount}" class="form-control col-2" readonly>
+        <input type="number" name="disks-${diskCount}-size" value="10" class="form-control disk-size">
+        <select class="form-control">
+            <option value="GB" selected>GB</option>
+        </select>
+        &nbsp;<button type="button" class="btn btn-danger btn-sm ml-2 delete-disk-btn" title="Delete Disk">Delete</button>
+    `;
+    container.appendChild(newDiskDiv);
+
+    // Attach delete handler
+    newDiskDiv.querySelector('.delete-disk-btn').addEventListener('click', function() {
+        newDiskDiv.remove();
+    });
+});
 </script>
 
 
