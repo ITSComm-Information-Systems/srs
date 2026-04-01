@@ -529,6 +529,7 @@ class WolfResponse(models.Model):
 
     submitted_by = models.CharField(max_length=10, null=True, blank=True)
     submitted_at = models.DateTimeField(null=True, blank=True)
+    processed = models.BooleanField(default=False)
 
     def __str__(self):
         return self.service_number
