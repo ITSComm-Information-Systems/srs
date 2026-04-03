@@ -1059,8 +1059,8 @@ class ServerView(UserPassesTestMixin, View):
             title = 'Delete Server'
         elif action == 'clone':
             template = loader.get_template('order/server_clone.html')
-            formset = CloneServerNameFormSet(prefix='clone')
-            title = 'Clone Server'
+            formset = DuplicateServerNameFormSet(prefix='clone')
+            title = 'Duplicate Server'
         else:
             raise Http404
 
@@ -1089,7 +1089,7 @@ class ServerView(UserPassesTestMixin, View):
             return HttpResponseRedirect('/requestsent')
 
         if action == 'clone':
-            formset = CloneServerNameFormSet(request.POST, prefix='clone')
+            formset = DuplicateServerNameFormSet(request.POST, prefix='clone')
             if formset.is_valid():
                 for clone in formset.cleaned_data:
                     new_server = instance.clone(clone['name'])

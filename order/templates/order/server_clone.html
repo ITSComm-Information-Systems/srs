@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1>Clone Server</h1>
+<h1>Order Duplicate Server</h1>
 
 <div class="mb-3">
   <strong>Name:</strong> {{ server.name }}<br>
@@ -10,6 +10,15 @@
   RAM: {{ server.ram }}<br>
   Shortcode: {{ server.shortcode }}<br>
   Owner: {{ server.owner.name }}<br>
+  Disk: {{ server.total_disk_size }}<br>
+
+  <ul class="ms-3">  <!-- Bootstrap margin-start for indent -->
+    {% for disk in server.disks.all %}
+      <li class="list-group-item">{{ disk.name }} - {{ disk.size }}</li>
+    {% empty %}
+      <li>No disks</li>
+    {% endfor %}
+  </ul>
 </div>
 
 <hr>
