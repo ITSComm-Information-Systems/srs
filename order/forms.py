@@ -20,7 +20,7 @@ get_choices = Choice.objects.get_choices
 CLONE_NAME_RE = re.compile(r'^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$')
 
 
-class CloneServerNameForm(forms.Form):
+class DuplicateServerNameForm(forms.Form):
     name = forms.CharField(label='New server name', max_length=63)
 
     def __init__(self, *args, **kwargs):
@@ -49,7 +49,7 @@ class CloneServerNameForm(forms.Form):
         return name
 
 
-class BaseCloneServerNameFormSet(forms.BaseFormSet):
+class BaseDuplicateServerNameFormSet(forms.BaseFormSet):
     def clean(self):
         if any(self.errors):
             return
@@ -68,9 +68,9 @@ class BaseCloneServerNameFormSet(forms.BaseFormSet):
             raise forms.ValidationError('Enter at least one server name.')
 
 
-CloneServerNameFormSet = formset_factory(
-    CloneServerNameForm,
-    formset=BaseCloneServerNameFormSet,
+DuplicateServerNameFormSet = formset_factory(
+    DuplicateServerNameForm,
+    formset=BaseDuplicateServerNameFormSet,
     extra=0,
     min_num=1,
     validate_min=True,

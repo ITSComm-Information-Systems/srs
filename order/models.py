@@ -851,6 +851,9 @@ class ServerDisk(models.Model):
     device = models.IntegerField(choices=DEVICE_LIST)
     size = models.IntegerField()
 
+    class Meta:
+        ordering = ['name']  # or ['-size']
+
     def __str__(self):
         return self.name
 
