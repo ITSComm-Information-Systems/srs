@@ -433,6 +433,26 @@ def download_csv(request, dept_id):
 
 
 # Wolf
+def wolf_csv(request, dept_id):
+    print('foo')
+    dept_list = get_wolf_dept_list(request.user)
+    dept_ids = [d['department_number'] for d in dept_list]
+    full_list = (
+        WolfResponse.objects
+        .filter(location__department_number__in=dept_ids, action__isnull=True)
+        .select_related("location")
+        .values(
+            "service_number",
+            "location__building_name",
+            "location__floor_name",
+            "location__room_name",
+            "location__form_display_name"
+        )
+        .order_by("service_number")
+    )
+    return download_csv_from_queryset(full_list, file_name='wolf_list')
+
+
 def wolf_redirect(request):
     dept_list = get_wolf_dept_list(request.user)
     dept_id = 0
