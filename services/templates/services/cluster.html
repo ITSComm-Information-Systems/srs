@@ -109,7 +109,7 @@
         var serverNameInput = document.getElementById('id_serverName');
         var host1Input = document.getElementById('host1_name');
         var host2Input = document.getElementById('host2_name');
-        var ramInput = document.getElementById('id_ram');
+        //var ramInput = document.getElementById('id_ram');
         var disk0SizeInput = document.querySelector('input[name="disks-0-size"]');
 
         if (serverNameInput && host1Input && host2Input) {
@@ -158,7 +158,7 @@
     newDiskDiv.innerHTML = `
         <input type="text" name="disks-${diskCount}-name" value="disk${diskCount}" class="form-control col-2" readonly>
         <input type="number" name="disks-${diskCount}-size" value="10" class="form-control disk-size">
-        <select class="form-control">
+        <select class="form-control" disabled>
             <option value="GB" selected>GB</option>
         </select>
         <button type="button" class="btn btn-danger btn-sm ml-2 delete-disk-btn" title="Delete Disk">Delete</button>

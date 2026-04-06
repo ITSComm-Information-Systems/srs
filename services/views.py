@@ -8,6 +8,7 @@ from .models import *
 from project.integrations import create_ticket, Openshift, TDx
 from oscauth.models import LDAPGroupMember
 import json
+from order.models import Server, ServerDisk
 
 
 SLUGS = {'midesktop': Pool,
@@ -138,6 +139,98 @@ class ServiceRequestView(UserPassesTestMixin, View):
                 return render(request, 'services/midesktop-image.html',context)
         elif service == 'cluster':
             template = None
+            server_names = request.POST.getlist('name')
+            ram = request.POST.get('ram')
+            cpu = request.POST.get('cpu')
+            owner = LDAPGroup.objects.get(pk=2509239)
+            database_type = Choice.objects.get(pk=66)  # Replace with actual choice ID
+            os_choice = Choice.objects.get(pk=129)
+            environment = request.POST.get('environment')
+            print(environment)
+            if environment == "production":
+                server_1_patch_day = Choice.objects.get(pk=99)
+                server_1_patch_time = Choice.objects.get(pk=39)
+                server_2_patch_day = Choice.objects.get(pk=99)
+                server_2_patch_time = Choice.objects.get(pk=40)
+            else:
+                server_1_patch_day = Choice.objects.get(pk=96)
+                server_1_patch_time = Choice.objects.get(pk=39)
+                server_2_patch_day = Choice.objects.get(pk=96)
+                server_2_patch_time = Choice.objects.get(pk=40)
+            disks = []
+            i = 0
+            while True:
+                disk_name = request.POST.get(f'disks-{i}-name')
+                disk_size = request.POST.get(f'disks-{i}-size')
+                if disk_name is None or disk_size is None:
+                    break
+                disks.append({'name': disk_name, 'size': disk_size})
+                i += 1
+
+            server1 = Server(
+                name=server_names[0],
+                owner=owner,
+                admin_group=owner,
+                database_type=database_type,
+                shortcode="000000",  # Use a valid shortcode
+                os=os_choice,
+                cpu=cpu,
+                ram=ram,
+                domain="",
+                datacenter="",
+                firewall="",
+                support_email="",
+                support_phone="",
+                firewall_requests="",
+                public_facing= False,
+                billable= False,
+                replicated= False,
+                patch_day= server_1_patch_day,
+                patch_time =server_1_patch_time
+            )
+            server1.save()
+
+            server2 = Server(
+                name=server_names[1],
+                owner=owner,
+                admin_group=owner,
+                database_type=database_type,
+                shortcode="000000",  # Use a valid shortcode
+                os=os_choice,
+                cpu=cpu,
+                ram=ram,
+                domain="",
+                datacenter="",
+                firewall="",
+                support_email="",
+                support_phone="",
+                firewall_requests="",
+                public_facing= False,
+                billable= False,
+                replicated= False,
+                patch_day= server_2_patch_day,
+                patch_time =server_2_patch_time
+            )
+            server2.save()
+
+            if disks:
+                disk = disks[0]
+                ServerDisk.objects.create(
+                    server=server2,
+                    name=disk['name'],
+                    size=int(disk['size']),
+                    controller=0,  # set as needed
+                    device=0       # set as needed
+                )
+
+            for idx, disk in enumerate(disks):
+                ServerDisk.objects.create(
+                    server=server1,
+                    name=disk['name'],
+                    size=int(disk['size']),
+                    controller=0,  # or as needed
+                    device=idx
+                )
             print(request.POST)
             return HttpResponseRedirect('/requestsent')
         else:
@@ -224,11 +317,11 @@ class ServiceRequestView(UserPassesTestMixin, View):
             return render(request, 'services/midesktop-image.html',context)
         if service == 'cluster':
             context = {}
-            disks = [{'name': 'disk0', 'size': '60', 'uom': 'GB', 'state': 'disabled'},
-                                {'name': 'disk1', 'size': '30', 'uom': 'GB', 'state': 'disabled'},
-                                {'name': 'disk2', 'size': '100', 'uom': 'GB', 'state': 'enabled'},
-                                {'name': 'disk3', 'size': '15', 'uom': 'GB', 'state': 'disabled'},
-                                {'name': 'disk4', 'size': '15', 'uom': 'GB', 'state': 'disabled'}]
+            disks = [{'name': 'disk0', 'size': '10', 'uom': 'GB', 'state': 'enabled'},
+                                {'name': 'disk1', 'size': '10', 'uom': 'GB', 'state': 'enabled'},
+                                {'name': 'disk2', 'size': '10', 'uom': 'GB', 'state': 'enabled'},
+                                {'name': 'disk3', 'size': '10', 'uom': 'GB', 'state': 'enabled'},
+                                {'name': 'disk4', 'size': '10', 'uom': 'GB', 'state': 'enabled'}]
             return render(request, 'services/cluster.html',{'disks':disks})
 
         try:
