@@ -147,9 +147,14 @@ UM_API = {
 }
 
 OPENSHIFT = {
-    'SERVER': os.getenv('OPENSHIFT_SERVER', 'containersdev.03r5.p1.openshiftapps.com'),
-    'USER': os.getenv('OPENSHIFT_USER', 'srs-serviceaccount'),
-    'TOKEN': os.getenv('OPENSHIFT_TOKEN', 'notfound'),
+    'cloud': {
+        'SERVER': os.getenv('OPENSHIFT_SERVER', 'containersdev.03r5.p1.openshiftapps.com'),
+        'TOKEN': os.getenv('OPENSHIFT_TOKEN', 'notfound'),
+    },
+    'campus': {
+        'SERVER': os.getenv('OPENSHIFT_CAMPUS_SERVER', 'campus-np.web.umich.edu'),
+        'TOKEN': os.getenv('OPENSHIFT_CAMPUS_TOKEN', 'notfound'),
+    }
 }
 
 ROOT_URLCONF = 'project.urls'
