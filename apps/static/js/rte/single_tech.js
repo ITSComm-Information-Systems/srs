@@ -104,6 +104,7 @@ $(document).ready(function() {
 
     // Submit entries
     $('.single-submit').on('click', function() {
+        console.log('new code')
         // Always rebuild hidden inputs from entries array before submit
         rebuild_table_and_inputs();
         // Remove any previous num_entries input to avoid duplicates
