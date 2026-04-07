@@ -50,10 +50,27 @@ $(document).ready(function() {
 
     // Submit entries
     $('.single-submit').on('click', function() {
-        var form_html = '<input name="num_entries" type="text" value="' + total_entries_single + '" hidden>';
+        // Always rebuild hidden inputs from entries array before submit
+        rebuild_table_and_inputs();
+        // Remove any previous num_entries input to avoid duplicates
+        $('#single-input-form input[name="num_entries"]').remove();
+        // Use entries.length for num_entries to ensure accuracy
+        var form_html = '<input name="num_entries" type="text" value="' + entries.length + '" hidden>';
         $('#single-input-form').append(form_html);
+
+        // Remove any previous assigned_group input to avoid duplicates
+        $('#single-input-form input[name="assigned_group"]').remove();
+        // Add assigned_group hidden input from agSelect value
+        var group_val = $('#agSelect').val();
+        $('#single-input-form').append('<input name="assigned_group" type="text" value="' + group_val + '" hidden>');
+
+        // Remove any previous tech_id input to avoid duplicates
+        $('#single-input-form input[name="tech_id"]').remove();
+        var tech_id_val = $('#tech_id').val();
+        $('#single-input-form').append('<input name="tech_id" type="text" value="' + tech_id_val + '" hidden>');
+
         $('#single-input-form').submit();
-    })
+    });
 
     // Add new row to input table
     $('#single-add').on('click', function() {
