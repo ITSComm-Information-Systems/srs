@@ -24,6 +24,7 @@ urlpatterns = [
     path('auth/', include('oscauth.urls')),
     path('apps/', include('apps.urls')),
     path('unitylogin', views.unity_login),
+    path("version", views.get_version),
     path('unitylogin/', views.unity_login),
     path('softphone/', include('softphone.urls')),
     path('services/', include('services.urls')),
