@@ -517,7 +517,7 @@ class WolfResponse(models.Model):
         blank=True,
     )
 
-    uniqname = models.CharField(max_length=30)
+    uniqname = models.CharField(max_length=30, null=True, blank=True)
 
     category = models.ForeignKey(
         Category,
