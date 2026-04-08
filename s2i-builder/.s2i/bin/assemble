@@ -1,34 +1,29 @@
-#!/bin/bash
-set -e
-
-echo "---> Installing Python dependencies"
-pip install --no-cache-dir -r requirements.txt
-
-echo "---> Copying application source"
-# S2I already copies your repo into /tmp/src
-cp -a /tmp/src/. /opt/app-root/src/
-
-echo "---> Collecting static files"
-cd /opt/app-root/src
-python3 manage.py collectstatic --noinput
-
-
 echo "Capturing git metadata..."
+
+cd /tmp/src
 
 COMMIT_FULL=${OPENSHIFT_BUILD_COMMIT}
 COMMIT_SHORT=${COMMIT_FULL:0:7}
 
-# These will work during assemble (git repo is present)
 COMMIT_MSG=$(git log -1 --pretty=%s 2>/dev/null || echo "unknown")
 COMMIT_AUTHOR=$(git log -1 --pretty=%an 2>/dev/null || echo "unknown")
 COMMIT_DATE=$(git log -1 --pretty=%cd --date=iso 2>/dev/null || echo "unknown")
 
-echo "$COMMIT_SHORT" > /opt/app-root/src/.git_commit
-echo "$COMMIT_MSG" > /opt/app-root/src/.git_message
-echo "$COMMIT_AUTHOR" > /opt/app-root/src/.git_author
-echo "$COMMIT_DATE" > /opt/app-root/src/.git_date
-echo "${OPENSHIFT_BUILD_REFERENCE}" > /opt/app-root/src/.git_branch
-echo "${OPENSHIFT_BUILD_NAME}" > /opt/app-root/src/.build_name
+# now continue with your normal flow
+echo "---> Installing Python dependencies"
+pip install --no-cache-dir -r requirements.txt
 
+echo "---> Copying application source"
+cp -a /tmp/src/. /opt/app-root/src/
 
-echo "---> Build completed"
+cd /opt/app-root/src
+
+echo "$COMMIT_SHORT" > .git_commit
+echo "$COMMIT_MSG" > .git_message
+echo "$COMMIT_AUTHOR" > .git_author
+echo "$COMMIT_DATE" > .git_date
+echo "${OPENSHIFT_BUILD_REFERENCE}" > .git_branch
+echo "${OPENSHIFT_BUILD_NAME}" > .build_name
+
+echo "---> Collecting static files"
+python3 manage.py collectstatic --noinput
