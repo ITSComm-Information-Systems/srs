@@ -3,7 +3,7 @@ echo "Capturing git metadata..."
 cd /tmp/src
 
 COMMIT_FULL=${OPENSHIFT_BUILD_COMMIT}
-COMMIT_SHORT=${COMMIT_FULL:0:7}
+COMMIT_SHORT=$(echo "$COMMIT_FULL" | cut -c1-7)
 
 COMMIT_MSG=$(git log -1 --pretty=%s 2>/dev/null || echo "unknown")
 COMMIT_AUTHOR=$(git log -1 --pretty=%an 2>/dev/null || echo "unknown")
