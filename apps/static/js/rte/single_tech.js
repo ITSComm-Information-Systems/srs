@@ -254,9 +254,24 @@ function wo_to_review() {
     $('#tech-info-review').empty();
     // Remove any previously appended hidden inputs to prevent duplication
     $('#single-input-form input[type="text"][name$="_work_order"], #single-input-form input[type="text"][name$="_rate"], #single-input-form input[type="date"][name$="_assigned_date"], #single-input-form input[type="text"][name$="_duration"], #single-input-form input[type="text"][name$="_notes"]').remove();
-    // Re-append the current table and info
-    $('#single-review').append($("#single-input").html());
-    $('#single-review tr').find('.delete-col').remove();
+    // Build a review table without the copy/delete column
+    var $inputTable = $('#single-input-table');
+    var $thead = $inputTable.find('thead').clone();
+    var $tbody = $inputTable.find('tbody').clone();
+
+    // Remove last th (copy/delete) from header
+    $thead.find('tr').each(function() {
+        $(this).find('th:last-child').remove();
+    });
+    // Remove last td (copy/delete) from each row
+    $tbody.find('tr').each(function() {
+        $(this).find('td:last-child').remove();
+    });
+
+    // Compose the table
+    var reviewTable = $('<table class="table table-bordered"></table>');
+    reviewTable.append($thead).append($tbody);
+    $('#single-review').empty().append(reviewTable);
     $('#tech-info-review').append($("#tech-info-input").html());
 }
 
