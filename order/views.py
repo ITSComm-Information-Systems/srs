@@ -825,6 +825,8 @@ class Services(UserPassesTestMixin, View):
                                    {'label': 'View/Change Image','target': '/services/midesktop-image/'},
                                    {'label': 'Create Network','target': '/services/midesktop-network/add'},
                                    {'label': 'View/Change Network','target': '/services/midesktop-network/'}]
+            elif service.name == 'cluster':
+                service.actions =[{'label': 'Setup Cluster','target': '/services/cluster/add/'}]
             elif service.name == 'container':
                 service.actions = [{'label': 'Request Container Project', 'target': '/services/container/add/',
                                     'description': 'The ITS Container Service hosts containerized applications. A Container Project is a development environment for creating or hosting a containerized app.'}]

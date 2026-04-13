@@ -269,7 +269,7 @@ class ServerAdmin(ServiceInstanceAdmin, SimpleHistoryAdmin):   #ServiceInstanceA
                         ('cname',),
                         ('regulated_data','non_regulated_data'),
                         'managed',
-                        'transformation',
+                        'transformation', 'purpose'
                         ),
         }),
         ('Managed', {
