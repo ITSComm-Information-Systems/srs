@@ -636,7 +636,6 @@ class DayOfWeek(models.IntegerChoices):
 
 
 class Server(models.Model):
-    history = HistoricalRecords()
 
     BUSINESS_HOURS = 0
     ALL_HOURS = 1
