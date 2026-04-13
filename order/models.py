@@ -696,6 +696,7 @@ class Server(models.Model):
     datacenter = models.CharField(max_length=100)
     firewall_requests = models.CharField(max_length=100)
     last_updated = models.DateTimeField(null=True)
+    purpose = models.CharField(max_length=500, blank=True, null=True, help_text='Purpose of this server')
 
     def __init__(self, *args, **kwargs):
         super(Server, self).__init__(*args, **kwargs)

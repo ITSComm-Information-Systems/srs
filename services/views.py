@@ -146,6 +146,7 @@ class ServiceRequestView(UserPassesTestMixin, View):
             database_type = Choice.objects.get(pk=66)  # Replace with actual choice ID
             os_choice = Choice.objects.get(pk=129)
             environment = request.POST.get('environment')
+            purpose = request.POST.get('purpose')
             print(environment)
             if environment == "production":
                 server_1_patch_day = Choice.objects.get(pk=99)
@@ -186,7 +187,8 @@ class ServiceRequestView(UserPassesTestMixin, View):
                 billable= False,
                 replicated= False,
                 patch_day= server_1_patch_day,
-                patch_time =server_1_patch_time
+                patch_time =server_1_patch_time,
+                purpose = purpose
             )
             server1.save()
 
@@ -209,7 +211,8 @@ class ServiceRequestView(UserPassesTestMixin, View):
                 billable= False,
                 replicated= False,
                 patch_day= server_2_patch_day,
-                patch_time =server_2_patch_time
+                patch_time =server_2_patch_time,
+                purpose = purpose
             )
             server2.save()
 

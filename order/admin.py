@@ -268,7 +268,7 @@ class ServerAdmin(ServiceInstanceAdmin):
                         ('cname',),
                         ('regulated_data','non_regulated_data'),
                         'managed',
-                        'transformation',
+                        'transformation', 'purpose'
                         ),
         }),
         ('Managed', {
