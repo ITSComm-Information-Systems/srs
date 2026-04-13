@@ -50,10 +50,28 @@ $(document).ready(function() {
 
     // Submit entries
     $('.single-submit').on('click', function() {
-        var form_html = '<input name="num_entries" type="text" value="' + total_entries_single + '" hidden>';
+        console.log('new code')
+        // Always rebuild hidden inputs from entries array before submit
+        rebuild_table_and_inputs();
+        // Remove any previous num_entries input to avoid duplicates
+        $('#single-input-form input[name="num_entries"]').remove();
+        // Use entries.length for num_entries to ensure accuracy
+        var form_html = '<input name="num_entries" type="text" value="' + entries.length + '" hidden>';
         $('#single-input-form').append(form_html);
+
+        // Remove any previous assigned_group input to avoid duplicates
+        $('#single-input-form input[name="assigned_group"]').remove();
+        // Add assigned_group hidden input from agSelect value
+        var group_val = $('#agSelect').val();
+        $('#single-input-form').append('<input name="assigned_group" type="text" value="' + group_val + '" hidden>');
+
+        // Remove any previous tech_id input to avoid duplicates
+        $('#single-input-form input[name="tech_id"]').remove();
+        var tech_id_val = $('#tech_id').val();
+        $('#single-input-form').append('<input name="tech_id" type="text" value="' + tech_id_val + '" hidden>');
+
         $('#single-input-form').submit();
-    })
+    });
 
     // Add new row to input table
     $('#single-add').on('click', function() {
@@ -113,6 +131,27 @@ function wo_to_review() {
     $('#tech-info-review').html('');
     $('#single-review').append($("#single-input").html());
     $('#single-review tr').find('.delete-col').remove();
+
+    // Remove any previously appended hidden inputs to prevent duplication
+    $('#single-input-form input[type="text"][name$="_work_order"], #single-input-form input[type="text"][name$="_rate"], #single-input-form input[type="date"][name$="_assigned_date"], #single-input-form input[type="text"][name$="_duration"], #single-input-form input[type="text"][name$="_notes"]').remove();
+    // Build a review table without the copy/delete column
+    var $inputTable = $('#single-input-table');
+    var $thead = $inputTable.find('thead').clone();
+    var $tbody = $inputTable.find('tbody').clone();
+
+    // Remove last th (copy/delete) from header
+    $thead.find('tr').each(function() {
+        $(this).find('th:last-child').remove();
+    });
+    // Remove last td (copy/delete) from each row
+    $tbody.find('tr').each(function() {
+        $(this).find('td:last-child').remove();
+    });
+
+    // Compose the table
+    var reviewTable = $('<table class="table table-bordered"></table>');
+    reviewTable.append($thead).append($tbody);
+    $('#single-review').empty().append(reviewTable);
     $('#tech-info-review').append($("#tech-info-input").html());
 }
 

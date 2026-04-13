@@ -110,6 +110,7 @@ def single_submit(request):
         except:
             print('error adding action single_submit')
 
+        print(request.POST)
         num_entries = request.POST.get('num_entries')
         tech_id = request.POST.get('tech_id')
         assigned_group = request.POST.get('assigned_group')

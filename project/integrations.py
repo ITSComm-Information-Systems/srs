@@ -176,14 +176,19 @@ class ShortCodesAPI(UmAPI):
         return requests.get(url, headers=self.headers)
 
 class Openshift():
-    SERVER = settings.OPENSHIFT['SERVER']    
-    USER = settings.OPENSHIFT['USER']
-    HEADERS = {'Authorization': 'Bearer ' + settings.OPENSHIFT['TOKEN']}
-    API_ENDPOINT = f'https://api.{SERVER}:6443'
-    PROJECT_URL = f'https://console-openshift-console.apps.{SERVER}/k8s/cluster/projects'
+
+    def __init__(self, cluster="cloud"):
+        cfg = settings.OPENSHIFT[cluster]
+
+        self.server = cfg["SERVER"]
+        self.headers = {'Authorization': f"Bearer {cfg['TOKEN']}"}
+        self.api_endpoint = f"https://api.{self.server}:6443"
+        self.project_url = (
+            f"https://console-openshift-console.apps.{self.server}/k8s/cluster/projects"
+        )
 
     def get_project(self, name):
-        return requests.get(f'{self.API_ENDPOINT}/apis/project.openshift.io/v1/projects/{name}', headers=self.HEADERS)
+        return requests.get(f'{self.api_endpoint}/apis/project.openshift.io/v1/projects/{name}', headers=self.headers)
 
     def create_project(self, instance, requester):
         payload = {"metadata": {
@@ -211,7 +216,7 @@ class Openshift():
             except:
                 print('error getting shortcode')
 
-        r = requests.post(f'{self.API_ENDPOINT}/apis/project.openshift.io/v1/projects', headers=self.HEADERS, json=payload)     
+        r = requests.post(f'{self.api_endpoint}/apis/project.openshift.io/v1/projects', headers=self.headers, json=payload)     
         if r.ok:
             self.create_role_bindings(instance)
             self.add_limits(instance)
@@ -224,7 +229,7 @@ class Openshift():
             raise RuntimeError(r.status_code, r.text)
 
     def create_role_bindings(self, instance):
-        url = self.API_ENDPOINT + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
+        url = self.api_endpoint + f'/apis/authorization.openshift.io/v1/namespaces/{instance.project_name}/rolebindings'
 
         role_map = {
             'admins': 'admin',
@@ -248,14 +253,14 @@ class Openshift():
                     'roleRef': {'name': role}, 'userNames': uniqnames
                 }
                 
-                r = requests.post(url, headers=self.HEADERS, json=body)
+                r = requests.post(url, headers=self.headers, json=body)
                 if not r.ok:
                     mail_admins('Error Openshift.create_role_bindings()', r.text, fail_silently=True)
 
     def add_limits(self, instance):
         limits = self.get_yaml(instance.size)
-        r = requests.post(f'{self.API_ENDPOINT}/api/v1/namespaces/{instance.project_name}/limitranges'
-                             , headers=self.HEADERS, json=limits)
+        r = requests.post(f'{self.api_endpoint}/api/v1/namespaces/{instance.project_name}/limitranges'
+                             , headers=self.headers, json=limits)
         if not r.ok:
             mail_admins('Error Openshift.add_limits()', r.text, fail_silently=True)
         return r
@@ -265,8 +270,8 @@ class Openshift():
         payload['metadata']['name'] = f'backup-schedule-{instance.project_name}'
         payload['spec']['template']['includedNamespaces'][0] = instance.project_name
 
-        r = requests.post(f'{self.API_ENDPOINT}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
-                             , headers=self.HEADERS)
+        r = requests.post(f'{self.api_endpoint}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
+                             , headers=self.headers)
         if not r.ok:
             mail_admins('Error Openshift.add_backup()', r.text, fail_silently=True)
         return r
@@ -276,8 +281,8 @@ class Openshift():
         for item in payload['items']:
             item['metadata']['namespace'] = instance.project_name
 
-            r = requests.post(f'{self.API_ENDPOINT}/apis/networking.k8s.io/v1/namespaces/{instance.project_name}/networkpolicies'
-                                , headers=self.HEADERS, json=item)
+            r = requests.post(f'{self.api_endpoint}/apis/networking.k8s.io/v1/namespaces/{instance.project_name}/networkpolicies'
+                                , headers=self.headers, json=item)
 
             if not r.ok:
                 mail_admins('Error Openshift.add_network_policy()', r.text, fail_silently=True)
@@ -531,6 +536,8 @@ class Payload():
             "Description": self.description,
             "Attributes": [] } | kwargs
 
+        self.add_custom_attributes(action, instance, request)
+
         if request.POST.get('sensitive_data_yn') == 'Yes':
             value = ''
             for val in instance.regulated_data.values() | instance.non_regulated_data.values():
@@ -571,6 +578,9 @@ class Payload():
         if hasattr(self, 'request_type'):
             self.add_attribute(self.request_type.id, getattr(self.request_type, action))
 
+
+    def add_custom_attributes(self, action, instance, request):
+        pass
 
 class ChoiceAttribute():
     
@@ -754,6 +764,89 @@ class ContainerPayload(Payload):
 
             title = 'Add contact group to notification group'
             self.data["Tasks"].append( {'Title': title, "ResponsibleGroupID": self.CONTAINER_TEAM} )
+
+
+class ServerPayload(Payload):
+    title = 'New MiServer Request'
+    description = ''
+    template = 'project/tdx_miserver_new.html'
+    type_id = 7                  # Compute Services
+    responsible_group_id = 18    # ITS-CloudComputeServices
+    service_id = 10              # ITS-MiDesktop
+    form_id = 24	             # ITS-MiDesktop - Form
+    priority_id = 20 # Medium
+
+    request_type = ChoiceAttribute(1951, Delete=202, Modify=201, New=200)
+    managed_yn = ChoiceAttribute(1952, Managed=203, NonManaged=207)
+    admin_group_name = TextAttribute(1953)
+    shortcode = TextAttribute(1954)
+    os = TextAttribute(1957)
+    name = TextAttribute(1959)
+    nonregulated_data = TextAttribute(1960)
+    cpu = TextAttribute(1963)
+    ram = TextAttribute(1964)
+    disk = TextAttribute(1965)
+    disk_replication = TextAttribute(1966)
+    subnet = TextAttribute(1967)
+    backup_time = TextAttribute(1968)
+    reboot_time = TextAttribute(1969)
+    reboot_day = TextAttribute(1981)
+    patch_time = TextAttribute(1970)
+    patch_day = TextAttribute(1971)
+    after_hours = TextAttribute(1974)    
+    support_email = TextAttribute(1975)
+    additional_details = TextAttribute(1977)
+    consultation = TextAttribute(1978)
+    mich_med = ChoiceAttribute(8480, No=21618, Yes=21619)
+
+    def add_custom_attributes(self, action, instance, request):
+
+        #TODO Disks and Description
+
+        if instance.public_facing:
+            self.add_attribute(self.subnet.id, 'public')
+        else:
+            self.add_attribute(self.subnet.id, 'secure')
+
+        if instance.replicated:
+            self.add_attribute(self.disk_replication.id, 'Yes (Replicated)')
+        else:
+            self.add_attribute(self.disk_replication.id, 'No')
+
+        if instance.managed:
+            self.add_attribute(self.managed_yn.id, self.managed_yn.Managed)
+        else:
+            self.add_attribute(self.managed_yn.id, self.managed_yn.NonManaged)
+
+        self.add_attribute(self.admin_group_name.id, instance.admin_group.name)
+
+        for field in instance._meta.get_fields():
+            # Skip reverse relations and m2m if you don't want them
+            if field.auto_created and not field.concrete:
+                continue
+
+            name = field.name
+
+            # Only map fields that exist on the payload class
+            if hasattr(self, name):
+                attr = getattr(self, name)
+                value = getattr(instance, name, None)
+
+                if value is None:
+                    continue
+
+                # If FK and has label
+                if hasattr(value, "label"):
+                    value = value.label
+
+                self.add_attribute(attr.id, value)
+        
+        disk_descr = "\n".join(
+            f"{disk.name} - {disk.size} GB"
+            for disk in instance.disks.all())
+        
+        self.add_attribute(self.disk.id, disk_descr)
+
 
 class MiDesktopPayload(Payload):
     title = 'MiDesktop New Order'
