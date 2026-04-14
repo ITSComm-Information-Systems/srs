@@ -6,7 +6,7 @@ from django.test import Client
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
 django.setup()
-
+# Test
 #Keep below django setup
 from order.models import Action
 from pages.models import Page
