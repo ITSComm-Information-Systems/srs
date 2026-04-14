@@ -12,7 +12,14 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+
 bin/
+
+# allow S2I scripts
+!.s2i/
+!.s2i/bin/
+!.s2i/bin/run
+
 build/
 develop-eggs/
 dist/
