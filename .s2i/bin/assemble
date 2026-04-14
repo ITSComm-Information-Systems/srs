@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+echo "PWD: $(pwd)"
+ls -la
+
 echo "---> Installing Python dependencies"
 pip install --no-cache-dir -r requirements.txt
 
