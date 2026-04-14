@@ -7,6 +7,7 @@ PORT=${PORT:-8000}
 cd "$APP_ROOT"
 
 echo "---> Starting Gunicorn on port $PORT"
+python manage.py migrate --noinput
 
 exec gunicorn project.wsgi:application \
     --bind=0.0.0.0:$PORT \
