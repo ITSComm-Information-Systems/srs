@@ -6,6 +6,9 @@ PORT=${PORT:-8000}
 
 cd "$APP_ROOT"
 
+echo "---> export home"
+export HOME=/tmp
+
 echo "---> Starting Gunicorn on port $PORT"
 
 exec gunicorn project.wsgi:application \
@@ -13,5 +16,7 @@ exec gunicorn project.wsgi:application \
     --workers=2 \
     --threads=4 \
     --pythonpath="$APP_ROOT" \
-    --worker-tmp-dir /tmp \
-    --log-file=-
+    --log-file=- \
+    --worker-tmp-dir=/tmp \
+    --access-logfile=- \
+    --error-logfile=-
