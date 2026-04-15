@@ -1,5 +1,5 @@
-# ——— 1) Base Python builder ———
-FROM registry.access.redhat.com/ubi9/python-312
+# This line will be replaced with the image in the openshift build.
+FROM registry.access.redhat.com/ubi9/python-314
 
 # Standard S2I working dir
 WORKDIR /opt/app-root
@@ -14,6 +14,8 @@ COPY requirements.txt /opt/app-root/requirements.txt
 
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r /opt/app-root/requirements.txt
+
+RUN chmod -R g+rwX /opt/app-root
 
 # ——— 3) Install S2I scripts ———
 #COPY .s2i/bin/ /usr/libexec/s2i/
