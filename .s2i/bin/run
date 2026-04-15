@@ -6,8 +6,8 @@ PORT=${PORT:-8000}
 
 cd "$APP_ROOT"
 
-echo "---> Running migrations"
-python manage.py migrate --noinput
+echo "---> export home"
+export HOME=/tmp
 
 echo "---> Starting Gunicorn on port $PORT"
 
@@ -20,3 +20,4 @@ exec gunicorn project.wsgi:application \
     --worker-tmp-dir=/tmp \
     --access-logfile=- \
     --error-logfile=-
+    
