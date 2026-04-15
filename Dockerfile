@@ -16,9 +16,9 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r /opt/app-root/requirements.txt
 
 # ——— 3) Install S2I scripts ———
-COPY .s2i/bin/ /usr/libexec/s2i/
-RUN chmod -R g+rwX /opt/app-root /usr/libexec/s2i
+#COPY .s2i/bin/ /usr/libexec/s2i/
+#RUN chmod -R g+rwX /opt/app-root /usr/libexec/s2i
 
-LABEL io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
+#LABEL io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
 
-CMD ["/usr/libexec/s2i/usage"]
+#CMD ["/usr/libexec/s2i/usage"]
