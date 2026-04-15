@@ -1,4 +1,5 @@
-# This line will be replaced with the image in the openshift build.
+# This will build the base image to be used for the s2i environment builds.
+# First line will be replaced with the image in the openshift build.
 FROM registry.access.redhat.com/ubi9/python-314
 
 # Standard S2I working dir
@@ -10,10 +11,10 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
 
 # ——— 2) Copy requirements and pre-install them ———
 # NOTE: This file rarely changes → cached layer!
-COPY requirements.txt /opt/app-root/requirements.txt
+#COPY requirements.txt /opt/app-root/requirements.txt
 
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r /opt/app-root/requirements.txt
+    pip install --no-cache-dir -r requirements.txt
 
 RUN chmod -R g+rwX /opt/app-root
 
