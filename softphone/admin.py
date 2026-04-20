@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Category, Selection, SelectionV, DuoUser, Ambassador
+from .models import Category, Selection, SelectionV, DuoUser, Ambassador, WolfResponse
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
@@ -189,3 +189,26 @@ class DuoAdmin(admin.ModelAdmin):
 class AmbassadorAdmin(admin.ModelAdmin):
     list_display = ['dept_grp','uniqname']
     ordering = list_display
+
+
+@admin.register(WolfResponse)
+class WolfResponseAdmin(admin.ModelAdmin):
+    list_display = [
+        'service_number',
+        'action',
+        'uniqname',
+        'category',
+        'submitted_by',
+        'submitted_at',
+        'location__department_number'
+    ]
+    search_fields = ['service_number', 'uniqname', 'submitted_by', 'processed']
+    list_filter = ['processed', 'action', 'category', 'submitted_by']
+    ordering = ['-submitted_at', 'service_number']
+    readonly_fields = ['submitted_at', 'submitted_by']
+    exclude = ['location','service_number']
+    actions = ['download_csv']
+
+    @admin.action(description='Download CSV')
+    def download_csv(self, request, queryset):
+        return download_csv_from_queryset(queryset, file_name='wolfresponse')

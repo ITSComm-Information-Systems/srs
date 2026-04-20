@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<h1>MiServer Cluster</h1>
+<form method="post" id="clusterForm">
+    {% csrf_token %}
+    <label for="name">
+        <strong>Server Name</strong>
+        <small class="text-muted form-text" id="hostsText">Server name must be unique, less than 15 alphanumeric characters.</small>
+    </label>
+
+
+
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group form-inline">
+                <div class="form-inline">
+                    <input type="text" name="serverName" class="form-control" required="" id="id_serverName" maxlength="12">
+                    <input id="host1_name" name="name" class="form-control" type="text" readonly="">
+                    <input id="host2_name" name="name" class="form-control" type="text" readonly="">
+                </div>
+                <div class="form-group mt-2">
+                    
+                    <label for="id_environment" class="me-2"><strong>Will this server be used in Production?</strong></label>
+                    <select id="id_environment" name="environment" class="form-control">
+                        <option value="production">Production</option>
+                        <option value="non-production">Non-Production</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label for="id_purpose"><strong>Purpose</strong></label>
+                <input type="text" name="purpose" class="form-control" id="id_purpose" maxlength="100" placeholder="Describe the purpose">
+            </div>
+        </div>
+    </div>
+
+    <div class="row cost-driver">
+        <div class="col-6">
+            <div class="form-group">
+                <label for="id_cpu">
+                    <strong>CPU</strong>
+                </label>
+                
+                <small class="text-muted form-text" id="cpu">Numbers 2 - 16 (Require approval above 16)</small>
+                <input type="number" name="cpu" value="2" min="2" max="16" class="form-control" data-server="99" required="" id="id_cpu">
+            
+                <div role="alert" class="valid-feedback">Good.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group" id="div_ram">
+                <label for="id_ram">
+                    <strong>RAM</strong>
+                </label>
+                <small class="text-muted form-text" id="ram"> RAM must be at least double of CPU count.  Amounts over 64GB require approval.</small>
+                <input style="display: inline;" type="number" name="ram" min="4" class="form-control form-inline col-2" required="" id="id_ram" value="4">
+                
+                <div role="alert" class="valid-feedback">Good.</div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-auto cost-driver">
+            <div id="disk_list" class="form-group">
+                <label for="disks">
+                    <strong>Disk Space</strong>
+                </label>
+
+                <small class="text-muted form-text" id="hostsText">Disk 0 is your base Operating System Disk.The other disks are for your database and supporting requirements, such as backups, logs and temp space.</small>
+            </div>
+            <div class="disk-div" id="disk-container" style="display: block;">
+            {% for disk in disks %}
+                <div class="form-inline mb-2">
+                    <input type="text" name="disks-{{ forloop.counter0 }}-name" value="{{ disk.name }}" class="form-control col-2" readonly>
+                    <input type="number" name="disks-{{ forloop.counter0 }}-size" value="{{ disk.size }}" class="form-control disk-size" {% if disk.state == 'disabled' %}readonly{% endif %}>
+                    <select class="form-control" disabled>
+                        <option value="{{ disk.uom }}" selected>{{ disk.uom }}</option>
+                    </select>
+                </div>
+            {% endfor %}
+            </div>
+<button type="button" id="add-disk-btn" class="btn btn-secondary mt-2">Add Disk</button>
+            <hr>
+        </div>
+    </div>
+        <div style="float:right;">
+            <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+        </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var serverNameInput = document.getElementById('id_serverName');
+        var host1Input = document.getElementById('host1_name');
+        var host2Input = document.getElementById('host2_name');
+        //var ramInput = document.getElementById('id_ram');
+        var disk0SizeInput = document.querySelector('input[name="disks-0-size"]');
+
+        if (serverNameInput && host1Input && host2Input) {
+            serverNameInput.addEventListener('input', function() {
+                host1Input.value = serverNameInput.value ? 'm1-' + serverNameInput.value : '';
+                host2Input.value = serverNameInput.value ? 'a1-' + serverNameInput.value : '';
+            });
+        }
+
+        if (ramInput && disk0SizeInput) {
+            function getMinDisk0Size(ram) {
+                if (isNaN(ram) || ram < 8) {
+                    return 60;
+                } else {
+                    return Math.ceil((ram - 8) / 4) * 10 + 60;
+                }
+            }
+
+            function updateDisk0Size() {
+                var ram = parseFloat(ramInput.value);
+                var minSize = getMinDisk0Size(ram);
+                disk0SizeInput.min = minSize;
+                disk0SizeInput.value = minSize;
+            }
+
+            ramInput.addEventListener('input', updateDisk0Size);
+            ramInput.addEventListener('change', updateDisk0Size);
+            disk0SizeInput.addEventListener('input', function() {
+                var ram = parseFloat(ramInput.value);
+                var minSize = getMinDisk0Size(ram);
+                if (parseInt(disk0SizeInput.value) < minSize) {
+                    disk0SizeInput.value = minSize;
+                }
+            });
+            // Initialize on page load
+            updateDisk0Size();
+        }
+    });
+
+    document.getElementById('add-disk-btn').addEventListener('click', function() {
+    var container = document.getElementById('disk-container');
+    var diskCount = container.querySelectorAll('input[name$="-name"]').length;
+    var newDiskDiv = document.createElement('div');
+    newDiskDiv.className = 'form-inline mt-2 new-disk';
+
+    newDiskDiv.innerHTML = `
+        <input type="text" name="disks-${diskCount}-name" value="disk${diskCount}" class="form-control col-2" readonly>
+        <input type="number" name="disks-${diskCount}-size" value="10" class="form-control disk-size">
+        <select class="form-control" disabled>
+            <option value="GB" selected>GB</option>
+        </select>
+        <button type="button" class="btn btn-danger btn-sm ml-2 delete-disk-btn" title="Delete Disk">Delete</button>
+    `;
+    container.appendChild(newDiskDiv);
+
+    // Attach delete handler
+    newDiskDiv.querySelector('.delete-disk-btn').addEventListener('click', function() {
+        newDiskDiv.remove();
+    });
+});
+</script>
+
+
+
+
+
+
+{% endblock %}

@@ -3,10 +3,11 @@ whitenoise
 gunicorn
 mozilla-django-oidc
 pyyaml
-oracledb==3.3
+oracledb
 django-debug-toolbar
 ldap3
 djangorestframework
 reportlab
 django-extensions
 openpyxl
+django-simple-history

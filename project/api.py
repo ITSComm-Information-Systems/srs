@@ -21,9 +21,15 @@ import threading, time, subprocess
 class IsAdminOrReadOnly(BasePermission):    # Allows full access to admins, read-only to others.
 
     def has_permission(self, request, view):
-        if request.method in SAFE_METHODS:  # SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
+        user = request.user
+
+        if not user.is_authenticated:  # Not logged in → denied
+            return False
+
+        if user.is_staff:  # Admin all methods
             return True
-        return request.user and request.user.is_staff
+
+        return request.method in SAFE_METHODS  # Logged-in non-admin → read only
 
 
 class TollUploadView(APIView):

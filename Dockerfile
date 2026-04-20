@@ -1,31 +1,24 @@
-FROM python:3.11-slim
+# ——— 1) Base Python builder ———
+FROM registry.access.redhat.com/ubi9/python-312
 
-ENV GUNICORN_WORKERS=2
-ENV GUNICORN_THREADS=4
+# Standard S2I working dir
+WORKDIR /opt/app-root
 
-ENV PYTHONUNBUFFERED=1
-ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/app-root/.local/bin:${PATH}"
 
-RUN apt-get -y update && apt-get install -y gcc
+# ——— 2) Copy requirements and pre-install them ———
+# NOTE: This file rarely changes → cached layer!
+COPY requirements.txt /opt/app-root/requirements.txt
 
-WORKDIR /usr/src/app
-COPY requirements.txt requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r /opt/app-root/requirements.txt
 
-RUN pip install -r requirements.txt
+# ——— 3) Install S2I scripts ———
+COPY .s2i/bin/ /usr/libexec/s2i/
+RUN chmod -R g+rwX /opt/app-root /usr/libexec/s2i
 
-COPY . /usr/src/app
+LABEL io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
 
-RUN apt-get purge -y --auto-remove gcc
-
-# Workaround for permission issue on OpenShift
-RUN chmod -R g+rw /usr/src/app
-
-RUN chmod g+x /usr/src/app/docker-entrypoint.sh
-
-ENV flag=1
-
-EXPOSE 8000
-
-ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
-
-CMD ["sh", "-c", "gunicorn --bind=0.0.0.0:8000 --workers=${GUNICORN_WORKERS} --threads=${GUNICORN_THREADS} --access-logfile=- --log-file=- project.wsgi"]
+CMD ["/usr/libexec/s2i/usage"]

@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from django import forms
 from django.core.exceptions import ValidationError
 from project.integrations import MCommunity
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.template import loader
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,6 +12,7 @@ from django.shortcuts import render
 from django.urls import path
 from project.models import Choice
 from project.utils import download_csv_from_queryset, get_query_result
+from simple_history.admin import SimpleHistoryAdmin
 
 from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database, LDAPGroupMember, StorageBilling
 
@@ -147,10 +148,13 @@ class ServiceInstanceAdmin(admin.ModelAdmin):
         return download_url + urls
 
     def download_csv(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponseForbidden("Authentication required")
 
-        if hasattr(self, 'csv_query') and request.path.startswith('/admin/'):
-            recs = get_query_result(self.csv_query)
-            return download_csv_from_queryset(recs, file_name=self.model.__name__)
+        if hasattr(self, 'csv_query'):
+            if request.user.has_perm(f"{self.model._meta.app_label}.view_{self.model._meta.model_name}"):
+                recs = get_query_result(self.csv_query)
+                return download_csv_from_queryset(recs, file_name=self.model.__name__)
 
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(content_type='text/csv')
@@ -246,7 +250,7 @@ class DatabaseAdmin(ServiceInstanceAdmin):
         )
 
 @admin.register(Server)
-class ServerAdmin(ServiceInstanceAdmin):
+class ServerAdmin(ServiceInstanceAdmin, SimpleHistoryAdmin):   #ServiceInstanceAdmin
     list_display = ['name', 'owner', 'os', 'transformation']
     list_filter = ('in_service','managed', 'database_type')
     ordering = ('name',)
@@ -265,7 +269,7 @@ class ServerAdmin(ServiceInstanceAdmin):
                         ('cname',),
                         ('regulated_data','non_regulated_data'),
                         'managed',
-                        'transformation',
+                        'transformation', 'purpose'
                         ),
         }),
         ('Managed', {
@@ -277,6 +281,8 @@ class ServerAdmin(ServiceInstanceAdmin):
             'fields': (('total_disk_size','total_cost'),),
         }),
     )
+
+    csv_query = 'select * from srs_order_server_api_v'
 
     class Media:
         js = ('order/js/admin_server.js',)

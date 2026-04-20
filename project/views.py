@@ -27,7 +27,7 @@ from order.models import Chartcom
 from oscauth.models import AuthUserDept, AuthUserDeptV, DepartmentSecurityV
 from oscauth.utils import get_mc_user
 from datetime import datetime, date, timedelta
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_not_required, permission_required
 from django.db.models import F
 from pages.models import Page
 from project.integrations import MCommunity
@@ -35,14 +35,15 @@ from project.integrations import MCommunity
 import json
 from django.http import JsonResponse
 
-import os
+import os, requests
 from django.db.models import indexes, Max
 from django.db import connections
 from django import db
 
 from django.core.mail import EmailMessage
 from django.conf import settings
-    
+
+@login_not_required
 def homepage(request):
 
 	notices = Page.objects.get(permalink='/notices')
@@ -61,7 +62,28 @@ def handle_custom_404(request, exception):
 def handle_custom_500(request):
 	return render(request, '404.html', status=500)
 
-@login_required
+def get_version(request):
+
+	commit_hash = os.getenv("OPENSHIFT_BUILD_COMMIT")
+
+	if not commit_hash:
+		return JsonResponse({"error": "No commit found"}, status=500)
+	
+	GITHUB_REPO = "ITSComm-Information-Systems/srs"
+
+	url = f"https://api.github.com/repos/{GITHUB_REPO}/commits/{commit_hash}"
+
+	resp = requests.get(url)
+
+	if resp.status_code != 200:
+		return HttpResponse(
+            resp.text,
+            status=resp.status_code,
+            content_type="application/json"
+        )
+
+	return JsonResponse(resp.json(), safe=False)
+
 def unity_login(request):
 	from project.models import Unity
 	from cryptography.fernet import Fernet

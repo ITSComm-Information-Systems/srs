@@ -759,8 +759,10 @@ function set_server_name() {
   $(document).on("change", "#id_reboot_day" , function() {
     if ($( "#id_reboot_day option:selected" ).text() == 'No Reboot Needed') {
       $('#div_reboot_time').hide();
+      $('#id_reboot_time').prop('disabled', true)
     } else {
       $('#div_reboot_time').show();
+      $('#id_reboot_time').prop('disabled', false)
     }
   });
 

@@ -23,6 +23,7 @@ from django.core.exceptions import ValidationError
 from oscauth.utils import get_mc_user, get_mc_group
 from decimal import Decimal
 from django.utils.functional import cached_property
+from simple_history.models import HistoricalRecords
 
 
 if settings.ENVIRONMENT == 'Production':
@@ -635,6 +636,7 @@ class DayOfWeek(models.IntegerChoices):
 
 
 class Server(models.Model):
+
     BUSINESS_HOURS = 0
     ALL_HOURS = 1
 
@@ -696,6 +698,7 @@ class Server(models.Model):
     datacenter = models.CharField(max_length=100)
     firewall_requests = models.CharField(max_length=100)
     last_updated = models.DateTimeField(null=True)
+    purpose = models.CharField(max_length=500, blank=True, null=True, help_text='Purpose of this server')
 
     def __init__(self, *args, **kwargs):
         super(Server, self).__init__(*args, **kwargs)
@@ -850,6 +853,7 @@ class ServerData(models.Model):
 
 
 class Database(models.Model):
+    history = HistoricalRecords()
     MDB_ADMIN_GROUP = 2349226
 
     MYSQL = 0
