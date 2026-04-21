@@ -20,4 +20,3 @@ exec gunicorn project.wsgi:application \
     --worker-tmp-dir=/tmp \
     --access-logfile=- \
     --error-logfile=-
-    

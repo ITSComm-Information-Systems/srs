@@ -154,7 +154,7 @@ def edit_project(request):
     if form.is_valid():
         project.save()
     
-    if project.engineer1 != engineer1 or project.engineer2 != engineer1:
+    if project.engineer1 != engineer1 or project.engineer2 != engineer2:
         project.notify_engineer(estimate_id)
 
     return HttpResponseRedirect(f'/apps/bom/estimate/{estimate_id}')
