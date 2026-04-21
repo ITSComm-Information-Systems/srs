@@ -505,6 +505,7 @@ class Payload():
     source_id = Web
     status_id = Open
     priority_id = Medium
+    form_id = 20 # Request Form
 
     def add_attribute(self, id, value):
         self.data['Attributes'].append(
@@ -841,6 +842,41 @@ class ServerPayload(Payload):
             for disk in instance.disks.all())
         
         self.add_attribute(self.disk.id, disk_descr)
+
+
+class DataDenPayload(Payload):
+#{"FormID": 20, "TypeID": 54, "ServiceID": 122, "Classification": 46, "ResponsibleGroupID": 220} dd
+    type_id = 54
+    responsible_group_id = 220
+    service_id = 122
+
+
+class LockerPayload(Payload):
+#{"FormID": 20, "TypeID": 54, "ServiceID": 196, "Classification": 46, "ResponsibleGroupID": 220}, locker
+    type_id = 54
+    responsible_group_id = 220
+    service_id = 196
+
+
+class TurboPayload(Payload):
+#{"FormID": 20, "TypeID": 54, "ServiceID": 293, "Classification": 46, "ResponsibleGroupID": 220}, Turbo
+    type_id = 54
+    responsible_group_id = 220
+    service_id = 293
+
+
+class MiBackupPayload(Payload):
+#{"FormID": 20, "TypeID": 57, "ServiceID": 207, "Classification": 46, "ResponsibleGroupID": 104}, MiBackup
+    type_id = 57
+    responsible_group_id = 104
+    service_id = 207
+
+
+class MiStoragePayload(Payload):
+#{"FormID": 20, "TypeID": 57, "ServiceID": 215, "Classification": 46, "ResponsibleGroupID": 104}, MiStorage
+    type_id = 57
+    responsible_group_id = 104
+    service_id = 215
 
 
 class MiDesktopPayload(Payload):
