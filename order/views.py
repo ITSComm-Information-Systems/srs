@@ -14,7 +14,7 @@ from pages.models import Page
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from pages.models import Page
 from django.http import JsonResponse
-from project.integrations import create_ticket_server_delete
+from project.integrations import create_ticket_server_delete, create_help_ticket
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from ast import literal_eval
@@ -414,16 +414,27 @@ class Submit(PermissionRequiredMixin, View):
 @csrf_exempt
 def send_email(request):   #Pinnacle will route non prod emails to a test address
     if request.method == "POST":
-        subject = request.POST.get('emailSubject') + ' question from: ' + request.user.username
+        subject = request.POST.get('emailSubject')
         body = request.POST['emailBody'] 
-        address = (request.POST.get('emailAddress', 'ITCOM.csr@umich.edu'))
-        print(request.POST)
+        
+        try:
+            service = Service.objects.get(name=subject)
+        except Service.DoesNotExist:
+            service = None
 
+        if service:
+            create_help_ticket(request, service, body)
+        else:
+            subject = subject + ' question from: ' + request.user.username
+            body = request.POST['emailBody'] 
+            address = (request.POST.get('emailAddress', 'ITCOM.csr@umich.edu'))
 
-        with connections['pinnacle'].cursor() as cursor:
-            cursor.callproc('um_osc_util_k.um_send_email_p', [address, body, subject])
-        if body == "Cancel Order":
-            return HttpResponseRedirect('/cancelorder') 
+            with connections['pinnacle'].cursor() as cursor:
+                cursor.callproc('um_osc_util_k.um_send_email_p', [address, body, subject])
+
+            if body == "Cancel Order":
+                return HttpResponseRedirect('/cancelorder') 
+        
         return HttpResponseRedirect('/emailsent') 
 
 
