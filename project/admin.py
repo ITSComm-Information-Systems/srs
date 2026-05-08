@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Test, Choice, ChoiceTag, Email
+from .models import Test, Choice, ChoiceTag, Email, MenuItem
 from django.urls import path
 from django.http import HttpResponseRedirect
+from django.contrib.auth.models import Permission
 from django.core.mail import send_mail
 from django.core.management import call_command
 from django.template.response import TemplateResponse
@@ -103,6 +104,86 @@ class ChoiceAdmin(admin.ModelAdmin):
     inlines = [
         ChoiceInline,
     ]
+
+
+class MenuItemInline(admin.TabularInline):
+    model = MenuItem
+    extra = 0
+    show_change_link = True
+    ordering = ("seq_num",)
+    fields = (
+        "code",
+        "label",
+        "seq_num",
+        "active",
+        "path",
+        #"permissions"
+    )
+    readonly_fields = ("permissions",)
+    #filter_horizontal = ("permissions",)
+
+# --- MenuItem Admin (standalone editing) ---
+@admin.register(MenuItem)
+class MenuItemAdmin(admin.ModelAdmin):
+    list_display = ("label", "parent", "seq_num", "active", "path")
+    search_fields = ("label",)
+    inlines = [MenuItemInline]
+
+    fieldsets = (
+        (None, {
+            "fields": (
+                "code",
+                "parent",
+                ("active","seq_num","label","path"),
+                "help_text",
+            ),
+        }),
+        ("Permissions", {
+            "classes": ("collapse",),
+            "fields": ("permissions",),
+        }),
+    )
+
+    filter_horizontal = ("permissions",)
+    list_editable = ("seq_num", "active")
+
+    ordering = ("seq_num",)
+
+    change_list_template = "admin/project/menu/menu_preview.html",
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+
+        qs = (
+            self.get_queryset(request)
+            .select_related("parent")
+            .prefetch_related("permissions__content_type")
+            .order_by("parent_id", "seq_num")
+        )
+
+        items = list(qs)
+
+        # build tree (same logic as before)
+        item_map = {item.code: item for item in items}
+        for item in items:
+            item.children_list = []
+
+        roots = []
+        for item in items:
+            if item.parent_id and item.parent_id in item_map:
+                item_map[item.parent_id].children_list.append(item)
+            else:
+                roots.append(item)
+
+        extra_context["tree"] = roots
+
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):   # Fix N+1 issue when viewing permissions.
+        if db_field.name == "permissions":
+            kwargs["queryset"] = Permission.objects.select_related("content_type")
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
 
 admin.site.register(Choice, ChoiceAdmin)
 admin.site.register(DownloadLog)

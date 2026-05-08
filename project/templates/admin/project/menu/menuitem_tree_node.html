@@ -1,0 +1,25 @@
+<li style="list-style: none; margin-left: {{ depth }}em;">
+  {{ item.seq_num}}
+
+{% if item.active %}
+  <img src="/static/admin/img/icon-yes.svg" alt="True">
+{% else %}
+  <img src="/static/admin/img/icon-no.svg" alt="False">
+{% endif %}
+
+  <strong>{{ item.label }}</strong>
+
+  <i>{{ item.path }}</i>
+
+  <a href="{% url 'admin:project_menuitem_change' item.code %}">
+    ✏️
+  </a>
+
+  {% if item.children_list %}
+    <ul>
+      {% for child in item.children_list %}
+        {% include "admin/project/menu/menuitem_tree_node.html" with item=child depth=depth|add:1 %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+</li>
