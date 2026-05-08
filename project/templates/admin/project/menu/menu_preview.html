@@ -1,0 +1,12 @@
+{% extends "admin/change_list.html" %}
+
+{% block result_list %}
+  <div class="results">
+    <ul class="menu-tree">
+      {% for item in tree %}
+        {{ item.node }}
+        {% include "admin/project/menu/menuitem_tree_node.html" with item=item depth=0 %}
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}
