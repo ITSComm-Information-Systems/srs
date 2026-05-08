@@ -12,7 +12,7 @@ from django.db.models.signals import class_prepared
 from django.template import Template, Context
 from datetime import timedelta
 from softphone.models import next_cut_date
-
+from django.contrib.auth.models import Permission
 
 def validate_shortcode(value):
 
@@ -36,7 +36,27 @@ def validate_shortcode(value):
      if status != 'Open':
           raise ValidationError(f'ShortCode {value} is {status}.')
 
+    
+class MenuItem(models.Model):
+     code = models.CharField(max_length=20, primary_key=True)
+     parent = models.ForeignKey(
+          "self", null=True, blank=True,
+          on_delete=models.CASCADE,
+          related_name="children"
+     )
 
+     active = models.BooleanField(default=True)
+     label = models.CharField(max_length=100)
+     seq_num = models.PositiveIntegerField(default=0)
+     help_text = models.TextField(blank=True)
+     permissions = models.ManyToManyField(Permission, blank=True)
+     path = models.CharField(max_length=100, blank=True, help_text='Internal=app:view_name  External=full https url')
+
+     class Meta:
+          ordering = ["seq_num"]
+
+     def __str__(self):
+          return self.label
 
 # This view uses the Pinnacle location table and includes locations added by ITS staff
 #  as well as the official builfing codes from MPathways
