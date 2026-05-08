@@ -843,6 +843,12 @@ class ServerPayload(Payload):
         
         self.add_attribute(self.disk.id, disk_descr)
 
+class MiDatabasePayload(Payload):
+#{"FormID": 19, "TypeID": 6, "SourceID": 4, "StatusID": 77, "ServiceID": 7, "ResponsibleGroupID": 17}
+    type_id = 6
+    responsible_group_id = 17
+    service_id = 7
+
 
 class DataDenPayload(Payload):
 #{"FormID": 20, "TypeID": 54, "ServiceID": 122, "Classification": 46, "ResponsibleGroupID": 220} dd
@@ -1093,6 +1099,33 @@ def create_ticket(action, instance, request, **kwargs):
         print('TDx response', resp.status_code, resp.text)
     
     return json.loads(resp.text)
+
+def create_help_ticket(request, service, body):
+    SERVICE_PAYLOAD_MAP = {
+        "miStorage": MiStoragePayload,
+        "miBackup": MiBackupPayload,
+        "turboResearch": TurboPayload,
+        "lockerStorage": LockerPayload,
+        "dataDen": DataDenPayload,
+        "miServer": ServerPayload,
+        "midatabase": MiDatabasePayload,
+        "container": ContainerPayload,
+        "midesktop": MiDesktopPayload,
+    }
+
+    service_payload = SERVICE_PAYLOAD_MAP[service.name]
+
+    payload = {     "FormID": Payload.form_id,   # Request
+                    "TypeID": service_payload.type_id,                       
+                    "ServiceID": service_payload.service_id,           
+                    "ResponsibleGroupID": service_payload.responsible_group_id,  
+                    "Title": service.label + " Help",
+                    "RequestorEmail": request.user.email,
+                    "Description": body,}
+
+    resp = TDx().create_ticket(payload)
+
+    return resp
 
 def create_ticket_database_modify(instance, user, description):
 
