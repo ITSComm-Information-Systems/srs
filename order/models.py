@@ -1330,7 +1330,7 @@ class Item(models.Model):
                     attributes.append({'ID': 1951, 'Value': 201})
                     payload['Title'] = f'Modify MiServer {instance.name}'
             else:
-                payload['Title'] = 'New MiServer Request'
+                payload['Title'] = 'New MiServer Request' + ' - ' + self.data.get('name')
                 mod_man = None
                 os_id = None
                 if self.data.get('public_facing') == 'True':
