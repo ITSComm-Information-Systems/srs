@@ -33,7 +33,7 @@
                     <td> {{ element.display_seq_no }} </td>
                     <td> {{ element.name }} </td>
                     <td> {{ element.type }}</td>
-                    <td> {{ element.label }}  <br>
+                    <td style="width: 20%;"> {{ element.label }}  <br>
                         <ul>
                         {% for key, value in element.arguments.items %}
                             <li><b>{{ key }}</b> : {{ value }}</li>
@@ -43,12 +43,18 @@
                     <td> 
                         {% if element.choices %}
                             <table>
-                            {% for code, label in element.choices %}
-                            <tr>
-                                <td>{{ code }}</td>
-                                <td>{{ label }}</td>
-                            </tr>
-                            {% endfor %}
+                                {% for choice in element.choices %}
+                                <tr>
+                                    <td>{{ choice.code }}</td>
+                                    <td>{{ choice.label }}</td>
+
+                                    <td>
+                                        {% for trigger in choice.triggers %}
+                                            <b>{{ trigger.action }}</b> → {{ trigger.target }}<br>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
                             </table>
                         {% endif %}
                     </td>

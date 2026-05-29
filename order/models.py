@@ -113,6 +113,18 @@ class Element(Configuration):
     target = models.CharField(max_length=80, blank=True, null=True)
 
 
+class Trigger(models.Model): 
+    ACTION_CHOICES = ( 
+        ('HIDE', 'Hide'), 
+        ('SHOW', 'Show'), 
+    ) 
+    element = models.ForeignKey(Element, on_delete=models.CASCADE) 
+    source = models.CharField(max_length=50) 
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES) 
+    target = models.CharField(max_length=50)
+    target_value = models.CharField(max_length=50, blank=True)
+
+
 class ProductCategory(Configuration):
     
     class Meta:
