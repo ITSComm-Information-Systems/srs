@@ -14,6 +14,7 @@ from project.models import Choice
 from project.utils import download_csv_from_queryset, get_query_result
 from simple_history.admin import SimpleHistoryAdmin
 
+from collections import defaultdict
 from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database, LDAPGroupMember, StorageBilling
 
 class ProductAdmin(admin.ModelAdmin):
@@ -67,21 +68,41 @@ class ActionAdmin(admin.ModelAdmin):
         action = Action.objects.get(id=object_id)
         hidden_fields = action.get_hidden_fields()
 
+        def get_choices(code):
+            return Choice.objects.filter(
+                    parent__code=code
+                    ).order_by('sequence').values_list('code', 'label')
+
         for step in step_list:
             step.element_list = Element.objects.all().filter(step_id = step.id).order_by('display_seq_no')
 
             for element in step.element_list:
-                if element.name not in hidden_fields:
-                    element.checked = True
-                    
-                m = re.match(r"get_choices\('([^']+)'\)", element.attributes)
-                if m:
-                    choice_set = m.group(1)
 
-                    element.choices = Choice.objects.filter(
-                        parent__code=choice_set
-                    ).order_by('sequence')
-    
+                if element.attributes:
+                    try:
+                        raw_choices = eval(element.attributes)
+
+                        # source -> list of triggers
+                        trigger_map = defaultdict(list)
+
+                        for trigger in element.trigger_set.all():
+                            trigger_map[trigger.source].append(trigger)
+
+                        element.choices = []
+
+                        for code, label in raw_choices:
+                            element.choices.append({
+                                'code': code,
+                                'label': label,
+                                'triggers': trigger_map.get(code, [])
+                            })
+
+                    except Exception as e:
+                        print(e)
+
+                        
+
+
         override = json.dumps(action.override, indent=4)
 
         extra_context = {
