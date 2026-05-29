@@ -1,4 +1,4 @@
-import csv, json
+import csv, json, re
 
 from django.utils.html import format_html
 from django import forms
@@ -72,6 +72,14 @@ class ActionAdmin(admin.ModelAdmin):
             for element in step.element_list:
                 if element.name not in hidden_fields:
                     element.checked = True
+                    
+                m = re.match(r"get_choices\('([^']+)'\)", element.attributes)
+                if m:
+                    choice_set = m.group(1)
+
+                    element.choices = Choice.objects.filter(
+                        parent__code=choice_set
+                    ).order_by('sequence')
     
         override = json.dumps(action.override, indent=4)
 
