@@ -43,15 +43,13 @@
                     <td> 
                         {% if element.choices %}
                             <table>
-                            {% for choice in element.choices %}
+                            {% for code, label in element.choices %}
                             <tr>
-                                <td>{{ choice.code }}</td>
-                                <td>{{ choice.label }}</td>
+                                <td>{{ code }}</td>
+                                <td>{{ label }}</td>
                             </tr>
                             {% endfor %}
                             </table>
-                        {% else %}
-                            {{ element.attributes }} 
                         {% endif %}
                     </td>
                     <td> {{ element.display_condition }} </td>

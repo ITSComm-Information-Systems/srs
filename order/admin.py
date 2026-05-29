@@ -66,6 +66,11 @@ class ActionAdmin(admin.ModelAdmin):
         action = Action.objects.get(id=object_id)
         hidden_fields = action.get_hidden_fields()
 
+        def get_choices(code):
+            return Choice.objects.filter(
+                    parent__code=code
+                    ).order_by('sequence').values_list('code', 'label')
+
         for step in step_list:
             step.element_list = Element.objects.all().filter(step_id = step.id).order_by('display_seq_no')
 
@@ -73,14 +78,14 @@ class ActionAdmin(admin.ModelAdmin):
                 if element.name not in hidden_fields:
                     element.checked = True
                     
-                m = re.match(r"get_choices\('([^']+)'\)", element.attributes)
-                if m:
-                    choice_set = m.group(1)
+                if element.attributes:
+                    try:
+                        element.choices = eval(element.attributes)
+                        print(type(element.choices), element.choices)
+                    except:
+                        print('error')
 
-                    element.choices = Choice.objects.filter(
-                        parent__code=choice_set
-                    ).order_by('sequence')
-    
+
         override = json.dumps(action.override, indent=4)
 
         extra_context = {
