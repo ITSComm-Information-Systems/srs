@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
-from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput, UmOscPreorderApiAbstract, UmOscNoteProfileV
+from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput, UmOscPreorderApiAbstract
 from project.models import ActionLog
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
@@ -532,25 +532,9 @@ def select_times(request):
     return HttpResponse(template.render(context, request))
 
 
-@permission_required('rte.add_umrteinput', raise_exception=True)
-def view_notes(request):
-    template = loader.get_template('rte/view/view_notes.html')
-
-    all_notes = UmOscNoteProfileV.objects.filter(note_subject = 'Time Entry Notes', note_author=request.user.username
-                                                 ).order_by('-last_update_date')[:100]
-
-    context = {
-        'title': 'View Notes',
-        'tech_name': request.user.username,
-        'all_notes': all_notes
-    }
-    return HttpResponse(template.render(context, request))
-
 # View times
 @permission_required('rte.add_umrteinput', raise_exception=True)
 def view_time_load(request):
-
-
     template = loader.get_template('rte/view/search.html')
 
     all_techs = UmRteTechnicianV.objects.all()

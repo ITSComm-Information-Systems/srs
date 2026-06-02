@@ -13,7 +13,6 @@ urlpatterns = [
     path('update/', views.update),
     path('view-time/display/', views.view_time_display),
     path('view-time/', views.view_time_load),
-    path('view-notes/', views.view_notes),
     path('actionlog/', views.get_action_log),
     path('actionlog/<int:id>/', views.get_action_log_entry),
     path('confirmation/', views.get_confirmation),
