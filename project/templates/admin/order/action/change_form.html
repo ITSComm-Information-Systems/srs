@@ -20,20 +20,45 @@
                 <tr>
                     <td></td>
                     <td><input type="checkbox" id="vehicle1" name="show_field" value="{{ element.name }}" {% if element.checked %}checked{% endif %}></td>
-                    <td><a class="related-widget-wrapper-link change-related" id="change_id_service" data-href-template="/admin/order/service/__fk__/change/?_to_field=id&amp;_popup=1" title="Change selected service" href="/admin/order/element/{{ element.id }}/change/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-changelink.svg" alt="Change"></a></td>
+                    <td>
+                        <a
+                            class="related-widget-wrapper-link change-related"
+                            data-popup="yes"
+                            id="change_id_service"
+                            href="/admin/order/element/{{ element.id }}/change/?_to_field=id&_popup=1"
+                            title="Change selected service">
+                            <img src="/static/admin/img/icon-changelink.svg" alt="Change">
+                        </a>
+                    </td>
                     <td> {{ element.display_seq_no }} </td>
                     <td> {{ element.name }} </td>
                     <td> {{ element.type }}</td>
-                    <td> {{ element.label }}  <br>
+                    <td style="width: 20%;"> {{ element.label }}  <br>
                         <ul>
                         {% for key, value in element.arguments.items %}
                             <li><b>{{ key }}</b> : {{ value }}</li>
                         {% endfor %}
                         </ul>
                     </td>
-                    <td> {{ element.attributes }} </td>
+                    <td> 
+                        {% if element.choices %}
+                            <table>
+                                {% for choice in element.choices %}
+                                <tr>
+                                    <td>{{ choice.code }}</td>
+                                    <td>{{ choice.label }}</td>
+
+                                    <td>
+                                        {% for trigger in choice.triggers %}
+                                            <b>{{ trigger.action }}</b> → {{ trigger.target }}<br>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        {% endif %}
+                    </td>
                     <td> {{ element.display_condition }} </td>
-                    <td> {{ element.target }} </td>
                     <td><a class="related-widget-wrapper-link change-related" id="change_id_service"  title="Delete Element" href="/admin/order/element/{{ element.id }}/delete/?_to_field=id&amp;_popup=1"><img src="/static/admin/img/icon-deletelink.svg" alt="Delete"></a></td>
                 </tr>
             {% endfor %}
