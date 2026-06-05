@@ -1,0 +1,42 @@
+{% extends 'baseapps.html' %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+
+{% if all_notes %}
+    <p class="text-muted mb-3">
+        Displaying the last {{ all_notes|length }} time entry notes.
+    </p>
+	<table class='table table-striped' id='view-time-table'>
+		<thead>
+			<th>Author</th>
+			<th>Note Body</th>
+			<th>Last Updated</th>
+		</thead>
+		<tbody>
+			{% for note in all_notes %}
+				<tr>
+					<td>{{ note.note_author }}</td>
+					<td>{{ note.note_body }}</td>
+					<td>{{ note.last_update_date|timesince }} ago</td>
+				</tr>
+			{% endfor%}
+		</tbody>
+	</table>
+
+{% else %}
+
+
+	<div class='alert alert-danger col-4'>
+		No time entries for the selected criteria.
+	</div>
+	<button type="button" class="btn btn-primary"> 
+	  <a href="/apps/rte/view-time/" style="color:inherit">Search Again</a>
+	</button>
+
+{% endif %}
+
+{% endblock %}
+
