@@ -3,8 +3,12 @@
 {% block content %}
 
 <h1>{{ title }}</h1>
- 
+
+
 {% if all_notes %}
+    <p class="text-muted mb-3">
+        Displaying the last {{ all_notes|length }} time entry notes.
+    </p>
 	<table class='table table-striped' id='view-time-table'>
 		<thead>
 			<th>Author</th>
@@ -36,6 +40,3 @@
 
 {% endblock %}
 
-{% block js %}
-<script src="/static/js/rte/view_times.js"></script>
-{% endblock %}
