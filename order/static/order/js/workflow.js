@@ -245,6 +245,20 @@ $(document).ready(function() {
     $('[data-tab="PhoneLocation"]').hide();
   }
 
+$('input[name="ModelInfo"]').on('change', function() {
+
+    if ($(this).val() === 'NA') {
+        $('[name="voipPhoneMac"]').hide();
+        $('label[for="id_voipPhoneMac"]').hide();
+        $('[data-tab="Equipment"]').show();
+    } else {
+        $('[name="voipPhoneMac"]').show();
+        $('label[for="id_voipPhoneMac"]').show();
+        $('[data-tab="Equipment"]').hide();
+    }
+
+});
+
   $("#AdminUnique").click(function() {
     $('#PhoneNumber').show();
     $('#GroupEmailAdd').show();
