@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
-from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput, UmOscPreorderApiAbstract, UmOscNoteProfileV
+from project.pinnmodels import UmRteLaborGroupV, UmRteTechnicianV, UmRteRateLevelV, UmRteCurrentTimeAssignedV, UmRteServiceOrderV, UmRteInput, UmOscNoteProfileV
 from project.models import ActionLog
 from django.http import JsonResponse
 from datetime import datetime, timedelta, date
@@ -549,8 +549,6 @@ def view_notes(request):
 # View times
 @permission_required('rte.add_umrteinput', raise_exception=True)
 def view_time_load(request):
-
-
     template = loader.get_template('rte/view/search.html')
 
     all_techs = UmRteTechnicianV.objects.all()
