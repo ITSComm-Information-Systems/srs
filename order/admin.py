@@ -77,6 +77,8 @@ class ActionAdmin(admin.ModelAdmin):
             step.element_list = Element.objects.all().filter(step_id = step.id).order_by('display_seq_no')
 
             for element in step.element_list:
+                if element.name not in hidden_fields:
+                    element.checked = True
 
                 if element.attributes:
                     try:
