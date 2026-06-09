@@ -7,7 +7,7 @@ from project.pinnmodels import UmBillInputApiV
 from django.db import connection
 
 from datetime import datetime, timedelta
-
+from pathlib import Path
 
 class ServiceBilling():
     file_id = 0
@@ -202,8 +202,9 @@ class Container(ServiceBilling):
     file_id = 100
 
     def get_records(self):
+        filename = Path(settings.MEDIA_ROOT) / self.filename
         x=0
-        with open(self.filename, newline="", encoding="utf-8") as f:
+        with open(filename, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 rec = UmBillInputApiV()
