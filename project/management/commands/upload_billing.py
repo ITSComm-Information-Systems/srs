@@ -14,8 +14,9 @@ class ServiceBilling():
     help = 'Upload Billing data for Mi-services to Pinnacle'
     heading = ['shortcode','size','name','date_created','rate_name','total_cost','owner']
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         today = datetime.now().strftime('%m%d%y')
+        self.filename = kwargs['file']
         self.today = int(today)
         self.service = self.__class__.__name__
         self.file_id = int(f"{self.file_id}{self.today}")
@@ -234,8 +235,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         from . import upload_billing as this
-        self.filename = options.get('file')
-        billing = getattr(this, options['service'])()    # Instantiate me sometime when you have no class.
+        billing = getattr(this, options['service'])(file=options.get('file'))    # Instantiate me sometime when you have no class.
         billing.get_records()
         billing.run_pinnacle_job()
         billing.send_email()
