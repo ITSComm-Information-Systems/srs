@@ -226,6 +226,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('service',type=str)
+        parser.add_argument(
+            '--file',
+            dest='file',
+            help='Billing file to process',
+        )
 
     def handle(self, *args, **options):
         from . import upload_billing as this
