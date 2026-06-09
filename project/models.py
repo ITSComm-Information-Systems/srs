@@ -99,28 +99,23 @@ class Unity(models.Model):
 
 class ChoiceManager(models.Manager):
 
-     def get_choices(self, code, pk=True):
+     def get_choices(self, code):
 
           group_list = []
           for optgroup in Choice.objects.filter(parent__code=code, active=True).order_by('sequence'):
+
                option_list = []
                value = optgroup.label
 
                for option in Choice.objects.filter(parent=optgroup.id, active=True).order_by('sequence'):
-                    if pk:
-                         option_list.append((option.id, option.label))
-                    else:
-                         option_list.append((option.code, option.label))
-                         print(option.code, option.label)
+                    option_list.append((option.id, option.label))
 
                if option_list == []:
-                    if pk:
-                         value = optgroup.id
-                    else:
-                         value = optgroup.code
+                    value = optgroup.id
                     option_list = optgroup.label
 
                group_list.append((value, option_list))
+
           return group_list
 
 
