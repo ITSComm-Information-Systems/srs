@@ -10,13 +10,15 @@ from datetime import datetime, timedelta
 
 
 class ServiceBilling():
+    file_id = 0
     help = 'Upload Billing data for Mi-services to Pinnacle'
     heading = ['shortcode','size','name','date_created','rate_name','total_cost','owner']
 
     def __init__(self):
-        today = datetime.now().strftime('%m%d%Y')
+        today = datetime.now().strftime('%m%d%y')
         self.today = int(today)
         self.service = self.__class__.__name__
+        self.file_id = int(f"{self.file_id}{self.today}")
 
     def get_records(self):
         with connection.cursor() as cursor:
@@ -93,7 +95,8 @@ class ServiceBilling():
             []
         )
 
-        email.attach(f'{self.service}.csv', self.csvfile.getvalue(), 'text/csv')
+        if hasattr(self, 'csvfile'):
+            email.attach(f'{self.service}.csv', self.csvfile.getvalue(), 'text/csv')
 
         email.send()
         
@@ -195,17 +198,28 @@ class MiServer(ServiceBilling):
 
 
 class Container(ServiceBilling):
-    sql = 'select 1 from dual;'   # TODO create procs when we get the test file.
+    file_id = 100
 
     def get_records(self):
-        print('foo')
-
-    def run_pinnacle_job(self):
-        print('bar')
-
-    def send_email(self):
-        print('baz')
-
+        x=0
+        with open(self.filename, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                rec = UmBillInputApiV()
+                rec.data_source = row['Data Source']
+                rec.assign_date = row['Assign Date']
+                rec.unique_identifier = row['Unique Identifier'].strip()
+                rec.short_code = row['Short Code']
+                rec.charge_identifier = row['Charge Identifier']
+                rec.quantity_vouchered = row['Quantity Vouchered']
+                rec.invoice_id = row['Invoice ID']
+                rec.m_uniqname = row['Uniqname']
+                rec.voucher_comment = row['Voucher Comment']
+                rec.bill_input_file_id = self.file_id
+                rec.save()
+                x+=1
+    
+        self.body = f'Records Loaded: {x}'
 
 class Command(BaseCommand):
     help = 'Upload Billing data for Mi-services to Pinnacle'
@@ -215,6 +229,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         from . import upload_billing as this
+        self.filename = options.get('file')
         billing = getattr(this, options['service'])()    # Instantiate me sometime when you have no class.
         billing.get_records()
         billing.run_pinnacle_job()

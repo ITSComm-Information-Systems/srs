@@ -46,23 +46,48 @@ class TollUploadView(APIView):
 class ContainerServicesBillingUploadView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def run_upload(environment):
+    @staticmethod
+    def run_upload(filename):
         from django.core.management import call_command
-        call_command('upload_billing', 'Container')
+
+        call_command(
+            'upload_billing',
+            'Container',
+            file=filename,
+        )
 
     def post(self, request):
         if request.user.username != 'rest.container':
             return Response(status=401)
 
+        if not request.FILES:
+            return Response(
+                {'error': 'No file uploaded'},
+                status=400
+            )
+
+        uploaded_file = next(iter(request.FILES.values()))
+
         fs = FileSystemStorage()
-        fs.save('pload/cs_billing.csv', request.FILES['cs_billing.csv'])
+
+        saved_name = fs.save(
+            f'pload/{uploaded_file.name}',
+            uploaded_file
+        )
 
         threading.Thread(
             target=self.run_upload,
-            daemon=True
+            args=(saved_name,),
+            daemon=True,
         ).start()
 
-        return Response(status=200)
+        return Response(
+            {
+                'status': 'accepted',
+                'file': saved_name,
+            },
+            status=200,
+        )
 
 
 def netboxEmails(request):
