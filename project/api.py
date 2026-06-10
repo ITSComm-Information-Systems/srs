@@ -49,6 +49,53 @@ class TollUploadView(APIView):
         return Response(status=204)
 
 
+class ContainerServicesBillingUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def run_upload(filename):
+        from django.core.management import call_command
+
+        call_command(
+            'upload_billing',
+            'Container',
+            file=filename,
+        )
+
+    def post(self, request):
+        if request.user.username != 'rest.container':
+            return Response(status=401)
+
+        if not request.FILES:
+            return Response(
+                {'error': 'No file uploaded'},
+                status=400
+            )
+
+        uploaded_file = next(iter(request.FILES.values()))
+
+        fs = FileSystemStorage()
+
+        saved_name = fs.save(
+            f'pload/{uploaded_file.name}',
+            uploaded_file
+        )
+
+        threading.Thread(
+            target=self.run_upload,
+            args=(saved_name,),
+            daemon=True,
+        ).start()
+
+        return Response(
+            {
+                'status': 'accepted',
+                'file': saved_name,
+            },
+            status=200,
+        )
+
+
 def netboxEmails(request):
     tosend = Webhooks.objects.all().filter(emailed=False)
     if len(tosend) > 0:
