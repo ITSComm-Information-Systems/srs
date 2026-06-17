@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceProfileV, UmOscChartfieldV
-from project.models import Email
+from project.models import Email, MenuItem
 from oscauth.models import AuthUserDept
 from pages.models import Page
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
@@ -809,52 +809,18 @@ class Services(UserPassesTestMixin, View):
     
     def get(self, request, group_id):
 
-        link_list = Page.objects.get(permalink=f'/links/{group_id}')
+        template = loader.get_template('order/service.html')
         notices = Page.objects.get(permalink=f'/notices/{group_id}')
 
-        template = loader.get_template('order/service.html')
-        action_list = Action.objects.filter(active=True).order_by('service','display_seq_no')
-        service_list = Service.objects.filter(group_id=group_id,active=True).order_by('display_seq_no')
-
-        if group_id == 1:
-            selected_service = request.session.get('Telephony','phoneData')
+        if group_id == 1:   #TODO use slugs
+            menu = MenuItem.objects.get_menu_tree('TELEPHONY')
         else:
-            selected_service = request.session.get('backupStorage','miBackup')
-
-        for service in service_list:
-            if service.name == 'cloud':
-                service.actions = [{'label': 'Order Google Cloud Platform', 'target': '/services/gcp/add/'},
-                                   {'label': 'View/Change GCP Project', 'target': '/services/gcp'},
-                                   {'label': 'Order Microsoft Azure', 'target': '/services/azure/add/'},
-                                   {'label': 'View/Change Microsoft Azure', 'target': '/services/azure'},
-                                   {'label': 'Order AWS', 'target': '/services/aws/add/'},
-                                   {'label': 'View/Change AWS', 'target': '/services/aws/'} ]
-            elif service.name == 'midesktop':
-                service.actions = [{'label': 'Order MiDesktop','target': '/services/midesktop/add/'},
-                                   {'label': 'View/Change MiDesktop','target': '/services/midesktop/'},
-                                   {'label': 'Create Image','target': '/services/midesktop-image/add'},
-                                   {'label': 'View/Change Image','target': '/services/midesktop-image/'},
-                                   {'label': 'Create Network','target': '/services/midesktop-network/add'},
-                                   {'label': 'View/Change Network','target': '/services/midesktop-network/'}]
-            elif service.name == 'container':
-                service.actions = [{'label': 'Request Container Project', 'target': '/services/container/add/',
-                                    'description': 'The ITS Container Service hosts containerized applications. A Container Project is a development environment for creating or hosting a containerized app.'}]
-            else:
-                service.actions = action_list.filter(service=service)
-                for action in service.actions:
-                    if action.id == 76:   # ToDo add target to action.
-                        action.target = '/orders/sp/AddSMS'
-                    else:
-                        action.target = f'/orders/wf/{action.id}'
-
-            if service.name == selected_service:
-                service.active = 'active show'
+            menu = MenuItem.objects.get_menu_tree('OTHER_SERVICES')
 
         context = {
             'title': 'Request Service',
-            'service_list': service_list,
-            'link_list': link_list,
             'notices': notices,
+            'menu': menu,
             'page_name': 'Request Service'
         }
         return HttpResponse(template.render(context, request))
