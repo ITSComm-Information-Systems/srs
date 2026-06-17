@@ -6,9 +6,9 @@
     <div class="col-xl-3 col-md-3 col-12">
         <h2 class="service-menu-header">Category</h2>
         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-            {% for service in service_list %}
-            <a class="nav-link {{ service.active }}" id="{{ service.name }}-tab" data-toggle="pill" href="#{{ service.name }}" role="tab"
-                aria-controls="v-pills-profile" aria-selected="false">{{ service }}</a>
+            {% for item in menu.nodes %}
+            <a class="nav-link {{ service.active }}" id="{{ item }}-tab" data-toggle="pill" href="#{{ item.code }}" role="tab" {% if forloop.first %}active{% endif %}
+                aria-controls="v-pills-profile" aria-selected="false">{{ item }}</a>
             {% endfor %}
         </div>
         <div class="alert alert-primary large-order">
@@ -18,24 +18,25 @@
     </div>
 
     <div class="tab-content col-xl-6 col-md-9 col-12" id="v-pills-tabContent">
-        {% for service in service_list %}
-        <div class="tab-pane fade {{ service.active }}" id="{{ service.name }}" role="tabpanel" aria-labelledby="v-pills-profile-tab">
-            <div class="row service" id="{{service.name}}" name="serviceCards">
-                <h3 class="lead">{{ service }}</h3>
+        {% for item in menu.nodes %}
+        <div class="tab-pane fade {{ item.active }}" id="{{ item.code }}" role="tabpanel" aria-labelledby="v-pills-profile-tab" {% if forloop.first %}active{% endif %}>
+            <div class="row service" id="{{item.code}}" name="serviceCards">
+                <h3 class="lead">{{ item }}</h3>
+                <p>{{ item.help_text }}</p>
                 <div class="col-md-12 card-deck">
-                    {% for action in service.actions %}
+                    {% for link in item.nodes %}
                     <div class="card col-12">
                         <div class="card-body">
                             <strong>
-                                <a href="{{action.target}}">
-                                    {{action.label}}
+                                <a href="{{link.path}}">
+                                    {{link.label}}
                                 </a>
                             </strong>
                             <p class="learn-more-link">
                                 <a tabindex="0" role="button" data-toggle="popover" data-container="body"
-                                    data-trigger="focus" data-placement="bottom" title="{{action.label}}"
-                                    data-content="{{action.description}}"> Learn more <span class="sr-only"> about
-                                        {{ action.label }}</span>
+                                    data-trigger="focus" data-placement="bottom" title="{{link.label}}"
+                                    data-content="{{link.help_text}}"> Learn more <span class="sr-only"> about
+                                        {{ link.help_text }}</span>
                                 </a>
                             </p>
                         </div>
@@ -67,29 +68,41 @@
 
 {% block js %}
 <script>
-    $(document).ready(function () {
-        $('[data-toggle="popover"]').popover();
 
-        if (window.location.href.indexOf('#') > 1) {
-            var url = window.location.href;
-            var hash = url.substring(url.indexOf('#'));
+$(function () {
 
-            $(hash + '-tab').addClass(' active');
-            $(hash).addClass(' active show');
-        //} else {
-            //$('#phoneData-tab').addClass(' active');
-            //$('#phoneData').addClass(' active show');
+    $('[data-toggle="popover"]').popover();
 
-            //$('#miBackup-tab').addClass(' active');
-            //$('#miBackup').addClass(' active show');
+    // Restore tab from URL hash
+    if (window.location.hash) {
+        const hash = window.location.hash;
+
+        const $tab = $('a[data-toggle="pill"][href="' + hash + '"]');
+
+        if ($tab.length) {
+            $tab.tab('show');
         }
+    } else {
+        // Default to first tab
+        $('#v-pills-tab .nav-link:first').tab('show');
+    }
 
-        $('.nav-link').on('show.bs.tab', function (event) {
-            id = '#' + event.target.id.slice(0, -4);
-            $('.tab-pane').attr('tabindex', '0');
-            $(id).attr('tabindex', '-1');
-        })
+    // Update URL when tab changes
+    $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
+        const hash = $(e.target).attr('href');
 
+        history.replaceState(null, null, hash);
     });
+
+    // Accessibility
+    $('.nav-link').on('show.bs.tab', function (event) {
+        const id = $(event.target).attr('href');
+
+        $('.tab-pane').attr('tabindex', '0');
+        $(id).attr('tabindex', '-1');
+    });
+
+});
+
 </script>
 {% endblock %}

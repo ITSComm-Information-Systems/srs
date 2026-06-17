@@ -36,8 +36,30 @@ def validate_shortcode(value):
      if status != 'Open':
           raise ValidationError(f'ShortCode {value} is {status}.')
 
-    
+
+class MenuItemManager(models.Manager):
+
+    def get_menu_tree(self, root_code=None):
+        items = list(self.filter(active=True))
+
+        lookup = {}
+
+        for item in items:
+            item.nodes = []
+            lookup[item.code] = item
+
+        for item in items:
+            if item.parent_id and item.parent_id in lookup:
+                lookup[item.parent_id].nodes.append(item)
+
+        if root_code:
+            return lookup.get(root_code)
+
+        return [item for item in items if item.parent_id is None]
+
+
 class MenuItem(models.Model):
+     objects = MenuItemManager()
      code = models.CharField(max_length=20, primary_key=True)
      parent = models.ForeignKey(
           "self", null=True, blank=True,
@@ -57,6 +79,7 @@ class MenuItem(models.Model):
 
      def __str__(self):
           return self.label
+
 
 # This view uses the Pinnacle location table and includes locations added by ITS staff
 #  as well as the official builfing codes from MPathways
@@ -99,28 +122,23 @@ class Unity(models.Model):
 
 class ChoiceManager(models.Manager):
 
-     def get_choices(self, code, pk=True):
+     def get_choices(self, code):
 
           group_list = []
           for optgroup in Choice.objects.filter(parent__code=code, active=True).order_by('sequence'):
+
                option_list = []
                value = optgroup.label
 
                for option in Choice.objects.filter(parent=optgroup.id, active=True).order_by('sequence'):
-                    if pk:
-                         option_list.append((option.id, option.label))
-                    else:
-                         option_list.append((option.code, option.label))
-                         print(option.code, option.label)
+                    option_list.append((option.id, option.label))
 
                if option_list == []:
-                    if pk:
-                         value = optgroup.id
-                    else:
-                         value = optgroup.code
+                    value = optgroup.id
                     option_list = optgroup.label
 
                group_list.append((value, option_list))
+
           return group_list
 
 
