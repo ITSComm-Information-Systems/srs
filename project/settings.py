@@ -34,6 +34,8 @@ ENVIRONMENT = os.getenv('ENVIRONMENT', 'DEV')
 ADMINS = [('Admins', 'srs-exception@umich.edu')]
 SERVER_EMAIL = f'{ ENVIRONMENT }-SRS@localhost'
 
+GOOGLE_ANALYTICS_GTAG_PROPERTY_ID = 'G-FFH2HNYYCQ'
+
 
 # Application definition
 
@@ -61,6 +63,7 @@ INSTALLED_APPS = [
     'tools',
     'softphone',
     'apps',
+    'analytical',
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
@@ -245,6 +248,7 @@ MEDIA_ROOT = '/media' # Use persistent volume in openshift
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 INTERNAL_IPS = ['127.0.0.1']
+
 
 try:
     from local_settings import *
