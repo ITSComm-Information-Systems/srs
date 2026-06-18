@@ -247,6 +247,23 @@ $(document).ready(function() {
     $('[data-tab="PhoneLocation"]').hide();
   }
 
+
+$('input[name="ModelInfo"]').on('change', function() {
+
+    if ($(this).val() === 'NA') {
+        $('[name="voipPhoneMac"]').hide();
+        $('label[for="id_voipPhoneMac"]').hide();
+        $('[data-tab="Equipment"]').show();
+
+    } else {
+        $('[name="voipPhoneMac"]').show();
+        $('label[for="id_voipPhoneMac"]').show();
+        $('[data-tab="Equipment"]').hide();
+    }
+
+});
+
+
   $("#AdminUnique").click(function() {
     $('#PhoneNumber').show();
     $('#GroupEmailAdd').show();
@@ -292,12 +309,12 @@ $(document).ready(function() {
     $('#div_zgJackNumber').show();
   });
 
-  $("#activePhone_yesactivephone").click(function() {
+  $("#activePhone_yes").click(function() {
     $('[data-tab="PhoneLocation"]').show();
     $('[data-tab="LocationNew"]').hide();
   });
 
-  $("#activePhone_noactivephone").click(function() {
+  $("#activePhone_no").click(function() {
     $('[data-tab="PhoneLocation"]').hide();
     $('[data-tab="LocationNew"]').show();
   });
