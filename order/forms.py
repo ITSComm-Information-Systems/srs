@@ -1556,11 +1556,11 @@ class EquipmentForm(TabForm):
             self.cat[0] = Product.objects.all().filter(active=True, category=41).order_by('display_seq_no') # Zoom for Govt
             self.cat[0].id = 'voip'
         else:
-            self.cat = ['Basic','VOIP']
-            self.cat[0] = Product.objects.all().filter(active=True, category=1).order_by('display_seq_no')
-            self.cat[0].id = 'basic'
-            self.cat[1] = Product.objects.all().filter(active=True, category__in=[2, 4]).order_by('display_seq_no') # Voip and Conference
-            self.cat[1].id = 'voip'
+            self.cat = ['VOIP']
+            #self.cat[0] = Product.objects.all().filter(active=True, category=1).order_by('display_seq_no')
+            #self.cat[0].id = 'basic'
+            self.cat[0] = Product.objects.all().filter(active=True, category__in=[2, 4]).order_by('display_seq_no') # Voip and Conference
+            self.cat[0].id = 'voip'
 
 
 class ProductForm(TabForm):

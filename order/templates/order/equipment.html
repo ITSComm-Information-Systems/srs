@@ -6,9 +6,9 @@
         </div>
   <div id="equip{{list.id}}" data-phoneset="{{list.id}}">
 
-    <div class="card-columns">
+    <div class="row">
     {% for field in list %}
-      <div class="card product-card" style="width: 18rem;">
+      <div class="card product-card" style="width: 18rem; margin-right: 20px;">
           <img class="card-img-top" src="/media/{{field.picture}}" alt="Product Image of {{ field }}">
           <div class="card-body">
             <p class="card-title h5" id="card-title-of-{{ field }}">{{ field }}</p>
