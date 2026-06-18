@@ -852,6 +852,9 @@ function set_server_name() {
   
   $(document).on("change", "#id_phoneCategory" , function() {
     var zoomCat = $('#id_phoneCategory').find(":selected").val();
+    $('#div_zoomRoomName').hide();
+    $('#div_zoomRoom').hide();
+    
     if (zoomCat == 'LN-STAFF' || zoomCat == 'LN-FACULTY' ) {
       $('#div_Uniqname').show();
     } else {
@@ -873,6 +876,7 @@ function set_server_name() {
 
   });
 
+  $("#id_phoneCategory").trigger("change");
 
   $(document).on("change", "#id_zoomRoom" , function() {
     var zoomRoomYN = $('#id_zoomRoom').find(":selected").val();
