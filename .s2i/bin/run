@@ -9,6 +9,10 @@ cd "$APP_ROOT"
 echo "---> export home"
 export HOME=/tmp
 
+# Packages installed during assemble live in the user-site under
+# /opt/app-root/.local; make them importable regardless of HOME.
+export PYTHONUSERBASE=/opt/app-root/.local
+
 echo "---> Starting Gunicorn on port $PORT"
 
 exec gunicorn project.wsgi:application \
