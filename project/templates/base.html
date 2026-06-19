@@ -1,7 +1,9 @@
+{% load analytical %}
 <!doctype html>
 <html lang="en">
 
 <head>
+	{% analytical_head_top %}
 	{% load static %}
 	<link rel="shortcut icon" href="/static/favicon.ico" />
 	<!-- Required meta tags -->
@@ -40,9 +42,13 @@
 	{% block title %}
 	<title>SRS - {{ title }}</title>
 	{% endblock title %}
+	{% analytical_head_bottom %}
 </head>
 
+
+
 <body>
+	{% analytical_body_top %}
 	<div id="skip-link">
 		<a href="#main-content" class="sr-only sr-only-focusable">Skip to main content</a>
 	</div>
@@ -252,6 +258,7 @@
 	<script src="/static/sorttable.js"></script>
 	
 	{% block js %}{% endblock js %}
+	{% analytical_body_bottom %}
 </body>
 
 </html>
