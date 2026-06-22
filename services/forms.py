@@ -2,7 +2,7 @@ from django import forms
 from django.core import validators
 from project.forms.fields import *
 from .models import AWS, Azure, GCP, GCPAccount, Container, Network, ImageDisk, Image, Pool
-from project.integrations import MCommunity, Openshift
+from project.integrations import MCommunity, Openshift, UmAPI
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from .midesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
 from django.forms import ModelForm, formset_factory
@@ -264,6 +264,7 @@ class ContainerNewForm(CloudForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.terms = UmAPI().get_academic_terms()
         self.cluster = 'cloud'
 
     def clean(self):

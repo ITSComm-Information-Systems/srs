@@ -162,7 +162,18 @@ class UmAPI:
         }
 
         return access_token
-        
+    
+    def get_academic_terms(self):
+        try:
+            token = self._get_token('umscheduleofclasses')
+            url = f'{self.BASE_URL}/um/Curriculum/SOC/Terms'
+            r = requests.get(url, headers=self.headers)
+            terms = r.json()['getSOCTermsResponse']['Term']
+            return terms
+        except:
+            print('error getting terms')
+            return []
+    
 
 class ShortCodesAPI(UmAPI):
     SCOPE = 'shortcodes'
