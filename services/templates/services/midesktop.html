@@ -38,9 +38,6 @@
             <h6 style="color:red; font-size:12px;">{{form.pool_name.errors}}{{form.image_name.errors}}{{form.network_name.errors}}</h6>
             <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_name.label_tag}}{{form.pool_name}}</h6>
 
-            <h6 style="color:red; font-size:12px;">{{form.pool_accessibility.errors}}</h6>
-            <h6><span style="color:red; font-size:12px;">*</span>{{form.pool_accessibility.label_tag}}{{form.pool_accessibility}}</h6>
-
             <div id="pool_type">
                 <h6><span style="color:red; font-size:12px;">*</span>Pool Type:
                     <select class="form-control" name="pool_type" id="id_pool_type" v-model="selectedPoolType">
@@ -48,8 +45,6 @@
                     </select>
                 </h6>
             </div>
-            <h6><span style="color:red; font-size:12px;">*</span>{{form.auto_logout.label_tag}}{{form.auto_logout}}</h6>
-            <div id="connection_options" v-show="visible">
                 <h2>Connection Options</h2>
                 <h6>{{form.ad_groups.label_tag}}{{form.ad_groups}}</h6>
             </div>
@@ -156,8 +151,6 @@
         
             <div id="networks-wrapper" v-show="visible">
                 <h6>
-                <span style="color:red; font-size:12px;">*</span>{{ form.network_name.label_tag }} {{ form.network_name }}
-                {{ form.network_name.errors }}<br/>
 
                 <span style="color:red; font-size:12px;">*</span>{{ form.access_internet.label_tag }} {{ form.access_internet }}
                 {{ form.access_internet.errors }}<br/>
