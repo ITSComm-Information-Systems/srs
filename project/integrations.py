@@ -198,6 +198,22 @@ class Openshift():
             f"https://console-openshift-console.apps.{self.server}/k8s/cluster/projects"
         )
 
+    def to_label(self, value):
+        # lowercase (optional but common)
+        value = value.lower()
+
+        # replace whitespace with dashes
+        value = re.sub(r"\s+", "-", value)
+
+        # remove invalid characters
+        value = re.sub(r"[^a-z0-9_.-]", "", value)
+
+        # ensure starts/ends with alphanumeric
+        value = re.sub(r"^[^a-z0-9]+", "", value)
+        value = re.sub(r"[^a-z0-9]+$", "", value)
+
+        return value
+
     def get_project(self, name):
         return requests.get(f'{self.api_endpoint}/apis/project.openshift.io/v1/projects/{name}', headers=self.headers)
 
@@ -216,7 +232,9 @@ class Openshift():
         }}
 
         if instance.course_info:
-            payload['metadata']['labels']['course'] = instance.course_info
+            payload['metadata']['labels']['course'] = self.to_label(instance.course_info)
+            payload['metadata']['labels']['course_project'] = 'true'
+            payload['metadata']['labels']['expiration_date'] = instance.expiration_date
         else:
             payload['metadata']['labels']['shortcode'] = instance.shortcode
 
