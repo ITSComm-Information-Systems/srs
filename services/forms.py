@@ -239,7 +239,7 @@ class ContainerNewForm(CloudForm):
     custom = ['database_type', 'course_info']
     skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','container_sensitive', 'course_term', 'course_subject', 'course_number']
     container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
-    course_yn = forms.BooleanField(widget=NoYes,
+    course_yn = forms.CharField(widget=NoYes,
         label='Are you requesting this service for a course project?',
         help_text = "This service is available at no cost for faculty, staff, or students provided it's being used for a project or activity associated with a current U-M course. Faculty may request multiple application instances at one time (e.g., one per student). A valid course code is required.")
     course_info = forms.CharField(required=False)
@@ -315,8 +315,7 @@ class ContainerNewForm(CloudForm):
         return super().clean()
 
     def save(self):
-        if self.cleaned_data.get('course_yn'):
-            print('summ course info')
+        if self.cleaned_data.get('course_yn') == 'Yes':
             self.instance.course_info = self.cleaned_data.get('course_subject') + '-' + self.cleaned_data.get('course_number')
             self.instance.expiration_date = ''
             course_term = int(self.cleaned_data.get('course_term'))
