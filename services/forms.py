@@ -311,6 +311,7 @@ class ContainerNewForm(CloudForm):
                 self.add_error(users, error + 'not found.')        
 
         self.instance.cleaned_names = cleaned_names  # Hang on to this for later.
+        self.instance.cluster = self.cluster
 
         return super().clean()
 
