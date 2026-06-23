@@ -162,7 +162,18 @@ class UmAPI:
         }
 
         return access_token
-        
+    
+    def get_academic_terms(self):
+        try:
+            token = self._get_token('umscheduleofclasses')
+            url = f'{self.BASE_URL}/um/Curriculum/SOC/Terms'
+            r = requests.get(url, headers=self.headers)
+            terms = r.json()['getSOCTermsResponse']['Term']
+            return terms
+        except:
+            print('error getting terms')
+            return []
+    
 
 class ShortCodesAPI(UmAPI):
     SCOPE = 'shortcodes'
@@ -187,6 +198,22 @@ class Openshift():
             f"https://console-openshift-console.apps.{self.server}/k8s/cluster/projects"
         )
 
+    def to_label(self, value):
+        # lowercase (optional but common)
+        value = value.lower()
+
+        # replace whitespace with dashes
+        value = re.sub(r"\s+", "-", value)
+
+        # remove invalid characters
+        value = re.sub(r"[^a-z0-9_.-]", "", value)
+
+        # ensure starts/ends with alphanumeric
+        value = re.sub(r"^[^a-z0-9]+", "", value)
+        value = re.sub(r"[^a-z0-9]+$", "", value)
+
+        return value
+
     def get_project(self, name):
         return requests.get(f'{self.api_endpoint}/apis/project.openshift.io/v1/projects/{name}', headers=self.headers)
 
@@ -205,7 +232,9 @@ class Openshift():
         }}
 
         if instance.course_info:
-            payload['metadata']['labels']['course'] = instance.course_info
+            payload['metadata']['labels']['course'] = self.to_label(instance.course_info)
+            payload['metadata']['labels']['course_project'] = 'true'
+            payload['metadata']['labels']['expiration_date'] = instance.expiration_date
         else:
             payload['metadata']['labels']['shortcode'] = instance.shortcode
 
@@ -735,6 +764,7 @@ class ContainerPayload(Payload):
             f'Uniqname: {request.user.username}\n' 
             f'Are you requesting this service for a course project? {request.POST.get("course_yn")}\n' 
             '\n\n--BUILD--\n' 
+            f'Cluster: {instance.cluster}\n' 
             'Application environment: NA\n' 
             'Does your application need a domain (or public endpoint)?\n' 
             f'Project or Application Name: {instance.project_name}\n' 
@@ -757,6 +787,7 @@ class ContainerPayload(Payload):
 
         super().__init__(action, instance, request, **kwargs)
 
+        self.title = f'Request {instance.cluster.capitalize()} Container Project'
         self.data["Tasks"] = [{'Title': 'Validate customer request', "Order": 1, "ResponsibleGroupID": self.CONTAINER_TEAM}]
 
         if instance.database in ['SHARED', 'DEDICATED']:
