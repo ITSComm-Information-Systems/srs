@@ -1398,7 +1398,8 @@ table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sor
 .srs-chatbot {
 	position:fixed;
 	right:20px;
-	bottom:20px;
+	top:50%;
+	transform:translateY(-50%);
 	z-index:1040;
 	font-family:Roboto,sans-serif;
 }
@@ -1419,7 +1420,8 @@ table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sor
 .srs-chatbot-window {
 	position:absolute;
 	right:0;
-	bottom:66px;
+	top:50%;
+	transform:translateY(-50%);
 	display:flex;
 	flex-direction:column;
 	width:340px;
