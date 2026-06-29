@@ -116,6 +116,18 @@ LOGIN_URL = '/oidc/authenticate'
 
 SLACK_AUTH_TOKEN = os.getenv('SLACK_AUTH_TOKEN', 'N/A')
 
+# Maizey chatbot config is loaded from environment variables so secrets stay out of code.
+MAIZEY = {
+    'BASE_URL': os.getenv('MAIZEY_BASE_URL', 'https://umgpt.umich.edu/maizey/api'),
+    'PROJECT_ID': os.getenv('MAIZEY_PROJECT_ID'),
+    'TOKEN': os.getenv('MAIZEY_TOKEN'),
+    'MAX_MESSAGE_LENGTH': int(os.getenv('MAIZEY_MAX_MESSAGE_LENGTH', '2000')),
+    'RATE_LIMIT_COUNT': int(os.getenv('MAIZEY_RATE_LIMIT_COUNT', '20')),
+    'RATE_LIMIT_SECONDS': int(os.getenv('MAIZEY_RATE_LIMIT_SECONDS', '300')),
+    'CONNECT_TIMEOUT': float(os.getenv('MAIZEY_CONNECT_TIMEOUT', '3.05')),
+    'READ_TIMEOUT': float(os.getenv('MAIZEY_READ_TIMEOUT', '20')),
+}
+
 EMAIL_HOST = 'vdc-relay.us-east-2.a.mail.umich.edu'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

@@ -34,6 +34,8 @@ urlpatterns = [
     path('services/', include('services.urls')),
     path('api/', include(api.router.urls)),
     path('api/token/', views.TokenView.as_view()),
+    # Frontend chatbot posts user messages here; views.chatbot_message handles Maizey calls server-side.
+    path('chatbot/message/', views.chatbot_message),
     path('api/bommaterial/', api.BomMaterialView.as_view()),
     path('api/tollupload/', api.TollUploadView.as_view()),
     path('api/csupload/', api.ContainerServicesBillingUploadView.as_view()),
@@ -65,4 +67,3 @@ if settings.DEBUG:
     urlpatterns = [
         path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
-

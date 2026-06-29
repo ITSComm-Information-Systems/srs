@@ -1394,3 +1394,124 @@ table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sor
     background-color: white; /* Ensures the header has a solid background */
     z-index: 1; /* Keeps the header above other content */
 }
+
+.srs-chatbot {
+	position:fixed;
+	right:20px;
+	bottom:20px;
+	z-index:1040;
+	font-family:Roboto,sans-serif;
+}
+.srs-chatbot-toggle {
+	width:54px;
+	height:54px;
+	border:0;
+	border-radius:50%;
+	background:#00274c;
+	color:#ffffff;
+	box-shadow:0 3px 10px rgba(0, 0, 0, .25);
+}
+.srs-chatbot-toggle:focus,
+.srs-chatbot-toggle:hover {
+	background:#004881;
+	outline:2px solid #ffffff;
+}
+.srs-chatbot-window {
+	position:absolute;
+	right:0;
+	bottom:66px;
+	display:flex;
+	flex-direction:column;
+	width:340px;
+	max-width:calc(100vw - 40px);
+	height:430px;
+	max-height:calc(100vh - 120px);
+	background:#ffffff;
+	border:1px solid #cecbc9;
+	box-shadow:0 4px 16px rgba(0, 0, 0, .2);
+}
+.srs-chatbot-window[hidden] {
+	display:none;
+}
+.srs-chatbot-header {
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	padding:12px 14px;
+	background:#00274c;
+	color:#ffffff;
+}
+.srs-chatbot-header h2 {
+	margin:0;
+	color:#ffffff;
+	font-size:1rem;
+}
+.srs-chatbot-close {
+	border:0;
+	background:transparent;
+	color:#ffffff;
+}
+.srs-chatbot-close:focus,
+.srs-chatbot-close:hover {
+	outline:1px dotted #ffffff;
+	background:#004881;
+}
+.srs-chatbot-messages {
+	flex:1;
+	padding:12px;
+	overflow-y:auto;
+	background:#f7f7f7;
+}
+.srs-chatbot-message {
+	margin:0 0 10px 0;
+	padding:8px 10px;
+	background:#ffffff;
+	border:1px solid #dddddd;
+	border-radius:4px;
+	white-space:pre-wrap;
+}
+.srs-chatbot-message-user {
+	margin-left:36px;
+	background:#e8f1fb;
+	border-color:#bed4ec;
+}
+.srs-chatbot-message-bot,
+.srs-chatbot-message-system,
+.srs-chatbot-message-error {
+	margin-right:36px;
+}
+.srs-chatbot-message-error {
+	background:#f8d7da;
+	border-color:#f1aeb5;
+}
+.srs-chatbot-form {
+	display:flex;
+	gap:8px;
+	padding:12px;
+	border-top:1px solid #cecbc9;
+	background:#ffffff;
+}
+.srs-chatbot-form textarea {
+	flex:1;
+	min-height:44px;
+	max-height:90px;
+	padding:8px;
+	border:1px solid #999999;
+	border-radius:4px;
+	resize:vertical;
+}
+.srs-chatbot-form button {
+	align-self:flex-end;
+	padding:8px 12px;
+	border:0;
+	border-radius:4px;
+	background:#00274c;
+	color:#ffffff;
+}
+.srs-chatbot-form button:focus,
+.srs-chatbot-form button:hover {
+	background:#004881;
+}
+.srs-chatbot-form button:disabled {
+	background:#777777;
+}

@@ -27,7 +27,7 @@ from order.models import Chartcom
 from oscauth.models import AuthUserDept, AuthUserDeptV, DepartmentSecurityV
 from oscauth.utils import get_mc_user
 from datetime import datetime, date, timedelta
-from django.contrib.auth.decorators import login_not_required, permission_required
+from django.contrib.auth.decorators import login_not_required, permission_required, login_required
 from django.db.models import F
 from pages.models import Page
 from project.integrations import MCommunity
@@ -35,7 +35,7 @@ from project.integrations import MCommunity
 import json
 from django.http import JsonResponse
 
-import os, requests
+import os, requests, time
 from django.db.models import indexes, Max
 from django.db import connections
 from django import db
@@ -83,6 +83,84 @@ def get_version(request):
         )
 
 	return JsonResponse(resp.json(), safe=False)
+
+@login_required
+@require_http_methods(["POST"])
+def chatbot_message(request):
+	# Chat messages arrive from srs_chatbot.js as JSON: {"query": "..."}.
+	try:
+		payload = json.loads(request.body.decode('utf-8'))
+	except (UnicodeDecodeError, json.JSONDecodeError):
+		return JsonResponse({'error': 'Invalid JSON payload.'}, status=400)
+
+	if not isinstance(payload, dict):
+		return JsonResponse({'error': 'Invalid JSON payload.'}, status=400)
+
+	query = str(payload.get('query', '')).strip()
+	if not query:
+		return JsonResponse({'error': 'Please enter a message.'}, status=400)
+
+	# Maizey credentials and tuning values stay server-side in environment-backed settings.
+	maizey = getattr(settings, 'MAIZEY', {})
+	base_url = maizey.get('BASE_URL', '').rstrip('/')
+	project_pk = maizey.get('PROJECT_ID')
+	token = maizey.get('TOKEN')
+	max_message_length = maizey.get('MAX_MESSAGE_LENGTH', 2000)
+	rate_limit_count = maizey.get('RATE_LIMIT_COUNT', 20)
+	rate_limit_seconds = maizey.get('RATE_LIMIT_SECONDS', 300)
+	timeout = (
+		maizey.get('CONNECT_TIMEOUT', 3.05),
+		maizey.get('READ_TIMEOUT', 20),
+	)
+
+	if not base_url or not project_pk or not token:
+		return JsonResponse({'error': 'Chatbot integration is not configured.'}, status=503)
+
+	if len(query) > max_message_length:
+		return JsonResponse({'error': f'Message must be {max_message_length} characters or fewer.'}, status=400)
+
+	# Lightweight per-session throttling to reduce accidental or repeated rapid requests.
+	now = time.time()
+	request_times = [
+		request_time for request_time in request.session.get('maizey_request_times', [])
+		if now - request_time < rate_limit_seconds
+	]
+	if len(request_times) >= rate_limit_count:
+		return JsonResponse({'error': 'Please wait a moment before sending another message.'}, status=429)
+	request_times.append(now)
+	request.session['maizey_request_times'] = request_times
+
+	headers = {
+		'accept': 'application/json',
+		'Authorization': f'Bearer {token}',
+		'Content-Type': 'application/json',
+	}
+
+	# Store the Maizey conversation id in the Django session so follow-up messages keep context.
+	conversation_pk = request.session.get('maizey_conversation_pk')
+	try:
+		if not conversation_pk:
+			conversation_url = f'{base_url}/projects/{project_pk}/conversation/'
+			conversation_response = requests.post(conversation_url, headers=headers, json={}, timeout=timeout)
+			conversation_response.raise_for_status()
+			conversation_pk = conversation_response.json().get('pk')
+
+			if not conversation_pk:
+				return JsonResponse({'error': 'Unable to start a chat conversation.'}, status=502)
+
+			request.session['maizey_conversation_pk'] = conversation_pk
+
+		# Send only the user's message to Maizey; the browser never receives token or conversation id.
+		message_url = f'{base_url}/projects/{project_pk}/conversation/{conversation_pk}/messages/'
+		message_response = requests.post(message_url, headers=headers, json={'query': query}, timeout=timeout)
+		message_response.raise_for_status()
+		message = message_response.json()
+	except (ValueError, requests.RequestException):
+		return JsonResponse({'error': 'The chatbot service is unavailable right now.'}, status=502)
+
+	return JsonResponse({
+		'response': message.get('response', ''),
+	})
 
 def unity_login(request):
 	from project.models import Unity

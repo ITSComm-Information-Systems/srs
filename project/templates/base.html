@@ -237,6 +237,30 @@
 		</div>
 	</footer>
 
+	{% if user.is_authenticated %}
+	<div class="srs-chatbot" data-chatbot-endpoint="/chatbot/message/">
+		<button class="srs-chatbot-toggle" type="button" aria-expanded="false" aria-controls="srs-chatbot-window">
+			<span class="fas fa-comment" aria-hidden="true"></span>
+			<span class="sr-only">Open chat</span>
+		</button>
+		<section class="srs-chatbot-window" id="srs-chatbot-window" aria-label="Chatbot" hidden>
+			<header class="srs-chatbot-header">
+				<h2>Chat</h2>
+				<button class="srs-chatbot-close" type="button" aria-label="Close chat">
+					<span class="fas fa-times" aria-hidden="true"></span>
+				</button>
+			</header>
+			<div class="srs-chatbot-messages" aria-live="polite"></div>
+			<form class="srs-chatbot-form">
+				{% csrf_token %}
+				<label class="sr-only" for="srs-chatbot-input">Message</label>
+				<textarea id="srs-chatbot-input" name="message" rows="2" maxlength="2000" placeholder="Ask a question"></textarea>
+				<button type="submit">Send</button>
+			</form>
+		</section>
+	</div>
+	{% endif %}
+
 	<!-- Optional JavaScript -->
 	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
 	<script src="https://code.jquery.com/jquery-1.12.4.min.js"
@@ -252,6 +276,9 @@
 	<script src="/static/sorttable.js"></script>
 	
 	{% block js %}{% endblock js %}
+	{% if user.is_authenticated %}
+	<script src="{% static 'js/srs_chatbot.js' %}"></script>
+	{% endif %}
 </body>
 
 </html>
