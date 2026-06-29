@@ -33,6 +33,75 @@
     return message;
   }
 
+  function createResponseLink(url, label) {
+    var link = document.createElement('a');
+    link.href = url;
+    link.textContent = label || url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    return link;
+  }
+
+  function splitTrailingLinkLabel(text) {
+    var match = text.match(/^(.*?)([^.!?\n]{3,80}):\s*$/);
+    var label;
+
+    if (!match) {
+      return null;
+    }
+
+    label = match[2].trim();
+    if (label.toLowerCase().indexOf('documentation') !== -1) {
+      label = 'official documentation';
+    }
+
+    return {
+      prefix: match[1],
+      label: label
+    };
+  }
+
+  function isGenericLinkLabel(label) {
+    return /^(source|link|url)$/i.test(label.trim());
+  }
+
+  function appendLinkedText(element, text) {
+    var linkPattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s<>"']+)/g;
+    var lastIndex = 0;
+    var match;
+    var textBeforeLink;
+    var trailingLabel;
+
+    element.textContent = '';
+    while ((match = linkPattern.exec(text)) !== null) {
+      textBeforeLink = text.slice(lastIndex, match.index);
+
+      if (match[1] && match[2]) {
+        trailingLabel = isGenericLinkLabel(match[1]) ? splitTrailingLinkLabel(textBeforeLink) : null;
+        if (trailingLabel) {
+          element.appendChild(document.createTextNode(trailingLabel.prefix));
+          element.appendChild(createResponseLink(match[2], trailingLabel.label));
+        } else {
+          element.appendChild(document.createTextNode(textBeforeLink));
+          element.appendChild(createResponseLink(match[2], match[1]));
+        }
+      } else {
+        trailingLabel = splitTrailingLinkLabel(textBeforeLink);
+        if (trailingLabel) {
+          element.appendChild(document.createTextNode(trailingLabel.prefix));
+          element.appendChild(createResponseLink(match[3], trailingLabel.label));
+        } else {
+          element.appendChild(document.createTextNode(textBeforeLink));
+          element.appendChild(createResponseLink(match[3], 'source'));
+        }
+      }
+
+      lastIndex = linkPattern.lastIndex;
+    }
+
+    element.appendChild(document.createTextNode(text.slice(lastIndex)));
+  }
+
   function setBusy(isBusy) {
     form.querySelector('button[type="submit"]').disabled = isBusy;
     input.disabled = isBusy;
@@ -78,8 +147,8 @@
         });
       })
       .then(function (data) {
-        pending.textContent = data.response || 'No response returned.';
         pending.className = 'srs-chatbot-message srs-chatbot-message-bot';
+        appendLinkedText(pending, data.response || 'No response returned.');
       })
       .catch(function (error) {
         pending.textContent = error.message;

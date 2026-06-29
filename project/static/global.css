@@ -1486,6 +1486,11 @@ table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sor
 	background:#f8d7da;
 	border-color:#f1aeb5;
 }
+.srs-chatbot-message a {
+	color:#005eb8;
+	text-decoration:underline;
+	word-break:break-word;
+}
 .srs-chatbot-form {
 	display:flex;
 	gap:8px;
