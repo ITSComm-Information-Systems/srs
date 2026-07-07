@@ -26,7 +26,7 @@
 
   function appendMessage(text, sender) {
     var message = document.createElement('div');
-    message.className = 'srs-chatbot-message srs-chatbot-message-' + sender;
+    message.className = 'srs-chatbot-message srs-chatbot-message-dynamic srs-chatbot-message-' + sender;
     // Use textContent so chatbot/user text is displayed as text, not executable HTML.
     message.textContent = text;
     messages.appendChild(message);
@@ -68,9 +68,13 @@
     }
   }
 
+  function normalizeResponseText(text) {
+    return text.replace(/\\n/g, '\n');
+  }
+
   function splitTrailingLinkLabel(text) {
-    var preferredMatch = text.match(/^(.*?\b)(direct link|learn more here|more details here|official documentation|documentation|here):\s*$/i);
-    var match = text.match(/^(.*?)([^.!?\n]{3,80}):\s*$/);
+    var preferredMatch = text.match(/^([\s\S]*?\b)(direct link|learn more here|more details here|official documentation|documentation|here):\s*$/i);
+    var match = text.match(/^([\s\S]*?)([^.!?\n]{3,80}):\s*$/);
     var label;
 
     if (preferredMatch) {
@@ -110,6 +114,7 @@
     var textBeforeLink;
     var trailingLabel;
 
+    text = normalizeResponseText(text);
     element.textContent = '';
     while ((match = linkPattern.exec(text)) !== null) {
       textBeforeLink = text.slice(lastIndex, match.index);
@@ -119,6 +124,9 @@
         if (trailingLabel) {
           element.appendChild(document.createTextNode(trailingLabel.prefix));
           appendResponseLink(element, match[2], trailingLabel.label);
+        } else if (isGenericLinkLabel(match[1]) && match[2].indexOf('documentation.its.umich.edu') !== -1) {
+          element.appendChild(document.createTextNode(textBeforeLink));
+          appendResponseLink(element, match[2], 'learn more here');
         } else {
           element.appendChild(document.createTextNode(textBeforeLink));
           appendResponseLink(element, match[2], match[1]);
@@ -175,12 +183,12 @@
         });
       })
       .then(function (data) {
-        pending.className = 'srs-chatbot-message srs-chatbot-message-bot';
+        pending.className = 'srs-chatbot-message srs-chatbot-message-dynamic srs-chatbot-message-bot';
         appendLinkedText(pending, data.response || 'No response returned.');
       })
       .catch(function (error) {
         pending.textContent = error.message;
-        pending.className = 'srs-chatbot-message srs-chatbot-message-error';
+        pending.className = 'srs-chatbot-message srs-chatbot-message-dynamic srs-chatbot-message-error';
       })
       .finally(function () {
         setBusy(false);
