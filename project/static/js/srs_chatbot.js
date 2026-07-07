@@ -5,11 +5,12 @@
   }
 
   var toggle = root.querySelector('.srs-chatbot-toggle');
-  var close = root.querySelector('.srs-chatbot-close');
+  var minimize = root.querySelector('.srs-chatbot-minimize');
   var windowEl = root.querySelector('.srs-chatbot-window');
   var form = root.querySelector('.srs-chatbot-form');
   var input = root.querySelector('#srs-chatbot-input');
   var messages = root.querySelector('.srs-chatbot-messages');
+  var options = root.querySelectorAll('.srs-chatbot-option');
   var csrfInput = root.querySelector('input[name="csrfmiddlewaretoken"]');
   var endpoint = root.getAttribute('data-chatbot-endpoint');
 
@@ -105,25 +106,12 @@
   function setBusy(isBusy) {
     form.querySelector('button[type="submit"]').disabled = isBusy;
     input.disabled = isBusy;
+    Array.prototype.forEach.call(options, function (option) {
+      option.disabled = isBusy;
+    });
   }
 
-  toggle.addEventListener('click', function () {
-    setOpen(windowEl.hidden);
-  });
-
-  close.addEventListener('click', function () {
-    setOpen(false);
-  });
-
-  form.addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    // User input starts here, then gets posted to Django's /chatbot/message/ endpoint.
-    var query = input.value.trim();
-    if (!query) {
-      return;
-    }
-
+  function sendMessage(query) {
     appendMessage(query, 'user');
     input.value = '';
     setBusy(true);
@@ -158,5 +146,33 @@
         setBusy(false);
         input.focus();
       });
+  }
+
+  toggle.addEventListener('click', function () {
+    setOpen(windowEl.hidden);
+  });
+
+  if (minimize) {
+    minimize.addEventListener('click', function () {
+      setOpen(false);
+    });
+  }
+
+  Array.prototype.forEach.call(options, function (option) {
+    option.addEventListener('click', function () {
+      sendMessage(option.getAttribute('data-prompt'));
+    });
+  });
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    // User input starts here, then gets posted to Django's /chatbot/message/ endpoint.
+    var query = input.value.trim();
+    if (!query) {
+      return;
+    }
+
+    sendMessage(query);
   });
 }());
