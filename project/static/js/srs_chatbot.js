@@ -11,8 +11,20 @@
   var input = root.querySelector('#srs-chatbot-input');
   var messages = root.querySelector('.srs-chatbot-messages');
   var options = root.querySelectorAll('.srs-chatbot-option');
+  var timestamp = root.querySelector('.srs-chatbot-timestamp');
   var csrfInput = root.querySelector('input[name="csrfmiddlewaretoken"]');
   var endpoint = root.getAttribute('data-chatbot-endpoint');
+
+  function formatTimestamp(date) {
+    var month = date.toLocaleString('en-US', { month: 'long' });
+    var day = date.getDate();
+    var hours = date.getHours();
+    var minutes = String(date.getMinutes()).padStart(2, '0');
+    var period = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12 || 12;
+    return month + ' ' + day + ', ' + hours + ':' + minutes + ' ' + period;
+  }
 
   function setOpen(isOpen) {
     windowEl.hidden = !isOpen;
@@ -211,6 +223,10 @@
       sendMessage(option.getAttribute('data-prompt'));
     });
   });
+
+  if (timestamp) {
+    timestamp.textContent = formatTimestamp(new Date());
+  }
 
   form.addEventListener('submit', function (event) {
     event.preventDefault();
