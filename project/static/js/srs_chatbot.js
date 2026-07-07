@@ -80,8 +80,30 @@
     }
   }
 
+  function joinBrokenMarkdownText(wordFragment, labelPrefix) {
+    if (!wordFragment) {
+      return labelPrefix;
+    }
+    if (wordFragment.length <= 3 && /^[a-z]/.test(labelPrefix)) {
+      return wordFragment + labelPrefix;
+    }
+    if (/^or\b/i.test(labelPrefix)) {
+      return wordFragment + ' ' + labelPrefix;
+    }
+    return wordFragment + labelPrefix;
+  }
+
   function normalizeResponseText(text) {
-    return text.replace(/\\n/g, '\n');
+    return text
+      .replace(/\\n/g, '\n')
+      .replace(/\\([\[\]()])/g, '$1')
+      .replace(/(\w*)\[([\s\S]*?(?:official\s+)?help page[\s\S]*?)\]\(\s*(https?:\/\/srs\.it\.umich\.edu\/help[^)]*)\s*\)/gi, function (fullMatch, wordFragment, label, url) {
+        var labelParts = label.match(/^([\s\S]*?)(official help page|help page)([\s\S]*)$/i);
+        if (!labelParts) {
+          return fullMatch;
+        }
+        return joinBrokenMarkdownText(wordFragment, labelParts[1]) + '[' + labelParts[2] + '](' + url + ')' + labelParts[3];
+      });
   }
 
   function splitTrailingLinkLabel(text) {
@@ -119,8 +141,40 @@
     return /^(source|link|url)$/i.test(label.trim()) || /^https?:\/\//i.test(label.trim());
   }
 
+  function getGenericLinkLabel(url) {
+    if (url.indexOf('documentation.its.umich.edu') !== -1) {
+      return 'learn more here';
+    }
+    if (url.indexOf('srs.it.umich.edu/help') !== -1) {
+      return 'SRS help page';
+    }
+    if (url.indexOf('srs.it.umich.edu') !== -1) {
+      return 'SRS';
+    }
+    return 'source';
+  }
+
+  function splitVerboseMarkdownLabel(label, url) {
+    var match;
+
+    if (url.indexOf('srs.it.umich.edu/help') === -1) {
+      return null;
+    }
+
+    match = label.match(/^([\s\S]*?)(official help page|help page)([\s\S]*)$/i);
+    if (!match) {
+      return null;
+    }
+
+    return {
+      prefix: match[1],
+      label: match[2],
+      suffix: match[3]
+    };
+  }
+
   function appendLinkedText(element, text) {
-    var linkPattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s<>"']+)|([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi;
+    var linkPattern = /\[([\s\S]*?)\]\(\s*(https?:\/\/[^)]+?)\s*\)|(https?:\/\/[^\s<>"']+)|([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi;
     var lastIndex = 0;
     var match;
     var textBeforeLink;
@@ -136,12 +190,21 @@
         if (trailingLabel) {
           element.appendChild(document.createTextNode(trailingLabel.prefix));
           appendResponseLink(element, match[2], trailingLabel.label);
-        } else if (isGenericLinkLabel(match[1]) && match[2].indexOf('documentation.its.umich.edu') !== -1) {
+        } else if (isGenericLinkLabel(match[1])) {
           element.appendChild(document.createTextNode(textBeforeLink));
-          appendResponseLink(element, match[2], 'learn more here');
+          appendResponseLink(element, match[2], getGenericLinkLabel(match[2]));
         } else {
+          trailingLabel = splitVerboseMarkdownLabel(match[1], match[2]);
           element.appendChild(document.createTextNode(textBeforeLink));
-          appendResponseLink(element, match[2], match[1]);
+          if (trailingLabel) {
+            element.appendChild(document.createTextNode(trailingLabel.prefix));
+            appendResponseLink(element, match[2], trailingLabel.label);
+            if (trailingLabel.suffix) {
+              element.appendChild(document.createTextNode(trailingLabel.suffix));
+            }
+          } else {
+            appendResponseLink(element, match[2], match[1]);
+          }
         }
       } else if (match[3]) {
         trailingLabel = splitTrailingLinkLabel(textBeforeLink);
@@ -150,7 +213,7 @@
           appendResponseLink(element, match[3], trailingLabel.label);
         } else {
           element.appendChild(document.createTextNode(textBeforeLink));
-          appendResponseLink(element, match[3], 'source');
+          appendResponseLink(element, match[3], getGenericLinkLabel(match[3]));
         }
       } else {
         element.appendChild(document.createTextNode(textBeforeLink));
