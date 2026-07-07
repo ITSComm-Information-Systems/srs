@@ -38,14 +38,51 @@
     var link = document.createElement('a');
     link.href = url;
     link.textContent = label || url;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
+    if (url.indexOf('mailto:') !== 0) {
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    }
     return link;
   }
 
+  function splitTrailingUrlPunctuation(url) {
+    var match = url.match(/^(.+?)([.,;:!?]+)$/);
+    if (!match) {
+      return {
+        url: url,
+        suffix: ''
+      };
+    }
+
+    return {
+      url: match[1],
+      suffix: match[2]
+    };
+  }
+
+  function appendResponseLink(element, url, label) {
+    var cleanedUrl = splitTrailingUrlPunctuation(url);
+    element.appendChild(createResponseLink(cleanedUrl.url, label));
+    if (cleanedUrl.suffix) {
+      element.appendChild(document.createTextNode(cleanedUrl.suffix));
+    }
+  }
+
   function splitTrailingLinkLabel(text) {
+    var preferredMatch = text.match(/^(.*?\b)(direct link|learn more here|more details here|official documentation|documentation|here):\s*$/i);
     var match = text.match(/^(.*?)([^.!?\n]{3,80}):\s*$/);
     var label;
+
+    if (preferredMatch) {
+      label = preferredMatch[2].trim();
+      if (label.toLowerCase() === 'documentation') {
+        label = 'official documentation';
+      }
+      return {
+        prefix: preferredMatch[1],
+        label: label
+      };
+    }
 
     if (!match) {
       return null;
@@ -63,11 +100,11 @@
   }
 
   function isGenericLinkLabel(label) {
-    return /^(source|link|url)$/i.test(label.trim());
+    return /^(source|link|url)$/i.test(label.trim()) || /^https?:\/\//i.test(label.trim());
   }
 
   function appendLinkedText(element, text) {
-    var linkPattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s<>"']+)/g;
+    var linkPattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s<>"']+)|([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi;
     var lastIndex = 0;
     var match;
     var textBeforeLink;
@@ -81,20 +118,23 @@
         trailingLabel = isGenericLinkLabel(match[1]) ? splitTrailingLinkLabel(textBeforeLink) : null;
         if (trailingLabel) {
           element.appendChild(document.createTextNode(trailingLabel.prefix));
-          element.appendChild(createResponseLink(match[2], trailingLabel.label));
+          appendResponseLink(element, match[2], trailingLabel.label);
         } else {
           element.appendChild(document.createTextNode(textBeforeLink));
-          element.appendChild(createResponseLink(match[2], match[1]));
+          appendResponseLink(element, match[2], match[1]);
         }
-      } else {
+      } else if (match[3]) {
         trailingLabel = splitTrailingLinkLabel(textBeforeLink);
         if (trailingLabel) {
           element.appendChild(document.createTextNode(trailingLabel.prefix));
-          element.appendChild(createResponseLink(match[3], trailingLabel.label));
+          appendResponseLink(element, match[3], trailingLabel.label);
         } else {
           element.appendChild(document.createTextNode(textBeforeLink));
-          element.appendChild(createResponseLink(match[3], 'source'));
+          appendResponseLink(element, match[3], 'source');
         }
+      } else {
+        element.appendChild(document.createTextNode(textBeforeLink));
+        element.appendChild(createResponseLink('mailto:' + match[4], match[4]));
       }
 
       lastIndex = linkPattern.lastIndex;
