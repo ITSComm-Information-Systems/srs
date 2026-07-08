@@ -1,8 +1,9 @@
 from django import forms
+from datetime import datetime
 from django.core import validators
 from project.forms.fields import *
 from .models import AWS, Azure, GCP, GCPAccount, Container, Network, ImageDisk, Image, Pool
-from project.integrations import MCommunity, Openshift
+from project.integrations import MCommunity, Openshift, UmAPI
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from .midesktopchoices import CPU_CHOICES,RAM_CHOICES,STORAGE_CHOICES
 from django.forms import ModelForm, formset_factory
@@ -236,12 +237,15 @@ def validate_project_name(value):
 class ContainerNewForm(CloudForm):
     title = 'Request a Container Service Project'
     custom = ['database_type', 'course_info']
-    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','container_sensitive']
+    skip = ['acknowledge_srd','acknowledge_sle','regulated_data','non_regulated_data','container_sensitive', 'course_term', 'course_subject', 'course_number']
     container_sensitive = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'none'}))    
-    course_yn = forms.BooleanField(widget=NoYes,
+    course_yn = forms.CharField(widget=NoYes,
         label='Are you requesting this service for a course project?',
         help_text = "This service is available at no cost for faculty, staff, or students provided it's being used for a project or activity associated with a current U-M course. Faculty may request multiple application instances at one time (e.g., one per student). A valid course code is required.")
     course_info = forms.CharField(required=False)
+    course_term = forms.ChoiceField(required=False, label='Term')
+    course_subject = forms.CharField(required=False, label='Subject', widget=forms.TextInput(attrs={'placeholder': '(e.g. ARCH)'}))
+    course_number = forms.CharField(required=False, label='Course Number', widget=forms.TextInput(attrs={'placeholder': 'e.g. 201'}))
     shortcode = forms.CharField(validators=[validate_shortcode], required=False)
     admin_group = forms.ChoiceField(label='Contact Group', help_text='The MCommunity group is used to identify a point of contact should the primary point of contact for this account change. Must be public and contain at least 2 members. The MCommunity group will not be used to define or maintain access to your project. Please omit @umich.edu from your group name in this field.')
     project_name = forms.CharField(help_text='A project is a logical grouping of resources that can be managed together. A project can contain multiple applications, services, and other resources. Projects are used to organize and manage resources in a way that makes sense for your team. The project name must be unique on the hosting cluster. It must be lowercase, contain no special characters, and contain no spaces. Hyphens are permitted.',
@@ -264,6 +268,14 @@ class ContainerNewForm(CloudForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        terms = UmAPI().get_academic_terms()
+        self.fields["course_term"].choices = [
+            ("", "Select...")
+        ] + [
+            (term["TermCode"], term["TermDescr"])
+            for term in terms
+        ]
+
         self.cluster = 'cloud'
 
     def clean(self):
@@ -299,10 +311,20 @@ class ContainerNewForm(CloudForm):
                 self.add_error(users, error + 'not found.')        
 
         self.instance.cleaned_names = cleaned_names  # Hang on to this for later.
+        self.instance.cluster = self.cluster
 
         return super().clean()
 
     def save(self):
+        if self.cleaned_data.get('course_yn') == 'Yes':
+            self.instance.course_info = self.cleaned_data.get('course_subject') + '-' + self.cleaned_data.get('course_number')
+            self.instance.expiration_date = ''
+            course_term = int(self.cleaned_data.get('course_term'))
+            for term in UmAPI().get_academic_terms():
+                if term['TermCode'] == course_term:
+                    self.instance.expiration_date = datetime.strptime(term['TermEndDt'], "%m/%d/%Y").strftime("%Y%m%d")
+                    break
+
         # Create project in openshift, don't save to SRS.
         os = Openshift(cluster=self.cluster)
         os.create_project(self.instance, self.user.username)
@@ -367,11 +389,11 @@ ACCESS_INTERNET_CHOICES = (('True','Yes, my desktop needs internet access (outsi
 MASK_CHOICES = [["16", "/28 (16 addresses)"], ["32", "/27 (32 addresses)"], ["64", "/26 (64 addresses)"], 
                     ["128", "/25 (128 addresses)"], ["256", "/24 (256 addresses)"]]
 
-CPU_INITIAL = 1.28
-MEMORY_INITIAL = 1.06
-STORAGE_INITIAL = 5.50
+CPU_INITIAL = 1.42
+MEMORY_INITIAL = 1.16
+STORAGE_INITIAL = 6.50
 GPU_INITIAL = 0.00
-BASE_COST = 34.71
+BASE_COST = 39.04
 TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
 
 class StorageForm(forms.Form):
@@ -465,7 +487,7 @@ class MiDesktopNewForm(MiDesktopForm):
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
     pool_type = forms.ChoiceField(label='Pool Type', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent"),("external","External")))
     pool_name = forms.CharField(required=True)
-    pool_accessibility = forms.ChoiceField(choices=(('No Restriction','No Restriction'),('Publicly Available','Publicly Available'),('From UMNet Only','From UMNet Only')),required=True)
+    pool_accessibility = forms.ChoiceField(choices=(('No Restriction','No Restriction'),('Publicly Available','Publicly Available'),('From UMNet Only','From UMNet Only')),required=False)
     auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('1min','1 Minute'),('5min','5 Minutes'),('15min','15 Minutes'),('30min','30 Minutes'),
                                                                 ('1hr','1 Hour'),('2hr','2 Hours'),('4hr','4 Hours'),('8hr','8 Hours'),('12hr','12 Hours'),
                                                                 ('16hr','16 Hours'),('20hr','20 Hours'),('24hr','24 Hours')))
@@ -495,8 +517,8 @@ class MiDesktopNewForm(MiDesktopForm):
     network  = forms.CharField(required=False)
     network_name = forms.CharField(required=False)
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
-    mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
-    protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False,required=False)
+    mask = forms.ChoiceField(choices=MASK_CHOICES,required=False, label="Network Size")
+    protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False,required=False,label="Firewall Options")
     technical_contact = forms.EmailField(required=False)
     business_contact = forms.EmailField(required=False)
     security_contact = forms.EmailField(required=False)

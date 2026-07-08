@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "---> Installing Python dependencies"
-pip install --no-cache-dir -r requirements.txt
-
 echo "---> Preparing app directory"
 mkdir -p /opt/app-root/src
 chmod -R g+rwX /opt/app-root/src
@@ -12,8 +9,17 @@ echo "---> Copying application source"
 # S2I already copies your repo into /tmp/src
 cp -a /tmp/src/. /opt/app-root/src/
 
-echo "---> Collecting static files"
 cd /opt/app-root/src
+
+echo "---> Installing Python dependencies"
+# S2I runs as an arbitrary non-root UID that cannot write to the system
+# site-packages, so pip falls back to a user install. Point HOME/PYTHONUSERBASE
+# at the writable /opt/app-root/.local (already on PATH in the base image).
+export HOME=/opt/app-root
+export PYTHONUSERBASE=/opt/app-root/.local
+pip install --no-cache-dir --user -r requirements.txt
+
+echo "---> Collecting static files"
 python3 manage.py collectstatic --noinput
 
 echo "---> Build completed"

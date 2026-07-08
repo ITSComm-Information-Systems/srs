@@ -36,8 +36,30 @@ def validate_shortcode(value):
      if status != 'Open':
           raise ValidationError(f'ShortCode {value} is {status}.')
 
-    
+
+class MenuItemManager(models.Manager):
+
+    def get_menu_tree(self, root_code=None):
+        items = list(self.filter(active=True))
+
+        lookup = {}
+
+        for item in items:
+            item.nodes = []
+            lookup[item.code] = item
+
+        for item in items:
+            if item.parent_id and item.parent_id in lookup:
+                lookup[item.parent_id].nodes.append(item)
+
+        if root_code:
+            return lookup.get(root_code)
+
+        return [item for item in items if item.parent_id is None]
+
+
 class MenuItem(models.Model):
+     objects = MenuItemManager()
      code = models.CharField(max_length=20, primary_key=True)
      parent = models.ForeignKey(
           "self", null=True, blank=True,
@@ -57,6 +79,7 @@ class MenuItem(models.Model):
 
      def __str__(self):
           return self.label
+
 
 # This view uses the Pinnacle location table and includes locations added by ITS staff
 #  as well as the official builfing codes from MPathways
