@@ -311,6 +311,7 @@ class ContainerNewForm(CloudForm):
                 self.add_error(users, error + 'not found.')        
 
         self.instance.cleaned_names = cleaned_names  # Hang on to this for later.
+        self.instance.cluster = self.cluster
 
         return super().clean()
 
@@ -388,11 +389,11 @@ ACCESS_INTERNET_CHOICES = (('True','Yes, my desktop needs internet access (outsi
 MASK_CHOICES = [["16", "/28 (16 addresses)"], ["32", "/27 (32 addresses)"], ["64", "/26 (64 addresses)"], 
                     ["128", "/25 (128 addresses)"], ["256", "/24 (256 addresses)"]]
 
-CPU_INITIAL = 1.28
-MEMORY_INITIAL = 1.06
-STORAGE_INITIAL = 5.50
+CPU_INITIAL = 1.42
+MEMORY_INITIAL = 1.16
+STORAGE_INITIAL = 6.50
 GPU_INITIAL = 0.00
-BASE_COST = 34.71
+BASE_COST = 39.04
 TOTAL_INITIAL = CPU_INITIAL + MEMORY_INITIAL + STORAGE_INITIAL + GPU_INITIAL + BASE_COST
 
 class StorageForm(forms.Form):
@@ -486,7 +487,7 @@ class MiDesktopNewForm(MiDesktopForm):
     shortcode = forms.CharField(validators=[validate_shortcode], required=True)
     pool_type = forms.ChoiceField(label='Pool Type', choices = (("instant_clone","Instant-Clone"),("persistent","Persistent"),("external","External")))
     pool_name = forms.CharField(required=True)
-    pool_accessibility = forms.ChoiceField(choices=(('No Restriction','No Restriction'),('Publicly Available','Publicly Available'),('From UMNet Only','From UMNet Only')),required=True)
+    pool_accessibility = forms.ChoiceField(choices=(('No Restriction','No Restriction'),('Publicly Available','Publicly Available'),('From UMNet Only','From UMNet Only')),required=False)
     auto_logout = forms.ChoiceField(required=False,choices=(('Never','Never'),('Immediately','Immediately'),('1min','1 Minute'),('5min','5 Minutes'),('15min','15 Minutes'),('30min','30 Minutes'),
                                                                 ('1hr','1 Hour'),('2hr','2 Hours'),('4hr','4 Hours'),('8hr','8 Hours'),('12hr','12 Hours'),
                                                                 ('16hr','16 Hours'),('20hr','20 Hours'),('24hr','24 Hours')))
@@ -516,8 +517,8 @@ class MiDesktopNewForm(MiDesktopForm):
     network  = forms.CharField(required=False)
     network_name = forms.CharField(required=False)
     access_internet = forms.ChoiceField(choices=ACCESS_INTERNET_CHOICES,required=False)
-    mask = forms.ChoiceField(choices=MASK_CHOICES,required=False)
-    protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False,required=False)
+    mask = forms.ChoiceField(choices=MASK_CHOICES,required=False, label="Network Size")
+    protection = forms.ChoiceField(choices=(('datacenter','Datacenter Firewall'),('none','None')), widget=forms.Select(), initial=False,required=False,label="Firewall Options")
     technical_contact = forms.EmailField(required=False)
     business_contact = forms.EmailField(required=False)
     security_contact = forms.EmailField(required=False)

@@ -754,6 +754,10 @@ function set_server_name() {
       $('#div_regulated_data').show().prop('required',true);
     } else if ($('#misevregu_1').prop("checked")) {  // No Sensitive Data
       $('#div_regulated_data').hide().prop('required',false);
+      $('#div_regulated_data')
+          .hide()
+          .find(':checkbox, :radio')
+          .prop('checked', false);
     } else {
       $('#div_regulated_data').hide().prop('required',false);
     }
@@ -764,6 +768,10 @@ function set_server_name() {
       $('#div_non_regulated_data').show().prop('required',true);
     } else if ($('#misevnonregu_1').prop("checked")) {  // No Unregulated Sensitive Data
       $('#div_non_regulated_data').hide().prop('required',false);
+      $('#div_non_regulated_data')
+          .hide()
+          .find(':checkbox, :radio')
+          .prop('checked', false);
     } else {
       $('#div_non_regulated_data').hide().prop('required',false);
     }

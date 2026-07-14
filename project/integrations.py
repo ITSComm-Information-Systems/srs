@@ -764,6 +764,7 @@ class ContainerPayload(Payload):
             f'Uniqname: {request.user.username}\n' 
             f'Are you requesting this service for a course project? {request.POST.get("course_yn")}\n' 
             '\n\n--BUILD--\n' 
+            f'Cluster: {instance.cluster}\n' 
             'Application environment: NA\n' 
             'Does your application need a domain (or public endpoint)?\n' 
             f'Project or Application Name: {instance.project_name}\n' 
@@ -786,6 +787,7 @@ class ContainerPayload(Payload):
 
         super().__init__(action, instance, request, **kwargs)
 
+        self.title = f'Request {instance.cluster.capitalize()} Container Project'
         self.data["Tasks"] = [{'Title': 'Validate customer request', "Order": 1, "ResponsibleGroupID": self.CONTAINER_TEAM}]
 
         if instance.database in ['SHARED', 'DEDICATED']:
