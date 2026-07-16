@@ -55,3 +55,20 @@ class ChatbotScriptTests(SimpleTestCase):
         self.assertIn("settingsToggle.setAttribute('aria-expanded'", self.script)
         self.assertIn("event.key === 'Escape'", self.script)
         self.assertIn("setSettingsOpen(false)", self.script)
+
+    def test_enter_to_send_uses_existing_submit_handler(self):
+        self.assertIn("input.addEventListener('keydown'", self.script)
+        self.assertIn("event.key !== 'Enter'", self.script)
+        self.assertIn("event.preventDefault()", self.script)
+        self.assertIn("submitChatForm()", self.script)
+        self.assertIn("form.requestSubmit()", self.script)
+        self.assertIn("form.addEventListener('submit'", self.script)
+
+    def test_enter_to_send_keeps_existing_guards(self):
+        self.assertIn("var query = input.value.trim()", self.script)
+        self.assertIn("if (!query)", self.script)
+        self.assertIn("event.shiftKey", self.script)
+        self.assertIn("event.isComposing", self.script)
+        self.assertIn("isComposing", self.script)
+        self.assertIn("compositionstart", self.script)
+        self.assertIn("compositionend", self.script)

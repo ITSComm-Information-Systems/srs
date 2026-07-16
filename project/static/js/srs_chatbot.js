@@ -21,6 +21,7 @@
   var timestamp = root.querySelector('.srs-chatbot-timestamp');
   var csrfInput = root.querySelector('input[name="csrfmiddlewaretoken"]');
   var endpoint = root.getAttribute('data-chatbot-endpoint');
+  var isComposing = false;
 
   function formatTimestamp(date) {
     var month = date.toLocaleString('en-US', { month: 'long' });
@@ -288,6 +289,18 @@
     });
   }
 
+  function submitChatForm() {
+    if (typeof form.requestSubmit === 'function') {
+      form.requestSubmit();
+      return;
+    }
+
+    form.dispatchEvent(new Event('submit', {
+      bubbles: true,
+      cancelable: true
+    }));
+  }
+
   function sendMessage(query) {
     appendMessage(query, 'user');
     input.value = '';
@@ -384,5 +397,22 @@
     }
 
     sendMessage(query);
+  });
+
+  input.addEventListener('compositionstart', function () {
+    isComposing = true;
+  });
+
+  input.addEventListener('compositionend', function () {
+    isComposing = false;
+  });
+
+  input.addEventListener('keydown', function (event) {
+    if (event.key !== 'Enter' || event.shiftKey || event.isComposing || isComposing) {
+      return;
+    }
+
+    event.preventDefault();
+    submitChatForm();
   });
 }());
