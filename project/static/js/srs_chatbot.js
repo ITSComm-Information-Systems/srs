@@ -4,7 +4,14 @@
     return;
   }
 
+  var TEXT_SIZE_STORAGE_KEY = 'srsChatbotTextSize';
+  var TEXT_SIZE_DEFAULT = '100';
+  var TEXT_SIZE_OPTIONS = ['60', '80', '100', '110', '120', '150'];
   var toggle = root.querySelector('.srs-chatbot-toggle');
+  var settingsToggle = root.querySelector('.srs-chatbot-settings-toggle');
+  var settingsPanel = root.querySelector('.srs-chatbot-settings');
+  var settingsClose = root.querySelector('.srs-chatbot-settings-close');
+  var textSizeInputs = root.querySelectorAll('input[name="srs-chatbot-text-size"]');
   var minimize = root.querySelector('.srs-chatbot-minimize');
   var windowEl = root.querySelector('.srs-chatbot-window');
   var form = root.querySelector('.srs-chatbot-form');
@@ -14,6 +21,7 @@
   var timestamp = root.querySelector('.srs-chatbot-timestamp');
   var csrfInput = root.querySelector('input[name="csrfmiddlewaretoken"]');
   var endpoint = root.getAttribute('data-chatbot-endpoint');
+  var isComposing = false;
 
   function formatTimestamp(date) {
     var month = date.toLocaleString('en-US', { month: 'long' });
@@ -24,6 +32,53 @@
 
     hours = hours % 12 || 12;
     return month + ' ' + day + ', ' + hours + ':' + minutes + ' ' + period;
+  }
+
+  function getStoredTextSize() {
+    var storedSize;
+
+    try {
+      storedSize = window.localStorage.getItem(TEXT_SIZE_STORAGE_KEY);
+    } catch (error) {
+      storedSize = null;
+    }
+
+    return TEXT_SIZE_OPTIONS.indexOf(storedSize) !== -1 ? storedSize : TEXT_SIZE_DEFAULT;
+  }
+
+  function storeTextSize(size) {
+    try {
+      window.localStorage.setItem(TEXT_SIZE_STORAGE_KEY, size);
+    } catch (error) {
+      return;
+    }
+  }
+
+  function applyTextSize(size, persist) {
+    var selectedSize = TEXT_SIZE_OPTIONS.indexOf(size) !== -1 ? size : TEXT_SIZE_DEFAULT;
+
+    windowEl.style.setProperty('--srs-chatbot-text-size', selectedSize + '%');
+    Array.prototype.forEach.call(textSizeInputs, function (input) {
+      input.checked = input.value === selectedSize;
+    });
+
+    if (persist) {
+      storeTextSize(selectedSize);
+    }
+  }
+
+  function setSettingsOpen(isOpen) {
+    if (!settingsPanel || !settingsToggle) {
+      return;
+    }
+
+    settingsPanel.hidden = !isOpen;
+    settingsToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    if (isOpen) {
+      (settingsPanel.querySelector('input:checked') || settingsPanel.querySelector('input') || settingsClose).focus();
+    } else {
+      settingsToggle.focus();
+    }
   }
 
   function setOpen(isOpen) {
@@ -234,6 +289,18 @@
     });
   }
 
+  function submitChatForm() {
+    if (typeof form.requestSubmit === 'function') {
+      form.requestSubmit();
+      return;
+    }
+
+    form.dispatchEvent(new Event('submit', {
+      bubbles: true,
+      cancelable: true
+    }));
+  }
+
   function sendMessage(query) {
     appendMessage(query, 'user');
     input.value = '';
@@ -275,6 +342,18 @@
     setOpen(windowEl.hidden);
   });
 
+  if (settingsToggle) {
+    settingsToggle.addEventListener('click', function () {
+      setSettingsOpen(settingsPanel.hidden);
+    });
+  }
+
+  if (settingsClose) {
+    settingsClose.addEventListener('click', function () {
+      setSettingsOpen(false);
+    });
+  }
+
   if (minimize) {
     minimize.addEventListener('click', function () {
       setOpen(false);
@@ -287,9 +366,26 @@
     });
   });
 
+  Array.prototype.forEach.call(textSizeInputs, function (input) {
+    input.addEventListener('change', function () {
+      if (input.checked) {
+        applyTextSize(input.value, true);
+      }
+    });
+  });
+
+  windowEl.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && settingsPanel && !settingsPanel.hidden) {
+      event.preventDefault();
+      setSettingsOpen(false);
+    }
+  });
+
   if (timestamp) {
     timestamp.textContent = formatTimestamp(new Date());
   }
+
+  applyTextSize(getStoredTextSize(), false);
 
   form.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -301,5 +397,22 @@
     }
 
     sendMessage(query);
+  });
+
+  input.addEventListener('compositionstart', function () {
+    isComposing = true;
+  });
+
+  input.addEventListener('compositionend', function () {
+    isComposing = false;
+  });
+
+  input.addEventListener('keydown', function (event) {
+    if (event.key !== 'Enter' || event.shiftKey || event.isComposing || isComposing) {
+      return;
+    }
+
+    event.preventDefault();
+    submitChatForm();
   });
 }());
