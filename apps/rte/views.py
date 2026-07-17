@@ -13,6 +13,7 @@ from django.core import serializers
 from ..bom.models import Workorder, Estimate, PreOrder, Labor, EstimateView
 from collections import defaultdict
 from django.views.decorators.cache import cache_page
+from django.db import connection
 
 # Base RTE view
 @permission_required('rte.add_umrteinput', raise_exception=True)
@@ -536,6 +537,9 @@ def select_times(request):
 @permission_required('rte.add_umrteinput', raise_exception=True)
 def view_notes(request):
     template = loader.get_template('rte/view/view_notes.html')
+
+    with connection.cursor() as cursor:         # Update RTE note author
+            cursor.callproc("UM_UPDATE_RTE_NOTES")
 
     all_notes = UmOscNoteProfileV.objects.filter(note_subject = 'Time Entry Notes', note_author=request.user.username
                                                  ).order_by('-last_update_date')[:100]
