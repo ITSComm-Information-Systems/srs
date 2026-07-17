@@ -19,6 +19,9 @@ class Command(BaseCommand):
         elif date.today().weekday() == 0:
             self.monday_jobs()
 
+        with connection.cursor() as cursor:         # Update RTE note author
+            cursor.callproc("UM_UPDATE_RTE_NOTES")
+
         sql = '''delete from srs_auth_user_dept a
                 where group_id in (5,6) -- Orderer, Reporter
                 and exists (select 'x'
