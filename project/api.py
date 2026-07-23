@@ -1,5 +1,6 @@
 #from django.contrib.auth.models import User
 from order.models import StorageInstance, ArcInstance, StorageRate, BackupDomain, BackupNode, ArcBilling, BackupDomain, Server, Database, ArcHost
+from project.pinnmodels import UmModemsV
 from services.models import Pool, Image, Network
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from rest_framework import routers, viewsets
@@ -266,7 +267,7 @@ class DefaultViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
-        queryset = self.serializer_class.Meta.model.objects.all().order_by('id')
+        queryset = self.serializer_class.Meta.model.objects.all().order_by(self.serializer_class.Meta.model._meta.pk.name)
         if hasattr(self.serializer_class, 'prefetch_related'):
             queryset = queryset.prefetch_related(*self.serializer_class.prefetch_related)
 
@@ -296,7 +297,7 @@ class DefaultViewSet(viewsets.ModelViewSet):
 def viewset_factory(model, serializer_class=None):
     name = model.__name__
     x = type(f'{name}ViewSet', (DefaultViewSet,), {})
-    x.queryset = model.objects.all().order_by('id')
+    x.queryset = model.objects.all().order_by(model._meta.pk.name)
 
     if serializer_class:
         x.serializer_class = serializer_class
@@ -314,6 +315,7 @@ router.register('pool', viewset_factory(Pool))
 router.register('image', viewset_factory(Image))
 router.register('server', viewset_factory(Server))
 router.register('archost', viewset_factory(ArcHost))
+router.register('modems', viewset_factory(UmModemsV))
 
 # Deprecated method requiring a custom serializer.
 router.register('network', viewset_factory(Network, serializers.NetworkSerializer))
