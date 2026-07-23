@@ -1359,3 +1359,25 @@ class UmOscNameChangeV(models.Model):
     class Meta:
         managed = False  # Created from a view. Don't remove.
         db_table = 'PINN_CUSTOM\".\"um_osc_name_change_v'
+
+
+class UmModemsV(models.Model):
+    service_number = models.CharField(max_length=60, primary_key=True)
+    service_status_code = models.CharField(max_length=60, blank=True, null=True)
+    mac_address = models.CharField(max_length=128, blank=True, null=True)
+    building_code = models.CharField(max_length=10, blank=True, null=True)
+    building_name = models.CharField(max_length=25, blank=True, null=True)
+    floor_name = models.CharField(max_length=18, blank=True, null=True)
+    room_name = models.CharField(max_length=18, blank=True, null=True)
+    jack_name = models.CharField(max_length=30, blank=True, null=True)
+    address_line_1 = models.CharField(max_length=255, blank=True, null=True)
+    address_line_2 = models.CharField(max_length=255, blank=True, null=True)
+    address_line_3 = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=50, blank=True, null=True)
+    state = models.CharField(max_length=2, blank=True, null=True)
+    zip_code = models.CharField(max_length=5, blank=True, null=True)
+    country_code = models.CharField(max_length=20, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'um_modems_v'
