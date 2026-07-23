@@ -261,10 +261,10 @@ class Openshift():
             "apiVersion": "user.openshift.io/v1",
             "kind": "Identity",
             "metadata": {
-                "name": "umich-openid:rhoffer"
+                "name": f"umich-openid:{username}"
             },
             "providerName": "umich-openid",
-            "providerUserName": "rhoffer",
+            "providerUserName": username,
             "user": {
                 "kind": "User",
                 "apiVersion": "user.openshift.io/v1",
