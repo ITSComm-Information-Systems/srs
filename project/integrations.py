@@ -217,6 +217,89 @@ class Openshift():
     def get_project(self, name):
         return requests.get(f'{self.api_endpoint}/apis/project.openshift.io/v1/projects/{name}', headers=self.headers)
 
+
+    def delete_user(self, username):
+        api = self.api_endpoint
+        identity = f"umich-openid:{username}"
+
+        for kind, path in [
+            ("UserIdentityMapping", f"/apis/user.openshift.io/v1/useridentitymappings/{identity}"),
+            ("Identity",           f"/apis/user.openshift.io/v1/identities/{identity}"),
+            ("User",               f"/apis/user.openshift.io/v1/users/{username}"),
+        ]:
+            r = requests.delete(api + path, headers=self.headers)
+            print(f"{kind}: {r.status_code} {r.text}")
+
+
+
+
+
+
+    def create_user(self, username):
+        url = f"{self.api_endpoint}/apis/user.openshift.io/v1/users"
+
+        body = {
+            "apiVersion": "user.openshift.io/v1",
+            "kind": "User",
+            "metadata": {
+                "name": username
+            }
+        }
+
+        r = requests.post(url, headers=self.headers, json=body)
+
+        if r.ok:
+            uid = r.json().get('metadata').get('uid')
+            if uid:
+                self.create_identity(username, uid)
+        else:
+            print(r.status_code, r.text)
+        
+    def create_identity(self, username, uid):
+
+        body = {
+            "apiVersion": "user.openshift.io/v1",
+            "kind": "Identity",
+            "metadata": {
+                "name": f"umich-openid:{username}"
+            },
+            "providerName": "umich-openid",
+            "providerUserName": username,
+            "user": {
+                "kind": "User",
+                "apiVersion": "user.openshift.io/v1",
+                "name": username,
+                "uid": uid
+            }
+        }
+
+        url = f"{self.api_endpoint}/apis/user.openshift.io/v1/identities"
+        r = requests.post(url, headers=self.headers, json=body)
+        if r.ok:
+            self.create_identity_mapping(username)
+        else:
+            print(r.status_code, r.text)
+
+    def create_identity_mapping(self, username):
+        body = {
+            "apiVersion": "user.openshift.io/v1",
+            "kind": "UserIdentityMapping",
+            "identity": {
+                "name": f"umich-openid:{username}"
+            },
+            "user": {
+                "name": username
+            }
+        }
+
+        url = f"{self.api_endpoint}/apis/user.openshift.io/v1/useridentitymappings"
+        r = requests.post(url, headers=self.headers, json=body)
+        if not r.ok:
+            print(r.status_code, r.text)
+
+    def get_user(self, username):
+        return requests.get(f"{self.api_endpoint}/apis/user.openshift.io/v1/users/{username}",headers=self.headers)
+
     def create_project(self, instance, requester):
         payload = {"metadata": {
                 "name": instance.project_name,
@@ -250,8 +333,6 @@ class Openshift():
             self.create_role_bindings(instance)
             self.add_limits(instance)
             self.add_network_policy(instance)
-            if instance.backup == 'Yes':
-                self.add_backup(instance)
         else:
             print('error', r.status_code, r.text)
             mail_admins('Error Openshift.create_project()', r.text, fail_silently=True)
@@ -265,6 +346,10 @@ class Openshift():
             'editors': 'edit',
             'viewers': 'view'
         }
+
+        for username in instance.cleaned_names['all']:
+            print('create user', username)
+            self.create_user(username)
 
         for users in instance.cleaned_names:
 
@@ -292,17 +377,6 @@ class Openshift():
                              , headers=self.headers, json=limits)
         if not r.ok:
             mail_admins('Error Openshift.add_limits()', r.text, fail_silently=True)
-        return r
-
-    def add_backup(self, instance):
-        payload = self.get_yaml('backup')
-        payload['metadata']['name'] = f'backup-schedule-{instance.project_name}'
-        payload['spec']['template']['includedNamespaces'][0] = instance.project_name
-
-        r = requests.post(f'{self.api_endpoint}/apis/velero.io/v1/namespaces/openshift-adp/schedules' , json=payload
-                             , headers=self.headers)
-        if not r.ok:
-            mail_admins('Error Openshift.add_backup()', r.text, fail_silently=True)
         return r
 
     def add_network_policy(self, instance):
