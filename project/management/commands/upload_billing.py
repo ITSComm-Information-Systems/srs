@@ -1,9 +1,11 @@
 import csv, io
 from django.core.management.base import BaseCommand
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.mail import EmailMessage
 from project.pinnmodels import UmBillInputApiV
+from order.models import StorageRate
 from django.db import connection
 
 from datetime import datetime, timedelta
@@ -202,11 +204,19 @@ class Container(ServiceBilling):
     file_id = 100
 
     def get_records(self):
+        container_rates = dict(
+            StorageRate.objects.filter(name__startswith='CS')
+            .values_list('name', 'rate'))
+
         filename = Path(settings.MEDIA_ROOT) / self.filename
         x=0
+        total_cost = 0
         with open(filename, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
+                quantity = Decimal(row['Quantity Vouchered'])
+                rate = container_rates[row['Charge Identifier']]
+
                 rec = UmBillInputApiV()
                 rec.data_source = row['Data Source']
                 rec.assign_date = row['Assign Date']
@@ -214,14 +224,17 @@ class Container(ServiceBilling):
                 rec.short_code = row['Short Code']
                 rec.charge_identifier = row['Charge Identifier']
                 rec.quantity_vouchered = row['Quantity Vouchered']
+                rec.total_amount = quantity * rate
                 rec.invoice_id = row['Invoice ID']
                 rec.m_uniqname = row['Uniqname']
                 rec.voucher_comment = row['Voucher Comment']
                 rec.bill_input_file_id = self.file_id
                 rec.save()
                 x+=1
+                total_cost = total_cost + rec.total_amount
     
-        self.body = f'Records Loaded: {x}'
+        self.body = f'Records Loaded: {x} \nTotal Cost: {total_cost:,}'
+
 
 class Command(BaseCommand):
     help = 'Upload Billing data for Mi-services to Pinnacle'
