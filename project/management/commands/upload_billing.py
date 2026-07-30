@@ -1,15 +1,18 @@
 import csv, io
 from django.core.management.base import BaseCommand
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.mail import EmailMessage
 from project.pinnmodels import UmBillInputApiV
+from order.models import StorageRate
 from django.db import connection
 
 from datetime import datetime, timedelta
 from pathlib import Path
 
 class ServiceBilling():
+    service = None
     file_id = 0
     help = 'Upload Billing data for Mi-services to Pinnacle'
     heading = ['shortcode','size','name','date_created','rate_name','total_cost','owner']
@@ -18,7 +21,7 @@ class ServiceBilling():
         today = datetime.now().strftime('%m%d%y')
         self.filename = kwargs['file']
         self.today = int(today)
-        self.service = self.__class__.__name__
+        self.service = self.service or self.__class__.__name__
         self.file_id = int(f"{self.file_id}{self.today}")
 
     def get_records(self):
@@ -74,7 +77,7 @@ class ServiceBilling():
 
         with connection.cursor() as cursor:
             result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load Infrastructure Billings'
-                                   , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'{self.service}',{self.today}"] )
+                                   , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'{self.service}',{self.file_id}"] )
         
         print(datetime.now(), result)
 
@@ -199,14 +202,23 @@ class MiServer(ServiceBilling):
 
 
 class Container(ServiceBilling):
+    service = 'Container-Services'
     file_id = 100
 
     def get_records(self):
+        container_rates = dict(
+            StorageRate.objects.filter(name__startswith='CS')
+            .values_list('name', 'rate'))
+
         filename = Path(settings.MEDIA_ROOT) / self.filename
         x=0
+        total_cost = 0
         with open(filename, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
+                quantity = Decimal(row['Quantity Vouchered'])
+                rate = container_rates[row['Charge Identifier']]
+
                 rec = UmBillInputApiV()
                 rec.data_source = row['Data Source']
                 rec.assign_date = row['Assign Date']
@@ -214,14 +226,17 @@ class Container(ServiceBilling):
                 rec.short_code = row['Short Code']
                 rec.charge_identifier = row['Charge Identifier']
                 rec.quantity_vouchered = row['Quantity Vouchered']
+                rec.total_amount = quantity * rate
                 rec.invoice_id = row['Invoice ID']
                 rec.m_uniqname = row['Uniqname']
                 rec.voucher_comment = row['Voucher Comment']
                 rec.bill_input_file_id = self.file_id
                 rec.save()
                 x+=1
+                total_cost = total_cost + rec.total_amount
     
-        self.body = f'Records Loaded: {x}'
+        self.body = f'Records Loaded: {x} \nTotal Cost: {total_cost:,}'
+
 
 class Command(BaseCommand):
     help = 'Upload Billing data for Mi-services to Pinnacle'
