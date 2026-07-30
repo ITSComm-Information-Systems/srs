@@ -76,7 +76,7 @@ class ServiceBilling():
 
         with connection.cursor() as cursor:
             result = cursor.callproc('pinn_custom.um_util_k.um_scheduler_p',  ['JOBID21000', 'Load Infrastructure Billings'
-                                   , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'{self.service}',{self.today}"] )
+                                   , (datetime.now() + timedelta(minutes=5)).strftime('%d-%b-%y %H:%M'),f"'{self.service}',{self.file_id}"] )
         
         print(datetime.now(), result)
 
