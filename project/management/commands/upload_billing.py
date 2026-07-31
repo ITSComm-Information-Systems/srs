@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 class ServiceBilling():
+    service = None
     file_id = 0
     help = 'Upload Billing data for Mi-services to Pinnacle'
     heading = ['shortcode','size','name','date_created','rate_name','total_cost','owner']
@@ -20,7 +21,7 @@ class ServiceBilling():
         today = datetime.now().strftime('%m%d%y')
         self.filename = kwargs['file']
         self.today = int(today)
-        self.service = self.__class__.__name__
+        self.service = self.service or self.__class__.__name__
         self.file_id = int(f"{self.file_id}{self.today}")
 
     def get_records(self):
@@ -201,6 +202,7 @@ class MiServer(ServiceBilling):
 
 
 class Container(ServiceBilling):
+    service = 'Container-Services'
     file_id = 100
 
     def get_records(self):
