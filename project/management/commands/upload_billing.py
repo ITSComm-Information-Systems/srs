@@ -204,6 +204,7 @@ class MiServer(ServiceBilling):
 class Container(ServiceBilling):
     service = 'Container-Services'
     file_id = 100
+    owner_email = 'its.container.service.admins@umich.edu'
 
     def get_records(self):
         container_rates = dict(
