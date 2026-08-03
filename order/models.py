@@ -1107,7 +1107,7 @@ class Order(models.Model):
 
                 if equipment_only:
                     if settings.ENVIRONMENT == 'Production':
-                        send_mail('Equipment Only Preorder ' + ponum + ' submitted', ponum, 'itscomm.information.systems@umich.edu', ['its-infrastructure-bom@umich.edu'])
+                        send_mail('Equipment Only Preorder ' + ponum + ' submitted', ponum, 'itscomm.information.systems@umich.edu', ['INF.Warehouse@umich.edu'])
                     else:
                         send_mail('Equipment Only Preorder ' + ponum + ' submitted', ponum, 'itscomm.information.systems@umich.edu', ['djamison@umich.edu'])   
                 break
