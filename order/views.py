@@ -14,7 +14,7 @@ from pages.models import Page
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from pages.models import Page
 from django.http import JsonResponse
-from project.integrations import create_ticket_server_delete, create_help_ticket
+from project.integrations import create_ticket_server_delete, create_help_ticket, create_ticket
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from ast import literal_eval
