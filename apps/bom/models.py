@@ -239,9 +239,8 @@ class Estimate(BOM):
     engineer_status = models.CharField(max_length=20, choices=ENGINEER_STATUS, default='NOT_COMPLETE')
     contingency_amount = models.DecimalField(null=True, max_digits=8, decimal_places=2, default=0)
     contingency_percentage = models.IntegerField(null=True, default=0)
+    permit_amount = models.DecimalField(null=True, max_digits=8, decimal_places=2, default=0)
     folder = models.URLField(null=True, blank=True)
-    legacy_data = models.TextField(null=True)
-    legacy_id = models.CharField(max_length=32, default=0)
 
     @property
     def read_only(self):
@@ -353,7 +352,7 @@ class Estimate(BOM):
         else:
             self.contingency_total = 0
 
-        self.total = labmat + self.contingency_total
+        self.total = labmat + self.contingency_total + self.permit_amount
 
     def get_workorder(self):
         try:
