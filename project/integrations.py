@@ -35,12 +35,18 @@ class MCommunity:
                         password=settings.MCOMMUNITY['PASSWORD'],
                         auto_bind=True)
 
-    def get_groups(self, uniqname):
-        self.conn.search('ou=Groups,dc=umich,dc=edu', '(&(umichDirectMember=uid=' + uniqname + ',ou=People,dc=umich,dc=edu)(joinable=False))')
+    def get_groups(self, uniqname, max_group_size=None):
+        self.conn.search('ou=Groups,dc=umich,dc=edu', '(&(umichDirectMember=uid=' + uniqname + ',ou=People,dc=umich,dc=edu)(joinable=False))'
+                        , attributes=["gidnumber", "member", "cn"])
 
         group_list = []
 
         for entry in self.conn.entries:
+            if max_group_size is not None:
+                member_count = len(entry.member.values)
+                if member_count > int(max_group_size):
+                    continue
+            member_count = len(entry.member.values)
             name = entry.entry_dn[3:-41]
             group_list.append(name)
 
