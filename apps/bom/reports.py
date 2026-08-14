@@ -241,6 +241,7 @@ class PdfCreator:
 				[Paragraph('<b>Labor</b>', normal), Paragraph(f'{self.estimate.labor_total:,}', RIGHT)],
 				[Paragraph('<b>Material</b>', normal), Paragraph(f'{self.estimate.material_total:,}', RIGHT)],
 				[Paragraph('<b>Contingency Total</b>', normal), Paragraph(f'{self.estimate.contingency_total:,}', RIGHT)],
+				[Paragraph('<b>Permit Amount</b>', normal), Paragraph(f'{self.estimate.permit_amount:,}', RIGHT)],
 				[Paragraph('<b>Project Cost</b>', normal), Paragraph(f'{self.estimate.total:,}', RIGHT)]]
 		col_widths = [2 * inch, 0.8 * inch]
 		flowables.append(self.build_table(data, col_widths))
