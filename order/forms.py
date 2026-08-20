@@ -298,7 +298,7 @@ class TabForm(forms.Form):
                 field = McGroup()
                 field.template_name = 'project/static.html'
             elif element.type == 'MyGroups':
-                group_list = MCommunity().get_groups(self.request.user.username)
+                group_list = MCommunity().get_groups(self.request.user.username, max_group_size=element.arguments.get('max_group_size'))
 
                 choice_list = [(None, '---')]
                 for group in group_list:

@@ -13,7 +13,16 @@
         {% for step in step_list %}
         <tr>
             <td><a class="related-widget-wrapper-link change-related" id="change_id_service" data-href-template="/admin/order/service/__fk__/change/?_to_field=id&amp;_popup=1" title="Change selected step" href="/admin/order/step/{{ step.id }}/change/?_to_field=id&amp;_popup=1">{{ step.label }}</a></td>
-            <td><a class="related-widget-wrapper-link add-related" id="add_id_steps" href="/admin/order/element/add/?step={{step.id}}&amp;_popup=1" title="Add Element"><img src="/static/admin/img/icon-addlink.svg" alt="Add"></a></td>
+            <td>
+                <a class="related-widget-wrapper-link add-related"
+                id="add_element_{{ step.id }}"
+                href="/admin/order/element/add/?step={{ step.id }}&_popup=1"
+                onclick="return showRelatedObjectPopup(this);"
+                title="Add Element">
+                    <img src="/static/admin/img/icon-addlink.svg" alt="Add">
+                </a>
+            </td>
+
         </tr>
             {% for element in step.element_list %}
 
@@ -82,4 +91,24 @@
     
 
 
+{% endblock %}
+
+{% block admin_change_form_document_ready %}
+    {{ block.super }}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('a.admin-popup').forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    window.open(
+                        this.href,
+                        'admin_popup',
+                        'height=700,width=1000,resizable=yes,scrollbars=yes'
+                    );
+                });
+            });
+        });
+    </script>
 {% endblock %}
