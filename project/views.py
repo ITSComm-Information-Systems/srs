@@ -1,4 +1,5 @@
 import warnings
+import logging
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.template import loader
@@ -42,6 +43,8 @@ from django import db
 
 from django.core.mail import EmailMessage
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 @login_not_required
 def homepage(request):
@@ -138,6 +141,8 @@ def chatbot_message(request):
 
 	# Store the Maizey conversation id in the Django session so follow-up messages keep context.
 	conversation_pk = request.session.get('maizey_conversation_pk')
+	conversation_response = None
+	message_response = None
 	try:
 		if not conversation_pk:
 			conversation_url = f'{base_url}/projects/{project_pk}/conversation/'
@@ -155,7 +160,28 @@ def chatbot_message(request):
 		message_response = requests.post(message_url, headers=headers, json={'query': query}, timeout=timeout)
 		message_response.raise_for_status()
 		message = message_response.json()
-	except (ValueError, requests.RequestException):
+	except ValueError:
+		logger.exception(
+			'Maizey chatbot JSON parse failed. project_id=%s has_conversation=%s',
+			project_pk,
+			bool(conversation_pk),
+		)
+		return JsonResponse({'error': 'The chatbot service is unavailable right now.'}, status=502)
+	except requests.RequestException as exc:
+		response = getattr(exc, 'response', None) or message_response or conversation_response
+		status_code = getattr(response, 'status_code', None)
+		body_preview = ''
+		if response is not None:
+			body_preview = (response.text or '').replace('\n', ' ')[:300]
+
+		logger.warning(
+			'Maizey chatbot upstream request failed. project_id=%s has_conversation=%s status=%s error=%s body_preview=%s',
+			project_pk,
+			bool(conversation_pk),
+			status_code,
+			type(exc).__name__,
+			body_preview,
+		)
 		return JsonResponse({'error': 'The chatbot service is unavailable right now.'}, status=502)
 
 	return JsonResponse({
