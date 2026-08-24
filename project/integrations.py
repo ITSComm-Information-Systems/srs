@@ -175,6 +175,10 @@ class UmAPI:
             url = f'{self.BASE_URL}/um/Curriculum/SOC/Terms'
             r = requests.get(url, headers=self.headers)
             terms = r.json()['getSOCTermsResponse']['Term']
+
+            if isinstance(terms, dict):
+                terms = [terms]
+
             return terms
         except:
             print('error getting terms')
