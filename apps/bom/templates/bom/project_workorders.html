@@ -1,0 +1,115 @@
+{% extends 'bom/base.html' %}
+{% block content %}
+<h2>{{ title }}</h2>
+
+<style>
+  .clickable-row {
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+  }
+
+  .clickable-row:hover {
+    background-color: #e9f5ff;
+  }
+
+  .non-clickable-row {
+    opacity: 0.68;
+  }
+
+  .workorder-link {
+    color: #0d6efd !important;
+    text-decoration: underline;
+    font-weight: 600;
+  }
+
+  .closed-row {
+    display: none;
+  }
+
+  .clickable-row:hover .workorder-link {
+    color: #0a58ca !important;
+  }
+</style>
+
+{% if not project_code %}
+<p>Please provide a project code.</p>
+{% elif not search_list %}
+<p>No workorders were found for project code <strong>{{ project_code }}</strong>.</p>
+{% else %}
+<div class="table-responsive">
+  <table class="table table-hover table-striped table-sm align-middle">
+    <thead>
+      <tr>
+        <th>Workorder</th>
+        <th>Preorder</th>
+        <th>Status</th>
+        <th>Project Manager</th>
+        <th>Assigned To</th>
+        <th>Building Name</th>
+        <th>Contact Name</th>
+        <th>Contact Phone</th>
+        <th>Contact Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in search_list %}
+      <tr class="{% if record.estimate_id %}clickable-row{% else %}non-clickable-row{% endif %}{% if record.status_name|lower != 'open' %} closed-row{% endif %}" {% if record.estimate_id %}data-estimate-id="{{ record.estimate_id }}"{% endif %}>
+        <td{% if record.estimate_id %} class="workorder-link"{% endif %}>{{ record.wo_number_display }}</td>
+        <td>{{ record.pre_order_number }}</td>
+        <td>{{ record.status_name }}</td>
+        <td>{{ record.add_info_list_value_name_2 }}</td>
+        <td>{{ record.assigned_labor_name_display }}</td>
+        <td>{{ record.add_info_list_value_name_1 }}</td>
+        <td>{{ record.form_display_contact_name }}</td>
+        <td>{{ record.contact_phone_number }}</td>
+        <td>{{ record.contact_email_address }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if closed_count %}
+<div class="text-end mt-2">
+  <button id="toggleClosedRows" type="button" class="btn btn-outline-secondary btn-sm" data-closed-count="{{ closed_count }}" data-expanded="false">
+    Show Closed ({{ closed_count }})
+  </button>
+</div>
+{% endif %}
+{% endif %}
+{% endblock content %}
+
+{% block js %}
+<script>
+  (function () {
+    var rows = document.querySelectorAll('tr[data-estimate-id]');
+    rows.forEach(function (row) {
+      row.addEventListener('click', function () {
+        var estimateId = row.getAttribute('data-estimate-id');
+        if (estimateId) {
+          window.location.replace('/apps/bom/estimate/' + estimateId + '/');
+        }
+      });
+    });
+
+    var toggleBtn = document.getElementById('toggleClosedRows');
+    if (toggleBtn) {
+      var closedRows = document.querySelectorAll('tr.closed-row');
+      var closedCount = toggleBtn.getAttribute('data-closed-count') || '0';
+
+      toggleBtn.addEventListener('click', function () {
+        var expanded = toggleBtn.getAttribute('data-expanded') === 'true';
+        var nextExpanded = !expanded;
+
+        closedRows.forEach(function (row) {
+          row.style.display = nextExpanded ? 'table-row' : 'none';
+        });
+
+        toggleBtn.setAttribute('data-expanded', nextExpanded ? 'true' : 'false');
+        toggleBtn.textContent = nextExpanded
+          ? 'Hide Closed (' + closedCount + ')'
+          : 'Show Closed (' + closedCount + ')';
+      });
+    }
+  })();
+</script>
+{% endblock js %}
