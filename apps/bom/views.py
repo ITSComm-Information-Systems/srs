@@ -690,6 +690,7 @@ def _sort_preorders_for_display(records):
 def project_workorders(request):
     project_code = request.GET.get('project_code', '').strip()
     search_list = PreOrder.objects.none()
+    closed_count = 0
 
     if project_code:
         search_list = PreOrder.objects.filter(project_code_display=project_code).order_by('-pre_order_number')
@@ -704,11 +705,13 @@ def project_workorders(request):
             record.estimate_id = estimate_map.get(record.pre_order_id)
 
         search_list = _sort_preorders_for_display(list(search_list))
+        closed_count = sum(1 for record in search_list if str(record.status_name).strip().lower() != 'open')
 
     return render(request, 'bom/project_workorders.html',
                 {'title': f'Workorders for Project {project_code}' if project_code else 'Workorders by Project',
                  'project_code': project_code,
                  'search_list': search_list,
+                 'closed_count': closed_count,
                 })
 
 
@@ -716,6 +719,7 @@ def project_workorders(request):
 def building_workorders(request):
     building_name = request.GET.get('building_name', '').strip()
     search_list = PreOrder.objects.none()
+    closed_count = 0
 
     if building_name:
         search_list = PreOrder.objects.filter(add_info_list_value_name_1=building_name).order_by('-pre_order_number')
@@ -730,11 +734,13 @@ def building_workorders(request):
             record.estimate_id = estimate_map.get(record.pre_order_id)
 
         search_list = _sort_preorders_for_display(list(search_list))
+        closed_count = sum(1 for record in search_list if str(record.status_name).strip().lower() != 'open')
 
     return render(request, 'bom/building_workorders.html',
                 {'title': f'Workorders for Building {building_name}' if building_name else 'Workorders by Building',
                  'building_name': building_name,
                  'search_list': search_list,
+                 'closed_count': closed_count,
                 })
 
 @permission_required('bom.can_access_bom')
