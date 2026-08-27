@@ -1488,3 +1488,47 @@ function sendTabData(field) {
 
   });
 };
+
+
+
+function updateDisplayConditions() {
+    document.querySelectorAll("[data-display-condition]").forEach(element => {
+        const conditions = element.dataset.displayCondition
+            .split(",")
+            .map(s => s.trim())
+            .filter(Boolean);
+
+        const show = conditions.every(condition => {
+            const [fieldName, expectedValue] = condition
+                .split("=")
+                .map(s => s.trim());
+
+            const field = document.querySelector(
+                `[name="${fieldName}"]`
+            );
+
+            if (!field) {
+                return false;
+            }
+
+            // Radio / checkbox groups
+            if (field.type === "radio" || field.type === "checkbox") {
+                const checked = document.querySelector(
+                    `[name="${fieldName}"]:checked`
+                );
+
+                return checked && checked.value === expectedValue;
+            }
+
+            // Select / text / etc.
+            return field.value === expectedValue;
+        });
+
+        element.hidden = !show;
+    });
+}
+// Initial state
+document.addEventListener("DOMContentLoaded", updateDisplayConditions);
+
+// Changes
+document.addEventListener("change", updateDisplayConditions);
