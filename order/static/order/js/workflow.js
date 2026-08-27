@@ -1511,13 +1511,22 @@ function updateDisplayConditions() {
                 return false;
             }
 
-            // Radio / checkbox groups
-            if (field.type === "radio" || field.type === "checkbox") {
+            if (field.type === "radio") {
                 const checked = document.querySelector(
                     `[name="${fieldName}"]:checked`
                 );
 
                 return checked && checked.value === expectedValue;
+            }
+
+            if (field.type === "checkbox") {
+                const checked = document.querySelectorAll(
+                    `[name="${fieldName}"]:checked`
+                );
+
+                return [...checked].some(
+                    item => item.value === expectedValue
+                );
             }
 
             // Select / text / etc.
