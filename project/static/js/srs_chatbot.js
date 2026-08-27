@@ -301,11 +301,24 @@
     }));
   }
 
+  function trackChatbotEvent(eventName, params) {
+    if (typeof window.gtag !== 'function') {
+      return;
+    }
+
+    window.gtag('event', eventName, params || {});
+  }
+
   function sendMessage(query) {
     appendMessage(query, 'user');
     input.value = '';
     setBusy(true);
     var pending = appendMessage('Waiting for response...', 'system');
+
+    trackChatbotEvent('chatbot_message_sent', {
+      endpoint_path: endpoint,
+      query_length: query.length
+    });
 
     fetch(endpoint, {
       method: 'POST',
@@ -319,8 +332,16 @@
       .then(function (response) {
         return response.json().then(function (data) {
           if (!response.ok) {
-            throw new Error(data.error || 'Unable to send message.');
+            var upstreamError = new Error(data.error || 'Unable to send message.');
+            upstreamError.statusCode = response.status;
+            throw upstreamError;
           }
+
+          trackChatbotEvent('chatbot_message_success', {
+            endpoint_path: endpoint,
+            status_code: response.status
+          });
+
           return data;
         });
       })
@@ -329,6 +350,12 @@
         appendLinkedText(pending, data.response || 'No response returned.');
       })
       .catch(function (error) {
+        trackChatbotEvent('chatbot_message_error', {
+          endpoint_path: endpoint,
+          status_code: error && error.statusCode ? error.statusCode : 0,
+          error_message: error && error.message ? error.message : 'Unknown error'
+        });
+
         pending.textContent = error.message;
         pending.className = 'srs-chatbot-message srs-chatbot-message-dynamic srs-chatbot-message-error';
       })
