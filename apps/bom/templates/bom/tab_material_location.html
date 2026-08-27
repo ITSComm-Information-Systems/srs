@@ -1,4 +1,30 @@
 {% load humanize %}
+<style>
+    .material-add-sticky {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #fff;
+        padding: 0.25rem 0;
+    }
+</style>
+{% if material_formset|length >= 3 %}
+<div class="mb-2 material-add-sticky">
+    <div class="btn-group">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="addMaterialTop"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Add
+        </button>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" href="/apps/bom/add_item/{{ estimate.id }}">Add Existing Part</a>
+            <a image="fas fa-star" class="dropdown-item" data-toggle="modal" href="#"
+                data-target="#addNewItem">Add New Part</a>
+            <a class="dropdown-item" data-toggle="modal" href="#" data-target="#csvImport">Import from
+                CSV</a>
+        </div>
+    </div>
+</div>
+{% endif %}
 <table class="table table-hover table-striped table-sm">
 
     <thead>
@@ -20,7 +46,7 @@
         {% with record=form.instance %}
         {% ifchanged record.material_location %}
         <tr>
-            <td colspan=7><a href="$" i class="fas fa-edit" aria-hidden="true"
+            <td colspan="9"><a href="$" i class="fas fa-edit" aria-hidden="true"
                 data-toggle="modal" data-material_location_id="{{ record.material_location.id }}" data-material_location="{{ record.material_location }}" data-material_location_description="{{ record.material_location.description }}" data-target="#matLocation"></a></i>&nbsp {{ record.material_location }}
             {% if record.material_location.description %}
                ( {{ record.material_location.description }} )        
