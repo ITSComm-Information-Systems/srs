@@ -1,4 +1,7 @@
-<div class="form-group" id="div_{{field.name}}">
+<div class="form-group" id="div_{{field.name}}" 
+     {% if field.field.display_condition %}
+         data-display-condition="{{ field.field.display_condition }}"
+     {% endif %}>
     <label for="{{field.id_for_label}}">
         <strong>{{ field.label }}</strong>
     </label>
