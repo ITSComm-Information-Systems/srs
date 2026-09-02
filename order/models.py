@@ -89,6 +89,7 @@ class Element(Configuration):
         ('', ''),
         ('Radio', 'Radio'),
         ('ST', 'String'),
+        ('Textarea', 'Textarea'),
         ('Select', 'Select'),
         ('List', 'List'),
         ('NU', 'Number'),
