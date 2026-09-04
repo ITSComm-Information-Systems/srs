@@ -92,6 +92,7 @@ class Element(Configuration):
         ('Textarea', 'Textarea'),
         ('Select', 'Select'),
         ('List', 'List'),
+        ('FileInput', 'FileInput'),
         ('NU', 'Number'),
         ('Chart', 'Chartcom'),
         ('Label', 'Label'),
