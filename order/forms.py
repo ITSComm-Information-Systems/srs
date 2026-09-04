@@ -279,8 +279,11 @@ class TabForm(forms.Form):
             elif element.type == 'NU':
                 field = forms.IntegerField(widget=forms.NumberInput(attrs={'min': "1", 'class': 'form-control'}), **element.arguments)
                 field.template_name = 'project/number.html'
-            elif element.type == 'TextArea':
+            elif element.type == 'Textarea':
                 field = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}), **element.arguments)
+                field.template_name = 'project/text.html'
+            elif element.type == 'FileInput':
+                field = forms.CharField(widget=forms.FileInput(attrs={'class': 'form-control'}), **element.arguments)
                 field.template_name = 'project/text.html'
             elif element.type == 'Select':
                 field = forms.ChoiceField(choices=eval(element.attributes), widget=forms.Select(attrs={'class': 'form-control'}))
