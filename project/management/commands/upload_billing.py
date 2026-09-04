@@ -218,7 +218,7 @@ class Container(ServiceBilling):
             reader = csv.DictReader(f)
             for row in reader:
                 quantity = Decimal(row['Quantity Vouchered'])
-                rate = container_rates[row['Charge Identifier']]
+                rate = container_rates.get(row['Charge Identifier'], 0)
 
                 rec = UmBillInputApiV()
                 rec.data_source = row['Data Source']
