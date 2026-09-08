@@ -1498,6 +1498,12 @@ function updateDisplayConditions() {
             .map(s => s.trim())
             .filter(Boolean);
 
+        if (!conditions.length) {
+            return;
+        }
+
+        let evaluated = true;
+
         const show = conditions.every(condition => {
             const [fieldName, expectedValue] = condition
                 .split("=")
@@ -1507,7 +1513,8 @@ function updateDisplayConditions() {
                 `[name="${fieldName}"]`
             );
 
-            if (!field) {
+            if (!field) {  // Field is not on this tab, leave visibility alone
+                evaluated = false;
                 return false;
             }
 
@@ -1529,11 +1536,25 @@ function updateDisplayConditions() {
                 );
             }
 
-            // Select / text / etc.
+            if (field.tagName === "SELECT") {
+                // Conditions may be written against the value or the label
+                const selected = field.options[field.selectedIndex];
+
+                return field.value === expectedValue ||
+                    (selected && selected.text.trim() === expectedValue);
+            }
+
             return field.value === expectedValue;
         });
 
-        element.hidden = !show;
+        if (!evaluated) {
+            return;
+        }
+
+        // Use the display style rather than the hidden attribute so this stays
+        // compatible with the jQuery show()/hide() calls used elsewhere.
+        element.hidden = false;
+        element.style.display = show ? "" : "none";
     });
 }
 // Initial state
