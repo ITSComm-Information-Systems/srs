@@ -1488,54 +1488,6 @@ function sendTabData(field) {
 
   });
 };
-
-
-
-function updateDisplayConditions() {
-    document.querySelectorAll("[data-display-condition]").forEach(element => {
-        const conditions = element.dataset.displayCondition
-            .split(",")
-            .map(s => s.trim())
-            .filter(Boolean);
-
-        const show = conditions.every(condition => {
-            const [fieldName, expectedValue] = condition
-                .split("=")
-                .map(s => s.trim());
-
-            const field = document.querySelector(
-                `[name="${fieldName}"]`
-            );
-
-            if (!field) {
-                return false;
-            }
-
-            if (field.type === "radio") {
-                const checked = document.querySelector(
-                    `[name="${fieldName}"]:checked`
-                );
-
-                return checked && checked.value === expectedValue;
-            }
-
-            if (field.type === "checkbox") {
-                const checked = document.querySelectorAll(
-                    `[name="${fieldName}"]:checked`
-                );
-
-                return [...checked].some(
-                    item => item.value === expectedValue
-                );
-            }
-
-            // Select / text / etc.
-            return field.value === expectedValue;
-        });
-
-        element.hidden = !show;
-    });
-}
 // Initial state
 document.addEventListener("DOMContentLoaded", updateDisplayConditions);
 
