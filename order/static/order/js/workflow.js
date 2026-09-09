@@ -1488,3 +1488,8 @@ function sendTabData(field) {
 
   });
 };
+// Initial state
+document.addEventListener("DOMContentLoaded", updateDisplayConditions);
+
+// Changes
+document.addEventListener("change", updateDisplayConditions);
