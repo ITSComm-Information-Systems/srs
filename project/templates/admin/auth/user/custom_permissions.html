@@ -1,0 +1,26 @@
+{% load static %}
+{% if permissions %}
+    <table>
+        <tr>
+            <th>Access</th>
+            <th>Permission</th>
+            <th>Source</th>
+        </tr>
+        {% for permission in permissions %}
+            <tr>
+                <td>
+                    {% if permission.granted %}
+                        <img src="{% static 'admin/img/icon-yes.svg' %}" alt="Yes">
+                    {% else %}
+                        <img src="{% static 'admin/img/icon-no.svg' %}" alt="No">
+                    {% endif %}
+                </td>
+                <td>{{ permission.name }}</td>
+                <td>{{ permission.source }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% else %}
+    <span class="quiet">None</span>
+{% endif %}

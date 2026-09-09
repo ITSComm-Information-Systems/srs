@@ -14,6 +14,53 @@ from django import forms
 from project.forms.fields import Uniqname
 from project.pinnmodels import UmMpathDwCurrDepartment
 
+from django.template.loader import render_to_string
+from django.contrib.auth.admin import UserAdmin
+
+# Unregister the default User admin
+admin.site.unregister(User)
+
+class CustomUserAdmin(UserAdmin):
+
+    @admin.display(description='Permissions')
+    def custom_permissions(self, obj):
+        if not obj or not obj.username:
+            return 'None'
+
+        CUSTOM_PERMISSIONS = (
+            ('bom.can_access_bom', 'PS_RATING.UM_RTE_TECHNICIAN_V.UNIQNAME'),
+            ('rte.add_umrteinput', 'PS_RATING.UM_RTE_TECHNICIAN_V.UNIQNAME'),
+            ('rte.add_submitalltechs', 'SRS RTE Admin Group'),
+            ('oscauth.can_report_all', 'SRS Project Managers Group'),
+            ('bom.can_update_bom_ordered', 'UM_BOM_PROCUREMENT_USERS_V'),
+        )
+
+        permissions = [
+            {
+                'name': name,
+                'granted': obj.has_perm(name),
+                'source': source,
+            }
+            for name, source in CUSTOM_PERMISSIONS
+        ]
+
+        return render_to_string('admin/auth/user/custom_permissions.html',
+            {'permissions': permissions, 'user': obj},)
+
+    readonly_fields = (*UserAdmin.readonly_fields,'custom_permissions',)
+
+    fieldsets = UserAdmin.fieldsets + (
+        (
+            'Custom Permissions',
+            {
+                'fields': ('custom_permissions',),
+            },
+        ),
+    )
+
+admin.site.register(User, CustomUserAdmin)
+
+
 
 class RoleAdmin(admin.ModelAdmin):
     list_display = ('role', 'display_seq_no', 'active', 'create_date', 'last_update_date')
