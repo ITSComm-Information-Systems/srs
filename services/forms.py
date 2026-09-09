@@ -263,7 +263,7 @@ class ContainerNewForm(CloudForm):
     class Meta:
         model = Container
         fields = ['container_sensitive','admin_group','course_yn','course_info','shortcode',
-                  'project_name', 'project_description', 'size','database','database_type','backup'] # Remaining follow form order
+                  'project_name', 'project_description', 'size','database','database_type'] # Remaining follow form order
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
