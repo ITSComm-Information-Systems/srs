@@ -44,11 +44,7 @@
         <th>Preorder</th>
         <th>Status</th>
         <th>Project Manager</th>
-        <th>Assigned To</th>
         <th>Building Name</th>
-        <th>Contact Name</th>
-        <th>Contact Phone</th>
-        <th>Contact Email</th>
       </tr>
     </thead>
     <tbody>
@@ -58,11 +54,7 @@
         <td>{{ record.pre_order_number }}</td>
         <td>{{ record.status_name }}</td>
         <td>{{ record.add_info_list_value_name_2 }}</td>
-        <td>{{ record.assigned_labor_name_display }}</td>
         <td>{{ record.add_info_list_value_name_1 }}</td>
-        <td>{{ record.form_display_contact_name }}</td>
-        <td>{{ record.contact_phone_number }}</td>
-        <td>{{ record.contact_email_address }}</td>
       </tr>
       {% endfor %}
     </tbody>

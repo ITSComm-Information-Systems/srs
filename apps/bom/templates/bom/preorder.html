@@ -25,7 +25,7 @@
             <p class="h4" id="tabTitle">Project</p>
             <strong>Project</strong>
             <p class="font-weight-normal">
-              <a href="{% url 'project_workorders' %}?project_code={{ workorder.project_code_display|urlencode }}">{{ workorder.project_code_display }}</a>
+              <a href="{% url 'project_workorders' %}?project_code={{ workorder.project_code_display|urlencode }}" target="_blank" rel="noopener noreferrer">{{ workorder.project_code_display }}</a>
             </p>
             <strong>Project Manager</strong>
             <p class="font-weight-normal">{{ workorder.add_info_list_value_name_2 }}</p>
@@ -52,7 +52,7 @@
 
             <strong>Building Name</strong>
             <p class="font-weight-normal">
-              <a href="{% url 'building_workorders' %}?building_name={{ workorder.add_info_list_value_name_1|urlencode }}">{{ workorder.add_info_list_value_name_1 }}</a>
+              <a href="{% url 'building_workorders' %}?building_name={{ workorder.add_info_list_value_name_1|urlencode }}" target="_blank" rel="noopener noreferrer">{{ workorder.add_info_list_value_name_1 }}</a>
             </p>
             <strong>Building Number</strong>
             <p class="font-weight-normal">{{ workorder.add_info_list_value_code_1 }}</p>
