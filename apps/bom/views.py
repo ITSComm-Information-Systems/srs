@@ -13,7 +13,7 @@ from datetime import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
 
-from .models import Estimate, Material, Labor, Favorite, Item, Workorder, MaterialLocation, Project, ProjectView, EstimateView, UmOscNoteProfileV, NotificationManager, Notification, Technician
+from .models import Estimate, Material, Labor, Favorite, Item, Workorder, PreOrder, MaterialLocation, Project, ProjectView, EstimateView, UmOscNoteProfileV, NotificationManager, Notification, Technician
 from .forms import FavoriteForm, EstimateForm, ProjectForm, MaterialForm, MaterialLocationForm, LaborForm
 
 
@@ -666,6 +666,81 @@ def open_preorder_search(request):
 
     return render(request, template,
                 {'title': 'Search Open Preorders/Workorders',
+                })
+
+
+def _sort_preorders_for_display(records):
+    # Group rows as: open+clickable, open+not clickable, then all closed.
+    def status_group(record):
+        is_open = str(record.status_name).strip().lower() == 'open'
+        has_estimate = bool(getattr(record, 'estimate_id', None))
+        if is_open and has_estimate:
+            return 0
+        if is_open:
+            return 1
+        return 2
+
+    return sorted(
+        records,
+        key=lambda record: (status_group(record), -(record.pre_order_number or 0))
+    )
+
+
+@permission_required('bom.can_access_bom')
+def project_workorders(request):
+    project_code = request.GET.get('project_code', '').strip()
+    search_list = PreOrder.objects.none()
+    closed_count = 0
+
+    if project_code:
+        search_list = PreOrder.objects.filter(project_code_display=project_code).order_by('-pre_order_number')
+
+        pre_order_ids = [record.pre_order_id for record in search_list]
+        estimate_map = {
+            row['pre_order_id']: row['estimate_id']
+            for row in Workorder.objects.filter(pre_order_id__in=pre_order_ids).values('pre_order_id', 'estimate_id')
+        }
+
+        for record in search_list:
+            record.estimate_id = estimate_map.get(record.pre_order_id)
+
+        search_list = _sort_preorders_for_display(list(search_list))
+        closed_count = sum(1 for record in search_list if str(record.status_name).strip().lower() != 'open')
+
+    return render(request, 'bom/project_workorders.html',
+                {'title': f'Workorders for Project {project_code}' if project_code else 'Workorders by Project',
+                 'project_code': project_code,
+                 'search_list': search_list,
+                 'closed_count': closed_count,
+                })
+
+
+@permission_required('bom.can_access_bom')
+def building_workorders(request):
+    building_name = request.GET.get('building_name', '').strip()
+    search_list = PreOrder.objects.none()
+    closed_count = 0
+
+    if building_name:
+        search_list = PreOrder.objects.filter(add_info_list_value_name_1=building_name).order_by('-pre_order_number')
+
+        pre_order_ids = [record.pre_order_id for record in search_list]
+        estimate_map = {
+            row['pre_order_id']: row['estimate_id']
+            for row in Workorder.objects.filter(pre_order_id__in=pre_order_ids).values('pre_order_id', 'estimate_id')
+        }
+
+        for record in search_list:
+            record.estimate_id = estimate_map.get(record.pre_order_id)
+
+        search_list = _sort_preorders_for_display(list(search_list))
+        closed_count = sum(1 for record in search_list if str(record.status_name).strip().lower() != 'open')
+
+    return render(request, 'bom/building_workorders.html',
+                {'title': f'Workorders for Building {building_name}' if building_name else 'Workorders by Building',
+                 'building_name': building_name,
+                 'search_list': search_list,
+                 'closed_count': closed_count,
                 })
 
 @permission_required('bom.can_access_bom')
