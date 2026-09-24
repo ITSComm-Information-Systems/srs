@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Sum, Max
 from django.contrib.auth.models import User
 from project.pinnmodels import UmOscPreorderApiV, UmOscNoteProfileV
 from datetime import datetime
@@ -330,7 +330,8 @@ class Estimate(BOM):
         for item in self.material_list:
             self.material_total = self.material_total + item.extended_price
 
-        self.part_list = Material.objects.filter(material_location__estimate=self).order_by('item').values('item','item__code','item__name','item__manufacturer_part_number','item__price','release_number','reel_number','staged','status','price').annotate(Sum('quantity'))
+        # Combine materials by item so the same item code is shown once with an accumulated quantity, regardless of release/reel/staged/status differences.
+        self.part_list = Material.objects.filter(material_location__estimate=self).order_by('item').values('item','item__code','item__name','item__manufacturer_part_number','item__price').annotate(quantity__sum=Sum('quantity'), price=Max('price'))
 
         self.location_list = MaterialLocation.objects.filter(estimate_id=self.id).order_by('name')
 
