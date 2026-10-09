@@ -51,6 +51,24 @@ class DefaultSerializer(serializers.ModelSerializer):
         return ticket_list
 
 
+class ChoiceRelatedField(serializers.RelatedField):
+
+    def to_representation(self, value):
+        return ChoiceSerializer(value).data
+
+    def to_internal_value(self, data):
+        try:
+            return self.get_queryset().get(code=data)
+        except Choice.DoesNotExist:
+            raise serializers.ValidationError(
+                f'Choice with code "{data}" does not exist.'
+            )
+        except Choice.MultipleObjectsReturned:
+            raise serializers.ValidationError(
+                f'Multiple choices with code "{data}" exist.'
+            )
+
+
 def serializer_factory(model):
     name = model.__name__
 
@@ -66,10 +84,24 @@ def serializer_factory(model):
     for fld in model._meta.get_fields():
         if type(fld) == models.fields.related.ForeignKey:
             if fld.related_model == Choice:
-                class_attrs[fld.name] = ChoiceSerializer()
+                queryset = Choice.objects.all()
+
+                if fld.remote_field.limit_choices_to:
+                    queryset = queryset.complex_filter(
+                        fld.remote_field.limit_choices_to
+                    )
+
+                class_attrs[fld.name] = ChoiceRelatedField(
+                    queryset=queryset
+                )
             else:
-                class_attrs[fld.name] = serializers.StringRelatedField()
+                class_attrs[fld.name] = serializers.SlugRelatedField(
+                    slug_field='name',
+                    queryset=fld.related_model.objects.all()
+                )
+
             class_attrs['select_related'].append(fld.name)
+
         elif type(fld) == models.fields.related.ManyToManyField:
             if fld.related_model == Choice:
                 class_attrs[fld.name] = ChoiceSerializer(many=True)
