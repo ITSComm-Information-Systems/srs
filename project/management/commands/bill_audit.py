@@ -12,36 +12,43 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         
         sql = '''
-                with curr as (select count(*) as recs, sum(total_amount) as cost, data_source
-                from ps_rating.um_bill_input_api_v
-                where bill_input_file_id = %s
-                group by data_source ),
-
-                prev as (select count(*) as recs, sum(total_amount) as cost, data_source
-                from ps_rating.um_bill_input_api_v
-                where bill_input_file_id =  %s
-                group by data_source ),
-
-                pinn as (select decode(service_type, 'Version Ctl Hosting','GitHub',service_type) as service_type, count(*) as recs , sum(one_time_total) as cost
-                from TELECOM.ONE_TIME_CHARGE_API_V
-                where installments_remaining = 1      
-                group by service_type)
-
-                select curr.*, curr.recs - prev.recs as prev_recs, curr.cost - prev.cost as prev_cost
-                , curr.cost - pinn.cost as pinn_cost
-                , curr.recs - pinn.recs as pinn_recs
-                from curr
-                left join prev on curr.data_source = prev.data_source
-                left join pinn on curr.data_source = pinn.service_type
+                WITH 
+                service AS
+                    (SELECT distinct
+                        data_source,
+                        service_type_code,
+                        subscriber_prefix
+                    FROM ps_rating.UM_BILL_VALID_SVCS_API_V
+                    WHERE subscriber_prefix IN
+                        ('SV', 'ST', 'TU', 'LK', 'CS', 'MB', 'VC', 'DD', 'MD' )
+                    ORDER by data_source),
+                curr AS
+                    (SELECT DATA_SOURCE , count(*) AS units, sum(TOTAL_AMOUNT) AS amount
+                    FROM ps_rating.um_bill_input_api_v 
+                    WHERE date_processed >= TRUNC(SYSDATE, 'MM')
+                    GROUP BY data_source),
+                prev AS
+                    (SELECT DATA_SOURCE , count(*) AS units, sum(TOTAL_AMOUNT ) AS amount
+                    FROM ps_rating.um_bill_input_api_v 
+                    WHERE date_processed >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -1)
+                    AND date_processed <  TRUNC(SYSDATE, 'MM')	
+                    GROUP BY data_source),
+                pinn as (select service_type, count(*) as units , sum(one_time_total) as amount
+                                from TELECOM.ONE_TIME_CHARGE_API_V
+                                where installments_remaining = 1      
+                                group by service_type)
+                SELECT service.data_source, curr.units, curr.amount, 
+                curr.units - pinn.units AS pinn_units, 
+                curr.amount - pinn.amount AS pinn_amount,
+                curr.units - prev.units AS prev_units,
+                curr.amount - prev.amount AS prev_amount
+                FROM service
+                LEFT JOIN curr ON curr.data_source = service.DATA_SOURCE 
+                LEFT JOIN prev ON prev.data_source = service.DATA_SOURCE 
+                LEFT JOIN pinn ON pinn.service_type = service.service_type_code 
             '''
 
-        today = datetime.date.today()
-        curr = today.strftime("%-m15%Y")
-        last_month = today.replace(day=1) - datetime.timedelta(days=1)
-        prev = last_month.strftime("%-m15%Y")
-
-        instances = get_query_result(sql, (curr, prev))
-
+        instances = get_query_result(sql)
         message = render_to_string('project/billing_audit.html', {'instances': instances})
 
         Slack(message, channel='inf-billing')
