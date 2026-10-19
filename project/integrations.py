@@ -194,7 +194,7 @@ class ShortCodesAPI(UmAPI):
 
     def get_shortcode(self, shortcode):        
         url = f'{self.BASE_URL}/um/bf/ShortCodes/v2/ShortCodes/{shortcode}'
-        return requests.get(url, headers=self.headers)
+        return requests.get(url, headers=self.headers, verify=False)
 
 class Openshift():
 
