@@ -209,8 +209,13 @@ class Email(models.Model):
                self.bcc = self.team_shared_email
                subject = f'{settings.ENVIRONMENT} - {self.subject}'
 
+          if isinstance(self.cc, (list, tuple)):
+               cc = [address for address in self.cc if address]
+          else:
+               cc = [self.cc] if self.cc else []
+
           # Send Distribution List to Leads
-          msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc], reply_to=[self.reply_to],
+          msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=cc, bcc=[self.bcc], reply_to=[self.reply_to],
                                        headers = {'srs_code': self.code})
           msg.attach_alternative(body, "text/html")
           msg.send()
