@@ -158,7 +158,7 @@ class UmAPI:
             }
 
         url = f'{self.BASE_URL}/um/oauth2/token?grant_type=client_credentials&scope={scope}'
-        response = requests.post(url, headers=headers)
+        response = requests.post(url, headers=headers, verify=False)
         response_token = json.loads(response.text)
         access_token = response_token.get('access_token')
 
