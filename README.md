@@ -21,3 +21,12 @@ Environment setting are in the [production config map](https://containers.it.umi
 This is built from the master branch.  Rebuilds are manual.
 
 Admins can access an openshift "cheat sheet" [here](https://docs.google.com/document/d/1FrGvyXhpybbMKpLENfLhjxzAmKt60gbj2Tz9A6PlUjk/edit).
+
+## MSSQL Cluster Ordering
+
+Configure these environment variables in each deployment's config map before enabling cluster ordering. The TDX form, type, service, and VCI responsible-group IDs must be provided by the TDX service owner; SRS will reject submissions when any value is missing or not an integer.
+
+- `MSSQL_CLUSTER_TDX_FORM_ID`
+- `MSSQL_CLUSTER_TDX_TYPE_ID`
+- `MSSQL_CLUSTER_TDX_SERVICE_ID`
+- `MSSQL_CLUSTER_TDX_VCI_GROUP_ID`

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+  <h1>MSSQL Cluster Submitted</h1>
+  <div class="alert alert-success" role="status">The cluster order and all three TDX tickets were submitted.</div>
+  <div class="table-responsive mb-4">
+    <table class="table table-sm table-striped">
+      <tbody>
+        <tr><th scope="row">Cluster</th><td>{{ cluster.name }}</td></tr>
+        <tr><th scope="row">Primary server</th><td>{{ cluster.primary_server.name }} (MACC)</td></tr>
+        <tr><th scope="row">Secondary server</th><td>{{ cluster.secondary_server.name }} (ASB)</td></tr>
+        <tr><th scope="row">Cluster TDX ticket</th><td>{{ cluster.cluster_ticket_id }}</td></tr>
+        <tr><th scope="row">Primary MiServer ticket</th><td>{{ cluster.primary_ticket_id }}</td></tr>
+        <tr><th scope="row">Secondary MiServer ticket</th><td>{{ cluster.secondary_ticket_id }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <a class="btn btn-primary" href="/orders/mssql-cluster/{{ cluster.id }}/">Manage cluster disks</a>
+  <a class="btn btn-outline-primary" href="/orders/services/2">Back to Services</a>
+</div>
+{% endblock %}

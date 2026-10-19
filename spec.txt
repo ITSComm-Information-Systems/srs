@@ -1,0 +1,114 @@
+Background
+
+DBA Team is moving SQL Enterprise Service from physical hardware into VMware.  This means we will be creating around 23 2-node clusters in VMware which should have SRS entries. These nodes also have large memory footprints, specific disk requirements, and a few other specifics.
+
+Scope of Work
+
+Requesting these features be implemented in SRS to order a new cluster:
+
+Add new category "MSSQL Cluster", which is only selectable by the DBA team
+"MSSQL Cluster" fields:
+“Cluster Name” that is autopopulated based on the user input (in red)
+
+Naming standard: db-{env}{type}{seq}-c{datacenter}1
+
+Field
+User Input?
+Values
+Meaning
+env
+Yes
+t / n / p
+test / nonprod / prod
+type
+Yes
+d / a
+database / ssas
+seq
+Yes
+01–99
+Used for instance name
+datacenter
+No
+m / a
+macc / asb
+
+
+For example, if a DBA enters "td01":
+Cluster Name: db-td01-c
+miserver #1 (primary): db-td01-cm1 
+miserver #2 (secondary): db-td01-ca1
+
+Servers
+Primary server field (autopopulated with macc server, see 1a)
+Secondary server field (autopopulated with asb server, see 1a)
+Add a “part of cluster” flag to these miserver records in the SRS admin view
+Application
+Text field that DBA will populate. Example: “eResearch”
+Production / Non-Production
+Production will be 24/7 On-Call
+Non-prod will be BHO On-Call
+Instance Type
+Autopopulate with either “Database” or “SSAS” depending on what “type” is entered (in a. above)
+VM Cluster
+Autopopulate with “mssqlcluster”
+CPU
+Memory
+No memory limit
+Remove “Amounts over 64GB require approval”
+Cluster Disks
+Don’t include system disk 0 - that should only exist on the miserver records
+Need to be able to add more than 4 disks
+Each disk should have 4 fields:
+SCSI Controller
+If Instance Type = Database, then dropdown containing 1,2,3
+If Instance Type = SSAS, then dropdown containing 1,3
+Ryan -  I think a dropdown would be preferred in case a DBA enters the wrong controller. Would this be ok? 
+Device ID
+DBA to enter a number, starting with 0
+Disk Label
+DBA to enter text. Example: “Root TranLog”
+Allow blanks in this field
+This field should be editable after a cluster is ordered
+Disk Size 
+In GB
+We would like the ability to extend the disk via SRS. Ryan: If this feature can be added, do you have an estimate on when it could be ready? 
+Can disks be dropped via SRS after the cluster is ordered? YES
+Can new disks be added after the cluster is ordered? YES
+Windows version
+Dropdown containing 2022 or 2025 
+Daily OS Backup Time
+DBA needs to be able to pick a time from the existing OS backup dropdown times. This is because DB backups are still written to disk, and OS backups need to happen after DB backups complete
+Can use same times available in the miserver backup time dropdown
+Both servers will have the same daily backup time
+Add a check in place to make sure this isn’t scheduled too close to patching time. Example: a user can’t select a 2am backup time if Windows patching is also scheduled at 2am. Ryan said there is a check for this in miserver, and he can create similar functionality here
+Rename “Purpose” to “Additional details” 
+Shortcode
+Support group email and phone number
+its.mssqldba@umich.edu
+734-822-7754
+Data Sensitivity
+Add same logic already in miserver / midatabase form, so a DBA can enter this and it gets passed into the 2 miserver records
+For the miserver records, set:
+Turn billing off
+Enable disk replication
+No reboot needed
+Not public facing
+Consult with technical team: no
+Mcommunity admin group set to "its mssqldba"
+Patch windows logic:
+If prod:
+first host: Sunday 2am. If 2am isn’t an option (not int dropdown?), then pick 3am. 
+second host: Sunday 5am
+If nonprod:
+first host: Thursday 2am If 2am isn’t an option (not in dropdown?), then pick 3am. 
+second host: Thursday 5am
+
+Additional details
+Ordering a MSSQL cluster via SRS should create 1 cluster TDX ticket, and 2 miserver TDX tickets. The cluster ticket should be assigned to VCI, and they will manually close the cluster ticket when the miserver tickets are completed. A TDX workflow does not need to be added to the cluster ticket, nor does it need to be changed in the miserver tickets. 
+
+Timeline
+Prefer to be completed by the end of September 2026.
+
+Test cluster add in SRS
+https://srs-dev.dsc.umich.edu/services/cluster/add/

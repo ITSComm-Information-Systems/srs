@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+  .cluster-spec-fields .form-control { max-width: 100%; }
+  .cluster-sensitivity-options { columns: initial; }
+  .cluster-disk-input { min-width: 7rem; }
+  #cluster-disk-table th { white-space: nowrap; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1>MSSQL Cluster</h1>
+  <p>Please specify the cluster and server requirements.</p>
+
+  {% if clusters %}
+  <section class="mb-4">
+    <h2>Existing Clusters</h2>
+    <div class="table-responsive">
+      <table class="table table-hover table-striped table-sm align-middle">
+        <thead>
+          <tr><th scope="col">Cluster</th><th scope="col">Application</th><th scope="col">Type</th><th scope="col">Environment</th><th scope="col">Ticket status</th><th scope="col">Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for cluster in clusters %}
+          <tr>
+            <td>{{ cluster.name }}</td>
+            <td>{{ cluster.application }}</td>
+            <td>{{ cluster.get_instance_type_display }}</td>
+            <td>{{ cluster.get_environment_display }}</td>
+            <td>{{ cluster.ticket_status }}</td>
+            <td><a class="btn btn-outline-primary btn-sm" href="/orders/mssql-cluster/{{ cluster.id }}/">Manage disks</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if error_message %}
+  <div class="alert alert-danger" role="alert">{{ error_message }}</div>
+  {% if cluster %}<p><a class="btn btn-outline-primary" href="/orders/mssql-cluster/{{ cluster.id }}/">Open cluster management and retry missing tickets</a></p>{% endif %}
+  {% endif %}
+
+  <form method="post" id="mssql-cluster-form" novalidate>
+    {% csrf_token %}
+    {{ form.disks_json }}
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <fieldset class="mb-4">
+      <legend>Cluster</legend>
+      <div class="row cluster-spec-fields">
+        {% for field in form %}
+          {% if field.name != 'disks_json' and field.name != 'regulated_data' and field.name != 'non_regulated_data' %}
+          <div class="form-group {% if field.name == 'additional_details' %}col-12{% else %}col-12 col-md-6{% endif %} mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
+            {{ field }}
+            {% if field.name == 'cluster_identifier' %}
+              {% include 'order/_cluster_identifier_feedback.html' with error=field.errors.0 only %}
+            {% endif %}
+            {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+            {% if field.name != 'cluster_identifier' %}
+              {% for error in field.errors %}<div class="invalid-feedback d-block" role="alert">{{ error }}</div>{% endfor %}
+            {% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="mb-3">
+        <p class="mb-1"><strong>Generated cluster:</strong> <span id="cluster-name-preview">db-...-c</span></p>
+        <p class="mb-1"><strong>Hosts:</strong> <span id="server-name-preview">db-...-cm1 / db-...-ca1</span></p>
+        <p class="mb-0"><span id="production-status-preview">Enter a valid cluster identifier</span></p>
+        <p class="mb-0"><strong>Patch window:</strong> <span id="patch-window-preview">{% if patch_window %}{{ patch_window }}{% else %}Enter a valid cluster identifier{% endif %}</span></p>
+      </div>
+    </fieldset>
+
+    <fieldset class="mb-4">
+      <legend>Data Sensitivity</legend>
+      {% for field in form %}
+        {% if field.name == 'regulated_data' or field.name == 'non_regulated_data' %}
+        <div class="form-group mb-3" id="div_{{ field.name }}">
+          <div class="form-label"><strong>{{ field.label }}</strong></div>
+          <div class="row row-cols-1 row-cols-md-2 g-2 cluster-sensitivity-options">
+            {% for checkbox in field %}
+            <div class="col">
+              <div class="form-check">
+                {{ checkbox.tag }}
+                <label class="form-check-label" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% for error in field.errors %}<div class="invalid-feedback d-block" role="alert">{{ error }}</div>{% endfor %}
+        </div>
+        {% endif %}
+      {% endfor %}
+    </fieldset>
+
+    <fieldset class="mb-4">
+      <legend>Cluster Disks</legend>
+      <p class="text-muted">Cluster disks are separate from each server's system disk.</p>
+      <div class="table-responsive">
+        <table class="table table-hover table-striped table-sm align-middle" id="cluster-disk-table">
+          <thead><tr><th scope="col">Controller</th><th scope="col">Device ID</th><th scope="col">Disk label</th><th scope="col">Size (GB)</th><th scope="col">Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <button type="button" class="btn btn-outline-primary" id="add-cluster-disk"><i class="fas fa-plus-circle" aria-hidden="true"></i> Add disk</button>
+      {% for error in form.disks_json.errors %}<div class="invalid-feedback d-block" role="alert">{{ error }}</div>{% endfor %}
+    </fieldset>
+
+    <button type="submit" class="btn btn-primary">Submit cluster order</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="/static/order/js/mssql_cluster_order.js"></script>
+{% endblock %}

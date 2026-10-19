@@ -13,7 +13,7 @@ from django.urls import path
 from project.models import Choice
 from project.utils import download_csv_from_queryset, get_query_result
 from collections import defaultdict
-from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database, LDAPGroupMember, StorageBilling
+from .models import Service, ServiceGroup, Product, Step, Action, Feature, FeatureCategory, Restriction, Element, Constant, ProductCategory, FeatureType, StorageInstance, StorageHost, StorageRate, BackupDomain, BackupNode, ArcInstance, ArcHost, ArcBilling, LDAPGroup, Ticket, Item, Server, ServerDisk, Database, LDAPGroupMember, StorageBilling, MSSQLCluster, MSSQLClusterDisk
 
 class ProductAdmin(admin.ModelAdmin):
     list_display  = ['display_seq_no','label','name','category','price']
@@ -240,6 +240,14 @@ class ServerDiskInline(admin.TabularInline):
 
     #def has_change_permission(self, request, obj=None):
     #    return user_has_permission(request, obj)
+
+
+class MSSQLClusterDiskInline(admin.TabularInline):
+    model = MSSQLClusterDisk
+    extra = 0
+    can_delete = False
+    max_num = 0
+    readonly_fields = ('controller', 'device_id', 'label', 'size_gb')
         
 
 @admin.register(Database)
@@ -280,7 +288,7 @@ class DatabaseAdmin(ServiceInstanceAdmin):
 
 @admin.register(Server)
 class ServerAdmin(ServiceInstanceAdmin):
-    list_display = ['name', 'owner', 'os', 'transformation']
+    list_display = ['name', 'owner', 'os', 'part_of_cluster', 'mssql_cluster', 'transformation']
     list_filter = ('in_service','managed', 'database_type')
     ordering = ('name',)
     search_fields = ['name','owner__name']
@@ -288,13 +296,14 @@ class ServerAdmin(ServiceInstanceAdmin):
     list_select_related = ['owner','os']
     inlines = [ServerDiskInline,]
 
-    readonly_fields = ('created_date','total_cost','total_disk_size')
+    readonly_fields = ('created_date','total_cost','total_disk_size','part_of_cluster','mssql_cluster','cluster_instance_type')
 
     fieldsets = (
         (None, {
-            'fields': (('name', 'in_service', 'billable', 'created_date'), 'owner', ('admin_group','database_type'), 'shortcode', ('os','cpu','ram'),
+            'fields': (('name', 'in_service', 'billable', 'created_date'), 'owner', ('admin_group','database_type','cluster_instance_type'), 'shortcode', ('os','cpu','ram'),
                         ('replicated','backup','backup_time','public_facing','production'),
                         ('on_call', 'support_email', 'support_phone'),
+                        ('part_of_cluster', 'mssql_cluster'),
                         ('cname',),
                         ('regulated_data','non_regulated_data'),
                         'managed',
@@ -319,15 +328,14 @@ class ServerAdmin(ServiceInstanceAdmin):
     #def has_change_permission(self, request, obj=None):
     #    return user_has_permission(request, obj)
 
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        instance = self.model.objects.get(id=object_id)
- 
-        extra_context = {
-            'ticket_list': instance.get_tickets() 
-        }
-        return super().change_view(
-            request, object_id, form_url, extra_context=extra_context,
-        )
+
+@admin.register(MSSQLCluster)
+class MSSQLClusterAdmin(admin.ModelAdmin):
+    list_display = ('name', 'application', 'instance_type', 'environment', 'primary_server', 'secondary_server', 'ticket_status')
+    list_filter = ('environment', 'instance_type', 'ticket_status')
+    search_fields = ('name', 'application', 'primary_server__name', 'secondary_server__name')
+    readonly_fields = ('created_date', 'cluster_ticket_id', 'primary_ticket_id', 'secondary_ticket_id', 'ticket_status', 'ticket_error')
+    inlines = (MSSQLClusterDiskInline,)
 
 
 @admin.register(Ticket)

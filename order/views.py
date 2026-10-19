@@ -3,13 +3,14 @@ from django.http.response import Http404
 from django.template import loader
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
+from types import SimpleNamespace
 from order.forms import *
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from project.pinnmodels import UmOscPreorderApiV, UmOscDeptProfileV, UmOscServiceProfileV, UmOscChartfieldV
 from project.models import Email, MenuItem
-from oscauth.models import AuthUserDept
+from oscauth.models import AuthUserDept, LDAPGroupMember
 from pages.models import Page
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from pages.models import Page
@@ -27,7 +28,7 @@ from oscauth.utils import get_mc_user
 
 import threading
 
-from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment, ChargeType, UserChartcomV
+from .models import Product, Action, Service, Step, Element, Item, Constant, Chartcom, Order, LogItem, Attachment, ChargeType, UserChartcomV, MSSQLCluster
 
 #import for filter
 import datetime
@@ -816,6 +817,44 @@ class Services(UserPassesTestMixin, View):
             menu = MenuItem.objects.get_menu_tree('TELEPHONY')
         else:
             menu = MenuItem.objects.get_menu_tree('OTHER_SERVICES')
+
+        if group_id == 2 and LDAPGroupMember.objects.filter(
+            username=request.user.username,
+            ldap_group__name__iexact='its mssqldba',
+        ).exists():
+            cluster_category = next(
+                (
+                    item for item in menu.nodes
+                    if item.code.casefold() == 'mssql-cluster'
+                    or item.label.casefold() == 'mssql cluster'
+                ),
+                None,
+            )
+            if cluster_category is None:
+                cluster_category = SimpleNamespace(
+                    code='mssql-cluster',
+                    label='MSSQL Cluster',
+                    help_text='Order and manage MSSQL clusters.',
+                    active='',
+                    nodes=[],
+                )
+                menu.nodes.append(cluster_category)
+
+            cluster_category.nodes = [
+                SimpleNamespace(
+                    label='Add MSSQL Cluster',
+                    path='/orders/mssql-cluster/',
+                    help_text='Order a new two-node MSSQL cluster.',
+                ),
+                *[
+                    SimpleNamespace(
+                        label=f'Edit {cluster.name}',
+                        path=f'/orders/mssql-cluster/{cluster.id}/',
+                        help_text=f'Manage disks for {cluster.name}.',
+                    )
+                    for cluster in MSSQLCluster.objects.order_by('-created_date')
+                ],
+            ]
 
         context = {
             'title': 'Request Service',

@@ -1,5 +1,10 @@
 from django.urls import path
 from order.views import Services, Workflow
+from order.cluster_views import (
+    MSSQLClusterIdentifierValidationView,
+    MSSQLClusterManageView,
+    MSSQLClusterOrderView,
+)
 
 from . import views
 
@@ -18,6 +23,9 @@ urlpatterns = [
     path('sp/AddSMS', views.AddSMS.as_view(), name='AddSMS'),
     path('database/<int:instance_id>', views.DatabaseView.as_view()),
     path('server/<int:instance_id>/<str:action>/', views.ServerView.as_view()),
+    path('mssql-cluster/', MSSQLClusterOrderView.as_view()),
+    path('mssql-cluster/validate-identifier/', MSSQLClusterIdentifierValidationView.as_view(), name='mssql_cluster_validate_identifier'),
+    path('mssql-cluster/<int:cluster_id>/', MSSQLClusterManageView.as_view()),
 
     path('detail/<int:order_id>', views.get_order_detail),
     path('integration/<int:order_id>', views.Integration.as_view()),

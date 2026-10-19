@@ -1,0 +1,8 @@
+{% include 'order/_cluster_identifier_feedback.html' %}
+<span id="patch-window-preview" hx-swap-oob="innerHTML">{% if patch_window %}{{ patch_window }}{% else %}Enter a valid cluster identifier{% endif %}</span>
+<select id="id_backup_time" hx-swap-oob="innerHTML">
+	<option value="">---------</option>
+	{% for choice in backup_time_choices %}
+	<option value="{{ choice.pk }}" {% if selected_backup_time == choice %}selected{% endif %}>{{ choice.label }}</option>
+	{% endfor %}
+</select>

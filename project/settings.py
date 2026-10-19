@@ -144,6 +144,13 @@ TDX = {
     'PASSWORD': os.getenv('TDX_PASSWORD'),
 }
 
+MSSQL_CLUSTER_TDX = {
+    'FormID': os.getenv('MSSQL_CLUSTER_TDX_FORM_ID'),
+    'TypeID': os.getenv('MSSQL_CLUSTER_TDX_TYPE_ID'),
+    'ServiceID': os.getenv('MSSQL_CLUSTER_TDX_SERVICE_ID'),
+    'ResponsibleGroupID': os.getenv('MSSQL_CLUSTER_TDX_VCI_GROUP_ID'),
+}
+
 NETBOX = {
     'NETBOX_KEY' : os.getenv('NETBOX_KEY'),
     'NETBOX_URL' : os.getenv('NETBOX_URL'),

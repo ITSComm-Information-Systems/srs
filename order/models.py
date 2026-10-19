@@ -663,6 +663,12 @@ class Server(models.Model):
     owner = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True)  #<mcommGroup>DPSS Technology Management</mcommGroup>
     admin_group = models.ForeignKey(LDAPGroup, on_delete=models.CASCADE, null=True, related_name='admin_group')
     database_type = models.ForeignKey(Choice, null=True, blank=True, limit_choices_to={"parent__code": "DATABASE_TYPE"}, on_delete=models.SET_NULL, related_name='database_type')
+    cluster_instance_type = models.CharField(
+        max_length=1,
+        choices=[('d', 'Database'), ('a', 'SSAS')],
+        null=True,
+        blank=True,
+    )
     shortcode = ShortCodeField()
     created_date = models.DateTimeField(default=timezone.now, null=True)
     #shortcode = models.CharField(max_length=100) 
@@ -769,6 +775,18 @@ class Server(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def part_of_cluster(self):
+        return hasattr(self, 'primary_mssql_cluster') or hasattr(self, 'secondary_mssql_cluster')
+
+    @property
+    def mssql_cluster(self):
+        if hasattr(self, 'primary_mssql_cluster'):
+            return self.primary_mssql_cluster
+        if hasattr(self, 'secondary_mssql_cluster'):
+            return self.secondary_mssql_cluster
+        return None
+
     def get_shortcodes(self):
         return [{'size':'', 'shortcode':self.shortcode}]
 
@@ -857,6 +875,136 @@ class ServerDisk(models.Model):
 def get_disk_size(server):
     size = ServerDisk.objects.filter(server=server)
     print(size)
+
+
+class MSSQLCluster(models.Model):
+    ENVIRONMENT_CHOICES = [
+        ('t', 'Test'),
+        ('n', 'Non-production'),
+        ('p', 'Production'),
+    ]
+    INSTANCE_TYPE_CHOICES = [
+        ('d', 'Database'),
+        ('a', 'SSAS'),
+    ]
+    WINDOWS_VERSION_CHOICES = [
+        ('2022', 'Windows Server 2022'),
+        ('2025', 'Windows Server 2025'),
+    ]
+
+    name = models.CharField(max_length=100, unique=True)
+    environment = models.CharField(max_length=1, choices=ENVIRONMENT_CHOICES)
+    instance_type = models.CharField(max_length=1, choices=INSTANCE_TYPE_CHOICES)
+    sequence = models.CharField(max_length=2)
+    application = models.CharField(max_length=100)
+    vm_cluster = models.CharField(max_length=100, default='mssqlcluster')
+    cpu = models.PositiveIntegerField()
+    memory = models.PositiveIntegerField(help_text='Memory in GB; no SRS approval limit.')
+    windows_version = models.CharField(max_length=4, choices=WINDOWS_VERSION_CHOICES)
+    backup_time = models.ForeignKey(
+        Choice,
+        on_delete=models.PROTECT,
+        limit_choices_to={'parent__code': 'SERVER_BACKUP_TIME'},
+        related_name='mssql_clusters',
+    )
+    shortcode = ShortCodeField()
+    additional_details = models.TextField(blank=True)
+    support_email = models.EmailField(default='its.mssqldba@umich.edu')
+    support_phone = models.CharField(max_length=30, default='734-822-7754')
+    primary_server = models.OneToOneField(
+        Server,
+        on_delete=models.PROTECT,
+        related_name='primary_mssql_cluster',
+    )
+    secondary_server = models.OneToOneField(
+        Server,
+        on_delete=models.PROTECT,
+        related_name='secondary_mssql_cluster',
+    )
+    regulated_data = models.ManyToManyField(
+        Choice,
+        blank=True,
+        limit_choices_to={'parent__code': 'REGULATED_SENSITIVE_DATA'},
+        related_name='mssql_clusters_regulated',
+    )
+    non_regulated_data = models.ManyToManyField(
+        Choice,
+        blank=True,
+        limit_choices_to={'parent__code': 'NON_REGULATED_SENSITIVE_DATA'},
+        related_name='mssql_clusters_non_regulated',
+    )
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    created_date = models.DateTimeField(default=timezone.now)
+    cluster_ticket_id = models.PositiveIntegerField(null=True, blank=True)
+    primary_ticket_id = models.PositiveIntegerField(null=True, blank=True)
+    secondary_ticket_id = models.PositiveIntegerField(null=True, blank=True)
+    ticket_status = models.CharField(max_length=20, default='pending')
+    ticket_error = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        super().clean()
+        if self.primary_server_id and self.primary_server_id == self.secondary_server_id:
+            raise ValidationError('Primary and secondary servers must be different.')
+        server_ids = {self.primary_server_id, self.secondary_server_id} - {None}
+        existing = MSSQLCluster.objects.filter(
+            models.Q(primary_server_id__in=server_ids) | models.Q(secondary_server_id__in=server_ids)
+        ).exclude(pk=self.pk)
+        if existing.exists():
+            raise ValidationError('A MiServer can belong to only one MSSQL cluster.')
+
+    @property
+    def production(self):
+        return self.environment == 'p'
+
+
+class MSSQLClusterDisk(models.Model):
+    CONTROLLER_CHOICES = [(1, '1'), (2, '2'), (3, '3')]
+    DEVICE_ID_CHOICES = [(device_id, str(device_id)) for device_id in range(16) if device_id != 7]
+
+    cluster = models.ForeignKey(MSSQLCluster, related_name='disks', on_delete=models.CASCADE)
+    controller = models.PositiveSmallIntegerField(choices=CONTROLLER_CHOICES)
+    device_id = models.PositiveSmallIntegerField(choices=DEVICE_ID_CHOICES)
+    label = models.CharField(max_length=100, blank=True)
+    size_gb = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ('controller', 'device_id')
+        constraints = [
+            models.UniqueConstraint(
+                fields=('cluster', 'controller', 'device_id'),
+                name='unique_mssql_cluster_disk_device',
+            ),
+            models.CheckConstraint(
+                condition=models.Q(controller__in=(1, 2, 3)),
+                name='mssql_cluster_controller_valid',
+            ),
+            models.CheckConstraint(
+                condition=~models.Q(device_id=7),
+                name='mssql_cluster_device_not_seven',
+            ),
+            models.CheckConstraint(
+                condition=models.Q(size_gb__gt=0),
+                name='mssql_cluster_disk_size_positive',
+            ),
+        ]
+
+    def clean(self):
+        super().clean()
+        if self.controller not in (1, 2, 3):
+            raise ValidationError({'controller': 'Controller must be 1, 2, or 3.'})
+        if self.device_id == 7:
+            raise ValidationError({'device_id': 'Device ID 7 is reserved and cannot be used.'})
+        if self.size_gb <= 0:
+            raise ValidationError({'size_gb': 'Disk size must be greater than zero.'})
+        if self.cluster_id and self.cluster.instance_type == 'a' and self.controller == 2:
+            raise ValidationError({'controller': 'SSAS cluster disks may use controllers 1 or 3.'})
+
+    def __str__(self):
+        return f'{self.cluster.name} SCSI {self.controller}:{self.device_id}'
+
 
 class ServerData(models.Model):
     server = models.ForeignKey(Server, related_name='data', on_delete=models.CASCADE)
