@@ -1,8 +1,6 @@
 Django~=6.0.0
 whitenoise
 gunicorn
-# Pinned because certifi 2026.10.18 breaks validation of current InCommon chains
-certifi==2026.7.22
 mozilla-django-oidc
 pyyaml
 oracledb
