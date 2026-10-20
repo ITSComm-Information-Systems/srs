@@ -5,7 +5,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from project.models import Choice, validate_shortcode
-from .models import MSSQLClusterDisk
+from .models import MSSQLCluster, MSSQLClusterDisk
 
 
 CLUSTER_IDENTIFIER_PATTERN = re.compile(r'[tnp][da](?:0[1-9]|[1-9][0-9])')
@@ -273,3 +273,63 @@ class MSSQLClusterDiskForm(forms.ModelForm):
         if self.instance.pk and cleaned.get('size_gb', 0) < self.instance.size_gb:
             self.add_error('size_gb', 'Disk size cannot be decreased.')
         return cleaned
+
+
+class MSSQLClusterEditForm(forms.ModelForm):
+    """Edit the mutable cluster-level configuration after an order is placed."""
+
+    class Meta:
+        model = MSSQLCluster
+        fields = (
+            'application',
+            'cpu',
+            'memory',
+            'windows_version',
+            'shortcode',
+            'additional_details',
+            'regulated_data',
+            'non_regulated_data',
+        )
+        widgets = {
+            'additional_details': forms.Textarea(attrs={'rows': 3}),
+            'regulated_data': forms.CheckboxSelectMultiple,
+            'non_regulated_data': forms.CheckboxSelectMultiple,
+        }
+        labels = {
+            'memory': 'Memory (GB)',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['regulated_data'].queryset = Choice.objects.filter(
+            parent__code='REGULATED_SENSITIVE_DATA', active=True
+        ).order_by('sequence')
+        self.fields['non_regulated_data'].queryset = Choice.objects.filter(
+            parent__code='NON_REGULATED_SENSITIVE_DATA', active=True
+        ).order_by('sequence')
+        for name, field in self.fields.items():
+            if isinstance(field.widget, forms.CheckboxSelectMultiple):
+                field.widget.attrs['class'] = 'form-check-input'
+            else:
+                field.widget.attrs['class'] = 'form-control'
+
+    def clean_shortcode(self):
+        shortcode = self.cleaned_data['shortcode'].strip()
+        if not shortcode.isdigit() or len(shortcode) != 6:
+            raise ValidationError('Shortcode must contain exactly six digits.')
+        validate_shortcode(shortcode)
+        return shortcode
+
+    def save(self, commit=True):
+        cluster = super().save(commit=commit)
+        if commit:
+            # Keep both MiServer records in sync with shared cluster values.
+            servers = [cluster.primary_server, cluster.secondary_server]
+            for server in servers:
+                server.cpu = cluster.cpu
+                server.ram = cluster.memory
+                server.shortcode = cluster.shortcode
+                server.save(update_fields=['cpu', 'ram', 'shortcode'])
+                server.regulated_data.set(self.cleaned_data['regulated_data'])
+                server.non_regulated_data.set(self.cleaned_data['non_regulated_data'])
+        return cluster

@@ -2,6 +2,7 @@ from django.urls import path
 from order.views import Services, Workflow
 from order.cluster_views import (
     MSSQLClusterIdentifierValidationView,
+    MSSQLClusterListView,
     MSSQLClusterManageView,
     MSSQLClusterOrderView,
 )
@@ -25,6 +26,7 @@ urlpatterns = [
     path('server/<int:instance_id>/<str:action>/', views.ServerView.as_view()),
     path('mssql-cluster/', MSSQLClusterOrderView.as_view()),
     path('mssql-cluster/validate-identifier/', MSSQLClusterIdentifierValidationView.as_view(), name='mssql_cluster_validate_identifier'),
+    path('mssql-cluster/list/', MSSQLClusterListView.as_view(), name='mssql_cluster_list'),
     path('mssql-cluster/<int:cluster_id>/', MSSQLClusterManageView.as_view()),
 
     path('detail/<int:order_id>', views.get_order_detail),

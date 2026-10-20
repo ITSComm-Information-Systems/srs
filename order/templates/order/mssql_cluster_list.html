@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">MSSQL Clusters</h1>
+    <a class="btn btn-primary" href="/orders/mssql-cluster/"><i class="fas fa-plus-circle" aria-hidden="true"></i> Order a cluster</a>
+  </div>
+
+  {% if clusters %}
+  <div class="table-responsive">
+    <table class="table table-hover table-striped table-sm align-middle">
+      <thead>
+        <tr>
+          <th scope="col">Cluster</th>
+          <th scope="col">Application</th>
+          <th scope="col">Type</th>
+          <th scope="col">Environment</th>
+          <th scope="col">Primary (MACC)</th>
+          <th scope="col">Secondary (ASB)</th>
+          <th scope="col">Disks</th>
+          <th scope="col">Ticket status</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cluster in clusters %}
+        <tr>
+          <td>{{ cluster.name }}</td>
+          <td>{{ cluster.application }}</td>
+          <td>{{ cluster.get_instance_type_display }}</td>
+          <td>{{ cluster.get_environment_display }}</td>
+          <td>{{ cluster.primary_server.name }}</td>
+          <td>{{ cluster.secondary_server.name }}</td>
+          <td>{{ cluster.disks.count }}</td>
+          <td>{{ cluster.ticket_status }}</td>
+          <td><a class="btn btn-outline-primary btn-sm" href="/orders/mssql-cluster/{{ cluster.id }}/">View / Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-muted">
+    You do not have access to any MSSQL clusters.
+  </p>
+  {% endif %}
+</div>
+{% endblock %}

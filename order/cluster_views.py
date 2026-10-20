@@ -9,6 +9,7 @@ from copy import copy
 from oscauth.models import LDAPGroup, LDAPGroupMember
 from order.cluster_forms import (
     MSSQLClusterDiskForm,
+    MSSQLClusterEditForm,
     MSSQLClusterOrderForm,
     get_available_backup_times,
     get_cluster_patch_window,
@@ -31,6 +32,16 @@ def is_mssql_dba(user):
         return user.username in getattr(community, 'members', set())
     except Exception:
         return False
+
+
+def user_cluster_queryset(user):
+    """Clusters whose owning MiServer group the user belongs to."""
+    user_group_ids = LDAPGroupMember.objects.filter(
+        username=user.username
+    ).values_list('ldap_group_id', flat=True)
+    return MSSQLCluster.objects.select_related(
+        'primary_server', 'secondary_server'
+    ).filter(primary_server__owner_id__in=user_group_ids)
 
 
 def format_cluster_patch_window(identifier):
@@ -264,9 +275,7 @@ class MSSQLClusterOrderView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
-        clusters = MSSQLCluster.objects.select_related(
-            'primary_server', 'secondary_server'
-        ).order_by('-created_date')
+        clusters = user_cluster_queryset(request.user).order_by('-created_date')
         return render(request, self.template_name, {
             'form': MSSQLClusterOrderForm(),
             'clusters': clusters,
@@ -357,20 +366,24 @@ class MSSQLClusterManageView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, cluster_id):
-        cluster = get_object_or_404(MSSQLCluster, pk=cluster_id)
+        cluster = get_object_or_404(user_cluster_queryset(request.user), pk=cluster_id)
         return render(request, 'order/mssql_cluster_manage.html', {
             'cluster': cluster,
             'disk_form': MSSQLClusterDiskForm(cluster=cluster),
+            'cluster_form': MSSQLClusterEditForm(instance=cluster),
         })
 
     def post(self, request, cluster_id):
-        cluster = get_object_or_404(MSSQLCluster, pk=cluster_id)
-        if request.POST.get('operation') == 'retry_tickets':
+        cluster = get_object_or_404(user_cluster_queryset(request.user), pk=cluster_id)
+        operation = request.POST.get('operation')
+
+        if operation == 'retry_tickets':
             try:
                 submit_cluster_tickets(cluster, request, get_cluster_ticket_config())
                 return render(request, 'order/mssql_cluster_manage.html', {
                     'cluster': cluster,
                     'disk_form': MSSQLClusterDiskForm(cluster=cluster),
+                    'cluster_form': MSSQLClusterEditForm(instance=cluster),
                     'notice': 'All cluster and MiServer tickets are recorded.',
                 })
             except Exception as exc:
@@ -381,16 +394,47 @@ class MSSQLClusterManageView(View):
                 return render(request, 'order/mssql_cluster_manage.html', {
                     'cluster': cluster,
                     'disk_form': MSSQLClusterDiskForm(cluster=cluster),
+                    'cluster_form': MSSQLClusterEditForm(instance=cluster),
                     'error_message': str(exc),
                 })
 
+        if operation == 'edit_cluster':
+            cluster_form = MSSQLClusterEditForm(request.POST, instance=cluster)
+            if cluster_form.is_valid():
+                os_choice = get_windows_choice(cluster_form.cleaned_data['windows_version'])
+                if not os_choice:
+                    cluster_form.add_error(
+                        'windows_version',
+                        f'Windows Server {cluster_form.cleaned_data["windows_version"]} is not configured '
+                        'in the MiServer operating-system choices.',
+                    )
+                else:
+                    with transaction.atomic():
+                        cluster = cluster_form.save()
+                        for server in (cluster.primary_server, cluster.secondary_server):
+                            server.os = os_choice
+                            server.save(update_fields=['os'])
+                    return render(request, 'order/mssql_cluster_manage.html', {
+                        'cluster': cluster,
+                        'disk_form': MSSQLClusterDiskForm(cluster=cluster),
+                        'cluster_form': MSSQLClusterEditForm(instance=cluster),
+                        'notice': 'Cluster configuration updated.',
+                    })
+            return render(request, 'order/mssql_cluster_manage.html', {
+                'cluster': cluster,
+                'disk_form': MSSQLClusterDiskForm(cluster=cluster),
+                'cluster_form': cluster_form,
+                'show_cluster_edit': True,
+            })
+
         disk_id = request.POST.get('disk_id')
-        if request.POST.get('operation') == 'remove':
+        if operation == 'remove':
             disk = get_object_or_404(MSSQLClusterDisk, pk=disk_id, cluster=cluster)
             disk.delete()
             return render(request, 'order/mssql_cluster_manage.html', {
                 'cluster': cluster,
                 'disk_form': MSSQLClusterDiskForm(cluster=cluster),
+                'cluster_form': MSSQLClusterEditForm(instance=cluster),
                 'notice': 'Cluster disk removed.',
             })
 
@@ -403,9 +447,28 @@ class MSSQLClusterManageView(View):
             return render(request, 'order/mssql_cluster_manage.html', {
                 'cluster': cluster,
                 'disk_form': MSSQLClusterDiskForm(cluster=cluster),
+                'cluster_form': MSSQLClusterEditForm(instance=cluster),
                 'notice': 'Cluster disk saved.',
             })
         return render(request, 'order/mssql_cluster_manage.html', {
             'cluster': cluster,
             'disk_form': form,
+            'cluster_form': MSSQLClusterEditForm(instance=cluster),
         })
+
+
+class MSSQLClusterListView(View):
+    template_name = 'order/mssql_cluster_list.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not is_mssql_dba(request.user):
+            from django.http import HttpResponseForbidden
+            return HttpResponseForbidden('MSSQL Cluster management is restricted to the DBA team.')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request):
+        clusters = user_cluster_queryset(request.user).order_by('-created_date')
+        return render(request, self.template_name, {
+            'clusters': clusters,
+        })
+

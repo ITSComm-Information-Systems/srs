@@ -846,14 +846,11 @@ class Services(UserPassesTestMixin, View):
                     path='/orders/mssql-cluster/',
                     help_text='Order a new two-node MSSQL cluster.',
                 ),
-                *[
-                    SimpleNamespace(
-                        label=f'Edit {cluster.name}',
-                        path=f'/orders/mssql-cluster/{cluster.id}/',
-                        help_text=f'Manage disks for {cluster.name}.',
-                    )
-                    for cluster in MSSQLCluster.objects.order_by('-created_date')
-                ],
+                SimpleNamespace(
+                    label='My Clusters',
+                    path='/orders/mssql-cluster/list/',
+                    help_text='See and edit the MSSQL clusters your groups own.',
+                ),
             ]
 
         context = {
