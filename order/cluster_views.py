@@ -16,7 +16,7 @@ from order.cluster_forms import (
     normalize_cluster_identifier,
 )
 from order.models import MSSQLCluster, MSSQLClusterDisk, Server, ServerDisk
-from project.integrations import MCommunity, TDx, create_ticket
+from project.integrations import MCommunity, TDx, create_ticket, ServerPayload
 from project.models import Choice
 
 
@@ -74,7 +74,10 @@ def get_windows_choice(version):
 
 
 def get_cluster_ticket_config():
-    config = getattr(settings, 'MSSQL_CLUSTER_TDX', None)
+    config = {'FormID': ServerPayload.form_id, 
+              'TypeID': ServerPayload.type_id,
+              'ServiceID': ServerPayload.service_id,
+              'ResponsibleGroupID': ServerPayload.responsible_group_id}
     required = ('FormID', 'TypeID', 'ServiceID', 'ResponsibleGroupID')
     if not isinstance(config, dict) or any(not config.get(key) for key in required):
         raise ImproperlyConfigured(
