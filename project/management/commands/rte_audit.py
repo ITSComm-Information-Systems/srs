@@ -48,18 +48,23 @@ class Command(BaseCommand):
                 ORDER BY grp, uniqname
         """
 
+        base_cc = email.parse_addresses(email.cc)
+        base_subject = email.subject
+
         for record in get_query_result(sql):
-            uniqname = record['uniqname'].lower()
-            supervisor = record['supervisor'].lower()
-            print(uniqname)
-            email.subject = f'{subject} - {uniqname}'
-            email.to = uniqname + '@umich.edu'
+            uniqname = record["uniqname"].lower()
+            supervisor = record.get("supervisor")
 
-            email.cc = ", ".join([
-                supervisor + "@umich.edu",
-                "stroudm@umich.edu",
-                "ericboyd@umich.edu",
-            ])
+            cc = list(base_cc)
 
-            email.bcc = email.team_shared_email
-            email.send()
+            if supervisor:
+                cc.insert(0, f"{supervisor.lower()}@umich.edu")
+
+            cc = list(dict.fromkeys(cc))
+
+            email.send(
+                to=f"{uniqname}@umich.edu",
+                cc=cc,
+                bcc=email.team_shared_email,
+                subject=f"{base_subject} - {uniqname}",
+            )
