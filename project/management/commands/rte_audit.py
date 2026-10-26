@@ -54,6 +54,12 @@ class Command(BaseCommand):
             print(uniqname)
             email.subject = f'{subject} - {uniqname}'
             email.to = uniqname + '@umich.edu'
-            email.cc = supervisor + '@umich.edu'
+
+            email.cc = ", ".join([
+                supervisor + "@umich.edu",
+                "stroudm@umich.edu",
+                "ericboyd@umich.edu",
+            ])
+
             email.bcc = email.team_shared_email
             email.send()
