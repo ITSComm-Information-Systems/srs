@@ -15,32 +15,6 @@
   <h1>MSSQL Cluster</h1>
   <p>Please specify the cluster and server requirements.</p>
 
-  {% if clusters %}
-  <section class="mb-4">
-    <h2>Existing Clusters</h2>
-    <p><a href="/orders/mssql-cluster/list/">View and edit all clusters &rarr;</a></p>
-    <div class="table-responsive">
-      <table class="table table-hover table-striped table-sm align-middle">
-        <thead>
-          <tr><th scope="col">Cluster</th><th scope="col">Application</th><th scope="col">Type</th><th scope="col">Environment</th><th scope="col">Ticket status</th><th scope="col">Actions</th></tr>
-        </thead>
-        <tbody>
-          {% for cluster in clusters %}
-          <tr>
-            <td>{{ cluster.name }}</td>
-            <td>{{ cluster.application }}</td>
-            <td>{{ cluster.get_instance_type_display }}</td>
-            <td>{{ cluster.get_environment_display }}</td>
-            <td>{{ cluster.ticket_status }}</td>
-            <td><a class="btn btn-outline-primary btn-sm" href="/orders/mssql-cluster/{{ cluster.id }}/">Manage disks</a></td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </section>
-  {% endif %}
-
   {% if error_message %}
   <div class="alert alert-danger" role="alert">{{ error_message }}</div>
   {% if cluster %}<p><a class="btn btn-outline-primary" href="/orders/mssql-cluster/{{ cluster.id }}/">Open cluster management and retry missing tickets</a></p>{% endif %}
