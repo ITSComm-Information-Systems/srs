@@ -633,7 +633,8 @@ class NotificationManager(models.Manager):
                 print(f'send to: {addr}')
                 email_list.append(addr)
             elif notification.recipient == 'engineer':
-                email_list.append(f'{estimate.assigned_engineer.user_name}@umich.edu')
+                if estimate.assigned_engineer:
+                    email_list.append(f'{estimate.assigned_engineer.user_name}@umich.edu')
             else:
                 email_list.append(notification.recipient)
 
