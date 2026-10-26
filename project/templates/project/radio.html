@@ -2,7 +2,7 @@
      {% if field.field.display_condition %}
          data-display-condition="{{ field.field.display_condition }}"
      {% endif %}>
-    <legend><strong>{{ field.label }}</strong> 
+     <legend id="legend{{ field.name }}"><strong>{{ field.label }}</strong> 
     {% if field.help_text %}
         <a tabindex="0" role="button" data-toggle="popover" data-container="body"
         data-trigger="focus" data-placement="bottom" 
