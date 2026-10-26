@@ -196,21 +196,80 @@ class Email(models.Model):
      def render_body(self):
           return Template(self.body).render(Context(self.context))
 
-     def send(self):
-          text_message = self.subject
-          subject = self.subject
+     @staticmethod
+     def parse_addresses(value):
+          if not value:
+               return []
 
-          body = Template(self.body).render(Context(self.context))
+          # Also accept an already-created list or tuple.
+          if isinstance(value, (list, tuple)):
+               return [
+                    address.strip()
+                    for address in value
+                    if address and address.strip()
+               ]
 
-          if settings.ENVIRONMENT != 'Production':
-               print('Non-prod, do not send to:', self.to)
-               self.to = 'djamison@umich.edu'
-               self.cc = ''
-               self.bcc = self.team_shared_email
-               subject = f'{settings.ENVIRONMENT} - {self.subject}'
+          return [
+               address.strip()
+               for address in value.split(",")
+               if address.strip()
+          ]
 
-          # Send Distribution List to Leads
-          msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc], reply_to=[self.reply_to],
-                                       headers = {'srs_code': self.code})
-          msg.attach_alternative(body, "text/html")
-          msg.send()
+     def send(
+          self,
+          *,
+          to=None,
+          cc=None,
+          bcc=None,
+          subject=None,
+          reply_to=None,
+          context=None,
+          ):
+          recipients = self.parse_addresses(
+               self.to if to is None else to
+          )
+          cc_recipients = self.parse_addresses(
+               self.cc if cc is None else cc
+          )
+          bcc_recipients = self.parse_addresses(
+               self.bcc if bcc is None else bcc
+          )
+          reply_to_recipients = self.parse_addresses(
+               self.reply_to if reply_to is None else reply_to
+          )
+
+          render_context = self.context if context is None else context
+
+          rendered_subject = Template(
+               self.subject if subject is None else subject
+          ).render(Context(render_context))
+
+          rendered_body = Template(self.body).render(
+               Context(render_context)
+          )
+
+          if settings.ENVIRONMENT != "Production":
+               print(
+                    "Non-prod, do not send to:",
+                    ", ".join(recipients),
+               )
+
+               recipients = ["djamison@umich.edu"]
+               cc_recipients = []
+               bcc_recipients = [self.team_shared_email]
+               rendered_subject = (
+                    f"{settings.ENVIRONMENT} - {rendered_subject}"
+               )
+
+          msg = EmailMultiAlternatives(
+               subject=rendered_subject,
+               body=rendered_body,
+               from_email=self.sender,
+               to=recipients,
+               cc=cc_recipients,
+               bcc=bcc_recipients,
+               reply_to=reply_to_recipients,
+               headers={"srs_code": self.code},
+          )
+          msg.attach_alternative(rendered_body, "text/html")
+          return msg.send()
