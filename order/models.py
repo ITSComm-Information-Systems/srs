@@ -690,7 +690,7 @@ class Server(models.Model):
     in_service = models.BooleanField(default=True)   #<servicestatus>Ended</servicestatus>
     billable = models.BooleanField(default=True, help_text='Turning this off will pause monthly billing.')
 
-    firewall = models.CharField(max_length=100)
+    firewall = models.CharField(max_length=100, null=True, blank=True)
     backup = models.BooleanField(default=True)
     support_email = models.CharField(max_length=100)    #  <afterhoursemail>dpss-technology-management@umich.edu</afterhoursemail>
     support_phone = models.CharField(max_length=100)   #  <afterhoursphone>7346470657</afterhoursphone>
@@ -712,9 +712,9 @@ class Server(models.Model):
                                     , related_name='reboot_day'
                                     , on_delete=models.CASCADE,)
     cname = models.CharField(max_length=100, null=True, blank=True)
-    domain = models.CharField(max_length=100)
-    datacenter = models.CharField(max_length=100)
-    firewall_requests = models.CharField(max_length=100)
+    domain = models.CharField(max_length=100, null=True, blank=True)
+    datacenter = models.CharField(max_length=100, null=True, blank=True)
+    firewall_requests = models.CharField(max_length=100, null=True, blank=True)
     last_updated = models.DateTimeField(null=True)
 
     def __init__(self, *args, **kwargs):

@@ -93,7 +93,9 @@ def serializer_factory(model):
                     )
 
                 class_attrs[fld.name] = ChoiceRelatedField(
-                    queryset=queryset
+                    queryset=queryset,
+                    allow_null=fld.null,
+                    required=not (fld.blank or fld.null or fld.has_default()),
                 )
             else:
                 class_attrs[fld.name] = serializers.SlugRelatedField(
@@ -105,7 +107,7 @@ def serializer_factory(model):
 
         elif type(fld) == models.fields.related.ManyToManyField:
             if fld.related_model == Choice:
-                class_attrs[fld.name] = ChoiceSerializer(many=True)
+                class_attrs[fld.name] = ChoiceSerializer(many=True, read_only=True)
             else:
                 class_attrs[fld.name] = serializers.StringRelatedField(many=True)
             class_attrs['prefetch_related'].append(fld.name)
