@@ -54,7 +54,8 @@ class DefaultSerializer(serializers.ModelSerializer):
 class ChoiceRelatedField(serializers.RelatedField):
 
     def to_representation(self, value):
-        return ChoiceSerializer(value).data
+        return value.code
+
 
     def to_internal_value(self, data):
         try:
