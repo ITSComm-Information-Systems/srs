@@ -123,6 +123,21 @@ def serializer_factory(model):
 
     return type(f'{name}Serializer', (DefaultSerializer,), class_attrs)
 
+
+class ServerSerializer(serializer_factory(Server)):
+    disks = ServerDiskSerializer(many=True, required=False)
+
+    def create(self, validated_data):
+        disks_data = validated_data.pop('disks', [])
+
+        server = super().create(validated_data)
+
+        for disk_data in disks_data:
+            server.disks.create(**disk_data)
+
+        return server
+
+
 class DatabaseSerializer(serializers.ModelSerializer):
 
     class Meta:

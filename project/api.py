@@ -313,9 +313,11 @@ router = routers.DefaultRouter()
 # Use this method to add a new endpoint using only the model
 router.register('pool', viewset_factory(Pool))
 router.register('image', viewset_factory(Image))
-router.register('server', viewset_factory(Server))
 router.register('archost', viewset_factory(ArcHost))
 router.register('modems', viewset_factory(UmModemsV))
+
+# Override Default
+router.register('server', viewset_factory(Server, serializers.ServerSerializer))
 
 # Deprecated method requiring a custom serializer.
 router.register('network', viewset_factory(Network, serializers.NetworkSerializer))
