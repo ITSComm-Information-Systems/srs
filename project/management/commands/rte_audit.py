@@ -48,6 +48,9 @@ class Command(BaseCommand):
                 ORDER BY grp, uniqname
         """
 
+        base_cc = email.parse_addresses(email.cc)
+        base_subject = email.subject
+
         for record in get_query_result(sql):
             uniqname = record['uniqname'].lower()
             supervisor = record['supervisor'].lower()
