@@ -869,7 +869,7 @@ class ServerSupportForm(TabForm):
             db = None
 
         if self.request.POST.get('production') == 'False':
-            self.fields['on_call'].initial = '0'
+            self.initial['on_call'] = '0'
             self.fields['on_call'].disabled = True
 
         if self.request.POST.get('database'):
