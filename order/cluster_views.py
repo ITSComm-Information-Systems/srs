@@ -1,8 +1,12 @@
+import logging
+
 from django.conf import settings
+from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import transaction, models
 from django.http import HttpResponseForbidden, QueryDict
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views import View
 from copy import copy
 
@@ -16,11 +20,16 @@ from order.cluster_forms import (
     normalize_cluster_identifier,
 )
 from order.models import MSSQLCluster, MSSQLClusterDisk, Server, ServerDisk
-from project.integrations import MCommunity, TDx, create_ticket, ServerPayload
+from project.integrations import MCommunity, TDx, create_ticket, create_ticket_server_delete, ServerPayload
 from project.models import Choice
 
 
 DBA_GROUP_NAME = 'its mssqldba'
+logger = logging.getLogger(__name__)
+
+
+class ClusterChangeTicketError(Exception):
+    pass
 
 
 def is_mssql_dba(user):
@@ -105,11 +114,18 @@ def cluster_ticket_payload(cluster, request, config):
         f'VM cluster: {cluster.vm_cluster}',
         f'CPU: {cluster.cpu}',
         f'Memory: {cluster.memory} GB',
+        f'Shortcode: {cluster.shortcode}',
         f'Windows version: {cluster.windows_version}',
         f'Daily OS backup time: {cluster.backup_time.label}',
         f'Primary MACC server: {cluster.primary_server.name}',
         f'Secondary ASB server: {cluster.secondary_server.name}',
         f'Data sensitivity: {", ".join(sensitivity) if sensitivity else "None selected"}',
+        'Regulated data: ' + ', '.join(
+            f'{choice.label} (ID {choice.pk})' for choice in cluster.regulated_data.all()
+        ),
+        'Non-regulated data: ' + ', '.join(
+            f'{choice.label} (ID {choice.pk})' for choice in cluster.non_regulated_data.all()
+        ),
         'Cluster disks:',
         *(disk_lines or ['None']),
         f'Additional details: {cluster.additional_details}',
@@ -127,6 +143,28 @@ def cluster_ticket_payload(cluster, request, config):
         'Description': description,
         'Attributes': [],
     }
+
+
+def submit_cluster_change_ticket(cluster, request, config, operation, before, after):
+    try:
+        payload = cluster_ticket_payload(cluster, request, config)
+        payload.update({
+            'Title': f'MSSQL Cluster Change - {cluster.name} - {operation}',
+            'RequestorEmail': request.user.email,
+            'Description': '\n'.join([
+                f'Operation: {operation}',
+                f'Original cluster ticket: {cluster.cluster_ticket_id or "Not recorded"}',
+                f'Requested by: {request.user.username}',
+                '', 'Before:', before, '', 'After:', after,
+            ]),
+        })
+        response = TDx().create_ticket(payload)
+        if not response.ok:
+            raise RuntimeError(f'TDX returned HTTP {response.status_code}')
+        return response.json()['ID']
+    except Exception as exc:
+        logger.exception('TDX change ticket failed for cluster %s', cluster.pk)
+        raise ClusterChangeTicketError from exc
 
 
 def submit_cluster_tickets(cluster, request, config):
@@ -361,6 +399,63 @@ class MSSQLClusterIdentifierValidationView(View):
         })
 
 
+def delete_cluster_with_tickets(cluster_id, request):
+    config = get_cluster_ticket_config()
+    ticket_ids = []
+    for field_name, server_field in (
+        ('delete_cluster_ticket_id', None),
+        ('delete_primary_ticket_id', 'primary_server'),
+        ('delete_secondary_ticket_id', 'secondary_server'),
+    ):
+        with transaction.atomic():
+            cluster = get_object_or_404(
+                user_cluster_queryset(request.user).select_for_update(), pk=cluster_id,
+            )
+            ticket_id = getattr(cluster, field_name)
+            if not ticket_id:
+                if server_field is None:
+                    before = cluster_ticket_payload(cluster, request, config)['Description']
+                    ticket_id = submit_cluster_change_ticket(
+                        cluster, request, config, 'Decommission cluster', before,
+                        'Cluster and shared disk records removed from SRS; '
+                        'both MiServers marked out of service. '
+                        'Decommission both servers and their shared storage through TDX.',
+                    )
+                else:
+                    server = getattr(cluster, server_field)
+                    response = create_ticket_server_delete(
+                        server, request.user,
+                        f'End Service for {server.name} - MSSQL cluster {cluster.name}. '
+                        f'Cluster decommission ticket: {cluster.delete_cluster_ticket_id}. '
+                        'Coordinate shared storage removal with the DBA team.',
+                    )
+                    if not response.ok:
+                        raise ClusterChangeTicketError(f'TDX returned HTTP {response.status_code}')
+                    ticket_id = response.json()['ID']
+                ticket_id = int(ticket_id)
+                if ticket_id <= 0:
+                    raise ClusterChangeTicketError('TDX did not return a valid ticket ID.')
+                setattr(cluster, field_name, ticket_id)
+                cluster.ticket_status = 'deleting'
+                cluster.ticket_error = ''
+                cluster.save(update_fields=[field_name, 'ticket_status', 'ticket_error'])
+            ticket_ids.append(ticket_id)
+
+    with transaction.atomic():
+        cluster = get_object_or_404(
+            user_cluster_queryset(request.user).select_for_update(), pk=cluster_id,
+        )
+        cluster_name = cluster.name
+        for server_id in (cluster.primary_server_id, cluster.secondary_server_id):
+            server = Server.objects.select_for_update().get(pk=server_id)
+            if server.in_service:
+                server.name = f'{server.name}-Ended-{timezone.localdate():%Y%m%d}'
+                server.in_service = False
+                server.save(update_fields=['name', 'in_service'])
+        cluster.delete()
+    return cluster_name, ticket_ids
+
+
 class MSSQLClusterManageView(View):
     def dispatch(self, request, *args, **kwargs):
         if not is_mssql_dba(request.user):
@@ -378,6 +473,66 @@ class MSSQLClusterManageView(View):
 
     def post(self, request, cluster_id):
         cluster = get_object_or_404(user_cluster_queryset(request.user), pk=cluster_id)
+        if cluster.ticket_status in ('deleting', 'delete_failed'):
+            return render(request, 'order/mssql_cluster_manage.html', {
+                'cluster': cluster,
+                'disk_form': MSSQLClusterDiskForm(cluster=cluster),
+                'cluster_form': MSSQLClusterEditForm(instance=cluster),
+                'error_message': 'Cluster deletion has started. Retry deletion from the cluster list.',
+            }, status=409)
+        operation = request.POST.get('operation')
+        if operation == 'retry_tickets':
+            return self.process_change(request, cluster)
+        operations = {
+            'edit_cluster': 'Update configuration',
+            'add': 'Add disk',
+            'save': 'Update disk',
+            'remove': 'Remove disk',
+        }
+        if operation not in operations:
+            from django.http import HttpResponseBadRequest
+            return HttpResponseBadRequest('Unknown cluster operation.')
+        try:
+            config = get_cluster_ticket_config()
+        except ImproperlyConfigured:
+            return render(request, 'order/mssql_cluster_manage.html', {
+                'cluster': cluster,
+                'disk_form': MSSQLClusterDiskForm(cluster=cluster),
+                'cluster_form': MSSQLClusterEditForm(instance=cluster),
+                'error_message': 'Ticket routing is not configured. No changes were saved.',
+            })
+        try:
+            with transaction.atomic():
+                cluster = user_cluster_queryset(request.user).select_for_update().get(pk=cluster.pk)
+                if cluster.ticket_status in ('deleting', 'delete_failed'):
+                    from django.http import HttpResponse
+                    return HttpResponse('Cluster deletion has started.', status=409)
+                before = cluster_ticket_payload(cluster, request, config)['Description']
+                response = self.process_change(request, cluster)
+                cluster.refresh_from_db()
+                after = cluster_ticket_payload(cluster, request, config)['Description']
+                if before == after:
+                    return response
+                ticket_id = submit_cluster_change_ticket(
+                    cluster, request, config, operations[operation], before, after,
+                )
+        except ClusterChangeTicketError:
+            cluster.refresh_from_db()
+            return render(request, 'order/mssql_cluster_manage.html', {
+                'cluster': cluster,
+                'disk_form': MSSQLClusterDiskForm(cluster=cluster),
+                'cluster_form': MSSQLClusterEditForm(instance=cluster),
+                'error_message': 'The change was not saved because its TDX ticket could not be confirmed. '
+                                 'Check TDX before retrying if the submission timed out.',
+            })
+        return render(request, 'order/mssql_cluster_manage.html', {
+            'cluster': cluster,
+            'disk_form': MSSQLClusterDiskForm(cluster=cluster),
+            'cluster_form': MSSQLClusterEditForm(instance=cluster),
+            'notice': f'Cluster change saved. TDX ticket {ticket_id} created.',
+        })
+
+    def process_change(self, request, cluster):
         operation = request.POST.get('operation')
 
         if operation == 'retry_tickets':
@@ -474,4 +629,32 @@ class MSSQLClusterListView(View):
         return render(request, self.template_name, {
             'clusters': clusters,
         })
+
+    def post(self, request):
+        if request.POST.get('operation') != 'delete_cluster':
+            from django.http import HttpResponseBadRequest
+            return HttpResponseBadRequest('Unknown cluster operation.')
+        cluster = get_object_or_404(
+            user_cluster_queryset(request.user), pk=request.POST.get('cluster_id'),
+        )
+        try:
+            cluster_name, ticket_ids = delete_cluster_with_tickets(cluster.pk, request)
+        except Exception:
+            logger.exception('Cluster deletion failed for cluster %s', cluster.pk)
+            user_cluster_queryset(request.user).filter(pk=cluster.pk).update(
+                ticket_status='delete_failed',
+                ticket_error='Deletion could not be completed. Confirmed tickets are retained. '
+                             'Check TDX before retrying if a submission timed out.',
+            )
+            return render(request, self.template_name, {
+                'clusters': user_cluster_queryset(request.user).order_by('-created_date'),
+                'error_message': 'The cluster was not deleted. Confirmed deletion tickets have been '
+                                 'retained for retry. Check TDX before retrying a timed-out submission.',
+            }, status=502)
+        messages.success(
+            request,
+            f'Cluster {cluster_name} deleted from SRS and both MiServers marked out of service. '
+            f'TDX tickets: {", ".join(str(ticket_id) for ticket_id in ticket_ids)}.',
+        )
+        return redirect('/orders/mssql-cluster/list/')
 

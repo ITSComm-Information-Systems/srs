@@ -610,7 +610,7 @@ def create_ticket_server_delete(instance, user, description):
     if instance.database_type:
         payload['Attributes'].append({"ID": "5319", "Value": DB_TYPE.get(instance.database_type.code)})
 
-    TDx().create_ticket(payload)
+    return TDx().create_ticket(payload)
 
 
 class Payload():

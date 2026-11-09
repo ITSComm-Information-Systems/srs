@@ -938,6 +938,9 @@ class MSSQLCluster(models.Model):
     cluster_ticket_id = models.PositiveIntegerField(null=True, blank=True)
     primary_ticket_id = models.PositiveIntegerField(null=True, blank=True)
     secondary_ticket_id = models.PositiveIntegerField(null=True, blank=True)
+    delete_cluster_ticket_id = models.PositiveIntegerField(null=True, blank=True)
+    delete_primary_ticket_id = models.PositiveIntegerField(null=True, blank=True)
+    delete_secondary_ticket_id = models.PositiveIntegerField(null=True, blank=True)
     ticket_status = models.CharField(max_length=20, default='pending')
     ticket_error = models.TextField(blank=True)
 
