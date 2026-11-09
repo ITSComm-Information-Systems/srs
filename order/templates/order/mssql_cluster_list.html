@@ -7,6 +7,8 @@
     <a class="btn btn-primary" href="/orders/mssql-cluster/"><i class="fas fa-plus-circle" aria-hidden="true"></i> Order a cluster</a>
   </div>
 
+  {% if error_message %}<div class="alert alert-danger" role="alert">{{ error_message }}</div>{% endif %}
+  {% for message in messages %}<div class="alert alert-success" role="status">{{ message }}</div>{% endfor %}
   {% if clusters %}
   <div class="table-responsive">
     <table class="table table-hover table-striped table-sm align-middle">
@@ -19,7 +21,6 @@
           <th scope="col">Primary (MACC)</th>
           <th scope="col">Secondary (ASB)</th>
           <th scope="col">Disks</th>
-          <th scope="col">Ticket status</th>
           <th scope="col">Actions</th>
         </tr>
       </thead>
@@ -33,8 +34,16 @@
           <td>{{ cluster.primary_server.name }}</td>
           <td>{{ cluster.secondary_server.name }}</td>
           <td>{{ cluster.disks.count }}</td>
-          <td>{{ cluster.ticket_status }}</td>
-          <td><a class="btn btn-outline-primary btn-sm" href="/orders/mssql-cluster/{{ cluster.id }}/">View / Edit</a></td>
+          <td>
+            <div class="d-flex flex-wrap gap-2">
+              <a class="btn btn-outline-primary btn-sm" href="/orders/mssql-cluster/{{ cluster.id }}/">View / Edit</a>
+              <form method="post" data-confirm="Are you sure you want to delete cluster {{ cluster.name }} and its shared disk records from SRS? This will create decommissioning tickets for the cluster and both servers ({{ cluster.primary_server.name }} and {{ cluster.secondary_server.name }}) and mark both servers out of service." onsubmit="return window.confirm(this.dataset.confirm);">
+                {% csrf_token %}
+                <input type="hidden" name="cluster_id" value="{{ cluster.id }}">
+                <button class="btn btn-outline-danger btn-sm" name="operation" value="delete_cluster"><i class="fas fa-trash-alt" aria-hidden="true"></i> {% if cluster.ticket_status == 'deleting' or cluster.ticket_status == 'delete_failed' %}Retry delete{% else %}Delete{% endif %}</button>
+              </form>
+            </div>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
