@@ -817,6 +817,10 @@ class Services(UserPassesTestMixin, View):
             menu = MenuItem.objects.get_menu_tree('TELEPHONY')
         else:
             menu = MenuItem.objects.get_menu_tree('OTHER_SERVICES')
+            menu.nodes = [
+                item for item in menu.nodes
+                if item.label.strip().casefold() != 'cluster'
+            ]
 
         if group_id == 2 and LDAPGroupMember.objects.filter(
             username=request.user.username,
