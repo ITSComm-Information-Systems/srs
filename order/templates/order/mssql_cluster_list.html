@@ -21,7 +21,6 @@
           <th scope="col">Primary (MACC)</th>
           <th scope="col">Secondary (ASB)</th>
           <th scope="col">Disks</th>
-          <th scope="col">Ticket status</th>
           <th scope="col">Actions</th>
         </tr>
       </thead>
@@ -35,13 +34,6 @@
           <td>{{ cluster.primary_server.name }}</td>
           <td>{{ cluster.secondary_server.name }}</td>
           <td>{{ cluster.disks.count }}</td>
-          <td>
-            {{ cluster.ticket_status }}
-            {% if cluster.ticket_status == 'deleting' or cluster.ticket_status == 'delete_failed' %}
-            <div class="small">{{ cluster.ticket_error }}</div>
-            <div class="small">Deletion tickets: Cluster {{ cluster.delete_cluster_ticket_id|default:'pending' }}; Primary {{ cluster.delete_primary_ticket_id|default:'pending' }}; Secondary {{ cluster.delete_secondary_ticket_id|default:'pending' }}</div>
-            {% endif %}
-          </td>
           <td>
             <div class="d-flex flex-wrap gap-2">
               <a class="btn btn-outline-primary btn-sm" href="/orders/mssql-cluster/{{ cluster.id }}/">View / Edit</a>
