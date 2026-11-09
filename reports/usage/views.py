@@ -12,7 +12,7 @@ def get_usage_report(request):
 
     if phone_number:
         phone_number = phone_number.replace('-','').replace('(','').replace(')','').replace(' ', '')
-        locations = UmOscServiceProfileV.objects.filter(service_number=phone_number).order_by('-start_date').values()
+        locations = UmOscServiceProfileV.objects.filter(service_number=phone_number).order_by('-start_date','subscriber_status').values()
 
         if not locations:
             context['message'] = f'Phone Number not found: {phone_number}'
