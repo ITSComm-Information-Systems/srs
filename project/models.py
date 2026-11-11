@@ -2,8 +2,8 @@ from sqlite3 import Timestamp
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-import re
-from django.core.mail import EmailMultiAlternatives
+import re, traceback
+from django.core.mail import EmailMultiAlternatives, mail_admins
 from django.conf import settings
 from django.forms import CharField, JSONField
 from project.integrations import ShortCodesAPI
@@ -16,25 +16,30 @@ from django.contrib.auth.models import Permission
 
 def validate_shortcode(value):
 
-     if not re.fullmatch(r"\d{6}", value):
-          raise ValidationError('Please enter a six digit shortcode.')
-     else:
-          try:
-               api = ShortCodesAPI()
-               request = api.get_shortcode(value)
-               if request.ok:
-                    json = request.json()
-                    shortcode = json['ShortCodes']['ShortCode'][0]
-                    descr = shortcode['shortCodeDescription']
-                    status = shortcode['ShortCodeStatusDescription']
-               else:
-                    print('error getting shortcode')
-                    status = 'Open'
-          except:
-               raise ValidationError(f'ShortCode {value} Not Found.')
+    if not re.fullmatch(r"\d{6}", value):
+        raise ValidationError('Please enter a six digit shortcode.')
 
-     if status != 'Open':
-          raise ValidationError(f'ShortCode {value} is {status}.')
+    try:
+        api = ShortCodesAPI()
+        request = api.get_shortcode(value)
+        data = request.json()
+
+    except Exception as e:
+        mail_admins(
+            'Error calling shortcode API',
+            f'Error: {e}\n\n{traceback.format_exc()}',
+            fail_silently=True
+        )
+        raise ValidationError('Network Error getting Shortcode.')
+
+    if len(data['ShortCodes']['ShortCode']) > 0:
+        shortcode = data['ShortCodes']['ShortCode'][0]
+        status = shortcode.get('ShortCodeStatusDescription', 'Not Found')
+    else:
+        status = 'Not Found'
+
+    if status != 'Open':
+        raise ValidationError(f'ShortCode {value} is {status}.')
 
 
 class MenuItemManager(models.Manager):
