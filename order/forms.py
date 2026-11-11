@@ -10,7 +10,7 @@ from project.pinnmodels import UmOSCBuildingV, UmMpathDwCurrDepartment
 from oscauth.models import LDAPGroupMember
 from project.integrations import MCommunity, create_ticket_database_modify, Zoom
 import math
-from project.models import Choice
+from project.models import Choice, validate_shortcode
 
 from project.forms.fields import *
 
@@ -1424,11 +1424,11 @@ class BillingStorageForm(TabForm):
             else:
                 for shortcode in self.shortcode_list:
                     sc = shortcode['shortcode']
-    
+
                     try:
-                        UmOscAllActiveAcctNbrsV.objects.get(short_code=sc)
-                    except:
-                        self.shortcode_error = f'Shortcode: {sc} not found.'
+                        validate_shortcode(sc)
+                    except ValidationError as exc:
+                        self.shortcode_error = "\n".join(exc.messages)
                         self.add_error('totalCost', 'block')       
 
     def get_summary(self, *args, **kwargs):
