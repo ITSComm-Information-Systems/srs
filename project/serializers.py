@@ -54,7 +54,24 @@ class DefaultSerializer(serializers.ModelSerializer):
 class ChoiceRelatedField(serializers.RelatedField):
 
     def to_representation(self, value):
-        return ChoiceSerializer(value).data
+        return ChoiceSerializer(
+            value,
+            context=self.context,
+        ).data
+
+    def get_choices(self, cutoff=None):
+        queryset = self.get_queryset()
+
+        if queryset is None:
+            return {}
+
+        if cutoff is not None:
+            queryset = queryset[:cutoff]
+
+        return {
+            choice.code: self.display_value(choice)
+            for choice in queryset
+        }
 
     def to_internal_value(self, data):
         try:
@@ -92,7 +109,9 @@ def serializer_factory(model):
                     )
 
                 class_attrs[fld.name] = ChoiceRelatedField(
-                    queryset=queryset
+                    queryset=queryset,
+                    allow_null=fld.null,
+                    required=not (fld.blank or fld.null or fld.has_default()),
                 )
             else:
                 class_attrs[fld.name] = serializers.SlugRelatedField(
@@ -104,7 +123,7 @@ def serializer_factory(model):
 
         elif type(fld) == models.fields.related.ManyToManyField:
             if fld.related_model == Choice:
-                class_attrs[fld.name] = ChoiceSerializer(many=True)
+                class_attrs[fld.name] = ChoiceSerializer(many=True, read_only=True)
             else:
                 class_attrs[fld.name] = serializers.StringRelatedField(many=True)
             class_attrs['prefetch_related'].append(fld.name)
@@ -119,6 +138,21 @@ def serializer_factory(model):
         class_attrs['storage'] = ImageDiskSerializer(many=True, read_only=True)
 
     return type(f'{name}Serializer', (DefaultSerializer,), class_attrs)
+
+
+class ServerSerializer(serializer_factory(Server)):
+    disks = ServerDiskSerializer(many=True, required=False)
+
+    def create(self, validated_data):
+        disks_data = validated_data.pop('disks', [])
+
+        server = super().create(validated_data)
+
+        for disk_data in disks_data:
+            server.disks.create(**disk_data)
+
+        return server
+
 
 class DatabaseSerializer(serializers.ModelSerializer):
 
