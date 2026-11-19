@@ -54,6 +54,7 @@
         </div>
     </div>
     </h6>
+     {{ form.gpu_memory_gb }}
 </div>
 
 
@@ -122,11 +123,12 @@ const gpu_cost = document.getElementById("{{ form.gpu_cost.id_for_label }}");
 const total_cost = document.getElementById("{{ form.total.id_for_label }}");
 const multi_disk = document.getElementById("{{ form.multi_disk.id_for_label }}");
 const storageTotal = document.getElementById("{{ form.storage_cost.id_for_label }}");
+const gpu_memory_gb = document.getElementById("{{ form.gpu_memory_gb.id_for_label }}");
 
 window.addEventListener("load", (event) => {
     //storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
     var page_loaded = false
-    gpu_cost.value = gpu_choice.value == 'True' ? 7.54 : 0.00.toFixed(2)
+    gpu_cost.value = gpu_choice.value == 'True' ? 7.54 * (gpu_memory_gb.value/2): 0.00.toFixed(2)
     cpu_cost.value = (cpu_choice.value * 1.42).toFixed(2)
     memory_cost.value = (memory_choice.value * 0.58).toFixed(2)
     handleStorageData()
@@ -144,7 +146,7 @@ memory_choice.addEventListener("change", () => {
 })
 
 gpu_choice.addEventListener("change", () => {
-    gpu_cost.value = gpu_choice.value == 'True' ? 7.54 : 0.00.toFixed(2)
+    gpu_cost.value = gpu_choice.value == 'True' ? 7.54 * (gpu_memory_gb.value/2): 0.00.toFixed(2)
     calculateBaseImageCost()
 })
 

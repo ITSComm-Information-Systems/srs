@@ -162,11 +162,25 @@ class MiDesktop(models.Model):
         abstract = True 
 
 class Image(MiDesktop):
+    GPU_MEMORY_CHOICES = [
+        (2, '2 GB — 1× GPU rate'),
+        (4, '4 GB — 2× GPU rate'),
+        (8, '8 GB — 4× GPU rate'),
+        (16, '16 GB — 8× GPU rate'),
+    ]
+
     instance_label = 'Image Name'
     name = models.CharField(unique=True,max_length=30, verbose_name='Image Name', default='TBD')
     cpu = models.IntegerField()
     memory = models.IntegerField()
     gpu = models.BooleanField(blank=True, null=True)
+    gpu_memory_gb = models.PositiveIntegerField(
+        choices=GPU_MEMORY_CHOICES,
+        null=True,
+        blank=True,
+        verbose_name='GPU memory',
+    )
+
     shared_network = models.BooleanField(default=True)
     network = models.ForeignKey("Network", on_delete=models.CASCADE, null=True, blank=True)
 
@@ -196,7 +210,9 @@ class Image(MiDesktop):
             if rate.label == 'Storage':
                 total_cost = total_cost + (rate.rate * self.total_storage_size)
             if rate.label[:3] == 'GPU' and self.gpu == True:
-                total_cost = total_cost + rate.rate
+                self.gpu_rate = rate.rate
+                gpu_cost = rate.rate * ((self.gpu_memory_gb or 0) // 2)
+                total_cost = total_cost + gpu_cost
 
         return total_cost
     

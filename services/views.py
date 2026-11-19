@@ -463,6 +463,7 @@ class ServiceChangeView(UserPassesTestMixin, View):
                 'cpu': instance.cpu,
                 'memory': instance.memory,
                 'gpu': instance.gpu,
+                'gpu_memory_gb': instance.gpu_memory_gb,
                 'multi_disk': multi_disk_string
             })
             title = 'Modify ' + instance._meta.verbose_name.title()
