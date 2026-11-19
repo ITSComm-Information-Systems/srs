@@ -125,6 +125,10 @@ const multi_disk = document.getElementById("{{ form.multi_disk.id_for_label }}")
 const storageTotal = document.getElementById("{{ form.storage_cost.id_for_label }}");
 const gpu_memory_gb = document.getElementById("{{ form.gpu_memory_gb.id_for_label }}");
 
+if (gpu_memory_gb.value === "") {
+    gpu_memory_gb.value = 2;
+}
+
 window.addEventListener("load", (event) => {
     //storage_cost.value = (storage_choice.value * 0.10).toFixed(2)
     var page_loaded = false
