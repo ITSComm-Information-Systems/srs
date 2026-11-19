@@ -241,6 +241,18 @@ class Image(MiDesktop):
     class Meta:
         verbose_name = 'MiDesktop Image'
 
+    def save(self, *args, **kwargs):
+        if self.gpu =='True' and self.gpu_memory_gb is None:
+            self.gpu_memory_gb = 2
+
+            # Ensure the default is saved during partial updates.
+            if kwargs.get('update_fields') is not None:
+                kwargs['update_fields'] = set(
+                    kwargs['update_fields']
+                ) | {'gpu_memory_gb'}
+
+        super().save(*args, **kwargs)
+
 class Network(MiDesktop):
     instance_label = 'Network Name'
     name = models.CharField(unique=True,blank=True, max_length=80)
