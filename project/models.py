@@ -2,8 +2,8 @@ from sqlite3 import Timestamp
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-import re
-from django.core.mail import EmailMultiAlternatives
+import re, traceback
+from django.core.mail import EmailMultiAlternatives, mail_admins
 from django.conf import settings
 from django.forms import CharField, JSONField
 from project.integrations import ShortCodesAPI
@@ -16,25 +16,30 @@ from django.contrib.auth.models import Permission
 
 def validate_shortcode(value):
 
-     if not re.fullmatch(r"\d{6}", value):
-          raise ValidationError('Please enter a six digit shortcode.')
-     else:
-          try:
-               api = ShortCodesAPI()
-               request = api.get_shortcode(value)
-               if request.ok:
-                    json = request.json()
-                    shortcode = json['ShortCodes']['ShortCode'][0]
-                    descr = shortcode['shortCodeDescription']
-                    status = shortcode['ShortCodeStatusDescription']
-               else:
-                    print('error getting shortcode')
-                    status = 'Open'
-          except:
-               raise ValidationError(f'ShortCode {value} Not Found.')
+    if not re.fullmatch(r"\d{6}", value):
+        raise ValidationError('Please enter a six digit shortcode.')
 
-     if status != 'Open':
-          raise ValidationError(f'ShortCode {value} is {status}.')
+    try:
+        api = ShortCodesAPI()
+        request = api.get_shortcode(value)
+        data = request.json()
+
+    except Exception as e:
+        mail_admins(
+            'Error calling shortcode API',
+            f'Error: {e}\n\n{traceback.format_exc()}',
+            fail_silently=True
+        )
+        raise ValidationError('Network Error getting Shortcode.')
+
+    if len(data['ShortCodes']['ShortCode']) > 0:
+        shortcode = data['ShortCodes']['ShortCode'][0]
+        status = shortcode.get('ShortCodeStatusDescription', 'Not Found')
+    else:
+        status = 'Not Found'
+
+    if status != 'Open':
+        raise ValidationError(f'ShortCode {value} is {status}.')
 
 
 class MenuItemManager(models.Manager):
@@ -142,25 +147,11 @@ class ChoiceManager(models.Manager):
           return group_list
 
 
-class ChoiceSet(models.Model):
-    """
-    The domain/category, e.g. SERVER_OS, BACKUP_TIME, STORAGE_TIER.
-    """
-    code = models.CharField(max_length=80, unique=True)   # SERVER_OS
-    label = models.CharField(max_length=120)              # "Server Operating System"
-    description = models.TextField(blank=True, default="")
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.code
-
-
 class Choice(models.Model):
      active = models.BooleanField(default=True)
      code = models.CharField(max_length=80)
      sequence = models.PositiveSmallIntegerField()
      parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
-     set = models.ForeignKey(ChoiceSet, on_delete=models.CASCADE)
      label = models.CharField(max_length=100)
      objects = ChoiceManager()
      
@@ -210,21 +201,80 @@ class Email(models.Model):
      def render_body(self):
           return Template(self.body).render(Context(self.context))
 
-     def send(self):
-          text_message = self.subject
-          subject = self.subject
+     @staticmethod
+     def parse_addresses(value):
+          if not value:
+               return []
 
-          body = Template(self.body).render(Context(self.context))
+          # Also accept an already-created list or tuple.
+          if isinstance(value, (list, tuple)):
+               return [
+                    address.strip()
+                    for address in value
+                    if address and address.strip()
+               ]
 
-          if settings.ENVIRONMENT != 'Production':
-               print('Non-prod, do not send to:', self.to)
-               self.to = 'djamison@umich.edu'
-               self.cc = ''
-               self.bcc = self.team_shared_email
-               subject = f'{settings.ENVIRONMENT} - {self.subject}'
+          return [
+               address.strip()
+               for address in value.split(",")
+               if address.strip()
+          ]
 
-          # Send Distribution List to Leads
-          msg = EmailMultiAlternatives(subject, text_message, self.sender, [self.to], cc=[self.cc], bcc=[self.bcc], reply_to=[self.reply_to],
-                                       headers = {'srs_code': self.code})
-          msg.attach_alternative(body, "text/html")
-          msg.send()
+     def send(
+          self,
+          *,
+          to=None,
+          cc=None,
+          bcc=None,
+          subject=None,
+          reply_to=None,
+          context=None,
+          ):
+          recipients = self.parse_addresses(
+               self.to if to is None else to
+          )
+          cc_recipients = self.parse_addresses(
+               self.cc if cc is None else cc
+          )
+          bcc_recipients = self.parse_addresses(
+               self.bcc if bcc is None else bcc
+          )
+          reply_to_recipients = self.parse_addresses(
+               self.reply_to if reply_to is None else reply_to
+          )
+
+          render_context = self.context if context is None else context
+
+          rendered_subject = Template(
+               self.subject if subject is None else subject
+          ).render(Context(render_context))
+
+          rendered_body = Template(self.body).render(
+               Context(render_context)
+          )
+
+          if settings.ENVIRONMENT != "Production":
+               print(
+                    "Non-prod, do not send to:",
+                    ", ".join(recipients),
+               )
+
+               recipients = ["djamison@umich.edu"]
+               cc_recipients = []
+               bcc_recipients = [self.team_shared_email]
+               rendered_subject = (
+                    f"{settings.ENVIRONMENT} - {rendered_subject}"
+               )
+
+          msg = EmailMultiAlternatives(
+               subject=rendered_subject,
+               body=rendered_body,
+               from_email=self.sender,
+               to=recipients,
+               cc=cc_recipients,
+               bcc=bcc_recipients,
+               reply_to=reply_to_recipients,
+               headers={"srs_code": self.code},
+          )
+          msg.attach_alternative(rendered_body, "text/html")
+          return msg.send()
