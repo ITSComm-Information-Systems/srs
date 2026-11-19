@@ -10,3 +10,5 @@ class PageAdmin(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(Page,PageAdmin)
+
+#test push again
