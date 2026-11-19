@@ -416,6 +416,7 @@ class CalculatorForm(forms.Form):
     storage_cost = forms.DecimalField(required=False,initial=STORAGE_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
     gpu = forms.ChoiceField(required=False,choices=((True,'Yes'),(False,'No')), widget=forms.Select(), initial=False, label="GPU(optional)")
     gpu_cost = forms.DecimalField(required=False,initial=GPU_INITIAL, label="GPU Cost", widget=forms.TextInput(attrs={'readonly':'true'}))
+    gpu_memory_gb = forms.DecimalField(required=False,initial=2, label="GPU RAM", widget=forms.HiddenInput(attrs={'readonly':'true'}))
     total = forms.DecimalField(required=False,initial=TOTAL_INITIAL, widget=forms.TextInput(attrs={'readonly':'true'}))
 
     storage_formset = StorageFormSet(prefix='disk')
