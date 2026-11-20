@@ -69,6 +69,29 @@ class UmBillInputApiV(models.Model):
      def __str__(self):
           return self.um_bill_input_id
 
+class UmBillValidSvcs(models.Model):
+     pk_id = models.IntegerField(db_column="PK_ID", primary_key=True)
+     tenant_id = models.IntegerField(db_column="TENANT_ID", null=True, blank=True)
+     data_source = models.CharField(db_column="DATA_SOURCE", max_length=50, blank=True)
+     service_type_code = models.CharField(db_column="SERVICE_TYPE_CODE", max_length=20, blank=True)
+     subscriber_prefix = models.CharField(db_column="SUBSCRIBER_PREFIX", max_length=2, blank=True)
+     charge_identifier = models.CharField(db_column="CHARGE_IDENTIFIER", max_length=200, blank=True)
+     charge_description = models.CharField(db_column="CHARGE_DESCRIPTION", max_length=200, blank=True)
+     pinnacle_charge_code = models.CharField(db_column="PINNACLE_CHARGE_CODE", max_length=12, blank=True)
+     active = models.IntegerField(db_column="ACTIVE", null=True, blank=True)
+     inactivation_date = models.DateTimeField(db_column="INACTIVATION_DATE", null=True, blank=True)
+     inactivated_by = models.CharField(db_column="INACTIVATED_BY", max_length=10, blank=True)
+     create_date = models.DateTimeField(db_column="CREATE_DATE", null=True, blank=True)
+     created_by = models.CharField(db_column="CREATED_BY", max_length=10, blank=True)
+     last_update_date = models.DateTimeField(db_column="LAST_UPDATE_DATE", null=True, blank=True)
+     last_updated_by = models.CharField(db_column="LAST_UPDATED_BY", max_length=10, blank=True)
+     class Meta:
+          managed = False
+          db_table = 'PS_RATING\".\"um_bill_valid_svcs'
+
+     def __str__(self):
+          return self.charge_identifier
+
 class UmOSCBuildingV(models.Model):
    building_code = models.CharField(max_length=15, primary_key=True)
    building_name = models.CharField(max_length=100,null=True) 

@@ -7,7 +7,7 @@ from django.db import models, transaction
 from django.forms.fields import DecimalField
 from ldap3.protocol.rfc4511 import Control
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
-from project.pinnmodels import UmOscPreorderApiV
+from project.pinnmodels import UmOscPreorderApiV, UmBillValidSvcs
 from project.integrations import MCommunity, TDx, DB_TYPE
 from project.models import ShortCodeField, Choice
 from project.utils import get_query_result
@@ -351,6 +351,7 @@ class StorageRate(Configuration):
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     rate = models.DecimalField(max_digits=8, decimal_places=6)
     unit_of_measure = models.CharField(max_length=2, default='GB', choices=UNIT_OF_MEASURE_CHOICES)
+    pinnacle_charge = models.ForeignKey(UmBillValidSvcs, on_delete=models.DO_NOTHING, db_constraint=False)
 
     def __str__(self):
         return self.label
