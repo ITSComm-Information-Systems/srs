@@ -1,12 +1,13 @@
 from typing import Sequence
 from django.conf import settings
+from copy import copy
 from django.core.mail import send_mail
 from django.contrib.admin.models import LogEntry, ADDITION
-from django.db import models
+from django.db import models, transaction
 from django.forms.fields import DecimalField
 from ldap3.protocol.rfc4511 import Control
 from oscauth.models import Role, LDAPGroup, LDAPGroupMember
-from project.pinnmodels import UmOscPreorderApiV
+from project.pinnmodels import UmOscPreorderApiV, UmBillValidSvcs
 from project.integrations import MCommunity, TDx, DB_TYPE
 from project.models import ShortCodeField, Choice
 from project.utils import get_query_result
@@ -350,6 +351,7 @@ class StorageRate(Configuration):
     type = models.CharField(max_length=4, default='NFS', choices=TYPE_CHOICES)
     rate = models.DecimalField(max_digits=8, decimal_places=6)
     unit_of_measure = models.CharField(max_length=2, default='GB', choices=UNIT_OF_MEASURE_CHOICES)
+    pinnacle_charge = models.ForeignKey(UmBillValidSvcs, on_delete=models.DO_NOTHING, db_constraint=False)
 
     def __str__(self):
         return self.label
@@ -729,6 +731,35 @@ class Server(models.Model):
             elif rate.name == 'SV-DI-BACKUP':
                 self.disk_backup = rate.rate
 
+    def clone(self, name):
+        with transaction.atomic():
+            original = self  # just for readability
+
+            new = copy(original)
+            new.pk = None
+            new.name = name
+            new.created_date = timezone.now() 
+            new.save()
+
+            # Clone child disks (assuming Disk has FK: server = ForeignKey(Server))
+            for disk in original.disks.all():  # adjust related_name
+                disk_new = copy(disk)
+                disk_new.pk = None
+                disk_new.name = disk.name
+                disk_new.controller = disk.controller
+                disk_new.device = disk.device
+                disk_new.size = disk.size
+                disk_new.server = new
+                disk_new.save()
+
+            # Clone ManyToMany
+            for field in self._meta.many_to_many:
+                getattr(new, field.name).set(
+                    getattr(original, field.name).all()
+                )
+
+            return new
+
 
     @staticmethod
     def get_storage_rates():
@@ -840,6 +871,9 @@ class ServerDisk(models.Model):
     controller = models.IntegerField(choices=CONTROLLER_LIST)
     device = models.IntegerField(choices=DEVICE_LIST)
     size = models.IntegerField()
+
+    class Meta:
+        ordering = ['name']  # or ['-size']
 
     def __str__(self):
         return self.name

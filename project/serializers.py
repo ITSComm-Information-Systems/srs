@@ -54,8 +54,24 @@ class DefaultSerializer(serializers.ModelSerializer):
 class ChoiceRelatedField(serializers.RelatedField):
 
     def to_representation(self, value):
-        return value.code
+        return ChoiceSerializer(
+            value,
+            context=self.context,
+        ).data
 
+    def get_choices(self, cutoff=None):
+        queryset = self.get_queryset()
+
+        if queryset is None:
+            return {}
+
+        if cutoff is not None:
+            queryset = queryset[:cutoff]
+
+        return {
+            choice.code: self.display_value(choice)
+            for choice in queryset
+        }
 
     def to_internal_value(self, data):
         try:
